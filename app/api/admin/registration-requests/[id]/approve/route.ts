@@ -10,7 +10,7 @@ import { db } from "@/lib/db";
 import {
   generateRegistrationToken,
   hashRegistrationToken,
-  REGISTRATION_TOKEN_TTL_FROM_REQUEST_MS,
+  getRegistrationTokenExpiresAt,
 } from "@/lib/auth/registration-token";
 import { getBaseUrlFromRequest } from "@/lib/get-base-url";
 
@@ -47,7 +47,7 @@ export async function POST(
 
   const token = generateRegistrationToken();
   const tokenHash = hashRegistrationToken(token);
-  const expiresAt = new Date(Date.now() + REGISTRATION_TOKEN_TTL_FROM_REQUEST_MS);
+  const expiresAt = getRegistrationTokenExpiresAt();
 
   const created = await db.registrationToken.create({
     data: {
@@ -70,7 +70,6 @@ export async function POST(
     token,
     link,
     expiresAt: expiresAt.toISOString(),
-    validHours: 24,
-    message: "Ссылка действительна 24 часа. Отправьте заявителю на указанную в заявке почту.",
+    message: "Одноразовая ссылка — действует только на одну регистрацию. Отправьте заявителю на указанную в заявке почту.",
   });
 }

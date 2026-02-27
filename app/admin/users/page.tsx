@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Users, Search, Copy, Filter, ArrowUpDown, Lock } from "lucide-react";
+import { Search, Copy, Filter, ArrowUpDown, Lock } from "lucide-react";
 import Link from "next/link";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { getBaseUrl } from "@/lib/get-base-url";
@@ -227,12 +227,6 @@ export default function AdminUsersPage() {
 
   return (
     <div className="min-w-0 max-w-full">
-      <div className="mb-6 flex min-w-0 flex-col gap-4 sm:mb-8 sm:flex-row sm:items-center sm:justify-center">
-        <div className="flex min-w-0 items-center justify-center gap-3">
-          <Users className="h-7 w-7 shrink-0 text-[var(--color-accent-gold)] sm:h-8 sm:w-8" />
-          <h1 className="min-w-0 text-center text-lg font-bold text-[var(--color-text)] sm:text-xl">Пользователи</h1>
-        </div>
-      </div>
       {error && (
         <div className="mb-6 rounded-xl border-0 bg-[var(--color-light-gray)] px-4 py-3 text-sm text-[var(--color-text)]">
           {error}
@@ -290,9 +284,9 @@ export default function AdminUsersPage() {
               {registrationLink}
             </div>
           )}
-          {tokenExpiresAt && (
+          {registrationLink && (
             <div className="mt-2 text-xs text-[var(--color-muted)]">
-              Ссылка действительна 1 час. Истекает: {new Date(tokenExpiresAt).toLocaleString("ru-RU")}
+              Одноразовая ссылка — действует только на одну регистрацию, без ограничения по времени.
             </div>
           )}
         </div>

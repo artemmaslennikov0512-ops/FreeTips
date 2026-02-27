@@ -17,7 +17,14 @@ const prisma = new PrismaClient();
 
 async function main() {
   const superAdminLogin = process.env.SUPERADMIN_LOGIN || "superadmin";
-  const superAdminPassword = process.env.SUPERADMIN_PASSWORD || "ChangeMe123!";
+  let superAdminPassword = process.env.SUPERADMIN_PASSWORD;
+  if (!superAdminPassword) {
+    if (process.env.NODE_ENV === "production") {
+      console.error("В production задайте SUPERADMIN_PASSWORD в окружении.");
+      process.exit(1);
+    }
+    superAdminPassword = "ChangeMe123!";
+  }
 
   console.log(`Создание суперадмина: ${superAdminLogin}...`);
 

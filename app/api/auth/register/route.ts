@@ -18,6 +18,7 @@ import { getDefaultRecipientUpdateData } from "@/lib/default-recipient-settings"
 import { logError, logSecurity } from "@/lib/logger";
 import { getRequestId } from "@/lib/security/request";
 import { parseJsonWithLimit, MAX_BODY_SIZE_AUTH, jsonError, internalError } from "@/lib/api/helpers";
+import { verifyCsrfFromRequest } from "@/lib/security/csrf";
 
 export async function POST(request: NextRequest) {
   const requestId = getRequestId(request);
@@ -29,6 +30,9 @@ export async function POST(request: NextRequest) {
         { error: "Слишком много запросов. Попробуйте позже." },
         { status: 429 },
       );
+    }
+    if (!verifyCsrfFromRequest(request)) {
+      return NextResponse.json({ error: "Некорректный CSRF токен" }, { status: 403 });
     }
 
     const parsed = await parseJsonWithLimit(request, MAX_BODY_SIZE_AUTH);
@@ -59,11 +63,24 @@ export async function POST(request: NextRequest) {
     });
     if (!regToken) {
       logSecurity("auth.register.invalid_token", { requestId, ip, login: validated.login });
-      return NextResponse.json({ error: "Неверный токен регистрации" }, { status: 403 });
+      return NextResponse.json(
+        { error: "Неверный или уже использованный токен регистрации" },
+        { status: 403 },
+      );
     }
 
     const passwordHash = await hashPassword(validated.password);
     const user = await db.$transaction(async (tx) => {
+      // Атомарно занимаем токен (одна регистрация на один токен), защита от гонки
+      const claimed = await tx.registrationToken.updateMany({
+        where: { id: regToken.id, usedAt: null },
+        data: { usedAt: new Date() },
+      });
+      if (claimed.count === 0) {
+        logSecurity("auth.register.token_already_used", { requestId, ip, login: validated.login });
+        throw new Error("TOKEN_ALREADY_USED");
+      }
+
       const created = await tx.user.create({
         data: { login: validated.login, passwordHash, email: validated.email, role: "RECIPIENT" },
       });
@@ -77,7 +94,7 @@ export async function POST(request: NextRequest) {
       });
       await tx.registrationToken.update({
         where: { id: regToken.id },
-        data: { usedAt: new Date(), usedById: created.id },
+        data: { usedById: created.id },
       });
       return created;
     });
@@ -123,6 +140,12 @@ export async function POST(request: NextRequest) {
       }));
       const message = details[0]?.message ?? "Неверные данные";
       return jsonError(400, message, details);
+    }
+    if (error instanceof Error && error.message === "TOKEN_ALREADY_USED") {
+      return NextResponse.json(
+        { error: "Неверный или уже использованный токен регистрации" },
+        { status: 403 },
+      );
     }
 
     logError("auth.register.error", error, { requestId, ip });

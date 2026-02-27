@@ -22,6 +22,7 @@ export default function CabinetDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<Stats | null>(null);
   const [apiKey, setApiKey] = useState<string | null>(null);
+  const [hasApiKey, setHasApiKey] = useState(false);
   const [apiKeyLoading, setApiKeyLoading] = useState(false);
   const [apiKeyCopied, setApiKeyCopied] = useState(false);
   const [fullName, setFullName] = useState<string | null>(null);
@@ -54,7 +55,7 @@ export default function CabinetDashboardPage() {
       }
       const profile = (await profileRes.json()) as {
         stats?: Stats;
-        apiKey?: string | null;
+        hasApiKey?: boolean;
         fullName?: string | null;
         uniqueId?: string | null;
         payoutLimits?: { dailyLimitCount: number; dailyLimitKop: number; monthlyLimitCount?: number; monthlyLimitKop?: number };
@@ -62,7 +63,8 @@ export default function CabinetDashboardPage() {
         payoutUsageMonth?: { count: number; sumKop: number };
       };
       setStats(profile.stats ?? null);
-      setApiKey(profile.apiKey ?? null);
+      setHasApiKey(profile.hasApiKey ?? false);
+      setApiKey(null);
       setFullName(profile.fullName ?? null);
       setUniqueId(profile.uniqueId ?? null);
       setPayoutLimits(profile.payoutLimits ?? null);
@@ -145,6 +147,7 @@ export default function CabinetDashboardPage() {
       if (res.ok) {
         const data = (await res.json()) as { apiKey: string };
         setApiKey(data.apiKey);
+        setHasApiKey(true);
       }
     } finally {
       setApiKeyLoading(false);
@@ -313,7 +316,7 @@ export default function CabinetDashboardPage() {
           <div className="cabinet-block-inner rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/6 p-5">
             <div className="mb-4 text-sm font-semibold text-[var(--color-text)]">Ваш API ключ</div>
             <div className="cabinet-input-window cabinet-block-inner mb-4 break-all rounded-md border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-3 font-mono text-sm text-[var(--color-text-secondary)]">
-              {apiKey ?? "Ключ не создан"}
+              {apiKey ?? (hasApiKey ? "••••••••••••••••" : "Ключ не создан")}
             </div>
             <div className="flex flex-wrap gap-3">
               {apiKey ? (
@@ -344,7 +347,7 @@ export default function CabinetDashboardPage() {
                   className="inline-flex items-center gap-2 rounded-[10px] bg-[var(--color-brand-gold)] px-5 py-2.5 font-semibold text-[#0a192f] hover:opacity-90 disabled:opacity-50"
                 >
                   <Key className="h-4 w-4" />
-                  {apiKeyLoading ? "Создаём…" : "Создать ключ"}
+                  {apiKeyLoading ? "Создаём…" : hasApiKey ? "Создать новый ключ" : "Создать ключ"}
                 </button>
               )}
             </div>

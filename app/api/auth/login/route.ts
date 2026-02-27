@@ -13,6 +13,7 @@ import { checkRateLimitByIP, getClientIP, AUTH_RATE_LIMIT } from "@/lib/middlewa
 import { logError, logSecurity } from "@/lib/logger";
 import { getRequestId } from "@/lib/security/request";
 import { parseJsonWithLimit, MAX_BODY_SIZE_AUTH, jsonError, internalError } from "@/lib/api/helpers";
+import { verifyCsrfFromRequest } from "@/lib/security/csrf";
 import { z } from "zod";
 
 export async function POST(request: NextRequest) {
@@ -25,6 +26,9 @@ export async function POST(request: NextRequest) {
         { error: "Слишком много запросов. Попробуйте позже." },
         { status: 429 },
       );
+    }
+    if (!verifyCsrfFromRequest(request)) {
+      return NextResponse.json({ error: "Некорректный CSRF токен" }, { status: 403 });
     }
 
     const parsed = await parseJsonWithLimit(request, MAX_BODY_SIZE_AUTH);

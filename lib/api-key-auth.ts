@@ -1,22 +1,18 @@
 /**
  * Авторизация по X-API-Key для приложения FreeTips.
  * Заголовок: X-API-Key: <ключ>
- * Сравнение ключа с БД — в константное время (timing-safe).
+ * Новые ключи: в БД только apiKeyPrefix + apiKeyHash (SHA-256). Старые — plaintext в apiKey.
+ * Сравнение в константное время (timing-safe).
  */
 
 import { createHash, timingSafeEqual } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { getApiKeyPrefix, hashApiKey } from "@/lib/auth/api-key";
 
-function sha256(text: string): Buffer {
-  return createHash("sha256").update(text, "utf8").digest();
-}
-
-function constantTimeEqual(a: string, b: string): boolean {
-  const ha = sha256(a);
-  const hb = sha256(b);
-  if (ha.length !== hb.length) return false;
-  return timingSafeEqual(ha, hb);
+function constantTimeEqualBuffers(a: Buffer, b: Buffer): boolean {
+  if (a.length !== b.length) return false;
+  return timingSafeEqual(a, b);
 }
 
 export async function requireApiKey(
@@ -33,29 +29,50 @@ export async function requireApiKey(
     };
   }
 
-  const user = await db.user.findFirst({
-    where: { apiKey },
-    select: { id: true, isBlocked: true, apiKey: true },
+  const prefix = getApiKeyPrefix(apiKey);
+  const keyHashHex = hashApiKey(apiKey);
+  const keyHashBuffer = Buffer.from(keyHashHex, "utf8");
+
+  let candidates = await db.user.findMany({
+    where: { apiKeyPrefix: prefix },
+    select: { id: true, isBlocked: true, apiKeyHash: true, apiKey: true },
   });
 
-  if (!user || !constantTimeEqual(apiKey, user.apiKey ?? "")) {
-    if (!user) constantTimeEqual(apiKey, apiKey);
-    return {
-      response: NextResponse.json(
-        { error: "Неверный API-ключ" },
-        { status: 401 },
-      ),
-    };
+  if (candidates.length === 0) {
+    const legacy = await db.user.findFirst({
+      where: { apiKey },
+      select: { id: true, isBlocked: true, apiKeyHash: true, apiKey: true },
+    });
+    if (legacy) candidates = [legacy];
   }
 
-  if (user.isBlocked) {
-    return {
-      response: NextResponse.json(
-        { error: "Доступ ограничен" },
-        { status: 403 },
-      ),
-    };
+  for (const user of candidates) {
+    let match = false;
+    if (user.apiKeyHash) {
+      const storedBuffer = Buffer.from(user.apiKeyHash, "utf8");
+      match = constantTimeEqualBuffers(keyHashBuffer, storedBuffer);
+    } else if (user.apiKey) {
+      const storedHashHex = hashApiKey(user.apiKey);
+      const storedBuffer = Buffer.from(storedHashHex, "utf8");
+      match = constantTimeEqualBuffers(keyHashBuffer, storedBuffer);
+    }
+    if (match) {
+      if (user.isBlocked) {
+        return {
+          response: NextResponse.json(
+            { error: "Доступ ограничен" },
+            { status: 403 },
+          );
+        }
+      return { userId: user.id };
+    }
   }
 
-  return { userId: user.id };
+  hashApiKey(apiKey);
+  return {
+    response: NextResponse.json(
+      { error: "Неверный API-ключ" },
+      { status: 401 },
+    ),
+  };
 }

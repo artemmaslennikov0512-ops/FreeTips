@@ -434,7 +434,10 @@ html:not([data-theme="dark"]) .admin-panel .antifraud-input:focus {
 [data-theme="dark"] .admin-panel .antifraud-input {
   background: #1a1a1a !important;
   border: 1px solid rgba(197, 165, 114, 0.35);
-  color: rgba(197, 165, 114, 0.95);
+  color: #ffffff;
+}
+[data-theme="dark"] .admin-panel .antifraud-input::placeholder {
+  color: rgba(255, 255, 255, 0.55);
 }
 
 /* Таблицы админки — в тёмной теме лёгкие золотистые границы между строками */

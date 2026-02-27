@@ -2,11 +2,12 @@ import crypto from "crypto";
 
 const REGISTRATION_TOKEN_BYTES = 24;
 
-/** Ссылка из одобренной заявки клиента — действительна 24 часа */
-export const REGISTRATION_TOKEN_TTL_FROM_REQUEST_MS = 24 * 60 * 60 * 1000;
+/** Срок действия токена не ограничен по времени (одноразовое использование). В БД храним дату далеко в будущем. */
+const REGISTRATION_TOKEN_EXPIRY_MS = 10 * 365 * 24 * 60 * 60 * 1000; // 10 лет
 
-/** Токен, созданный суперадмином по кнопке «Получить токен» — действителен 1 час */
-export const REGISTRATION_TOKEN_TTL_MANUAL_MS = 60 * 60 * 1000;
+export function getRegistrationTokenExpiresAt(): Date {
+  return new Date(Date.now() + REGISTRATION_TOKEN_EXPIRY_MS);
+}
 
 export function generateRegistrationToken(): string {
   return crypto.randomBytes(REGISTRATION_TOKEN_BYTES).toString("base64url");

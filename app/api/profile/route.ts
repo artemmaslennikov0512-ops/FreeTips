@@ -36,6 +36,7 @@ export async function GET(request: NextRequest) {
           birthDate: true,
           establishment: true,
           apiKey: true,
+          apiKeyHash: true,
           paygineSdRef: true,
         },
       }),
@@ -106,7 +107,7 @@ export async function GET(request: NextRequest) {
     fullName: profile.fullName,
     birthDate: profile.birthDate,
     establishment: profile.establishment,
-    apiKey: profile.apiKey ?? null,
+    hasApiKey: !!(profile.apiKey ?? profile.apiKeyHash),
     stats: {
       balanceKop: balanceKopForStats,
       totalReceivedKop: Number(received),

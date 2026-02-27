@@ -22,7 +22,7 @@ interface UserDetailsResponse {
     email: string | null;
     role: string;
     isBlocked: boolean;
-    apiKey: string | null;
+    hasApiKey: boolean;
     payoutDailyLimitCount: number | null;
     payoutDailyLimitKop: number | null;
     payoutMonthlyLimitCount: number | null;
@@ -84,6 +84,7 @@ export default function AdminUserDetailsPage() {
   const [loadingAutoConfirmToggle, setLoadingAutoConfirmToggle] = useState(false);
   const [apiKeyLoading, setApiKeyLoading] = useState(false);
   const [apiKeyCopied, setApiKeyCopied] = useState(false);
+  const [displayApiKey, setDisplayApiKey] = useState<string | null>(null);
   const [blockLoading, setBlockLoading] = useState(false);
   const [blockError, setBlockError] = useState<string | null>(null);
 
@@ -97,6 +98,7 @@ export default function AdminUserDetailsPage() {
         if (!res.ok) throw new Error("Ошибка загрузки");
         const json = (await res.json()) as UserDetailsResponse;
         setData(json);
+        setDisplayApiKey(null);
         const u = json.user;
         setAutoConfirmEnabled(u.autoConfirmPayouts ?? false);
         if (u.autoConfirmPayoutThresholdKop != null) {
@@ -389,6 +391,7 @@ export default function AdminUserDetailsPage() {
       if (profileRes.ok) {
         const json = (await profileRes.json()) as UserDetailsResponse;
         setData(json);
+        setDisplayApiKey(null);
       }
     } catch {
       setPayoutError("Ошибка соединения");
@@ -412,8 +415,9 @@ export default function AdminUserDetailsPage() {
         return;
       }
       const { apiKey: newKey } = (await res.json()) as { apiKey: string };
+      setDisplayApiKey(newKey);
       setData((prev) =>
-        prev ? { ...prev, user: { ...prev.user, apiKey: newKey } } : null,
+        prev ? { ...prev, user: { ...prev.user, hasApiKey: true } } : null,
       );
     } finally {
       setApiKeyLoading(false);
@@ -421,8 +425,8 @@ export default function AdminUserDetailsPage() {
   };
 
   const handleCopyApiKey = () => {
-    if (!data?.user?.apiKey) return;
-    void navigator.clipboard.writeText(data.user.apiKey).then(() => {
+    if (!displayApiKey) return;
+    void navigator.clipboard.writeText(displayApiKey).then(() => {
       setApiKeyCopied(true);
       setTimeout(() => setApiKeyCopied(false), 2500);
     });
@@ -823,8 +827,10 @@ export default function AdminUserDetailsPage() {
         </h2>
         <div className="flex flex-wrap items-center gap-3">
           <div className="min-w-0 flex-1 rounded-xl border-0 bg-[var(--color-light-gray)] px-4 py-2.5 font-mono text-sm text-[var(--color-text)]">
-            {data.user.apiKey ? (
-              <span className="truncate block">{data.user.apiKey}</span>
+            {displayApiKey ? (
+              <span className="truncate block">{displayApiKey}</span>
+            ) : data.user.hasApiKey ? (
+              <span className="text-[var(--color-text-secondary)]">••••••••••••••••</span>
             ) : (
               <span className="text-[var(--color-text-secondary)]">Не создан</span>
             )}
@@ -836,9 +842,9 @@ export default function AdminUserDetailsPage() {
             className="inline-flex items-center gap-2 rounded-xl border-0 bg-[var(--color-bg-sides)] px-4 py-2.5 text-sm font-medium text-[var(--color-text)] hover:bg-[var(--color-light-gray)] disabled:opacity-50"
           >
             <RotateCw className={`h-4 w-4 ${apiKeyLoading ? "animate-spin" : ""}`} />
-            {apiKeyLoading ? "Создание…" : data.user.apiKey ? "Обновить ключ" : "Создать ключ"}
+            {apiKeyLoading ? "Создание…" : data.user.hasApiKey ? "Обновить ключ" : "Создать ключ"}
           </button>
-          {data.user.apiKey && (
+          {displayApiKey && (
             <button
               type="button"
               onClick={handleCopyApiKey}

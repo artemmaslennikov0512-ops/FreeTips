@@ -177,11 +177,6 @@ export default function AdminPayoutsPage() {
 
   return (
     <div className="min-w-0 max-w-full">
-      <div className="mb-6 flex min-w-0 items-center justify-center gap-3 sm:mb-8">
-        <Send className="h-7 w-7 shrink-0 text-[var(--color-accent-gold)] sm:h-8 sm:w-8" />
-        <h1 className="min-w-0 text-center text-lg font-bold text-[var(--color-text)] sm:text-xl">Заявки на вывод</h1>
-      </div>
-
       <div className="mb-6">
         <select
           value={statusFilter}

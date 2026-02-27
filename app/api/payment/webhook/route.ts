@@ -37,7 +37,6 @@ export async function POST(request: NextRequest) {
     return new NextResponse("ok", { status: 200, headers: { "Content-Type": "text/plain" } });
   } catch (error) {
     logError("payment.webhook.error", error, { requestId, ip });
-    // Возвращаем 200, чтобы Paygine не показывал ошибку пользователю и не слал повторные попытки
-    return new NextResponse("ok", { status: 200, headers: { "Content-Type": "text/plain" } });
+    return new NextResponse("error", { status: 503, headers: { "Content-Type": "text/plain" } });
   }
 }

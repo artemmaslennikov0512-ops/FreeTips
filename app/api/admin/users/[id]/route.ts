@@ -32,6 +32,7 @@ const USER_SELECT = {
   role: true,
   isBlocked: true,
   apiKey: true,
+  apiKeyHash: true,
   payoutDailyLimitCount: true,
   payoutDailyLimitKop: true,
   payoutMonthlyLimitCount: true,
@@ -78,6 +79,7 @@ function serializeUser(user: {
   role: string;
   isBlocked: boolean;
   apiKey: string | null;
+  apiKeyHash: string | null;
   payoutDailyLimitCount: number | null;
   payoutDailyLimitKop: bigint | null;
   payoutMonthlyLimitCount: number | null;
@@ -95,7 +97,7 @@ function serializeUser(user: {
     email: user.email,
     role: user.role,
     isBlocked: user.isBlocked,
-    apiKey: user.apiKey,
+    hasApiKey: !!(user.apiKey ?? user.apiKeyHash),
     payoutDailyLimitCount: user.payoutDailyLimitCount,
     payoutDailyLimitKop: user.payoutDailyLimitKop != null ? Number(user.payoutDailyLimitKop) : null,
     payoutMonthlyLimitCount: user.payoutMonthlyLimitCount,

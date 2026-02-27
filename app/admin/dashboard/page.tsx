@@ -1,7 +1,7 @@
 "use client";
 
 import { Fragment, useEffect, useState } from "react";
-import { LayoutDashboard, Users, TrendingUp, Send, DollarSign, ChevronDown, ChevronRight, ClipboardCheck, Copy, ShieldAlert } from "lucide-react";
+import { Users, TrendingUp, Send, DollarSign, ChevronDown, ChevronRight, ClipboardCheck, Copy } from "lucide-react";
 import { formatMoneyCompact } from "@/lib/utils";
 
 interface Stats {
@@ -466,11 +466,6 @@ export default function AdminDashboardPage() {
 
   return (
     <div className="min-w-0 max-w-full">
-      <div className="mb-6 flex min-w-0 items-center justify-center gap-3 sm:mb-8">
-        <LayoutDashboard className="h-7 w-7 shrink-0 text-[var(--color-accent-gold)] sm:h-8 sm:w-8" />
-        <h1 className="min-w-0 text-center text-lg font-bold text-[var(--color-text)] sm:text-xl">Дашборд</h1>
-      </div>
-
       <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
         {cards.map((card) => {
           const Icon = card.icon;
@@ -494,11 +489,6 @@ export default function AdminDashboardPage() {
       </div>
 
       <section className="cabinet-section-header mt-10 rounded-2xl border-0 p-6">
-        <h2 className="mb-6 flex items-center justify-center gap-2 text-base font-bold text-[var(--color-text)]">
-          <ShieldAlert className="h-8 w-8 shrink-0 text-[var(--color-muted)]" />
-          Панель управления антифродом
-        </h2>
-
         <div className="antifraud-inner rounded-xl border-0 bg-[var(--color-light-gray)] p-5">
           {antifraudMessage && (
             <p className="mb-4 text-center text-sm text-[var(--color-text)]">
@@ -727,7 +717,6 @@ export default function AdminDashboardPage() {
       </section>
 
       <section className="mt-10">
-        <h2 className="mb-4 text-center text-base font-bold text-[var(--color-text)]">Заявки на подключение</h2>
         {requestsLoading ? (
           <p className="text-[var(--color-muted)]">Загрузка заявок...</p>
         ) : (() => {
@@ -826,11 +815,11 @@ export default function AdminDashboardPage() {
                                     <Copy className="h-4 w-4" />
                                   </button>
                                 </div>
-                                <span className="text-xs text-[var(--color-muted)]">Ссылка действительна 24 часа</span>
+                                <span className="text-xs text-[var(--color-muted)]">Одноразовая ссылка — только одна регистрация</span>
                               </div>
                             )}
                             {r.status === "APPROVED" && r.hasToken && !linkForRow && (
-                              <span className="text-xs text-[var(--color-muted)]">Ссылка выдана (скопируйте при выдаче)</span>
+                              <span className="text-xs text-[var(--color-muted)]">Ссылка выдана (одноразовая, скопируйте при выдаче)</span>
                             )}
                           </td>
                         </tr>

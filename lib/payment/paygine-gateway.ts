@@ -92,7 +92,11 @@ export class PayginePaymentGateway implements PaymentGateway {
     }
 
     if (!baseUrl) {
-      return { success: false, error: "Не указан baseUrl для редиректа" };
+      const msg =
+        process.env.NODE_ENV === "production"
+          ? "Задайте NEXT_PUBLIC_APP_URL в окружении (production)"
+          : "Не указан baseUrl для редиректа";
+      return { success: false, error: msg };
     }
 
     const feeKop = feeKopForIncoming(amount, "card");

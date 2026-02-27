@@ -48,7 +48,9 @@ model User {
   fullName          String?   @db.VarChar(255)
   birthDate         String?   @db.VarChar(20)
   establishment     String?   @db.VarChar(255)
-  apiKey            String?   @unique @db.VarChar(64) // для приложения FreeTips (X-API-Key)
+  apiKey            String?   @unique @db.VarChar(64) // устаревшее: только для старых ключей до миграции на хеш
+  apiKeyPrefix      String?   @db.VarChar(20) // первые 16 символов ключа для поиска
+  apiKeyHash        String?   @db.VarChar(64) // SHA-256 hex ключа (новые ключи только хеш)
   payoutDailyLimitCount Int?   // лимит заявок в сутки (null = глобальный)
   payoutDailyLimitKop   BigInt? // лимит суммы в сутки, коп (null = глобальный)
   payoutMonthlyLimitCount Int?  // лимит заявок в месяц (null = 30 × суточный)
@@ -70,6 +72,7 @@ model User {
 
   @@index([login])
   @@index([email])
+  @@index([apiKeyPrefix])
   @@map("users")
 }
 

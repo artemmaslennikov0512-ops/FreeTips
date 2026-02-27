@@ -9,6 +9,7 @@ RUN npm ci
 # --- build ---
 FROM node:20-slim AS builder
 WORKDIR /app
+RUN apt-get update -y && apt-get install -y openssl ca-certificates && rm -rf /var/lib/apt/lists/*
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
@@ -22,6 +23,9 @@ RUN npx next build
 # --- runner ---
 FROM node:20-slim AS runner
 WORKDIR /app
+
+# OpenSSL нужен для Prisma (иначе предупреждение и возможные 500 при работе с БД)
+RUN apt-get update -y && apt-get install -y openssl ca-certificates && rm -rf /var/lib/apt/lists/*
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1

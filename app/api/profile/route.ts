@@ -16,132 +16,139 @@ import { logError } from "@/lib/logger";
 import { getRequestId } from "@/lib/security/request";
 
 export async function GET(request: NextRequest) {
-  const auth = await requireAuthOrApiKey(request);
-  if ("response" in auth) return auth.response;
-
-  const id = auth.userId;
-  const requestId = getRequestId(request);
-
+  let userId: string | undefined;
   try {
-  const dayStart = getUtcDayStart();
-  const monthStart = getUtcMonthStart();
+    const auth = await requireAuthOrApiKey(request);
+    if ("response" in auth) return auth.response;
+    userId = auth.userId;
+    const id = auth.userId;
+    const requestId = getRequestId(request);
 
-  const [profile, txSum, payoutsCompletedSum, txCount, payoutsPendingCount, limits, monthlyLimits, todayPayouts, monthPayouts] =
-    await Promise.all([
-      db.user.findUnique({
-        where: { id },
-        select: {
-          id: true,
-          uniqueId: true,
-          login: true,
-          email: true,
-          role: true,
-          mustChangePassword: true,
-          fullName: true,
-          birthDate: true,
-          establishment: true,
-          apiKey: true,
-          apiKeyHash: true,
-          paygineSdRef: true,
-        },
-      }),
-      db.transaction.aggregate({
-        where: { recipientId: id, status: "SUCCESS" },
-        _sum: { amountKop: true },
-      }),
-      db.payoutRequest.aggregate({
-        where: { userId: id, status: "COMPLETED" },
-        _sum: { amountKop: true },
-      }),
-      db.transaction.count({ where: { recipientId: id, status: "SUCCESS" } }),
-      db.payoutRequest.count({
-        where: { userId: id, status: { in: ["CREATED", "PROCESSING"] } },
-      }),
-      getEffectivePayoutLimits(id),
-      getEffectiveMonthlyPayoutLimits(id),
-      db.payoutRequest.aggregate({
-        where: {
-          userId: id,
-          status: "COMPLETED",
-          updatedAt: { gte: dayStart },
-        },
-        _count: true,
-        _sum: { amountKop: true },
-      }),
-      db.payoutRequest.aggregate({
-        where: {
-          userId: id,
-          status: "COMPLETED",
-          updatedAt: { gte: monthStart },
-        },
-        _count: true,
-        _sum: { amountKop: true },
-      }),
-    ]);
+    const dayStart = getUtcDayStart();
+    const monthStart = getUtcMonthStart();
 
-  if (!profile) {
-    return NextResponse.json({ error: "Пользователь не найден" }, { status: 404 });
-  }
+    const [profile, txSum, payoutsCompletedSum, txCount, payoutsPendingCount, limits, monthlyLimits, todayPayouts, monthPayouts] =
+      await Promise.all([
+        db.user.findUnique({
+          where: { id },
+          select: {
+            id: true,
+            uniqueId: true,
+            login: true,
+            email: true,
+            role: true,
+            mustChangePassword: true,
+            fullName: true,
+            birthDate: true,
+            establishment: true,
+            apiKey: true,
+            paygineSdRef: true,
+          },
+        }),
+        db.transaction.aggregate({
+          where: { recipientId: id, status: "SUCCESS" },
+          _sum: { amountKop: true },
+        }),
+        db.payoutRequest.aggregate({
+          where: { userId: id, status: "COMPLETED" },
+          _sum: { amountKop: true },
+        }),
+        db.transaction.count({ where: { recipientId: id, status: "SUCCESS" } }),
+        db.payoutRequest.count({
+          where: { userId: id, status: { in: ["CREATED", "PROCESSING"] } },
+        }),
+        getEffectivePayoutLimits(id),
+        getEffectiveMonthlyPayoutLimits(id),
+        db.payoutRequest.aggregate({
+          where: {
+            userId: id,
+            status: "COMPLETED",
+            updatedAt: { gte: dayStart },
+          },
+          _count: true,
+          _sum: { amountKop: true },
+        }),
+        db.payoutRequest.aggregate({
+          where: {
+            userId: id,
+            status: "COMPLETED",
+            updatedAt: { gte: monthStart },
+          },
+          _count: true,
+          _sum: { amountKop: true },
+        }),
+      ]);
 
-  const received = txSum._sum.amountKop ?? BigInt(0);
-  const withdrawn = payoutsCompletedSum._sum.amountKop ?? BigInt(0);
-  const balanceCalculated = received - withdrawn;
-  const todayCount = todayPayouts._count;
-  const todaySumKop = todayPayouts._sum.amountKop ?? BigInt(0);
-  const monthCount = monthPayouts._count;
-  const monthSumKop = monthPayouts._sum.amountKop ?? BigInt(0);
-
-  let balanceKopForStats = Number(balanceCalculated);
-  const sector = process.env.PAYGINE_SECTOR?.trim();
-  const password = process.env.PAYGINE_PASSWORD;
-  const sdRef = profile.paygineSdRef?.trim();
-  if (sdRef && sector && password) {
-    try {
-      const paygineBalance = await sdGetBalance({ sector, password }, { sdRef });
-      if (paygineBalance.ok) {
-        balanceKopForStats = paygineBalance.balanceKop;
-      }
-    } catch {
-      // При недоступности Paygine отдаём баланс по БД, чтобы ЛК официанта загружался
+    if (!profile) {
+      return NextResponse.json({ error: "Пользователь не найден" }, { status: 404 });
     }
-  }
 
-  return NextResponse.json({
-    id: profile.id,
-    uniqueId: profile.uniqueId,
-    login: profile.login,
-    email: profile.email,
-    role: profile.role,
-    mustChangePassword: profile.mustChangePassword,
-    fullName: profile.fullName,
-    birthDate: profile.birthDate,
-    establishment: profile.establishment,
-    hasApiKey: !!(profile.apiKey ?? profile.apiKeyHash),
-    stats: {
-      balanceKop: balanceKopForStats,
-      totalReceivedKop: Number(received),
-      transactionsCount: txCount,
-      payoutsPendingCount,
-    },
-    payoutLimits: {
-      dailyLimitCount: limits.count,
-      dailyLimitKop: Number(limits.kop),
-      monthlyLimitCount: monthlyLimits.count,
-      monthlyLimitKop: monthlyLimits.kop != null ? Number(monthlyLimits.kop) : null,
-    },
-    payoutUsageToday: {
-      count: todayCount,
-      sumKop: Number(todaySumKop),
-    },
-    payoutUsageMonth: {
-      count: monthCount,
-      sumKop: Number(monthSumKop),
-    },
-  });
+    const received = txSum._sum.amountKop ?? BigInt(0);
+    const withdrawn = payoutsCompletedSum._sum.amountKop ?? BigInt(0);
+    const balanceCalculated = received - withdrawn;
+    const todayCount = todayPayouts._count;
+    const todaySumKop = todayPayouts._sum.amountKop ?? BigInt(0);
+    const monthCount = monthPayouts._count;
+    const monthSumKop = monthPayouts._sum.amountKop ?? BigInt(0);
+
+    let balanceKopForStats = Number(balanceCalculated);
+    const sector = process.env.PAYGINE_SECTOR?.trim();
+    const password = process.env.PAYGINE_PASSWORD;
+    const sdRef = profile.paygineSdRef?.trim();
+    if (sdRef && sector && password) {
+      try {
+        const paygineBalance = await sdGetBalance({ sector, password }, { sdRef });
+        if (paygineBalance.ok) {
+          balanceKopForStats = paygineBalance.balanceKop;
+        }
+      } catch {
+        // При недоступности Paygine отдаём баланс по БД
+      }
+    }
+
+    // Ответ только примитивами — гарантированная сериализация без BigInt
+    const body = {
+      id: String(profile.id),
+      uniqueId: Number(profile.uniqueId),
+      login: String(profile.login),
+      email: profile.email != null ? String(profile.email) : null,
+      role: String(profile.role),
+      mustChangePassword: Boolean(profile.mustChangePassword),
+      fullName: profile.fullName != null ? String(profile.fullName) : null,
+      birthDate: profile.birthDate != null ? String(profile.birthDate) : null,
+      establishment: profile.establishment != null ? String(profile.establishment) : null,
+      hasApiKey: !!profile.apiKey,
+      stats: {
+        balanceKop: Number(balanceKopForStats),
+        totalReceivedKop: Number(received),
+        transactionsCount: Number(txCount),
+        payoutsPendingCount: Number(payoutsPendingCount),
+      },
+      payoutLimits: {
+        dailyLimitCount: Number(limits.count),
+        dailyLimitKop: Number(limits.kop),
+        monthlyLimitCount: monthlyLimits.count != null ? Number(monthlyLimits.count) : null,
+        monthlyLimitKop: monthlyLimits.kop != null ? Number(monthlyLimits.kop) : null,
+      },
+      payoutUsageToday: {
+        count: Number(todayCount),
+        sumKop: Number(todaySumKop),
+      },
+      payoutUsageMonth: {
+        count: Number(monthCount),
+        sumKop: Number(monthSumKop),
+      },
+    };
+    return NextResponse.json(body);
   } catch (err) {
-    logError("profile.get.error", err, { requestId, userId: id });
+    try {
+      logError("profile.get.error", err, { userId });
+    } catch {
+      console.error("profile.get.error", err);
+    }
+    const message = err instanceof Error ? err.message : String(err);
     return NextResponse.json(
-      { error: "Не удалось загрузить профиль" },
+      { error: "Не удалось загрузить профиль: " + message },
       { status: 500 },
     );
   }

@@ -59,6 +59,8 @@ class MainActivity : AppCompatActivity(), NotificationsBottomSheet.BadgeUpdater 
             notificationBadge = BadgeDrawable.create(this).apply {
                 maxCharacterCount = 3
                 badgeGravity = BadgeDrawable.TOP_END
+                backgroundColor = ContextCompat.getColor(this@MainActivity, R.color.primary)
+                badgeTextColor = ContextCompat.getColor(this@MainActivity, R.color.on_primary)
             }
             BadgeUtils.attachBadgeDrawable(notificationBadge!!, binding.bellBadgeAnchor)
             binding.bellBadgeAnchor.setOnClickListener {

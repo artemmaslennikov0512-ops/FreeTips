@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/swipeRefresh"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingStart="@dimen/screen_padding"
+        android:paddingEnd="@dimen/screen_padding"
+        android:paddingTop="@dimen/content_top_padding"
+        android:paddingBottom="@dimen/content_bottom_padding">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Ссылки для приёма чаевых"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@color/on_surface" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_md"
+            style="@style/Widget.FreeTips.Card"
+            android:padding="@dimen/card_padding">
+
+            <TextView
+                android:id="@+id/linksList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/card_padding"
+                android:paddingEnd="@dimen/card_padding"
+                android:paddingTop="@dimen/spacing_md"
+                android:paddingBottom="@dimen/spacing_md"
+                android:textSize="14sp"
+                android:lineSpacingMultiplier="1.25"
+                android:textColor="@color/on_surface_variant"
+                android:breakStrategy="balanced"
+                android:hyphenationFrequency="none"
+                android:scrollHorizontally="false"
+                tools:text="Ссылка для чаевых:&#10;https://site.com/pay/myslug" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/qrCard"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="@dimen/spacing_lg"
+            style="@style/Widget.FreeTips.Card"
+            app:cardBackgroundColor="@color/surface"
+            app:cardElevation="4dp"
+            android:padding="@dimen/spacing_lg"
+            android:visibility="gone">
+
+            <FrameLayout
+                android:layout_width="248dp"
+                android:layout_height="248dp"
+                android:background="@drawable/bg_qr_block"
+                android:padding="24dp">
+
+                <ImageView
+                    android:id="@+id/qrImage"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:contentDescription="@null"
+                    android:scaleType="fitCenter" />
+            </FrameLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <ProgressBar
+            android:id="@+id/progress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="@dimen/spacing_lg"
+            android:indeterminateTint="@color/primary"
+            android:visibility="gone" />
+        <TextView
+            android:id="@+id/errorText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_md"
+            android:visibility="gone"
+            android:textColor="@color/error"
+            android:textSize="14sp" />
+    </LinearLayout>
+    </ScrollView>
+</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

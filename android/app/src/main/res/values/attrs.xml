@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+        Атрибуты темы по элементам: можно переопределять отдельно в теме,
+        не меняя весь блок. Использование: ?attr/freetips_headerBarBackground и т.д.
+    -->
+    <attr name="freetips_headerBarBackground" format="color|reference" />
+    <attr name="freetips_headerBarTextColor" format="color|reference" />
+    <attr name="freetips_headerBarIconColor" format="color|reference" />
+    <attr name="freetips_screenBackground" format="color|reference" />
+    <attr name="freetips_bottomNavBackground" format="color|reference" />
+    <attr name="freetips_bottomNavIconColor" format="color|reference" />
+    <attr name="freetips_cardBackground" format="color|reference" />
+    <attr name="freetips_cardTextColor" format="color|reference" />
+    <attr name="freetips_cardTextColorVariant" format="color|reference" />
+    <attr name="freetips_statusBarColor" format="color|reference" />
+    <attr name="freetips_navigationBarColor" format="color|reference" />
+
+    <!-- Положение и отступы элементов (независимо от темы) -->
+    <attr name="freetips_headerBarPaddingStart" format="dimension|reference" />
+    <attr name="freetips_headerBarPaddingEnd" format="dimension|reference" />
+    <attr name="freetips_headerBarPaddingTop" format="dimension|reference" />
+    <attr name="freetips_headerBarPaddingBottom" format="dimension|reference" />
+    <attr name="freetips_headerBarMinHeight" format="dimension|reference" />
+    <!-- gravity: 8388611=START, 17=CENTER, 8388613=END (Gravity.*) -->
+    <attr name="freetips_headerBarLogoGravity" format="integer" />
+    <attr name="freetips_headerBarBellGravity" format="integer" />
+    <attr name="freetips_screenPaddingHorizontal" format="dimension|reference" />
+    <attr name="freetips_screenPaddingTop" format="dimension|reference" />
+    <attr name="freetips_screenPaddingBottom" format="dimension|reference" />
+    <attr name="freetips_contentTopPadding" format="dimension|reference" />
+    <attr name="freetips_contentBottomPadding" format="dimension|reference" />
+    <attr name="freetips_cardToSectionMargin" format="dimension|reference" />
+    <attr name="freetips_cardInsetMargin" format="dimension|reference" />
+</resources>

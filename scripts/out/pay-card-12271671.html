@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <title>Пополнение кубышки картой — 100.00 ₽</title>
+</head>
+<body>
+  <p>Пополнение кубышки по карте: <strong>100.00 ₽</strong> (заказ 12271671).</p>
+  <p>Перенаправление на Paygine…</p>
+  <form id="payForm" method="post" action="https://test.paygine.com/webapi/b2puser/sd-services/SDPayIn">
+    <input type="hidden" name="sector" value="9022" />
+    <input type="hidden" name="id" value="12271671" />
+    <input type="hidden" name="amount" value="10000" />
+    <input type="hidden" name="currency" value="643" />
+    <input type="hidden" name="sd_ref" value="1tips_r_test" />
+    <input type="hidden" name="url" value="https://example.com/pay/success" />
+    <input type="hidden" name="failurl" value="https://example.com/pay/fail" />
+    <input type="hidden" name="signature" value="NjBkZTc5MjlkMjA4MGU2ZTExMGFlNDUyZDI3YmM1ODkzOTBjYjdmOTk5ZTg3NjkzZGE2NWIyYTU1Mzg5NzI1Nw==" />
+    <button type="submit">Оплатить картой</button>
+  </form>
+  <script>document.getElementById("payForm").submit();</script>
+</body>
+</html>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Widget.FreeTips.Card" parent="Widget.MaterialComponents.CardView">
+        <item name="cardCornerRadius">@dimen/card_radius</item>
+        <item name="cardElevation">@dimen/card_elevation</item>
+        <item name="cardBackgroundColor">?attr/freetips_cardBackground</item>
+    </style>
+
+    <style name="Widget.FreeTips.TextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="boxCornerRadiusTopStart">@dimen/card_radius</item>
+        <item name="boxCornerRadiusTopEnd">@dimen/card_radius</item>
+        <item name="boxCornerRadiusBottomStart">@dimen/card_radius</item>
+        <item name="boxCornerRadiusBottomEnd">@dimen/card_radius</item>
+        <item name="hintTextColor">@color/on_surface</item>
+        <item name="boxStrokeColor">@color/box_stroke_color</item>
+        <item name="cursorColor">@color/primary</item>
+    </style>
+
+    <!-- Поля ввода на светлом фоне (экран входа) -->
+    <style name="Widget.FreeTips.TextInputLayout.Light" parent="Widget.FreeTips.TextInputLayout">
+        <item name="hintTextColor">@color/on_surface_light_variant</item>
+        <item name="boxBackgroundColor">@color/surface_light</item>
+    </style>
+
+    <!-- Карточка на светлом фоне для экрана входа -->
+    <style name="Widget.FreeTips.Card.Light" parent="Widget.FreeTips.Card">
+        <item name="cardBackgroundColor">@color/surface_light</item>
+    </style>
+</resources>

@@ -1,0 +1,212 @@
+// Prisma schema для платформы безналичных чаевых
+// Все суммы в копейках (BigInt) для точности финансовых операций
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  RECIPIENT  // получатель чаевых (официант, курьер, мастер)
+  ADMIN      // администратор
+  SUPERADMIN // суперадминистратор (создаётся только через миграцию/seed)
+}
+
+enum TransactionStatus {
+  PENDING   // создан, ожидает оплаты
+  SUCCESS   // успешно оплачен
+  FAILED    // ошибка оплаты
+  CANCELLED // отменён
+}
+
+enum PayoutStatus {
+  CREATED      // заявка создана
+  PROCESSING   // в обработке
+  COMPLETED    // выполнен
+  REJECTED     // отклонён
+}
+
+enum RegistrationRequestStatus {
+  PENDING   // ожидает рассмотрения
+  APPROVED  // одобрена, выдан токен
+  REJECTED  // отклонена
+}
+
+model User {
+  id                String    @id @default(cuid())
+  uniqueId          Int       @unique @default(autoincrement())
+  login             String    @unique @db.VarChar(50)
+  email             String?   @unique @db.VarChar(255)
+  passwordHash      String    @db.VarChar(255)
+  role              UserRole  @default(RECIPIENT)
+  mustChangePassword Boolean   @default(false) // обязательная смена пароля при первом входе
+  isBlocked         Boolean   @default(false)
+  fullName          String?   @db.VarChar(255)
+  birthDate         String?   @db.VarChar(20)
+  establishment     String?   @db.VarChar(255)
+  apiKey            String?   @unique @db.VarChar(64) // для приложения FreeTips (X-API-Key)
+  payoutDailyLimitCount Int?   // лимит заявок в сутки (null = глобальный)
+  payoutDailyLimitKop   BigInt? // лимит суммы в сутки, коп (null = глобальный)
+  payoutMonthlyLimitCount Int?  // лимит заявок в месяц (null = 30 × суточный)
+  payoutMonthlyLimitKop   BigInt? // лимит суммы в месяц, коп (null = 30 × суточный)
+  autoConfirmPayouts    Boolean @default(false) // автоподтверждение выводов
+  autoConfirmPayoutThresholdKop BigInt? // порог в коп: заявки до этой суммы подтверждаются автоматически (null = любая сумма при включённом флаге)
+  paygineSdRef       String?   @db.VarChar(128) // кубышка официанта (присваивается при регистрации, в Paygine создаётся при первом зачислении)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  // Relations
+  sessions         Session[]
+  tipLinks         TipLink[]
+  transactions     Transaction[] @relation("RecipientTransactions")
+  payoutRequests   PayoutRequest[]
+  createdRegistrationTokens RegistrationToken[] @relation("CreatedRegistrationTokens")
+  usedRegistrationTokens    RegistrationToken[] @relation("UsedRegistrationTokens")
+  paygineCubbies            PaygineCubbie[]
+
+  @@index([login])
+  @@index([email])
+  @@map("users")
+}
+
+model PaygineCubbie {
+  id     String  @id @default(cuid())
+  sdRef  String  @unique @db.VarChar(128)
+  userId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([sdRef])
+  @@index([userId])
+  @@map("paygine_cubbies")
+}
+
+model Session {
+  id         String   @id @default(cuid())
+  userId     String
+  refreshToken String @unique @db.VarChar(512)
+  deviceInfo String?  @db.Text // JSON: {ip, userAgent, deviceId?}
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([refreshToken])
+  @@index([expiresAt])
+  @@map("sessions")
+}
+
+model TipLink {
+  id        String   @id @default(cuid())
+  userId    String
+  slug      String   @unique @db.VarChar(50) // уникальный идентификатор для URL
+  createdAt DateTime @default(now())
+
+  // Relations
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+
+  @@unique([userId, slug]) // один пользователь может иметь несколько ссылок (позже)
+  @@index([userId])
+  @@index([slug])
+  @@map("tip_links")
+}
+
+model Transaction {
+  id              String            @id @default(cuid())
+  linkId           String
+  recipientId     String            // денормализация для быстрого доступа
+  amountKop       BigInt            // сумма в копейках (BigInt для точности)
+  feeKop          BigInt?           // комиссия при приёме СБП; при переливе СБП — на кубышку ЮЛ
+  paymentMethod   String?           @db.VarChar(16) // 'sbp' | 'card'; только для СБП делается split (fee→ЮЛ, остаток→официант)
+  payerInfo       String?           @db.Text // JSON: {phone?, email?, name?} — опционально
+  status          TransactionStatus @default(PENDING)
+  externalId      String?           @unique @db.VarChar(255) // ID от платёжного провайдера
+  paygineOrderSdRef String?         @db.VarChar(128) // кубышка заказа (временная, после оплаты — Relocate на кубышку официанта)
+  idempotencyKey  String            @unique @db.VarChar(255) // для идемпотентности
+  relocateStartedAt DateTime?       // установить при старте перелива — защита от двойного запуска (два вебхука)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  // Relations
+  link     TipLink @relation(fields: [linkId], references: [id], onDelete: Restrict)
+  recipient User   @relation("RecipientTransactions", fields: [recipientId], references: [id], onDelete: Restrict)
+
+  @@index([linkId])
+  @@index([recipientId])
+  @@index([status])
+  @@index([externalId])
+  @@index([idempotencyKey])
+  @@index([createdAt])
+  @@map("transactions")
+}
+
+model PayoutRequest {
+  id                String       @id @default(cuid())
+  userId            String
+  amountKop         BigInt       // сумма в копейках
+  details           String       @db.Text // текст: "Карта: ..." или "Телефон (банк): ..."
+  recipientName     String?      @db.VarChar(255) // ФИО получателя при переводе по телефону
+  status            PayoutStatus @default(CREATED)
+  externalId        String?      @unique @db.VarChar(255) // ID от платёжного провайдера
+  completedByUserId String?      @db.VarChar(64) // ID пользователя, выполнившего выплату (для чека)
+  feeKop            BigInt?      // комиссия в копейках (опционально)
+  rejectionReason   String?      @db.VarChar(500) // причина отклонения от Paygine (при status = REJECTED)
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  @@index([userId])
+  @@index([status])
+  @@index([externalId])
+  @@index([createdAt])
+  @@map("payout_requests")
+}
+
+model RegistrationToken {
+  id           String   @id @default(cuid())
+  tokenHash    String   @unique @db.VarChar(64)
+  createdById  String
+  usedById     String?
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+  usedAt       DateTime?
+
+  createdBy User  @relation("CreatedRegistrationTokens", fields: [createdById], references: [id], onDelete: Restrict)
+  usedBy    User? @relation("UsedRegistrationTokens", fields: [usedById], references: [id], onDelete: SetNull)
+  registrationRequest RegistrationRequest?
+
+  @@index([createdById])
+  @@index([usedById])
+  @@index([expiresAt])
+  @@map("registration_tokens")
+}
+
+model RegistrationRequest {
+  id                   String                     @id @default(cuid())
+  fullName             String                     @db.VarChar(255)
+  dateOfBirth          String                     @db.VarChar(20)
+  establishment        String                     @db.VarChar(255)
+  phone                String                     @db.VarChar(50)
+  activityType         String                     @db.VarChar(255)
+  email                String                     @db.VarChar(255)
+  status               RegistrationRequestStatus @default(PENDING)
+  registrationTokenId  String?                    @unique
+  createdAt            DateTime                   @default(now())
+
+  registrationToken RegistrationToken? @relation(fields: [registrationTokenId], references: [id], onDelete: SetNull)
+
+  @@index([status])
+  @@index([createdAt])
+  @@map("registration_requests")
+}

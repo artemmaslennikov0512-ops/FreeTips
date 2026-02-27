@@ -1,0 +1,1 @@
+# Миграции будут созданы при первом запуске: docker compose exec dev npx prisma migrate dev

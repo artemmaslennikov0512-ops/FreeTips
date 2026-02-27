@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/nav_home">
+
+    <fragment android:id="@+id/nav_home" android:name="com.freetips.app.ui.home.HomeFragment"
+        android:label="Главная" />
+    <fragment android:id="@+id/nav_payouts" android:name="com.freetips.app.ui.payouts.PayoutsFragment"
+        android:label="Выводы" />
+    <fragment android:id="@+id/nav_transactions" android:name="com.freetips.app.ui.transactions.TransactionsFragment"
+        android:label="Операции" />
+    <fragment android:id="@+id/nav_links" android:name="com.freetips.app.ui.links.LinksFragment"
+        android:label="Ссылки" />
+    <fragment android:id="@+id/nav_profile" android:name="com.freetips.app.ui.profile.ProfileFragment"
+        android:label="Профиль" />
+</navigation>

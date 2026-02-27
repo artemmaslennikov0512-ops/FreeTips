@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Виртуальная карта как в ЛК официанта: пропорции карты, бейдж VIRTUAL, FreeTips, БАЛАНС -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:minHeight="0dp"
+    android:background="@drawable/bg_virtual_card">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="160dp"
+        android:padding="@dimen/card_padding">
+
+        <!-- Бейдж VIRTUAL, сверху слева -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|start"
+            android:background="@drawable/bg_virtual_card_badge"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:text="VIRTUAL"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.12"
+            android:textColor="@android:color/white" />
+
+        <!-- Чип с аббревиатурой FT и логотип FreeTips, снизу слева -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|start"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingBottom="4dp">
+
+            <TextView
+                android:layout_width="40dp"
+                android:layout_height="28dp"
+                android:background="@drawable/bg_card_chip"
+                android:gravity="center"
+                android:text="FT"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="@color/chip_text" />
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Free"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/on_surface"
+                    android:alpha="0.9" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Tips"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:textColor="@android:color/white" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- БАЛАНС и сумма, снизу справа (как на карте в ЛК) -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:orientation="vertical"
+            android:gravity="end">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="БАЛАНС"
+                android:textSize="10sp"
+                android:textColor="@color/on_surface"
+                android:alpha="0.7" />
+            <TextView
+                android:id="@+id/cardBalance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/white"
+                tools:text="20 200,00 ₽" />
+        </LinearLayout>
+    </FrameLayout>
+</FrameLayout>

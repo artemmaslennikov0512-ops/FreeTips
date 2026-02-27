@@ -91,9 +91,13 @@ export async function GET(request: NextRequest) {
   const password = process.env.PAYGINE_PASSWORD;
   const sdRef = profile.paygineSdRef?.trim();
   if (sdRef && sector && password) {
-    const paygineBalance = await sdGetBalance({ sector, password }, { sdRef });
-    if (paygineBalance.ok) {
-      balanceKopForStats = paygineBalance.balanceKop;
+    try {
+      const paygineBalance = await sdGetBalance({ sector, password }, { sdRef });
+      if (paygineBalance.ok) {
+        balanceKopForStats = paygineBalance.balanceKop;
+      }
+    } catch {
+      // При недоступности Paygine отдаём баланс по БД, чтобы ЛК официанта загружался
     }
   }
 

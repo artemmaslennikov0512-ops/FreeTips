@@ -43,6 +43,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [retryTrigger, setRetryTrigger] = useState(0);
 
   useEffect(() => setMounted(true), []);
 
@@ -73,7 +75,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         }
 
         if (!res.ok) {
-          router.replace("/login");
+          setLoadError("Не удалось загрузить данные. Проверьте подключение и нажмите «Повторить».");
+          setLoading(false);
           return;
         }
 
@@ -90,14 +93,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           return;
         }
       } catch {
-        router.replace("/login");
+        setLoadError("Ошибка соединения. Проверьте подключение и нажмите «Повторить».");
       } finally {
         setLoading(false);
       }
     };
 
     checkAuth();
-  }, [mounted, router]);
+  }, [mounted, retryTrigger, router]);
 
   const handleLogout = async () => {
     try {
@@ -122,6 +125,25 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   if (!mounted || loading) {
     return <LoadingSpinner message="Загрузка…" className="min-h-[60vh]" />;
+  }
+
+  if (loadError) {
+    return (
+      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 px-4 text-[var(--color-text)]">
+        <p className="text-center text-[var(--color-text-secondary)]">{loadError}</p>
+        <button
+          type="button"
+          onClick={() => {
+            setLoadError(null);
+            setLoading(true);
+            setRetryTrigger((t) => t + 1);
+          }}
+          className="rounded-xl bg-[var(--color-brand-gold)] px-6 py-2.5 font-medium text-[#0a192f] hover:opacity-90"
+        >
+          Повторить
+        </button>
+      </div>
+    );
   }
 
   if (!user || user.role !== "SUPERADMIN") {

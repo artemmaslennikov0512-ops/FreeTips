@@ -12,12 +12,17 @@ import { patchProfileSchema } from "@/lib/validations";
 import { parseJsonWithLimit, MAX_BODY_SIZE_AUTH } from "@/lib/api/helpers";
 import { getEffectivePayoutLimits, getEffectiveMonthlyPayoutLimits, getUtcDayStart, getUtcMonthStart } from "@/lib/payout-limits";
 import { sdGetBalance } from "@/lib/payment/paygine/client";
+import { logError } from "@/lib/logger";
+import { getRequestId } from "@/lib/security/request";
 
 export async function GET(request: NextRequest) {
   const auth = await requireAuthOrApiKey(request);
   if ("response" in auth) return auth.response;
 
   const id = auth.userId;
+  const requestId = getRequestId(request);
+
+  try {
   const dayStart = getUtcDayStart();
   const monthStart = getUtcMonthStart();
 
@@ -133,6 +138,13 @@ export async function GET(request: NextRequest) {
       sumKop: Number(monthSumKop),
     },
   });
+  } catch (err) {
+    logError("profile.get.error", err, { requestId, userId: id });
+    return NextResponse.json(
+      { error: "Не удалось загрузить профиль" },
+      { status: 500 },
+    );
+  }
 }
 
 export async function PATCH(request: NextRequest) {

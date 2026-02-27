@@ -40,6 +40,10 @@ COPY --from=builder /app/node_modules/ws ./node_modules/ws
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
 COPY --from=builder /app/scripts ./scripts
 
+# tsx и bcryptjs для запуска seed в контейнере (prisma db seed / npx tsx prisma/seed.ts)
+COPY --from=builder /app/package.json /app/package-lock.json ./
+USER root
+RUN npm install tsx bcryptjs --omit=dev --ignore-scripts && chown -R nextjs:nodejs /app/node_modules
 USER nextjs
 
 EXPOSE 3000

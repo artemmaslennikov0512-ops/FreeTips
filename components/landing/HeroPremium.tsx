@@ -20,7 +20,7 @@ export function HeroPremium() {
             <span className="text-[var(--color-accent-gold)]">Профессионалов</span>
           </h1>
           <p className="text-lg text-[var(--color-on-dark-muted)] mb-6 max-w-[560px]">
-            Безопасный и уважительный способ получать достойное вознаграждение за ваш труд. Технологии, которым доверяют ведущие заведения.
+            Безопасный и уважительный способ получать достойное вознаграждение за ваш труд. Технологии, которым доверяют ведущие заведения. Современный сервис.
           </p>
           <div className="flex flex-wrap gap-4 mb-0">
             <Link

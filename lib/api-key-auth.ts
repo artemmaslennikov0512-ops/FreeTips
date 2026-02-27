@@ -58,12 +58,12 @@ export async function requireApiKey(
     }
     if (match) {
       if (user.isBlocked) {
-        return {
-          response: NextResponse.json(
-            { error: "Доступ ограничен" },
-            { status: 403 },
-          );
-        }
+        const res = NextResponse.json(
+          { error: "Доступ ограничен" },
+          { status: 403 },
+        );
+        return { response: res };
+      }
       return { userId: user.id };
     }
   }

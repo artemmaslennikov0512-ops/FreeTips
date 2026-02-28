@@ -43,6 +43,7 @@ export async function GET(request: NextRequest) {
             establishment: true,
             apiKey: true,
             paygineSdRef: true,
+            autoConfirmPayoutThresholdKop: true,
           },
         }),
         db.transaction.aggregate({
@@ -138,6 +139,11 @@ export async function GET(request: NextRequest) {
         count: Number(monthCount),
         sumKop: Number(monthSumKop),
       },
+      /** Максимальная сумма одной заявки на вывод (коп); для подсказки и валидации на клиенте */
+      maxPayoutPerRequestKop:
+        profile.autoConfirmPayoutThresholdKop != null
+          ? Number(profile.autoConfirmPayoutThresholdKop)
+          : 10_000_000, // 100 000 ₽ по умолчанию
     };
     return NextResponse.json(body);
   } catch (err) {

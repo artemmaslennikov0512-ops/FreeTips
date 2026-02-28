@@ -263,7 +263,7 @@ export default function AdminUsersPage() {
               type="button"
               onClick={handleBlockAll}
               disabled={blockAllLoading}
-              className="inline-flex items-center gap-1.5 rounded-xl border-0 bg-[var(--color-light-gray)] px-4 py-2.5 text-sm font-semibold text-[var(--color-text)] transition-colors hover:opacity-90 disabled:opacity-60"
+              className="inline-flex items-center gap-1.5 rounded-xl border-0 bg-black px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#1a1a1a] disabled:opacity-60"
             >
               <Lock className="h-4 w-4" />
               {blockAllLoading ? "Выполняется..." : "Заблокировать всех"}
@@ -396,8 +396,11 @@ export default function AdminUsersPage() {
                   <td className="px-4 py-3 text-sm font-mono text-[var(--color-muted)]">
                     #{user.uniqueId}
                   </td>
-                  <td className="px-4 py-3 text-sm font-medium text-[var(--color-text)]">
-                    <Link href={`/admin/users/${user.id}`} className="hover:underline">
+                  <td className="px-4 py-3">
+                    <Link
+                      href={`/admin/users/${user.id}`}
+                      className="inline-block rounded-xl border border-[var(--color-brand-gold)]/40 bg-[var(--color-brand-gold)]/15 px-4 py-2 text-sm font-medium text-[var(--color-text)] transition-colors hover:bg-[var(--color-brand-gold)]/25 hover:border-[var(--color-brand-gold)]/60 focus:outline-none focus:ring-2 focus:ring-[var(--color-brand-gold)]/50"
+                    >
                       {user.login}
                     </Link>
                   </td>

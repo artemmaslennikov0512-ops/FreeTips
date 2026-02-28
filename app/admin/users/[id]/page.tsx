@@ -55,10 +55,9 @@ export default function AdminUserDetailsPage() {
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [passwordOk, setPasswordOk] = useState(false);
   const [payoutAmount, setPayoutAmount] = useState("");
-  const [payoutDetails, setPayoutDetails] = useState("");
   const [payoutLoading, setPayoutLoading] = useState(false);
   const [payoutError, setPayoutError] = useState<string | null>(null);
-  const [payoutOk, setPayoutOk] = useState(false);
+  const [payoutNewTabHint, setPayoutNewTabHint] = useState(false);
   const [limitsMessage, setLimitsMessage] = useState<{ type: "ok" | "err"; text: string } | null>(null);
   const [autoConfirmEnabled, setAutoConfirmEnabled] = useState(false);
   const [appliedMaxPerOpRub, setAppliedMaxPerOpRub] = useState<string | null>(null);
@@ -359,32 +358,57 @@ export default function AdminUserDetailsPage() {
       setPayoutError("Введите корректную сумму");
       return;
     }
+    const amountKop = Math.round(amountRub * 100);
+    if (amountKop < 10000 || amountKop > 100_000_00) {
+      setPayoutError("Сумма от 100 до 100 000 ₽");
+      return;
+    }
     setPayoutLoading(true);
     setPayoutError(null);
     setPayoutOk(false);
     try {
-      const res = await fetch(`/api/admin/users/${userId}/payout`, {
+      const res = await fetch(`/api/admin/users/${userId}/sd-pay-out-page`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
           ...getCsrfHeader(),
         },
-        body: JSON.stringify({
-          amountKop: Math.round(amountRub * 100),
-          details: payoutDetails || "Вывод администратором",
-        }),
+        body: JSON.stringify({ amountKop }),
       });
+      const data = (await res.json()) as {
+        formUrl?: string;
+        formFields?: Record<string, string>;
+        error?: string;
+        code?: string;
+        description?: string;
+      };
       if (!res.ok) {
-        const d = (await res.json()) as { error?: string };
-        setPayoutError(d.error ?? "Ошибка вывода");
+        setPayoutError(data.error ?? data.description ?? "Ошибка вывода");
         return;
       }
-      setPayoutOk(true);
+      if (!data.formUrl || !data.formFields) {
+        setPayoutError("Некорректный ответ сервера");
+        return;
+      }
+      const form = document.createElement("form");
+      form.method = "POST";
+      form.action = data.formUrl;
+      form.target = "_blank";
+      form.style.display = "none";
+      for (const [name, value] of Object.entries(data.formFields)) {
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.name = name;
+        input.value = value;
+        form.appendChild(input);
+      }
+      document.body.appendChild(form);
+      form.submit();
+      document.body.removeChild(form);
+      setPayoutNewTabHint(true);
+      setTimeout(() => setPayoutNewTabHint(false), 8000);
       setPayoutAmount("");
-      setPayoutDetails("");
-      setTimeout(() => setPayoutOk(false), 3000);
-      // refresh data
       const profileRes = await fetch(`/api/admin/users/${userId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -782,34 +806,32 @@ export default function AdminUserDetailsPage() {
             <h2 className="min-w-0 text-center text-base font-semibold text-[var(--color-text)]">Вывести средства</h2>
           </div>
           {payoutError && <p className="mb-3 text-sm text-[var(--color-text)]">{payoutError}</p>}
-          {payoutOk && <p className="mb-3 text-sm text-[var(--color-text)]">Вывод выполнен</p>}
+          {payoutNewTabHint && (
+            <p className="mb-3 text-sm text-[var(--color-brand-gold)]">
+              Открыта новая вкладка — введите данные карты официанта на странице Paygine. После завершения заявка обновится.
+            </p>
+          )}
           <div className="grid gap-3">
             <input
               type="number"
               step="0.01"
-              min="0"
+              min="100"
+              max="100000"
               value={payoutAmount}
-              onChange={(e) => setPayoutAmount(e.target.value)}
-              placeholder="Сумма (₽)"
-              className="w-full rounded-xl border-0 bg-[var(--color-bg-sides)] px-4 py-2.5 text-[var(--color-text)] placeholder:text-[var(--color-muted)] focus:outline-none"
-            />
-            <input
-              type="text"
-              value={payoutDetails}
-              onChange={(e) => setPayoutDetails(e.target.value)}
-              placeholder="Реквизиты (необязательно)"
+              onChange={(e) => { setPayoutAmount(e.target.value); setPayoutError(null); }}
+              placeholder="Сумма (₽), от 100 до 100 000"
               className="w-full rounded-xl border-0 bg-[var(--color-bg-sides)] px-4 py-2.5 text-[var(--color-text)] placeholder:text-[var(--color-muted)] focus:outline-none"
             />
           </div>
             <button
               type="button"
               onClick={handlePayout}
-              disabled={payoutLoading || !payoutAmount}
+              disabled={payoutLoading || !payoutAmount || parseFloat(payoutAmount) < 100}
               className="relative z-10 mt-4 w-full rounded-xl bg-[var(--color-brand-gold)] px-5 py-2.5 text-sm font-medium text-[#0a192f] hover:opacity-90 disabled:opacity-60"
             >
-              {payoutLoading ? "Обработка..." : "Вывести денежные средства"}
+              {payoutLoading ? "Открываем Paygine…" : "Вывести на карту (страница Paygine)"}
             </button>
-          <p className="mt-2 text-xs text-[var(--color-text-secondary)]">Заявка подтверждается автоматически</p>
+          <p className="mt-2 text-xs text-[var(--color-text-secondary)]">Откроется страница Paygine для ввода номера карты официанта</p>
           <div className="mt-6 w-full max-w-[320px] mx-auto">
             <PremiumCard
               fullName={data.user.fullName}

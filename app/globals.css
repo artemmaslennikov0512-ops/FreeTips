@@ -441,14 +441,16 @@ html:not([data-theme="dark"]) .admin-panel .antifraud-value {
   border-bottom: 1px solid rgba(197, 165, 114, 0.28);
 }
 
-/* Поля ввода значений лимитов («окна») — только эти инпуты */
+/* Поля ввода значений лимитов («окна») — только эти инпуты; в тёмной теме текст белый, чтобы цифры были видны при «Изменить» */
 [data-theme="dark"] .admin-panel .antifraud-input {
   background: #1a1a1a !important;
   border: 1px solid rgba(197, 165, 114, 0.35);
-  color: #ffffff;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff;
 }
 [data-theme="dark"] .admin-panel .antifraud-input::placeholder {
   color: rgba(255, 255, 255, 0.55);
+  -webkit-text-fill-color: rgba(255, 255, 255, 0.55);
 }
 
 /* Таблицы админки — в тёмной теме лёгкие золотистые границы между строками */

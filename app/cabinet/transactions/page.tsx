@@ -80,6 +80,7 @@ export default function CabinetTransactionsPage() {
   const [sdPageLoading, setSdPageLoading] = useState(false);
   const [sdPageError, setSdPageError] = useState<string | null>(null);
   const [sdPageNewTabHint, setSdPageNewTabHint] = useState(false);
+  const [maxPayoutPerRequestKop, setMaxPayoutPerRequestKop] = useState<number>(10_000_000);
 
   const totalPages = Math.max(1, Math.ceil(list.length / PER_PAGE));
   const paginatedList = useMemo(
@@ -124,8 +125,11 @@ export default function CabinetTransactionsPage() {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (profileRes.ok) {
-        const profile = (await profileRes.json()) as { stats?: Stats };
+        const profile = (await profileRes.json()) as { stats?: Stats; maxPayoutPerRequestKop?: number };
         setStats(profile.stats ?? null);
+        if (typeof profile.maxPayoutPerRequestKop === "number" && profile.maxPayoutPerRequestKop > 0) {
+          setMaxPayoutPerRequestKop(profile.maxPayoutPerRequestKop);
+        }
       }
     } catch {
       setError("Ошибка соединения");
@@ -175,8 +179,12 @@ export default function CabinetTransactionsPage() {
       return;
     }
     const amountKop = Math.round(rub * 100);
-    if (amountKop < 10000 || amountKop > 100_000_00) {
-      setSdPageError("Сумма от 100 до 100 000 ₽");
+    if (amountKop < 10000) {
+      setSdPageError("Минимальная сумма вывода 100 ₽");
+      return;
+    }
+    if (amountKop > maxPayoutPerRequestKop) {
+      setSdPageError(`Сумма превышает лимит (макс. ${(maxPayoutPerRequestKop / 100).toLocaleString("ru-RU")} ₽)`);
       return;
     }
     setSdPageLoading(true);
@@ -251,27 +259,44 @@ export default function CabinetTransactionsPage() {
                 <PremiumCard balanceKop={stats.balanceKop} compact hideButtons />
               </div>
               <div className="mt-8 flex flex-col items-center gap-4">
+                <p className="text-center text-sm text-[var(--color-text-secondary)]">
+                  Введите сумму не больше {(maxPayoutPerRequestKop / 100).toLocaleString("ru-RU")} ₽
+                </p>
                 <div className="flex flex-wrap items-center justify-center gap-3">
                   <input
                     type="number"
                     step="0.01"
                     min="100"
-                    max="100000"
+                    max={maxPayoutPerRequestKop / 100}
                     value={sdPageAmount}
                     onChange={(e) => { setSdPageAmount(e.target.value); setSdPageError(null); }}
-                    placeholder="От 100 до 100 000"
-                    className="min-w-[240px] max-w-full rounded-xl border border-[var(--color-brand-gold)]/30 bg-white px-5 py-3 text-[#0a192f] placeholder:text-[var(--color-text-secondary)]/70 focus:outline-none focus:ring-2 focus:ring-[var(--color-brand-gold)]/40 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none overflow-hidden"
+                    placeholder={`От 100 до ${(maxPayoutPerRequestKop / 100).toLocaleString("ru-RU")} ₽`}
+                    className={`min-w-[240px] max-w-full rounded-xl border bg-white px-5 py-3 text-[#0a192f] placeholder:text-[var(--color-text-secondary)]/70 focus:outline-none focus:ring-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none overflow-hidden ${
+                      sdPageAmount && parseFloat(sdPageAmount) > maxPayoutPerRequestKop / 100
+                        ? "border-red-500 focus:ring-red-500/40"
+                        : "border-[var(--color-brand-gold)]/30 focus:ring-[var(--color-brand-gold)]/40"
+                    }`}
                   />
                   <button
                     type="button"
                     onClick={handleSDPayOutPage}
-                    disabled={sdPageLoading || !sdPageAmount || parseFloat(sdPageAmount) < 100}
+                    disabled={
+                      sdPageLoading ||
+                      !sdPageAmount ||
+                      parseFloat(sdPageAmount) < 100 ||
+                      Math.round(parseFloat(sdPageAmount) * 100) > maxPayoutPerRequestKop
+                    }
                     className="cabinet-btn-gold w-auto rounded-xl bg-[var(--color-brand-gold)] px-6 py-3 font-semibold text-[#0a192f] transition-all hover:opacity-90 disabled:opacity-50 disabled:pointer-events-none"
                   >
                     {sdPageLoading ? "Переход…" : "Вывести средства"}
                   </button>
                 </div>
-                {sdPageAmount && parseFloat(sdPageAmount) > 0 && (() => {
+                {sdPageAmount && parseFloat(sdPageAmount) > 0 && Math.round(parseFloat(sdPageAmount) * 100) > maxPayoutPerRequestKop && (
+                  <p className="text-center text-sm font-medium text-red-600" role="alert">
+                    Сумма превышает лимит (макс. {(maxPayoutPerRequestKop / 100).toLocaleString("ru-RU")} ₽)
+                  </p>
+                )}
+                {sdPageAmount && parseFloat(sdPageAmount) > 0 && Math.round(parseFloat(sdPageAmount) * 100) <= maxPayoutPerRequestKop && (() => {
                   const amountKop = Math.round(parseFloat(sdPageAmount) * 100);
                   const feeKop = feeKopForPayout(amountKop);
                   const totalKop = amountKop + feeKop;
@@ -293,7 +318,7 @@ export default function CabinetTransactionsPage() {
                   );
                 })()}
                 {sdPageError && (
-                  <p className="rounded-lg bg-[var(--color-muted)]/15 px-4 py-2 text-sm text-[var(--color-text-secondary)] text-center">
+                  <p className="rounded-lg bg-red-500/15 px-4 py-2 text-sm font-medium text-red-600 text-center" role="alert">
                     {sdPageError}
                   </p>
                 )}

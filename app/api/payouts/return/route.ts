@@ -1,6 +1,6 @@
 /**
  * GET /api/payouts/return?payoutId=...&success=0|1 — обработка возврата с Paygine после SDPayOutPage.
- * Обновляет статус заявки (COMPLETED/REJECTED) только для владельца и только если заявка в PROCESSING.
+ * Обновляет статус заявки (COMPLETED/REJECTED). Владелец заявки или SUPERADMIN (например после вывода из профиля официанта).
  */
 
 import { NextRequest, NextResponse } from "next/server";
@@ -24,12 +24,21 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  const payout = await db.payoutRequest.findFirst({
-    where: { id: payoutId, userId: auth.userId },
-    select: { id: true, status: true, amountKop: true },
+  const payout = await db.payoutRequest.findUnique({
+    where: { id: payoutId },
+    select: { id: true, userId: true, status: true, amountKop: true },
   });
 
   if (!payout) {
+    return NextResponse.json(
+      { error: "Заявка не найдена", status: null },
+      { status: 404 },
+    );
+  }
+
+  const isOwner = payout.userId === auth.userId;
+  const isSuperadmin = auth.role === "SUPERADMIN";
+  if (!isOwner && !isSuperadmin) {
     return NextResponse.json(
       { error: "Заявка не найдена", status: null },
       { status: 404 },
@@ -50,10 +59,11 @@ export async function GET(request: NextRequest) {
     data: { status: newStatus },
   });
 
+  const recipientUserId = payout.userId;
   if (newStatus === "COMPLETED") {
-    void broadcastBalanceUpdated(auth.userId);
+    void broadcastBalanceUpdated(recipientUserId);
   }
-  void requestPaygineBalance(auth.userId);
+  void requestPaygineBalance(recipientUserId);
 
   return NextResponse.json({
     status: newStatus,

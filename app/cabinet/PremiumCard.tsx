@@ -32,6 +32,15 @@ const CARD_STYLES = `
 }
 .premium-card-front {
   background: radial-gradient(ellipse 120% 120% at 50% 50%, #d4b896 0%, var(--color-brand-gold) 40%, #b8985c 100%);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.25), inset -20px -20px 40px rgba(0,0,0,0.08);
+}
+.premium-card-shine {
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0.08) 40%, transparent 60%);
+  pointer-events: none;
+  z-index: 1;
 }
 .premium-animated-pattern {
   position: absolute;
@@ -39,10 +48,10 @@ const CARD_STYLES = `
   left: 0;
   width: 200%;
   height: 200%;
-  background: repeating-linear-gradient(90deg, transparent, transparent 25px, rgba(255,255,255,0.02) 25px, rgba(255,255,255,0.02) 50px);
+  background: repeating-linear-gradient(90deg, transparent, transparent 25px, rgba(255,255,255,0.04) 25px, rgba(255,255,255,0.04) 50px);
   animation: premium-move-pattern 20s linear infinite;
   z-index: 0;
-  opacity: 0.3;
+  opacity: 0.5;
 }
 @keyframes premium-move-pattern {
   0% { transform: translateX(0) translateY(0); }
@@ -58,7 +67,7 @@ const CARD_STYLES = `
 .premium-glass {
   position: absolute;
   inset: 0;
-  background: transparent;
+  background: linear-gradient(180deg, rgba(255,255,255,0.12) 0%, transparent 50%, rgba(0,0,0,0.05) 100%);
   border-radius: 12px;
   z-index: 1;
 }
@@ -75,11 +84,8 @@ const CARD_STYLES = `
   font-weight: bold;
 }
 .premium-card-brand {
-  background: linear-gradient(135deg, #c0c0c0 0%, #909090 35%, #606060 65%, #808080 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent;
+  color: #4a4a4a;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.4);
 }
 .premium-badge {
   background: linear-gradient(90deg, #fff, #ccc);
@@ -126,6 +132,7 @@ export function PremiumCard({ fullName, balanceKop, compact }: Props) {
               <div className="premium-animated-pattern" aria-hidden />
               <div className="premium-dynamic-pattern" aria-hidden />
               <div className="premium-glass" aria-hidden />
+              <div className="premium-card-shine" aria-hidden />
               <div
                 className="absolute top-[10px] right-[12px] h-6 w-12 opacity-50 z-[2]"
                 style={{ background: `${graffitiSvg} no-repeat center` }}

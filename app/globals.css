@@ -275,13 +275,12 @@ html:not([data-theme="dark"]) .admin-panel .admin-main-block.cabinet-main-block 
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06);
 }
 
-/* Светлая тема: карточки в одном стиле с блоком чата — скругление, тонкая рамка, мягкий фон */
+/* Светлая тема: блоки на основном блоке — тот же фон и рамка, что у блока чата поддержки */
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-card,
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-section-header {
-  background: rgba(255, 255, 255, 0.92);
-  border: 1px solid rgba(10, 25, 47, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 1rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
 /* Светлая тема: блок «Оставить чаевые» (/pay) — тот же стиль */
@@ -383,10 +382,14 @@ html:not([data-theme="dark"]) .cabinet-premium .cabinet-input-window:focus-withi
   color: rgba(255, 255, 255, 0.6) !important;
 }
 
-/* Светлая тема: блок «Доступные лимиты» — нейтральный серый (без сиренево-серого оттенка) */
+/* Светлая тема: блок «Доступные лимиты» — нейтральный серый; внутри тёмной карточки чуть светлее для читаемости текста */
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-limits-block {
   background: rgba(0, 0, 0, 0.06) !important;
   border-color: rgba(10, 25, 47, 0.15);
+}
+html:not([data-theme="dark"]) .cabinet-premium .cabinet-card .cabinet-limits-block {
+  background: rgba(255, 255, 255, 0.2) !important;
+  border-color: rgba(255, 255, 255, 0.25);
 }
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-limits-block .cabinet-limits-track {
   background: rgba(0, 0, 0, 0.12) !important;

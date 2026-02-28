@@ -241,7 +241,7 @@ export default function CabinetTransactionsPage() {
   if (loading) {
     return (
       <div className="flex min-h-[40vh] flex-col items-center justify-center">
-        <div className="text-[var(--color-text-secondary)]">Загрузка…</div>
+        <div className="text-white/90">Загрузка…</div>
       </div>
     );
   }
@@ -250,16 +250,16 @@ export default function CabinetTransactionsPage() {
     <div className="space-y-8">
       {stats && (
         <div className="grid items-stretch gap-8 lg:grid-cols-1">
-          <div className="cabinet-card rounded-xl border-0 bg-[var(--color-bg-sides)] overflow-hidden shadow-[var(--shadow-subtle)]">
+          <div id="waiter-card" className="cabinet-card rounded-xl border-0 bg-[var(--color-bg-sides)] overflow-hidden shadow-[var(--shadow-subtle)]">
             <div className="border-0 px-6 py-4 text-center">
-              <h3 className="font-[family:var(--font-playfair)] text-xl font-semibold text-[var(--color-text)]">Карта официанта</h3>
+              <h3 className="font-[family:var(--font-playfair)] text-xl font-semibold text-white">Карта официанта</h3>
             </div>
             <div className="p-6">
               <div className="overflow-hidden rounded-2xl">
                 <PremiumCard balanceKop={stats.balanceKop} compact hideButtons />
               </div>
               <div className="mt-8 flex flex-col items-center gap-4">
-                <p className="text-center text-sm text-[var(--color-text-secondary)]">
+                <p className="text-center text-sm text-white">
                   Введите сумму не больше {(maxPayoutPerRequestKop / 100).toLocaleString("ru-RU")} ₽
                 </p>
                 <div className="flex flex-wrap items-center justify-center gap-3">
@@ -296,23 +296,24 @@ export default function CabinetTransactionsPage() {
                     Сумма превышает лимит (макс. {(maxPayoutPerRequestKop / 100).toLocaleString("ru-RU")} ₽)
                   </p>
                 )}
-                {sdPageAmount && parseFloat(sdPageAmount) > 0 && Math.round(parseFloat(sdPageAmount) * 100) <= maxPayoutPerRequestKop && (() => {
-                  const amountKop = Math.round(parseFloat(sdPageAmount) * 100);
-                  const feeKop = feeKopForPayout(amountKop);
+                {(() => {
+                  const hasValidAmount = sdPageAmount && parseFloat(sdPageAmount) > 0 && Math.round(parseFloat(sdPageAmount) * 100) <= maxPayoutPerRequestKop;
+                  const amountKop = hasValidAmount && sdPageAmount ? Math.round(parseFloat(sdPageAmount) * 100) : 0;
+                  const feeKop = hasValidAmount ? feeKopForPayout(amountKop) : 0;
                   const totalKop = amountKop + feeKop;
                   return (
-                    <div className="w-full max-w-sm rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-4 py-3 text-sm">
-                      <div className="flex justify-between text-[var(--color-text-secondary)]">
+                    <div className="waiter-card-summary w-full max-w-sm rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-4 py-3 text-sm text-white">
+                      <div className="flex justify-between text-white">
                         <span>К зачислению на карту:</span>
-                        <span className="font-medium text-[var(--color-text)]">{formatMoney(BigInt(amountKop))}</span>
+                        <span className="font-medium">{hasValidAmount ? formatMoney(BigInt(amountKop)) : "—"}</span>
                       </div>
-                      <div className="mt-1 flex justify-between text-[var(--color-text-secondary)]">
+                      <div className="mt-1 flex justify-between text-white">
                         <span>Комиссия (1,2%):</span>
-                        <span className="font-medium text-[var(--color-text)]">{formatMoney(BigInt(feeKop))}</span>
+                        <span className="font-medium">{hasValidAmount ? formatMoney(BigInt(feeKop)) : "—"}</span>
                       </div>
-                      <div className="mt-1 flex justify-between font-medium text-[var(--color-text)]">
+                      <div className="mt-1 flex justify-between font-medium text-white">
                         <span>С баланса будет списано:</span>
-                        <span>{formatMoney(BigInt(totalKop))}</span>
+                        <span>{hasValidAmount ? formatMoney(BigInt(totalKop)) : "—"}</span>
                       </div>
                     </div>
                   );
@@ -329,37 +330,37 @@ export default function CabinetTransactionsPage() {
       )}
 
       {error && (
-        <div className="rounded-xl border-0 bg-[var(--color-muted)]/10 p-4 text-sm text-[var(--color-text-secondary)]">
+        <div className="rounded-xl border-0 bg-[var(--color-muted)]/10 p-4 text-sm text-white/90">
           {error}
         </div>
       )}
 
       {sdPageNewTabHint && (
-        <div className="rounded-xl border border-[var(--color-brand-gold)]/30 bg-[var(--color-brand-gold)]/10 px-4 py-3 text-sm text-[var(--color-text)]">
+        <div className="rounded-xl border border-[var(--color-brand-gold)]/30 bg-[var(--color-brand-gold)]/10 px-4 py-3 text-sm text-white">
           Открыта новая вкладка — введите данные карты на странице Paygine. После завершения вы вернётесь на этот сайт.
         </div>
       )}
 
-      <div className="cabinet-card overflow-hidden rounded-xl border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)]">
+      <div id="operations-history" className="cabinet-card overflow-hidden rounded-xl border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)]">
         <div className="border-0 px-6 py-5">
-          <h3 className="font-[family:var(--font-playfair)] text-xl font-semibold text-[var(--color-text)]">
+          <h3 className="font-[family:var(--font-playfair)] text-xl font-semibold text-white">
             История операций
           </h3>
         </div>
         {list.length === 0 ? (
-          <div className="px-6 py-12 text-center text-[var(--color-text-secondary)]">Операций пока нет</div>
+          <div className="px-6 py-12 text-center text-white/90">Операций пока нет</div>
         ) : (
           <>
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[320px] border-collapse text-left text-sm">
+              <table className="w-full min-w-[320px] border-collapse text-left text-sm text-white">
                 <thead className="bg-[var(--color-dark-gray)]/10">
                   <tr className="border-b border-[var(--color-brand-gold)]/20">
-                    <th className="px-5 py-4 font-semibold text-[var(--color-text)]">Дата</th>
-                    <th className="px-5 py-4 font-semibold text-[var(--color-text)]">Тип</th>
-                    <th className="px-5 py-4 font-semibold text-[var(--color-text)]">Сумма</th>
-                    <th className="px-5 py-4 font-semibold text-[var(--color-text)]">Комиссия</th>
-                    <th className="px-5 py-4 font-semibold text-[var(--color-text)]">Итоговая сумма</th>
-                    <th className="px-5 py-4 font-semibold text-[var(--color-text)]">Статус</th>
+                    <th className="px-5 py-4 font-semibold text-white">Дата</th>
+                    <th className="px-5 py-4 font-semibold text-white">Тип</th>
+                    <th className="px-5 py-4 font-semibold text-white">Сумма</th>
+                    <th className="px-5 py-4 font-semibold text-white">Комиссия</th>
+                    <th className="px-5 py-4 font-semibold text-white">Итоговая сумма</th>
+                    <th className="px-5 py-4 font-semibold text-white">Статус</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -377,26 +378,26 @@ export default function CabinetTransactionsPage() {
                           key={`${op.type}-${op.id}`}
                           className="border-b border-[var(--color-brand-gold)]/20 transition-colors hover:bg-[var(--color-dark-gray)]/8"
                         >
-                          <td className="px-5 py-4 text-[var(--color-text-secondary)]">
+                          <td className="px-5 py-4 text-white/90">
                             {formatDate(op.createdAt, { includeYear: true })}
                           </td>
-                          <td className="px-5 py-4 text-[var(--color-text)]">
+                          <td className="px-5 py-4 text-white">
                             {op.type === "tip" ? "Пополнение" : "Списание"}
                           </td>
-                          <td className="px-5 py-4 font-semibold text-[var(--color-text)]">
+                          <td className="px-5 py-4 font-semibold text-white">
                             {formatMoney(BigInt(op.amountKop))}
                           </td>
-                          <td className="px-5 py-4 text-[var(--color-text-secondary)]">
+                          <td className="px-5 py-4 text-white/90">
                             {op.feeKop ? formatMoney(BigInt(op.feeKop)) : "—"}
                           </td>
-                          <td className="px-5 py-4 font-medium text-[var(--color-text)]">
+                          <td className="px-5 py-4 font-medium text-white">
                             {formatMoney(BigInt(op.amountKop + op.feeKop))}
                           </td>
                           <td className="px-5 py-4">
                             <div className="flex flex-col gap-1">
                               <StatusIcon op={op} />
                               {op.type === "payout" && op.status === "REJECTED" && op.rejectionReason && (
-                                <span className="max-w-[200px] text-xs text-[var(--color-text-secondary)]" title={op.rejectionReason}>
+                                <span className="max-w-[200px] text-xs text-white/80" title={op.rejectionReason}>
                                   {op.rejectionReason}
                                 </span>
                               )}
@@ -411,7 +412,7 @@ export default function CabinetTransactionsPage() {
             </div>
             {totalPages > 1 && (
               <div className="flex flex-wrap items-center justify-between gap-4 border-t border-[var(--color-brand-gold)]/20 px-6 py-4">
-                <p className="text-sm text-[var(--color-text-secondary)]">
+                <p className="text-sm text-white/90">
                   Показано {(currentPage - 1) * PER_PAGE + 1}–{Math.min(currentPage * PER_PAGE, list.length)} из {list.length}
                 </p>
                 <div className="flex items-center gap-2">
@@ -419,19 +420,19 @@ export default function CabinetTransactionsPage() {
                     type="button"
                     onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                     disabled={currentPage <= 1}
-                    className="inline-flex h-9 min-w-[36px] items-center justify-center rounded-lg border border-[var(--color-brand-gold)]/20 bg-transparent px-2 text-sm font-medium text-[var(--color-text)] transition-colors hover:bg-[var(--color-dark-gray)]/10 disabled:opacity-40 disabled:pointer-events-none"
+                    className="inline-flex h-9 min-w-[36px] items-center justify-center rounded-lg border border-[var(--color-brand-gold)]/20 bg-transparent px-2 text-sm font-medium text-white transition-colors hover:bg-[var(--color-dark-gray)]/10 disabled:opacity-40 disabled:pointer-events-none"
                     aria-label="Предыдущая страница"
                   >
                     <ChevronLeft className="h-5 w-5" />
                   </button>
-                  <span className="text-sm text-[var(--color-text-secondary)]">
+                  <span className="text-sm text-white/90">
                     {currentPage} из {totalPages}
                   </span>
                   <button
                     type="button"
                     onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                     disabled={currentPage >= totalPages}
-                    className="inline-flex h-9 min-w-[36px] items-center justify-center rounded-lg border border-[var(--color-brand-gold)]/20 bg-transparent px-2 text-sm font-medium text-[var(--color-text)] transition-colors hover:bg-[var(--color-dark-gray)]/10 disabled:opacity-40 disabled:pointer-events-none"
+                    className="inline-flex h-9 min-w-[36px] items-center justify-center rounded-lg border border-[var(--color-brand-gold)]/20 bg-transparent px-2 text-sm font-medium text-white transition-colors hover:bg-[var(--color-dark-gray)]/10 disabled:opacity-40 disabled:pointer-events-none"
                     aria-label="Следующая страница"
                   >
                     <ChevronRight className="h-5 w-5" />
@@ -444,7 +445,7 @@ export default function CabinetTransactionsPage() {
       </div>
 
       {list.length > 0 && total > list.length && (
-        <p className="mt-2 text-sm text-[var(--color-text-secondary)]">
+        <p className="mt-2 text-sm text-white/90">
           Загружено {list.length} из {total} операций. Перелистывайте страницы для просмотра.
         </p>
       )}

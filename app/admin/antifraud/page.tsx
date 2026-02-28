@@ -7,7 +7,7 @@ const ANTIFRAUD_INPUT =
 const ANTIFRAUD_BTN_APPLY =
   "rounded-xl bg-[var(--color-brand-gold)] px-4 py-2 text-sm font-medium text-[#0a192f] hover:opacity-90 disabled:opacity-50";
 const ANTIFRAUD_BTN_EDIT =
-  "rounded-xl border-0 bg-[var(--color-bg-sides)] px-4 py-2 text-sm font-medium text-[var(--color-text)] hover:bg-[var(--color-light-gray)]";
+  "rounded-xl border border-white/25 bg-white/10 px-4 py-2 text-sm font-medium text-white hover:bg-white/20 hover:border-white/35";
 
 /** Форматирует значение лимита для отображения (сумма в ₽ или число заявок). */
 function formatLimitDisplay(value: string | null, kind: "rub" | "count"): string {
@@ -321,23 +321,23 @@ export default function AdminAntifraudPage() {
 
   return (
     <div className="min-w-0 max-w-full">
-      <h1 className="mb-6 text-xl font-semibold text-[var(--color-text)]">Антифрод и лимиты</h1>
+      <h1 className="antifraud-page-title mb-6 text-xl font-semibold text-white">Антифрод и лимиты</h1>
 
       <section className="cabinet-section-header rounded-2xl border-0 p-6">
-        <div className="antifraud-inner rounded-xl border-0 bg-[var(--color-light-gray)] p-5">
+        <div className="antifraud-inner cabinet-block-inner rounded-xl border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/85 p-5">
           {antifraudMessage && (
-            <p className="mb-4 text-center text-sm text-[var(--color-text)]">
+            <p className="mb-4 text-center text-sm text-white">
               {antifraudMessage.text}
             </p>
           )}
-          <p className="mb-4 text-xs text-[var(--color-text-secondary)]">
+          <p className="mb-4 text-xs text-white/80">
             Текущие значения видны ниже; «—» — не задано (для массового применения или в карточке пользователя).
           </p>
           <div className="antifraud-limits-list space-y-4">
             <div className="antifraud-limit-rows space-y-4">
               {/* 1. Макс. сумма одной операции вывода */}
               <div className="antifraud-limit-row flex items-center gap-4 border-0 pb-4">
-                <div className="min-w-[220px] shrink-0 text-sm font-medium text-[var(--color-text)]">
+                <div className="min-w-[220px] shrink-0 text-sm font-medium text-white">
                   1. Макс. сумма одной операции вывода
                 </div>
                 <div className="flex min-w-[8rem] flex-1 justify-center">
@@ -351,7 +351,7 @@ export default function AdminAntifraudPage() {
                       className={ANTIFRAUD_INPUT}
                     />
                   ) : (
-                    <span className="antifraud-value text-base font-semibold text-[var(--color-text)]" aria-label="Текущий лимит">
+                    <span className="antifraud-value text-base font-semibold text-white" aria-label="Текущий лимит">
                       {formatLimitDisplay(appliedAutoConfirmRub, "rub")}
                     </span>
                   )}
@@ -380,7 +380,7 @@ export default function AdminAntifraudPage() {
 
               {/* 2. Суточный лимит вывода (сумма) */}
               <div className="antifraud-limit-row flex items-center gap-4 border-0 pb-4">
-                <div className="min-w-[220px] shrink-0 text-sm font-medium text-[var(--color-text)]">
+                <div className="min-w-[220px] shrink-0 text-sm font-medium text-white">
                   2. Суточный лимит вывода
                 </div>
                 <div className="flex min-w-[8rem] flex-1 justify-center">
@@ -394,7 +394,7 @@ export default function AdminAntifraudPage() {
                       className={ANTIFRAUD_INPUT}
                     />
                   ) : (
-                    <span className="antifraud-value text-base font-semibold text-[var(--color-text)]" aria-label="Текущий лимит">
+                    <span className="antifraud-value text-base font-semibold text-white" aria-label="Текущий лимит">
                       {formatLimitDisplay(appliedDailyRub, "rub")}
                     </span>
                   )}
@@ -423,7 +423,7 @@ export default function AdminAntifraudPage() {
 
               {/* 3. Месячный лимит вывода (сумма) */}
               <div className="antifraud-limit-row flex items-center gap-4 border-0 pb-4">
-                <div className="min-w-[220px] shrink-0 text-sm font-medium text-[var(--color-text)]">
+                <div className="min-w-[220px] shrink-0 text-sm font-medium text-white">
                   3. Месячный лимит вывода
                 </div>
                 <div className="flex min-w-[8rem] flex-1 justify-center">
@@ -437,7 +437,7 @@ export default function AdminAntifraudPage() {
                       className={ANTIFRAUD_INPUT}
                     />
                   ) : (
-                    <span className="antifraud-value text-base font-semibold text-[var(--color-text)]" aria-label="Текущий лимит">
+                    <span className="antifraud-value text-base font-semibold text-white" aria-label="Текущий лимит">
                       {formatLimitDisplay(appliedMonthlyRub, "rub")}
                     </span>
                   )}
@@ -466,7 +466,7 @@ export default function AdminAntifraudPage() {
 
               {/* 4. Суточный лимит заявок */}
               <div className="antifraud-limit-row flex items-center gap-4 border-0 pb-4">
-                <div className="min-w-[220px] shrink-0 text-sm font-medium text-[var(--color-text)]">
+                <div className="min-w-[220px] shrink-0 text-sm font-medium text-white">
                   4. Суточный лимит заявок
                 </div>
                 <div className="flex min-w-[8rem] flex-1 justify-center">
@@ -481,7 +481,7 @@ export default function AdminAntifraudPage() {
                       className={ANTIFRAUD_INPUT}
                     />
                   ) : (
-                    <span className="antifraud-value text-base font-semibold text-[var(--color-text)]" title="Текущее значение">
+                    <span className="antifraud-value text-base font-semibold text-white" title="Текущее значение">
                       {formatLimitDisplay(appliedDailyCount, "count")}
                     </span>
                   )}
@@ -510,7 +510,7 @@ export default function AdminAntifraudPage() {
 
               {/* 5. Месячный лимит заявок */}
               <div className="antifraud-limit-row flex items-center gap-4 border-0 pb-4">
-                <div className="min-w-[220px] shrink-0 text-sm font-medium text-[var(--color-text)]">
+                <div className="min-w-[220px] shrink-0 text-sm font-medium text-white">
                   5. Месячный лимит заявок
                 </div>
                 <div className="flex min-w-[8rem] flex-1 justify-center">
@@ -525,7 +525,7 @@ export default function AdminAntifraudPage() {
                       className={ANTIFRAUD_INPUT}
                     />
                   ) : (
-                    <span className="antifraud-value text-base font-semibold text-[var(--color-text)]" title="Текущее значение">
+                    <span className="antifraud-value text-base font-semibold text-white" title="Текущее значение">
                       {formatLimitDisplay(appliedMonthlyCount, "count")}
                     </span>
                   )}
@@ -555,11 +555,11 @@ export default function AdminAntifraudPage() {
 
             {/* Тумблер Авто-вывод */}
             <div className="flex flex-wrap items-center gap-3 pt-2">
-              <div className="min-w-[220px] text-sm font-medium text-[var(--color-text)]">
+              <div className="min-w-[220px] text-sm font-medium text-white">
                 Авто-вывод
               </div>
               <label className="flex cursor-pointer items-center gap-2">
-                <span className="relative inline-block h-6 w-10 shrink-0 rounded-full bg-[var(--color-dark-gray)]/30 transition-colors after:absolute after:left-0.5 after:top-0.5 after:h-5 after:w-5 after:rounded-full after:bg-[var(--color-white)] after:shadow after:content-[''] after:transition-transform focus-within:ring-2 focus-within:ring-[var(--color-muted)] focus-within:ring-offset-2 has-[:checked]:bg-[var(--color-muted)] has-[:checked]:after:translate-x-4">
+                <span className="relative inline-block h-6 w-10 shrink-0 rounded-full bg-black/30 transition-colors after:absolute after:left-0.5 after:top-0.5 after:h-5 after:w-5 after:rounded-full after:bg-white after:shadow after:content-[''] after:transition-transform focus-within:ring-2 focus-within:ring-white/30 focus-within:ring-offset-2 has-[:checked]:bg-[var(--color-brand-gold)] has-[:checked]:after:translate-x-4">
                   <input
                     type="checkbox"
                     checked={autoConfirmEnabled}
@@ -568,13 +568,13 @@ export default function AdminAntifraudPage() {
                     className="sr-only"
                   />
                 </span>
-                <span className="text-sm text-[var(--color-text)]">Включить автоподтверждение заявок до макс. суммы одной операции</span>
+                <span className="text-sm text-white/90">Включить автоподтверждение заявок до макс. суммы одной операции</span>
               </label>
             </div>
           </div>
         </div>
 
-        <p className="mt-4 text-center text-xs text-[var(--color-text-secondary)]">
+        <p className="mt-4 text-center text-xs text-white/80">
           Индивидуальные лимиты и порог задаются в карточке пользователя (Пользователи → выбрать пользователя).
         </p>
       </section>

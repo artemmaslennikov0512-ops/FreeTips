@@ -269,17 +269,17 @@ export default function CabinetDashboardPage() {
           </div>
         </div>
 
-        <div className="cabinet-card rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden">
+        <div id="quick-actions" className="cabinet-card rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden">
           <div className="border-0 px-6 py-4">
-            <h3 className="font-[family:var(--font-playfair)] text-lg font-semibold text-[var(--color-text)]">
+            <h3 className="font-[family:var(--font-playfair)] text-lg font-semibold text-white">
               Быстрые действия
             </h3>
           </div>
           <div className="p-6">
             {tipLink && (
               <div className="cabinet-block-inner mb-6 rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 p-4">
-                <div className="mb-2 text-sm font-semibold text-[var(--color-text)]">Ваша ссылка для чаевых</div>
-                <div className="cabinet-input-window mb-3 break-all rounded-lg bg-[var(--color-bg-sides)] px-3 py-2 font-mono text-xs text-[var(--color-text-secondary)]">
+                <div className="mb-2 text-sm font-semibold text-white">Ваша ссылка для чаевых</div>
+                <div className="cabinet-input-window mb-3 break-all rounded-lg bg-[var(--color-bg-sides)] px-3 py-2 font-mono text-xs text-white/90">
                   {tipLink}
                 </div>
                 <button
@@ -302,8 +302,8 @@ export default function CabinetDashboardPage() {
                   <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-[var(--color-brand-gold)] text-[#0a192f]">
                     <Icon className="h-5 w-5" />
                   </div>
-                  <div className="font-semibold text-[var(--color-text)] text-center">{title}</div>
-                  <div className="mt-1 text-center text-sm text-[var(--color-text-secondary)]">{desc}</div>
+                  <div className="font-semibold text-white text-center">{title}</div>
+                  <div className="mt-1 text-center text-sm text-white/90">{desc}</div>
                 </Link>
               ))}
             </div>
@@ -313,12 +313,12 @@ export default function CabinetDashboardPage() {
 
       <div id="api-key" className="cabinet-card rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden">
         <div className="border-0 px-6 py-4">
-          <h3 className="font-[family:var(--font-playfair)] text-lg font-semibold text-[var(--color-text)]">
+          <h3 className="font-[family:var(--font-playfair)] text-lg font-semibold text-white">
             API для уведомлений
           </h3>
         </div>
         <div className="p-6">
-          <p className="mb-6 text-[var(--color-text-secondary)]">
+          <p className="mb-6 text-white/90">
             Скопируйте ключ и введите его в приложении FreeTips — и управляйте личным кабинетом официанта из мобильного приложения. (только для Android)
           </p>
           <div className="cabinet-block-inner rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/6 p-5">

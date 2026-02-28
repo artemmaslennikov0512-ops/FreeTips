@@ -181,14 +181,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         }`}
       >
         <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
-          <div className="cabinet-sidebar-profile mx-4 mb-4 rounded-xl border border-[rgba(192,192,192,0.5)] px-4 py-3">
+          <div className="cabinet-sidebar-profile cabinet-block-inner mx-4 mb-4 rounded-xl border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-4 py-3">
             <div className="flex items-center gap-3">
               <div className="cabinet-sidebar-avatar flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--color-brand-gold)] font-semibold text-[#0a192f] text-sm">
                 {(user.login || "A").charAt(0).toUpperCase()}
               </div>
               <div className="min-w-0 flex-1">
-                <div className="truncate font-semibold text-[var(--color-text)]">{user.login}</div>
-                <div className="text-sm text-[var(--color-text)]/60">Админ</div>
+                <div className="truncate font-semibold text-white">{user.login}</div>
+                <div className="text-sm text-white/80">Админ</div>
               </div>
             </div>
           </div>

@@ -86,9 +86,9 @@ export default function AdminUsersPage() {
 
   const getRoleBadge = (role: string) => {
     const styles = {
-      RECIPIENT: "bg-[var(--color-light-gray)] text-[var(--color-text-secondary)]",
-      ADMIN: "bg-[var(--color-light-gray)] text-[var(--color-text)]",
-      SUPERADMIN: "bg-[var(--color-light-gray)] text-[var(--color-text)]",
+      RECIPIENT: "bg-[var(--color-dark-gray)]/50 text-white border border-white/20",
+      ADMIN: "bg-[var(--color-dark-gray)]/50 text-white border border-white/20",
+      SUPERADMIN: "bg-[var(--color-dark-gray)]/50 text-white border border-white/20",
     };
     const labels = {
       RECIPIENT: "Получатель",
@@ -386,41 +386,41 @@ export default function AdminUsersPage() {
           <tbody>
             {sortedUsers.length === 0 ? (
               <tr>
-                <td colSpan={10} className="px-4 py-8 text-center text-[var(--color-muted)]">
+                <td colSpan={10} className="px-4 py-8 text-center text-white/90">
                   Пользователей не найдено
                 </td>
               </tr>
             ) : (
               sortedUsers.map((user) => (
-                <tr key={user.id} className="border-0 hover:bg-[var(--color-light-gray)]">
-                  <td className="px-4 py-3 text-sm font-mono text-[var(--color-muted)]">
+                <tr key={user.id} className="border-0 hover:bg-[var(--color-brand-gold)]/15 transition-colors">
+                  <td className="px-4 py-3 text-sm font-mono text-white/90">
                     #{user.uniqueId}
                   </td>
                   <td className="px-4 py-3">
                     <Link
                       href={`/admin/users/${user.id}`}
-                      className="inline-block rounded-xl border border-[var(--color-brand-gold)]/40 bg-[var(--color-brand-gold)]/15 px-4 py-2 text-sm font-medium text-[var(--color-text)] transition-colors hover:bg-[var(--color-brand-gold)]/25 hover:border-[var(--color-brand-gold)]/60 focus:outline-none focus:ring-2 focus:ring-[var(--color-brand-gold)]/50"
+                      className="inline-block rounded-xl border border-white/25 bg-[var(--color-dark-gray)]/50 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[var(--color-dark-gray)]/70 hover:border-white/40 focus:outline-none focus:ring-2 focus:ring-white/30"
                     >
                       {user.login}
                     </Link>
                   </td>
-                  <td className="px-4 py-3 text-sm text-[var(--color-muted)]">
+                  <td className="px-4 py-3 text-sm text-white/90">
                     {user.email || "—"}
                   </td>
                   <td className="px-4 py-3">{getRoleBadge(user.role)}</td>
-                  <td className="px-4 py-3 text-sm text-[var(--color-text-secondary)]">
+                  <td className="px-4 py-3 text-sm text-white">
                     {formatMoneyCompact(user.stats.balanceKop)}
                   </td>
-                  <td className="px-4 py-3 text-sm text-[var(--color-text-secondary)]">
+                  <td className="px-4 py-3 text-sm text-white">
                     {formatMoneyCompact(user.stats.totalReceivedKop)}
                   </td>
-                  <td className="px-4 py-3 text-sm text-[var(--color-text-secondary)]">
+                  <td className="px-4 py-3 text-sm text-white/90">
                     {user.stats.transactionsCount.toLocaleString("ru-RU")}
                   </td>
-                  <td className="px-4 py-3 text-sm text-[var(--color-text-secondary)]">
+                  <td className="px-4 py-3 text-sm text-white/90">
                     {user.stats.payoutsPendingCount.toLocaleString("ru-RU")}
                   </td>
-                  <td className="px-4 py-3 text-sm text-[var(--color-muted)]">
+                  <td className="px-4 py-3 text-sm text-white/80">
                     {formatDate(user.createdAt)}
                   </td>
                   <td className="px-4 py-3">
@@ -428,11 +428,7 @@ export default function AdminUsersPage() {
                       type="button"
                       onClick={() => handleToggleBlocked(user)}
                       disabled={updatingId === user.id}
-                      className={`rounded-lg border-0 px-3 py-1.5 text-xs font-semibold transition-colors ${
-                        user.isBlocked
-                          ? "border-0 bg-[var(--color-light-gray)] text-[var(--color-text)] hover:opacity-90"
-                          : "border-0 bg-[var(--color-light-gray)] text-[var(--color-text)] hover:opacity-90"
-                      } ${updatingId === user.id ? "opacity-60" : ""}`}
+                      className={`rounded-lg border border-white/25 px-3 py-1.5 text-xs font-semibold text-white transition-colors bg-[var(--color-dark-gray)]/50 hover:bg-[var(--color-dark-gray)]/70 disabled:opacity-60 ${updatingId === user.id ? "opacity-60" : ""}`}
                     >
                       {user.isBlocked ? "Разблокировать" : "Ограничить"}
                     </button>

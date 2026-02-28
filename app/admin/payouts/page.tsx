@@ -181,7 +181,7 @@ export default function AdminPayoutsPage() {
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="cabinet-section-header rounded-xl border-0 px-4 py-2 text-sm text-[var(--color-text)] focus:outline-none"
+          className="cabinet-section-header rounded-xl border-0 px-4 py-2 text-sm text-white focus:outline-none"
         >
           <option value="">Все статусы</option>
           <option value="CREATED">Создана</option>
@@ -218,29 +218,29 @@ export default function AdminPayoutsPage() {
           <tbody>
             {payouts.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-4 py-8 text-center text-[var(--color-muted)]">
+                <td colSpan={6} className="px-4 py-8 text-center text-white/90">
                   Заявок не найдено
                 </td>
               </tr>
             ) : (
               payouts.map((payout) => (
-                <tr key={payout.id} className="border-0 hover:bg-[var(--color-light-gray)]">
-                  <td className="px-4 py-3 text-sm text-[var(--color-muted)]">
+                <tr key={payout.id} className="border-0 hover:bg-[var(--color-brand-gold)]/15 transition-colors">
+                  <td className="px-4 py-3 text-sm text-white/90">
                     {payout.id.slice(0, 8)}...
                   </td>
                   <td className="px-4 py-3 text-sm">
                     <div>
-                      <div className="font-medium text-[var(--color-text)]">{payout.userLogin}</div>
+                      <div className="font-medium text-white">{payout.userLogin}</div>
                       {payout.userEmail && (
-                        <div className="text-xs text-[var(--color-muted)]">{payout.userEmail}</div>
+                        <div className="text-xs text-white/80">{payout.userEmail}</div>
                       )}
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-sm font-medium text-[var(--color-text)]">
+                  <td className="px-4 py-3 text-sm font-medium text-white">
                     {formatMoneyCompact(payout.amountKop)}
                   </td>
                   <td className="px-4 py-3">{getStatusBadge(payout.status)}</td>
-                  <td className="px-4 py-3 text-sm text-[var(--color-muted)]">
+                  <td className="px-4 py-3 text-sm text-white/90">
                     {formatDate(payout.createdAt)}
                   </td>
                   <td className="px-4 py-3">

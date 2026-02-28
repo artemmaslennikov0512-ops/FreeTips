@@ -102,6 +102,11 @@ html:not([data-theme="dark"]) .cabinet-premium .cabinet-sidebar:not(.admin-sideb
   color: inherit;
 }
 
+/* Светлая тема: блок пользователя в сайдбаре — как «Быстрые действия», белый текст */
+html:not([data-theme="dark"]) .cabinet-premium .cabinet-sidebar-profile {
+  color: #fff !important;
+}
+
 /* Светлая тема: активный пункт в сайдбаре на тёмно-синем стекле — светлая подсветка */
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-sidebar:not(.admin-sidebar) .cabinet-nav-active {
   border-color: rgba(255, 255, 255, 0.35) !important;
@@ -135,6 +140,13 @@ html:not([data-theme="dark"]) .admin-panel .admin-sidebar .cabinet-nav-active {
   color: #ffffff !important;
   font-weight: 600;
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.15);
+}
+
+/* Светлая тема: блок пользователя в сайдбаре админки — как у официанта (тёмное стекло, золотая обводка, белый текст) */
+html:not([data-theme="dark"]) .admin-panel .admin-sidebar .cabinet-sidebar-profile {
+  background: rgba(79, 79, 79, 0.85) !important;
+  border: 1px solid rgba(197, 165, 114, 0.35) !important;
+  color: #fff !important;
 }
 
 /* Светлая тема: блок профиля в сайдбаре — белый фон, обводка как у активного подсвечивающего блока; аватар — золотой фон, тёмные инициалы */
@@ -283,6 +295,13 @@ html:not([data-theme="dark"]) .cabinet-premium .cabinet-section-header {
   border-radius: 1rem;
 }
 
+/* Светлая тема: ЛК супер-админа — дашборд: карточки и таблица заявок — белый шрифт */
+html:not([data-theme="dark"]) .admin-panel .admin-dashboard-card p,
+html:not([data-theme="dark"]) .admin-panel .admin-dashboard-table th,
+html:not([data-theme="dark"]) .admin-panel .admin-dashboard-table td {
+  color: #fff !important;
+}
+
 /* Светлая тема: блок «Оставить чаевые» (/pay) — тот же стиль */
 html:not([data-theme="dark"]) .pay-block {
   background: rgba(255, 255, 255, 0.92) !important;
@@ -350,6 +369,63 @@ html:not([data-theme="dark"]) .cabinet-premium .cabinet-card .cabinet-input-wind
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-card .cabinet-input-window input::placeholder,
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-card .cabinet-input-window textarea::placeholder {
   color: rgba(255, 255, 255, 0.6) !important;
+}
+
+/* Светлая тема: настройки профиля — заголовки и подписи полей белые */
+html:not([data-theme="dark"]) .cabinet-premium #settings-profile.cabinet-card h2,
+html:not([data-theme="dark"]) .cabinet-premium #settings-profile.cabinet-card h3,
+html:not([data-theme="dark"]) .cabinet-premium #settings-profile.cabinet-card label,
+html:not([data-theme="dark"]) .cabinet-premium #settings-profile.cabinet-card .p-6 p { color: #fff !important; }
+html:not([data-theme="dark"]) .cabinet-premium #settings-profile.cabinet-card .rounded-lg.font-mono { color: rgba(255,255,255,0.9) !important; }
+html:not([data-theme="dark"]) .cabinet-premium #settings-password.cabinet-card h2,
+html:not([data-theme="dark"]) .cabinet-premium #settings-password.cabinet-card label,
+html:not([data-theme="dark"]) .cabinet-premium #settings-password.cabinet-card .p-6 p { color: #fff !important; }
+
+/* Светлая тема: страница «Ссылка» — «Ссылка для оплаты» и «Ваша ссылка для чаевых» — белый текст */
+html:not([data-theme="dark"]) .cabinet-premium #link-payment.cabinet-card h2,
+html:not([data-theme="dark"]) .cabinet-premium #link-payment.cabinet-card .font-semibold,
+html:not([data-theme="dark"]) .cabinet-premium #link-payment.cabinet-card .cabinet-input-window {
+  color: #fff !important;
+}
+
+/* Светлая тема: блок «Быстрые действия» — весь текст белый */
+html:not([data-theme="dark"]) .cabinet-premium #quick-actions.cabinet-card h3,
+html:not([data-theme="dark"]) .cabinet-premium #quick-actions.cabinet-card .cabinet-block-inner,
+html:not([data-theme="dark"]) .cabinet-premium #quick-actions.cabinet-card .cabinet-input-window {
+  color: #fff !important;
+}
+
+/* Светлая тема: блок «API для уведомлений» — весь текст белый */
+html:not([data-theme="dark"]) .cabinet-premium #api-key.cabinet-card h3 {
+  color: #fff !important;
+}
+html:not([data-theme="dark"]) .cabinet-premium #api-key.cabinet-card .p-6 > p {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+html:not([data-theme="dark"]) .cabinet-premium #api-key.cabinet-card .cabinet-block-inner p {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+/* Светлая тема: страница операций — «Карта официанта» и «История операций» — весь текст белый */
+html:not([data-theme="dark"]) .cabinet-premium #waiter-card.cabinet-card h3,
+html:not([data-theme="dark"]) .cabinet-premium #waiter-card.cabinet-card .p-6 > p,
+html:not([data-theme="dark"]) .cabinet-premium #waiter-card.cabinet-card .p-6 [class*="rounded-lg"],
+html:not([data-theme="dark"]) .cabinet-premium #waiter-card.cabinet-card .waiter-card-summary,
+html:not([data-theme="dark"]) .cabinet-premium #waiter-card.cabinet-card .waiter-card-summary * {
+  color: #fff !important;
+}
+html:not([data-theme="dark"]) .cabinet-premium #operations-history.cabinet-card h3,
+html:not([data-theme="dark"]) .cabinet-premium #operations-history.cabinet-card table,
+html:not([data-theme="dark"]) .cabinet-premium #operations-history.cabinet-card .px-6.py-12,
+html:not([data-theme="dark"]) .cabinet-premium #operations-history.cabinet-card .border-t .text-sm,
+html:not([data-theme="dark"]) .cabinet-premium #operations-history.cabinet-card .border-t span.text-sm {
+  color: #fff !important;
+}
+html:not([data-theme="dark"]) .cabinet-premium #operations-history.cabinet-card table th {
+  color: #fff !important;
+}
+html:not([data-theme="dark"]) .cabinet-premium #operations-history.cabinet-card table td {
+  color: rgba(255, 255, 255, 0.9) !important;
 }
 
 /* Текст в полях ввода ЛК и админки — чёрный на светлом фоне */
@@ -474,8 +550,20 @@ html:not([data-theme="dark"]) .cabinet-premium .cabinet-main-block #main-content
 }
 
 /* Светлая тема: блок антифрода в карточке — контейнер и поля значений темнее */
+/* Заголовок страницы «Антифрод и лимиты» — белый */
+.admin-panel .antifraud-page-title {
+  color: #fff !important;
+}
+
+/* Фон блока антифрода — как у карточек в блоке официанта (тёмное стекло, золотая обводка) */
 html:not([data-theme="dark"]) .admin-panel .antifraud-inner {
-  background: #e0e0e0 !important;
+  background: rgba(79, 79, 79, 0.85) !important;
+  border: 1px solid rgba(197, 165, 114, 0.35) !important;
+  color: rgba(255, 255, 255, 0.95);
+}
+html:not([data-theme="dark"]) .admin-panel .antifraud-inner .antifraud-value,
+html:not([data-theme="dark"]) .admin-panel .antifraud-inner .antifraud-limit-row .font-medium {
+  color: #fff !important;
 }
 html:not([data-theme="dark"]) .admin-panel .antifraud-input {
   background: #d4d4d4 !important;
@@ -491,12 +579,12 @@ html:not([data-theme="dark"]) .admin-panel .antifraud-input:focus {
   background: #1e1e1e;
 }
 
-/* Отображаемые значения лимитов (текущее значение) — всегда читаемый контраст */
+/* Отображаемые значения лимитов — на тёмном фоне антифрода белый текст */
 .admin-panel .antifraud-value {
   color: inherit;
 }
-html:not([data-theme="dark"]) .admin-panel .antifraud-value {
-  color: #0a192f;
+html:not([data-theme="dark"]) .admin-panel .antifraud-inner .antifraud-value {
+  color: #fff !important;
 }
 [data-theme="dark"] .admin-panel .antifraud-value {
   color: #f5f5f5;

@@ -144,14 +144,14 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <div className="cabinet-sidebar-profile mx-4 rounded-xl border border-[rgba(192,192,192,0.5)] px-4 py-3">
+        <div className="cabinet-sidebar-profile cabinet-block-inner mx-4 rounded-xl border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-4 py-3">
           <div className="flex items-center gap-3">
             <div className="cabinet-sidebar-avatar flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--color-brand-gold)] font-semibold text-[#0a192f] text-sm">
               {initials}
             </div>
             <div className="min-w-0 flex-1">
-              <div className="truncate font-semibold text-[var(--color-text)]">{displayName}</div>
-              <div className="text-sm text-[var(--color-text)]/60">Официант</div>
+              <div className="truncate font-semibold text-white">{displayName}</div>
+              <div className="text-sm text-white/80">Официант</div>
             </div>
           </div>
         </div>

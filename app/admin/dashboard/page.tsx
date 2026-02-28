@@ -179,7 +179,7 @@ export default function AdminDashboardPage() {
   if (loading) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="text-slate-400">Загрузка...</div>
+        <div className="text-white/90">Загрузка...</div>
       </div>
     );
   }
@@ -187,7 +187,7 @@ export default function AdminDashboardPage() {
   if (error || !stats) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="text-[var(--color-text-secondary)]">{error || "Ошибка загрузки"}</div>
+        <div className="text-white/90">{error || "Ошибка загрузки"}</div>
       </div>
     );
   }
@@ -208,14 +208,14 @@ export default function AdminDashboardPage() {
           return (
             <div
               key={card.title}
-              className="cabinet-section-header rounded-2xl border-0 p-6"
+              className="admin-dashboard-card cabinet-section-header rounded-2xl border-0 p-6"
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-[var(--color-text-secondary)]">{card.title}</p>
-                  <p className="mt-2 text-xl font-bold text-[var(--color-text)]">{card.value}</p>
+                  <p className="text-sm font-medium text-white/90">{card.title}</p>
+                  <p className="mt-2 text-xl font-bold text-white">{card.value}</p>
                 </div>
-                <div className="rounded-xl bg-[var(--color-light-gray)] p-3">
+                <div className="rounded-xl bg-white/20 p-3">
                   <Icon className="h-6 w-6 text-[var(--color-brand-gold)]" />
                 </div>
               </div>
@@ -226,7 +226,7 @@ export default function AdminDashboardPage() {
 
       <section className="mt-10">
         {requestsLoading ? (
-          <p className="text-[var(--color-muted)]">Загрузка заявок...</p>
+          <p className="text-white/90">Загрузка заявок...</p>
         ) : (() => {
           const now = Date.now();
           const visibleRequests = requests.filter((r) => {
@@ -234,19 +234,19 @@ export default function AdminDashboardPage() {
             return new Date(r.tokenExpiresAt).getTime() > now;
           });
           return visibleRequests.length === 0 ? (
-            <p className="text-[var(--color-muted)]">Заявок пока нет.</p>
+            <p className="text-white/90">Заявок пока нет.</p>
           ) : (
-          <div className="cabinet-section-header overflow-hidden rounded-2xl border-0">
+          <div className="admin-dashboard-table cabinet-section-header overflow-hidden rounded-2xl border-0">
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm">
+              <table className="w-full text-left text-sm text-white">
                 <thead>
-                  <tr className="border-0 bg-[var(--color-light-gray)]">
-                    <th className="w-8 p-3 text-[var(--color-muted)]"></th>
-                    <th className="p-3 font-medium text-[var(--color-text-secondary)]">ФИО</th>
-                    <th className="p-3 font-medium text-[var(--color-text-secondary)]">Почта</th>
-                    <th className="p-3 font-medium text-[var(--color-text-secondary)]">Дата заявки</th>
-                    <th className="p-3 font-medium text-[var(--color-text-secondary)]">Статус</th>
-                    <th className="p-3 font-medium text-[var(--color-text-secondary)]">Действие</th>
+                  <tr className="border-0 bg-white/10">
+                    <th className="w-8 p-3 text-white/80"></th>
+                    <th className="p-3 font-medium text-white">ФИО</th>
+                    <th className="p-3 font-medium text-white">Почта</th>
+                    <th className="p-3 font-medium text-white">Дата заявки</th>
+                    <th className="p-3 font-medium text-white">Статус</th>
+                    <th className="p-3 font-medium text-white">Действие</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -263,15 +263,15 @@ export default function AdminDashboardPage() {
                             <button
                               type="button"
                               onClick={() => setExpandedId(isExpanded ? null : r.id)}
-                              className="rounded p-1 text-[var(--color-muted)] hover:bg-[var(--color-light-gray)] hover:text-[var(--color-text)]"
+                              className="rounded p-1 text-white/80 hover:bg-white/15 hover:text-white"
                               aria-label={isExpanded ? "Свернуть" : "Развернуть"}
                             >
                               {isExpanded ? <ChevronDown className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
                             </button>
                           </td>
-                          <td className="p-3 text-[var(--color-text-secondary)]">{r.fullName}</td>
-                          <td className="p-3 text-[var(--color-text-secondary)]">{r.email}</td>
-                          <td className="p-3 text-[var(--color-muted)]">
+                          <td className="p-3 text-white/90">{r.fullName}</td>
+                          <td className="p-3 text-white/90">{r.email}</td>
+                          <td className="p-3 text-white/80">
                             {new Date(r.createdAt).toLocaleDateString("ru-RU", {
                               day: "2-digit",
                               month: "2-digit",
@@ -317,28 +317,28 @@ export default function AdminDashboardPage() {
                                   <button
                                     type="button"
                                     onClick={() => copyLink(linkForRow)}
-                                    className="rounded p-1.5 text-[var(--color-muted)] hover:bg-[var(--color-light-gray)] hover:text-[var(--color-text)]"
+                                    className="rounded p-1.5 text-white/80 hover:bg-white/15 hover:text-white"
                                     title="Копировать"
                                   >
                                     <Copy className="h-4 w-4" />
                                   </button>
                                 </div>
-                                <span className="text-xs text-[var(--color-muted)]">Одноразовая ссылка — только одна регистрация</span>
+                                <span className="text-xs text-white/80">Одноразовая ссылка — только одна регистрация</span>
                               </div>
                             )}
                             {r.status === "APPROVED" && r.hasToken && !linkForRow && (
-                              <span className="text-xs text-[var(--color-muted)]">Ссылка выдана (одноразовая, скопируйте при выдаче)</span>
+                              <span className="text-xs text-white/80">Ссылка выдана (одноразовая, скопируйте при выдаче)</span>
                             )}
                           </td>
                         </tr>
                         {isExpanded && (
-                          <tr className="border-0 bg-[var(--color-light-gray)]">
+                          <tr className="border-0 bg-white/10">
                             <td colSpan={6} className="p-4">
-                              <div className="grid gap-2 text-[var(--color-text-secondary)] sm:grid-cols-2">
-                                <p><span className="text-[var(--color-muted)]">Дата рождения:</span> {r.dateOfBirth}</p>
-                                <p><span className="text-[var(--color-muted)]">Заведение:</span> {r.establishment}</p>
-                                <p><span className="text-[var(--color-muted)]">Телефон:</span> {r.phone}</p>
-                                <p><span className="text-[var(--color-muted)]">Вид деятельности:</span> {r.activityType}</p>
+                              <div className="grid gap-2 text-white/90 sm:grid-cols-2">
+                                <p><span className="text-white/70">Дата рождения:</span> {r.dateOfBirth}</p>
+                                <p><span className="text-white/70">Заведение:</span> {r.establishment}</p>
+                                <p><span className="text-white/70">Телефон:</span> {r.phone}</p>
+                                <p><span className="text-white/70">Вид деятельности:</span> {r.activityType}</p>
                               </div>
                             </td>
                           </tr>

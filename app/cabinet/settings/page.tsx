@@ -212,25 +212,25 @@ export default function CabinetSettingsPage() {
 
   return (
     <div className="space-y-8">
-      <div className="cabinet-card rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden">
+      <div id="settings-profile" className="cabinet-card rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden">
         <div className="flex items-center justify-between border-0 px-6 py-4">
           <div className="flex items-center gap-3">
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--color-accent-gold)]/20 text-[var(--color-accent-gold)]">
               <User className="h-6 w-6" />
             </div>
-            <h2 className="font-[family:var(--font-playfair)] text-lg font-semibold text-[var(--color-navy)]">Данные для входа</h2>
+            <h2 className="font-[family:var(--font-playfair)] text-lg font-semibold text-white">Данные для входа</h2>
           </div>
           {user && (
-            <span className="rounded-lg bg-[var(--color-dark-gray)]/10 px-3 py-1.5 font-mono text-sm text-[var(--color-text-secondary)]">
+            <span className="rounded-lg bg-[var(--color-dark-gray)]/10 px-3 py-1.5 font-mono text-sm text-white/90">
               ID: #{user.uniqueId}
             </span>
           )}
         </div>
         <div className="p-6">
 
-        {saveError && <p className="mb-4 text-sm text-[var(--color-text-secondary)]">{saveError}</p>}
+        {saveError && <p className="mb-4 text-sm text-white/90">{saveError}</p>}
         {saveOk && (
-          <div className="mb-4 flex items-center gap-2 text-sm text-[var(--color-text)]">
+          <div className="mb-4 flex items-center gap-2 text-sm text-white">
             <CheckCircle2 className="h-5 w-5 shrink-0" />
             <span>Сохранено</span>
           </div>
@@ -238,7 +238,7 @@ export default function CabinetSettingsPage() {
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <label htmlFor="settings-login" className="mb-1 block text-sm font-medium text-[var(--color-navy)]">Логин</label>
+            <label htmlFor="settings-login" className="mb-1 block text-sm font-medium text-white">Логин</label>
             <input
               id="settings-login"
               type="text"
@@ -246,10 +246,10 @@ export default function CabinetSettingsPage() {
               onChange={(e) => setEditLogin(e.target.value)}
               className={cabinetInputClassName(!!profileFieldErrors.login)}
             />
-            {profileFieldErrors.login && <p className="mt-1 text-xs text-[var(--color-text-secondary)]" role="alert">{profileFieldErrors.login}</p>}
+            {profileFieldErrors.login && <p className="mt-1 text-xs text-white/90" role="alert">{profileFieldErrors.login}</p>}
           </div>
           <div>
-            <label htmlFor="settings-email" className="mb-1 block text-sm font-medium text-[var(--color-navy)]">Email (необязательно)</label>
+            <label htmlFor="settings-email" className="mb-1 block text-sm font-medium text-white">Email (необязательно)</label>
             <input
               id="settings-email"
               type="email"
@@ -258,15 +258,15 @@ export default function CabinetSettingsPage() {
               placeholder="email@example.com"
               className={cabinetInputClassName(!!profileFieldErrors.email)}
             />
-            {profileFieldErrors.email && <p className="mt-1 text-xs text-[var(--color-text-secondary)]" role="alert">{profileFieldErrors.email}</p>}
+            {profileFieldErrors.email && <p className="mt-1 text-xs text-white/90" role="alert">{profileFieldErrors.email}</p>}
           </div>
         </div>
 
         <div className="mt-6">
-          <h3 className="text-sm font-semibold text-[var(--color-navy)]">Анкета</h3>
+          <h3 className="text-sm font-semibold text-white">Анкета</h3>
           <div className="mt-3 grid gap-4 sm:grid-cols-2">
             <div className="sm:col-span-2">
-              <label htmlFor="settings-fullName" className="mb-1 block text-sm font-medium text-[var(--color-navy)]">ФИО</label>
+              <label htmlFor="settings-fullName" className="mb-1 block text-sm font-medium text-white">ФИО</label>
               <input
                 id="settings-fullName"
                 type="text"
@@ -275,10 +275,10 @@ export default function CabinetSettingsPage() {
                 placeholder="Иванов Иван Иванович"
                 className={cabinetInputClassName(!!profileFieldErrors.fullName)}
               />
-              {profileFieldErrors.fullName && <p className="mt-1 text-xs text-[var(--color-text-secondary)]" role="alert">{profileFieldErrors.fullName}</p>}
+              {profileFieldErrors.fullName && <p className="mt-1 text-xs text-white/90" role="alert">{profileFieldErrors.fullName}</p>}
             </div>
             <div>
-              <label htmlFor="settings-birthDate" className="mb-1 block text-sm font-medium text-[var(--color-navy)]">Дата рождения</label>
+              <label htmlFor="settings-birthDate" className="mb-1 block text-sm font-medium text-white">Дата рождения</label>
               <input
                 id="settings-birthDate"
                 type="date"
@@ -286,10 +286,10 @@ export default function CabinetSettingsPage() {
                 onChange={(e) => setEditBirthDate(e.target.value)}
                 className={cabinetInputClassName(!!profileFieldErrors.birthDate)}
               />
-              {profileFieldErrors.birthDate && <p className="mt-1 text-xs text-[var(--color-text-secondary)]" role="alert">{profileFieldErrors.birthDate}</p>}
+              {profileFieldErrors.birthDate && <p className="mt-1 text-xs text-white/90" role="alert">{profileFieldErrors.birthDate}</p>}
             </div>
             <div>
-              <label htmlFor="settings-establishment" className="mb-1 block text-sm font-medium text-[var(--color-navy)]">Заведение</label>
+              <label htmlFor="settings-establishment" className="mb-1 block text-sm font-medium text-white">Заведение</label>
               <input
                 id="settings-establishment"
                 type="text"
@@ -298,7 +298,7 @@ export default function CabinetSettingsPage() {
                 placeholder="Название заведения"
                 className={cabinetInputClassName(!!profileFieldErrors.establishment)}
               />
-              {profileFieldErrors.establishment && <p className="mt-1 text-xs text-[var(--color-text-secondary)]" role="alert">{profileFieldErrors.establishment}</p>}
+              {profileFieldErrors.establishment && <p className="mt-1 text-xs text-white/90" role="alert">{profileFieldErrors.establishment}</p>}
             </div>
           </div>
         </div>
@@ -315,15 +315,15 @@ export default function CabinetSettingsPage() {
         </div>
       </div>
 
-      <div className="cabinet-card rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden">
+      <div id="settings-password" className="cabinet-card rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden">
         <div className="border-0 px-6 py-4">
-          <h2 className="font-[family:var(--font-playfair)] text-lg font-semibold text-[var(--color-navy)]">Сменить пароль</h2>
+          <h2 className="font-[family:var(--font-playfair)] text-lg font-semibold text-white">Сменить пароль</h2>
         </div>
         <div className="p-6">
 
-        {pwError && <p className="mb-4 text-sm text-[var(--color-text-secondary)]">{pwError}</p>}
+        {pwError && <p className="mb-4 text-sm text-white/90">{pwError}</p>}
         {pwOk && (
-          <div className="mb-4 flex items-center gap-2 text-sm text-[var(--color-text)]">
+          <div className="mb-4 flex items-center gap-2 text-sm text-white">
             <CheckCircle2 className="h-5 w-5 shrink-0" />
             <span>Пароль изменён</span>
           </div>
@@ -331,7 +331,7 @@ export default function CabinetSettingsPage() {
 
         <div className="grid gap-4 sm:max-w-md">
           <div>
-            <label htmlFor="settings-pwCurrent" className="mb-1 block text-sm font-medium text-[var(--color-navy)]">Текущий пароль</label>
+            <label htmlFor="settings-pwCurrent" className="mb-1 block text-sm font-medium text-white">Текущий пароль</label>
             <input
               id="settings-pwCurrent"
               type="password"
@@ -340,10 +340,10 @@ export default function CabinetSettingsPage() {
               onChange={(e) => setPwCurrent(e.target.value)}
               className={cabinetInputClassName(!!pwFieldErrors.currentPassword)}
             />
-            {pwFieldErrors.currentPassword && <p className="mt-1 text-xs text-[var(--color-text-secondary)]" role="alert">{pwFieldErrors.currentPassword}</p>}
+            {pwFieldErrors.currentPassword && <p className="mt-1 text-xs text-white/90" role="alert">{pwFieldErrors.currentPassword}</p>}
           </div>
           <div>
-            <label htmlFor="settings-pwNew" className="mb-1 block text-sm font-medium text-[var(--color-navy)]">Новый пароль</label>
+            <label htmlFor="settings-pwNew" className="mb-1 block text-sm font-medium text-white">Новый пароль</label>
             <input
               id="settings-pwNew"
               type="password"
@@ -352,10 +352,10 @@ export default function CabinetSettingsPage() {
               onChange={(e) => setPwNew(e.target.value)}
               className={cabinetInputClassName(!!pwFieldErrors.newPassword)}
             />
-            {pwFieldErrors.newPassword && <p className="mt-1 text-xs text-[var(--color-text-secondary)]" role="alert">{pwFieldErrors.newPassword}</p>}
+            {pwFieldErrors.newPassword && <p className="mt-1 text-xs text-white/90" role="alert">{pwFieldErrors.newPassword}</p>}
           </div>
           <div>
-            <label htmlFor="settings-pwConfirm" className="mb-1 block text-sm font-medium text-[var(--color-navy)]">Повторите новый пароль</label>
+            <label htmlFor="settings-pwConfirm" className="mb-1 block text-sm font-medium text-white">Повторите новый пароль</label>
             <input
               id="settings-pwConfirm"
               type="password"
@@ -364,7 +364,7 @@ export default function CabinetSettingsPage() {
               onChange={(e) => setPwConfirm(e.target.value)}
               className={cabinetInputClassName(!!pwFieldErrors.newPasswordConfirm)}
             />
-            {pwFieldErrors.newPasswordConfirm && <p className="mt-1 text-xs text-[var(--color-text-secondary)]" role="alert">{pwFieldErrors.newPasswordConfirm}</p>}
+            {pwFieldErrors.newPasswordConfirm && <p className="mt-1 text-xs text-white/90" role="alert">{pwFieldErrors.newPasswordConfirm}</p>}
           </div>
         </div>
 
@@ -372,7 +372,7 @@ export default function CabinetSettingsPage() {
           type="button"
           onClick={handleChangePassword}
           disabled={pwSaving || !pwCurrent || !pwNew || !pwConfirm}
-          className="mt-6 inline-flex items-center gap-2 rounded-xl border-0 px-5 py-2.5 font-semibold text-[var(--color-navy)] transition-all hover:bg-[var(--color-dark-gray)]/10 disabled:opacity-50"
+          className="mt-6 inline-flex items-center gap-2 rounded-xl border border-[var(--color-brand-gold)]/20 bg-white px-5 py-2.5 font-semibold text-[#0a192f] transition-all hover:bg-[var(--color-light-gray)] disabled:opacity-50"
         >
           {pwSaving && <Loader2 className="h-4 w-4 animate-spin" />}
           Сменить пароль

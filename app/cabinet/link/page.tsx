@@ -143,13 +143,13 @@ export default function CabinetLinkPage() {
         </div>
       ) : (
         <div className="grid gap-8 md:grid-cols-2">
-          <div className="cabinet-card rounded-xl border-0 bg-[var(--color-bg-sides)] p-6 shadow-[var(--shadow-subtle)] transition-all hover:shadow-[var(--shadow-medium)]">
-            <h2 className="mb-4 font-[family:var(--font-playfair)] text-xl font-semibold text-[var(--color-text)]">
+          <div id="link-payment" className="cabinet-card rounded-xl border-0 bg-[var(--color-bg-sides)] p-6 shadow-[var(--shadow-subtle)] transition-all hover:shadow-[var(--shadow-medium)]">
+            <h2 className="mb-4 font-[family:var(--font-playfair)] text-xl font-semibold text-white">
               Ссылка для оплаты
             </h2>
             <div className="rounded-xl bg-[var(--color-dark-gray)]/6 p-5">
-              <div className="mb-4 font-semibold text-[var(--color-text)]">Ваша ссылка для чаевых</div>
-              <div className="cabinet-input-window mb-4 break-all rounded-lg border border-[var(--color-brand-gold)]/20 px-4 py-3 font-mono text-sm text-[var(--color-text-secondary)]">
+              <div className="mb-4 font-semibold text-white">Ваша ссылка для чаевых</div>
+              <div className="cabinet-input-window mb-4 break-all rounded-lg border border-[var(--color-brand-gold)]/20 px-4 py-3 font-mono text-sm text-white/90">
                 {linkUrl}
               </div>
               <div className="flex flex-wrap gap-3">
@@ -165,7 +165,7 @@ export default function CabinetLinkPage() {
                   <a
                     href={qrDataUrl}
                     download="freetips-qr.png"
-                    className="inline-flex items-center gap-2 rounded-xl border-0 px-5 py-2.5 font-semibold text-[var(--color-text)] transition-all hover:bg-[var(--color-dark-gray)]/10 "
+                    className="inline-flex items-center gap-2 rounded-xl border border-[var(--color-brand-gold)]/20 bg-white px-5 py-2.5 font-semibold text-[#0a192f] transition-all hover:bg-[var(--color-light-gray)]"
                   >
                     <Download className="h-4 w-4" />
                     Скачать QR

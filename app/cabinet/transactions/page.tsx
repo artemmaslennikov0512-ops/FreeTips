@@ -302,16 +302,16 @@ export default function CabinetTransactionsPage() {
                   const feeKop = hasValidAmount ? feeKopForPayout(amountKop) : 0;
                   const totalKop = amountKop + feeKop;
                   return (
-                    <div className="waiter-card-summary w-full max-w-sm rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-4 py-3 text-sm text-white">
+                    <div className="waiter-card-summary cabinet-block-inner w-full max-w-sm rounded-xl border border-[var(--color-brand-gold)]/20 px-5 py-4 text-sm text-white shadow-sm">
                       <div className="flex justify-between text-white">
                         <span>К зачислению на карту:</span>
                         <span className="font-medium">{hasValidAmount ? formatMoney(BigInt(amountKop)) : "—"}</span>
                       </div>
-                      <div className="mt-1 flex justify-between text-white">
+                      <div className="mt-2 flex justify-between text-white">
                         <span>Комиссия (1,2%):</span>
                         <span className="font-medium">{hasValidAmount ? formatMoney(BigInt(feeKop)) : "—"}</span>
                       </div>
-                      <div className="mt-1 flex justify-between font-medium text-white">
+                      <div className="mt-2 flex justify-between font-medium text-white">
                         <span>С баланса будет списано:</span>
                         <span>{hasValidAmount ? formatMoney(BigInt(totalKop)) : "—"}</span>
                       </div>

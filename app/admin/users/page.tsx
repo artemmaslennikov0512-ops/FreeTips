@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Search, Copy, Filter, ArrowUpDown, Lock } from "lucide-react";
+import { Search, Copy, Filter, ArrowUpDown, Lock, Check } from "lucide-react";
 import Link from "next/link";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { getBaseUrl } from "@/lib/get-base-url";
@@ -43,6 +43,7 @@ export default function AdminUsersPage() {
   const [tokenExpiresAt, setTokenExpiresAt] = useState<string | null>(null);
   const [tokenLoading, setTokenLoading] = useState(false);
   const [registrationLink, setRegistrationLink] = useState<string | null>(null);
+  const [linkCopied, setLinkCopied] = useState(false);
   const [blockAllLoading, setBlockAllLoading] = useState(false);
   const [blockAllError, setBlockAllError] = useState<string | null>(null);
 
@@ -197,6 +198,8 @@ export default function AdminUsersPage() {
     if (!registrationLink) return;
     try {
       await navigator.clipboard.writeText(registrationLink);
+      setLinkCopied(true);
+      setTimeout(() => setLinkCopied(false), 2000);
     } catch {
       setError("Не удалось скопировать токен");
     }
@@ -272,10 +275,23 @@ export default function AdminUsersPage() {
               <button
                 type="button"
                 onClick={handleCopyToken}
-                className="flex items-center gap-1 rounded-lg border border-white/25 bg-white/10 px-3 py-2 text-xs font-medium text-white hover:bg-white/20"
+                className={`flex items-center gap-1 rounded-lg border px-3 py-2 text-xs font-medium transition-colors ${
+                  linkCopied
+                    ? "border-[var(--color-accent-emerald)] bg-[var(--color-accent-emerald)]/20 text-white"
+                    : "border-white/25 bg-white/10 text-white hover:bg-white/20"
+                }`}
               >
-                <Copy className="h-4 w-4" />
-                Скопировать ссылку
+                {linkCopied ? (
+                  <>
+                    <Check className="h-4 w-4" />
+                    Скопировано!
+                  </>
+                ) : (
+                  <>
+                    <Copy className="h-4 w-4" />
+                    Скопировать ссылку
+                  </>
+                )}
               </button>
             )}
           </div>

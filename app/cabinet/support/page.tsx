@@ -125,10 +125,18 @@ export default function CabinetSupportPage() {
 
   return (
     <div className="support-chat-header mx-auto max-w-2xl text-center">
-      <h1 className="flex items-center justify-center gap-2 text-2xl font-bold text-white">
-        <MessageCircle className="h-7 w-7 text-[var(--color-brand-gold)]" />
-        Чат поддержки
-      </h1>
+      <div className="relative flex items-center justify-center">
+        <h1 className="flex items-center justify-center gap-2 text-2xl font-bold text-white">
+          <MessageCircle className="h-7 w-7 text-[var(--color-brand-gold)]" />
+          Поддержка Free Tips
+        </h1>
+        <img
+          src="/logo.svg"
+          alt=""
+          className="absolute right-0 h-10 w-10 opacity-90"
+          aria-hidden
+        />
+      </div>
       <p className="mt-2 text-sm text-white/90">
         Задайте вопрос или опишите проблему. Ответим в рабочее время.
       </p>

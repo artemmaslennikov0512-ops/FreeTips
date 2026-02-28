@@ -610,13 +610,24 @@ html:not([data-theme="dark"]) .cabinet-premium .cabinet-limits-block .font-mediu
 }
 
 /* Админка: выпадающие списки (select) — тёмный фон и светлый текст, чтобы не было «белой шторки» (и в светлой, и в тёмной теме контент админки на тёмном фоне) */
-.admin-panel select {
+/* Тёмная тема: выпадающие списки в админке — тёмный фон, чтобы не было белой шторки */
+[data-theme="dark"] .admin-panel select {
   background: #262626 !important;
   color: #fafafa !important;
 }
-.admin-panel select option {
+[data-theme="dark"] .admin-panel select option {
   background: #262626 !important;
   color: #fafafa !important;
+}
+
+/* Светлая тема: селекты в админке — как кнопки (тот же фон, что у «Убыв.» / cabinet-section-header) */
+html:not([data-theme="dark"]) .admin-panel select {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #fff !important;
+}
+html:not([data-theme="dark"]) .admin-panel select option {
+  background: #2d3748 !important;
+  color: #fff !important;
 }
 
 /* Поле поиска в админке «Пользователи» — белый текст ввода */

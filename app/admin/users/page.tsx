@@ -272,7 +272,7 @@ export default function AdminUsersPage() {
               <button
                 type="button"
                 onClick={handleCopyToken}
-                className="flex items-center gap-1 rounded-lg border-0 px-3 py-2 text-xs text-[var(--color-text-secondary)] hover:bg-[var(--color-light-gray)]"
+                className="flex items-center gap-1 rounded-lg border border-white/25 bg-white/10 px-3 py-2 text-xs font-medium text-white hover:bg-white/20"
               >
                 <Copy className="h-4 w-4" />
                 Скопировать ссылку

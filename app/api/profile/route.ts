@@ -12,7 +12,7 @@ import { patchProfileSchema } from "@/lib/validations";
 import { parseJsonWithLimit, MAX_BODY_SIZE_AUTH } from "@/lib/api/helpers";
 import { getEffectivePayoutLimits, getEffectiveMonthlyPayoutLimits, getUtcDayStart, getUtcMonthStart } from "@/lib/payout-limits";
 import { sdGetBalance } from "@/lib/payment/paygine/client";
-import { logError } from "@/lib/logger";
+import { logError, logInfo } from "@/lib/logger";
 import { getRequestId } from "@/lib/security/request";
 
 export async function GET(request: NextRequest) {
@@ -96,16 +96,28 @@ export async function GET(request: NextRequest) {
     const sector = process.env.PAYGINE_SECTOR?.trim();
     const password = process.env.PAYGINE_PASSWORD;
     const sdRef = profile.paygineSdRef?.trim();
+    let paygineBalanceKop: number | null = null;
     if (sdRef && sector && password) {
       try {
         const paygineBalance = await sdGetBalance({ sector, password }, { sdRef });
         if (paygineBalance.ok) {
+          paygineBalanceKop = paygineBalance.balanceKop;
           balanceKopForStats = paygineBalance.balanceKop;
         }
       } catch {
         // При недоступности Paygine отдаём баланс по БД
       }
     }
+    logInfo("profile.balance_source", {
+      userId: id,
+      login: profile.login,
+      uniqueId: profile.uniqueId,
+      balanceFromDb: Number(balanceCalculated),
+      balanceFromPaygine: paygineBalanceKop,
+      balanceReturned: balanceKopForStats,
+      sdRef: sdRef ?? null,
+      transactionsCount: txCount,
+    });
 
     // Ответ только примитивами — гарантированная сериализация без BigInt
     const body = {

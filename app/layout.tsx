@@ -37,9 +37,38 @@ const inter = Inter({
   preload: false,
 });
 
+const siteName = "FreeTips";
+const defaultTitle = `${siteName} | Сервис премиальных чаевых для профессионалов`;
+const defaultDescription =
+  "Безопасный и уважительный способ получать достойное вознаграждение за ваш труд. Премиальные чаевые для профессионалов.";
+const baseUrl = (process.env.NEXT_PUBLIC_APP_URL ?? "").replace(/\/$/, "") || "https://freetips.ru";
+
 export const metadata: Metadata = {
-  title: "FreeTips | Сервис премиальных чаевых для профессионалов",
-  description: "Безопасный и уважительный способ получать достойное вознаграждение за ваш труд. Премиальные чаевые для профессионалов.",
+  metadataBase: new URL(baseUrl),
+  title: { default: defaultTitle, template: `%s | ${siteName}` },
+  description: defaultDescription,
+  keywords: [
+    "чаевые",
+    "премиальные чаевые",
+    "сервис чаевых",
+    "чаевые для официантов",
+    "чаевые онлайн",
+    "FreeTips",
+  ],
+  openGraph: {
+    type: "website",
+    locale: "ru_RU",
+    url: baseUrl,
+    siteName,
+    title: defaultTitle,
+    description: defaultDescription,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: defaultTitle,
+    description: defaultDescription,
+  },
+  alternates: { canonical: baseUrl },
 };
 
 export const viewport = {

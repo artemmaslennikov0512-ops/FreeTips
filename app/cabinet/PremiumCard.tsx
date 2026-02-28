@@ -74,6 +74,13 @@ const CARD_STYLES = `
   color: #000;
   font-weight: bold;
 }
+.premium-card-brand {
+  background: linear-gradient(135deg, #f5f5f5 0%, #d8d8d8 35%, #b8b8b8 65%, #d0d0d0 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
 .premium-badge {
   background: linear-gradient(90deg, #fff, #ccc);
   color: #000;
@@ -126,7 +133,7 @@ export function PremiumCard({ fullName, balanceKop, compact }: Props) {
               />
               <div className="absolute left-[12px] bottom-[28px] z-[3] flex items-center gap-1.5">
                 <div className="premium-logo-icon">FT</div>
-                <span className="text-xs font-extrabold text-white">
+                <span className="premium-card-brand text-xs font-extrabold">
                   FreeTips
                 </span>
               </div>

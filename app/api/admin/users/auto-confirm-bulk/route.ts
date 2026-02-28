@@ -10,6 +10,7 @@ import { db } from "@/lib/db";
 import { z } from "zod";
 import { parseJsonWithLimit, MAX_BODY_SIZE_AUTH } from "@/lib/api/helpers";
 import { UserRole } from "@prisma/client";
+import { saveSystemDefaultLimits } from "@/lib/system-default-limits";
 
 const bodySchema = z.object({
   enabled: z.boolean(),
@@ -42,8 +43,10 @@ export async function POST(request: NextRequest) {
     data,
   });
 
+  await saveSystemDefaultLimits(data);
+
   return NextResponse.json({
     updated: result.count,
-    message: `Обновлено пользователей: ${result.count}. Автоподтверждение: ${parsed.data.enabled ? "включено" : "выключено"}.`,
+    message: `Обновлено пользователей: ${result.count}. Автоподтверждение: ${parsed.data.enabled ? "включено" : "выключено"}. Эти настройки будут у новых аккаунтов.`,
   });
 }

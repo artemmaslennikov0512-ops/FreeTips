@@ -213,3 +213,18 @@ model RegistrationRequest {
   @@index([createdAt])
   @@map("registration_requests")
 }
+
+// Дефолтные лимиты для новых пользователей (задаются в блоке антифрода админки).
+// Одна запись (id = "default"); при "Применить" в антифроде — обновляется; при регистрации — читается.
+model SystemDefaultLimits {
+  id                            String   @id @default("default")
+  payoutDailyLimitCount         Int?
+  payoutDailyLimitKop           BigInt?
+  payoutMonthlyLimitCount      Int?
+  payoutMonthlyLimitKop        BigInt?
+  autoConfirmPayouts           Boolean  @default(false)
+  autoConfirmPayoutThresholdKop BigInt?
+  updatedAt                     DateTime @updatedAt
+
+  @@map("system_default_limits")
+}

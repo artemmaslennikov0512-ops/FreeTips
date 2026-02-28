@@ -75,7 +75,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         }
 
         if (!res.ok) {
-          setLoadError("Не удалось загрузить данные. Проверьте подключение и нажмите «Повторить».");
+          let msg = "Не удалось загрузить данные.";
+          try {
+            const errBody = (await res.json()) as { error?: string };
+            if (errBody?.error) msg += ` ${errBody.error}`;
+            msg += ` Код ответа: ${res.status}. Нажмите «Повторить» или проверьте логи сервера.`;
+          } catch {
+            msg += ` Код ответа: ${res.status}. Нажмите «Повторить» или проверьте логи сервера.`;
+          }
+          setLoadError(msg);
           setLoading(false);
           return;
         }

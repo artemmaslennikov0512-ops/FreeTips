@@ -28,6 +28,15 @@ const ANTIFRAUD_BTN_APPLY =
 const ANTIFRAUD_BTN_EDIT =
   "rounded-xl border-0 bg-[var(--color-bg-sides)] px-4 py-2 text-sm font-medium text-[var(--color-text)] hover:bg-[var(--color-light-gray)]";
 
+/** Форматирует значение лимита для отображения (сумма в ₽ или число заявок). */
+function formatLimitDisplay(value: string | null, kind: "rub" | "count"): string {
+  if (value == null || value.trim() === "") return "—";
+  const n = kind === "rub" ? parseFloat(value.replace(/\s/g, "").replace(",", ".")) : parseInt(value, 10);
+  if (Number.isNaN(n)) return "—";
+  if (kind === "rub") return `${Math.round(n).toLocaleString("ru-RU")} ₽`;
+  return `${n} заявок`;
+}
+
 interface StoredLink {
   link: string;
   expiresAt: string;
@@ -495,6 +504,9 @@ export default function AdminDashboardPage() {
               {antifraudMessage.text}
             </p>
           )}
+          <p className="mb-4 text-xs text-[var(--color-text-secondary)]">
+            Текущие значения видны ниже; «—» — не задано (для массового применения или в карточке пользователя).
+          </p>
           <div className="antifraud-limits-list space-y-4">
             <div className="antifraud-limit-rows space-y-4">
             {/* 1. Макс. сумма одной операции вывода */}
@@ -502,16 +514,21 @@ export default function AdminDashboardPage() {
               <div className="min-w-[220px] shrink-0 text-sm font-medium text-[var(--color-text)]">
                 1. Макс. сумма одной операции вывода
               </div>
-              <div className="flex flex-1 justify-center">
-                <input
-                  type="text"
-                  inputMode="decimal"
-                  readOnly={!editingAutoConfirm}
-                  value={editingAutoConfirm ? inputAutoConfirmRub : (appliedAutoConfirmRub ?? "")}
-                  onChange={(e) => setInputAutoConfirmRub(e.target.value)}
-                  placeholder="сумма за 1 раз (₽)"
-                  className={ANTIFRAUD_INPUT}
-                />
+              <div className="flex min-w-[8rem] flex-1 justify-center">
+                {editingAutoConfirm ? (
+                  <input
+                    type="text"
+                    inputMode="decimal"
+                    value={inputAutoConfirmRub}
+                    onChange={(e) => setInputAutoConfirmRub(e.target.value)}
+                    placeholder="сумма за 1 раз (₽)"
+                    className={ANTIFRAUD_INPUT}
+                  />
+                ) : (
+                  <span className="antifraud-value text-base font-semibold text-[var(--color-text)]" aria-label="Текущий лимит">
+                    {formatLimitDisplay(appliedAutoConfirmRub, "rub")}
+                  </span>
+                )}
               </div>
               <div className="shrink-0 pr-4">
               {editingAutoConfirm ? (
@@ -540,16 +557,21 @@ export default function AdminDashboardPage() {
               <div className="min-w-[220px] shrink-0 text-sm font-medium text-[var(--color-text)]">
                 2. Суточный лимит вывода
               </div>
-              <div className="flex flex-1 justify-center">
-                <input
-                  type="text"
-                  inputMode="decimal"
-                  readOnly={!editingDailyRub}
-                  value={editingDailyRub ? inputDailyRub : (appliedDailyRub ?? "")}
-                  onChange={(e) => setInputDailyRub(e.target.value)}
-                  placeholder="сумма (₽)"
-                  className={ANTIFRAUD_INPUT}
-                />
+              <div className="flex min-w-[8rem] flex-1 justify-center">
+                {editingDailyRub ? (
+                  <input
+                    type="text"
+                    inputMode="decimal"
+                    value={inputDailyRub}
+                    onChange={(e) => setInputDailyRub(e.target.value)}
+                    placeholder="сумма (₽)"
+                    className={ANTIFRAUD_INPUT}
+                  />
+                ) : (
+                  <span className="antifraud-value text-base font-semibold text-[var(--color-text)]" aria-label="Текущий лимит">
+                    {formatLimitDisplay(appliedDailyRub, "rub")}
+                  </span>
+                )}
               </div>
               <div className="shrink-0 pr-4">
               {editingDailyRub ? (
@@ -578,16 +600,21 @@ export default function AdminDashboardPage() {
               <div className="min-w-[220px] shrink-0 text-sm font-medium text-[var(--color-text)]">
                 3. Месячный лимит вывода
               </div>
-              <div className="flex flex-1 justify-center">
-                <input
-                  type="text"
-                  inputMode="decimal"
-                  readOnly={!editingMonthlyRub}
-                  value={editingMonthlyRub ? inputMonthlyRub : (appliedMonthlyRub ?? "")}
-                  onChange={(e) => setInputMonthlyRub(e.target.value)}
-                  placeholder="сумма (₽)"
-                  className={ANTIFRAUD_INPUT}
-                />
+              <div className="flex min-w-[8rem] flex-1 justify-center">
+                {editingMonthlyRub ? (
+                  <input
+                    type="text"
+                    inputMode="decimal"
+                    value={inputMonthlyRub}
+                    onChange={(e) => setInputMonthlyRub(e.target.value)}
+                    placeholder="сумма (₽)"
+                    className={ANTIFRAUD_INPUT}
+                  />
+                ) : (
+                  <span className="antifraud-value text-base font-semibold text-[var(--color-text)]" aria-label="Текущий лимит">
+                    {formatLimitDisplay(appliedMonthlyRub, "rub")}
+                  </span>
+                )}
               </div>
               <div className="shrink-0 pr-4">
               {editingMonthlyRub ? (
@@ -616,17 +643,22 @@ export default function AdminDashboardPage() {
               <div className="min-w-[220px] shrink-0 text-sm font-medium text-[var(--color-text)]">
                 4. Суточный лимит заявок
               </div>
-              <div className="flex flex-1 justify-center">
-                <input
-                  type="number"
-                  min={0}
-                  max={100}
-                  readOnly={!editingDailyCount}
-                  value={editingDailyCount ? inputDailyCount : (appliedDailyCount ?? "")}
-                  onChange={(e) => setInputDailyCount(e.target.value)}
-                  placeholder="заявок"
-                  className={ANTIFRAUD_INPUT}
-                />
+              <div className="flex min-w-[8rem] flex-1 justify-center">
+                {editingDailyCount ? (
+                  <input
+                    type="number"
+                    min={0}
+                    max={100}
+                    value={inputDailyCount}
+                    onChange={(e) => setInputDailyCount(e.target.value)}
+                    placeholder="заявок"
+                    className={ANTIFRAUD_INPUT}
+                  />
+                ) : (
+                  <span className="antifraud-value text-base font-semibold text-[var(--color-text)]" title="Текущее значение">
+                    {formatLimitDisplay(appliedDailyCount, "count")}
+                  </span>
+                )}
               </div>
               <div className="shrink-0 pr-4">
               {editingDailyCount ? (
@@ -655,17 +687,22 @@ export default function AdminDashboardPage() {
               <div className="min-w-[220px] shrink-0 text-sm font-medium text-[var(--color-text)]">
                 5. Месячный лимит заявок
               </div>
-              <div className="flex flex-1 justify-center">
-                <input
-                  type="number"
-                  min={0}
-                  max={3000}
-                  readOnly={!editingMonthlyCount}
-                  value={editingMonthlyCount ? inputMonthlyCount : (appliedMonthlyCount ?? "")}
-                  onChange={(e) => setInputMonthlyCount(e.target.value)}
-                  placeholder="заявок"
-                  className={ANTIFRAUD_INPUT}
-                />
+              <div className="flex min-w-[8rem] flex-1 justify-center">
+                {editingMonthlyCount ? (
+                  <input
+                    type="number"
+                    min={0}
+                    max={3000}
+                    value={inputMonthlyCount}
+                    onChange={(e) => setInputMonthlyCount(e.target.value)}
+                    placeholder="заявок"
+                    className={ANTIFRAUD_INPUT}
+                  />
+                ) : (
+                  <span className="antifraud-value text-base font-semibold text-[var(--color-text)]" title="Текущее значение">
+                    {formatLimitDisplay(appliedMonthlyCount, "count")}
+                  </span>
+                )}
               </div>
               <div className="shrink-0 pr-4">
               {editingMonthlyCount ? (

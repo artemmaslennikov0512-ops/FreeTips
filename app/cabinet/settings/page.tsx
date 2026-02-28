@@ -62,7 +62,15 @@ export default function CabinetSettingsPage() {
           return;
         }
         if (!res.ok) {
-          setError("Не удалось загрузить профиль");
+          let msg = "Не удалось загрузить профиль";
+          try {
+            const errBody = (await res.json()) as { error?: string };
+            if (errBody?.error) msg += `: ${errBody.error}`;
+            else msg += ` (код ${res.status})`;
+          } catch {
+            msg += ` (код ${res.status})`;
+          }
+          setError(msg);
           return;
         }
         const data = (await res.json()) as Profile;

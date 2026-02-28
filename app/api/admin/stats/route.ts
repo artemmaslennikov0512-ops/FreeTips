@@ -39,6 +39,7 @@ export async function GET(request: NextRequest) {
     transactionsSum,
     payoutsPendingCount,
     payoutsPendingSum,
+    systemDefaultLimits,
     sampleMonthlyLimitsUser,
     sampleAutoConfirmUser,
   ] = await Promise.all([
@@ -60,6 +61,7 @@ export async function GET(request: NextRequest) {
       where: { status: "CREATED" },
       _sum: { amountKop: true },
     }),
+    db.systemDefaultLimits.findUnique({ where: { id: "default" } }),
     db.user.findFirst({
       where: {
         role: { not: "SUPERADMIN" },
@@ -78,6 +80,8 @@ export async function GET(request: NextRequest) {
     }),
   ]);
 
+  const defaults = systemDefaultLimits;
+
   return NextResponse.json({
     usersCount,
     transactionsCount,
@@ -85,20 +89,22 @@ export async function GET(request: NextRequest) {
     payoutsPendingCount,
     payoutsPendingSumKop: Number(payoutsPendingSum._sum.amountKop ?? BigInt(0)),
     period,
-    /** Лимиты по умолчанию (для отображения в панели антифрода и статистике) */
-    defaultPayoutDailyLimitCount: PAYOUT_DAILY_LIMIT_COUNT,
-    defaultPayoutDailyLimitKop: Number(PAYOUT_DAILY_LIMIT_KOP) / 100,
-    /** Пример текущих месячных лимитов (по одному из пользователей) для отображения в блоке «Месячный лимит вывода» */
-    defaultPayoutMonthlyLimitCount: sampleMonthlyLimitsUser?.payoutMonthlyLimitCount ?? null,
+    /** Лимиты по умолчанию для новых аккаунтов (из антифрода; при отсутствии — константы) */
+    defaultPayoutDailyLimitCount: defaults?.payoutDailyLimitCount ?? PAYOUT_DAILY_LIMIT_COUNT,
+    defaultPayoutDailyLimitKop: defaults?.payoutDailyLimitKop != null ? Number(defaults.payoutDailyLimitKop) / 100 : Number(PAYOUT_DAILY_LIMIT_KOP) / 100,
+    defaultPayoutMonthlyLimitCount: defaults?.payoutMonthlyLimitCount ?? sampleMonthlyLimitsUser?.payoutMonthlyLimitCount ?? null,
     defaultPayoutMonthlyLimitKop:
-      sampleMonthlyLimitsUser?.payoutMonthlyLimitKop != null
-        ? Number(sampleMonthlyLimitsUser.payoutMonthlyLimitKop) / 100
-        : null,
-    /** Пример состояния авто-вывода (по одному из пользователей) */
-    defaultAutoConfirmEnabled: sampleAutoConfirmUser?.autoConfirmPayouts ?? false,
+      defaults?.payoutMonthlyLimitKop != null
+        ? Number(defaults.payoutMonthlyLimitKop) / 100
+        : sampleMonthlyLimitsUser?.payoutMonthlyLimitKop != null
+          ? Number(sampleMonthlyLimitsUser.payoutMonthlyLimitKop) / 100
+          : null,
+    defaultAutoConfirmEnabled: defaults?.autoConfirmPayouts ?? sampleAutoConfirmUser?.autoConfirmPayouts ?? false,
     defaultAutoConfirmThresholdKop:
-      sampleAutoConfirmUser?.autoConfirmPayoutThresholdKop != null
-        ? Number(sampleAutoConfirmUser.autoConfirmPayoutThresholdKop)
-        : null,
+      defaults?.autoConfirmPayoutThresholdKop != null
+        ? Number(defaults.autoConfirmPayoutThresholdKop)
+        : sampleAutoConfirmUser?.autoConfirmPayoutThresholdKop != null
+          ? Number(sampleAutoConfirmUser.autoConfirmPayoutThresholdKop)
+          : null,
   });
 }

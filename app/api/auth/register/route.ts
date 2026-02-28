@@ -14,7 +14,7 @@ import { generateAccessToken, generateRefreshToken, setRefreshTokenCookie } from
 import { checkRateLimitByIP, getClientIP, AUTH_RATE_LIMIT } from "@/lib/middleware/rate-limit";
 import { hashRegistrationToken } from "@/lib/auth/registration-token";
 import { getWaiterPaygineSdRef } from "@/lib/payment/paygine-sd-ref";
-import { getDefaultRecipientUpdateData } from "@/lib/default-recipient-settings";
+import { getSystemDefaultLimitsForNewUser } from "@/lib/system-default-limits";
 import { logError, logSecurity } from "@/lib/logger";
 import { getRequestId } from "@/lib/security/request";
 import { parseJsonWithLimit, MAX_BODY_SIZE_AUTH, jsonError, internalError } from "@/lib/api/helpers";
@@ -84,12 +84,12 @@ export async function POST(request: NextRequest) {
       const created = await tx.user.create({
         data: { login: validated.login, passwordHash, email: validated.email, role: "RECIPIENT" },
       });
-      const defaultRecipient = getDefaultRecipientUpdateData();
+      const defaultLimits = await getSystemDefaultLimitsForNewUser();
       await tx.user.update({
         where: { id: created.id },
         data: {
           paygineSdRef: getWaiterPaygineSdRef(created.uniqueId),
-          ...defaultRecipient,
+          ...defaultLimits,
         },
       });
       await tx.registrationToken.update({

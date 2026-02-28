@@ -50,7 +50,15 @@ export default function CabinetDashboardPage() {
         return;
       }
       if (!profileRes.ok) {
-        setError("Не удалось загрузить данные");
+        let msg = "Не удалось загрузить данные";
+        try {
+          const errBody = (await profileRes.json()) as { error?: string };
+          if (errBody?.error) msg += `: ${errBody.error}`;
+          else msg += ` (код ${profileRes.status})`;
+        } catch {
+          msg += ` (код ${profileRes.status})`;
+        }
+        setError(msg);
         return;
       }
       const profile = (await profileRes.json()) as {
@@ -318,6 +326,16 @@ export default function CabinetDashboardPage() {
             <div className="cabinet-input-window cabinet-block-inner mb-4 break-all rounded-md border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-3 font-mono text-sm text-[var(--color-text-secondary)]">
               {apiKey ?? (hasApiKey ? "••••••••••••••••" : "Ключ не создан")}
             </div>
+            {hasApiKey && !apiKey && (
+              <p className="mb-4 text-xs text-[var(--color-muted)]">
+                Ключ скрыт для безопасности. Чтобы скопировать его или ввести в приложении — нажмите «Создать новый ключ», затем сразу скопируйте ключ и вставьте в приложение. Старый ключ перестанет работать.
+              </p>
+            )}
+            {apiKey && (
+              <p className="mb-4 text-xs text-[var(--color-muted)]">
+                Скопируйте ключ сейчас и вставьте в приложение — после обновления страницы он будет скрыт.
+              </p>
+            )}
             <div className="flex flex-wrap gap-3">
               {apiKey ? (
                 <>
@@ -327,7 +345,7 @@ export default function CabinetDashboardPage() {
                     className="inline-flex items-center gap-2 rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-bg-sides)] px-5 py-2.5 font-semibold text-[var(--color-text)] shadow-sm transition-all duration-200 hover:bg-[var(--color-light-gray)] hover:shadow-md active:scale-[0.98] active:shadow-inner focus:outline-none"
                   >
                     <Copy className="h-4 w-4 shrink-0" />
-                    {apiKeyCopied ? "Код скопирован" : "Копировать"}
+                    {apiKeyCopied ? "Скопировано" : "Копировать"}
                   </button>
                   <button
                     type="button"

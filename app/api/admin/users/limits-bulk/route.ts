@@ -10,6 +10,7 @@ import { db } from "@/lib/db";
 import { z } from "zod";
 import { parseJsonWithLimit, MAX_BODY_SIZE_AUTH } from "@/lib/api/helpers";
 import { UserRole } from "@prisma/client";
+import { saveSystemDefaultLimits } from "@/lib/system-default-limits";
 
 const bodySchema = z.object({
   dailyLimitCount: z.number().int().min(0).max(100).nullable().optional(),
@@ -53,8 +54,10 @@ export async function POST(request: NextRequest) {
     data,
   });
 
+  await saveSystemDefaultLimits(data);
+
   return NextResponse.json({
     updated: result.count,
-    message: `Обновлено пользователей: ${result.count}. Лимиты применены.`,
+    message: `Обновлено пользователей: ${result.count}. Лимиты применены. Эти же лимиты будут у новых аккаунтов.`,
   });
 }

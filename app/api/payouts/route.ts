@@ -10,12 +10,14 @@ import { db } from "@/lib/db";
 import { createPayoutSchema } from "@/lib/validations";
 import { getBalance } from "@/lib/balance";
 import { parseJsonWithLimit, MAX_BODY_SIZE_AUTH } from "@/lib/api/helpers";
-import { getUtcDayStart, getEffectivePayoutLimits } from "@/lib/payout-limits";
+import { getUtcDayStart, getUtcMonthStart, getEffectivePayoutLimits, getEffectiveMonthlyPayoutLimits } from "@/lib/payout-limits";
 import { sendPayoutToPaygine, isPayginePayoutAutoSendEnabled } from "@/lib/payment/send-payout-to-paygine";
 import { feeKopForPayout } from "@/lib/payment/paygine-fee";
 import { logSecurity } from "@/lib/logger";
 import { broadcastBalanceUpdated } from "@/lib/ws-broadcast";
 import { requestPaygineBalance } from "@/lib/payment/request-paygine-balance";
+import { getRequestId } from "@/lib/security/request";
+import { getClientIP } from "@/lib/middleware/rate-limit";
 
 export async function GET(request: NextRequest) {
   const auth = await requireAuthOrApiKey(request);
@@ -42,6 +44,9 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const requestId = getRequestId(request);
+  const ip = getClientIP(request);
+
   const auth = await requireAuthOrApiKey(request);
   if ("response" in auth) return auth.response;
 
@@ -50,6 +55,13 @@ export async function POST(request: NextRequest) {
 
   const parsed = createPayoutSchema.safeParse(bodyResult.data);
   if (!parsed.success) {
+    logSecurity("payout.create.invalid_payload", {
+      rule: "payout_validation",
+      action: "reject",
+      requestId,
+      ip,
+      userId: auth.userId,
+    });
     return NextResponse.json(
       { error: "Неверные данные", issues: parsed.error.issues },
       { status: 400 },
@@ -98,9 +110,13 @@ export async function POST(request: NextRequest) {
   }
 
   const dayStart = getUtcDayStart();
-  const limits = await getEffectivePayoutLimits(auth.userId);
+  const monthStart = getUtcMonthStart();
+  const [limits, monthlyLimits] = await Promise.all([
+    getEffectivePayoutLimits(auth.userId),
+    getEffectiveMonthlyPayoutLimits(auth.userId),
+  ]);
 
-  const [todayCount, todaySum] = await Promise.all([
+  const [todayCount, todaySum, monthCount, monthSum] = await Promise.all([
     db.payoutRequest.count({
       where: { userId: auth.userId, createdAt: { gte: dayStart } },
     }),
@@ -108,9 +124,29 @@ export async function POST(request: NextRequest) {
       where: { userId: auth.userId, createdAt: { gte: dayStart } },
       _sum: { amountKop: true },
     }),
+    monthlyLimits.count != null
+      ? db.payoutRequest.count({
+          where: { userId: auth.userId, createdAt: { gte: monthStart } },
+        })
+      : Promise.resolve(0),
+    monthlyLimits.kop != null
+      ? db.payoutRequest.aggregate({
+          where: { userId: auth.userId, createdAt: { gte: monthStart } },
+          _sum: { amountKop: true },
+        })
+      : Promise.resolve({ _sum: { amountKop: null as bigint | null } }),
   ]);
 
   if (todayCount >= limits.count) {
+    logSecurity("payout.create.limit_daily_count", {
+      rule: "payout_daily_count",
+      action: "reject",
+      requestId,
+      ip,
+      userId: auth.userId,
+      amountKop: Number(amountBigInt),
+      limit: limits.count,
+    });
     return NextResponse.json(
       { error: `Превышен лимит: не более ${limits.count} заявок в сутки` },
       { status: 400 },
@@ -118,9 +154,51 @@ export async function POST(request: NextRequest) {
   }
   const todaySumKop = todaySum._sum.amountKop ?? BigInt(0);
   if (todaySumKop + amountBigInt > limits.kop) {
+    logSecurity("payout.create.limit_daily_kop", {
+      rule: "payout_daily_kop",
+      action: "reject",
+      requestId,
+      ip,
+      userId: auth.userId,
+      amountKop: Number(amountBigInt),
+      limitKop: Number(limits.kop),
+    });
     const limitRub = Number(limits.kop) / 100;
     return NextResponse.json(
       { error: `Превышен лимит: не более ${limitRub.toLocaleString("ru-RU")} ₽ вывода в сутки` },
+      { status: 400 },
+    );
+  }
+
+  if (monthlyLimits.count != null && monthCount >= monthlyLimits.count) {
+    logSecurity("payout.create.limit_monthly_count", {
+      rule: "payout_monthly_count",
+      action: "reject",
+      requestId,
+      ip,
+      userId: auth.userId,
+      amountKop: Number(amountBigInt),
+      limit: monthlyLimits.count,
+    });
+    return NextResponse.json(
+      { error: `Превышен лимит: не более ${monthlyLimits.count} заявок в месяц` },
+      { status: 400 },
+    );
+  }
+  const monthSumKop = monthSum._sum?.amountKop ?? BigInt(0);
+  if (monthlyLimits.kop != null && monthSumKop + amountBigInt > monthlyLimits.kop) {
+    logSecurity("payout.create.limit_monthly_kop", {
+      rule: "payout_monthly_kop",
+      action: "reject",
+      requestId,
+      ip,
+      userId: auth.userId,
+      amountKop: Number(amountBigInt),
+      limitKop: Number(monthlyLimits.kop),
+    });
+    const limitRub = Number(monthlyLimits.kop) / 100;
+    return NextResponse.json(
+      { error: `Превышен лимит: не более ${limitRub.toLocaleString("ru-RU")} ₽ вывода в месяц` },
       { status: 400 },
     );
   }

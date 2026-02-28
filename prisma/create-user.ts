@@ -51,14 +51,14 @@ async function main() {
 
   await prisma.user.update({
     where: { id: user.id },
-    data: { paygineSdRef: `FreeTips_w_${user.uniqueId}` },
+    data: { paygineSdRef: `FreeTips_w_${user.id}` },
   });
 
   console.log(`Пользователь создан:`);
   console.log(`  ID:       ${user.id}`);
   console.log(`  Логин:    ${user.login}`);
   console.log(`  Роль:     ${role}`);
-  console.log(`  paygineSdRef: FreeTips_w_${user.uniqueId}`);
+  console.log(`  paygineSdRef: FreeTips_w_${user.id}`);
 }
 
 main()

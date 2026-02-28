@@ -61,7 +61,7 @@ async function main() {
 
   await prisma.user.update({
     where: { id: superAdmin.id },
-    data: { paygineSdRef: `FreeTips_w_${superAdmin.uniqueId}` },
+    data: { paygineSdRef: `FreeTips_w_${superAdmin.id}` },
   });
 
   console.log(`✅ Суперадмин создан: ${superAdmin.login} (ID: ${superAdmin.id})`);

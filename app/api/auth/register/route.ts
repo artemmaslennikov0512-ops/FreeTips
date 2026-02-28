@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
       await tx.user.update({
         where: { id: created.id },
         data: {
-          paygineSdRef: getWaiterPaygineSdRef(created.uniqueId),
+          paygineSdRef: getWaiterPaygineSdRef(created.id),
           ...defaultLimits,
         },
       });

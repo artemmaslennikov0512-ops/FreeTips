@@ -198,6 +198,11 @@ html:not([data-theme="dark"]) .cabinet-premium .cabinet-sidebar-avatar {
   box-shadow: 0 0 0 1px rgba(192, 192, 192, 0.08);
 }
 
+[data-theme="dark"] .cabinet-premium .premium-card-brand {
+  color: #fff !important;
+  text-shadow: none !important;
+}
+
 [data-theme="dark"] .cabinet-premium .premium-animated-pattern,
 [data-theme="dark"] .cabinet-premium .premium-dynamic-pattern {
   opacity: 0.08;

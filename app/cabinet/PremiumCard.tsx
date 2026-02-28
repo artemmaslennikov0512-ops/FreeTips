@@ -42,21 +42,6 @@ const CARD_STYLES = `
   pointer-events: none;
   z-index: 1;
 }
-.premium-animated-pattern {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 200%;
-  height: 200%;
-  background: repeating-linear-gradient(90deg, transparent, transparent 25px, rgba(255,255,255,0.04) 25px, rgba(255,255,255,0.04) 50px);
-  animation: premium-move-pattern 20s linear infinite;
-  z-index: 0;
-  opacity: 0.5;
-}
-@keyframes premium-move-pattern {
-  0% { transform: translateX(0) translateY(0); }
-  100% { transform: translateX(-50%) translateY(-50%); }
-}
 .premium-dynamic-pattern {
   position: absolute;
   inset: 0;
@@ -129,7 +114,6 @@ export function PremiumCard({ fullName, balanceKop, compact }: Props) {
         <div className="premium-card w-full max-w-[320px]">
           <div className="premium-card-inner">
             <div className="premium-card-face premium-card-front">
-              <div className="premium-animated-pattern" aria-hidden />
               <div className="premium-dynamic-pattern" aria-hidden />
               <div className="premium-glass" aria-hidden />
               <div className="premium-card-shine" aria-hidden />

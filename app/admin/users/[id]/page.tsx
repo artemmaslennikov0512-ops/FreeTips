@@ -57,6 +57,7 @@ export default function AdminUserDetailsPage() {
   const [payoutAmount, setPayoutAmount] = useState("");
   const [payoutLoading, setPayoutLoading] = useState(false);
   const [payoutError, setPayoutError] = useState<string | null>(null);
+  const [payoutOk, setPayoutOk] = useState(false);
   const [payoutNewTabHint, setPayoutNewTabHint] = useState(false);
   const [limitsMessage, setLimitsMessage] = useState<{ type: "ok" | "err"; text: string } | null>(null);
   const [autoConfirmEnabled, setAutoConfirmEnabled] = useState(false);

@@ -41,9 +41,8 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# prisma
-prisma/migrations/*
-!prisma/migrations/.gitkeep
+# prisma (миграции коммитим, чтобы на сервере был prisma migrate deploy)
+# prisma/migrations — не игнорируем
 
 # сохранённые чеки (история на сервере)
 /storage/

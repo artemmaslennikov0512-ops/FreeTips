@@ -115,6 +115,7 @@ export async function POST(
     data: {
       userId: targetUserId,
       amountKop: amountBigInt,
+      feeKop: feeKop > 0 ? BigInt(feeKop) : null,
       details: "Вывод через страницу Paygine (SDPayOutPage), инициирован администратором",
     },
     select: { id: true },

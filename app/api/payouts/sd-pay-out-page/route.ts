@@ -108,6 +108,7 @@ export async function POST(request: NextRequest) {
     data: {
       userId: auth.userId,
       amountKop: amountBigInt,
+      feeKop: feeKop > 0 ? BigInt(feeKop) : null,
       details: "Вывод через страницу Paygine (SDPayOutPage)",
     },
     select: { id: true },

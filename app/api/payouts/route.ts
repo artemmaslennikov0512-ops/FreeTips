@@ -207,6 +207,7 @@ export async function POST(request: NextRequest) {
     data: {
       userId: auth.userId,
       amountKop: amountBigInt,
+      feeKop: payoutFeeKop > 0 ? BigInt(payoutFeeKop) : null,
       details,
       recipientName: recipientName?.trim() || null,
     },

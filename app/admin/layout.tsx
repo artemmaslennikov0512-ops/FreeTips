@@ -9,6 +9,7 @@ import {
   Send,
   Users,
   Menu,
+  ShieldCheck,
 } from "lucide-react";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
@@ -25,6 +26,7 @@ const NAV = [
   { label: "Дашборд", href: "/admin/dashboard", icon: LayoutDashboard },
   { label: "Выводы", href: "/admin/payouts", icon: Send },
   { label: "Пользователи", href: "/admin/users", icon: Users },
+  { label: "Антифрод", href: "/admin/antifraud", icon: ShieldCheck },
 ] as const;
 
 function getAdminTitle(pathname: string | null): string {
@@ -33,6 +35,7 @@ function getAdminTitle(pathname: string | null): string {
   if (pathname.startsWith("/admin/payouts")) return "Выводы";
   if (pathname === "/admin/users") return "Пользователи";
   if (pathname.match(/^\/admin\/users\/[^/]+$/)) return "Пользователь";
+  if (pathname === "/admin/antifraud") return "Антифрод";
   return "Админ-панель";
 }
 

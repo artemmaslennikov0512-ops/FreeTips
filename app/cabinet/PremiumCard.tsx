@@ -126,7 +126,7 @@ export function PremiumCard({ fullName, balanceKop, compact }: Props) {
               />
               <div className="absolute left-[12px] bottom-[28px] z-[3] flex items-center gap-1.5">
                 <div className="premium-logo-icon">FT</div>
-                <span className="text-xs font-extrabold text-[#0a192f]">
+                <span className="text-xs font-extrabold text-white">
                   FreeTips
                 </span>
               </div>

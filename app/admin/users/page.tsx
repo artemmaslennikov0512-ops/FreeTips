@@ -240,13 +240,13 @@ export default function AdminUsersPage() {
 
       <div className="mb-6 grid gap-4 lg:grid-cols-[1fr_auto]">
         <div className="relative flex max-w-md items-center">
-          <Search className="pointer-events-none absolute left-3 h-5 w-5 text-[var(--color-muted)]" style={{top:"50%",transform:"translateY(-50%)"}} />
+          <Search className="pointer-events-none absolute left-3 h-5 w-5 text-white/80" style={{top:"50%",transform:"translateY(-50%)"}} />
           <input
             type="text"
             placeholder="Поиск по логину или email..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="cabinet-section-header w-full rounded-xl border-0 py-2.5 pl-10 pr-4 text-sm text-[var(--color-text)] placeholder:text-[var(--color-muted)] focus:outline-none"
+            className="cabinet-section-header w-full rounded-xl border-0 py-2.5 pl-10 pr-4 text-sm text-white placeholder:text-white/70 focus:outline-none"
           />
         </div>
         <div className="cabinet-section-header rounded-2xl border-0 bg-[var(--color-light-gray)] p-4 text-sm text-[var(--color-text-secondary)]">
@@ -293,14 +293,14 @@ export default function AdminUsersPage() {
       </div>
 
       <div className="mb-6 flex flex-wrap items-center gap-3">
-        <div className="flex items-center gap-2 text-sm text-[var(--color-muted)]">
+        <div className="flex items-center gap-2 text-sm text-white/90">
           <Filter className="h-4 w-4" />
           <span>Фильтры:</span>
         </div>
         <select
           value={roleFilter}
           onChange={(e) => setRoleFilter(e.target.value)}
-          className="rounded-lg cabinet-section-header border-0 px-3 py-2 text-sm text-[var(--color-text-secondary)] focus:outline-none"
+          className="rounded-lg cabinet-section-header border-0 px-3 py-2 text-sm text-white focus:outline-none"
         >
           <option value="">Все роли</option>
           <option value="RECIPIENT">Получатель</option>
@@ -309,18 +309,18 @@ export default function AdminUsersPage() {
         <select
           value={blockedFilter}
           onChange={(e) => setBlockedFilter(e.target.value)}
-          className="rounded-lg cabinet-section-header border-0 px-3 py-2 text-sm text-[var(--color-text-secondary)] focus:outline-none"
+          className="rounded-lg cabinet-section-header border-0 px-3 py-2 text-sm text-white focus:outline-none"
         >
           <option value="">Все статусы</option>
           <option value="false">Активные</option>
           <option value="true">Заблокированные</option>
         </select>
         <div className="flex items-center gap-2">
-          <ArrowUpDown className="h-4 w-4 text-[var(--color-muted)]" />
+          <ArrowUpDown className="h-4 w-4 text-white/80" />
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
-            className="rounded-lg cabinet-section-header border-0 px-3 py-2 text-sm text-[var(--color-text-secondary)] focus:outline-none"
+            className="rounded-lg cabinet-section-header border-0 px-3 py-2 text-sm text-white focus:outline-none"
           >
             <option value="createdAt">По дате</option>
             <option value="login">По логину</option>
@@ -331,7 +331,7 @@ export default function AdminUsersPage() {
           <button
             type="button"
             onClick={() => setSortOrder((o) => (o === "desc" ? "asc" : "desc"))}
-            className="rounded-lg cabinet-section-header border-0 px-3 py-2 text-sm text-[var(--color-text-secondary)] hover:bg-[var(--color-light-gray)] transition-colors"
+            className="rounded-lg cabinet-section-header border-0 px-3 py-2 text-sm text-white hover:bg-white/10 transition-colors"
           >
             {sortOrder === "desc" ? "↓ Убыв." : "↑ Возр."}
           </button>
@@ -340,7 +340,7 @@ export default function AdminUsersPage() {
           <button
             type="button"
             onClick={() => { setRoleFilter(""); setBlockedFilter(""); setSortBy("createdAt"); setSortOrder("desc"); }}
-            className="cabinet-section-header rounded-lg border-0 px-3 py-2 text-xs text-[var(--color-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-light-gray)] transition-colors"
+            className="cabinet-section-header rounded-lg border-0 px-3 py-2 text-xs text-white/80 hover:text-white hover:bg-white/10 transition-colors"
           >
             Сбросить
           </button>

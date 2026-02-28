@@ -492,7 +492,7 @@ export default function AdminUserDetailsPage() {
   if (loading) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="text-[var(--color-muted)]">Загрузка...</div>
+        <div className="text-white/90">Загрузка...</div>
       </div>
     );
   }
@@ -500,7 +500,7 @@ export default function AdminUserDetailsPage() {
   if (error || !data) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="text-[var(--color-text-secondary)]">{error || "Ошибка загрузки"}</div>
+        <div className="text-white/90">{error || "Ошибка загрузки"}</div>
       </div>
     );
   }
@@ -510,7 +510,7 @@ export default function AdminUserDetailsPage() {
       <div className="mb-6 flex flex-col items-center gap-3">
         <Link
           href="/admin/users"
-          className="cabinet-section-header self-start flex items-center gap-2 rounded-xl border-0 px-3 py-2 text-sm text-[var(--color-text-secondary)] hover:bg-[var(--color-light-gray)]"
+          className="cabinet-section-header self-start flex items-center gap-2 rounded-xl border-0 px-3 py-2 text-sm text-white/90 hover:bg-white/10"
         >
           <ArrowLeft className="h-4 w-4" />
           Назад
@@ -518,15 +518,15 @@ export default function AdminUserDetailsPage() {
         <div className="cabinet-section-header flex h-[120px] w-full max-w-[360px] items-center justify-center gap-4 rounded-2xl border-0 px-4 sm:px-5">
           <UserRound className="h-12 w-12 shrink-0 text-primary-500" />
           <div className="min-w-0 leading-tight">
-            <div className="text-base font-semibold uppercase tracking-wide text-[var(--color-text)]">
+            <div className="text-base font-semibold uppercase tracking-wide text-white">
               {data.user.login}
             </div>
-            <div className="mt-1.5 text-sm text-[var(--color-text-secondary)]">
+            <div className="mt-1.5 text-sm text-white/80">
               {data.user.email || "—"}
             </div>
           </div>
         </div>
-        {blockError && <p className="text-sm text-[var(--color-text)]">{blockError}</p>}
+        {blockError && <p className="text-sm text-white/90">{blockError}</p>}
         <button
           type="button"
           onClick={handleBlockToggle}
@@ -551,95 +551,95 @@ export default function AdminUserDetailsPage() {
         <div className="cabinet-section-header rounded-2xl border-0 p-5">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-[var(--color-text-secondary)]">Текущий баланс</p>
-              <p className="mt-2 text-xl font-bold text-[var(--color-text)]">{formatMoneyCompact(data.stats.balanceKop)}</p>
+              <p className="text-sm text-white/90">Текущий баланс</p>
+              <p className="mt-2 text-xl font-bold text-white">{formatMoneyCompact(data.stats.balanceKop)}</p>
             </div>
-            <Wallet className="h-6 w-6 text-[var(--color-text)]" />
+            <Wallet className="h-6 w-6 text-white/90" />
           </div>
         </div>
         <div className="cabinet-section-header rounded-2xl border-0 p-5">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-[var(--color-text-secondary)]">Всего получено</p>
-              <p className="mt-2 text-xl font-bold text-[var(--color-text)]">{formatMoneyCompact(data.stats.totalReceivedKop)}</p>
+              <p className="text-sm text-white/90">Всего получено</p>
+              <p className="mt-2 text-xl font-bold text-white">{formatMoneyCompact(data.stats.totalReceivedKop)}</p>
             </div>
-            <TrendingUp className="h-6 w-6 text-[var(--color-text)]" />
+            <TrendingUp className="h-6 w-6 text-white/90" />
           </div>
         </div>
         <div className="cabinet-section-header rounded-2xl border-0 p-5">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-[var(--color-text-secondary)]">Транзакций</p>
-              <p className="mt-2 text-xl font-bold text-[var(--color-text)]">
+              <p className="text-sm text-white/90">Транзакций</p>
+              <p className="mt-2 text-xl font-bold text-white">
                 {data.stats.transactionsCount.toLocaleString("ru-RU")}
               </p>
             </div>
-            <ListChecks className="h-6 w-6 text-[var(--color-text)]" />
+            <ListChecks className="h-6 w-6 text-white/90" />
           </div>
         </div>
         <div className="cabinet-section-header rounded-2xl border-0 p-5">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-[var(--color-text-secondary)]">Ожидают вывода</p>
-              <p className="mt-2 text-xl font-bold text-[var(--color-text-secondary)]">
+              <p className="text-sm text-white/90">Ожидают вывода</p>
+              <p className="mt-2 text-xl font-bold text-white/90">
                 {data.stats.payoutsPendingCount.toLocaleString("ru-RU")}
               </p>
             </div>
-            <Clock className="h-6 w-6 text-[var(--color-text-secondary)]" />
+            <Clock className="h-6 w-6 text-white/80" />
           </div>
         </div>
       </div>
 
       <div className="mb-8 grid min-w-0 grid-cols-1 gap-6 lg:grid-cols-2">
         <div className="cabinet-section-header min-w-0 overflow-hidden rounded-2xl border-0 p-6">
-          <h2 className="text-center text-base font-semibold text-[var(--color-text)]">Анкета</h2>
-          <dl className="mt-4 grid gap-3 text-sm text-[var(--color-text-secondary)]">
+          <h2 className="text-center text-base font-semibold text-white">Анкета</h2>
+          <dl className="mt-4 grid gap-3 text-sm text-white/90">
             <div className="flex justify-between gap-4">
-              <dt className="text-[var(--color-text)]">Логин</dt>
-              <dd className="text-[var(--color-text)]">{data.user.login}</dd>
+              <dt className="text-white">Логин</dt>
+              <dd className="text-white/90">{data.user.login}</dd>
             </div>
             <div className="flex justify-between gap-4">
-              <dt className="text-[var(--color-text)]">Email</dt>
-              <dd className="text-[var(--color-text)]">{data.user.email || "—"}</dd>
+              <dt className="text-white">Email</dt>
+              <dd className="text-white/90">{data.user.email || "—"}</dd>
             </div>
             <div className="flex justify-between gap-4">
-              <dt className="text-[var(--color-text)]">ФИО</dt>
-              <dd className="text-[var(--color-text)]">{data.user.fullName || "—"}</dd>
+              <dt className="text-white">ФИО</dt>
+              <dd className="text-white/90">{data.user.fullName || "—"}</dd>
             </div>
             <div className="flex justify-between gap-4">
-              <dt className="text-[var(--color-text)]">Дата рождения</dt>
-              <dd className="text-[var(--color-text)]">{data.user.birthDate || "—"}</dd>
+              <dt className="text-white">Дата рождения</dt>
+              <dd className="text-white/90">{data.user.birthDate || "—"}</dd>
             </div>
             <div className="flex justify-between gap-4">
-              <dt className="text-[var(--color-text)]">Заведение</dt>
-              <dd className="text-[var(--color-text)]">{data.user.establishment || "—"}</dd>
+              <dt className="text-white">Заведение</dt>
+              <dd className="text-white/90">{data.user.establishment || "—"}</dd>
             </div>
             <div className="flex justify-between gap-4">
-              <dt className="text-[var(--color-text)]">Роль</dt>
-              <dd className="text-[var(--color-text)]">{data.user.role === "ADMIN" ? "Администратор" : data.user.role === "SUPERADMIN" ? "Суперадмин" : "Официант"}</dd>
+              <dt className="text-white">Роль</dt>
+              <dd className="text-white/90">{data.user.role === "ADMIN" ? "Администратор" : data.user.role === "SUPERADMIN" ? "Суперадмин" : "Официант"}</dd>
             </div>
             <div className="flex justify-between gap-4">
-              <dt className="text-[var(--color-text)]">Статус</dt>
-              <dd className="text-[var(--color-text)]">{data.user.isBlocked ? "Заблокирован" : "Активен"}</dd>
+              <dt className="text-white">Статус</dt>
+              <dd className="text-white/90">{data.user.isBlocked ? "Заблокирован" : "Активен"}</dd>
             </div>
             <div className="flex justify-between gap-4">
-              <dt className="text-[var(--color-text)]">Дата регистрации</dt>
-              <dd className="text-[var(--color-text)]">{formatDate(data.user.createdAt)}</dd>
+              <dt className="text-white">Дата регистрации</dt>
+              <dd className="text-white/90">{formatDate(data.user.createdAt)}</dd>
             </div>
             <div className="flex justify-between gap-4">
-              <dt className="text-[var(--color-text)]">Пароль</dt>
-              <dd className="text-[var(--color-text)]">Скрыт (хэш)</dd>
+              <dt className="text-white">Пароль</dt>
+              <dd className="text-white/90">Скрыт (хэш)</dd>
             </div>
           </dl>
         </div>
 
         <div className="cabinet-section-header min-w-0 overflow-hidden rounded-2xl border-0 p-6">
-          <h2 className="text-center text-base font-semibold text-[var(--color-text)]">Смена пароля</h2>
-          <p className="mt-2 text-sm text-[var(--color-text-secondary)]">
+          <h2 className="text-center text-base font-semibold text-white">Смена пароля</h2>
+          <p className="mt-2 text-sm text-white/80">
             Новый пароль будет установлен, и пользователь обязан сменить его при входе.
           </p>
-          {passwordError && <p className="mt-3 text-sm text-[var(--color-text)]">{passwordError}</p>}
-          {passwordOk && <p className="mt-3 text-sm text-[var(--color-text)]">Пароль обновлён</p>}
+          {passwordError && <p className="mt-3 text-sm text-white/90">{passwordError}</p>}
+          {passwordOk && <p className="mt-3 text-sm text-white">Пароль обновлён</p>}
           <div className="mt-4 grid gap-3">
             <input
               type="password"
@@ -671,10 +671,10 @@ export default function AdminUserDetailsPage() {
         <div className="cabinet-section-header min-w-0 rounded-2xl border-0 p-6 shadow-[var(--cabinet-shadow-subtle)]">
           <div className="mb-5 flex min-w-0 items-center justify-center gap-2">
             <Sliders className="h-5 w-5 shrink-0 text-[var(--color-accent-gold)]" aria-hidden />
-            <h2 className="min-w-0 text-center text-lg font-semibold leading-tight text-[var(--color-text)] break-words">Лимиты и вывод</h2>
+            <h2 className="min-w-0 text-center text-lg font-semibold leading-tight text-white break-words">Лимиты и вывод</h2>
           </div>
           {limitsMessage && (
-            <p className={`mb-4 text-sm ${limitsMessage.type === "ok" ? "text-[var(--color-text)]" : "text-[var(--color-text)]"}`}>
+            <p className="mb-4 text-sm text-white/90">
               {limitsMessage.text}
             </p>
           )}
@@ -747,7 +747,7 @@ export default function AdminUserDetailsPage() {
               },
             ].map((row, idx) => (
               <div key={idx} className="flex min-w-0 flex-wrap items-center gap-3">
-                <div className="min-w-0 flex-1 text-sm font-medium text-[var(--color-text)] sm:min-w-[200px]">
+                <div className="min-w-0 flex-1 text-sm font-medium text-white sm:min-w-[200px]">
                   {row.label}
                 </div>
                 <div className="w-[8.5rem] shrink-0">
@@ -776,7 +776,7 @@ export default function AdminUserDetailsPage() {
                   <button
                     type="button"
                     onClick={row.onEdit}
-                    className="shrink-0 rounded-xl border-0 bg-[var(--color-bg-sides)] px-4 py-2 text-sm font-medium text-[var(--color-text)] hover:bg-[var(--color-light-gray)]"
+                    className="shrink-0 rounded-xl border border-white/25 bg-white/10 px-4 py-2 text-sm font-medium text-white hover:bg-white/20"
                   >
                     Изменить
                   </button>
@@ -784,9 +784,9 @@ export default function AdminUserDetailsPage() {
               </div>
             ))}
             <div className="flex min-w-0 flex-wrap items-center gap-3 border-0 pt-4">
-              <div className="min-w-0 text-sm font-medium text-[var(--color-text)]">Авто-вывод</div>
+              <div className="min-w-0 text-sm font-medium text-white">Авто-вывод</div>
               <label className="flex cursor-pointer items-center gap-2">
-                <span className="relative inline-block h-6 w-10 shrink-0 rounded-full bg-[var(--color-dark-gray)]/30 transition-colors after:absolute after:left-0.5 after:top-0.5 after:h-5 after:w-5 after:rounded-full after:bg-[var(--color-white)] after:shadow after:content-[''] after:transition-transform focus-within:ring-2 focus-within:ring-[var(--color-muted)] focus-within:ring-offset-2 has-[:checked]:bg-[var(--color-muted)] has-[:checked]:after:translate-x-4">
+                <span className="relative inline-block h-6 w-10 shrink-0 rounded-full bg-black/30 transition-colors after:absolute after:left-0.5 after:top-0.5 after:h-5 after:w-5 after:rounded-full after:bg-white after:shadow after:content-[''] after:transition-transform focus-within:ring-2 focus-within:ring-white/30 focus-within:ring-offset-2 has-[:checked]:bg-[var(--color-brand-gold)] has-[:checked]:after:translate-x-4">
                   <input
                     type="checkbox"
                     checked={autoConfirmEnabled}
@@ -795,7 +795,7 @@ export default function AdminUserDetailsPage() {
                     className="sr-only"
                   />
                 </span>
-                <span className="text-xs text-[var(--color-text)] sm:text-sm">Включить автоподтверждение заявок до макс. суммы одной операции</span>
+                <span className="text-xs text-white/90 sm:text-sm">Включить автоподтверждение заявок до макс. суммы одной операции</span>
               </label>
             </div>
           </div>
@@ -804,9 +804,9 @@ export default function AdminUserDetailsPage() {
         <div className="cabinet-section-header min-w-0 rounded-2xl border-0 p-6">
           <div className="mb-4 flex min-w-0 items-center justify-center gap-2">
             <Send className="h-5 w-5 shrink-0 text-[var(--color-accent-gold)]" />
-            <h2 className="min-w-0 text-center text-base font-semibold text-[var(--color-text)]">Вывести средства</h2>
+            <h2 className="min-w-0 text-center text-base font-semibold text-white">Вывести средства</h2>
           </div>
-          {payoutError && <p className="mb-3 text-sm text-[var(--color-text)]">{payoutError}</p>}
+          {payoutError && <p className="mb-3 text-sm text-white/90">{payoutError}</p>}
           {payoutNewTabHint && (
             <p className="mb-3 text-sm text-[var(--color-brand-gold)]">
               Открыта новая вкладка — введите данные карты официанта на странице Paygine. После завершения заявка обновится.
@@ -832,7 +832,7 @@ export default function AdminUserDetailsPage() {
             >
               {payoutLoading ? "Открываем Paygine…" : "Вывести на карту (страница Paygine)"}
             </button>
-          <p className="mt-2 text-xs text-[var(--color-text-secondary)]">Откроется страница Paygine для ввода номера карты официанта</p>
+          <p className="mt-2 text-xs text-white/80">Откроется страница Paygine для ввода номера карты официанта</p>
           <div className="mt-6 w-full max-w-[320px] mx-auto">
             <PremiumCard
               fullName={data.user.fullName}
@@ -844,12 +844,12 @@ export default function AdminUserDetailsPage() {
       </div>
 
       <div className="cabinet-section-header mb-8 min-w-0 overflow-hidden rounded-2xl border-0 p-4 sm:p-6">
-        <h2 className="mb-4 flex min-w-0 items-center justify-center gap-2 text-base font-semibold text-[var(--color-text)]">
+        <h2 className="mb-4 flex min-w-0 items-center justify-center gap-2 text-base font-semibold text-white">
           <Key className="h-5 w-5 shrink-0 text-[var(--color-accent-gold)]" />
           API-ключ
         </h2>
         <div className="flex flex-wrap items-center gap-3">
-          <div className="min-w-0 flex-1 rounded-xl border-0 bg-[var(--color-light-gray)] px-4 py-2.5 font-mono text-sm text-[var(--color-text)]">
+          <div className="min-w-0 flex-1 rounded-xl border-0 bg-[var(--color-light-gray)] px-4 py-2.5 font-mono text-sm text-[#0a192f]">
             {displayApiKey ? (
               <span className="truncate block">{displayApiKey}</span>
             ) : data.user.hasApiKey ? (
@@ -862,7 +862,7 @@ export default function AdminUserDetailsPage() {
             type="button"
             onClick={handleRegenerateApiKey}
             disabled={apiKeyLoading}
-            className="inline-flex items-center gap-2 rounded-xl border-0 bg-[var(--color-bg-sides)] px-4 py-2.5 text-sm font-medium text-[var(--color-text)] hover:bg-[var(--color-light-gray)] disabled:opacity-50"
+            className="inline-flex items-center gap-2 rounded-xl border border-white/25 bg-white/10 px-4 py-2.5 text-sm font-medium text-white hover:bg-white/20 disabled:opacity-50"
           >
             <RotateCw className={`h-4 w-4 ${apiKeyLoading ? "animate-spin" : ""}`} />
             {apiKeyLoading ? "Создание…" : data.user.hasApiKey ? "Обновить ключ" : "Создать ключ"}
@@ -871,7 +871,7 @@ export default function AdminUserDetailsPage() {
             <button
               type="button"
               onClick={handleCopyApiKey}
-              className="inline-flex items-center gap-2 rounded-xl border-0 bg-[var(--color-bg-sides)] px-4 py-2.5 text-sm font-medium text-[var(--color-text)] hover:bg-[var(--color-light-gray)]"
+              className="inline-flex items-center gap-2 rounded-xl border border-white/25 bg-white/10 px-4 py-2.5 text-sm font-medium text-white hover:bg-white/20"
             >
               <Copy className="h-4 w-4" />
               {apiKeyCopied ? "Код скопирован" : "Копировать"}
@@ -882,32 +882,32 @@ export default function AdminUserDetailsPage() {
 
       <div className="cabinet-section-header min-w-0 overflow-hidden rounded-2xl border-0">
         <div className="border-0 px-5 py-4">
-          <h2 className="text-center text-base font-semibold text-[var(--color-text)]">История пополнений</h2>
+          <h2 className="text-center text-base font-semibold text-white">История пополнений</h2>
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="border-0 bg-[var(--color-light-gray)]">
+          <table className="w-full text-white">
+            <thead className="border-0 bg-white/10">
               <tr>
-                <th className="px-4 py-3 text-left text-sm font-semibold text-[var(--color-text-secondary)]">ID</th>
-                <th className="px-4 py-3 text-left text-sm font-semibold text-[var(--color-text-secondary)]">Сумма</th>
-                <th className="px-4 py-3 text-left text-sm font-semibold text-[var(--color-text-secondary)]">Статус</th>
-                <th className="px-4 py-3 text-left text-sm font-semibold text-[var(--color-text-secondary)]">Дата</th>
+                <th className="px-4 py-3 text-left text-sm font-semibold text-white">ID</th>
+                <th className="px-4 py-3 text-left text-sm font-semibold text-white">Сумма</th>
+                <th className="px-4 py-3 text-left text-sm font-semibold text-white">Статус</th>
+                <th className="px-4 py-3 text-left text-sm font-semibold text-white">Дата</th>
               </tr>
             </thead>
             <tbody>
               {data.transactions.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="px-4 py-8 text-center text-[var(--color-text-secondary)]">
+                  <td colSpan={4} className="px-4 py-8 text-center text-white/90">
                     Записей не найдено
                   </td>
                 </tr>
               ) : (
                 data.transactions.map((tx) => (
-                  <tr key={tx.id} className="border-0 hover:bg-[var(--color-light-gray)]">
-                    <td className="px-4 py-3 text-sm text-[var(--color-text-secondary)]">{tx.id.slice(0, 8)}...</td>
-                    <td className="px-4 py-3 text-sm text-[var(--color-text-secondary)]">{formatMoneyCompact(tx.amountKop)}</td>
-                    <td className="px-4 py-3 text-sm text-[var(--color-text-secondary)]">{statusLabels[tx.status]}</td>
-                    <td className="px-4 py-3 text-sm text-[var(--color-text-secondary)]">{formatDate(tx.createdAt)}</td>
+                  <tr key={tx.id} className="border-0 hover:bg-[var(--color-brand-gold)]/15 transition-colors">
+                    <td className="px-4 py-3 text-sm text-white/90">{tx.id.slice(0, 8)}...</td>
+                    <td className="px-4 py-3 text-sm text-white/90">{formatMoneyCompact(tx.amountKop)}</td>
+                    <td className="px-4 py-3 text-sm text-white/90">{statusLabels[tx.status]}</td>
+                    <td className="px-4 py-3 text-sm text-white/90">{formatDate(tx.createdAt)}</td>
                   </tr>
                 ))
               )}

@@ -337,10 +337,10 @@ html:not([data-theme="dark"]) .cabinet-premium .cabinet-btn-gold {
   border: 1px solid rgba(197, 165, 114, 0.6);
 }
 
-/* Светлая тема: карточки внутри блоков — тот же фон, что у пузыря сообщения в чате (тёмно-серый + золотая обводка) */
+/* Светлая тема: карточки внутри блоков — как на фото (пузырь «Поддержка»: полупрозрачный тёмный фон, светлая обводка) */
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-block-inner {
-  background: rgba(79, 79, 79, 0.85) !important;
-  border: 1px solid rgba(197, 165, 114, 0.35);
+  background: rgba(255, 255, 255, 0.15) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2);
   color: rgba(255, 255, 255, 0.95);
 }
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-block-inner .cabinet-limits-label,
@@ -350,17 +350,17 @@ html:not([data-theme="dark"]) .cabinet-premium .cabinet-block-inner [class*="tex
 }
 
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-input-window {
-  background: rgba(79, 79, 79, 0.85) !important;
-  border: 1px solid rgba(197, 165, 114, 0.35);
+  background: rgba(255, 255, 255, 0.15) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2);
   color: #fff !important;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-input-window:hover {
-  border-color: rgba(197, 165, 114, 0.5);
+  border-color: rgba(255, 255, 255, 0.35);
 }
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-input-window:focus-within {
-  border-color: rgba(197, 165, 114, 0.6);
-  box-shadow: 0 0 0 2px rgba(197, 165, 114, 0.2);
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
 }
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-card .cabinet-input-window,
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-card .cabinet-input-window input {
@@ -473,14 +473,14 @@ html:not([data-theme="dark"]) .cabinet-premium #operations-history.cabinet-card 
   color: rgba(255, 255, 255, 0.6) !important;
 }
 
-/* Светлая тема: блок «Доступные лимиты» — тот же фон, что у пузыря в чате (тёмно-серый + золотая обводка), текст светлый */
+/* Светлая тема: блок «Доступные лимиты» — как на фото (полупрозрачный фон, светлая обводка) */
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-limits-block {
-  background: rgba(79, 79, 79, 0.85) !important;
-  border-color: rgba(197, 165, 114, 0.35);
+  background: rgba(255, 255, 255, 0.15) !important;
+  border-color: rgba(255, 255, 255, 0.2);
 }
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-card .cabinet-limits-block {
-  background: rgba(79, 79, 79, 0.85) !important;
-  border-color: rgba(197, 165, 114, 0.35);
+  background: rgba(255, 255, 255, 0.15) !important;
+  border-color: rgba(255, 255, 255, 0.2);
 }
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-limits-block .cabinet-limits-track {
   background: rgba(0, 0, 0, 0.25) !important;

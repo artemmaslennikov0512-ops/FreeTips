@@ -19,9 +19,10 @@ const authSelect = {
 export class PrismaUserRepository implements IUserRepository {
   constructor(private readonly prisma: PrismaClient) {}
 
+  /** Поиск по логину без учёта регистра (User и user — один и тот же пользователь). */
   async findByLogin(login: string): Promise<AuthUser | null> {
-    const user = await this.prisma.user.findUnique({
-      where: { login },
+    const user = await this.prisma.user.findFirst({
+      where: { login: { equals: login, mode: "insensitive" } },
       select: authSelect,
     });
     return user;

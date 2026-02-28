@@ -7,6 +7,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireRole } from "@/lib/middleware/auth";
 import { db } from "@/lib/db";
+import { getBalance } from "@/lib/balance";
 import { z } from "zod";
 import { parseJsonWithLimit, MAX_BODY_SIZE_AUTH } from "@/lib/api/helpers";
 
@@ -124,20 +125,6 @@ function getUser(id: string) {
   return db.user.findUnique({ where: { id }, select: USER_SELECT });
 }
 
-function getTransactionSum(id: string) {
-  return db.transaction.aggregate({
-    where: { recipientId: id, status: "SUCCESS" },
-    _sum: { amountKop: true },
-  });
-}
-
-function getCompletedPayoutSum(id: string) {
-  return db.payoutRequest.aggregate({
-    where: { userId: id, status: "COMPLETED" },
-    _sum: { amountKop: true },
-  });
-}
-
 function getTransactionCount(id: string) {
   return db.transaction.count({ where: { recipientId: id, status: "SUCCESS" } });
 }
@@ -158,23 +145,21 @@ function getTransactions(id: string, params: ListParams) {
 }
 
 async function fetchUserDetails(id: string, params: ListParams) {
-  const [user, txSum, payoutsCompletedSum, txCount, payoutsPendingCount, transactions] =
+  const [user, balanceData, txCount, payoutsPendingCount, transactions] =
     await Promise.all([
       getUser(id),
-      getTransactionSum(id),
-      getCompletedPayoutSum(id),
+      getBalance(id),
       getTransactionCount(id),
       getPayoutPendingCount(id),
       getTransactions(id, params),
     ]);
-  return { user, txSum, payoutsCompletedSum, txCount, payoutsPendingCount, transactions };
+  return { user, balanceData, txCount, payoutsPendingCount, transactions };
 }
 
-function buildStats(txSum: bigint, payoutsCompleted: bigint, txCount: number, pendingCount: number) {
-  const balance = txSum - payoutsCompleted;
+function buildStats(balanceData: { balanceKop: bigint; receivedKop: bigint }, txCount: number, pendingCount: number) {
   return {
-    balanceKop: Number(balance),
-    totalReceivedKop: Number(txSum),
+    balanceKop: Number(balanceData.balanceKop),
+    totalReceivedKop: Number(balanceData.receivedKop),
     transactionsCount: txCount,
     payoutsPendingCount: pendingCount,
   };
@@ -191,11 +176,9 @@ async function handleGet(
   if (!data.user || data.user.role === "SUPERADMIN") {
     return NextResponse.json({ error: "Пользователь не найден" }, { status: 404 });
   }
-  const received = data.txSum._sum.amountKop ?? BigInt(0);
-  const withdrawn = data.payoutsCompletedSum._sum.amountKop ?? BigInt(0);
   return NextResponse.json({
     user: serializeUser(data.user),
-    stats: buildStats(received, withdrawn, data.txCount, data.payoutsPendingCount),
+    stats: buildStats(data.balanceData, data.txCount, data.payoutsPendingCount),
     transactions: data.transactions.map(serializeTransaction),
     limit: parsed.limit,
     offset: parsed.offset,

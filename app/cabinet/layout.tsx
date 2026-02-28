@@ -10,6 +10,7 @@ import {
   Settings,
   Menu,
   LogOut,
+  MessageCircle,
 } from "lucide-react";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
@@ -18,6 +19,7 @@ const NAV = [
   { label: "Дашборд", href: "/cabinet", icon: LayoutDashboard },
   { label: "Операции", href: "/cabinet/transactions", icon: List },
   { label: "Моя ссылка", href: "/cabinet/link", icon: Link2 },
+  { label: "Поддержка", href: "/cabinet/support", icon: MessageCircle },
   { label: "Настройки профиля", href: "/cabinet/settings", icon: Settings },
 ] as const;
 

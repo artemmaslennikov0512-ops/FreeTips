@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint .",
     "test": "tsx --test tests/validation/*.test.ts tests/security/*.test.ts",
+    "prepush": "npm run lint && npm run build && npm run test",
     "db:migrate": "prisma migrate dev",
     "db:generate": "prisma generate",
     "db:studio": "prisma studio",

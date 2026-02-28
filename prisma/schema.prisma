@@ -69,6 +69,8 @@ model User {
   createdRegistrationTokens RegistrationToken[] @relation("CreatedRegistrationTokens")
   usedRegistrationTokens    RegistrationToken[] @relation("UsedRegistrationTokens")
   paygineCubbies            PaygineCubbie[]
+  supportThread             SupportThread?
+  supportMessagesAuthored   SupportMessage[] @relation("SupportMessageAuthor")
 
   @@index([login])
   @@index([email])
@@ -212,6 +214,36 @@ model RegistrationRequest {
   @@index([status])
   @@index([createdAt])
   @@map("registration_requests")
+}
+
+// Чат поддержки: один тред на пользователя (клиента), сообщения от клиента и от сотрудников (ADMIN/SUPERADMIN).
+model SupportThread {
+  id        String   @id @default(cuid())
+  userId    String   @unique // один тред на пользователя
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user     User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages SupportMessage[]
+
+  @@index([userId])
+  @@index([updatedAt])
+  @@map("support_threads")
+}
+
+model SupportMessage {
+  id        String   @id @default(cuid())
+  threadId  String
+  authorId  String   // кто написал (User: клиент или сотрудник)
+  body      String   @db.Text
+  createdAt DateTime @default(now())
+
+  thread SupportThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  author User          @relation("SupportMessageAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([threadId])
+  @@index([createdAt])
+  @@map("support_messages")
 }
 
 // Дефолтные лимиты для новых пользователей (задаются в блоке антифрода админки).

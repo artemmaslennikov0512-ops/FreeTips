@@ -186,6 +186,15 @@ export const patchProfileSchema = z.object({
     .refine((v) => v === null || v.length <= 255, "Название заведения слишком длинное"),
 });
 
+// Сообщение в чат поддержки: 1–4000 символов
+export const supportMessageSchema = z.object({
+  text: z
+    .string()
+    .trim()
+    .min(1, "Введите сообщение")
+    .max(4000, "Сообщение не должно превышать 4000 символов"),
+});
+
 // Смена пароля
 export const changePasswordSchema = z
   .object({

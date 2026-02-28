@@ -31,7 +31,7 @@ const CARD_STYLES = `
   overflow: hidden;
 }
 .premium-card-front {
-  background: radial-gradient(ellipse 120% 120% at 50% 50%, #d4b896 0%, var(--color-brand-gold) 40%, #b8985c 100%);
+  background: radial-gradient(ellipse 120% 120% at 50% 50%, #c4a876 0%, #b89450 40%, #9a7a44 100%);
 }
 .premium-animated-pattern {
   position: absolute;

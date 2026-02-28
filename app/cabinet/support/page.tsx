@@ -119,12 +119,12 @@ export default function CabinetSupportPage() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl">
-      <h1 className="flex items-center gap-2 text-2xl font-bold text-[var(--color-text)]">
+    <div className="support-chat-header mx-auto max-w-2xl">
+      <h1 className="flex items-center gap-2 text-2xl font-bold text-white">
         <MessageCircle className="h-7 w-7 text-[var(--color-brand-gold)]" />
         Чат поддержки
       </h1>
-      <p className="mt-2 text-sm text-[var(--color-text-secondary)]">
+      <p className="mt-2 text-sm text-white/90">
         Задайте вопрос или опишите проблему. Ответим в рабочее время. Чтобы увидеть новые ответы — нажмите «Обновить».
       </p>
 
@@ -132,7 +132,7 @@ export default function CabinetSupportPage() {
         type="button"
         onClick={refresh}
         disabled={refreshing}
-        className="mt-3 flex items-center gap-2 rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-sm text-[var(--color-text)] hover:bg-white/10 disabled:opacity-50"
+        className="mt-3 flex items-center gap-2 rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-sm text-white hover:bg-white/10 disabled:opacity-50"
       >
         <RefreshCw className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`} />
         Обновить
@@ -197,7 +197,7 @@ export default function CabinetSupportPage() {
               onChange={(e) => setInput(e.target.value)}
               placeholder="Напишите сообщение…"
               maxLength={4000}
-              className="flex-1 rounded-xl border border-white/20 bg-white/5 px-4 py-3 text-white placeholder:text-white/60 focus:border-[var(--color-brand-gold)]/50 focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-gold)]/30"
+              className="support-chat-input flex-1 rounded-xl border border-white/20 bg-white/5 px-4 py-3 text-white placeholder:text-white/60 focus:border-[var(--color-brand-gold)]/50 focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-gold)]/30"
               disabled={sending}
             />
             <button

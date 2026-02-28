@@ -275,17 +275,29 @@ html:not([data-theme="dark"]) .admin-panel .admin-main-block.cabinet-main-block 
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06);
 }
 
-/* Светлая тема: карточки — обводка как у сайдбара (1px золото) */
+/* Светлая тема: карточки в одном стиле с блоком чата — скругление, тонкая рамка, мягкий фон */
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-card,
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-section-header {
-  background-color: #ffffff;
-  border: 1px solid rgba(197, 165, 114, 0.5);
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(10, 25, 47, 0.08);
+  border-radius: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
-/* Светлая тема: блок «Оставить чаевые» (/pay) — фон как у карточки ЛК, тонкая золотая обводка */
+/* Светлая тема: блок «Оставить чаевые» (/pay) — тот же стиль */
 html:not([data-theme="dark"]) .pay-block {
-  background-color: #ffffff !important;
-  border: 1px solid rgba(197, 165, 114, 0.5);
+  background: rgba(255, 255, 255, 0.92) !important;
+  border: 1px solid rgba(10, 25, 47, 0.08) !important;
+  border-radius: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+/* Светлая тема: общий класс для карточек в стиле блока чата (404, контакты, заявка и т.д.) */
+html:not([data-theme="dark"]) .card-block {
+  background: rgba(255, 255, 255, 0.92) !important;
+  border: 1px solid rgba(10, 25, 47, 0.08) !important;
+  border-radius: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
 /* Тёмная тема: у блоков страницы чаевых без обводки */
@@ -307,16 +319,18 @@ html:not([data-theme="dark"]) .cabinet-premium .cabinet-btn-gold {
   border: 1px solid rgba(197, 165, 114, 0.6);
 }
 
-/* Светлая тема: внутренние блоки в карточках — фон темнее карточки */
+/* Светлая тема: внутренние блоки в карточках — в том же стиле, чуть темнее */
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-block-inner {
-  background: #d4d4d4 !important;
-  border: 1px solid rgba(197, 165, 114, 0.5);
+  background: rgba(0, 0, 0, 0.04) !important;
+  border: 1px solid rgba(10, 25, 47, 0.06);
+  border-radius: 0.75rem;
 }
 
-/* Светлая тема: окна для ввода/отображения (ссылка, API-ключ) — белый фон, адаптивная граница */
+/* Светлая тема: окна для ввода/отображения (ссылка, API-ключ) — в стиле блока чата */
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-input-window {
-  background: #ffffff !important;
-  border: 1px solid rgba(10, 25, 47, 0.15);
+  background: rgba(255, 255, 255, 0.9) !important;
+  border: 1px solid rgba(10, 25, 47, 0.08);
+  border-radius: 0.75rem;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-input-window:hover {
@@ -335,6 +349,27 @@ html:not([data-theme="dark"]) .cabinet-premium .cabinet-input-window:focus-withi
 .cabinet-premium input::placeholder,
 .cabinet-premium textarea::placeholder {
   color: #64748b !important;
+}
+
+/* Чат поддержки: поле ввода на тёмном фоне — белый текст всегда */
+.cabinet-premium .support-chat-input {
+  color: #fff !important;
+}
+.cabinet-premium .support-chat-input::placeholder {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+/* Чат поддержки: заголовок, описание и кнопка «Обновить» — белый текст */
+.cabinet-premium .support-chat-header h1,
+.cabinet-premium .support-chat-header p,
+.cabinet-premium .support-chat-header button {
+  color: #fff !important;
+}
+.cabinet-premium .support-chat-header button:disabled {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+.cabinet-premium .support-chat-header button svg {
+  color: #fff !important;
 }
 
 /* Светлая тема: блок «Доступные лимиты» — нейтральный серый (без сиренево-серого оттенка) */
@@ -459,6 +494,14 @@ html:not([data-theme="dark"]) .admin-panel .antifraud-value {
 }
 [data-theme="dark"] .admin-panel table thead tr {
   border-bottom: 1px solid rgba(197, 165, 114, 0.35);
+}
+
+/* Светлая тема: карточки входа/регистрации — в одном стиле с блоком чата */
+html:not([data-theme="dark"]) .auth-page-card {
+  background: rgba(255, 255, 255, 0.92) !important;
+  border: 1px solid rgba(10, 25, 47, 0.08) !important;
+  border-radius: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
 /* Страницы входа, регистрации, заявки — тёмная тема */

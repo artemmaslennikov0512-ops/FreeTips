@@ -28,7 +28,7 @@ export default function KontaktyPage() {
 
         <div className="mt-12 grid gap-8 sm:grid-cols-2">
           {hasOperator && (
-            <section className="rounded-2xl border-0 bg-[var(--color-bg-sides)] p-6 shadow-[var(--shadow-card)] transition-shadow hover:shadow-[var(--shadow-medium)]">
+            <section className="card-block rounded-2xl border-0 bg-[var(--color-bg-sides)] p-6 shadow-[var(--shadow-card)] transition-shadow hover:shadow-[var(--shadow-medium)]">
               <h2 className="flex items-center gap-2 font-semibold text-[var(--color-text)]">
                 <MapPin className="h-5 w-5 text-[var(--color-accent-gold)]" />
                 Оператор
@@ -62,7 +62,7 @@ export default function KontaktyPage() {
             </section>
           )}
 
-          <section className="rounded-2xl border-0 bg-[var(--color-bg-sides)] p-6 shadow-[var(--shadow-card)] transition-shadow hover:shadow-[var(--shadow-medium)]">
+          <section className="card-block rounded-2xl border-0 bg-[var(--color-bg-sides)] p-6 shadow-[var(--shadow-card)] transition-shadow hover:shadow-[var(--shadow-medium)]">
             <h2 className="flex items-center gap-2 font-semibold text-[var(--color-text)]">
               <MessageCircle className="h-5 w-5 text-[var(--color-accent-gold)]" />
               Поддержка

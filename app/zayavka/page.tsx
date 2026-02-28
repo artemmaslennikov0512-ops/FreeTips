@@ -84,7 +84,7 @@ export default function ZayavkaPage() {
     return (
       <AuthPageShell>
         <div className="mx-auto flex min-h-[80vh] max-w-md flex-col justify-center overflow-visible px-4 py-16">
-          <div className="rounded-2xl border-0 bg-[var(--color-bg-sides)] p-8 shadow-[var(--shadow-card)] text-center">
+          <div className="card-block rounded-2xl border-0 bg-[var(--color-bg-sides)] p-8 shadow-[var(--shadow-card)] text-center">
             <h1 className="font-[family:var(--font-playfair)] text-2xl font-semibold text-[var(--color-text)]">Спасибо за оставление заявки</h1>
             <p className="mt-3 text-[var(--color-text-secondary)]">
               Ожидайте, с вами свяжутся в рабочие часы.
@@ -114,7 +114,7 @@ export default function ZayavkaPage() {
   return (
     <AuthPageShell>
       <div className="mx-auto flex min-h-[80vh] max-w-md flex-col justify-center overflow-visible px-4 py-16">
-        <div className="overflow-visible rounded-2xl border-0 bg-[var(--color-bg-sides)] p-8 shadow-[var(--shadow-card)]">
+        <div className="card-block overflow-visible rounded-2xl border-0 bg-[var(--color-bg-sides)] p-8 shadow-[var(--shadow-card)]">
           <h1 className="font-[family:var(--font-playfair)] text-2xl font-semibold text-[var(--color-text)]">Оставить заявку</h1>
           <p className="mt-2 text-[var(--color-text-secondary)]">
             Заполните форму. На указанную почту будет выслана ссылка для регистрации после одобрения заявки.

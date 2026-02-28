@@ -248,7 +248,7 @@ export default function AdminSupportThreadPage() {
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ответ клиенту…"
               maxLength={4000}
-              className="flex-1 rounded-xl border border-white/20 bg-white/5 px-4 py-3 text-white placeholder:text-white/60 focus:border-[var(--color-brand-gold)]/50 focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-gold)]/30"
+              className="support-chat-input flex-1 rounded-xl border border-white/20 bg-white/5 px-4 py-3 text-white placeholder:text-white/60 focus:border-[var(--color-brand-gold)]/50 focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-gold)]/30"
               disabled={sending}
             />
             <button

@@ -2,12 +2,10 @@
 
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { MessageCircle, Send, Loader2 } from "lucide-react";
+import { MessageCircle, Send, Loader2, RefreshCw } from "lucide-react";
 import { getAccessToken, authHeaders, clearAccessToken } from "@/lib/auth-client";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
-
-const POLL_INTERVAL_MS = 3000;
 
 type Message = {
   id: string;
@@ -26,55 +24,31 @@ export default function CabinetSupportPage() {
   const [sending, setSending] = useState(false);
   const [input, setInput] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
   const listEndRef = useRef<HTMLDivElement>(null);
-  const lastMessageIdRef = useRef<string | null>(null);
 
-  const fetchMessages = useCallback(
-    async (sinceId?: string | null) => {
-      const token = getAccessToken();
-      if (!token) return;
-      const url = sinceId
-        ? `/api/support/messages?since=${encodeURIComponent(sinceId)}`
-        : "/api/support/messages";
-      try {
-        const res = await fetch(url, { headers: authHeaders() });
-        if (res.status === 401) {
-          clearAccessToken();
-          router.replace("/login");
-          return;
-        }
-        if (!res.ok) {
-          const data = (await res.json()) as { error?: string };
-          setError(data?.error ?? "Не удалось загрузить сообщения");
-          return;
-        }
-        const data = (await res.json()) as { messages: Message[] };
-        setError(null);
-        if (sinceId != null) {
-          setMessages((prev) => {
-            const byId = new Map(prev.map((m) => [m.id, m]));
-            for (const m of data.messages) byId.set(m.id, m);
-            return Array.from(byId.values()).sort(
-              (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
-            );
-          });
-          if (data.messages.length > 0) {
-            lastMessageIdRef.current = data.messages[data.messages.length - 1].id;
-          }
-        } else {
-          setMessages(data.messages);
-          if (data.messages.length > 0) {
-            lastMessageIdRef.current = data.messages[data.messages.length - 1].id;
-          } else {
-            lastMessageIdRef.current = null;
-          }
-        }
-      } catch {
-        setError("Ошибка соединения");
+  const fetchMessages = useCallback(async () => {
+    const token = getAccessToken();
+    if (!token) return;
+    try {
+      const res = await fetch("/api/support/messages", { headers: authHeaders() });
+      if (res.status === 401) {
+        clearAccessToken();
+        router.replace("/login");
+        return;
       }
-    },
-    [router],
-  );
+      if (!res.ok) {
+        const data = (await res.json()) as { error?: string };
+        setError(data?.error ?? "Не удалось загрузить сообщения");
+        return;
+      }
+      const data = (await res.json()) as { messages: Message[] };
+      setMessages(data.messages);
+      setError(null);
+    } catch {
+      setError("Ошибка соединения");
+    }
+  }, [router]);
 
   const loadInitial = useCallback(async () => {
     const token = getAccessToken();
@@ -83,24 +57,19 @@ export default function CabinetSupportPage() {
       return;
     }
     setLoading(true);
-    await fetchMessages(null);
+    await fetchMessages();
     setLoading(false);
   }, [fetchMessages, router]);
+
+  const refresh = useCallback(async () => {
+    setRefreshing(true);
+    await fetchMessages();
+    setRefreshing(false);
+  }, [fetchMessages]);
 
   useEffect(() => {
     loadInitial();
   }, [loadInitial]);
-
-  useEffect(() => {
-    const token = getAccessToken();
-    if (!token) return;
-    const id = setInterval(() => {
-      if (document.visibilityState === "visible") {
-        fetchMessages(lastMessageIdRef.current);
-      }
-    }, POLL_INTERVAL_MS);
-    return () => clearInterval(id);
-  }, [fetchMessages]);
 
   useEffect(() => {
     listEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -136,7 +105,6 @@ export default function CabinetSupportPage() {
       }
       const msg = (await res.json()) as Message;
       setMessages((prev) => [...prev, msg]);
-      lastMessageIdRef.current = msg.id;
       setError(null);
     } catch {
       setError("Ошибка соединения");
@@ -157,8 +125,18 @@ export default function CabinetSupportPage() {
         Чат поддержки
       </h1>
       <p className="mt-2 text-sm text-[var(--color-text-secondary)]">
-        Задайте вопрос или опишите проблему. Ответим в рабочее время. Сообщения обновляются автоматически.
+        Задайте вопрос или опишите проблему. Ответим в рабочее время. Чтобы увидеть новые ответы — нажмите «Обновить».
       </p>
+
+      <button
+        type="button"
+        onClick={refresh}
+        disabled={refreshing}
+        className="mt-3 flex items-center gap-2 rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-sm text-[var(--color-text)] hover:bg-white/10 disabled:opacity-50"
+      >
+        <RefreshCw className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`} />
+        Обновить
+      </button>
 
       {error && (
         <div className="mt-4 rounded-xl border border-amber-500/50 bg-amber-500/10 px-4 py-2 text-sm text-amber-200">
@@ -169,7 +147,7 @@ export default function CabinetSupportPage() {
       <div className="mt-6 flex flex-col rounded-2xl border border-white/10 bg-white/[0.04] overflow-hidden">
         <div className="flex min-h-[320px] max-h-[50vh] flex-col overflow-y-auto p-4 space-y-3">
           {messages.length === 0 && (
-            <p className="py-8 text-center text-[var(--color-text-secondary)]">
+            <p className="py-8 text-center text-white/90">
               Пока нет сообщений. Напишите первым — мы ответим.
             </p>
           )}
@@ -181,17 +159,17 @@ export default function CabinetSupportPage() {
               <div
                 className={`max-w-[85%] rounded-2xl px-4 py-2.5 ${
                   m.isFromStaff
-                    ? "rounded-bl-md bg-[var(--color-dark-gray)]/30 text-[var(--color-text)]"
-                    : "rounded-br-md bg-[var(--color-brand-gold)]/20 text-[var(--color-text)] border border-[var(--color-brand-gold)]/30"
+                    ? "rounded-bl-md bg-[var(--color-dark-gray)]/30 text-white"
+                    : "rounded-br-md bg-[var(--color-brand-gold)]/20 text-white border border-[var(--color-brand-gold)]/30"
                 }`}
               >
                 {m.isFromStaff && (
-                  <div className="mb-1 text-xs font-medium text-[var(--color-text)]/70">
+                  <div className="mb-1 text-xs font-medium text-white/80">
                     Поддержка
                   </div>
                 )}
-                <div className="whitespace-pre-wrap break-words text-sm">{m.body}</div>
-                <div className="mt-1 text-xs text-[var(--color-text)]/50">
+                <div className="whitespace-pre-wrap break-words text-sm text-white">{m.body}</div>
+                <div className="mt-1 text-xs text-white/70">
                   {new Date(m.createdAt).toLocaleString("ru-RU", {
                     day: "2-digit",
                     month: "2-digit",
@@ -219,7 +197,7 @@ export default function CabinetSupportPage() {
               onChange={(e) => setInput(e.target.value)}
               placeholder="Напишите сообщение…"
               maxLength={4000}
-              className="flex-1 rounded-xl border border-white/20 bg-white/5 px-4 py-3 text-[var(--color-text)] placeholder:text-[var(--color-text)]/50 focus:border-[var(--color-brand-gold)]/50 focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-gold)]/30"
+              className="flex-1 rounded-xl border border-white/20 bg-white/5 px-4 py-3 text-white placeholder:text-white/60 focus:border-[var(--color-brand-gold)]/50 focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-gold)]/30"
               disabled={sending}
             />
             <button

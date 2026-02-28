@@ -3,12 +3,10 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Send, Loader2 } from "lucide-react";
+import { ArrowLeft, Send, Loader2, RefreshCw } from "lucide-react";
 import { getAccessToken, authHeaders, clearAccessToken } from "@/lib/auth-client";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
-
-const POLL_INTERVAL_MS = 4000;
 
 type Message = {
   id: string;
@@ -38,6 +36,7 @@ export default function AdminSupportThreadPage() {
   const [sending, setSending] = useState(false);
   const [input, setInput] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
   const listEndRef = useRef<HTMLDivElement>(null);
 
   const fetchThread = useCallback(async () => {
@@ -74,6 +73,12 @@ export default function AdminSupportThreadPage() {
     }
   }, [threadId, router]);
 
+  const refresh = useCallback(async () => {
+    setRefreshing(true);
+    await fetchThread();
+    setRefreshing(false);
+  }, [fetchThread]);
+
   useEffect(() => {
     if (!threadId) return;
     const token = getAccessToken();
@@ -84,14 +89,6 @@ export default function AdminSupportThreadPage() {
     setLoading(true);
     fetchThread().finally(() => setLoading(false));
   }, [threadId, fetchThread, router]);
-
-  useEffect(() => {
-    if (!threadId || !getAccessToken()) return;
-    const id = setInterval(() => {
-      if (document.visibilityState === "visible") fetchThread();
-    }, POLL_INTERVAL_MS);
-    return () => clearInterval(id);
-  }, [threadId, fetchThread]);
 
   useEffect(() => {
     listEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -183,10 +180,20 @@ export default function AdminSupportThreadPage() {
         </div>
       )}
 
+      <button
+        type="button"
+        onClick={refresh}
+        disabled={refreshing}
+        className="mb-4 flex items-center gap-2 rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-sm text-[var(--color-text)] hover:bg-white/10 disabled:opacity-50"
+      >
+        <RefreshCw className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`} />
+        Обновить
+      </button>
+
       <div className="flex flex-col rounded-2xl border border-white/10 bg-white/[0.04] overflow-hidden">
         <div className="flex min-h-[320px] max-h-[50vh] flex-col overflow-y-auto p-4 space-y-3">
           {messages.length === 0 && (
-            <p className="py-8 text-center text-[var(--color-text-secondary)]">
+            <p className="py-8 text-center text-white/90">
               Нет сообщений в этом диалоге.
             </p>
           )}
@@ -198,22 +205,22 @@ export default function AdminSupportThreadPage() {
               <div
                 className={`max-w-[85%] rounded-2xl px-4 py-2.5 ${
                   m.isFromStaff
-                    ? "rounded-br-md bg-[var(--color-brand-gold)]/20 text-[var(--color-text)] border border-[var(--color-brand-gold)]/30"
-                    : "rounded-bl-md bg-[var(--color-dark-gray)]/30 text-[var(--color-text)]"
+                    ? "rounded-br-md bg-[var(--color-brand-gold)]/20 text-white border border-[var(--color-brand-gold)]/30"
+                    : "rounded-bl-md bg-[var(--color-dark-gray)]/30 text-white"
                 }`}
               >
                 {!m.isFromStaff && (
-                  <div className="mb-1 text-xs font-medium text-[var(--color-text)]/70">
+                  <div className="mb-1 text-xs font-medium text-white/80">
                     {m.authorName || m.authorLogin || "Клиент"}
                   </div>
                 )}
                 {m.isFromStaff && (
-                  <div className="mb-1 text-xs font-medium text-[var(--color-text)]/70">
+                  <div className="mb-1 text-xs font-medium text-white/80">
                     Вы
                   </div>
                 )}
-                <div className="whitespace-pre-wrap break-words text-sm">{m.body}</div>
-                <div className="mt-1 text-xs text-[var(--color-text)]/50">
+                <div className="whitespace-pre-wrap break-words text-sm text-white">{m.body}</div>
+                <div className="mt-1 text-xs text-white/70">
                   {new Date(m.createdAt).toLocaleString("ru-RU", {
                     day: "2-digit",
                     month: "2-digit",
@@ -241,7 +248,7 @@ export default function AdminSupportThreadPage() {
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ответ клиенту…"
               maxLength={4000}
-              className="flex-1 rounded-xl border border-white/20 bg-white/5 px-4 py-3 text-[var(--color-text)] placeholder:text-[var(--color-text)]/50 focus:border-[var(--color-brand-gold)]/50 focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-gold)]/30"
+              className="flex-1 rounded-xl border border-white/20 bg-white/5 px-4 py-3 text-white placeholder:text-white/60 focus:border-[var(--color-brand-gold)]/50 focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-gold)]/30"
               disabled={sending}
             />
             <button

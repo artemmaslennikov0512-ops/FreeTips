@@ -323,8 +323,8 @@ export default function AdminAntifraudPage() {
     <div className="min-w-0 max-w-full">
       <h1 className="antifraud-page-title mb-6 text-xl font-semibold text-white">Антифрод и лимиты</h1>
 
-      <section className="cabinet-section-header rounded-2xl border-0 p-6">
-        <div className="antifraud-inner cabinet-block-inner rounded-xl border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/85 p-5">
+      <section className="cabinet-section-header rounded-2xl border-0 p-4 sm:p-6">
+        <div className="antifraud-inner cabinet-block-inner min-w-0 rounded-xl border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/85 p-4 sm:p-5">
           {antifraudMessage && (
             <p className="mb-4 text-center text-sm text-white">
               {antifraudMessage.text}
@@ -333,14 +333,14 @@ export default function AdminAntifraudPage() {
           <p className="mb-4 text-xs text-white/80">
             Текущие значения видны ниже; «—» — не задано (для массового применения или в карточке пользователя).
           </p>
-          <div className="antifraud-limits-list space-y-4">
+          <div className="antifraud-limits-list min-w-0 space-y-4">
             <div className="antifraud-limit-rows space-y-4">
               {/* 1. Макс. сумма одной операции вывода */}
-              <div className="antifraud-limit-row flex items-center gap-4 border-0 pb-4">
-                <div className="min-w-[220px] shrink-0 text-sm font-medium text-white">
+              <div className="antifraud-limit-row flex min-w-0 flex-wrap items-center gap-2 border-0 pb-4 sm:gap-4">
+                <div className="min-w-0 flex-[1_1_100%] text-sm font-medium text-white sm:min-w-[180px] sm:flex-none sm:shrink-0">
                   1. Макс. сумма одной операции вывода
                 </div>
-                <div className="flex min-w-[8rem] flex-1 justify-center">
+                <div className="flex min-w-0 max-w-full flex-1 basis-0 justify-center overflow-hidden sm:min-w-[8rem]">
                   {editingAutoConfirm ? (
                     <input
                       type="text"
@@ -356,7 +356,7 @@ export default function AdminAntifraudPage() {
                     </span>
                   )}
                 </div>
-                <div className="shrink-0 pr-4">
+                <div className="shrink-0 sm:pr-2">
                   {editingAutoConfirm ? (
                     <button
                       type="button"
@@ -379,11 +379,11 @@ export default function AdminAntifraudPage() {
               </div>
 
               {/* 2. Суточный лимит вывода (сумма) */}
-              <div className="antifraud-limit-row flex items-center gap-4 border-0 pb-4">
-                <div className="min-w-[220px] shrink-0 text-sm font-medium text-white">
+              <div className="antifraud-limit-row flex min-w-0 flex-wrap items-center gap-2 border-0 pb-4 sm:gap-4">
+                <div className="min-w-0 flex-[1_1_100%] text-sm font-medium text-white sm:min-w-[180px] sm:flex-none sm:shrink-0">
                   2. Суточный лимит вывода
                 </div>
-                <div className="flex min-w-[8rem] flex-1 justify-center">
+                <div className="flex min-w-0 max-w-full flex-1 basis-0 justify-center overflow-hidden sm:min-w-[8rem]">
                   {editingDailyRub ? (
                     <input
                       type="text"
@@ -399,7 +399,7 @@ export default function AdminAntifraudPage() {
                     </span>
                   )}
                 </div>
-                <div className="shrink-0 pr-4">
+                <div className="shrink-0 sm:pr-2">
                   {editingDailyRub ? (
                     <button
                       type="button"
@@ -422,11 +422,11 @@ export default function AdminAntifraudPage() {
               </div>
 
               {/* 3. Месячный лимит вывода (сумма) */}
-              <div className="antifraud-limit-row flex items-center gap-4 border-0 pb-4">
-                <div className="min-w-[220px] shrink-0 text-sm font-medium text-white">
+              <div className="antifraud-limit-row flex min-w-0 flex-wrap items-center gap-2 border-0 pb-4 sm:gap-4">
+                <div className="min-w-0 flex-[1_1_100%] text-sm font-medium text-white sm:min-w-[180px] sm:flex-none sm:shrink-0">
                   3. Месячный лимит вывода
                 </div>
-                <div className="flex min-w-[8rem] flex-1 justify-center">
+                <div className="flex min-w-0 max-w-full flex-1 basis-0 justify-center overflow-hidden sm:min-w-[8rem]">
                   {editingMonthlyRub ? (
                     <input
                       type="text"
@@ -442,7 +442,7 @@ export default function AdminAntifraudPage() {
                     </span>
                   )}
                 </div>
-                <div className="shrink-0 pr-4">
+                <div className="shrink-0 sm:pr-2">
                   {editingMonthlyRub ? (
                     <button
                       type="button"
@@ -465,11 +465,11 @@ export default function AdminAntifraudPage() {
               </div>
 
               {/* 4. Суточный лимит заявок */}
-              <div className="antifraud-limit-row flex items-center gap-4 border-0 pb-4">
-                <div className="min-w-[220px] shrink-0 text-sm font-medium text-white">
+              <div className="antifraud-limit-row flex min-w-0 flex-wrap items-center gap-2 border-0 pb-4 sm:gap-4">
+                <div className="min-w-0 flex-[1_1_100%] text-sm font-medium text-white sm:min-w-[180px] sm:flex-none sm:shrink-0">
                   4. Суточный лимит заявок
                 </div>
-                <div className="flex min-w-[8rem] flex-1 justify-center">
+                <div className="flex min-w-0 max-w-full flex-1 basis-0 justify-center overflow-hidden sm:min-w-[8rem]">
                   {editingDailyCount ? (
                     <input
                       type="number"
@@ -486,7 +486,7 @@ export default function AdminAntifraudPage() {
                     </span>
                   )}
                 </div>
-                <div className="shrink-0 pr-4">
+                <div className="shrink-0 sm:pr-2">
                   {editingDailyCount ? (
                     <button
                       type="button"
@@ -509,11 +509,11 @@ export default function AdminAntifraudPage() {
               </div>
 
               {/* 5. Месячный лимит заявок */}
-              <div className="antifraud-limit-row flex items-center gap-4 border-0 pb-4">
-                <div className="min-w-[220px] shrink-0 text-sm font-medium text-white">
+              <div className="antifraud-limit-row flex min-w-0 flex-wrap items-center gap-2 border-0 pb-4 sm:gap-4">
+                <div className="min-w-0 flex-[1_1_100%] text-sm font-medium text-white sm:min-w-[180px] sm:flex-none sm:shrink-0">
                   5. Месячный лимит заявок
                 </div>
-                <div className="flex min-w-[8rem] flex-1 justify-center">
+                <div className="flex min-w-0 max-w-full flex-1 basis-0 justify-center overflow-hidden sm:min-w-[8rem]">
                   {editingMonthlyCount ? (
                     <input
                       type="number"
@@ -530,7 +530,7 @@ export default function AdminAntifraudPage() {
                     </span>
                   )}
                 </div>
-                <div className="shrink-0 pr-4">
+                <div className="shrink-0 sm:pr-2">
                   {editingMonthlyCount ? (
                     <button
                       type="button"

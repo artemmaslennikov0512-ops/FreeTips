@@ -25,12 +25,6 @@ export function CTAPremium() {
           >
             Начать бесплатно
           </Link>
-          <Link
-            href="/kontakty"
-            className="inline-flex items-center justify-center px-7 py-3 rounded-xl border-0 text-[var(--color-on-navy)] font-semibold text-[15px] bg-transparent hover:opacity-90 transition-all duration-300"
-          >
-            Запросить демо
-          </Link>
         </div>
       </div>
     </section>

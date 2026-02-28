@@ -178,11 +178,26 @@ html:not([data-theme="dark"]) .cabinet-premium .cabinet-sidebar-avatar {
   background: #000;
 }
 
-[data-theme="dark"] .cabinet-premium .cabinet-main-block,
-[data-theme="dark"] .cabinet-premium .cabinet-sidebar {
+[data-theme="dark"] .cabinet-premium .cabinet-main-block {
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(192, 192, 192, 0.4);
   box-shadow: 0 0 0 1px rgba(192, 192, 192, 0.08);
+}
+
+[data-theme="dark"] .cabinet-premium .cabinet-sidebar {
+  background: #262626;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2);
+  color: #fafafa;
+}
+[data-theme="dark"] .cabinet-premium .cabinet-sidebar a,
+[data-theme="dark"] .cabinet-premium .cabinet-sidebar button {
+  color: rgba(250, 250, 250, 0.9);
+}
+[data-theme="dark"] .cabinet-premium .cabinet-sidebar .cabinet-sidebar-profile {
+  background: rgba(0, 0, 0, 0.25) !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+  color: #fafafa !important;
 }
 
 [data-theme="dark"] .cabinet-premium .cabinet-card {
@@ -226,6 +241,14 @@ html:not([data-theme="dark"]) .cabinet-premium .cabinet-sidebar-avatar {
   background: transparent;
   border: 1px solid rgba(192, 192, 192, 0.25);
   box-shadow: none;
+}
+
+/* Тёмная тема: мобильное меню хедера — тёмная панель и тёмный оверлей (не белые) */
+[data-theme="dark"] .header-mobile-overlay {
+  background: rgba(0, 0, 0, 0.6) !important;
+}
+[data-theme="dark"] .header-mobile-panel {
+  background: #0a192f !important;
 }
 
 /* Лендинг: шапка во всю ширину без отступов, без скруглений и без границы от шторки */
@@ -546,6 +569,24 @@ html:not([data-theme="dark"]) .cabinet-premium .cabinet-limits-block .font-mediu
 /* Карточки секций в админке (тёмная тема) */
 [data-theme="dark"] .admin-panel .cabinet-section-header {
   background: #141414;
+}
+
+/* Админка: выпадающие списки (select) — тёмный фон и светлый текст, чтобы не было «белой шторки» (и в светлой, и в тёмной теме контент админки на тёмном фоне) */
+.admin-panel select {
+  background: #262626 !important;
+  color: #fafafa !important;
+}
+.admin-panel select option {
+  background: #262626 !important;
+  color: #fafafa !important;
+}
+
+/* Поле поиска в админке «Пользователи» — белый текст ввода */
+.admin-panel .admin-users-search-input {
+  color: #ffffff !important;
+}
+.admin-panel .admin-users-search-input::placeholder {
+  color: rgba(255, 255, 255, 0.7) !important;
 }
 
 /* Заголовки в разделах на тёмном фоне — белым шрифтом (тёмная тема: основной блок, карточки, секции тёмные) */

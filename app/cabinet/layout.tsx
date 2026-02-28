@@ -130,7 +130,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
     .slice(0, 2);
 
   return (
-    <div className="cabinet-premium flex min-h-screen w-full bg-[var(--color-bg)] font-[family:var(--font-inter)] text-[var(--color-text)] pt-4">
+    <div className="cabinet-premium flex min-h-screen w-full max-w-full overflow-x-hidden bg-[var(--color-bg)] font-[family:var(--font-inter)] text-[var(--color-text)] pt-4">
       {/* Шторка — стиль как на блоке: тёмное стекло, размытие, тонкая светлая обводка */}
       <div
         className={`cabinet-overlay fixed inset-0 z-30 rounded-xl border border-white/[0.12] bg-[rgba(15,23,42,0.65)] backdrop-blur-xl lg:hidden ml-4 mr-4 mt-4 mb-4 ${sidebarOpen ? "block" : "hidden"}`}
@@ -141,7 +141,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
       {/* Левое меню — как шторка: отступы от краёв */}
       <div
         className={`cabinet-sidebar fixed left-4 top-4 z-40 flex h-auto max-h-[calc(100vh-2rem)] w-[260px] shrink-0 flex-col overflow-hidden rounded-2xl border border-white/10 bg-white/[0.06] py-6 shadow-sm backdrop-blur-xl transition-transform duration-300 lg:static lg:left-auto lg:top-auto lg:ml-4 lg:mt-4 lg:mr-0 lg:mb-0 lg:max-h-none lg:self-start lg:translate-x-0 ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+          sidebarOpen ? "translate-x-0" : "-translate-x-[calc(100%+1rem)]"
         }`}
       >
         <div className="cabinet-sidebar-profile cabinet-block-inner mx-4 rounded-xl border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-4 py-3">
@@ -190,18 +190,20 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
         </nav>
       </div>
 
-      <main className="min-h-screen min-w-0 flex-1 lg:ml-0 flex flex-col">
+      <main className="min-h-screen min-w-0 flex-1 overflow-x-hidden lg:ml-0 flex flex-col">
         {/* Основной блок — как шторка: отступы от краёв */}
-        <div className="cabinet-main-block mt-4 mr-4 mb-4 ml-4 lg:ml-4 flex min-h-[calc(100vh-2rem)] flex-1 flex-col rounded-2xl border border-white/10 bg-white/[0.06] backdrop-blur-xl">
+        <div className="cabinet-main-block mt-4 mr-0 mb-4 ml-4 lg:mr-4 lg:ml-4 flex min-h-[calc(100vh-2rem)] flex-1 flex-col rounded-2xl border border-white/10 bg-white/[0.06] backdrop-blur-xl">
           <div className="p-6 lg:p-8" id="main-content">
-            <button
-              type="button"
-              onClick={() => setSidebarOpen(true)}
-              className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg text-[var(--color-text)] hover:bg-[var(--color-dark-gray)]/10 lg:hidden"
-              aria-label="Меню"
-            >
-              <Menu className="h-5 w-5" />
-            </button>
+            <div className="mb-4 flex justify-end lg:hidden">
+              <button
+                type="button"
+                onClick={() => setSidebarOpen(true)}
+                className="flex h-10 w-10 items-center justify-center rounded-lg border border-[var(--color-brand-gold)]/50 bg-[var(--color-brand-gold)]/10 text-[var(--color-brand-gold)] hover:bg-[var(--color-brand-gold)]/20"
+                aria-label="Меню"
+              >
+                <Menu className="h-5 w-5" />
+              </button>
+            </div>
             {children}
           </div>
         </div>

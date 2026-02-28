@@ -141,7 +141,7 @@ export default function ZayavkaPage() {
                   value={formData.fullName}
                   onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                   placeholder="Иванов Иван Иванович"
-                  className={`w-full rounded-xl border-0 bg-[var(--color-light-gray)] py-2.5 pl-10 pr-4 text-[var(--color-text)] placeholder:text-[var(--color-muted)] focus:outline-none focus:outline-none ${
+                  className={`w-full rounded-xl border-0 bg-[var(--color-light-gray)] py-2.5 pl-10 pr-4 text-[var(--color-text)] placeholder:text-[var(--color-muted)] caret-[var(--color-text)] focus:outline-none ${
                     fieldErrors.fullName ? "" : ""
                   }`}
                 />
@@ -158,7 +158,7 @@ export default function ZayavkaPage() {
                   type="date"
                   value={formData.dateOfBirth}
                   onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
-                  className={`w-full rounded-xl border-0 bg-[var(--color-light-gray)] py-2.5 pl-10 pr-4 text-[var(--color-text)] placeholder:text-[var(--color-muted)] focus:outline-none focus:outline-none ${
+                  className={`w-full rounded-xl border-0 bg-[var(--color-light-gray)] py-2.5 pl-10 pr-4 text-[var(--color-text)] placeholder:text-[var(--color-muted)] caret-[var(--color-text)] focus:outline-none ${
                     fieldErrors.dateOfBirth ? "" : ""
                   }`}
                 />
@@ -183,7 +183,7 @@ export default function ZayavkaPage() {
                   value={formatPhoneNational(formData.phone)}
                   onChange={handlePhoneChange}
                   placeholder="(999) 123-45-67"
-                  className={`flex-1 min-w-0 py-2.5 pr-4 pl-1 text-[var(--color-text)] placeholder:text-[var(--color-muted)] focus:outline-none border-0 bg-transparent ${
+                  className={`flex-1 min-w-0 py-2.5 pr-4 pl-1 text-[var(--color-text)] placeholder:text-[var(--color-muted)] caret-[var(--color-text)] focus:outline-none border-0 bg-transparent ${
                     fieldErrors.phone ? "placeholder:text-[var(--color-text-secondary)]" : ""
                   }`}
                   aria-invalid={Boolean(fieldErrors.phone)}
@@ -202,7 +202,7 @@ export default function ZayavkaPage() {
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   placeholder="email@example.com"
-                  className={`w-full rounded-xl border-0 bg-[var(--color-light-gray)] py-2.5 pl-10 pr-4 text-[var(--color-text)] placeholder:text-[var(--color-muted)] focus:outline-none focus:outline-none ${
+                  className={`w-full rounded-xl border-0 bg-[var(--color-light-gray)] py-2.5 pl-10 pr-4 text-[var(--color-text)] placeholder:text-[var(--color-muted)] caret-[var(--color-text)] focus:outline-none ${
                     fieldErrors.email ? "" : ""
                   }`}
                 />
@@ -226,7 +226,7 @@ export default function ZayavkaPage() {
                   value={formData.activityType}
                   onChange={(e) => setFormData({ ...formData, activityType: e.target.value })}
                   placeholder="Официант, курьер, мастер"
-                  className={`w-full rounded-xl border-0 bg-[var(--color-light-gray)] py-2.5 pl-10 pr-4 text-[var(--color-text)] placeholder:text-[var(--color-muted)] focus:outline-none focus:outline-none ${
+                  className={`w-full rounded-xl border-0 bg-[var(--color-light-gray)] py-2.5 pl-10 pr-4 text-[var(--color-text)] placeholder:text-[var(--color-muted)] caret-[var(--color-text)] focus:outline-none ${
                     fieldErrors.activityType ? "" : ""
                   }`}
                 />
@@ -244,7 +244,7 @@ export default function ZayavkaPage() {
                   value={formData.establishment}
                   onChange={(e) => setFormData({ ...formData, establishment: e.target.value })}
                   placeholder="Название кафе, ресторана"
-                  className={`w-full rounded-xl border-0 bg-[var(--color-light-gray)] py-2.5 pl-10 pr-4 text-[var(--color-text)] placeholder:text-[var(--color-muted)] focus:outline-none focus:outline-none ${
+                  className={`w-full rounded-xl border-0 bg-[var(--color-light-gray)] py-2.5 pl-10 pr-4 text-[var(--color-text)] placeholder:text-[var(--color-muted)] caret-[var(--color-text)] focus:outline-none ${
                     fieldErrors.establishment ? "" : ""
                   }`}
                 />

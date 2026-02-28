@@ -168,30 +168,30 @@ export function Header() {
         </div>
         {sideOpen && (
           <>
-            <div className="fixed inset-0 bg-black/20 z-40 lg:hidden" onClick={close} aria-hidden />
-            <aside ref={(el) => { sideMenuRef.current = el; }} className="fixed top-0 right-0 z-50 h-full w-[min(100vw-4rem,20rem)] bg-[var(--color-white)] shadow-2xl lg:hidden p-6">
+            <div className="header-mobile-overlay fixed inset-0 z-40 bg-black/20 lg:hidden" onClick={close} aria-hidden />
+            <aside ref={(el) => { sideMenuRef.current = el; }} className="header-mobile-panel fixed top-0 right-0 z-50 h-full w-[min(100vw-4rem,20rem)] bg-[#0a192f] shadow-2xl lg:hidden p-6">
               <div className="flex justify-between items-center mb-6">
-                <span className="font-[family:var(--font-playfair)] font-bold text-[var(--color-navy)]"><span className="site-header-logo-free">Free</span><span className="text-[var(--color-brand-gold)]">Tips</span></span>
-                <button type="button" onClick={close} className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg text-[var(--color-charcoal)] hover:bg-[var(--color-light-gray)]" aria-label="Закрыть">
+                <span className="font-[family:var(--font-playfair)] font-bold"><span className="text-white">Free</span><span className="text-[var(--color-brand-gold)]">Tips</span></span>
+                <button type="button" onClick={close} className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg text-white hover:bg-white/10" aria-label="Закрыть">
                   <X className="h-5 w-5" />
                 </button>
               </div>
               <nav className="flex flex-col gap-2">
-                <Link href="/#features" onClick={close} className="py-3 font-medium text-[var(--color-charcoal)] hover:text-[var(--color-accent-gold)]">Преимущества</Link>
-                <Link href="/#process" onClick={close} className="py-3 font-medium text-[var(--color-charcoal)] hover:text-[var(--color-accent-gold)]">Как работает</Link>
-                <Link href="/#business" onClick={close} className="py-3 font-medium text-[var(--color-charcoal)] hover:text-[var(--color-accent-gold)]">Для бизнеса</Link>
-                <Link href="/oferta" onClick={close} className="py-3 font-medium text-[var(--color-charcoal)] hover:text-[var(--color-accent-gold)]">Тарифы</Link>
-                <Link href="/kontakty" onClick={close} className="py-3 font-medium text-[var(--color-charcoal)] hover:text-[var(--color-accent-gold)]">Контакты</Link>
-                <div className="mt-6 pt-6 border-0 flex flex-col gap-3">
+                <Link href="/#features" onClick={close} className="py-3 font-medium text-white hover:text-[var(--color-brand-gold)]">Преимущества</Link>
+                <Link href="/#process" onClick={close} className="py-3 font-medium text-white hover:text-[var(--color-brand-gold)]">Как работает</Link>
+                <Link href="/#business" onClick={close} className="py-3 font-medium text-white hover:text-[var(--color-brand-gold)]">Для бизнеса</Link>
+                <Link href="/oferta" onClick={close} className="py-3 font-medium text-white hover:text-[var(--color-brand-gold)]">Тарифы</Link>
+                <Link href="/kontakty" onClick={close} className="py-3 font-medium text-white hover:text-[var(--color-brand-gold)]">Контакты</Link>
+                <div className="mt-6 pt-6 border-t border-white/20 flex flex-col gap-3">
                   {user ? (
                     <>
-                      <Link href={cabinetHref} onClick={close} className="py-3 text-center font-semibold text-[var(--color-white)] bg-[var(--color-navy)] rounded-xl">Кабинет</Link>
-                      <button type="button" onClick={handleLogout} className="py-3 text-center font-semibold text-[var(--color-white)] bg-[var(--color-navy)] rounded-xl">Выйти</button>
+                      <Link href={cabinetHref} onClick={close} className="py-3 text-center font-semibold text-[var(--color-white)] bg-[var(--color-brand-gold)] text-[#0a192f] rounded-xl hover:opacity-90">Кабинет</Link>
+                      <button type="button" onClick={handleLogout} className="py-3 text-center font-semibold text-[var(--color-white)] bg-white/10 rounded-xl hover:bg-white/20">Выйти</button>
                     </>
                   ) : (
                     <>
-                      <Link href="/login" onClick={close} className="py-3 text-center font-semibold text-[var(--color-navy)] border-0 rounded-xl">Войти</Link>
-                      <Link href="/zayavka" onClick={close} className="py-3 text-center font-semibold text-[var(--color-white)] bg-[var(--color-navy)] rounded-xl">Начать</Link>
+                      <Link href="/login" onClick={close} className="py-3 text-center font-semibold bg-[var(--color-brand-gold)] text-[#0a192f] rounded-xl hover:opacity-90">Войти</Link>
+                      <Link href="/zayavka" onClick={close} className="py-3 text-center font-semibold text-[var(--color-white)] bg-white/10 rounded-xl hover:bg-white/20">Начать</Link>
                     </>
                   )}
                 </div>
@@ -311,27 +311,27 @@ export function Header() {
             role="dialog"
             aria-modal="true"
             aria-label="Меню навигации"
-            className={`md:hidden fixed inset-0 z-[9999] transition-opacity duration-300 ${
+            className={`md:hidden fixed inset-0 z-[9999] overflow-hidden transition-opacity duration-300 ${
               sideOpen ? "opacity-100" : "opacity-0 pointer-events-none"
             }`}
             onClick={close}
           >
             <div
-              className="absolute inset-0 bg-black/20 backdrop-blur-sm cursor-pointer"
+              className="header-mobile-overlay absolute inset-0 cursor-pointer bg-black/20 backdrop-blur-sm"
               aria-hidden
             />
             <aside
               ref={(el) => { sideMenuRef.current = el; }}
-              className={`absolute top-0 right-0 z-10 h-full w-[min(100vw-4rem,20rem)] bg-[var(--color-white)] shadow-2xl flex flex-col transition-transform duration-300 ease-out border-0 ${
+              className={`header-mobile-panel absolute top-0 right-0 z-10 flex h-full w-[min(calc(100%-4rem),20rem)] flex-col border-0 bg-[#0a192f] shadow-2xl transition-transform duration-300 ease-out ${
                 sideOpen ? "translate-x-0" : "translate-x-full"
               }`}
             >
               <div className="flex h-16 items-center justify-between px-4 border-0">
-                <span className="font-[family:var(--font-playfair)] font-bold text-[var(--color-navy)]"><span className="site-header-logo-free">Free</span><span className="text-[var(--color-brand-gold)]">Tips</span></span>
+                <span className="font-[family:var(--font-playfair)] font-bold"><span className="text-white">Free</span><span className="text-[var(--color-brand-gold)]">Tips</span></span>
                 <button
                   type="button"
                   onClick={close}
-                  className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded-lg text-[var(--color-navy)] hover:bg-[var(--color-light-gray)]"
+                  className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded-lg text-white hover:bg-white/10"
                   aria-label="Закрыть меню"
                 >
                   <X className="h-5 w-5" />
@@ -343,18 +343,18 @@ export function Header() {
                     key={item.href}
                     href={item.href}
                     onClick={close}
-                    className="min-h-[48px] flex items-center rounded-xl px-4 py-3 text-[var(--color-navy)] hover:bg-[var(--color-light-gray)] hover:text-[var(--color-accent-gold)] font-medium transition-all"
+                    className="min-h-[48px] flex items-center rounded-xl px-4 py-3 text-white hover:bg-white/10 hover:text-[var(--color-brand-gold)] font-medium transition-all"
                   >
                     {item.label}
                   </Link>
                 ))}
-                <div className="mt-4 pt-4 border-0 space-y-2">
+                <div className="mt-4 pt-4 border-t border-white/20 space-y-2">
                   {user ? (
                     <>
                       <Link
                         href={cabinetHref}
                         onClick={close}
-                        className="flex items-center justify-center gap-2 rounded-xl bg-[var(--color-navy)] px-4 py-3 font-semibold text-[var(--color-white)] hover:opacity-90 transition-all"
+                        className="flex items-center justify-center gap-2 rounded-xl bg-[var(--color-brand-gold)] px-4 py-3 font-semibold text-[#0a192f] hover:opacity-90 transition-all"
                       >
                         <User className="h-4 w-4" />
                         {displayName}
@@ -362,7 +362,7 @@ export function Header() {
                       <button
                         type="button"
                         onClick={handleLogout}
-                        className="w-full flex items-center justify-center gap-2 rounded-xl bg-[var(--color-navy)] px-4 py-3 font-semibold text-[var(--color-white)] hover:opacity-90 transition-all"
+                        className="w-full flex items-center justify-center gap-2 rounded-xl bg-white/10 px-4 py-3 font-semibold text-white hover:bg-white/20 transition-all"
                       >
                         <LogOut className="h-3.5 w-3.5" />
                         Выйти
@@ -373,14 +373,14 @@ export function Header() {
                       <Link
                         href={site.register.href}
                         onClick={close}
-                        className="block rounded-xl border-0 px-4 py-3 text-center font-semibold text-[var(--color-navy)] hover:opacity-90 transition-all"
+                        className="block rounded-xl border-0 px-4 py-3 text-center font-semibold text-white hover:bg-white/10 transition-all"
                       >
                         {site.register.label}
                       </Link>
                       <Link
                         href={site.cta.href}
                         onClick={close}
-                        className="block rounded-xl bg-[var(--color-navy)] px-4 py-3 text-center font-semibold text-[var(--color-white)] hover:opacity-90 transition-all"
+                        className="block rounded-xl bg-[var(--color-brand-gold)] px-4 py-3 text-center font-semibold text-[#0a192f] hover:opacity-90 transition-all"
                       >
                         {site.cta.label}
                       </Link>

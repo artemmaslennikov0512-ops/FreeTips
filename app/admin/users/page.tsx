@@ -246,7 +246,7 @@ export default function AdminUsersPage() {
             placeholder="Поиск по логину или email..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="cabinet-section-header w-full rounded-xl border-0 py-2.5 pl-10 pr-4 text-sm text-white placeholder:text-white/70 focus:outline-none"
+            className="admin-users-search-input cabinet-section-header w-full rounded-xl border-0 py-2.5 pl-10 pr-4 text-sm text-white placeholder:text-white/70 focus:outline-none"
           />
         </div>
         <div className="cabinet-section-header rounded-2xl border-0 bg-[var(--color-light-gray)] p-4 text-sm text-[var(--color-text-secondary)]">

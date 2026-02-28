@@ -31,7 +31,7 @@ const CARD_STYLES = `
   overflow: hidden;
 }
 .premium-card-front {
-  background: linear-gradient(135deg, #8b6914 0%, var(--color-brand-gold) 25%, #d4b896 50%, var(--color-brand-gold) 75%, #9a7b2e 100%);
+  background: radial-gradient(ellipse 120% 120% at 50% 50%, #d4b896 0%, var(--color-brand-gold) 40%, #b8985c 100%);
 }
 .premium-animated-pattern {
   position: absolute;
@@ -126,7 +126,7 @@ export function PremiumCard({ fullName, balanceKop, compact }: Props) {
               />
               <div className="absolute left-[12px] bottom-[28px] z-[3] flex items-center gap-1.5">
                 <div className="premium-logo-icon">FT</div>
-                <span className="text-xs font-extrabold bg-gradient-to-r from-[var(--color-white)] via-[var(--color-muted)] to-[var(--color-white)] bg-clip-text text-transparent">
+                <span className="text-xs font-extrabold text-[#0a192f]">
                   FreeTips
                 </span>
               </div>

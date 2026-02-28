@@ -506,7 +506,7 @@ export default function AdminUserDetailsPage() {
   }
 
   return (
-    <div className="min-w-0 max-w-full">
+    <div id="admin-user-detail" className="min-w-0 max-w-full">
       <div className="mb-6 flex flex-col items-center gap-3">
         <Link
           href="/admin/users"
@@ -516,7 +516,7 @@ export default function AdminUserDetailsPage() {
           Назад
         </Link>
         <div className="cabinet-section-header flex h-[120px] w-full max-w-[360px] items-center justify-center gap-4 rounded-2xl border-0 px-4 sm:px-5">
-          <UserRound className="h-12 w-12 shrink-0 text-primary-500" />
+          <UserRound className="h-12 w-12 shrink-0 text-white" />
           <div className="min-w-0 leading-tight">
             <div className="text-base font-semibold uppercase tracking-wide text-white">
               {data.user.login}

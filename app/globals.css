@@ -143,9 +143,10 @@ html:not([data-theme="dark"]) .admin-panel .admin-sidebar .cabinet-nav-active {
 }
 
 /* Светлая тема: блок пользователя в сайдбаре админки — как у официанта (тёмное стекло, золотая обводка, белый текст) */
+/* Фон блока пользователя в сайдбаре админки — как в карточках (полупрозрачный, светлая обводка) */
 html:not([data-theme="dark"]) .admin-panel .admin-sidebar .cabinet-sidebar-profile {
-  background: rgba(79, 79, 79, 0.85) !important;
-  border: 1px solid rgba(197, 165, 114, 0.35) !important;
+  background: rgba(255, 255, 255, 0.15) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
   color: #fff !important;
 }
 
@@ -381,14 +382,28 @@ html:not([data-theme="dark"]) .cabinet-premium #settings-password.cabinet-card h
 html:not([data-theme="dark"]) .cabinet-premium #settings-password.cabinet-card label,
 html:not([data-theme="dark"]) .cabinet-premium #settings-password.cabinet-card .p-6 p { color: #fff !important; }
 
+/* Светлая тема: страница «Ссылка» — блок QR-код — белый текст */
+html:not([data-theme="dark"]) .cabinet-premium #link-qr-card.cabinet-card h2,
+html:not([data-theme="dark"]) .cabinet-premium #link-qr-card.cabinet-card a[download] {
+  color: #fff !important;
+}
+
 /* Светлая тема: страница «Ссылка» — «Ссылка для оплаты» и «Ваша ссылка для чаевых» — белый текст */
 html:not([data-theme="dark"]) .cabinet-premium #link-payment.cabinet-card h2,
 html:not([data-theme="dark"]) .cabinet-premium #link-payment.cabinet-card .font-semibold,
 html:not([data-theme="dark"]) .cabinet-premium #link-payment.cabinet-card .cabinet-input-window {
   color: #fff !important;
 }
+/* Кнопки в карточках ЛК официанта — чёрный шрифт */
+html:not([data-theme="dark"]) .cabinet-premium #link-payment.cabinet-card button,
+html:not([data-theme="dark"]) .cabinet-premium #link-payment.cabinet-card a[download],
+html:not([data-theme="dark"]) .cabinet-premium #quick-actions.cabinet-card button,
+html:not([data-theme="dark"]) .cabinet-premium #api-key.cabinet-card button,
+html:not([data-theme="dark"]) .cabinet-premium #api-key.cabinet-card .cabinet-block-inner button {
+  color: #0a192f !important;
+}
 
-/* Светлая тема: блок «Быстрые действия» — весь текст белый */
+/* Светлая тема: блок «Быстрые действия» — весь текст белый (кнопки — чёрный, см. правило выше) */
 html:not([data-theme="dark"]) .cabinet-premium #quick-actions.cabinet-card h3,
 html:not([data-theme="dark"]) .cabinet-premium #quick-actions.cabinet-card .cabinet-block-inner,
 html:not([data-theme="dark"]) .cabinet-premium #quick-actions.cabinet-card .cabinet-input-window {
@@ -556,9 +571,10 @@ html:not([data-theme="dark"]) .cabinet-premium .cabinet-main-block #main-content
 }
 
 /* Фон блока антифрода — как у карточек в блоке официанта (тёмное стекло, золотая обводка) */
+/* Фон блока антифрода — как в карточках официанта (полупрозрачный, светлая обводка) */
 html:not([data-theme="dark"]) .admin-panel .antifraud-inner {
-  background: rgba(79, 79, 79, 0.85) !important;
-  border: 1px solid rgba(197, 165, 114, 0.35) !important;
+  background: rgba(255, 255, 255, 0.15) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
   color: rgba(255, 255, 255, 0.95);
 }
 html:not([data-theme="dark"]) .admin-panel .antifraud-inner .antifraud-value,
@@ -572,6 +588,14 @@ html:not([data-theme="dark"]) .admin-panel .antifraud-input {
 html:not([data-theme="dark"]) .admin-panel .antifraud-input:focus {
   border-color: rgba(197, 165, 114, 0.6);
   outline: none;
+}
+
+/* Светлая тема: раздел «Пользователи» → карточка пользователя — заголовки и иконка пользователя белые */
+html:not([data-theme="dark"]) .admin-panel #admin-user-detail h2 {
+  color: #fff !important;
+}
+html:not([data-theme="dark"]) .admin-panel #admin-user-detail .mb-6 .cabinet-section-header svg {
+  color: #fff !important;
 }
 
 /* Внутренний блок антифрода (контейнер с лимитами) — только этот блок */

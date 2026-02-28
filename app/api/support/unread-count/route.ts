@@ -5,18 +5,17 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
+import { UserRole } from "@prisma/client";
 import { requireAuth } from "@/lib/middleware/auth";
 import { db } from "@/lib/db";
 import { logError } from "@/lib/logger";
-
-const STAFF_ROLES = ["ADMIN", "SUPERADMIN"];
 
 export async function GET(request: NextRequest) {
   const auth = await requireAuth(request);
   if ("response" in auth) return auth.response;
   const { userId, role } = auth.user;
 
-  if (STAFF_ROLES.includes(role)) {
+  if (role === "ADMIN" || role === "SUPERADMIN") {
     return NextResponse.json({ count: 0 });
   }
 
@@ -36,7 +35,7 @@ export async function GET(request: NextRequest) {
       where: {
         threadId: thread.id,
         createdAt: { gt: after },
-        author: { role: { in: STAFF_ROLES } },
+        author: { role: { in: [UserRole.ADMIN, UserRole.SUPERADMIN] } },
       },
     });
 

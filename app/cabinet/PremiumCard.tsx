@@ -31,7 +31,7 @@ const CARD_STYLES = `
   overflow: hidden;
 }
 .premium-card-front {
-  background: radial-gradient(ellipse 120% 120% at 50% 50%, #c4a876 0%, #b89450 40%, #9a7a44 100%);
+  background: radial-gradient(ellipse 120% 120% at 50% 50%, #d4b896 0%, var(--color-brand-gold) 40%, #b8985c 100%);
 }
 .premium-animated-pattern {
   position: absolute;
@@ -75,7 +75,7 @@ const CARD_STYLES = `
   font-weight: bold;
 }
 .premium-card-brand {
-  background: linear-gradient(135deg, #f5f5f5 0%, #d8d8d8 35%, #b8b8b8 65%, #d0d0d0 100%);
+  background: linear-gradient(135deg, #c0c0c0 0%, #909090 35%, #606060 65%, #808080 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;

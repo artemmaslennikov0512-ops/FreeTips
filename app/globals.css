@@ -318,23 +318,38 @@ html:not([data-theme="dark"]) .cabinet-premium .cabinet-btn-gold {
   border: 1px solid rgba(197, 165, 114, 0.6);
 }
 
-/* Светлая тема: карточки внутри блоков (например «Доступные лимиты», окна ввода) — не трогаем, как было */
+/* Светлая тема: карточки внутри блоков — тот же фон, что у пузыря сообщения в чате (тёмно-серый + золотая обводка) */
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-block-inner {
-  background: #d4d4d4 !important;
-  border: 1px solid rgba(197, 165, 114, 0.5);
+  background: rgba(79, 79, 79, 0.85) !important;
+  border: 1px solid rgba(197, 165, 114, 0.35);
+  color: rgba(255, 255, 255, 0.95);
+}
+html:not([data-theme="dark"]) .cabinet-premium .cabinet-block-inner .cabinet-limits-label,
+html:not([data-theme="dark"]) .cabinet-premium .cabinet-block-inner [class*="text-[var(--color-text)]"],
+html:not([data-theme="dark"]) .cabinet-premium .cabinet-block-inner [class*="text-[var(--color-text-secondary)]"] {
+  color: rgba(255, 255, 255, 0.9) !important;
 }
 
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-input-window {
-  background: #ffffff !important;
-  border: 1px solid rgba(10, 25, 47, 0.15);
+  background: rgba(79, 79, 79, 0.85) !important;
+  border: 1px solid rgba(197, 165, 114, 0.35);
+  color: #fff !important;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-input-window:hover {
-  border-color: rgba(10, 25, 47, 0.25);
+  border-color: rgba(197, 165, 114, 0.5);
 }
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-input-window:focus-within {
   border-color: rgba(197, 165, 114, 0.6);
   box-shadow: 0 0 0 2px rgba(197, 165, 114, 0.2);
+}
+html:not([data-theme="dark"]) .cabinet-premium .cabinet-card .cabinet-input-window,
+html:not([data-theme="dark"]) .cabinet-premium .cabinet-card .cabinet-input-window input {
+  color: #fff !important;
+}
+html:not([data-theme="dark"]) .cabinet-premium .cabinet-card .cabinet-input-window input::placeholder,
+html:not([data-theme="dark"]) .cabinet-premium .cabinet-card .cabinet-input-window textarea::placeholder {
+  color: rgba(255, 255, 255, 0.6) !important;
 }
 
 /* Текст в полях ввода ЛК и админки — чёрный на светлом фоне */
@@ -382,20 +397,22 @@ html:not([data-theme="dark"]) .cabinet-premium .cabinet-input-window:focus-withi
   color: rgba(255, 255, 255, 0.6) !important;
 }
 
-/* Светлая тема: блок «Доступные лимиты» — нейтральный серый; внутри тёмной карточки чуть светлее для читаемости текста */
+/* Светлая тема: блок «Доступные лимиты» — тот же фон, что у пузыря в чате (тёмно-серый + золотая обводка), текст светлый */
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-limits-block {
-  background: rgba(0, 0, 0, 0.06) !important;
-  border-color: rgba(10, 25, 47, 0.15);
+  background: rgba(79, 79, 79, 0.85) !important;
+  border-color: rgba(197, 165, 114, 0.35);
 }
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-card .cabinet-limits-block {
-  background: rgba(255, 255, 255, 0.2) !important;
-  border-color: rgba(255, 255, 255, 0.25);
+  background: rgba(79, 79, 79, 0.85) !important;
+  border-color: rgba(197, 165, 114, 0.35);
 }
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-limits-block .cabinet-limits-track {
-  background: rgba(0, 0, 0, 0.12) !important;
+  background: rgba(0, 0, 0, 0.25) !important;
 }
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-limits-block .cabinet-limits-label {
-  color: #4b5563;
+html:not([data-theme="dark"]) .cabinet-premium .cabinet-limits-block .cabinet-limits-label,
+html:not([data-theme="dark"]) .cabinet-premium .cabinet-limits-block h4,
+html:not([data-theme="dark"]) .cabinet-premium .cabinet-limits-block .font-medium {
+  color: rgba(255, 255, 255, 0.9) !important;
 }
 
 /* Тёмная тема: шторка ЛК (официант и админ) — тёмное стекло */

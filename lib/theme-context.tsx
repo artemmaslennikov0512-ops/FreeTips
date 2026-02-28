@@ -43,8 +43,10 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setThemeState(readTheme());
-    setMounted(true);
+    queueMicrotask(() => {
+      setThemeState(readTheme());
+      setMounted(true);
+    });
   }, []);
 
   useLayoutEffect(() => {

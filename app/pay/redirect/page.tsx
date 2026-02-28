@@ -2,6 +2,7 @@
  * Редирект на платёжную форму Paygine — только оплата картой (SDPayIn).
  */
 
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { AutoSubmitForm } from "@/components/AutoSubmitForm";
@@ -33,9 +34,9 @@ export default async function PayRedirectPage({ searchParams }: { searchParams: 
     return (
       <div className="mx-auto max-w-md px-4 py-12 text-center">
         <p className="text-[var(--color-text)]">Платёж не найден.</p>
-        <a href="/" className="mt-4 inline-block text-[var(--color-accent-gold)] hover:underline">
+        <Link href="/" className="mt-4 inline-block text-[var(--color-accent-gold)] hover:underline">
           На главную
-        </a>
+        </Link>
       </div>
     );
   }
@@ -48,9 +49,9 @@ export default async function PayRedirectPage({ searchParams }: { searchParams: 
     return (
       <div className="mx-auto max-w-md px-4 py-12 text-center">
         <p className="text-[var(--color-text)]">Платёж уже обработан или отменён.</p>
-        <a href="/" className="mt-4 inline-block text-[var(--color-accent-gold)] hover:underline">
+        <Link href="/" className="mt-4 inline-block text-[var(--color-accent-gold)] hover:underline">
           На главную
-        </a>
+        </Link>
       </div>
     );
   }
@@ -71,9 +72,9 @@ export default async function PayRedirectPage({ searchParams }: { searchParams: 
         <p className="text-[var(--color-text-secondary)]">
           {!orderSdRef ? "Не указана кубышка заказа. Создайте платёж заново." : "Задайте NEXT_PUBLIC_APP_URL в окружении."}
         </p>
-        <a href="/" className="mt-4 inline-block text-[var(--color-accent-gold)] hover:underline">
+        <Link href="/" className="mt-4 inline-block text-[var(--color-accent-gold)] hover:underline">
           На главную
-        </a>
+        </Link>
       </div>
     );
   }

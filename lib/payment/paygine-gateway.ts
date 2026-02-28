@@ -180,7 +180,7 @@ export class PayginePaymentGateway implements PaymentGateway {
     const reference = referenceMatch?.[1]?.trim();
     if (!reference) return { ok: true };
 
-    let tx = await db.transaction.findUnique({
+    const tx = await db.transaction.findUnique({
       where: { idempotencyKey: reference },
       select: { id: true, status: true, recipientId: true, amountKop: true, feeKop: true, paymentMethod: true, paygineOrderSdRef: true },
     });

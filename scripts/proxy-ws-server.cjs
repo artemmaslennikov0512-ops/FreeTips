@@ -2,7 +2,7 @@
  * Прокси-сервер на порту 3000: проксирует HTTP в Next.js (3001), обрабатывает WebSocket на /ws.
  * WebSocket: авторизация по api_key в query. Broadcast при зачислении — через POST /internal/broadcast.
  */
-
+/* eslint-disable @typescript-eslint/no-require-imports -- CommonJS script, run with node */
 const http = require("http");
 const { WebSocketServer } = require("ws");
 const { PrismaClient } = require("@prisma/client");

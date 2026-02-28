@@ -255,7 +255,7 @@ export default function AdminUsersPage() {
               type="button"
               onClick={handleCreateToken}
               disabled={tokenLoading}
-              className="inline-flex items-center gap-2 rounded-xl bg-[var(--color-brand-gold)] px-4 py-2.5 text-sm font-semibold text-[#0a192f] transition-colors hover:opacity-90 disabled:opacity-60"
+              className="admin-users-token-btn inline-flex items-center gap-2 rounded-xl bg-[var(--color-brand-gold)] px-4 py-2.5 text-sm font-semibold text-[#0a192f] transition-colors hover:opacity-90 disabled:opacity-60"
             >
               {tokenLoading ? "Создание..." : "Выдать токен регистрации"}
             </button>
@@ -347,7 +347,7 @@ export default function AdminUsersPage() {
         )}
       </div>
 
-      <div className="cabinet-section-header overflow-x-auto rounded-xl border-0">
+      <div className="admin-users-table cabinet-section-header overflow-x-auto rounded-xl border-0">
         <table className="w-full">
           <thead className="border-0 bg-[var(--color-brand-gold)]">
             <tr>

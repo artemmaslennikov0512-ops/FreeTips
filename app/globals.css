@@ -331,6 +331,21 @@ html:not([data-theme="dark"]) .admin-panel .admin-dashboard-table td {
   color: #fff !important;
 }
 
+/* Светлая тема: в админке убрать «коричневые окна» — заголовки таблиц и кнопка «Выдать токен» в стиле светлого стекла */
+html:not([data-theme="dark"]) .admin-panel table thead {
+  background: rgba(255, 255, 255, 0.2) !important;
+}
+html:not([data-theme="dark"]) .admin-panel table thead th {
+  color: #fff !important;
+}
+html:not([data-theme="dark"]) .admin-panel .admin-users-token-btn {
+  background: rgba(255, 255, 255, 0.25) !important;
+  color: #fff !important;
+}
+html:not([data-theme="dark"]) .admin-panel .admin-users-token-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.35) !important;
+}
+
 /* Светлая тема: блок «Оставить чаевые» (/pay) — тот же стиль */
 html:not([data-theme="dark"]) .pay-block {
   background: rgba(255, 255, 255, 0.92) !important;
@@ -351,6 +366,20 @@ html:not([data-theme="dark"]) .card-block {
 [data-theme="dark"] .pay-block,
 [data-theme="dark"] .pay-block-inner {
   border-color: transparent !important;
+}
+
+/* Иконки результата оплаты: успех — зелёный, ошибка — красный (и в тёмной теме) */
+.pay-result-icon-success {
+  background: rgba(4, 120, 87, 0.15) !important;
+}
+.pay-result-icon-success svg {
+  color: #047857 !important;
+}
+.pay-result-icon-error {
+  background: rgba(220, 38, 38, 0.15) !important;
+}
+.pay-result-icon-error svg {
+  color: #dc2626 !important;
 }
 
 /* Кнопка «Оплатить» на странице чаевых — всегда золотая (светлая и тёмная тема) */
@@ -500,6 +529,15 @@ html:not([data-theme="dark"]) .cabinet-premium #operations-history.cabinet-card 
 }
 .cabinet-premium .support-chat-header button svg {
   color: #fff !important;
+}
+
+/* Чат поддержки: скрыть полосу прокрутки, прокрутка остаётся */
+.support-chat-messages {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.support-chat-messages::-webkit-scrollbar {
+  display: none;
 }
 
 /* Админка: раздел поддержки — заголовки и текст белые на тёмном фоне */

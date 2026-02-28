@@ -293,7 +293,7 @@ export function Header() {
             ref={menuButtonRef}
             type="button"
             onClick={() => setSideOpen(true)}
-            className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded-lg text-[var(--color-navy)] hover:bg-[var(--color-light-gray)] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-navy)] focus-visible:ring-offset-2"
+            className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded-lg text-[var(--color-brand-gold)] hover:bg-[var(--color-brand-gold)]/10 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-gold)]/50 focus-visible:ring-offset-2"
             aria-label="Открыть меню"
             aria-expanded={sideOpen}
             aria-controls="side-menu"

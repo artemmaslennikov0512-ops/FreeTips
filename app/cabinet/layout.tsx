@@ -194,11 +194,11 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
         {/* Основной блок — как шторка: отступы от краёв */}
         <div className="cabinet-main-block mt-4 mr-0 mb-4 ml-4 lg:mr-4 lg:ml-4 flex min-h-[calc(100vh-2rem)] flex-1 flex-col rounded-2xl border border-white/10 bg-white/[0.06] backdrop-blur-xl">
           <div className="p-6 lg:p-8" id="main-content">
-            <div className="mb-4 flex justify-end lg:hidden">
+            <div className="mb-4 lg:hidden">
               <button
                 type="button"
                 onClick={() => setSidebarOpen(true)}
-                className="flex h-10 w-10 items-center justify-center rounded-lg border border-[var(--color-brand-gold)]/50 bg-[var(--color-brand-gold)]/10 text-[var(--color-brand-gold)] hover:bg-[var(--color-brand-gold)]/20"
+                className="flex h-10 w-10 items-center justify-center rounded-lg text-[var(--color-brand-gold)] hover:bg-[var(--color-brand-gold)]/10"
                 aria-label="Меню"
               >
                 <Menu className="h-5 w-5" />

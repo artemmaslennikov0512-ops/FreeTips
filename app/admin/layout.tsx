@@ -222,15 +222,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
       <main className="min-h-screen min-w-0 flex-1 overflow-x-hidden lg:ml-0 flex flex-col">
         <div className="admin-main-block cabinet-main-block mt-4 mr-4 mb-4 ml-4 lg:ml-4 flex min-h-[calc(100vh-2rem)] flex-1 flex-col rounded-2xl border border-white/10 bg-white/[0.06] backdrop-blur-xl">
-          <button
-            type="button"
-            onClick={() => setSidebarOpen(true)}
-            className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg text-[var(--color-text)] hover:bg-[var(--color-dark-gray)]/10 lg:hidden"
-            aria-label="Меню"
-          >
-            <Menu className="h-5 w-5" />
-          </button>
-          <div className="min-w-0 max-w-full flex-1 overflow-x-hidden p-4 sm:p-6 lg:p-8" id="main-content">
+          <div className="p-4 sm:p-6 lg:p-8 min-w-0 max-w-full flex-1 overflow-x-hidden flex flex-col" id="main-content">
+            <div className="mb-4 flex justify-end lg:hidden">
+              <button
+                type="button"
+                onClick={() => setSidebarOpen(true)}
+                className="flex h-10 w-10 items-center justify-center rounded-lg border border-[var(--color-brand-gold)]/50 bg-[var(--color-brand-gold)]/10 text-[var(--color-brand-gold)] hover:bg-[var(--color-brand-gold)]/20"
+                aria-label="Меню"
+              >
+                <Menu className="h-5 w-5" />
+              </button>
+            </div>
             {children}
           </div>
         </div>

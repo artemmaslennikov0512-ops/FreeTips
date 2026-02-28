@@ -29,6 +29,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
   const [mounted, setMounted] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [user, setUser] = useState<{ fullName?: string | null } | null>(null);
+  const [supportUnreadCount, setSupportUnreadCount] = useState(0);
 
   useEffect(() => setMounted(true), []);
 
@@ -66,6 +67,36 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
       })
       .catch(() => {});
   }, [mounted, router]);
+
+  const fetchSupportUnread = useCallback(() => {
+    const token = localStorage.getItem("accessToken");
+    if (!token) return;
+    fetch("/api/support/unread-count", { headers: { Authorization: `Bearer ${token}` } })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: { count?: number } | null) => {
+        if (data && typeof data.count === "number") setSupportUnreadCount(data.count);
+      })
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    if (!mounted || typeof window === "undefined") return;
+    fetchSupportUnread();
+    if (pathname === "/cabinet/support") {
+      const t = setTimeout(fetchSupportUnread, 1500);
+      return () => clearTimeout(t);
+    }
+  }, [mounted, pathname, fetchSupportUnread]);
+
+  useEffect(() => {
+    const onFocus = () => {
+      if (document.visibilityState === "visible" && localStorage.getItem("accessToken")) {
+        fetchSupportUnread();
+      }
+    };
+    document.addEventListener("visibilitychange", onFocus);
+    return () => document.removeEventListener("visibilitychange", onFocus);
+  }, [fetchSupportUnread]);
 
   const handleLogout = useCallback(async () => {
     try {
@@ -138,6 +169,14 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
             >
               <Icon className="h-5 w-5 shrink-0" />
               <span>{label}</span>
+              {href === "/cabinet/support" && supportUnreadCount > 0 && (
+                <span
+                  className="ml-auto flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[var(--color-accent-red)] px-1.5 text-xs font-semibold text-white"
+                  aria-label={`Непрочитанных: ${supportUnreadCount}`}
+                >
+                  {supportUnreadCount > 99 ? "99+" : supportUnreadCount}
+                </span>
+              )}
             </Link>
           ))}
           <button

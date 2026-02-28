@@ -159,8 +159,8 @@ export default function CabinetSupportPage() {
               <div
                 className={`max-w-[85%] rounded-2xl px-4 py-2.5 ${
                   m.isFromStaff
-                    ? "rounded-bl-md bg-[var(--color-dark-gray)]/30 text-white"
-                    : "rounded-br-md bg-[var(--color-brand-gold)]/20 text-white border border-[var(--color-brand-gold)]/30"
+                    ? "rounded-bl-md bg-white/15 text-white border border-white/20"
+                    : "rounded-br-md bg-[var(--color-brand-gold)]/25 text-white border border-[var(--color-brand-gold)]/40"
                 }`}
               >
                 {m.isFromStaff && (

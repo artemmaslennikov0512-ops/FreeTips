@@ -319,18 +319,15 @@ html:not([data-theme="dark"]) .cabinet-premium .cabinet-btn-gold {
   border: 1px solid rgba(197, 165, 114, 0.6);
 }
 
-/* Светлая тема: внутренние блоки в карточках — в том же стиле, чуть темнее */
+/* Светлая тема: карточки внутри блоков (например «Доступные лимиты», окна ввода) — не трогаем, как было */
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-block-inner {
-  background: rgba(0, 0, 0, 0.04) !important;
-  border: 1px solid rgba(10, 25, 47, 0.06);
-  border-radius: 0.75rem;
+  background: #d4d4d4 !important;
+  border: 1px solid rgba(197, 165, 114, 0.5);
 }
 
-/* Светлая тема: окна для ввода/отображения (ссылка, API-ключ) — в стиле блока чата */
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-input-window {
-  background: rgba(255, 255, 255, 0.9) !important;
-  border: 1px solid rgba(10, 25, 47, 0.08);
-  border-radius: 0.75rem;
+  background: #ffffff !important;
+  border: 1px solid rgba(10, 25, 47, 0.15);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-input-window:hover {
@@ -370,6 +367,20 @@ html:not([data-theme="dark"]) .cabinet-premium .cabinet-input-window:focus-withi
 }
 .cabinet-premium .support-chat-header button svg {
   color: #fff !important;
+}
+
+/* Админка: раздел поддержки — заголовки и текст белые на тёмном фоне */
+.admin-panel .admin-support-page h1,
+.admin-panel .admin-support-page p,
+.admin-panel .admin-support-thread a,
+.admin-panel .admin-support-thread button {
+  color: #fff !important;
+}
+.admin-panel .admin-support-thread .support-chat-input {
+  color: #fff !important;
+}
+.admin-panel .admin-support-thread .support-chat-input::placeholder {
+  color: rgba(255, 255, 255, 0.6) !important;
 }
 
 /* Светлая тема: блок «Доступные лимиты» — нейтральный серый (без сиренево-серого оттенка) */

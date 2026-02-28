@@ -218,10 +218,11 @@ model RegistrationRequest {
 
 // Чат поддержки: один тред на пользователя (клиента), сообщения от клиента и от сотрудников (ADMIN/SUPERADMIN).
 model SupportThread {
-  id        String   @id @default(cuid())
-  userId    String   @unique // один тред на пользователя
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String    @id @default(cuid())
+  userId      String    @unique // один тред на пользователя
+  lastReadAt  DateTime? // когда клиент последний раз открывал чат (для счётчика непрочитанных)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   user     User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   messages SupportMessage[]

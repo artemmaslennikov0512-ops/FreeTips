@@ -45,6 +45,13 @@ export async function GET(request: NextRequest) {
       },
     });
 
+    if (thread) {
+      await db.supportThread.update({
+        where: { id: thread.id },
+        data: { lastReadAt: new Date() },
+      });
+    }
+
     const sinceId = request.nextUrl.searchParams.get("since");
     let messages = thread?.messages ?? [];
 

@@ -64,12 +64,12 @@ export default function AdminSupportPage() {
   }
 
   return (
-    <div>
-      <h1 className="flex items-center gap-2 text-2xl font-bold text-[var(--color-text)]">
+    <div className="admin-support-page">
+      <h1 className="flex items-center gap-2 text-2xl font-bold text-white">
         <MessageCircle className="h-7 w-7 text-[var(--color-brand-gold)]" />
         Обращения в поддержку
       </h1>
-      <p className="mt-2 text-sm text-[var(--color-text-secondary)]">
+      <p className="mt-2 text-sm text-white/90">
         Выберите диалог и ответьте клиенту.
       </p>
 
@@ -81,7 +81,7 @@ export default function AdminSupportPage() {
 
       <div className="mt-6 space-y-2">
         {threads.length === 0 && (
-          <p className="py-8 text-center text-[var(--color-text-secondary)]">
+          <p className="py-8 text-center text-white/80">
             Пока нет обращений.
           </p>
         )}
@@ -89,29 +89,29 @@ export default function AdminSupportPage() {
           <Link
             key={t.id}
             href={`/admin/support/${t.id}`}
-            className="flex items-center gap-4 rounded-xl border border-white/10 bg-white/[0.04] p-4 transition-colors hover:bg-white/[0.08]"
+            className="flex items-center gap-4 rounded-xl border border-white/10 bg-white/[0.04] p-4 transition-colors hover:bg-white/[0.08] text-white"
           >
             <div className="min-w-0 flex-1">
-              <div className="font-medium text-[var(--color-text)]">
+              <div className="font-medium text-white">
                 {t.userFullName || t.userLogin}
                 {t.establishment && (
-                  <span className="ml-2 text-sm text-[var(--color-text-secondary)]">
+                  <span className="ml-2 text-sm text-white/80">
                     · {t.establishment}
                   </span>
                 )}
               </div>
               {t.userEmail && (
-                <div className="text-sm text-[var(--color-text-secondary)]">{t.userEmail}</div>
+                <div className="text-sm text-white/80">{t.userEmail}</div>
               )}
               {t.lastMessage && (
-                <p className="mt-1 truncate text-sm text-[var(--color-text)]/80">
+                <p className="mt-1 truncate text-sm text-white/90">
                   {t.lastMessage.fromStaff && "Вы: "}
                   {t.lastMessage.body}
                 </p>
               )}
             </div>
             <div className="shrink-0 text-right">
-              <div className="text-xs text-[var(--color-text)]/50">
+              <div className="text-xs text-white/70">
                 {new Date(t.updatedAt).toLocaleString("ru-RU", {
                   day: "2-digit",
                   month: "2-digit",
@@ -119,7 +119,7 @@ export default function AdminSupportPage() {
                   minute: "2-digit",
                 })}
               </div>
-              <ChevronRight className="mt-1 h-5 w-5 text-[var(--color-text)]/50" />
+              <ChevronRight className="mt-1 h-5 w-5 text-white/70" />
             </div>
           </Link>
         ))}

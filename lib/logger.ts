@@ -15,13 +15,25 @@ const REDACT_KEYS = new Set([
   "secret",
   "apiKey",
   "webhookSecret",
+  "payginePassword",
+  "paygineSector",
+  "paygine_password",
+  "paygine_sector",
+  "sector",
+  "pan",
+  "cvc",
 ]);
 
 function sanitizeContext(context: LogContext): LogContext {
   const out: LogContext = {};
   for (const [key, value] of Object.entries(context)) {
     const lower = key.toLowerCase();
-    const shouldRedact = REDACT_KEYS.has(lower) || lower.includes("password") || lower.includes("secret") || lower.includes("token");
+    const shouldRedact =
+      REDACT_KEYS.has(lower) ||
+      lower.includes("password") ||
+      lower.includes("secret") ||
+      lower.includes("token") ||
+      lower.includes("paygine");
     out[key] = shouldRedact && value != null ? "[REDACTED]" : value;
   }
   return out;

@@ -58,13 +58,13 @@ export async function POST(request: NextRequest, { params }: Params) {
     );
   }
 
-  const rateLimitIp = checkRateLimitByIP(ip, PAY_RATE_LIMIT_IP);
+  const rateLimitIp = await checkRateLimitByIP(ip, PAY_RATE_LIMIT_IP);
   if (!rateLimitIp.allowed) {
     logSecurity("pay.init.rate_limit_ip", { requestId, ip, slug });
     return NextResponse.json({ error: "Слишком много запросов. Попробуйте позже." }, { status: 429 });
   }
 
-  const rateLimitSlug = checkRateLimitByKey(slug, PAY_RATE_LIMIT_SLUG);
+  const rateLimitSlug = await checkRateLimitByKey(slug, PAY_RATE_LIMIT_SLUG);
   if (!rateLimitSlug.allowed) {
     logSecurity("pay.init.rate_limit_slug", { requestId, ip, slug });
     return NextResponse.json({ error: "Слишком много запросов на эту ссылку. Попробуйте позже." }, { status: 429 });

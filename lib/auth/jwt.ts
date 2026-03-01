@@ -6,21 +6,14 @@
 import { SignJWT, jwtVerify, type JWTPayload } from "jose";
 import { cookies } from "next/headers";
 
-// Ленивая инициализация ключей (проверка только при использовании)
+import { getJwtSecret, getJwtRefreshSecret, getNodeEnv } from "@/lib/config";
+
 function getJWTSecretKey(): Uint8Array {
-  const secret = process.env.JWT_SECRET;
-  if (!secret) {
-    throw new Error("JWT_SECRET должен быть установлен в .env");
-  }
-  return new TextEncoder().encode(secret);
+  return new TextEncoder().encode(getJwtSecret());
 }
 
 function getJWTRefreshSecretKey(): Uint8Array {
-  const secret = process.env.JWT_REFRESH_SECRET;
-  if (!secret) {
-    throw new Error("JWT_REFRESH_SECRET должен быть установлен в .env");
-  }
-  return new TextEncoder().encode(secret);
+  return new TextEncoder().encode(getJwtRefreshSecret());
 }
 
 // Время жизни токенов
@@ -91,7 +84,7 @@ export async function setRefreshTokenCookie(token: string): Promise<void> {
     const cookieStore = await cookies();
     cookieStore.set("refreshToken", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: getNodeEnv() === "production",
       sameSite: "strict",
       maxAge: 60 * 60 * 24 * 7, // 7 дней в секундах
       path: "/",

@@ -4,6 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
+import { getNodeEnv } from "@/lib/config";
 
 /** Максимальный размер тела запроса для auth/регистрации (512 KB) */
 export const MAX_BODY_SIZE_AUTH = 512 * 1024;
@@ -119,7 +120,7 @@ export function internalError(
   genericMessage: string = "Внутренняя ошибка сервера",
   devMessage?: string,
 ): NextResponse<ApiErrorBody> {
-  const isProd = process.env.NODE_ENV === "production";
+  const isProd = getNodeEnv() === "production";
   const message = isProd ? genericMessage : (devMessage ?? genericMessage);
   return NextResponse.json({ error: message }, { status: 500 });
 }

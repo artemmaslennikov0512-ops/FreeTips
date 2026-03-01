@@ -11,7 +11,7 @@ import { parseJsonWithLimit, MAX_BODY_SIZE_DEFAULT, jsonError } from "@/lib/api/
 
 export async function POST(request: NextRequest) {
   const ip = getClientIP(request);
-  const rateLimit = checkRateLimitByIP(ip, REGISTRATION_REQUEST_RATE_LIMIT);
+  const rateLimit = await checkRateLimitByIP(ip, REGISTRATION_REQUEST_RATE_LIMIT);
   if (!rateLimit.allowed) {
     return NextResponse.json(
       { error: "Слишком много заявок. Попробуйте позже." },

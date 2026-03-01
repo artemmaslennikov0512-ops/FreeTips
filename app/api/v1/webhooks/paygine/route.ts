@@ -14,7 +14,7 @@ import { readTextWithLimit, MAX_BODY_SIZE_WEBHOOK } from "@/lib/api/helpers";
 export async function POST(request: NextRequest) {
   const requestId = getRequestId(request);
   const ip = getClientIP(request);
-  const rateLimit = checkRateLimitByIP(ip, WEBHOOK_RATE_LIMIT);
+  const rateLimit = await checkRateLimitByIP(ip, WEBHOOK_RATE_LIMIT);
   if (!rateLimit.allowed) {
     logSecurity("payment.webhook.rate_limit", { requestId, ip });
     return NextResponse.json({ error: "Too many requests" }, { status: 429 });

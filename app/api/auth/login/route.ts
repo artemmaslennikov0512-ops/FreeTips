@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
   const requestId = getRequestId(request);
   const ip = getClientIP(request);
   try {
-    const rateLimit = checkRateLimitByIP(ip, AUTH_RATE_LIMIT);
+    const rateLimit = await checkRateLimitByIP(ip, AUTH_RATE_LIMIT);
     if (!rateLimit.allowed) {
       return NextResponse.json(
         { error: "Слишком много запросов. Попробуйте позже." },

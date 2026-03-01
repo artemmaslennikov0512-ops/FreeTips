@@ -1,18 +1,20 @@
 /**
- * Rate limiting по IP и userId
- * MVP: простой in-memory store (один инстанс приложения).
- * При горизонтальном масштабировании (несколько инстансов) лимиты не общие — рекомендуется
- * вынести хранилище в Redis (или аналог) и заменить Map на вызовы Redis INCR/EXPIRE.
+ * Rate limiting по IP и userId.
+ * При наличии REDIS_URL используется Redis (общий лимит при нескольких инстансах).
+ * Иначе — in-memory store; периодическая очистка истёкших записей через startRateLimitCleanup().
  */
 
 import type { NextRequest } from "next/server";
+import { checkRateLimitRedis } from "@/lib/rate-limit-redis";
+import { getRedisUrl } from "@/lib/config";
+
+export type RateLimitResult = { allowed: boolean; remaining: number; resetAt: number };
 
 interface RateLimitEntry {
   count: number;
   resetAt: number;
 }
 
-// In-memory store (в production использовать Redis)
 const ipStore = new Map<string, RateLimitEntry>();
 const userIdStore = new Map<string, RateLimitEntry>();
 const genericStore = new Map<string, RateLimitEntry>();
@@ -61,8 +63,6 @@ type RateLimitOptions = {
   keyPrefix?: string;
 };
 
-type RateLimitResult = { allowed: boolean; remaining: number; resetAt: number };
-
 function resolveOptions(options?: RateLimitOptions): Required<RateLimitOptions> {
   return {
     windowMs: options?.windowMs ?? DEFAULT_WINDOW_MS,
@@ -75,7 +75,7 @@ function buildKey(prefix: string, key: string): string {
   return prefix ? `${prefix}:${key}` : key;
 }
 
-function checkRateLimit(
+function checkRateLimitMemory(
   store: Map<string, RateLimitEntry>,
   key: string,
   windowMs: number,
@@ -97,25 +97,44 @@ function checkRateLimit(
   return { allowed: true, remaining: maxRequests - entry.count, resetAt: entry.resetAt };
 }
 
+async function checkRateLimitWithRedis(
+  fullKey: string,
+  windowMs: number,
+  maxRequests: number,
+): Promise<RateLimitResult> {
+  return checkRateLimitRedis(fullKey, windowMs, maxRequests);
+}
+
 /**
- * Проверяет rate limit по IP
+ * Проверяет rate limit по IP (async: при REDIS_URL используется Redis).
  */
-export function checkRateLimitByIP(ip: string, options?: RateLimitOptions): RateLimitResult {
+export async function checkRateLimitByIP(
+  ip: string,
+  options?: RateLimitOptions,
+): Promise<RateLimitResult> {
   const resolved = resolveOptions(options);
   const key = buildKey(resolved.keyPrefix, ip);
-  return checkRateLimit(ipStore, key, resolved.windowMs, resolved.maxRequests);
+
+  if (getRedisUrl()) {
+    return checkRateLimitWithRedis(key, resolved.windowMs, resolved.maxRequests);
+  }
+  return checkRateLimitMemory(ipStore, key, resolved.windowMs, resolved.maxRequests);
 }
 
 /**
  * Проверяет rate limit по произвольному ключу (например slug).
  */
-export function checkRateLimitByKey(
+export async function checkRateLimitByKey(
   key: string,
   options: RateLimitOptions & { keyPrefix: string },
-): RateLimitResult {
+): Promise<RateLimitResult> {
   const resolved = resolveOptions(options);
   const fullKey = buildKey(resolved.keyPrefix, key);
-  return checkRateLimit(
+
+  if (getRedisUrl()) {
+    return checkRateLimitWithRedis(fullKey, resolved.windowMs, resolved.maxRequests);
+  }
+  return checkRateLimitMemory(
     genericStore,
     fullKey,
     resolved.windowMs,
@@ -124,21 +143,24 @@ export function checkRateLimitByKey(
 }
 
 /**
- * Проверяет rate limit по userId
+ * Проверяет rate limit по userId.
  */
-export function checkRateLimitByUserId(
+export async function checkRateLimitByUserId(
   userId: string,
   options?: RateLimitOptions,
-): RateLimitResult {
+): Promise<RateLimitResult> {
   const resolved = resolveOptions(options);
   const key = buildKey(resolved.keyPrefix, userId);
-  return checkRateLimit(userIdStore, key, resolved.windowMs, resolved.maxRequests);
+
+  if (getRedisUrl()) {
+    return checkRateLimitWithRedis(key, resolved.windowMs, resolved.maxRequests);
+  }
+  return checkRateLimitMemory(userIdStore, key, resolved.windowMs, resolved.maxRequests);
 }
 
 /**
  * Получает IP адрес из request.
- * Важно: в production прокси (Nginx, Vercel и т.д.) должен передавать x-forwarded-for или x-real-ip,
- * иначе все запросы без заголовков получат ключ "unknown" и будут делить один rate limit.
+ * В production прокси должен передавать x-forwarded-for или x-real-ip.
  */
 export function getClientIP(request: NextRequest): string {
   const forwarded = request.headers.get("x-forwarded-for");
@@ -153,23 +175,33 @@ export function getClientIP(request: NextRequest): string {
 }
 
 /**
- * Очищает истёкшие записи (можно вызывать периодически)
+ * Очищает истёкшие записи in-memory store.
+ * Вызывается периодически из instrumentation (при отсутствии Redis).
  */
 export function cleanupExpiredEntries(): void {
   const now = Date.now();
   for (const [key, entry] of ipStore.entries()) {
-    if (now > entry.resetAt) {
-      ipStore.delete(key);
-    }
+    if (now > entry.resetAt) ipStore.delete(key);
   }
   for (const [key, entry] of userIdStore.entries()) {
-    if (now > entry.resetAt) {
-      userIdStore.delete(key);
-    }
+    if (now > entry.resetAt) userIdStore.delete(key);
   }
   for (const [key, entry] of genericStore.entries()) {
-    if (now > entry.resetAt) {
-      genericStore.delete(key);
-    }
+    if (now > entry.resetAt) genericStore.delete(key);
   }
+}
+
+const CLEANUP_INTERVAL_MS = 5 * 60 * 1000; // 5 минут
+let cleanupIntervalId: ReturnType<typeof setInterval> | null = null;
+
+/**
+ * Запускает периодическую очистку in-memory rate limit (при отсутствии Redis).
+ * Вызывается из instrumentation.ts при старте сервера.
+ */
+export function startRateLimitCleanup(): void {
+  if (getRedisUrl()) return;
+  if (cleanupIntervalId != null) return;
+  cleanupIntervalId = setInterval(() => {
+    cleanupExpiredEntries();
+  }, CLEANUP_INTERVAL_MS);
 }

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { checkRateLimitByIP, cleanupExpiredEntries, getClientIP } from "@/lib/middleware/rate-limit";
+import { checkRateLimitByIP, getClientIP } from "@/lib/middleware/rate-limit";
 import { REQUEST_ID_HEADER } from "@/lib/security/request";
 import {
   CSRF_COOKIE_NAME,
@@ -148,11 +148,10 @@ function withJsonError(
   return response;
 }
 
-function handleRateLimit(request: NextRequest, pathname: string, requestId: string): NextResponse | null {
+async function handleRateLimit(request: NextRequest, pathname: string, requestId: string): Promise<NextResponse | null> {
   if (!isApiRequest(pathname)) return null;
-  cleanupExpiredEntries();
   const ip = getClientIP(request);
-  const rateResult = checkRateLimitByIP(ip, RATE_LIMIT_OPTIONS);
+  const rateResult = await checkRateLimitByIP(ip, RATE_LIMIT_OPTIONS);
   if (rateResult.allowed) return null;
   return withJsonError(request, 429, "Слишком много запросов. Попробуйте позже.", requestId);
 }
@@ -173,7 +172,7 @@ function handleCsrf(request: NextRequest, pathname: string, requestId: string): 
   return null;
 }
 
-export function proxy(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   const query = request.nextUrl.search || "";
   const method = request.method;
@@ -191,7 +190,7 @@ export function proxy(request: NextRequest) {
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set(REQUEST_ID_HEADER, requestId);
 
-  const rateLimitResponse = handleRateLimit(request, pathname, requestId);
+  const rateLimitResponse = await handleRateLimit(request, pathname, requestId);
   if (rateLimitResponse) return rateLimitResponse;
 
   const csrfResponse = handleCsrf(request, pathname, requestId);

@@ -2,7 +2,7 @@
  * Явный маршрут GET /sitemap.xml для совместимости со standalone-сборкой и прокси.
  * Дублирует данные из app/sitemap.ts.
  */
-const baseUrl = (process.env.NEXT_PUBLIC_APP_URL ?? "").replace(/\/$/, "") || "https://freetips.ru";
+const baseUrl = (process.env.NEXT_PUBLIC_APP_URL ?? "").replace(/\/$/, "") || "https://free-tips.ru";
 
 const publicPaths: { path: string; priority: number; changeFrequency: string }[] = [
   { path: "/", priority: 1, changeFrequency: "weekly" },

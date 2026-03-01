@@ -41,7 +41,7 @@ const siteName = "FreeTips";
 const defaultTitle = `${siteName} | Сервис премиальных чаевых для профессионалов`;
 const defaultDescription =
   "Безопасный и уважительный способ получать достойное вознаграждение за ваш труд. Премиальные чаевые для профессионалов.";
-const baseUrl = (process.env.NEXT_PUBLIC_APP_URL ?? "").replace(/\/$/, "") || "https://freetips.ru";
+const baseUrl = (process.env.NEXT_PUBLIC_APP_URL ?? "").replace(/\/$/, "") || "https://free-tips.ru";
 
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),

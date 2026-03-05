@@ -82,16 +82,16 @@
   --section-dark-heading: #171717;
 }
 
-/* Светлая тема: основной фон ЛК и админки — тёмно-синий */
+/* Светлая тема: основной фон ЛК и админки — тёмно-синий (как на первом фото) */
 html:not([data-theme="dark"]) body.cabinet-page,
 html:not([data-theme="dark"]) body.admin-page,
 html:not([data-theme="dark"]) .cabinet-premium {
-  background: #1a2b3c;
+  background: #1a2337;
 }
 
-/* Светлая тема: сайдбар — тёмно-синее стекло, золотая обводка, светлый текст */
+/* Светлая тема: сайдбар — блок #1c253b, золотая обводка, светлый текст */
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-sidebar:not(.admin-sidebar) {
-  background: linear-gradient(135deg, #0a192f 0%, color-mix(in srgb, #0a192f 85%, white) 50%, #0a192f 100%);
+  background: #1c253b;
   border: 2px solid rgba(197, 165, 114, 0.7);
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06);
   color: rgba(255, 255, 255, 0.92);
@@ -122,7 +122,7 @@ html:not([data-theme="dark"]) .cabinet-premium .cabinet-sidebar:not(.admin-sideb
 
 /* Светлая тема: сайдбар админки — градиент как у ЛК, разделы видны (светлый текст), шрифт, подсветка активного */
 html:not([data-theme="dark"]) .admin-panel .admin-sidebar {
-  background: linear-gradient(135deg, #0a192f 0%, color-mix(in srgb, #0a192f 85%, white) 50%, #0a192f 100%) !important;
+  background: #1c253b !important;
   border: 2px solid rgba(197, 165, 114, 0.7) !important;
   color: rgba(255, 255, 255, 0.95);
   font-family: var(--font-inter), system-ui, sans-serif;
@@ -290,8 +290,8 @@ body.admin-page .site-header {
 /* Светлая тема: шапка — фон как у виртуальной карты (градиент navy) */
 html:not([data-theme="dark"]) body.cabinet-page .site-header,
 html:not([data-theme="dark"]) body.admin-page .site-header {
-  background: linear-gradient(135deg, #0a192f 0%, color-mix(in srgb, #0a192f 85%, white) 50%, #0a192f 100%);
-  border: 1px solid rgba(197, 165, 114, 0.55);
+  background: #131926;
+  border: 2px solid rgba(197, 165, 114, 0.55);
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06);
   color: rgba(255, 255, 255, 0.92);
 }
@@ -310,7 +310,7 @@ html:not([data-theme="dark"]) body.admin-page .site-header .site-header-logo-fre
 /* Светлая тема: основной блок ЛК и админки — градиент navy */
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-main-block:not(.admin-main-block),
 html:not([data-theme="dark"]) .admin-panel .admin-main-block.cabinet-main-block {
-  background: linear-gradient(135deg, #0a192f 0%, color-mix(in srgb, #0a192f 85%, white) 50%, #0a192f 100%);
+  background: #1c253b;
   border: 2px solid rgba(197, 165, 114, 0.7);
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06);
 }

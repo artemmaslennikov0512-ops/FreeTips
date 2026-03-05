@@ -51,6 +51,7 @@ export function Header() {
   const displayName = (() => {
     if (!user) return "";
     if (user.role === "SUPERADMIN" || user.role === "ADMIN") return "Админ";
+    if (user.role === "ESTABLISHMENT_ADMIN") return "Управляющий";
     if (user.fullName?.trim()) return user.fullName.trim();
     return user.login;
   })();
@@ -58,7 +59,9 @@ export function Header() {
   const cabinetHref =
     user?.role === "ADMIN" || user?.role === "SUPERADMIN"
       ? "/admin/dashboard"
-      : "/cabinet";
+      : user?.role === "ESTABLISHMENT_ADMIN"
+        ? "/establishment"
+        : "/cabinet";
 
   const handleLogout = useCallback(async () => {
     close();

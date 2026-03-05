@@ -11,9 +11,11 @@ datasource db {
 }
 
 enum UserRole {
-  RECIPIENT  // получатель чаевых (официант, курьер, мастер)
-  ADMIN      // администратор
-  SUPERADMIN // суперадминистратор (создаётся только через миграцию/seed)
+  RECIPIENT           // получатель чаевых без заведения (как раньше)
+  ADMIN               // администратор (глобальный)
+  SUPERADMIN          // суперадминистратор (создаётся только через миграцию/seed)
+  ESTABLISHMENT_ADMIN // управляющий заведением (доступ только к своему заведению)
+  EMPLOYEE            // официант/сотрудник заведения (привязан к Employee)
 }
 
 enum TransactionStatus {
@@ -47,7 +49,8 @@ model User {
   isBlocked         Boolean   @default(false)
   fullName          String?   @db.VarChar(255)
   birthDate         String?   @db.VarChar(20)
-  establishment     String?   @db.VarChar(255)
+  establishment     String?   @db.VarChar(255) // устаревшее: дублирование названия для обратной совместимости
+  establishmentId   String?   @db.VarChar(64)  // связь с заведением (для ESTABLISHMENT_ADMIN и EMPLOYEE)
   apiKey            String?   @unique @db.VarChar(64) // устаревшее: только для старых ключей до миграции на хеш
   apiKeyPrefix      String?   @db.VarChar(20) // первые 16 символов ключа для поиска
   apiKeyHash        String?   @db.VarChar(64) // SHA-256 hex ключа (новые ключи только хеш)
@@ -62,10 +65,12 @@ model User {
   updatedAt         DateTime  @updatedAt
 
   // Relations
-  sessions         Session[]
-  tipLinks         TipLink[]
-  transactions     Transaction[] @relation("RecipientTransactions")
-  payoutRequests   PayoutRequest[]
+  establishmentRelation Establishment? @relation(fields: [establishmentId], references: [id], onDelete: SetNull)
+  employeeProfile       Employee?      // если роль EMPLOYEE — привязка к сотруднику заведения
+  sessions              Session[]
+  tipLinks              TipLink[]
+  transactions          Transaction[] @relation("RecipientTransactions")
+  payoutRequests        PayoutRequest[]
   createdRegistrationTokens RegistrationToken[] @relation("CreatedRegistrationTokens")
   usedRegistrationTokens    RegistrationToken[] @relation("UsedRegistrationTokens")
   paygineCubbies            PaygineCubbie[]
@@ -75,6 +80,7 @@ model User {
   @@index([login])
   @@index([email])
   @@index([apiKeyPrefix])
+  @@index([establishmentId])
   @@map("users")
 }
 
@@ -179,21 +185,27 @@ model PayoutRequest {
 }
 
 model RegistrationToken {
-  id           String   @id @default(cuid())
-  tokenHash    String   @unique @db.VarChar(64)
-  createdById  String
-  usedById     String?
-  expiresAt    DateTime
-  createdAt    DateTime @default(now())
-  usedAt       DateTime?
+  id              String    @id @default(cuid())
+  tokenHash       String    @unique @db.VarChar(64)
+  createdById     String
+  usedById        String?
+  expiresAt       DateTime
+  createdAt       DateTime  @default(now())
+  usedAt          DateTime?
+  establishmentId String?   @db.VarChar(64) // токен для регистрации управляющего этого заведения
+  employeeId      String?   @db.VarChar(64) // токен для регистрации официанта (привязка к Employee)
 
-  createdBy User  @relation("CreatedRegistrationTokens", fields: [createdById], references: [id], onDelete: Restrict)
-  usedBy    User? @relation("UsedRegistrationTokens", fields: [usedById], references: [id], onDelete: SetNull)
+  createdBy          User                @relation("CreatedRegistrationTokens", fields: [createdById], references: [id], onDelete: Restrict)
+  usedBy             User?               @relation("UsedRegistrationTokens", fields: [usedById], references: [id], onDelete: SetNull)
   registrationRequest RegistrationRequest?
+  establishment      Establishment?     @relation(fields: [establishmentId], references: [id], onDelete: Cascade)
+  employee           Employee?           @relation(fields: [employeeId], references: [id], onDelete: Cascade)
 
   @@index([createdById])
   @@index([usedById])
   @@index([expiresAt])
+  @@index([establishmentId])
+  @@index([employeeId])
   @@map("registration_tokens")
 }
 
@@ -214,6 +226,65 @@ model RegistrationRequest {
   @@index([status])
   @@index([createdAt])
   @@map("registration_requests")
+}
+
+// Заведение (кафе, ресторан): управляющий, сотрудники, правила распределения чаевых.
+model Establishment {
+  id                String   @id @default(cuid())
+  name              String   @db.VarChar(255)
+  address           String?  @db.Text
+  phone             String?  @db.VarChar(50)
+  logoUrl           String?  @db.VarChar(512)
+  uniqueSlug        String   @unique @db.VarChar(50) // для URL и QR (например momo-pizza)
+  maxEmployeesCount Int?     // лимит сотрудников (null = без лимита); задаёт суперадмин
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  users              User[]              // ESTABLISHMENT_ADMIN привязаны сюда
+  employees          Employee[]
+  payoutRules        PayoutRule[]
+  registrationTokens RegistrationToken[] // токены для регистрации управляющего
+
+  @@index([uniqueSlug])
+  @@map("establishments")
+}
+
+// Сотрудник заведения (официант): может быть без привязки к User до регистрации/инвайта.
+model Employee {
+  id               String   @id @default(cuid())
+  establishmentId  String
+  name             String   @db.VarChar(255)
+  position         String?  @db.VarChar(100)
+  coefficient      Decimal  @default(1) @db.Decimal(10, 2) // для распределения по коэффициентам
+  isActive         Boolean  @default(true)
+  qrCodeIdentifier String   @unique @db.VarChar(50) // slug для страницы оплаты (QR)
+  userId           String?  @unique @db.VarChar(64) // привязка к User после регистрации/инвайта
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  establishment      Establishment      @relation(fields: [establishmentId], references: [id], onDelete: Cascade)
+  user               User?              @relation(fields: [userId], references: [id], onDelete: SetNull)
+  registrationTokens RegistrationToken[] // токены для регистрации официанта (1 токен = 1 сотрудник)
+
+  @@index([establishmentId])
+  @@index([qrCodeIdentifier])
+  @@map("employees")
+}
+
+// Правило распределения чаевых по заведению (равномерно, по коэффициентам, процент в фонд и т.д.).
+model PayoutRule {
+  id             String   @id @default(cuid())
+  establishmentId String
+  name           String   @db.VarChar(100)
+  type           String   @db.VarChar(20) // percentage | fixed | charity
+  value          Decimal  @db.Decimal(10, 4) // процент или фикс в копейках
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  establishment Establishment @relation(fields: [establishmentId], references: [id], onDelete: Cascade)
+
+  @@index([establishmentId])
+  @@map("payout_rules")
 }
 
 // Чат поддержки: один тред на пользователя (клиента), сообщения от клиента и от сотрудников (ADMIN/SUPERADMIN).

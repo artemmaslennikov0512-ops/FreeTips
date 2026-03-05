@@ -41,6 +41,8 @@ export async function GET(request: NextRequest) {
             fullName: true,
             birthDate: true,
             establishment: true,
+            establishmentId: true,
+            establishmentRelation: { select: { name: true } },
             apiKey: true,
             apiKeyHash: true,
             paygineSdRef: true,
@@ -131,6 +133,11 @@ export async function GET(request: NextRequest) {
       fullName: profile.fullName != null ? String(profile.fullName) : null,
       birthDate: profile.birthDate != null ? String(profile.birthDate) : null,
       establishment: profile.establishment != null ? String(profile.establishment) : null,
+      establishmentId: profile.establishmentId != null ? String(profile.establishmentId) : null,
+      establishmentName:
+        profile.establishmentRelation?.name != null
+          ? String(profile.establishmentRelation.name)
+          : null,
       hasApiKey: !!(profile.apiKey ?? profile.apiKeyHash),
       stats: {
         balanceKop: Number(balanceKopForStats),

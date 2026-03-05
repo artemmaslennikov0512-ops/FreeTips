@@ -616,7 +616,17 @@ export default function AdminUserDetailsPage() {
             </div>
             <div className="flex justify-between gap-4">
               <dt className="text-white">Роль</dt>
-              <dd className="text-white/90">{data.user.role === "ADMIN" ? "Администратор" : data.user.role === "SUPERADMIN" ? "Суперадмин" : "Официант"}</dd>
+              <dd className="text-white/90">
+                {data.user.role === "ADMIN"
+                  ? "Администратор"
+                  : data.user.role === "SUPERADMIN"
+                    ? "Суперадмин"
+                    : data.user.role === "ESTABLISHMENT_ADMIN"
+                      ? "Управляющий заведения"
+                      : data.user.role === "EMPLOYEE"
+                        ? "Официант"
+                        : "Получатель"}
+              </dd>
             </div>
             <div className="flex justify-between gap-4">
               <dt className="text-white">Статус</dt>

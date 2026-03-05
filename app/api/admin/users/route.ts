@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
   const sortBy = searchParams.get("sortBy") ?? "createdAt";
   const sortOrder = searchParams.get("sortOrder") === "asc" ? "asc" : "desc";
 
-  const validRoles = ["RECIPIENT", "ADMIN"] as const;
+  const validRoles = ["RECIPIENT", "ADMIN", "ESTABLISHMENT_ADMIN", "EMPLOYEE"] as const;
   const baseWhere: Record<string, unknown> = { role: { not: UserRole.SUPERADMIN } };
 
   if (roleFilter && validRoles.includes(roleFilter as (typeof validRoles)[number])) {

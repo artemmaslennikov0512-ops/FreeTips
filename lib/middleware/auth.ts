@@ -99,3 +99,39 @@ export function requireRole(allowedRoles: string[]) {
     return authResult;
   };
 }
+
+/**
+ * Проверка: пользователь — управляющий заведением (ESTABLISHMENT_ADMIN) с заполненным establishmentId.
+ * Возвращает payload и establishmentId для использования в API заведения.
+ */
+export async function requireEstablishmentAdmin(
+  request: NextRequest,
+): Promise<
+  | { user: TokenPayload; establishmentId: string; response?: never }
+  | { user?: never; establishmentId?: never; response: NextResponse }
+> {
+  const authResult = await requireRole(["ESTABLISHMENT_ADMIN"])(request);
+
+  if ("response" in authResult && authResult.response) {
+    return { response: authResult.response };
+  }
+
+  const u = await db.user.findUnique({
+    where: { id: authResult.user.userId },
+    select: { establishmentId: true },
+  });
+
+  if (!u?.establishmentId) {
+    return {
+      response: NextResponse.json(
+        { error: "Заведение не привязано к аккаунту" },
+        { status: 403 },
+      ),
+    };
+  }
+
+  return {
+    user: authResult.user,
+    establishmentId: u.establishmentId,
+  };
+}

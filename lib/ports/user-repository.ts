@@ -3,7 +3,12 @@
  * Позволяет подменять источник данных (Prisma, моки в тестах) без изменения use case.
  */
 
-export type UserRole = "RECIPIENT" | "ADMIN" | "SUPERADMIN";
+export type UserRole =
+  | "RECIPIENT"
+  | "ADMIN"
+  | "SUPERADMIN"
+  | "ESTABLISHMENT_ADMIN"
+  | "EMPLOYEE";
 
 /** Минимальный набор полей пользователя для аутентификации и авторизации */
 export interface AuthUser {

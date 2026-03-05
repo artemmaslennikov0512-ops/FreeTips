@@ -60,6 +60,10 @@ export async function POST(request: NextRequest) {
     const tokenHash = hashRegistrationToken(validated.registrationToken);
     const regToken = await db.registrationToken.findFirst({
       where: { tokenHash, usedAt: null, expiresAt: { gt: new Date() } },
+      include: {
+        establishment: { select: { id: true } },
+        employee: { select: { id: true, establishmentId: true } },
+      },
     });
     if (!regToken) {
       logSecurity("auth.register.invalid_token", { requestId, ip, login: validated.login });
@@ -70,10 +74,12 @@ export async function POST(request: NextRequest) {
     }
 
     const passwordHash = await hashPassword(validated.password);
+    const isEstablishmentAdminToken = !!regToken.establishmentId;
+    const isEmployeeToken = !!regToken.employeeId;
+
     const user = await db.$transaction(async (tx) => {
-      // Атомарно занимаем токен (одна регистрация на один токен), защита от гонки
       const claimed = await tx.registrationToken.updateMany({
-        where: { id: regToken.id, usedAt: null },
+        where: { id: regToken!.id, usedAt: null },
         data: { usedAt: new Date() },
       });
       if (claimed.count === 0) {
@@ -81,8 +87,26 @@ export async function POST(request: NextRequest) {
         throw new Error("TOKEN_ALREADY_USED");
       }
 
+      const role = isEstablishmentAdminToken
+        ? "ESTABLISHMENT_ADMIN"
+        : isEmployeeToken
+          ? "EMPLOYEE"
+          : "RECIPIENT";
+      const establishmentId =
+        isEstablishmentAdminToken && regToken!.establishment
+          ? regToken!.establishment.id
+          : isEmployeeToken && regToken!.employee
+            ? regToken!.employee.establishmentId
+            : null;
+
       const created = await tx.user.create({
-        data: { login: validated.login, passwordHash, email: validated.email, role: "RECIPIENT" },
+        data: {
+          login: validated.login,
+          passwordHash,
+          email: validated.email,
+          role,
+          establishmentId: establishmentId ?? undefined,
+        },
       });
       const defaultLimits = await getSystemDefaultLimitsForNewUser();
       await tx.user.update({
@@ -92,8 +116,14 @@ export async function POST(request: NextRequest) {
           ...defaultLimits,
         },
       });
+      if (isEmployeeToken && regToken!.employee) {
+        await tx.employee.update({
+          where: { id: regToken!.employee.id },
+          data: { userId: created.id },
+        });
+      }
       await tx.registrationToken.update({
-        where: { id: regToken.id },
+        where: { id: regToken!.id },
         data: { usedById: created.id },
       });
       return created;

@@ -90,11 +90,15 @@ export default function AdminUsersPage() {
       RECIPIENT: "bg-[var(--color-dark-gray)]/50 text-white border border-white/20",
       ADMIN: "bg-[var(--color-dark-gray)]/50 text-white border border-white/20",
       SUPERADMIN: "bg-[var(--color-dark-gray)]/50 text-white border border-white/20",
+      ESTABLISHMENT_ADMIN: "bg-[var(--color-dark-gray)]/50 text-white border border-white/20",
+      EMPLOYEE: "bg-[var(--color-dark-gray)]/50 text-white border border-white/20",
     };
     const labels = {
       RECIPIENT: "Получатель",
       ADMIN: "Админ",
       SUPERADMIN: "Суперадмин",
+      ESTABLISHMENT_ADMIN: "Управляющий заведения",
+      EMPLOYEE: "Официант",
     };
     return (
       <span className={`rounded-full px-3 py-1 text-xs font-medium ${styles[role as keyof typeof styles] || styles.RECIPIENT}`}>
@@ -321,6 +325,8 @@ export default function AdminUsersPage() {
           <option value="">Все роли</option>
           <option value="RECIPIENT">Получатель</option>
           <option value="ADMIN">Админ</option>
+          <option value="ESTABLISHMENT_ADMIN">Управляющий заведения</option>
+          <option value="EMPLOYEE">Официант</option>
         </select>
         <select
           value={blockedFilter}

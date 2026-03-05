@@ -11,6 +11,7 @@ import {
   Menu,
   ShieldCheck,
   MessageCircle,
+  Building2,
 } from "lucide-react";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
@@ -34,6 +35,7 @@ const NAV = [
 function getAdminTitle(pathname: string | null): string {
   if (!pathname) return "Админ-панель";
   if (pathname === "/admin" || pathname === "/admin/dashboard") return "Дашборд";
+  if (pathname === "/admin/establishments") return "Заведения";
   if (pathname.startsWith("/admin/payouts")) return "Выводы";
   if (pathname === "/admin/users") return "Пользователи";
   if (pathname.match(/^\/admin\/users\/[^/]+$/)) return "Пользователь";

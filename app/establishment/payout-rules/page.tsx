@@ -141,84 +141,83 @@ export default function PayoutRulesPage() {
       </div>
 
       {showForm && (
-        <form
-          onSubmit={handleSubmit}
-          className="rounded-2xl border border-white/10 bg-[var(--color-navy)] p-6 space-y-4"
-        >
-          <h2 className="text-lg font-medium text-white">
-            {editingId ? "Редактировать правило" : "Новое правило"}
-          </h2>
-          {formError && (
-            <p className="text-sm text-red-300">{formError}</p>
-          )}
-          {!editingId && (
+        <div className="cabinet-card rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden">
+          <form onSubmit={handleSubmit} className="p-6 space-y-4">
+            <h2 className="text-lg font-medium text-[var(--color-text)]">
+              {editingId ? "Редактировать правило" : "Новое правило"}
+            </h2>
+            {formError && (
+              <p className="text-sm text-[var(--color-accent-red)]">{formError}</p>
+            )}
+            {!editingId && (
+              <div>
+                <label className="block text-sm text-[var(--color-text-secondary)] mb-1">Тип</label>
+                <select
+                  value={formType}
+                  onChange={(e) =>
+                    setFormType(e.target.value as "establishment_share" | "charity")
+                  }
+                  className="cabinet-input-window w-full rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-[var(--color-text)] focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-gold)]/40"
+                >
+                  <option value="establishment_share">Доля заведения</option>
+                  <option value="charity">В фонд / благотворительность</option>
+                </select>
+              </div>
+            )}
             <div>
-              <label className="block text-sm text-white/80 mb-1">Тип</label>
-              <select
-                value={formType}
-                onChange={(e) =>
-                  setFormType(e.target.value as "establishment_share" | "charity")
-                }
-                className="w-full rounded-lg border border-white/20 bg-white/5 px-3 py-2 text-white"
-              >
-                <option value="establishment_share">Доля заведения</option>
-                <option value="charity">В фонд / благотворительность</option>
-              </select>
+              <label className="block text-sm text-[var(--color-text-secondary)] mb-1">Название</label>
+              <input
+                type="text"
+                value={formName}
+                onChange={(e) => setFormName(e.target.value)}
+                placeholder={TYPE_LABELS[formType]}
+                className="cabinet-input-window w-full rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-[var(--color-text)] placeholder:text-[var(--color-text-secondary)]/70 focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-gold)]/40"
+              />
             </div>
-          )}
-          <div>
-            <label className="block text-sm text-white/80 mb-1">Название</label>
-            <input
-              type="text"
-              value={formName}
-              onChange={(e) => setFormName(e.target.value)}
-              placeholder={TYPE_LABELS[formType]}
-              className="w-full rounded-lg border border-white/20 bg-white/5 px-3 py-2 text-white"
-            />
-          </div>
-          <div>
-            <label className="block text-sm text-white/80 mb-1">Процент (0–100)</label>
-            <input
-              type="text"
-              inputMode="decimal"
-              value={formValue}
-              onChange={(e) => setFormValue(e.target.value)}
-              placeholder="15"
-              className="w-full rounded-lg border border-white/20 bg-white/5 px-3 py-2 text-white"
-            />
-          </div>
-          <div className="flex gap-2">
-            <button
-              type="submit"
-              disabled={submitting}
-              className="rounded-xl bg-[var(--color-brand-gold)] px-4 py-2 font-medium text-[#0a192f] hover:opacity-90 disabled:opacity-50"
-            >
-              {submitting ? "Сохранение…" : editingId ? "Сохранить" : "Добавить"}
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setShowForm(false);
-                setEditingId(null);
-                setFormName("");
-                setFormValue("");
-              }}
-              className="rounded-xl bg-white/10 px-4 py-2 text-white hover:bg-white/20"
-            >
-              Отмена
-            </button>
-          </div>
-        </form>
+            <div>
+              <label className="block text-sm text-[var(--color-text-secondary)] mb-1">Процент (0–100)</label>
+              <input
+                type="text"
+                inputMode="decimal"
+                value={formValue}
+                onChange={(e) => setFormValue(e.target.value)}
+                placeholder="15"
+                className="cabinet-input-window w-full rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-[var(--color-text)] placeholder:text-[var(--color-text-secondary)]/70 focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-gold)]/40"
+              />
+            </div>
+            <div className="flex gap-2">
+              <button
+                type="submit"
+                disabled={submitting}
+                className="rounded-[10px] bg-[var(--color-brand-gold)] px-4 py-2 font-medium text-[#0a192f] hover:opacity-90 disabled:opacity-50"
+              >
+                {submitting ? "Сохранение…" : editingId ? "Сохранить" : "Добавить"}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowForm(false);
+                  setEditingId(null);
+                  setFormName("");
+                  setFormValue("");
+                }}
+                className="rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-4 py-2 font-medium text-[var(--color-text)] hover:bg-[var(--color-dark-gray)]/20"
+              >
+                Отмена
+              </button>
+            </div>
+          </form>
+        </div>
       )}
 
-      <div className="rounded-2xl border border-white/10 bg-[var(--color-navy)] overflow-hidden">
-        <div className="flex items-center justify-between p-4 border-b border-white/10">
-          <span className="font-medium text-white">Правила</span>
+      <div className="cabinet-card rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden">
+        <div className="flex items-center justify-between p-4 border-b border-[var(--color-dark-gray)]/20">
+          <span className="font-medium text-[var(--color-text)]">Правила</span>
           {!showForm && (
             <button
               type="button"
               onClick={() => setShowForm(true)}
-              className="inline-flex items-center gap-2 rounded-xl bg-[var(--color-brand-gold)] px-3 py-2 text-sm font-medium text-[#0a192f] hover:opacity-90"
+              className="inline-flex items-center gap-2 rounded-[10px] bg-[var(--color-brand-gold)] px-3 py-2 text-sm font-medium text-[#0a192f] hover:opacity-90"
             >
               <Plus className="h-4 w-4" />
               Добавить
@@ -226,19 +225,19 @@ export default function PayoutRulesPage() {
           )}
         </div>
         {rules.length === 0 ? (
-          <div className="p-6 text-center text-white/60">
+          <div className="p-6 text-center text-[var(--color-text-secondary)]">
             Нет правил. Добавьте правило «Доля заведения» (например 10–20%), чтобы заведение получало процент от пула чаевых. Остаток распределяется между сотрудниками по коэффициентам.
           </div>
         ) : (
-          <ul className="divide-y divide-white/5">
+          <ul className="divide-y divide-[var(--color-dark-gray)]/10">
             {rules.map((r) => (
               <li
                 key={r.id}
                 className="flex items-center justify-between gap-4 p-4"
               >
                 <div>
-                  <p className="font-medium text-white">{r.name}</p>
-                  <p className="text-sm text-white/60">
+                  <p className="font-medium text-[var(--color-text)]">{r.name}</p>
+                  <p className="text-sm text-[var(--color-text-secondary)]">
                     {TYPE_LABELS[r.type] ?? r.type} · {r.value}%
                   </p>
                 </div>
@@ -246,7 +245,7 @@ export default function PayoutRulesPage() {
                   <button
                     type="button"
                     onClick={() => handleEdit(r)}
-                    className="rounded-lg bg-white/10 p-2 text-white/80 hover:bg-white/20 hover:text-white"
+                    className="rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 p-2 text-[var(--color-text)] hover:bg-[var(--color-dark-gray)]/20"
                     title="Редактировать"
                   >
                     <Pencil className="h-4 w-4" />
@@ -254,7 +253,7 @@ export default function PayoutRulesPage() {
                   <button
                     type="button"
                     onClick={() => handleDelete(r.id)}
-                    className="rounded-lg bg-red-500/20 p-2 text-red-200 hover:bg-red-500/30"
+                    className="rounded-lg bg-[var(--color-accent-red)]/20 p-2 text-[var(--color-accent-red)] hover:bg-[var(--color-accent-red)]/30"
                     title="Удалить"
                   >
                     <Trash2 className="h-4 w-4" />

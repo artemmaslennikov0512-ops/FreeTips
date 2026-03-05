@@ -76,7 +76,7 @@ export default function AnalyticsPage() {
   }
 
   return (
-    <div className="mx-auto max-w-4xl space-y-6">
+    <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <h1 className="font-[family:var(--font-playfair)] text-xl font-semibold text-[var(--color-text)]">
           Аналитика
@@ -85,7 +85,7 @@ export default function AnalyticsPage() {
           <select
             value={period}
             onChange={(e) => setPeriod(e.target.value as "7d" | "30d")}
-            className="rounded-lg border border-white/20 bg-[var(--color-navy)] px-3 py-2 text-[var(--color-text)]"
+            className="cabinet-input-window rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-[var(--color-text)] focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-gold)]/40"
           >
             <option value="7d">За 7 дней</option>
             <option value="30d">За 30 дней</option>
@@ -94,7 +94,7 @@ export default function AnalyticsPage() {
             type="button"
             onClick={exportCsv}
             disabled={!stats?.byDay?.length}
-            className="inline-flex items-center gap-2 rounded-xl bg-[var(--color-brand-gold)] px-4 py-2 font-medium text-[#0a192f] hover:opacity-90 disabled:opacity-50"
+            className="inline-flex items-center gap-2 rounded-[10px] bg-[var(--color-brand-gold)] px-4 py-2 font-medium text-[#0a192f] hover:opacity-90 disabled:opacity-50"
           >
             <Download className="h-4 w-4" />
             Экспорт CSV
@@ -105,46 +105,48 @@ export default function AnalyticsPage() {
       {stats && (
         <>
           <div className="grid gap-4 sm:grid-cols-2">
-            <div className="rounded-2xl border border-white/10 bg-[var(--color-navy)] p-5">
-              <p className="text-sm text-white/70">Всего чаевых за период</p>
-              <p className="text-2xl font-semibold text-white">
+            <div className="cabinet-block-inner rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 p-5">
+              <p className="text-sm text-[var(--color-text-secondary)]">Всего чаевых за период</p>
+              <p className="text-2xl font-semibold text-[var(--color-text)]">
                 {(stats.totalTipsKop / 100).toFixed(2)} ₽
               </p>
             </div>
-            <div className="rounded-2xl border border-white/10 bg-[var(--color-navy)] p-5">
-              <p className="text-sm text-white/70">Количество транзакций</p>
-              <p className="text-2xl font-semibold text-white">
+            <div className="cabinet-block-inner rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 p-5">
+              <p className="text-sm text-[var(--color-text-secondary)]">Количество транзакций</p>
+              <p className="text-2xl font-semibold text-[var(--color-text)]">
                 {stats.transactionsCount}
               </p>
             </div>
           </div>
 
-          <div className="rounded-2xl border border-white/10 bg-[var(--color-navy)] p-5">
-            <h2 className="text-lg font-medium text-white mb-4">По дням</h2>
-            {stats.byDay.length === 0 ? (
-              <p className="text-white/60">Нет данных за выбранный период.</p>
-            ) : (
-              <div className="space-y-3">
-                {stats.byDay.map((d) => (
-                  <div key={d.date} className="flex items-center gap-4">
-                    <span className="w-28 text-sm text-white/80 shrink-0">
-                      {formatDate(d.date)}
-                    </span>
-                    <div className="flex-1 h-6 rounded bg-white/10 overflow-hidden">
-                      <div
-                        className="h-full rounded bg-[var(--color-brand-gold)] min-w-[2px]"
-                        style={{
-                          width: `${(d.amountKop / maxDay) * 100}%`,
-                        }}
-                      />
+          <div className="cabinet-card rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden">
+            <div className="p-5">
+              <h2 className="text-lg font-medium text-[var(--color-text)] mb-4">По дням</h2>
+              {stats.byDay.length === 0 ? (
+                <p className="text-[var(--color-text-secondary)]">Нет данных за выбранный период.</p>
+              ) : (
+                <div className="space-y-3">
+                  {stats.byDay.map((d) => (
+                    <div key={d.date} className="flex items-center gap-4">
+                      <span className="w-28 text-sm text-[var(--color-text-secondary)] shrink-0">
+                        {formatDate(d.date)}
+                      </span>
+                      <div className="flex-1 h-6 rounded bg-[var(--color-dark-gray)]/20 overflow-hidden">
+                        <div
+                          className="h-full rounded bg-[var(--color-brand-gold)] min-w-[2px]"
+                          style={{
+                            width: `${(d.amountKop / maxDay) * 100}%`,
+                          }}
+                        />
+                      </div>
+                      <span className="w-24 text-right text-sm font-medium text-[var(--color-text)] shrink-0">
+                        {(d.amountKop / 100).toFixed(2)} ₽
+                      </span>
                     </div>
-                    <span className="w-24 text-right text-sm font-medium text-white shrink-0">
-                      {(d.amountKop / 100).toFixed(2)} ₽
-                    </span>
-                  </div>
-                ))}
-              </div>
-            )}
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </>
       )}

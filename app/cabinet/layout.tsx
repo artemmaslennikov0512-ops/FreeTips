@@ -65,7 +65,9 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
   useEffect(() => {
     if (brandMainBg) {
       document.body.style.setProperty("--cabinet-bg", brandMainBg);
-      return () => document.body.style.removeProperty("--cabinet-bg");
+      return () => {
+        document.body.style.removeProperty("--cabinet-bg");
+      };
     }
   }, [brandMainBg]);
 

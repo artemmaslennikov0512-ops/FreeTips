@@ -10,6 +10,11 @@ const FOOTER_COLUMNS: { title: string; links: { href: string; label: string }[] 
   { title: "Помощь", links: [{ href: "/kontakty", label: "Поддержка" }, { href: "/politika", label: "Документация" }] },
 ];
 
+function telegramUsername(url: string): string {
+  const match = url.match(/t\.me\/([^/?]+)/);
+  return match ? `@${match[1]}` : url;
+}
+
 export function FooterPremium() {
   const { support } = site.footer;
   const hasEmail = support.email && !support.email.startsWith("[ЗАПОЛНИТЬ");
@@ -19,27 +24,27 @@ export function FooterPremium() {
     <footer className="bg-[var(--color-charcoal)] text-[var(--color-text-secondary)] py-12 sm:py-16 lg:py-20 pb-8 sm:pb-10">
       <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8 xl:max-w-7xl 2xl:max-w-screen-2xl">
         {(hasEmail || hasTg) && (
-          <div className="mb-12 rounded-2xl border border-white/10 bg-[var(--color-navy)]/40 px-6 py-5 sm:flex sm:items-center sm:justify-between sm:gap-4">
-            <p className="font-semibold text-white mb-4 sm:mb-0">Связь и поддержка</p>
-            <div className="flex flex-wrap items-center gap-4">
+          <div className="mb-12 flex flex-col sm:flex-row sm:items-center sm:justify-between sm:gap-8 gap-6 rounded-xl border border-white/[0.08] bg-white/[0.04] px-6 py-5 backdrop-blur-sm">
+            <span className="text-sm font-medium uppercase tracking-wider text-white/70 leading-none sm:leading-normal">Связь и поддержка</span>
+            <div className="flex flex-wrap items-center justify-start sm:justify-end gap-6 sm:gap-8">
               {hasTg && (
                 <a
                   href={support.telegram}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-[var(--color-on-dark-muted)] hover:text-[var(--color-accent-gold)] transition-colors"
+                  className="group inline-flex items-center gap-2.5 text-[var(--color-on-dark-muted)] hover:text-[var(--color-accent-gold)] transition-colors"
                 >
-                  <MessageCircle className="h-5 w-5 shrink-0" />
-                  <span>Telegram: @SupporFT_SD</span>
+                  <MessageCircle className="h-4 w-4 shrink-0 opacity-80 group-hover:opacity-100" />
+                  <span className="text-sm">{telegramUsername(support.telegram)}</span>
                 </a>
               )}
               {hasEmail && (
                 <a
                   href={`mailto:${support.email}`}
-                  className="inline-flex items-center gap-2 text-[var(--color-on-dark-muted)] hover:text-[var(--color-accent-gold)] transition-colors"
+                  className="group inline-flex items-center gap-2.5 text-[var(--color-on-dark-muted)] hover:text-[var(--color-accent-gold)] transition-colors"
                 >
-                  <Mail className="h-5 w-5 shrink-0" />
-                  <span>{support.email}</span>
+                  <Mail className="h-4 w-4 shrink-0 opacity-80 group-hover:opacity-100" />
+                  <span className="text-sm break-all">{support.email}</span>
                 </a>
               )}
             </div>

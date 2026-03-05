@@ -346,54 +346,55 @@ export default function EstablishmentTeamPage() {
                       {emp.hasUser ? (
                         <span className="text-[var(--color-text-secondary)] text-sm">Уже зарегистрирован</span>
                       ) : linkByEmpId[emp.id] ? (
-                      <div className="flex flex-wrap items-center gap-2">
-                        <button
-                          type="button"
-                          onClick={() => copyLink(linkByEmpId[emp.id])}
-                          className="inline-flex items-center gap-1 rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-2 py-1.5 text-xs text-[var(--color-text)] hover:bg-[var(--color-dark-gray)]/20"
-                        >
-                          <Copy className="h-3 w-3" /> Копировать
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => getOrRegenerateToken(emp.id)}
-                          disabled={loadingTokenId === emp.id}
-                          className="inline-flex items-center gap-1 rounded-lg bg-[var(--color-brand-gold)]/20 px-2 py-1.5 text-xs text-[var(--color-text)] hover:bg-[var(--color-brand-gold)]/30 disabled:opacity-50"
-                        >
-                          <RefreshCw
-                            className={`h-3 w-3 ${loadingTokenId === emp.id ? "animate-spin" : ""}`}
-                          />{" "}
-                          Сменить токен
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="flex flex-wrap items-center gap-1">
-                        <button
-                          type="button"
-                          onClick={() => getOrRegenerateToken(emp.id)}
-                          disabled={loadingTokenId === emp.id}
-                          className="inline-flex items-center gap-1 rounded-lg bg-[var(--color-brand-gold)] px-2 py-1.5 text-xs text-[#0a192f] hover:opacity-90 disabled:opacity-50"
-                        >
-                          {loadingTokenId === emp.id ? "…" : "Выдать ссылку"}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => inviteByEmail(emp.id)}
-                          disabled={invitingId === emp.id}
-                          className="inline-flex items-center gap-1 rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-2 py-1.5 text-xs text-[var(--color-text)] hover:bg-[var(--color-dark-gray)]/20 disabled:opacity-50"
-                          title="Пригласить по email"
-                        >
-                          <Mail className="h-3 w-3" />
-                          {invitingId === emp.id ? "…" : "Email"}
-                        </button>
-                      </div>
-                    )}
-                  </td>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => copyLink(linkByEmpId[emp.id])}
+                            className="inline-flex items-center gap-1 rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-2 py-1.5 text-xs text-[var(--color-text)] hover:bg-[var(--color-dark-gray)]/20"
+                          >
+                            <Copy className="h-3 w-3" /> Копировать
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => getOrRegenerateToken(emp.id)}
+                            disabled={loadingTokenId === emp.id}
+                            className="inline-flex items-center gap-1 rounded-lg bg-[var(--color-brand-gold)]/20 px-2 py-1.5 text-xs text-[var(--color-text)] hover:bg-[var(--color-brand-gold)]/30 disabled:opacity-50"
+                          >
+                            <RefreshCw
+                              className={`h-3 w-3 ${loadingTokenId === emp.id ? "animate-spin" : ""}`}
+                            />{" "}
+                            Сменить токен
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="flex flex-wrap items-center gap-1">
+                          <button
+                            type="button"
+                            onClick={() => getOrRegenerateToken(emp.id)}
+                            disabled={loadingTokenId === emp.id}
+                            className="inline-flex items-center gap-1 rounded-lg bg-[var(--color-brand-gold)] px-2 py-1.5 text-xs text-[#0a192f] hover:opacity-90 disabled:opacity-50"
+                          >
+                            {loadingTokenId === emp.id ? "…" : "Выдать ссылку"}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => inviteByEmail(emp.id)}
+                            disabled={invitingId === emp.id}
+                            className="inline-flex items-center gap-1 rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-2 py-1.5 text-xs text-[var(--color-text)] hover:bg-[var(--color-dark-gray)]/20 disabled:opacity-50"
+                            title="Пригласить по email"
+                          >
+                            <Mail className="h-3 w-3" />
+                            {invitingId === emp.id ? "…" : "Email"}
+                          </button>
+                        </div>
+                      )}
+                    </td>
                 </tr>
               ))
             )}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   );

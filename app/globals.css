@@ -82,33 +82,33 @@
   --section-dark-heading: #171717;
 }
 
-/* Светлая тема: основной фон ЛК и админки — карбоновый */
-html:not([data-theme="dark"]) body.cabinet-page,
+/* Светлая тема: основной фон ЛК и админки — карбоновый (ЛК официанта со своей темой не трогаем) */
+html:not([data-theme="dark"]) body.cabinet-page:not([data-cabinet-theme="dark"]),
 html:not([data-theme="dark"]) body.admin-page,
-html:not([data-theme="dark"]) .cabinet-premium {
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) {
   background: #f2f2f2;
 }
 
 /* Светлая тема: сайдбар — тёмно-синее стекло, светлый текст */
 /* Светлая тема: сайдбар — фон как у виртуальной карты (градиент navy) */
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-sidebar:not(.admin-sidebar) {
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) .cabinet-sidebar:not(.admin-sidebar) {
   background: linear-gradient(135deg, #0a192f 0%, color-mix(in srgb, #0a192f 85%, white) 50%, #0a192f 100%);
   border: 1px solid rgba(197, 165, 114, 0.55);
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06);
   color: rgba(255, 255, 255, 0.92);
 }
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-sidebar:not(.admin-sidebar) a,
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-sidebar:not(.admin-sidebar) button {
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) .cabinet-sidebar:not(.admin-sidebar) a,
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) .cabinet-sidebar:not(.admin-sidebar) button {
   color: inherit;
 }
 
 /* Светлая тема: блок пользователя в сайдбаре — как «Быстрые действия», белый текст */
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-sidebar-profile {
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) .cabinet-sidebar-profile {
   color: #fff !important;
 }
 
 /* Светлая тема: активный пункт в сайдбаре на тёмно-синем стекле — светлая подсветка */
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-sidebar:not(.admin-sidebar) .cabinet-nav-active {
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) .cabinet-sidebar:not(.admin-sidebar) .cabinet-nav-active {
   border-color: rgba(255, 255, 255, 0.35) !important;
   background: rgba(255, 255, 255, 0.18) !important;
   color: #ffffff !important;
@@ -151,12 +151,12 @@ html:not([data-theme="dark"]) .admin-panel .admin-sidebar .cabinet-sidebar-profi
 }
 
 /* Светлая тема: блок профиля в сайдбаре — белый фон, обводка как у активного подсвечивающего блока; аватар — золотой фон, тёмные инициалы */
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-sidebar-profile {
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) .cabinet-sidebar-profile {
   background: #ffffff !important;
   border: 1px solid rgba(255, 255, 255, 0.5) !important;
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.15);
 }
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-sidebar-avatar {
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) .cabinet-sidebar-avatar {
   background: var(--color-brand-gold) !important;
   border: 2px solid rgba(197, 165, 114, 0.8);
   color: #0a192f !important;
@@ -288,6 +288,64 @@ body.admin-page .site-header {
   margin-top: 1rem;
 }
 
+/* ============================================
+   Тема ЛК официанта (изолирована от глобальной темы)
+   Сайдбар, шапка, основной блок — один цвет; блоки 2 уровня и карточки — один стиль;
+   кнопки — золото; шрифт — белый; поля ввода — тёмное поле как на макете.
+   Новые элементы внутри .cabinet-premium с data-cabinet-theme="dark" подхватывают стили автоматически.
+   ============================================ */
+body.cabinet-page {
+  --cabinet-bg: #0a192f;
+  background: var(--cabinet-bg);
+}
+
+[data-cabinet-theme="dark"] .cabinet-premium {
+  --cabinet-bg: #0a192f;
+  --cabinet-block-bg: rgba(255, 255, 255, 0.06);
+  --cabinet-text: #ffffff;
+  --color-text: var(--cabinet-text);
+  --cabinet-input-bg: #262626;
+  --cabinet-input-border: #3f3f3f;
+  --cabinet-input-placeholder: #a3a3a3;
+  color: var(--cabinet-text);
+}
+
+/* Поля ввода и текстовые области в ЛК — тёмное поле (фон, серая обводка, серый placeholder) */
+[data-cabinet-theme="dark"] .cabinet-premium input,
+[data-cabinet-theme="dark"] .cabinet-premium textarea,
+[data-cabinet-theme="dark"] .cabinet-premium .cabinet-input-window,
+[data-cabinet-theme="dark"] .cabinet-premium .support-chat-input {
+  background-color: var(--cabinet-input-bg) !important;
+  border: 1px solid var(--cabinet-input-border) !important;
+  color: var(--cabinet-text) !important;
+  border-radius: 0.75rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+[data-cabinet-theme="dark"] .cabinet-premium input::placeholder,
+[data-cabinet-theme="dark"] .cabinet-premium textarea::placeholder,
+[data-cabinet-theme="dark"] .cabinet-premium .cabinet-input-window::placeholder,
+[data-cabinet-theme="dark"] .cabinet-premium .support-chat-input::placeholder {
+  color: var(--cabinet-input-placeholder) !important;
+}
+[data-cabinet-theme="dark"] .cabinet-premium input:focus,
+[data-cabinet-theme="dark"] .cabinet-premium textarea:focus,
+[data-cabinet-theme="dark"] .cabinet-premium .cabinet-input-window:focus-within,
+[data-cabinet-theme="dark"] .cabinet-premium .support-chat-input:focus {
+  outline: none;
+  border-color: var(--color-brand-gold) !important;
+  box-shadow: 0 0 0 2px rgba(197, 165, 114, 0.25);
+}
+[data-cabinet-theme="dark"] .cabinet-premium .cabinet-input-window input,
+[data-cabinet-theme="dark"] .cabinet-premium .cabinet-input-window textarea {
+  background: transparent !important;
+  border: none !important;
+  color: inherit !important;
+}
+[data-cabinet-theme="dark"] .cabinet-premium .cabinet-input-window input::placeholder,
+[data-cabinet-theme="dark"] .cabinet-premium .cabinet-input-window textarea::placeholder {
+  color: var(--cabinet-input-placeholder) !important;
+}
+
 /* Светлая тема: шапка — фон как у виртуальной карты (градиент navy) */
 html:not([data-theme="dark"]) body.cabinet-page .site-header,
 html:not([data-theme="dark"]) body.admin-page .site-header {
@@ -309,7 +367,7 @@ html:not([data-theme="dark"]) body.admin-page .site-header .site-header-logo-fre
 }
 
 /* Светлая тема: основной блок ЛК и админки — градиент navy */
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-main-block:not(.admin-main-block),
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) .cabinet-main-block:not(.admin-main-block),
 html:not([data-theme="dark"]) .admin-panel .admin-main-block.cabinet-main-block {
   background: linear-gradient(135deg, #0a192f 0%, color-mix(in srgb, #0a192f 85%, white) 50%, #0a192f 100%);
   border: 1px solid rgba(197, 165, 114, 0.55);
@@ -317,8 +375,8 @@ html:not([data-theme="dark"]) .admin-panel .admin-main-block.cabinet-main-block 
 }
 
 /* Светлая тема: блоки на основном блоке — тот же фон и рамка, что у блока чата поддержки */
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-card,
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-section-header {
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) .cabinet-card,
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) .cabinet-section-header {
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 1rem;
@@ -389,114 +447,119 @@ html:not([data-theme="dark"]) .card-block {
 }
 
 /* Светлая тема: кнопка «Вывести» — всегда золотая */
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-btn-gold {
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) .cabinet-btn-gold {
   background: var(--color-brand-gold) !important;
   color: #0a192f !important;
   border: 1px solid rgba(197, 165, 114, 0.6);
 }
 
+/* Фон карточек/блоков в ЛК: при настройке бренда используется --cabinet-block-bg */
+.cabinet-premium .cabinet-block-inner {
+  background-color: var(--cabinet-block-bg, rgba(255, 255, 255, 0.06));
+}
+
 /* Светлая тема: карточки внутри блоков — как на фото (пузырь «Поддержка»: полупрозрачный тёмный фон, светлая обводка) */
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-block-inner {
-  background: rgba(255, 255, 255, 0.15) !important;
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) .cabinet-block-inner {
+  background: var(--cabinet-block-bg, rgba(255, 255, 255, 0.15)) !important;
   border: 1px solid rgba(255, 255, 255, 0.2);
   color: rgba(255, 255, 255, 0.95);
 }
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-block-inner .cabinet-limits-label,
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-block-inner [class*="text-[var(--color-text)]"],
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-block-inner [class*="text-[var(--color-text-secondary)]"] {
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) .cabinet-block-inner .cabinet-limits-label,
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) .cabinet-block-inner [class*="text-[var(--color-text)]"],
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) .cabinet-block-inner [class*="text-[var(--color-text-secondary)]"] {
   color: rgba(255, 255, 255, 0.9) !important;
 }
 
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-input-window {
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) .cabinet-input-window {
   background: rgba(255, 255, 255, 0.15) !important;
   border: 1px solid rgba(255, 255, 255, 0.2);
   color: #fff !important;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-input-window:hover {
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) .cabinet-input-window:hover {
   border-color: rgba(255, 255, 255, 0.35);
 }
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-input-window:focus-within {
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) .cabinet-input-window:focus-within {
   border-color: rgba(255, 255, 255, 0.4);
   box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
 }
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-card .cabinet-input-window,
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-card .cabinet-input-window input {
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) .cabinet-card .cabinet-input-window,
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) .cabinet-card .cabinet-input-window input {
   color: #fff !important;
 }
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-card .cabinet-input-window input::placeholder,
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-card .cabinet-input-window textarea::placeholder {
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) .cabinet-card .cabinet-input-window input::placeholder,
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) .cabinet-card .cabinet-input-window textarea::placeholder {
   color: rgba(255, 255, 255, 0.6) !important;
 }
 
 /* Светлая тема: настройки профиля — заголовки и подписи полей белые */
-html:not([data-theme="dark"]) .cabinet-premium #settings-profile.cabinet-card h2,
-html:not([data-theme="dark"]) .cabinet-premium #settings-profile.cabinet-card h3,
-html:not([data-theme="dark"]) .cabinet-premium #settings-profile.cabinet-card label,
-html:not([data-theme="dark"]) .cabinet-premium #settings-profile.cabinet-card .p-6 p { color: #fff !important; }
-html:not([data-theme="dark"]) .cabinet-premium #settings-profile.cabinet-card .rounded-lg.font-mono { color: rgba(255,255,255,0.9) !important; }
-html:not([data-theme="dark"]) .cabinet-premium #settings-password.cabinet-card h2,
-html:not([data-theme="dark"]) .cabinet-premium #settings-password.cabinet-card label,
-html:not([data-theme="dark"]) .cabinet-premium #settings-password.cabinet-card .p-6 p { color: #fff !important; }
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) #settings-profile.cabinet-card h2,
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) #settings-profile.cabinet-card h3,
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) #settings-profile.cabinet-card label,
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) #settings-profile.cabinet-card .p-6 p { color: #fff !important; }
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) #settings-profile.cabinet-card .rounded-lg.font-mono { color: rgba(255,255,255,0.9) !important; }
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) #settings-password.cabinet-card h2,
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) #settings-password.cabinet-card label,
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) #settings-password.cabinet-card .p-6 p { color: #fff !important; }
 
 /* Светлая тема: страница «Ссылка» — блок QR-код — белый текст */
-html:not([data-theme="dark"]) .cabinet-premium #link-qr-card.cabinet-card h2,
-html:not([data-theme="dark"]) .cabinet-premium #link-qr-card.cabinet-card a[download] {
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) #link-qr-card.cabinet-card h2,
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) #link-qr-card.cabinet-card a[download] {
   color: #fff !important;
 }
 
 /* Светлая тема: страница «Ссылка» — «Ссылка для оплаты» и «Ваша ссылка для чаевых» — белый текст */
-html:not([data-theme="dark"]) .cabinet-premium #link-payment.cabinet-card h2,
-html:not([data-theme="dark"]) .cabinet-premium #link-payment.cabinet-card .font-semibold,
-html:not([data-theme="dark"]) .cabinet-premium #link-payment.cabinet-card .cabinet-input-window {
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) #link-payment.cabinet-card h2,
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) #link-payment.cabinet-card .font-semibold,
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) #link-payment.cabinet-card .cabinet-input-window {
   color: #fff !important;
 }
 /* Кнопки в карточках ЛК официанта — чёрный шрифт */
-html:not([data-theme="dark"]) .cabinet-premium #link-payment.cabinet-card button,
-html:not([data-theme="dark"]) .cabinet-premium #link-payment.cabinet-card a[download],
-html:not([data-theme="dark"]) .cabinet-premium #quick-actions.cabinet-card button,
-html:not([data-theme="dark"]) .cabinet-premium #api-key.cabinet-card button,
-html:not([data-theme="dark"]) .cabinet-premium #api-key.cabinet-card .cabinet-block-inner button {
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) #link-payment.cabinet-card button,
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) #link-payment.cabinet-card a[download],
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) #quick-actions.cabinet-card button,
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) #api-key.cabinet-card button,
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) #api-key.cabinet-card .cabinet-block-inner button {
   color: #0a192f !important;
 }
 
 /* Светлая тема: блок «Быстрые действия» — весь текст белый (кнопки — чёрный, см. правило выше) */
-html:not([data-theme="dark"]) .cabinet-premium #quick-actions.cabinet-card h3,
-html:not([data-theme="dark"]) .cabinet-premium #quick-actions.cabinet-card .cabinet-block-inner,
-html:not([data-theme="dark"]) .cabinet-premium #quick-actions.cabinet-card .cabinet-input-window {
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) #quick-actions.cabinet-card h3,
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) #quick-actions.cabinet-card .cabinet-block-inner,
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) #quick-actions.cabinet-card .cabinet-input-window {
   color: #fff !important;
 }
 
 /* Светлая тема: блок «API для уведомлений» — весь текст белый */
-html:not([data-theme="dark"]) .cabinet-premium #api-key.cabinet-card h3 {
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) #api-key.cabinet-card h3 {
   color: #fff !important;
 }
-html:not([data-theme="dark"]) .cabinet-premium #api-key.cabinet-card .p-6 > p {
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) #api-key.cabinet-card .p-6 > p {
   color: rgba(255, 255, 255, 0.9) !important;
 }
-html:not([data-theme="dark"]) .cabinet-premium #api-key.cabinet-card .cabinet-block-inner p {
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) #api-key.cabinet-card .cabinet-block-inner p {
   color: rgba(255, 255, 255, 0.85) !important;
 }
 
 /* Светлая тема: страница операций — «Карта официанта» и «История операций» — весь текст белый */
-html:not([data-theme="dark"]) .cabinet-premium #waiter-card.cabinet-card h3,
-html:not([data-theme="dark"]) .cabinet-premium #waiter-card.cabinet-card .p-6 > p,
-html:not([data-theme="dark"]) .cabinet-premium #waiter-card.cabinet-card .p-6 [class*="rounded-lg"],
-html:not([data-theme="dark"]) .cabinet-premium #waiter-card.cabinet-card .waiter-card-summary,
-html:not([data-theme="dark"]) .cabinet-premium #waiter-card.cabinet-card .waiter-card-summary * {
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) #waiter-card.cabinet-card h3,
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) #waiter-card.cabinet-card .p-6 > p,
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) #waiter-card.cabinet-card .p-6 [class*="rounded-lg"],
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) #waiter-card.cabinet-card .waiter-card-summary,
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) #waiter-card.cabinet-card .waiter-card-summary * {
   color: #fff !important;
 }
-html:not([data-theme="dark"]) .cabinet-premium #operations-history.cabinet-card h3,
-html:not([data-theme="dark"]) .cabinet-premium #operations-history.cabinet-card table,
-html:not([data-theme="dark"]) .cabinet-premium #operations-history.cabinet-card .px-6.py-12,
-html:not([data-theme="dark"]) .cabinet-premium #operations-history.cabinet-card .border-t .text-sm,
-html:not([data-theme="dark"]) .cabinet-premium #operations-history.cabinet-card .border-t span.text-sm {
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) #operations-history.cabinet-card h3,
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) #operations-history.cabinet-card table,
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) #operations-history.cabinet-card .px-6.py-12,
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) #operations-history.cabinet-card .border-t .text-sm,
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) #operations-history.cabinet-card .border-t span.text-sm {
   color: #fff !important;
 }
-html:not([data-theme="dark"]) .cabinet-premium #operations-history.cabinet-card table th {
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) #operations-history.cabinet-card table th {
   color: #fff !important;
 }
-html:not([data-theme="dark"]) .cabinet-premium #operations-history.cabinet-card table td {
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) #operations-history.cabinet-card table td {
   color: rgba(255, 255, 255, 0.9) !important;
 }
 
@@ -510,7 +573,7 @@ html:not([data-theme="dark"]) .cabinet-premium #operations-history.cabinet-card 
   color: #64748b !important;
 }
 
-/* Тёмная тема: текст в полях ввода — белый */
+/* Тёмная тема: текст в полях ввода — белый (не применяется к ЛК официанта: там своя тема) */
 [data-theme="dark"] .cabinet-premium input,
 [data-theme="dark"] .cabinet-premium textarea {
   color: #ffffff !important;
@@ -520,7 +583,31 @@ html:not([data-theme="dark"]) .cabinet-premium #operations-history.cabinet-card 
   color: rgba(255, 255, 255, 0.5) !important;
 }
 
-/* Чат поддержки: поле ввода на тёмном фоне — белый текст всегда */
+/* ЛК официанта (data-cabinet-theme): поля ввода — тёмное поле, серая обводка, серый placeholder (перебивает глобальную тему) */
+[data-cabinet-theme="dark"] .cabinet-premium input,
+[data-cabinet-theme="dark"] .cabinet-premium textarea,
+[data-cabinet-theme="dark"] .cabinet-premium .cabinet-input-window,
+[data-cabinet-theme="dark"] .cabinet-premium .support-chat-input {
+  background-color: var(--cabinet-input-bg) !important;
+  border-color: var(--cabinet-input-border) !important;
+  color: var(--cabinet-text) !important;
+}
+[data-cabinet-theme="dark"] .cabinet-premium input::placeholder,
+[data-cabinet-theme="dark"] .cabinet-premium textarea::placeholder,
+[data-cabinet-theme="dark"] .cabinet-premium .support-chat-input::placeholder {
+  color: var(--cabinet-input-placeholder) !important;
+}
+[data-cabinet-theme="dark"] .cabinet-premium .cabinet-input-window input,
+[data-cabinet-theme="dark"] .cabinet-premium .cabinet-input-window textarea {
+  background: transparent !important;
+  color: inherit !important;
+}
+[data-cabinet-theme="dark"] .cabinet-premium .cabinet-input-window input::placeholder,
+[data-cabinet-theme="dark"] .cabinet-premium .cabinet-input-window textarea::placeholder {
+  color: var(--cabinet-input-placeholder) !important;
+}
+
+/* Чат поддержки: поле ввода на тёмном фоне — белый текст всегда (админка без data-cabinet-theme) */
 .cabinet-premium .support-chat-input {
   color: #fff !important;
 }
@@ -565,20 +652,20 @@ html:not([data-theme="dark"]) .cabinet-premium #operations-history.cabinet-card 
 }
 
 /* Светлая тема: блок «Доступные лимиты» — как на фото (полупрозрачный фон, светлая обводка) */
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-limits-block {
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) .cabinet-limits-block {
   background: rgba(255, 255, 255, 0.15) !important;
   border-color: rgba(255, 255, 255, 0.2);
 }
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-card .cabinet-limits-block {
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) .cabinet-card .cabinet-limits-block {
   background: rgba(255, 255, 255, 0.15) !important;
   border-color: rgba(255, 255, 255, 0.2);
 }
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-limits-block .cabinet-limits-track {
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) .cabinet-limits-block .cabinet-limits-track {
   background: rgba(0, 0, 0, 0.25) !important;
 }
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-limits-block .cabinet-limits-label,
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-limits-block h4,
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-limits-block .font-medium {
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) .cabinet-limits-block .cabinet-limits-label,
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) .cabinet-limits-block h4,
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) .cabinet-limits-block .font-medium {
   color: rgba(255, 255, 255, 0.9) !important;
 }
 
@@ -665,20 +752,20 @@ html:not([data-theme="dark"]) .admin-panel select option {
 }
 
 /* Светлая тема: заголовок страницы (h1) на тёмном градиенте основного блока — белым */
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-main-block #main-content > h1 {
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) .cabinet-main-block #main-content > h1 {
   color: #ffffff !important;
 }
 
 /* Светлая тема: все заголовки в основном блоке (ЛК заведения и др.) на тёмном фоне — белым (глобальный h1–h6 задаёт var(--color-navy)) */
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-main-block h1,
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-main-block h2,
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-main-block h3,
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-main-block h4 {
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) .cabinet-main-block h1,
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) .cabinet-main-block h2,
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) .cabinet-main-block h3,
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) .cabinet-main-block h4 {
   color: #ffffff !important;
 }
 
 /* Светлая тема: заголовок «Кабинет заведения» в сайдбаре на тёмном фоне — белым */
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-sidebar .font-bold {
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="dark"]) .cabinet-sidebar .font-bold {
   color: #ffffff !important;
 }
 

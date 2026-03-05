@@ -144,12 +144,12 @@ export default function CabinetLinkPage() {
       ) : (
         <div className="grid gap-8 md:grid-cols-2">
           <div id="link-payment" className="cabinet-card rounded-xl border-0 bg-[var(--color-bg-sides)] p-6 shadow-[var(--shadow-subtle)] transition-all hover:shadow-[var(--shadow-medium)]">
-            <h2 className="mb-4 font-[family:var(--font-playfair)] text-xl font-semibold text-white">
+            <h2 className="mb-4 font-[family:var(--font-playfair)] text-xl font-semibold text-[var(--color-text)]">
               Ссылка для оплаты
             </h2>
             <div className="rounded-xl bg-[var(--color-dark-gray)]/6 p-5">
-              <div className="mb-4 font-semibold text-white">Ваша ссылка для чаевых</div>
-              <div className="cabinet-input-window mb-4 break-all rounded-lg border border-[var(--color-brand-gold)]/20 px-4 py-3 font-mono text-sm text-white/90">
+              <div className="mb-4 font-semibold text-[var(--color-text)]">Ваша ссылка для чаевых</div>
+              <div className="cabinet-input-window mb-4 break-all rounded-lg border border-[var(--color-brand-gold)]/20 px-4 py-3 font-mono text-sm text-[var(--color-text)]/90">
                 {linkUrl}
               </div>
               <div className="flex flex-wrap gap-3">
@@ -176,7 +176,7 @@ export default function CabinetLinkPage() {
           </div>
 
           <div id="link-qr-card" className="cabinet-card rounded-xl border-0 bg-[var(--color-bg-sides)] p-6 shadow-[var(--shadow-subtle)] transition-all hover:shadow-[var(--shadow-medium)]">
-            <h2 className="mb-4 font-[family:var(--font-playfair)] text-xl font-semibold text-white">
+            <h2 className="mb-4 font-[family:var(--font-playfair)] text-xl font-semibold text-[var(--color-text)]">
               QR-код
             </h2>
             <div className="flex flex-col items-start gap-4">
@@ -192,14 +192,14 @@ export default function CabinetLinkPage() {
                   <a
                     href={qrDataUrl}
                     download="freetips-qr.png"
-                    className="inline-flex items-center gap-2 rounded-xl border-0 px-5 py-2.5 font-semibold text-white transition-all hover:bg-white/10"
+                    className="inline-flex items-center gap-2 rounded-xl border-0 px-5 py-2.5 font-semibold text-[var(--color-text)] transition-all hover:bg-white/10"
                   >
                     <Download className="h-4 w-4" />
                     Скачать PNG
                   </a>
                 </>
               ) : (
-                <div className="flex h-64 w-64 items-center justify-center rounded-xl border-0 bg-[var(--color-dark-gray)]/5 text-white/90">
+                <div className="flex h-64 w-64 items-center justify-center rounded-xl border-0 bg-[var(--color-dark-gray)]/5 text-[var(--color-text)]/90">
                   Загрузка QR…
                 </div>
               )}

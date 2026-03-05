@@ -46,8 +46,28 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
 
   useEffect(() => {
     document.body.classList.add("cabinet-page");
-    return () => document.body.classList.remove("cabinet-page");
+    document.body.setAttribute("data-cabinet-theme", "dark");
+    return () => {
+      document.body.classList.remove("cabinet-page");
+      document.body.removeAttribute("data-cabinet-theme");
+    };
   }, []);
+
+  const hex = (s: string | null | undefined) => (s && /^#[0-9A-Fa-f]{6}$/i.test(s) ? s : undefined);
+  const brand = user?.establishmentBrand;
+  const brandPrimary = hex(brand?.primaryColor ?? null);
+  const brandSecondary = hex(brand?.secondaryColor ?? null);
+  const brandMainBg = hex(brand?.mainBackgroundColor ?? null);
+  const brandBlocksBg = hex(brand?.blocksBackgroundColor ?? null);
+  const brandFont = hex(brand?.fontColor ?? null);
+  const brandBorder = hex(brand?.borderColor ?? null);
+
+  useEffect(() => {
+    if (brandMainBg) {
+      document.body.style.setProperty("--cabinet-bg", brandMainBg);
+      return () => document.body.style.removeProperty("--cabinet-bg");
+    }
+  }, [brandMainBg]);
 
   useEffect(() => {
     if (!mounted || typeof window === "undefined") return;
@@ -140,28 +160,27 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
     .toUpperCase()
     .slice(0, 2);
 
-  const hex = (s: string | null | undefined) => (s && /^#[0-9A-Fa-f]{6}$/i.test(s) ? s : undefined);
-  const brand = user?.establishmentBrand;
-  const brandPrimary = hex(brand?.primaryColor ?? null);
-  const brandSecondary = hex(brand?.secondaryColor ?? null);
-  const brandMainBg = hex(brand?.mainBackgroundColor ?? null);
-  const brandBlocksBg = hex(brand?.blocksBackgroundColor ?? null);
-  const brandFont = hex(brand?.fontColor ?? null);
-  const brandBorder = hex(brand?.borderColor ?? null);
   const brandStyle: React.CSSProperties & Record<string, string> = {};
   if (brandPrimary) brandStyle["--color-brand-gold"] = brandPrimary;
   if (brandMainBg) brandStyle.backgroundColor = brandMainBg;
-  if (brandFont) brandStyle.color = brandFont;
+  if (brandFont) {
+    brandStyle.color = brandFont;
+    brandStyle["--color-text"] = brandFont;
+    brandStyle["--cabinet-text"] = brandFont;
+  }
+  if (brandBlocksBg) brandStyle["--cabinet-block-bg"] = brandBlocksBg;
   const sidebarBg = brandBlocksBg ?? brandSecondary;
   const mainBlockBg = brandBlocksBg ?? brandSecondary;
   const sidebarStyle: React.CSSProperties = { backgroundColor: sidebarBg ?? "rgba(255,255,255,0.06)" };
   if (brandBorder) sidebarStyle.borderColor = brandBorder;
   const mainBlockStyle: React.CSSProperties = { backgroundColor: mainBlockBg ?? "rgba(255,255,255,0.06)" };
   if (brandBorder) mainBlockStyle.borderColor = brandBorder;
+  const profileBlockStyle: React.CSSProperties = sidebarBg ? { backgroundColor: sidebarBg } : {};
 
   return (
     <div
-      className="cabinet-premium flex min-h-screen w-full max-w-full overflow-x-hidden bg-[var(--color-bg)] font-[family:var(--font-inter)] text-[var(--color-text)] pt-4"
+      data-cabinet-theme="dark"
+      className="cabinet-premium flex min-h-screen w-full max-w-full overflow-x-hidden bg-[var(--cabinet-bg)] font-[family:var(--font-inter)] text-[var(--cabinet-text)] pt-4"
       style={Object.keys(brandStyle).length ? brandStyle : undefined}
     >
       {/* Шторка — стиль как на блоке: тёмное стекло, размытие, тонкая светлая обводка */}
@@ -183,14 +202,17 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
             <img src={user.establishmentBrand.logoUrl} alt="" className="h-8 w-auto max-w-[140px] object-contain opacity-95" />
           </div>
         )}
-        <div className="cabinet-sidebar-profile cabinet-block-inner mx-4 rounded-xl border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-4 py-3">
+        <div
+          className={`cabinet-sidebar-profile cabinet-block-inner mx-4 rounded-xl border border-[var(--color-brand-gold)]/20 px-4 py-3 ${!sidebarBg ? "bg-[var(--color-dark-gray)]/10" : ""}`}
+          style={Object.keys(profileBlockStyle).length ? profileBlockStyle : undefined}
+        >
           <div className="flex items-center gap-3">
             <div className="cabinet-sidebar-avatar flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--color-brand-gold)] font-semibold text-[#0a192f] text-sm">
               {initials}
             </div>
             <div className="min-w-0 flex-1">
-              <div className="truncate font-semibold text-white">{displayName}</div>
-              <div className="text-sm text-white/80">Официант</div>
+              <div className="truncate font-semibold text-[var(--color-text)]" style={brandFont ? { color: brandFont } : undefined}>{displayName}</div>
+              <div className="text-sm text-[var(--color-text)]/80" style={brandFont ? { color: brandFont } : undefined}>Официант</div>
             </div>
           </div>
         </div>
@@ -205,6 +227,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
                   ? "cabinet-nav-active border border-[#0a192f]/35 bg-[#0a192f]/12 text-[#0a192f] font-semibold"
                   : "border border-transparent text-[var(--color-text)]/80 hover:bg-[var(--color-dark-gray)]/10 hover:text-[var(--color-text)]"
               }`}
+              style={!isActive(href) && brandFont ? { color: `${brandFont}cc` } : undefined}
             >
               <Icon className="h-5 w-5 shrink-0" />
               <span>{label}</span>
@@ -222,6 +245,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
             type="button"
             onClick={handleLogout}
             className="mt-4 flex w-full items-center gap-3 rounded-[10px] px-4 py-3.5 font-medium text-[var(--color-text)]/80 transition-colors hover:bg-[var(--color-dark-gray)]/10 hover:text-[var(--color-text)]"
+            style={brandFont ? { color: `${brandFont}cc` } : undefined}
           >
             <LogOut className="h-5 w-5 shrink-0" />
             <span>Выйти</span>

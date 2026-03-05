@@ -125,11 +125,11 @@ export default function CabinetSupportPage() {
 
   return (
     <div className="support-chat-header mx-auto max-w-2xl text-center">
-      <h1 className="flex items-center justify-center gap-2 text-2xl font-bold text-white">
+      <h1 className="flex items-center justify-center gap-2 text-2xl font-bold text-[var(--color-text)]">
         <MessageCircle className="h-7 w-7 text-[var(--color-brand-gold)]" />
         Поддержка FreeTips
       </h1>
-      <p className="mt-2 text-sm text-white/90">
+      <p className="mt-2 text-sm text-[var(--color-text)]/90">
         Задайте вопрос или опишите проблему. Ответим в рабочее время.
       </p>
 
@@ -138,7 +138,7 @@ export default function CabinetSupportPage() {
           type="button"
           onClick={refresh}
           disabled={refreshing}
-          className="flex items-center gap-2 rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-sm text-white hover:bg-white/10 disabled:opacity-50"
+          className="flex items-center gap-2 rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-sm text-[var(--color-text)] hover:bg-white/10 disabled:opacity-50"
         >
           <RefreshCw className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`} />
           Обновить
@@ -167,14 +167,14 @@ export default function CabinetSupportPage() {
                   Поддержка FreeTips
                 </span>
               </div>
-              <p className="whitespace-pre-wrap text-sm text-white/95">
+              <p className="whitespace-pre-wrap text-sm text-[var(--color-text)]/95">
                 {WELCOME_LINES.join("\n\n")}
               </p>
             </div>
           </div>
 
           {messages.length === 0 && (
-            <p className="py-4 text-center text-sm text-white/70">
+            <p className="py-4 text-center text-sm text-[var(--color-text)]/70">
               Пока нет сообщений. Напишите первым — мы ответим.
             </p>
           )}
@@ -209,10 +209,10 @@ export default function CabinetSupportPage() {
                     </span>
                   </div>
                 )}
-                <div className="whitespace-pre-wrap break-words text-sm text-white">{m.body}</div>
+                <div className="whitespace-pre-wrap break-words text-sm text-[var(--color-text)]">{m.body}</div>
               </div>
               <div
-                className="mt-1 px-1 text-[10px] text-white/50"
+                className="mt-1 px-1 text-[10px] text-[var(--color-text)]/50"
                 aria-label="Дата и время сообщения"
               >
                 {new Date(m.createdAt).toLocaleString("ru-RU", {
@@ -241,7 +241,7 @@ export default function CabinetSupportPage() {
               onChange={(e) => setInput(e.target.value)}
               placeholder="Напишите сообщение…"
               maxLength={4000}
-              className="support-chat-input flex-1 rounded-xl border border-white/20 bg-white/5 px-4 py-3 text-white placeholder:text-white/60 focus:border-[var(--color-brand-gold)]/50 focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-gold)]/30"
+              className="support-chat-input flex-1 rounded-xl border border-white/20 bg-white/5 px-4 py-3 text-[var(--color-text)] placeholder:text-[var(--color-text)]/60 focus:border-[var(--color-brand-gold)]/50 focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-gold)]/30"
               disabled={sending}
             />
             <button

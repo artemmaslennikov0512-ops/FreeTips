@@ -46,11 +46,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
 
   useEffect(() => {
     document.body.classList.add("cabinet-page");
-    document.body.setAttribute("data-cabinet-theme", "dark");
-    return () => {
-      document.body.classList.remove("cabinet-page");
-      document.body.removeAttribute("data-cabinet-theme");
-    };
+    return () => document.body.classList.remove("cabinet-page");
   }, []);
 
   const hex = (s: string | null | undefined) => (s && /^#[0-9A-Fa-f]{6}$/i.test(s) ? s : undefined);
@@ -64,9 +60,9 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
 
   useEffect(() => {
     if (brandMainBg) {
-      document.body.style.setProperty("--cabinet-bg", brandMainBg);
+      document.body.style.backgroundColor = brandMainBg;
       return () => {
-        document.body.style.removeProperty("--cabinet-bg");
+        document.body.style.backgroundColor = "";
       };
     }
   }, [brandMainBg]);
@@ -168,7 +164,6 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
   if (brandFont) {
     brandStyle.color = brandFont;
     brandStyle["--color-text"] = brandFont;
-    brandStyle["--cabinet-text"] = brandFont;
   }
   if (brandBlocksBg) brandStyle["--cabinet-block-bg"] = brandBlocksBg;
   const sidebarBg = brandBlocksBg ?? brandSecondary;
@@ -181,8 +176,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
 
   return (
     <div
-      data-cabinet-theme="dark"
-      className="cabinet-premium flex min-h-screen w-full max-w-full overflow-x-hidden bg-[var(--cabinet-bg)] font-[family:var(--font-inter)] text-[var(--cabinet-text)] pt-4"
+      className="cabinet-premium flex min-h-screen w-full max-w-full overflow-x-hidden bg-[var(--color-bg)] font-[family:var(--font-inter)] text-[var(--color-text)] pt-4"
       style={Object.keys(brandStyle).length ? brandStyle : undefined}
     >
       {/* Шторка — стиль как на блоке: тёмное стекло, размытие, тонкая светлая обводка */}

@@ -56,7 +56,15 @@ export default function PayPage() {
         }
         const data = (await res.json()) as {
           recipientName: string;
-          branding?: { logoUrl?: string; primaryColor?: string; secondaryColor?: string };
+          branding?: {
+            logoUrl?: string;
+            primaryColor?: string;
+            secondaryColor?: string;
+            mainBackgroundColor?: string;
+            blocksBackgroundColor?: string;
+            fontColor?: string;
+            borderColor?: string;
+          };
         };
         setRecipientName(data.recipientName);
         setBranding(data.branding ?? null);
@@ -193,18 +201,29 @@ export default function PayPage() {
   const kop = amountKop();
   const rub = kop / 100;
 
-  const primary = branding?.primaryColor && /^#[0-9A-Fa-f]{6}$/i.test(branding.primaryColor) ? branding.primaryColor : undefined;
-  const secondary = branding?.secondaryColor && /^#[0-9A-Fa-f]{6}$/i.test(branding.secondaryColor) ? branding.secondaryColor : undefined;
-  const payBlockStyle =
-    primary || secondary
-      ? ({ "--pay-brand-primary": primary ?? "var(--color-brand-gold)", "--pay-brand-secondary": secondary ?? "var(--color-navy)" } as React.CSSProperties)
-      : undefined;
+  const hex = (s: string | undefined) => (s && /^#[0-9A-Fa-f]{6}$/i.test(s) ? s : undefined);
+  const primary = hex(branding?.primaryColor);
+  const secondary = hex(branding?.secondaryColor);
+  const mainBg = hex(branding?.mainBackgroundColor);
+  const blocksBg = hex(branding?.blocksBackgroundColor);
+  const fontClr = hex(branding?.fontColor);
+  const borderClr = hex(branding?.borderColor);
+  const payBlockStyle: React.CSSProperties = {};
+  if (primary) payBlockStyle["--pay-brand-primary" as string] = primary;
+  if (secondary) payBlockStyle["--pay-brand-secondary" as string] = secondary;
+  if (borderClr) payBlockStyle["--pay-border" as string] = borderClr;
+  const wrapperStyle: React.CSSProperties = mainBg ? { backgroundColor: mainBg } : {};
+  const cardStyle: React.CSSProperties = { ...payBlockStyle };
+  if (secondary) cardStyle.backgroundColor = secondary;
+  if (borderClr) cardStyle.borderColor = borderClr;
+  if (blocksBg) cardStyle["--pay-blocks-bg" as string] = blocksBg;
+  if (fontClr) cardStyle["--pay-font" as string] = fontClr;
 
   return (
-    <div className="mx-auto min-h-[60vh] max-w-md px-4 py-12">
+    <div className="mx-auto min-h-[60vh] max-w-md px-4 py-12" style={wrapperStyle}>
       <div
-        className="pay-block relative rounded-2xl border border-[var(--pay-brand-primary,var(--color-brand-gold))]/50 bg-[var(--color-bg-sides)] p-6 shadow-[var(--shadow-card)]"
-        style={payBlockStyle}
+        className="pay-block relative rounded-2xl border-2 border-[var(--pay-border,var(--color-brand-gold))]/50 bg-[var(--color-bg-sides)] p-6 shadow-[var(--shadow-card)]"
+        style={Object.keys(cardStyle).length ? cardStyle : undefined}
       >
         {/* Кнопка смены темы */}
         <div className="absolute right-4 top-4">
@@ -218,24 +237,39 @@ export default function PayPage() {
             ) : (
               <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--pay-brand-primary,var(--color-brand-gold))] text-sm font-bold text-[#0a192f]">FT</span>
             )}
-            <span className="font-[family:var(--font-playfair)] text-xl font-bold text-[var(--color-text)]">
-              <span className="text-[var(--color-navy)]">Free</span>
+            <span
+              className="font-[family:var(--font-playfair)] text-xl font-bold"
+              style={{ color: fontClr ?? "var(--color-text)" }}
+            >
+              <span style={{ color: fontClr ? "inherit" : "var(--color-navy)", opacity: 0.9 }}>Free</span>
               <span className="text-[var(--pay-brand-primary,var(--color-brand-gold))]">Tips</span>
             </span>
           </div>
         </div>
 
-        {/* Деловая визитка */}
-        <div className="pay-block-inner mt-4 rounded-xl border border-[var(--pay-brand-primary,var(--color-brand-gold))]/50 bg-[var(--color-light-gray)] p-4 text-center">
+        {/* Деловая визитка — фон блока = доп. цвет или фон блоков, обводка */}
+        <div
+          className="pay-block-inner mt-4 rounded-xl border-2 p-4 text-center"
+          style={{
+            backgroundColor: blocksBg ?? "var(--color-light-gray)",
+            borderColor: borderClr ?? "var(--color-brand-gold)",
+          }}
+        >
           <div className="flex flex-col items-center justify-center gap-2">
             <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--pay-brand-primary,var(--color-accent-gold))]/20 text-[var(--pay-brand-primary,var(--color-accent-gold))]">
               <User className="h-4 w-4" />
             </div>
-            <p className="min-w-0 truncate text-sm font-semibold text-[var(--color-text)]">{recipientName}</p>
+            <p className="min-w-0 truncate text-sm font-semibold" style={{ color: fontClr ?? "var(--color-text)" }}>{recipientName}</p>
           </div>
         </div>
 
-        <div className="pay-block-inner mt-6 flex flex-wrap justify-center gap-3 rounded-xl border border-[var(--pay-brand-primary,var(--color-brand-gold))]/50 bg-[var(--color-light-gray)]/50 p-3">
+        <div
+          className="pay-block-inner mt-6 flex flex-wrap justify-center gap-3 rounded-xl border-2 p-3"
+          style={{
+            backgroundColor: blocksBg ? `${blocksBg}80` : "var(--color-light-gray)",
+            borderColor: borderClr ?? "var(--color-brand-gold)",
+          }}
+        >
           {PRESETS.map((r) => {
             const numCustom = customAmount.trim() ? Number(customAmount.replace(",", ".")) : null;
             const isSelected = (numCustom != null && !Number.isNaN(numCustom) && numCustom === r) || (numCustom == null && amount === r);
@@ -259,7 +293,7 @@ export default function PayPage() {
           })}
         </div>
 
-        <p className="mt-4 text-center text-sm font-medium text-[var(--color-text)]">Выберите сумму или введите свою</p>
+        <p className="mt-4 text-center text-sm font-medium" style={{ color: fontClr ?? "var(--color-text)" }}>Выберите сумму или введите свою</p>
 
         <div className="mt-2 flex justify-center">
           <input
@@ -273,7 +307,7 @@ export default function PayPage() {
           />
         </div>
 
-        <p className="mt-6 text-center text-sm font-medium text-[var(--color-text)]">Оставьте отзыв!)</p>
+        <p className="mt-6 text-center text-sm font-medium" style={{ color: fontClr ?? "var(--color-text)" }}>Оставьте отзыв!)</p>
         <div className="mt-2 flex justify-center">
           <textarea
             rows={2}
@@ -314,7 +348,7 @@ export default function PayPage() {
         )}
       </div>
 
-      <p className="mt-6 text-center text-sm text-[var(--color-muted)]">
+      <p className="mt-6 text-center text-sm text-[var(--color-muted)]" style={fontClr ? { color: fontClr, opacity: 0.8 } : undefined}>
         Оплата банковской картой. Регистрация не нужна.
       </p>
     </div>

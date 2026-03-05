@@ -45,6 +45,10 @@ export async function GET(request: NextRequest, { params }: Params) {
               logoUrl: true,
               primaryColor: true,
               secondaryColor: true,
+              mainBackgroundColor: true,
+              blocksBackgroundColor: true,
+              fontColor: true,
+              borderColor: true,
             },
           },
         },
@@ -65,6 +69,10 @@ export async function GET(request: NextRequest, { params }: Params) {
           logoUrl: tipLink.employee.establishment.logoUrl ?? undefined,
           primaryColor: tipLink.employee.establishment.primaryColor ?? undefined,
           secondaryColor: tipLink.employee.establishment.secondaryColor ?? undefined,
+          mainBackgroundColor: tipLink.employee.establishment.mainBackgroundColor ?? undefined,
+          blocksBackgroundColor: tipLink.employee.establishment.blocksBackgroundColor ?? undefined,
+          fontColor: tipLink.employee.establishment.fontColor ?? undefined,
+          borderColor: tipLink.employee.establishment.borderColor ?? undefined,
         }
       : undefined;
   return NextResponse.json({ recipientName, ...(branding && { branding }) });

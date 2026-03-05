@@ -243,7 +243,11 @@ model Establishment {
   maxEmployeesCount Int?     // лимит сотрудников (null = без лимита); задаёт суперадмин
   tipPoolUserId     String?  @unique @db.VarChar(64) // пользователь-пул для приёма чаевых по QR сотрудников
   primaryColor      String?  @db.VarChar(20) // hex для White Label (например #c9a227)
-  secondaryColor    String?  @db.VarChar(20)
+  secondaryColor    String?  @db.VarChar(20) // доп. цвет: фон, акценты
+  mainBackgroundColor   String?  @db.VarChar(20) // фон основной страницы (hex)
+  blocksBackgroundColor String?  @db.VarChar(20) // фон блоков/карточек (hex)
+  fontColor         String?  @db.VarChar(20) // цвет основного текста (hex)
+  borderColor       String?  @db.VarChar(20) // цвет обводки/рамок (hex)
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 

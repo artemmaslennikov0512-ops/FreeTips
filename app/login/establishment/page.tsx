@@ -111,9 +111,11 @@ export default function LoginEstablishmentPage() {
     <AuthPageShell>
       <div className="mx-auto flex min-h-[80vh] max-w-md flex-col justify-center px-4 py-16">
         <div className={`${AUTH_CARD_CLASS} pt-10`}>
-          <div className="flex items-start gap-2 pt-1">
-            <Building2 className="h-7 w-7 shrink-0 text-[var(--color-accent-gold)] mt-0.5" />
-            <h1 className="font-[family:var(--font-playfair)] text-2xl font-semibold leading-tight text-[var(--color-text)] min-w-0 break-words">
+          <div className="flex items-center gap-3">
+            <div className="flex shrink-0 items-center justify-center">
+              <Building2 className="h-6 w-6 text-[var(--color-accent-gold)] sm:h-7 sm:w-7" />
+            </div>
+            <h1 className="font-[family:var(--font-playfair)] text-lg font-semibold leading-snug text-[var(--color-text)] min-w-0 break-words sm:text-xl">
               Вход для управляющего заведением
             </h1>
           </div>

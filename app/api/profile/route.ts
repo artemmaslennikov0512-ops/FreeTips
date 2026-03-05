@@ -42,7 +42,18 @@ export async function GET(request: NextRequest) {
             birthDate: true,
             establishment: true,
             establishmentId: true,
-            establishmentRelation: { select: { name: true, logoUrl: true, primaryColor: true, secondaryColor: true } },
+            establishmentRelation: {
+              select: {
+                name: true,
+                logoUrl: true,
+                primaryColor: true,
+                secondaryColor: true,
+                mainBackgroundColor: true,
+                blocksBackgroundColor: true,
+                fontColor: true,
+                borderColor: true,
+              },
+            },
             apiKey: true,
             apiKeyHash: true,
             paygineSdRef: true,
@@ -138,13 +149,17 @@ export async function GET(request: NextRequest) {
         profile.establishmentRelation?.name != null
           ? String(profile.establishmentRelation.name)
           : null,
-      /** Бренд заведения для ЛК официанта и целостного образа (лого, цвета) */
+      /** Бренд заведения для ЛК официанта и целостного образа (лого, цвета, фоны) */
       establishmentBrand:
         profile.establishmentRelation != null
           ? {
               logoUrl: profile.establishmentRelation.logoUrl != null ? String(profile.establishmentRelation.logoUrl) : null,
               primaryColor: profile.establishmentRelation.primaryColor != null ? String(profile.establishmentRelation.primaryColor) : null,
               secondaryColor: profile.establishmentRelation.secondaryColor != null ? String(profile.establishmentRelation.secondaryColor) : null,
+              mainBackgroundColor: profile.establishmentRelation.mainBackgroundColor != null ? String(profile.establishmentRelation.mainBackgroundColor) : null,
+              blocksBackgroundColor: profile.establishmentRelation.blocksBackgroundColor != null ? String(profile.establishmentRelation.blocksBackgroundColor) : null,
+              fontColor: profile.establishmentRelation.fontColor != null ? String(profile.establishmentRelation.fontColor) : null,
+              borderColor: profile.establishmentRelation.borderColor != null ? String(profile.establishmentRelation.borderColor) : null,
             }
           : null,
       hasApiKey: !!(profile.apiKey ?? profile.apiKeyHash),

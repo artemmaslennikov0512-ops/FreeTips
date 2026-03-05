@@ -30,7 +30,15 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [user, setUser] = useState<{
     fullName?: string | null;
-    establishmentBrand?: { logoUrl: string | null; primaryColor: string | null; secondaryColor: string | null } | null;
+    establishmentBrand?: {
+      logoUrl: string | null;
+      primaryColor: string | null;
+      secondaryColor: string | null;
+      mainBackgroundColor: string | null;
+      blocksBackgroundColor: string | null;
+      fontColor: string | null;
+      borderColor: string | null;
+    } | null;
   } | null>(null);
   const [supportUnreadCount, setSupportUnreadCount] = useState(0);
 
@@ -132,15 +140,29 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
     .toUpperCase()
     .slice(0, 2);
 
-  const brandPrimary = user?.establishmentBrand?.primaryColor && /^#[0-9A-Fa-f]{6}$/i.test(user.establishmentBrand.primaryColor)
-    ? user.establishmentBrand.primaryColor
-    : undefined;
-  const brandStyle = brandPrimary ? { ["--color-brand-gold" as string]: brandPrimary } as React.CSSProperties : undefined;
+  const hex = (s: string | null | undefined) => (s && /^#[0-9A-Fa-f]{6}$/i.test(s) ? s : undefined);
+  const brand = user?.establishmentBrand;
+  const brandPrimary = hex(brand?.primaryColor ?? null);
+  const brandSecondary = hex(brand?.secondaryColor ?? null);
+  const brandMainBg = hex(brand?.mainBackgroundColor ?? null);
+  const brandBlocksBg = hex(brand?.blocksBackgroundColor ?? null);
+  const brandFont = hex(brand?.fontColor ?? null);
+  const brandBorder = hex(brand?.borderColor ?? null);
+  const brandStyle: React.CSSProperties = {};
+  if (brandPrimary) brandStyle["--color-brand-gold" as string] = brandPrimary;
+  if (brandMainBg) brandStyle.backgroundColor = brandMainBg;
+  if (brandFont) brandStyle.color = brandFont;
+  const sidebarBg = brandBlocksBg ?? brandSecondary;
+  const mainBlockBg = brandBlocksBg ?? brandSecondary;
+  const sidebarStyle: React.CSSProperties = { backgroundColor: sidebarBg ?? "rgba(255,255,255,0.06)" };
+  if (brandBorder) sidebarStyle.borderColor = brandBorder;
+  const mainBlockStyle: React.CSSProperties = { backgroundColor: mainBlockBg ?? "rgba(255,255,255,0.06)" };
+  if (brandBorder) mainBlockStyle.borderColor = brandBorder;
 
   return (
     <div
       className="cabinet-premium flex min-h-screen w-full max-w-full overflow-x-hidden bg-[var(--color-bg)] font-[family:var(--font-inter)] text-[var(--color-text)] pt-4"
-      style={brandStyle}
+      style={Object.keys(brandStyle).length ? brandStyle : undefined}
     >
       {/* Шторка — стиль как на блоке: тёмное стекло, размытие, тонкая светлая обводка */}
       <div
@@ -151,9 +173,10 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
 
       {/* Левое меню — как шторка: отступы от краёв */}
       <div
-        className={`cabinet-sidebar fixed left-4 top-4 z-40 flex h-auto max-h-[calc(100vh-2rem)] w-[260px] shrink-0 flex-col overflow-hidden rounded-2xl border border-white/10 bg-white/[0.06] py-6 shadow-sm backdrop-blur-xl transition-transform duration-300 lg:static lg:left-auto lg:top-auto lg:ml-4 lg:mt-4 lg:mr-0 lg:mb-0 lg:max-h-none lg:self-start lg:translate-x-0 ${
+        className={`cabinet-sidebar fixed left-4 top-4 z-40 flex h-auto max-h-[calc(100vh-2rem)] w-[260px] shrink-0 flex-col overflow-hidden rounded-2xl border border-white/10 py-6 shadow-sm backdrop-blur-xl transition-transform duration-300 lg:static lg:left-auto lg:top-auto lg:ml-4 lg:mt-4 lg:mr-0 lg:mb-0 lg:max-h-none lg:self-start lg:translate-x-0 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-[calc(100%+1rem)]"
         }`}
+        style={sidebarStyle}
       >
         {user?.establishmentBrand?.logoUrl && (
           <div className="mx-4 mb-3 flex justify-center">
@@ -208,7 +231,10 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
 
       <main className="min-h-screen min-w-0 flex-1 overflow-x-hidden lg:ml-0 flex flex-col">
         {/* Основной блок — как шторка: отступы от краёв */}
-        <div className="cabinet-main-block mt-4 mr-0 mb-4 ml-4 lg:mr-4 lg:ml-4 flex min-h-[calc(100vh-2rem)] flex-1 flex-col rounded-2xl border border-white/10 bg-white/[0.06] backdrop-blur-xl">
+        <div
+          className="cabinet-main-block mt-4 mr-0 mb-4 ml-4 lg:mr-4 lg:ml-4 flex min-h-[calc(100vh-2rem)] flex-1 flex-col rounded-2xl border border-white/10 backdrop-blur-xl"
+          style={mainBlockStyle}
+        >
           <div className="p-6 lg:p-8" id="main-content">
             <div className="mb-4 lg:hidden">
               <button

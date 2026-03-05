@@ -17,8 +17,7 @@ ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_OPTIONS="--max-old-space-size=4096"
 ENV DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy"
-RUN npx prisma generate --schema=prisma/schema.prisma
-RUN npx next build
+RUN npm run build
 
 # --- runner ---
 FROM node:20-slim AS runner

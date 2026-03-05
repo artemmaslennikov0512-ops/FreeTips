@@ -70,7 +70,7 @@ export const metadata: Metadata = {
   },
   alternates: { canonical: baseUrl },
   icons: [
-    { url: "/favicon.png?v=2", type: "image/png", sizes: "32x32" },
+    { url: "/favicon.png?v=3", type: "image/png", sizes: "32x32" },
     { url: "/logo.svg", type: "image/svg+xml", sizes: "any" },
   ],
 };

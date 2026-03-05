@@ -22,7 +22,15 @@ export default function PayPage() {
 
   const [loading, setLoading] = useState(true);
   const [recipientName, setRecipientName] = useState<string | null>(null);
-  const [branding, setBranding] = useState<{ logoUrl?: string; primaryColor?: string; secondaryColor?: string } | null>(null);
+  const [branding, setBranding] = useState<{
+    logoUrl?: string;
+    primaryColor?: string;
+    secondaryColor?: string;
+    mainBackgroundColor?: string;
+    blocksBackgroundColor?: string;
+    fontColor?: string;
+    borderColor?: string;
+  } | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const [amount, setAmount] = useState<number>(100);
@@ -208,12 +216,12 @@ export default function PayPage() {
   const blocksBg = hex(branding?.blocksBackgroundColor);
   const fontClr = hex(branding?.fontColor);
   const borderClr = hex(branding?.borderColor);
-  const payBlockStyle: React.CSSProperties = {};
-  if (primary) payBlockStyle["--pay-brand-primary" as string] = primary;
-  if (secondary) payBlockStyle["--pay-brand-secondary" as string] = secondary;
-  if (borderClr) payBlockStyle["--pay-border" as string] = borderClr;
+  const payBlockStyle: React.CSSProperties & Record<string, string> = {};
+  if (primary) payBlockStyle["--pay-brand-primary"] = primary;
+  if (secondary) payBlockStyle["--pay-brand-secondary"] = secondary;
+  if (borderClr) payBlockStyle["--pay-border"] = borderClr;
   const wrapperStyle: React.CSSProperties = mainBg ? { backgroundColor: mainBg } : {};
-  const cardStyle: React.CSSProperties = { ...payBlockStyle };
+  const cardStyle: React.CSSProperties & Record<string, string> = { ...payBlockStyle };
   if (secondary) cardStyle.backgroundColor = secondary;
   if (borderClr) cardStyle.borderColor = borderClr;
   if (blocksBg) cardStyle["--pay-blocks-bg" as string] = blocksBg;

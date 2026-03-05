@@ -148,8 +148,8 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
   const brandBlocksBg = hex(brand?.blocksBackgroundColor ?? null);
   const brandFont = hex(brand?.fontColor ?? null);
   const brandBorder = hex(brand?.borderColor ?? null);
-  const brandStyle: React.CSSProperties = {};
-  if (brandPrimary) brandStyle["--color-brand-gold" as string] = brandPrimary;
+  const brandStyle: React.CSSProperties & Record<string, string> = {};
+  if (brandPrimary) brandStyle["--color-brand-gold"] = brandPrimary;
   if (brandMainBg) brandStyle.backgroundColor = brandMainBg;
   if (brandFont) brandStyle.color = brandFont;
   const sidebarBg = brandBlocksBg ?? brandSecondary;

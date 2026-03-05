@@ -1,9 +1,12 @@
 /**
  * Генерирует минимальный 16x16 favicon.ico (тёмный квадрат — бренд FreeTips).
- * Запуск: node scripts/gen-favicon.js
+ * Запуск: node scripts/gen-favicon.mjs
  */
-const fs = require("fs");
-const path = require("path");
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // ICO: header 6 + dir entry 16 = 22, then BMP (40 header + 16*16*4 pixels)
 const header = Buffer.alloc(6);

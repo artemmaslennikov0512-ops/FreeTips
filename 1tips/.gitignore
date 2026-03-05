@@ -47,6 +47,9 @@ next-env.d.ts
 # сохранённые чеки (история на сервере)
 /storage/
 
+# вывод скриптов (pay-auto, pay-card HTML/PNG)
+scripts/out/
+
 # Android (мобильное приложение)
 /android/local.properties
 /android/build

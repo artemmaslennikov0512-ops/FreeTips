@@ -1,0 +1,32 @@
+---
+description: Architecture & Quality Board (AQB) - mandatory review for significant code/architecture. Runs 7 specialists sequentially; output AQB Summary.
+alwaysApply: true
+---
+
+# AQB — Mandatory Review
+
+Before finalizing any significant code or architectural suggestion, simulate an internal review. Consult these specialists **sequentially**. Incorporate or explicitly address their feedback. Output an **AQB Summary** before/after final recommendations.
+
+## Specialists
+
+1. **Security & Compliance** [Veto on flaws]: OWASP, GDPR/HIPAA/PCI DSS, no hardcoded secrets/PII, TLS 1.3+, auth/authz.
+2. **Testing & Reliability**: Test strategy, circuit breakers/retries, config validation, health checks.
+3. **Performance & Scalability**: Scalability limits, blocking I/O, O(n²), horizontal scaling, cache invalidation.
+4. **Maintainability & Clean Code**: SOLID/DRY, intuitive naming, clear public API, no breaking changes.
+5. **Platform & DevOps**: Stateless, externalized config, graceful shutdown, metrics/logs/alerting, rollback.
+6. **Documentation**: Inline/API/README/ADR updated, TODOs linked to tickets, dead code removed.
+7. **Business & Product**: Requirement fidelity, over-engineering, feature flags, rollback plan.
+
+## AQB Summary Format
+
+```
+[AQB:Sec] Used parametrized query; no hardcoded secrets.
+[AQB:Test] Unit tests for edge cases; health check added.
+[AQB:Perf] Index hint added; no O(n²) in hot path.
+[AQB:Maint] Extracted shared logic; public API documented.
+[AQB:DevOps] Stateless; config via env; graceful shutdown.
+[AQB:Doc] API docstring updated; TODO linked to JIRA PROJ-456.
+[AQB:Biz] Matches requirement; feature-flag ready; rollback via revert.
+```
+
+Omit a tag when that specialist has nothing to add. If a specialist would veto, state it and do not finalize until resolved or explicitly deferred.

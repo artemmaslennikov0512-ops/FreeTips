@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">FreeTips</string>
+    <string name="login_success">Вход выполнен</string>
+    <string name="profile_address_saved">Адрес сохранён</string>
+    <string name="dialog_cancel">Отмена</string>
+    <string name="default_notification_channel_id">freetips_default</string>
+    <string name="default_notification_channel_name">Уведомления</string>
+    <string name="notification_topup_title">FreeTips</string>
+    <string name="notification_topup_body">Пополнение: +%s</string>
+    <string name="notification_balance_changed_title">FreeTips</string>
+    <string name="notification_balance_changed_body">Баланс обновлён: %s</string>
+    <string name="notifications_title">Уведомления</string>
+    <string name="notifications_empty">Нет уведомлений о пополнении</string>
+    <string name="notifications_clear">Очистить</string>
+    <string name="limits_section_title">Доступные лимиты</string>
+    <string name="limits_daily_requests">Заявок в сутки</string>
+    <string name="limits_daily_sum">Сумма в сутки</string>
+    <string name="limits_monthly_requests">Заявок в месяц</string>
+    <string name="limits_monthly_sum">Сумма в месяц</string>
+    <string name="limits_daily_count_fmt">%1$d из %2$d</string>
+    <string name="limits_daily_sum_fmt">%1$s из %2$s</string>
+    <string name="limits_monthly_count_fmt">%1$d из %2$d</string>
+    <string name="limits_monthly_sum_fmt">%1$s из %2$s</string>
+    <string name="operations_history">История операций</string>
+    <string name="operations_filter_amount_from">Сумма от, ₽</string>
+    <string name="operations_filter_amount_to">Сумма до, ₽</string>
+    <string name="operations_filter_apply">Показать</string>
+</resources>

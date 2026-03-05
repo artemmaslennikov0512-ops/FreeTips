@@ -1,0 +1,27 @@
+# Built application files
+*.apk
+*.ap_
+*.aab
+
+# Generated files
+bin/
+gen/
+out/
+release/
+
+# Gradle
+.gradle/
+build/
+
+# Local config
+local.properties
+*.iml
+
+# Android Studio
+.idea/
+captures/
+*.hprof
+
+# Keystore (не коммитить ключи подписи)
+*.jks
+*.keystore

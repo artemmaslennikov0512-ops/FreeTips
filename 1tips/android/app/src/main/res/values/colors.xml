@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Primary: золотой акцент для премиум тёмной темы -->
+    <color name="primary">#C5A572</color>
+    <color name="primary_dark">#9A7B4F</color>
+    <color name="primary_light">#D4B896</color>
+    <color name="on_primary">#0D1117</color>
+
+    <!-- Surface & background (тёмная тема) -->
+    <color name="surface">#1C2128</color>
+    <color name="surface_variant">#252D37</color>
+    <!-- Блоки в Выводы и Операции (тёмный синевато-серый) -->
+    <color name="block_card">#24272E</color>
+    <color name="background">#0D1117</color>
+    <color name="on_surface">#E6EDF3</color>
+    <color name="on_surface_variant">#8B949E</color>
+    <color name="outline">#484F58</color>
+
+    <!-- Semantic -->
+    <color name="error">#F85149</color>
+    <color name="on_error">#FFFFFF</color>
+    <color name="success">#3FB950</color>
+    <color name="status_pending_orange">#FF9800</color>
+
+    <!-- Специфичные (чип на карте — тёмный текст на светлом фоне) -->
+    <color name="chip_text">#1C1B1F</color>
+    <color name="logo_ft_dark_blue">#0D1B2A</color>
+    <color name="logo_tips_gold">#B8860B</color>
+    <color name="logo_container_border">#E0E0E0</color>
+
+    <!-- Светлые блоки (история операций: белый фон, чёрный текст) -->
+    <color name="surface_light">#FFFFFF</color>
+    <color name="on_surface_light">#1C1B1F</color>
+    <color name="on_surface_light_variant">#6B7280</color>
+    <color name="amount_chip_bg_light">#E5E7EB</color>
+
+    <!-- Legacy -->
+    <color name="ic_launcher_background">#0D1117</color>
+</resources>

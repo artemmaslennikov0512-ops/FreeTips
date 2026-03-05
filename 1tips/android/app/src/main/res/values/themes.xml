@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.FreeTips.Splash" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="android:windowBackground">@drawable/splash_background</item>
+        <item name="android:statusBarColor">@color/background</item>
+        <item name="android:navigationBarColor">@color/background</item>
+    </style>
+
+    <!-- Экран входа: тёмный фон как в приложении, золотые кнопки -->
+    <style name="Theme.FreeTips.ApiKeyEntry" parent="Theme.FreeTips">
+        <item name="android:windowBackground">@color/background</item>
+        <item name="android:statusBarColor">@color/background</item>
+        <item name="android:navigationBarColor">@color/surface</item>
+    </style>
+
+    <!-- Атрибуты freetips_* в attrs.xml — переопределяйте в своей теме по одному. -->
+    <style name="Theme.FreeTips" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorAccent">@color/primary</item>
+        <item name="android:colorBackground">@color/background</item>
+        <item name="colorSurface">@color/surface</item>
+        <item name="colorOnPrimary">@color/on_primary</item>
+        <item name="colorOnSurface">@color/on_surface</item>
+        <item name="colorOnSurfaceVariant">@color/on_surface_variant</item>
+        <item name="colorError">@color/error</item>
+        <item name="android:statusBarColor">?attr/freetips_statusBarColor</item>
+        <item name="android:navigationBarColor">?attr/freetips_navigationBarColor</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowBackground">@color/background</item>
+        <item name="android:windowLightNavigationBar">false</item>
+        <item name="materialButtonStyle">@style/Widget.FreeTips.Button</item>
+        <!-- Поэлементные атрибуты (можно менять только нужный блок) -->
+        <item name="freetips_headerBarBackground">@color/surface</item>
+        <item name="freetips_headerBarTextColor">@color/on_surface</item>
+        <item name="freetips_headerBarIconColor">@color/on_surface</item>
+        <item name="freetips_screenBackground">@color/background</item>
+        <item name="freetips_bottomNavBackground">@color/surface</item>
+        <item name="freetips_bottomNavIconColor">@color/bottom_nav_color</item>
+        <item name="freetips_cardBackground">@color/surface</item>
+        <item name="freetips_cardTextColor">@color/on_surface</item>
+        <item name="freetips_cardTextColorVariant">@color/on_surface_variant</item>
+        <item name="freetips_statusBarColor">@color/background</item>
+        <item name="freetips_navigationBarColor">@color/surface</item>
+        <!-- Положение и отступы (можно менять без смены цветов темы) -->
+        <item name="freetips_headerBarPaddingStart">@dimen/header_content_inset</item>
+        <item name="freetips_headerBarPaddingEnd">@dimen/header_content_inset</item>
+        <item name="freetips_headerBarPaddingTop">@dimen/spacing_sm</item>
+        <item name="freetips_headerBarPaddingBottom">@dimen/spacing_sm</item>
+        <item name="freetips_headerBarMinHeight">?attr/actionBarSize</item>
+        <item name="freetips_headerBarLogoGravity">8388627</item>
+        <item name="freetips_headerBarBellGravity">8388629</item>
+        <item name="freetips_screenPaddingHorizontal">@dimen/screen_padding</item>
+        <item name="freetips_screenPaddingTop">@dimen/content_top_padding</item>
+        <item name="freetips_screenPaddingBottom">@dimen/content_bottom_padding</item>
+        <item name="freetips_contentTopPadding">@dimen/content_top_padding</item>
+        <item name="freetips_contentBottomPadding">@dimen/content_bottom_padding</item>
+        <item name="freetips_cardToSectionMargin">@dimen/card_to_section_margin</item>
+        <item name="freetips_cardInsetMargin">@dimen/card_inset_margin</item>
+    </style>
+
+    <style name="Widget.FreeTips.Button" parent="Widget.MaterialComponents.Button">
+        <item name="android:paddingTop">14dp</item>
+        <item name="android:paddingBottom">14dp</item>
+        <item name="cornerRadius">12dp</item>
+    </style>
+
+    <style name="Widget.FreeTips.BottomNavigation" parent="Widget.MaterialComponents.BottomNavigationView">
+        <item name="itemIconTint">@color/bottom_nav_color</item>
+        <item name="itemTextColor">@color/bottom_nav_color</item>
+        <item name="android:background">@color/surface</item>
+        <item name="elevation">8dp</item>
+    </style>
+</resources>

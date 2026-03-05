@@ -132,14 +132,14 @@ export default function AdminEstablishmentsPage() {
 
   if (loading) {
     return (
-      <div className="text-[var(--color-text-secondary)]">Загрузка…</div>
+      <div className="text-white/90">Загрузка…</div>
     );
   }
 
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="font-[family:var(--font-playfair)] text-xl font-semibold text-[var(--color-text)]">
+        <h1 className="font-[family:var(--font-playfair)] text-xl font-semibold text-white">
           Заведения
         </h1>
         <button
@@ -157,7 +157,7 @@ export default function AdminEstablishmentsPage() {
       )}
 
       {createdLink && (
-        <div className="rounded-2xl border border-white/10 bg-[var(--color-navy)] p-4">
+        <div className="rounded-2xl border border-white/10 bg-[#0a192f] p-4">
           <p className="mb-2 text-white font-medium">
             Заведение «{createdLink.name}» создано. Ссылка для регистрации управляющего:
           </p>
@@ -185,7 +185,7 @@ export default function AdminEstablishmentsPage() {
       {showForm && (
         <form
           onSubmit={handleCreate}
-          className="rounded-2xl border border-white/10 bg-[var(--color-navy)] p-6 space-y-4"
+          className="rounded-2xl border border-white/10 bg-[#0a192f] p-6 space-y-4"
         >
           <h2 className="text-lg font-medium text-white">Новое заведение</h2>
           {formError && (
@@ -273,7 +273,7 @@ export default function AdminEstablishmentsPage() {
         </form>
       )}
 
-      <div className="overflow-x-auto rounded-2xl border border-white/10 bg-[var(--color-navy)]">
+      <div className="overflow-x-auto rounded-2xl border border-white/10 bg-[#0a192f]">
         <table className="w-full text-left">
           <thead>
             <tr className="border-b border-white/10">

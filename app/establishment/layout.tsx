@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { LayoutDashboard, LogOut, Users } from "lucide-react";
+import { LayoutDashboard, LogOut, Users, PieChart, BarChart3, Palette } from "lucide-react";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 
@@ -120,7 +120,7 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
 
   return (
     <div className="establishment-panel cabinet-premium flex min-h-screen w-full min-w-0 max-w-full bg-[var(--color-bg)] font-[family:var(--font-inter)] text-[var(--color-text)] pt-4">
-      <aside className="fixed left-4 top-4 z-40 flex w-[260px] shrink-0 flex-col overflow-hidden rounded-2xl border border-white/10 bg-[var(--color-navy)] py-6 lg:static lg:ml-4 lg:mt-4">
+      <aside className="fixed left-4 top-4 z-40 flex w-[260px] shrink-0 flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#0a192f] py-6 lg:static lg:ml-4 lg:mt-4">
         <div className="px-4 mb-6">
           <span className="font-[family:var(--font-playfair)] font-bold text-white">
             Кабинет заведения
@@ -140,6 +140,27 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
           >
             <Users className="h-5 w-5 shrink-0" />
             <span>Команда</span>
+          </Link>
+          <Link
+            href="/establishment/payout-rules"
+            className="flex items-center gap-3 rounded-xl px-4 py-3 text-white/90 hover:bg-white/10 hover:text-white"
+          >
+            <PieChart className="h-5 w-5 shrink-0" />
+            <span>Распределение</span>
+          </Link>
+          <Link
+            href="/establishment/analytics"
+            className="flex items-center gap-3 rounded-xl px-4 py-3 text-white/90 hover:bg-white/10 hover:text-white"
+          >
+            <BarChart3 className="h-5 w-5 shrink-0" />
+            <span>Аналитика</span>
+          </Link>
+          <Link
+            href="/establishment/brand"
+            className="flex items-center gap-3 rounded-xl px-4 py-3 text-white/90 hover:bg-white/10 hover:text-white"
+          >
+            <Palette className="h-5 w-5 shrink-0" />
+            <span>Бренд</span>
           </Link>
         </nav>
         <div className="mt-auto border-t border-white/10 px-2 pt-4">

@@ -7,6 +7,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireRole } from "@/lib/middleware/auth";
 import { db } from "@/lib/db";
+import { hashPassword } from "@/lib/auth/password";
 import {
   generateRegistrationToken,
   hashRegistrationToken,
@@ -15,6 +16,8 @@ import {
 import { getBaseUrlFromRequest } from "@/lib/get-base-url";
 import { parseJsonWithLimit, MAX_BODY_SIZE_AUTH, jsonError } from "@/lib/api/helpers";
 import { z } from "zod";
+import { randomBytes } from "crypto";
+import { UserRole } from "@prisma/client";
 
 const createEstablishmentSchema = z.object({
   name: z.string().trim().min(1, "Укажите название").max(255),
@@ -100,6 +103,19 @@ export async function POST(request: NextRequest) {
         maxEmployeesCount: maxEmployeesCount ?? null,
       },
     });
+    const poolLogin = `pool-${est.id}`;
+    const poolPasswordHash = await hashPassword(randomBytes(32).toString("hex"));
+    const poolUser = await tx.user.create({
+      data: {
+        login: poolLogin,
+        passwordHash: poolPasswordHash,
+        role: UserRole.RECIPIENT,
+      },
+    });
+    await tx.establishment.update({
+      where: { id: est.id },
+      data: { tipPoolUserId: poolUser.id },
+    });
     await tx.registrationToken.create({
       data: {
         tokenHash,
@@ -108,7 +124,7 @@ export async function POST(request: NextRequest) {
         establishmentId: est.id,
       },
     });
-    return est;
+    return { ...est, tipPoolUserId: poolUser.id };
   });
 
   const link = `${baseUrl}/register?token=${encodeURIComponent(token)}`;

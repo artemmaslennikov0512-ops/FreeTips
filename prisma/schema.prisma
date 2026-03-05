@@ -65,7 +65,8 @@ model User {
   updatedAt         DateTime  @updatedAt
 
   // Relations
-  establishmentRelation Establishment? @relation(fields: [establishmentId], references: [id], onDelete: SetNull)
+  establishmentRelation Establishment?  @relation(fields: [establishmentId], references: [id], onDelete: SetNull)
+  poolForEstablishment  Establishment? @relation("TipPoolUser") // пользователь-пул для чаевых заведения (RECIPIENT, без входа)
   employeeProfile       Employee?      // если роль EMPLOYEE — привязка к сотруднику заведения
   sessions              Session[]
   tipLinks              TipLink[]
@@ -116,18 +117,21 @@ model Session {
 }
 
 model TipLink {
-  id        String   @id @default(cuid())
-  userId    String
-  slug      String   @unique @db.VarChar(50) // уникальный идентификатор для URL
-  createdAt DateTime @default(now())
+  id         String   @id @default(cuid())
+  userId     String
+  slug       String   @unique @db.VarChar(50) // уникальный идентификатор для URL
+  employeeId String?  @db.VarChar(64) // если ссылка привязана к сотруднику заведения (чаевые в пул)
+  createdAt  DateTime @default(now())
 
   // Relations
-  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  employee     Employee? @relation(fields: [employeeId], references: [id], onDelete: SetNull)
   transactions Transaction[]
 
-  @@unique([userId, slug]) // один пользователь может иметь несколько ссылок (позже)
+  @@unique([userId, slug])
   @@index([userId])
   @@index([slug])
+  @@index([employeeId])
   @@map("tip_links")
 }
 
@@ -237,10 +241,14 @@ model Establishment {
   logoUrl           String?  @db.VarChar(512)
   uniqueSlug        String   @unique @db.VarChar(50) // для URL и QR (например momo-pizza)
   maxEmployeesCount Int?     // лимит сотрудников (null = без лимита); задаёт суперадмин
+  tipPoolUserId     String?  @unique @db.VarChar(64) // пользователь-пул для приёма чаевых по QR сотрудников
+  primaryColor      String?  @db.VarChar(20) // hex для White Label (например #c9a227)
+  secondaryColor    String?  @db.VarChar(20)
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
   users              User[]              // ESTABLISHMENT_ADMIN привязаны сюда
+  tipPoolUser        User?               @relation("TipPoolUser", fields: [tipPoolUserId], references: [id], onDelete: SetNull)
   employees          Employee[]
   payoutRules        PayoutRule[]
   registrationTokens RegistrationToken[] // токены для регистрации управляющего
@@ -264,11 +272,27 @@ model Employee {
 
   establishment      Establishment      @relation(fields: [establishmentId], references: [id], onDelete: Cascade)
   user               User?              @relation(fields: [userId], references: [id], onDelete: SetNull)
+  tipLinks           TipLink[]           // ссылки приёма чаевых (slug = qrCodeIdentifier), ведут в пул заведения
   registrationTokens RegistrationToken[] // токены для регистрации официанта (1 токен = 1 сотрудник)
+  reviews            EmployeeReview[]
 
   @@index([establishmentId])
   @@index([qrCodeIdentifier])
   @@map("employees")
+}
+
+// Отзыв/рейтинг по сотруднику (после оплаты или отдельно).
+model EmployeeReview {
+  id         String   @id @default(cuid())
+  employeeId String
+  rating     Int      // 1–5
+  comment    String?  @db.Text
+  createdAt  DateTime @default(now())
+
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@index([employeeId])
+  @@map("employee_reviews")
 }
 
 // Правило распределения чаевых по заведению (равномерно, по коэффициентам, процент в фонд и т.д.).

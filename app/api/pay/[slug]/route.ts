@@ -34,16 +34,40 @@ export async function GET(request: NextRequest, { params }: Params) {
 
   const tipLink = await db.tipLink.findUnique({
     where: { slug },
-    select: { id: true, user: { select: { login: true, fullName: true } } },
+    select: {
+      id: true,
+      employeeId: true,
+      employee: {
+        select: {
+          name: true,
+          establishment: {
+            select: {
+              logoUrl: true,
+              primaryColor: true,
+              secondaryColor: true,
+            },
+          },
+        },
+      },
+      user: { select: { login: true, fullName: true } },
+    },
   });
 
   if (!tipLink) {
     return NextResponse.json({ error: "Ссылка не найдена" }, { status: 404 });
   }
 
-  return NextResponse.json({
-    recipientName: tipLink.user.fullName || tipLink.user.login,
-  });
+  const recipientName =
+    tipLink.employee?.name ?? tipLink.user.fullName ?? tipLink.user.login;
+  const branding =
+    tipLink.employee?.establishment
+      ? {
+          logoUrl: tipLink.employee.establishment.logoUrl ?? undefined,
+          primaryColor: tipLink.employee.establishment.primaryColor ?? undefined,
+          secondaryColor: tipLink.employee.establishment.secondaryColor ?? undefined,
+        }
+      : undefined;
+  return NextResponse.json({ recipientName, ...(branding && { branding }) });
 }
 
 export async function POST(request: NextRequest, { params }: Params) {

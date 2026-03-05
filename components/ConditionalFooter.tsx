@@ -9,6 +9,7 @@ export function ConditionalFooter() {
   if (
     pathname.startsWith("/cabinet") ||
     pathname.startsWith("/admin") ||
+    pathname.startsWith("/establishment") ||
     pathname.startsWith("/pay") ||
     pathname === "/login" ||
     pathname === "/register" ||

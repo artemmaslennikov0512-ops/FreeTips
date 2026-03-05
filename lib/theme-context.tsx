@@ -21,6 +21,7 @@ function isThemeScope(pathname: string | null): boolean {
   return (
     pathname.startsWith("/cabinet") ||
     pathname.startsWith("/admin") ||
+    pathname.startsWith("/establishment") ||
     pathname.startsWith("/pay") ||
     pathname.startsWith("/login") ||
     pathname.startsWith("/register") ||

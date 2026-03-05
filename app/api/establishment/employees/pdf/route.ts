@@ -7,7 +7,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireEstablishmentAdmin } from "@/lib/middleware/auth";
 import { db } from "@/lib/db";
 import { getBaseUrlFromRequest } from "@/lib/get-base-url";
-import { PDFDocument, rgb } from "pdf-lib";
+import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 import QRCode from "qrcode";
 
 const CARD_WIDTH = 180;
@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
   }
 
   const doc = await PDFDocument.create();
-  const font = doc.embedStandardFont("Helvetica");
+  const font = doc.embedStandardFont(StandardFonts.Helvetica);
 
   let cardIndex = 0;
   let page = doc.addPage([PAGE_WIDTH, PAGE_HEIGHT]);
@@ -118,7 +118,7 @@ export async function GET(request: NextRequest) {
 
   const pdfBytes = await doc.save();
 
-  return new NextResponse(pdfBytes, {
+  return new NextResponse(Buffer.from(pdfBytes), {
     status: 200,
     headers: {
       "Content-Type": "application/pdf",

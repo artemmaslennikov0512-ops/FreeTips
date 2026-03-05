@@ -35,41 +35,38 @@ export async function GET(request: NextRequest) {
   const auth = await requireEstablishmentAdmin(request);
   if (auth.response) return auth.response;
 
-  const [employees, reviewAgg] = await Promise.all([
-    db.employee.findMany({
-      where: { establishmentId: auth.establishmentId },
-      orderBy: { createdAt: "desc" },
-      select: {
-        id: true,
-        name: true,
-        position: true,
-        coefficient: true,
-        isActive: true,
-        qrCodeIdentifier: true,
-        userId: true,
-        createdAt: true,
+  const employees = await db.employee.findMany({
+    where: { establishmentId: auth.establishmentId },
+    orderBy: { createdAt: "desc" },
+    select: {
+      id: true,
+      name: true,
+      position: true,
+      coefficient: true,
+      isActive: true,
+      qrCodeIdentifier: true,
+      userId: true,
+      createdAt: true,
+    },
+  });
+
+  const reviewRows = await db.employeeReview.groupBy({
+    by: ["employeeId"],
+    _avg: { rating: true },
+    _count: true,
+    where: {
+      employee: { establishmentId: auth.establishmentId },
+    },
+  });
+  const reviewAgg = Object.fromEntries(
+    reviewRows.map((x) => [
+      x.employeeId,
+      {
+        avgRating: x._avg.rating != null ? Math.round(Number(x._avg.rating) * 10) / 10 : null,
+        reviewsCount: x._count,
       },
-    }),
-    db.employeeReview
-      .groupBy({
-        by: ["employeeId"],
-        _avg: { rating: true },
-        _count: true,
-        where: {
-          employee: { establishmentId: auth.establishmentId },
-        },
-      })
-      .then((r) =>
-        Object.fromEntries(
-          r.map((x) => [
-            x.employeeId,
-            {
-              avgRating: x._avg.rating != null ? Math.round(x._avg.rating * 10) / 10 : null,
-              reviewsCount: x._count,
-            },
-          ]),
-        ),
-  ]);
+    ]),
+  );
 
   return NextResponse.json({
     employees: employees.map((e) => {

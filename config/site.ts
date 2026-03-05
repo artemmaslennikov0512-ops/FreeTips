@@ -8,7 +8,7 @@ export function isPlaceholder(s: string): boolean {
 
 export const site = {
   name: "FreeTips",
-  logo: { src: "/logo.svg", alt: "Логотип", href: "/" },
+  logo: { src: "/favicon.png", alt: "Логотип", href: "/" },
   /** Фото в Hero. Положите файл в public/ и укажите путь (напр. /hero-tips.jpg). Пустая строка — скрыть блок. */
   heroImage: "" as const,
   /** Тематические фото. Локальные — после запуска scripts/download-images.ps1 */

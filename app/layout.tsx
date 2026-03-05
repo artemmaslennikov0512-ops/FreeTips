@@ -71,7 +71,6 @@ export const metadata: Metadata = {
   alternates: { canonical: baseUrl },
   icons: [
     { url: "/favicon.png?v=4", type: "image/png", sizes: "32x32" },
-    { url: "/logo.svg", type: "image/svg+xml", sizes: "any" },
   ],
 };
 

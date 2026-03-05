@@ -80,8 +80,70 @@ export default function EstablishmentBrandPage() {
           Бренд заведения
         </h1>
         <p className="text-white/90 text-sm mt-1">
-          Логотип и цвета отображаются на странице оплаты чаевых (по QR сотрудников).
+          Логотип и цвета отображаются на странице оплаты чаевых и в кабинете официанта. Меняйте поля — превью обновится сразу.
         </p>
+      </div>
+
+      {/* Превью в реальном времени */}
+      <div className="cabinet-card rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden">
+        <div className="border-b border-white/10 px-4 py-3">
+          <span className="text-sm font-medium text-white/90">Превью: как увидят гости и официанты</span>
+        </div>
+        <div
+          className="p-6 flex flex-col items-center gap-4"
+          style={
+            (primaryColor && /^#[0-9A-Fa-f]{6}$/i.test(primaryColor)) || (secondaryColor && /^#[0-9A-Fa-f]{6}$/i.test(secondaryColor))
+              ? {
+                  ["--preview-primary" as string]: primaryColor && /^#[0-9A-Fa-f]{6}$/i.test(primaryColor) ? primaryColor : "#c9a227",
+                  ["--preview-secondary" as string]: secondaryColor && /^#[0-9A-Fa-f]{6}$/i.test(secondaryColor) ? secondaryColor : "#0a192f",
+                }
+              : undefined
+          }
+        >
+          <div
+            className="w-full max-w-sm rounded-xl border-2 border-[var(--preview-primary,var(--color-brand-gold))]/60 bg-[var(--color-dark-gray)]/20 p-4"
+            style={
+              primaryColor && /^#[0-9A-Fa-f]{6}$/i.test(primaryColor)
+                ? { ["--preview-primary" as string]: primaryColor }
+                : undefined
+            }
+          >
+            <div className="flex items-center justify-center gap-2 mb-3 min-h-[32px]">
+              {logoUrl.trim() && (
+                <img
+                  src={logoUrl.trim()}
+                  alt=""
+                  className="h-8 w-auto max-w-[100px] object-contain"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).style.display = "none";
+                  }}
+                />
+              )}
+              <span className="font-[family:var(--font-playfair)] text-lg font-bold text-white">
+                <span className="text-white/80">{logoUrl.trim() ? "" : "Free"}</span>
+                <span className="text-[var(--preview-primary,var(--color-brand-gold))]">Tips</span>
+              </span>
+            </div>
+            <div className="rounded-lg border border-[var(--preview-primary,var(--color-brand-gold))]/40 bg-white/5 py-2 px-3 text-center text-sm text-white/90">
+              Имя официанта
+            </div>
+            <div className="flex gap-2 mt-3">
+              <span className="flex-1 rounded-lg bg-white/10 py-1.5 text-center text-xs text-white/70">50 ₽</span>
+              <span className="flex-1 rounded-lg bg-[var(--preview-primary,var(--color-brand-gold))]/20 py-1.5 text-center text-xs text-white">100 ₽</span>
+            </div>
+            <button
+              type="button"
+              disabled
+              className="mt-3 w-full rounded-lg py-2 text-sm font-semibold text-[#0a192f]"
+              style={{ backgroundColor: "var(--preview-primary, var(--color-brand-gold))" }}
+            >
+              Оплатить 100 ₽
+            </button>
+          </div>
+          <p className="text-xs text-white/60 text-center">
+            Страница оплаты по QR · кнопки и акценты в кабинете официанта
+          </p>
+        </div>
       </div>
 
       <div className="cabinet-card rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden">

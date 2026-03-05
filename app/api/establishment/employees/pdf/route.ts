@@ -27,6 +27,13 @@ function getOrigin(request: NextRequest): string {
   }
 }
 
+function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
+  const m = hex.match(/^#?([0-9A-Fa-f]{6})$/);
+  if (!m) return null;
+  const n = parseInt(m[1], 16);
+  return { r: (n >> 16) / 255, g: ((n >> 8) & 0xff) / 255, b: (n & 0xff) / 255 };
+}
+
 export async function GET(request: NextRequest) {
   const auth = await requireEstablishmentAdmin(request);
   if (auth.response) return auth.response;
@@ -35,11 +42,17 @@ export async function GET(request: NextRequest) {
   const baseUrl = getBaseUrlFromRequest(origin) || origin;
   const payBase = `${baseUrl.replace(/\/$/, "")}/pay`;
 
-  const employees = await db.employee.findMany({
-    where: { establishmentId: auth.establishmentId, isActive: true },
-    orderBy: { name: "asc" },
-    select: { id: true, name: true, position: true, qrCodeIdentifier: true },
-  });
+  const [employees, establishment] = await Promise.all([
+    db.employee.findMany({
+      where: { establishmentId: auth.establishmentId, isActive: true },
+      orderBy: { name: "asc" },
+      select: { id: true, name: true, position: true, qrCodeIdentifier: true },
+    }),
+    db.establishment.findUnique({
+      where: { id: auth.establishmentId },
+      select: { primaryColor: true },
+    }),
+  ]);
 
   if (employees.length === 0) {
     return NextResponse.json(
@@ -73,12 +86,15 @@ export async function GET(request: NextRequest) {
     const qrImage = await doc.embedPng(pngBytes);
     const qrSize = 56;
 
+    const borderRgb = establishment?.primaryColor ? hexToRgb(establishment.primaryColor) : null;
+    const borderColor = borderRgb ? rgb(borderRgb.r, borderRgb.g, borderRgb.b) : rgb(0.9, 0.9, 0.9);
+
     page.drawRectangle({
       x: x - 4,
       y: cardY - 4,
       width: CARD_WIDTH + 8,
       height: CARD_HEIGHT + 8,
-      borderColor: rgb(0.9, 0.9, 0.9),
+      borderColor,
       borderWidth: 0.5,
     });
 

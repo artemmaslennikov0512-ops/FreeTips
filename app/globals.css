@@ -510,6 +510,16 @@ html:not([data-theme="dark"]) .cabinet-premium #operations-history.cabinet-card 
   color: #64748b !important;
 }
 
+/* Тёмная тема: текст в полях ввода — белый */
+[data-theme="dark"] .cabinet-premium input,
+[data-theme="dark"] .cabinet-premium textarea {
+  color: #ffffff !important;
+}
+[data-theme="dark"] .cabinet-premium input::placeholder,
+[data-theme="dark"] .cabinet-premium textarea::placeholder {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+
 /* Чат поддержки: поле ввода на тёмном фоне — белый текст всегда */
 .cabinet-premium .support-chat-input {
   color: #fff !important;
@@ -656,6 +666,19 @@ html:not([data-theme="dark"]) .admin-panel select option {
 
 /* Светлая тема: заголовок страницы (h1) на тёмном градиенте основного блока — белым */
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-main-block #main-content > h1 {
+  color: #ffffff !important;
+}
+
+/* Светлая тема: все заголовки в основном блоке (ЛК заведения и др.) на тёмном фоне — белым (глобальный h1–h6 задаёт var(--color-navy)) */
+html:not([data-theme="dark"]) .cabinet-premium .cabinet-main-block h1,
+html:not([data-theme="dark"]) .cabinet-premium .cabinet-main-block h2,
+html:not([data-theme="dark"]) .cabinet-premium .cabinet-main-block h3,
+html:not([data-theme="dark"]) .cabinet-premium .cabinet-main-block h4 {
+  color: #ffffff !important;
+}
+
+/* Светлая тема: заголовок «Кабинет заведения» в сайдбаре на тёмном фоне — белым */
+html:not([data-theme="dark"]) .cabinet-premium .cabinet-sidebar .font-bold {
   color: #ffffff !important;
 }
 

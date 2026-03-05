@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
             birthDate: true,
             establishment: true,
             establishmentId: true,
-            establishmentRelation: { select: { name: true } },
+            establishmentRelation: { select: { name: true, logoUrl: true, primaryColor: true, secondaryColor: true } },
             apiKey: true,
             apiKeyHash: true,
             paygineSdRef: true,
@@ -137,6 +137,15 @@ export async function GET(request: NextRequest) {
       establishmentName:
         profile.establishmentRelation?.name != null
           ? String(profile.establishmentRelation.name)
+          : null,
+      /** Бренд заведения для ЛК официанта и целостного образа (лого, цвета) */
+      establishmentBrand:
+        profile.establishmentRelation != null
+          ? {
+              logoUrl: profile.establishmentRelation.logoUrl != null ? String(profile.establishmentRelation.logoUrl) : null,
+              primaryColor: profile.establishmentRelation.primaryColor != null ? String(profile.establishmentRelation.primaryColor) : null,
+              secondaryColor: profile.establishmentRelation.secondaryColor != null ? String(profile.establishmentRelation.secondaryColor) : null,
+            }
           : null,
       hasApiKey: !!(profile.apiKey ?? profile.apiKeyHash),
       stats: {

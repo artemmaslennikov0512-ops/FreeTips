@@ -309,7 +309,7 @@ export default function EstablishmentTeamPage() {
               {employees.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="p-6 text-center text-white/90">
-                    Нет сотрудников. Добавьте первого и выдайте ему ссылку для регистрации (1 токен = 1 официант).
+                    Нет сотрудников.
                   </td>
                 </tr>
               ) : (

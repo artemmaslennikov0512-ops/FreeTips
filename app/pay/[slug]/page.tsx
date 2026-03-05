@@ -22,6 +22,7 @@ export default function PayPage() {
 
   const [loading, setLoading] = useState(true);
   const [recipientName, setRecipientName] = useState<string | null>(null);
+  const [branding, setBranding] = useState<{ logoUrl?: string; primaryColor?: string; secondaryColor?: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const [amount, setAmount] = useState<number>(100);
@@ -53,8 +54,12 @@ export default function PayPage() {
           setError("Не удалось загрузить страницу");
           return;
         }
-        const data = (await res.json()) as { recipientName: string };
+        const data = (await res.json()) as {
+          recipientName: string;
+          branding?: { logoUrl?: string; primaryColor?: string; secondaryColor?: string };
+        };
         setRecipientName(data.recipientName);
+        setBranding(data.branding ?? null);
       } catch {
         setError("Ошибка соединения");
       } finally {
@@ -188,35 +193,49 @@ export default function PayPage() {
   const kop = amountKop();
   const rub = kop / 100;
 
+  const primary = branding?.primaryColor && /^#[0-9A-Fa-f]{6}$/i.test(branding.primaryColor) ? branding.primaryColor : undefined;
+  const secondary = branding?.secondaryColor && /^#[0-9A-Fa-f]{6}$/i.test(branding.secondaryColor) ? branding.secondaryColor : undefined;
+  const payBlockStyle =
+    primary || secondary
+      ? ({ "--pay-brand-primary": primary ?? "var(--color-brand-gold)", "--pay-brand-secondary": secondary ?? "var(--color-navy)" } as React.CSSProperties)
+      : undefined;
+
   return (
     <div className="mx-auto min-h-[60vh] max-w-md px-4 py-12">
-      <div className="pay-block relative rounded-2xl border border-[var(--color-brand-gold)]/50 bg-[var(--color-bg-sides)] p-6 shadow-[var(--shadow-card)]">
-        {/* Кнопка смены темы — левый верхний угол блока */}
+      <div
+        className="pay-block relative rounded-2xl border border-[var(--pay-brand-primary,var(--color-brand-gold))]/50 bg-[var(--color-bg-sides)] p-6 shadow-[var(--shadow-card)]"
+        style={payBlockStyle}
+      >
+        {/* Кнопка смены темы */}
         <div className="absolute right-4 top-4">
           <ThemeToggle />
         </div>
-        {/* Логотип по центру */}
+        {/* Логотип заведения или FreeTips */}
         <div className="flex justify-center">
           <div className="flex items-center gap-2">
-            <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--color-brand-gold)] text-sm font-bold text-[#0a192f]">FT</span>
+            {branding?.logoUrl ? (
+              <img src={branding.logoUrl} alt="" className="h-10 w-auto max-w-[120px] object-contain" />
+            ) : (
+              <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--pay-brand-primary,var(--color-brand-gold))] text-sm font-bold text-[#0a192f]">FT</span>
+            )}
             <span className="font-[family:var(--font-playfair)] text-xl font-bold text-[var(--color-text)]">
               <span className="text-[var(--color-navy)]">Free</span>
-              <span className="text-[var(--color-brand-gold)]">Tips</span>
+              <span className="text-[var(--pay-brand-primary,var(--color-brand-gold))]">Tips</span>
             </span>
           </div>
         </div>
 
         {/* Деловая визитка */}
-        <div className="pay-block-inner mt-4 rounded-xl border border-[var(--color-brand-gold)]/50 bg-[var(--color-light-gray)] p-4 text-center">
+        <div className="pay-block-inner mt-4 rounded-xl border border-[var(--pay-brand-primary,var(--color-brand-gold))]/50 bg-[var(--color-light-gray)] p-4 text-center">
           <div className="flex flex-col items-center justify-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--color-accent-gold)]/20 text-[var(--color-accent-gold)]">
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--pay-brand-primary,var(--color-accent-gold))]/20 text-[var(--pay-brand-primary,var(--color-accent-gold))]">
               <User className="h-4 w-4" />
             </div>
             <p className="min-w-0 truncate text-sm font-semibold text-[var(--color-text)]">{recipientName}</p>
           </div>
         </div>
 
-        <div className="pay-block-inner mt-6 flex flex-wrap justify-center gap-3 rounded-xl border border-[var(--color-brand-gold)]/50 bg-[var(--color-light-gray)]/50 p-3">
+        <div className="pay-block-inner mt-6 flex flex-wrap justify-center gap-3 rounded-xl border border-[var(--pay-brand-primary,var(--color-brand-gold))]/50 bg-[var(--color-light-gray)]/50 p-3">
           {PRESETS.map((r) => {
             const numCustom = customAmount.trim() ? Number(customAmount.replace(",", ".")) : null;
             const isSelected = (numCustom != null && !Number.isNaN(numCustom) && numCustom === r) || (numCustom == null && amount === r);
@@ -230,7 +249,7 @@ export default function PayPage() {
                 }}
                 className={`min-h-[44px] min-w-[44px] inline-flex flex-col items-center justify-center rounded-xl border px-4 py-2.5 text-sm font-medium transition-colors touch-manipulation sm:flex-row sm:gap-1 ${
                   isSelected
-                    ? "border-0 bg-[var(--color-accent-gold)]/10 text-[var(--color-text)]"
+                    ? "border-0 bg-[var(--pay-brand-primary,var(--color-accent-gold))]/10 text-[var(--color-text)]"
                     : "border-0 bg-[var(--color-light-gray)] text-[var(--color-text)] "
                 }`}
               >
@@ -249,7 +268,7 @@ export default function PayPage() {
             placeholder="100"
             value={customAmount}
             onChange={(e) => setCustomAmount(e.target.value)}
-            className="pay-block-inner w-full max-w-sm rounded-xl border border-[var(--color-brand-gold)]/50 bg-white px-4 py-2.5 text-center text-[#0a192f] placeholder:text-[var(--color-text-secondary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-brand-gold)]/40"
+            className="pay-block-inner w-full max-w-sm rounded-xl border border-[var(--pay-brand-primary,var(--color-brand-gold))]/50 bg-white px-4 py-2.5 text-center text-[#0a192f] placeholder:text-[var(--color-text-secondary)] focus:outline-none focus:ring-2 focus:ring-[var(--pay-brand-primary,var(--color-brand-gold))]/40"
             aria-label="Своя сумма в рублях"
           />
         </div>
@@ -262,7 +281,7 @@ export default function PayPage() {
             onChange={(e) => setComment(e.target.value)}
             maxLength={500}
             placeholder="Спасибо за отличный сервис!"
-            className="pay-block-inner w-full max-w-sm resize-none rounded-xl border border-[var(--color-brand-gold)]/50 bg-white px-4 py-2.5 text-center text-[#0a192f] placeholder:text-[var(--color-text-secondary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-brand-gold)]/40"
+            className="pay-block-inner w-full max-w-sm resize-none rounded-xl border border-[var(--pay-brand-primary,var(--color-brand-gold))]/50 bg-white px-4 py-2.5 text-center text-[#0a192f] placeholder:text-[var(--color-text-secondary)] focus:outline-none focus:ring-2 focus:ring-[var(--pay-brand-primary,var(--color-brand-gold))]/40"
             aria-label="Отзыв"
           />
         </div>
@@ -275,7 +294,7 @@ export default function PayPage() {
           type="button"
           onClick={handlePay}
           disabled={paying || kop < 100}
-          className="pay-btn-gold mt-6 w-full rounded-xl bg-[var(--color-brand-gold)] py-3 font-semibold text-[#0a192f] transition-colors hover:opacity-90 disabled:opacity-50"
+          className="pay-btn-gold mt-6 w-full rounded-xl bg-[var(--pay-brand-primary,var(--color-brand-gold))] py-3 font-semibold text-[#0a192f] transition-colors hover:opacity-90 disabled:opacity-50"
         >
           {paying ? (
             <span className="inline-flex items-center justify-center gap-2">

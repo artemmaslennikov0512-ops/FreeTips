@@ -28,7 +28,10 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
   const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [user, setUser] = useState<{ fullName?: string | null } | null>(null);
+  const [user, setUser] = useState<{
+    fullName?: string | null;
+    establishmentBrand?: { logoUrl: string | null; primaryColor: string | null; secondaryColor: string | null } | null;
+  } | null>(null);
   const [supportUnreadCount, setSupportUnreadCount] = useState(0);
 
   useEffect(() => setMounted(true), []);
@@ -63,7 +66,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
           router.replace("/change-password");
           return;
         }
-        if (data) setUser({ fullName: data.fullName });
+        if (data) setUser({ fullName: data.fullName, establishmentBrand: data.establishmentBrand ?? null });
       })
       .catch(() => {});
   }, [mounted, router]);
@@ -129,8 +132,16 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
     .toUpperCase()
     .slice(0, 2);
 
+  const brandPrimary = user?.establishmentBrand?.primaryColor && /^#[0-9A-Fa-f]{6}$/i.test(user.establishmentBrand.primaryColor)
+    ? user.establishmentBrand.primaryColor
+    : undefined;
+  const brandStyle = brandPrimary ? { ["--color-brand-gold" as string]: brandPrimary } as React.CSSProperties : undefined;
+
   return (
-    <div className="cabinet-premium flex min-h-screen w-full max-w-full overflow-x-hidden bg-[var(--color-bg)] font-[family:var(--font-inter)] text-[var(--color-text)] pt-4">
+    <div
+      className="cabinet-premium flex min-h-screen w-full max-w-full overflow-x-hidden bg-[var(--color-bg)] font-[family:var(--font-inter)] text-[var(--color-text)] pt-4"
+      style={brandStyle}
+    >
       {/* Шторка — стиль как на блоке: тёмное стекло, размытие, тонкая светлая обводка */}
       <div
         className={`cabinet-overlay fixed inset-0 z-30 rounded-xl border border-white/[0.12] bg-[rgba(15,23,42,0.65)] backdrop-blur-xl lg:hidden ml-4 mr-4 mt-4 mb-4 ${sidebarOpen ? "block" : "hidden"}`}
@@ -144,6 +155,11 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
           sidebarOpen ? "translate-x-0" : "-translate-x-[calc(100%+1rem)]"
         }`}
       >
+        {user?.establishmentBrand?.logoUrl && (
+          <div className="mx-4 mb-3 flex justify-center">
+            <img src={user.establishmentBrand.logoUrl} alt="" className="h-8 w-auto max-w-[140px] object-contain opacity-95" />
+          </div>
+        )}
         <div className="cabinet-sidebar-profile cabinet-block-inner mx-4 rounded-xl border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-4 py-3">
           <div className="flex items-center gap-3">
             <div className="cabinet-sidebar-avatar flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--color-brand-gold)] font-semibold text-[#0a192f] text-sm">

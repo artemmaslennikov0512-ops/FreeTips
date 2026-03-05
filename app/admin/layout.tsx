@@ -26,6 +26,7 @@ interface User {
 
 const NAV = [
   { label: "Дашборд", href: "/admin/dashboard", icon: LayoutDashboard },
+  { label: "Заведения", href: "/admin/establishments", icon: Building2 },
   { label: "Выводы", href: "/admin/payouts", icon: Send },
   { label: "Пользователи", href: "/admin/users", icon: Users },
   { label: "Поддержка", href: "/admin/support", icon: MessageCircle },

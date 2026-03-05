@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { User, Lock, ArrowRight } from "lucide-react";
+import { User, Lock, ArrowRight, Building2 } from "lucide-react";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { AuthPageShell } from "@/components/AuthPageShell";
 import { loginRequestSchema } from "@/lib/validations";
@@ -11,7 +11,7 @@ import { getFieldErrors } from "@/lib/form-errors";
 import { AUTH_CARD_CLASS, AUTH_INPUT_CLASS, AUTH_ERROR_BORDER, AUTH_BTN_PRIMARY } from "@/lib/auth-form-classes";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 
-export default function LoginPage() {
+export default function LoginEstablishmentPage() {
   const router = useRouter();
   const [checkingAuth, setCheckingAuth] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -30,12 +30,19 @@ export default function LoginPage() {
     }
     fetch("/api/profile", { headers: { Authorization: `Bearer ${token}` } })
       .then((res) => {
-        if (res.ok) {
-          router.replace("/cabinet");
+        if (!res.ok) {
+          if (res.status === 401) localStorage.removeItem("accessToken");
+          setCheckingAuth(false);
           return;
         }
-        if (res.status === 401) localStorage.removeItem("accessToken");
-        setCheckingAuth(false);
+        return res.json();
+      })
+      .then((data) => {
+        if (data?.role === "ESTABLISHMENT_ADMIN" && data?.establishmentId) {
+          router.replace("/establishment");
+        } else {
+          setCheckingAuth(false);
+        }
       })
       .catch(() => setCheckingAuth(false));
   }, [router]);
@@ -64,19 +71,23 @@ export default function LoginPage() {
 
       if (!res.ok) {
         setError(data.error || "Ошибка при входе");
+        setLoading(false);
         return;
       }
 
-      if (data.accessToken) {
+      if (data.accessToken && data.user) {
+        if (data.user.role !== "ESTABLISHMENT_ADMIN") {
+          setError(
+            "Этот аккаунт не является управляющим заведением. Используйте обычную страницу входа.",
+          );
+          setLoading(false);
+          return;
+        }
         localStorage.setItem("accessToken", data.accessToken);
         if (data.mustChangePassword) {
           router.push("/change-password");
-        } else if (data.user?.role === "ADMIN" || data.user?.role === "SUPERADMIN") {
-          router.push("/admin/dashboard");
-        } else if (data.user?.role === "ESTABLISHMENT_ADMIN") {
-          router.push("/establishment");
         } else {
-          router.push("/cabinet");
+          router.push("/establishment");
         }
       }
     } catch {
@@ -100,13 +111,18 @@ export default function LoginPage() {
     <AuthPageShell>
       <div className="mx-auto flex min-h-[80vh] max-w-md flex-col justify-center px-4 py-16">
         <div className={AUTH_CARD_CLASS}>
-          <h1 className="font-[family:var(--font-playfair)] text-2xl font-semibold text-[var(--color-text)]">Вход</h1>
+          <div className="flex items-center gap-2">
+            <Building2 className="h-7 w-7 text-[var(--color-accent-gold)]" />
+            <h1 className="font-[family:var(--font-playfair)] text-2xl font-semibold text-[var(--color-text)]">
+              Вход для управляющего заведением
+            </h1>
+          </div>
           <p className="mt-2 text-[var(--color-text-secondary)]">
-            Войдите в личный кабинет для управления чаевыми
+            Введите логин и пароль, выданные при подключении заведения
           </p>
 
           {error && (
-            <div className="mt-4 rounded-xl border-0 bg-[var(--color-muted)]/10 p-3 text-sm text-[var(--color-text-secondary)]">
+            <div className="mt-4 rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 text-sm text-amber-200">
               {error}
             </div>
           )}
@@ -124,12 +140,14 @@ export default function LoginPage() {
                   autoComplete="username"
                   value={formData.login}
                   onChange={(e) => setFormData({ ...formData, login: e.target.value })}
-                  placeholder="Ваш логин"
+                  placeholder="Логин управляющего"
                   className={`${AUTH_INPUT_CLASS} ${fieldErrors.login ? AUTH_ERROR_BORDER : ""}`}
                 />
               </div>
               {fieldErrors.login && (
-                <p className="mt-1 text-xs text-[var(--color-text-secondary)]" role="alert">{fieldErrors.login}</p>
+                <p className="mt-1 text-xs text-[var(--color-text-secondary)]" role="alert">
+                  {fieldErrors.login}
+                </p>
               )}
             </div>
 
@@ -145,12 +163,14 @@ export default function LoginPage() {
                   autoComplete="current-password"
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  placeholder="Введите пароль"
+                  placeholder="Пароль"
                   className={`${AUTH_INPUT_CLASS} ${fieldErrors.password ? AUTH_ERROR_BORDER : ""}`}
                 />
               </div>
               {fieldErrors.password && (
-                <p className="mt-1 text-xs text-[var(--color-text-secondary)]" role="alert">{fieldErrors.password}</p>
+                <p className="mt-1 text-xs text-[var(--color-text-secondary)]" role="alert">
+                  {fieldErrors.password}
+                </p>
               )}
               <Link
                 href="/forgot-password"
@@ -163,29 +183,26 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className={`${AUTH_BTN_PRIMARY} flex items-center justify-center gap-2`}
+              className={`${AUTH_BTN_PRIMARY} flex w-full items-center justify-center gap-2`}
             >
-              {loading ? "Вход..." : (
+              {loading ? (
+                "Вход…"
+              ) : (
                 <>
-                  Войти
+                  Войти в кабинет заведения
                   <ArrowRight className="h-4 w-4" />
                 </>
               )}
             </button>
           </form>
 
-          <div className="mt-6 space-y-2 text-center text-sm text-[var(--color-text-secondary)]">
-            <p>
-              Нет аккаунта?{" "}
-              <Link href="/zayavka" className="font-medium text-[var(--color-accent-gold)] hover:opacity-90 hover:underline transition-colors">
-                Оставить заявку
-              </Link>
-            </p>
-            <p>
-              <Link href="/login/establishment" className="font-medium text-[var(--color-accent-gold)] hover:opacity-90 hover:underline transition-colors">
-                Вход для управляющего заведением →
-              </Link>
-            </p>
+          <div className="mt-6 border-t border-white/10 pt-6 text-center text-sm text-[var(--color-text-secondary)]">
+            <Link
+              href="/login"
+              className="font-medium text-[var(--color-accent-gold)] hover:opacity-90 hover:underline transition-colors"
+            >
+              ← Вход в личный кабинет
+            </Link>
           </div>
 
           <Link

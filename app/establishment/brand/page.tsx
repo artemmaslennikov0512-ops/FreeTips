@@ -69,17 +69,17 @@ export default function EstablishmentBrandPage() {
   };
 
   if (loading) {
-    return <div className="text-[var(--color-text-secondary)]">Загрузка…</div>;
+    return <div className="text-white/90">Загрузка…</div>;
   }
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <div>
-        <h1 className="font-[family:var(--font-playfair)] text-xl font-semibold text-[var(--color-text)] flex items-center gap-2">
+        <h1 className="font-[family:var(--font-playfair)] text-xl font-semibold text-white flex items-center gap-2">
           <Palette className="h-5 w-5" />
           Бренд заведения
         </h1>
-        <p className="text-[var(--color-text-secondary)] text-sm mt-1">
+        <p className="text-white/90 text-sm mt-1">
           Логотип и цвета отображаются на странице оплаты чаевых (по QR сотрудников).
         </p>
       </div>
@@ -92,17 +92,17 @@ export default function EstablishmentBrandPage() {
             </p>
           )}
           <div>
-            <label className="block text-sm text-[var(--color-text-secondary)] mb-1">URL логотипа</label>
+            <label className="block text-sm text-white/90 mb-1">URL логотипа</label>
             <input
               type="url"
               value={logoUrl}
               onChange={(e) => setLogoUrl(e.target.value)}
               placeholder="https://..."
-              className="cabinet-input-window w-full rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-[var(--color-text)] placeholder:text-[var(--color-text-secondary)]/70 focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-gold)]/40"
+              className="cabinet-input-window w-full rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-white placeholder:text-white/50 focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-gold)]/40"
             />
           </div>
           <div>
-            <label className="block text-sm text-[var(--color-text-secondary)] mb-1">Основной цвет (hex)</label>
+            <label className="block text-sm text-white/90 mb-1">Основной цвет (hex)</label>
             <div className="flex gap-2 items-center">
               <input
                 type="color"
@@ -115,12 +115,12 @@ export default function EstablishmentBrandPage() {
                 value={primaryColor}
                 onChange={(e) => setPrimaryColor(e.target.value)}
                 placeholder="#c9a227"
-                className="cabinet-input-window flex-1 rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-[var(--color-text)] placeholder:text-[var(--color-text-secondary)]/70 focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-gold)]/40"
+                className="cabinet-input-window flex-1 rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-white placeholder:text-white/50 focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-gold)]/40"
               />
             </div>
           </div>
           <div>
-            <label className="block text-sm text-[var(--color-text-secondary)] mb-1">Доп. цвет (hex)</label>
+            <label className="block text-sm text-white/90 mb-1">Доп. цвет (hex)</label>
             <div className="flex gap-2 items-center">
               <input
                 type="color"
@@ -133,7 +133,7 @@ export default function EstablishmentBrandPage() {
                 value={secondaryColor}
                 onChange={(e) => setSecondaryColor(e.target.value)}
                 placeholder="#0a192f"
-                className="cabinet-input-window flex-1 rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-[var(--color-text)] placeholder:text-[var(--color-text-secondary)]/70 focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-gold)]/40"
+                className="cabinet-input-window flex-1 rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-white placeholder:text-white/50 focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-gold)]/40"
               />
             </div>
           </div>

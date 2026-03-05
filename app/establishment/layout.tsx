@@ -106,8 +106,8 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
 
   if (loadError) {
     return (
-      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 px-4 text-[var(--color-text)]">
-        <p className="text-center text-[var(--color-text-secondary)]">{loadError}</p>
+      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 px-4 text-white">
+        <p className="text-center text-white/90">{loadError}</p>
         <button
           type="button"
           onClick={() => {
@@ -131,10 +131,10 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
   const navIcons = [LayoutDashboard, Users, PieChart, BarChart3, Palette] as const;
 
   return (
-    <div className="establishment-panel cabinet-premium flex min-h-screen w-full min-w-0 max-w-full overflow-x-hidden bg-[var(--color-bg)] font-[family:var(--font-inter)] text-[var(--color-text)] pt-4">
+    <div className="establishment-panel cabinet-premium flex min-h-screen w-full min-w-0 max-w-full overflow-x-hidden bg-[var(--color-bg)] font-[family:var(--font-inter)] text-white pt-4">
       <aside className="cabinet-sidebar fixed left-4 top-4 z-40 flex h-auto max-h-[calc(100vh-2rem)] w-[260px] shrink-0 flex-col overflow-hidden rounded-2xl border border-white/10 bg-white/[0.06] py-6 shadow-sm backdrop-blur-xl lg:static lg:ml-4 lg:mt-4 lg:max-h-none lg:self-start">
         <div className="px-4 mb-6">
-          <span className="font-[family:var(--font-playfair)] font-bold text-[var(--color-text)]">
+          <span className="font-[family:var(--font-playfair)] font-bold text-white">
             Кабинет заведения
           </span>
         </div>
@@ -148,7 +148,7 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
                 className={`flex items-center gap-3 rounded-[10px] px-4 py-3.5 font-medium transition-colors ${
                   isActive(href)
                     ? "cabinet-nav-active border border-[#0a192f]/35 bg-[#0a192f]/12 text-[#0a192f] font-semibold"
-                    : "border border-transparent text-[var(--color-text)]/80 hover:bg-[var(--color-dark-gray)]/10 hover:text-[var(--color-text)]"
+                    : "border border-transparent text-white/80 hover:bg-[var(--color-dark-gray)]/10 hover:text-white"
                 }`}
               >
                 <Icon className="h-5 w-5 shrink-0" />
@@ -158,22 +158,22 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
           })}
           <Link
             href="/cabinet"
-            className="mt-2 flex items-center gap-3 rounded-[10px] px-4 py-3.5 font-medium text-[var(--color-text)]/80 transition-colors hover:bg-[var(--color-dark-gray)]/10 hover:text-[var(--color-text)]"
+            className="mt-2 flex items-center gap-3 rounded-[10px] px-4 py-3.5 font-medium text-white/80 transition-colors hover:bg-[var(--color-dark-gray)]/10 hover:text-white"
           >
             Личный кабинет
           </Link>
           <button
             type="button"
             onClick={handleLogout}
-            className="mt-2 flex w-full items-center gap-3 rounded-[10px] px-4 py-3.5 font-medium text-[var(--color-text)]/80 transition-colors hover:bg-[var(--color-dark-gray)]/10 hover:text-[var(--color-text)]"
+            className="mt-2 flex w-full items-center gap-3 rounded-[10px] px-4 py-3.5 font-medium text-white/80 transition-colors hover:bg-[var(--color-dark-gray)]/10 hover:text-white"
           >
             <LogOut className="h-5 w-5 shrink-0" />
             <span>Выйти</span>
           </button>
         </nav>
       </aside>
-      <main className="min-h-screen min-w-0 flex-1 overflow-x-hidden lg:ml-0 flex flex-col">
-        <div className="cabinet-main-block mt-4 mr-0 mb-4 ml-4 lg:mr-4 lg:ml-4 flex min-h-[calc(100vh-2rem)] flex-1 flex-col rounded-2xl border border-white/10 bg-white/[0.06] backdrop-blur-xl">
+      <main className="min-w-0 flex-1 overflow-x-hidden lg:ml-0 flex flex-col">
+        <div className="cabinet-main-block mt-4 mr-0 mb-4 ml-4 lg:mr-4 lg:ml-4 flex flex-col rounded-2xl border border-white/10 bg-white/[0.06] backdrop-blur-xl">
           <div className="p-6 lg:p-8">
             {children}
           </div>

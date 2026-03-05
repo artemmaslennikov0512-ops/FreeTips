@@ -120,7 +120,7 @@ export default function PayoutRulesPage() {
   };
 
   if (loading) {
-    return <div className="text-[var(--color-text-secondary)]">Загрузка…</div>;
+    return <div className="text-white/90">Загрузка…</div>;
   }
 
   if (error) {
@@ -132,10 +132,10 @@ export default function PayoutRulesPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <div>
-        <h1 className="font-[family:var(--font-playfair)] text-xl font-semibold text-[var(--color-text)]">
+        <h1 className="font-[family:var(--font-playfair)] text-xl font-semibold text-white">
           Правила распределения
         </h1>
-        <p className="text-[var(--color-text-secondary)] text-sm mt-1">
+        <p className="text-white/90 text-sm mt-1">
           Доля заведения (процент, остающийся у заведения) и при необходимости — процент в фонд. Остаток пула распределяется между сотрудниками по коэффициентам (настраиваются в разделе «Команда»).
         </p>
       </div>
@@ -143,7 +143,7 @@ export default function PayoutRulesPage() {
       {showForm && (
         <div className="cabinet-card rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden">
           <form onSubmit={handleSubmit} className="p-6 space-y-4">
-            <h2 className="text-lg font-medium text-[var(--color-text)]">
+            <h2 className="text-lg font-medium text-white">
               {editingId ? "Редактировать правило" : "Новое правило"}
             </h2>
             {formError && (
@@ -151,13 +151,13 @@ export default function PayoutRulesPage() {
             )}
             {!editingId && (
               <div>
-                <label className="block text-sm text-[var(--color-text-secondary)] mb-1">Тип</label>
+                <label className="block text-sm text-white/90 mb-1">Тип</label>
                 <select
                   value={formType}
                   onChange={(e) =>
                     setFormType(e.target.value as "establishment_share" | "charity")
                   }
-                  className="cabinet-input-window w-full rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-[var(--color-text)] focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-gold)]/40"
+                  className="cabinet-input-window w-full rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-white focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-gold)]/40"
                 >
                   <option value="establishment_share">Доля заведения</option>
                   <option value="charity">В фонд / благотворительность</option>
@@ -165,24 +165,24 @@ export default function PayoutRulesPage() {
               </div>
             )}
             <div>
-              <label className="block text-sm text-[var(--color-text-secondary)] mb-1">Название</label>
+              <label className="block text-sm text-white/90 mb-1">Название</label>
               <input
                 type="text"
                 value={formName}
                 onChange={(e) => setFormName(e.target.value)}
                 placeholder={TYPE_LABELS[formType]}
-                className="cabinet-input-window w-full rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-[var(--color-text)] placeholder:text-[var(--color-text-secondary)]/70 focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-gold)]/40"
+                className="cabinet-input-window w-full rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-white placeholder:text-white/50 focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-gold)]/40"
               />
             </div>
             <div>
-              <label className="block text-sm text-[var(--color-text-secondary)] mb-1">Процент (0–100)</label>
+              <label className="block text-sm text-white/90 mb-1">Процент (0–100)</label>
               <input
                 type="text"
                 inputMode="decimal"
                 value={formValue}
                 onChange={(e) => setFormValue(e.target.value)}
                 placeholder="15"
-                className="cabinet-input-window w-full rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-[var(--color-text)] placeholder:text-[var(--color-text-secondary)]/70 focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-gold)]/40"
+                className="cabinet-input-window w-full rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-white placeholder:text-white/50 focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-gold)]/40"
               />
             </div>
             <div className="flex gap-2">
@@ -201,7 +201,7 @@ export default function PayoutRulesPage() {
                   setFormName("");
                   setFormValue("");
                 }}
-                className="rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-4 py-2 font-medium text-[var(--color-text)] hover:bg-[var(--color-dark-gray)]/20"
+                className="rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-4 py-2 font-medium text-white hover:bg-[var(--color-dark-gray)]/20"
               >
                 Отмена
               </button>
@@ -212,7 +212,7 @@ export default function PayoutRulesPage() {
 
       <div className="cabinet-card rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden">
         <div className="flex items-center justify-between p-4 border-b border-[var(--color-dark-gray)]/20">
-          <span className="font-medium text-[var(--color-text)]">Правила</span>
+          <span className="font-medium text-white">Правила</span>
           {!showForm && (
             <button
               type="button"
@@ -225,7 +225,7 @@ export default function PayoutRulesPage() {
           )}
         </div>
         {rules.length === 0 ? (
-          <div className="p-6 text-center text-[var(--color-text-secondary)]">
+          <div className="p-6 text-center text-white/90">
             Нет правил. Добавьте правило «Доля заведения» (например 10–20%), чтобы заведение получало процент от пула чаевых. Остаток распределяется между сотрудниками по коэффициентам.
           </div>
         ) : (
@@ -236,8 +236,8 @@ export default function PayoutRulesPage() {
                 className="flex items-center justify-between gap-4 p-4"
               >
                 <div>
-                  <p className="font-medium text-[var(--color-text)]">{r.name}</p>
-                  <p className="text-sm text-[var(--color-text-secondary)]">
+                  <p className="font-medium text-white">{r.name}</p>
+                  <p className="text-sm text-white/90">
                     {TYPE_LABELS[r.type] ?? r.type} · {r.value}%
                   </p>
                 </div>
@@ -245,7 +245,7 @@ export default function PayoutRulesPage() {
                   <button
                     type="button"
                     onClick={() => handleEdit(r)}
-                    className="rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 p-2 text-[var(--color-text)] hover:bg-[var(--color-dark-gray)]/20"
+                    className="rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 p-2 text-white hover:bg-[var(--color-dark-gray)]/20"
                     title="Редактировать"
                   >
                     <Pencil className="h-4 w-4" />

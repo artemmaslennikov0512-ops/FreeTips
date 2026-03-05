@@ -110,10 +110,10 @@ export default function LoginEstablishmentPage() {
   return (
     <AuthPageShell>
       <div className="mx-auto flex min-h-[80vh] max-w-md flex-col justify-center px-4 py-16">
-        <div className={AUTH_CARD_CLASS}>
-          <div className="flex items-center gap-2">
-            <Building2 className="h-7 w-7 text-[var(--color-accent-gold)]" />
-            <h1 className="font-[family:var(--font-playfair)] text-2xl font-semibold text-[var(--color-text)]">
+        <div className={`${AUTH_CARD_CLASS} pt-10`}>
+          <div className="flex items-center gap-2 pt-1">
+            <Building2 className="h-7 w-7 shrink-0 text-[var(--color-accent-gold)]" />
+            <h1 className="font-[family:var(--font-playfair)] text-2xl font-semibold leading-tight text-[var(--color-text)]">
               Вход для управляющего заведением
             </h1>
           </div>

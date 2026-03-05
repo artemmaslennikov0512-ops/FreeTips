@@ -72,20 +72,20 @@ export default function AnalyticsPage() {
   );
 
   if (loading && !stats) {
-    return <div className="text-[var(--color-text-secondary)]">Загрузка…</div>;
+    return <div className="text-white/90">Загрузка…</div>;
   }
 
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="font-[family:var(--font-playfair)] text-xl font-semibold text-[var(--color-text)]">
+        <h1 className="font-[family:var(--font-playfair)] text-xl font-semibold text-white">
           Аналитика
         </h1>
         <div className="flex items-center gap-2">
           <select
             value={period}
             onChange={(e) => setPeriod(e.target.value as "7d" | "30d")}
-            className="cabinet-input-window rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-[var(--color-text)] focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-gold)]/40"
+            className="cabinet-input-window rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-white focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-gold)]/40"
           >
             <option value="7d">За 7 дней</option>
             <option value="30d">За 30 дней</option>
@@ -106,14 +106,14 @@ export default function AnalyticsPage() {
         <>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="cabinet-block-inner rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 p-5">
-              <p className="text-sm text-[var(--color-text-secondary)]">Всего чаевых за период</p>
-              <p className="text-2xl font-semibold text-[var(--color-text)]">
+              <p className="text-sm text-white/90">Всего чаевых за период</p>
+              <p className="text-2xl font-semibold text-white">
                 {(stats.totalTipsKop / 100).toFixed(2)} ₽
               </p>
             </div>
             <div className="cabinet-block-inner rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 p-5">
-              <p className="text-sm text-[var(--color-text-secondary)]">Количество транзакций</p>
-              <p className="text-2xl font-semibold text-[var(--color-text)]">
+              <p className="text-sm text-white/90">Количество транзакций</p>
+              <p className="text-2xl font-semibold text-white">
                 {stats.transactionsCount}
               </p>
             </div>
@@ -121,14 +121,14 @@ export default function AnalyticsPage() {
 
           <div className="cabinet-card rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden">
             <div className="p-5">
-              <h2 className="text-lg font-medium text-[var(--color-text)] mb-4">По дням</h2>
+              <h2 className="text-lg font-medium text-white mb-4">По дням</h2>
               {stats.byDay.length === 0 ? (
-                <p className="text-[var(--color-text-secondary)]">Нет данных за выбранный период.</p>
+                <p className="text-white/90">Нет данных за выбранный период.</p>
               ) : (
                 <div className="space-y-3">
                   {stats.byDay.map((d) => (
                     <div key={d.date} className="flex items-center gap-4">
-                      <span className="w-28 text-sm text-[var(--color-text-secondary)] shrink-0">
+                      <span className="w-28 text-sm text-white/90 shrink-0">
                         {formatDate(d.date)}
                       </span>
                       <div className="flex-1 h-6 rounded bg-[var(--color-dark-gray)]/20 overflow-hidden">
@@ -139,7 +139,7 @@ export default function AnalyticsPage() {
                           }}
                         />
                       </div>
-                      <span className="w-24 text-right text-sm font-medium text-[var(--color-text)] shrink-0">
+                      <span className="w-24 text-right text-sm font-medium text-white shrink-0">
                         {(d.amountKop / 100).toFixed(2)} ₽
                       </span>
                     </div>

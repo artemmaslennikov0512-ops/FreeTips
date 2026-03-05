@@ -197,7 +197,7 @@ export default function EstablishmentTeamPage() {
     (info.maxEmployeesCount == null || info.employeesCount < info.maxEmployeesCount);
 
   if (loading) {
-    return <div className="text-[var(--color-text-secondary)]">Загрузка…</div>;
+    return <div className="text-white/90">Загрузка…</div>;
   }
 
   if (error || !info) {
@@ -211,7 +211,7 @@ export default function EstablishmentTeamPage() {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="font-[family:var(--font-playfair)] text-xl font-semibold text-[var(--color-text)]">
+        <h1 className="font-[family:var(--font-playfair)] text-xl font-semibold text-white">
           Команда
         </h1>
         <div className="flex flex-wrap items-center gap-2">
@@ -219,7 +219,7 @@ export default function EstablishmentTeamPage() {
             type="button"
             onClick={downloadPdf}
             disabled={downloadingPdf || employees.filter((e) => e.isActive).length === 0}
-            className="inline-flex items-center gap-2 rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-4 py-2.5 font-medium text-[var(--color-text)] hover:bg-[var(--color-dark-gray)]/20 disabled:opacity-50"
+            className="inline-flex items-center gap-2 rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-4 py-2.5 font-medium text-white hover:bg-[var(--color-dark-gray)]/20 disabled:opacity-50"
           >
             <FileDown className={`h-5 w-5 ${downloadingPdf ? "animate-pulse" : ""}`} />
             {downloadingPdf ? "Скачивание…" : "Скачать PDF с QR"}
@@ -237,7 +237,7 @@ export default function EstablishmentTeamPage() {
         </div>
       </div>
 
-      <p className="text-[var(--color-text-secondary)] text-sm">
+      <p className="text-white/90 text-sm">
         Сотрудников: {info.employeesCount}
         {info.maxEmployeesCount != null && ` из ${info.maxEmployeesCount}`}.
         {!canAdd && info.maxEmployeesCount != null && (
@@ -250,25 +250,25 @@ export default function EstablishmentTeamPage() {
       {showForm && (
         <div className="cabinet-card rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden">
           <form onSubmit={handleAddEmployee} className="p-6 space-y-4">
-            <h2 className="text-lg font-medium text-[var(--color-text)]">Новый сотрудник</h2>
+            <h2 className="text-lg font-medium text-white">Новый сотрудник</h2>
             {formError && <p className="text-sm text-[var(--color-accent-red)]">{formError}</p>}
             <div>
-              <label className="block text-sm text-[var(--color-text-secondary)] mb-1">Имя *</label>
+              <label className="block text-sm text-white/90 mb-1">Имя *</label>
               <input
                 type="text"
                 required
                 value={formName}
                 onChange={(e) => setFormName(e.target.value)}
-                className="cabinet-input-window w-full rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-[var(--color-text)] placeholder:text-[var(--color-text-secondary)]/70 focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-gold)]/40"
+                className="cabinet-input-window w-full rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-white placeholder:text-white/50 focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-gold)]/40"
               />
             </div>
             <div>
-              <label className="block text-sm text-[var(--color-text-secondary)] mb-1">Должность</label>
+              <label className="block text-sm text-white/90 mb-1">Должность</label>
               <input
                 type="text"
                 value={formPosition}
                 onChange={(e) => setFormPosition(e.target.value)}
-                className="cabinet-input-window w-full rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-[var(--color-text)] placeholder:text-[var(--color-text-secondary)]/70 focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-gold)]/40"
+                className="cabinet-input-window w-full rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-white placeholder:text-white/50 focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-gold)]/40"
               />
             </div>
             <div className="flex gap-2">
@@ -282,7 +282,7 @@ export default function EstablishmentTeamPage() {
               <button
                 type="button"
                 onClick={() => setShowForm(false)}
-                className="rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-4 py-2 font-medium text-[var(--color-text)] hover:bg-[var(--color-dark-gray)]/20"
+                className="rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-4 py-2 font-medium text-white hover:bg-[var(--color-dark-gray)]/20"
               >
                 Отмена
               </button>
@@ -296,19 +296,19 @@ export default function EstablishmentTeamPage() {
           <table className="w-full text-left">
             <thead>
               <tr className="border-b border-[var(--color-dark-gray)]/20">
-                <th className="p-3 font-medium text-[var(--color-text)]">Имя</th>
-                <th className="p-3 font-medium text-[var(--color-text)]">Должность</th>
-                <th className="p-3 font-medium text-[var(--color-text)]">Коэфф.</th>
-                <th className="p-3 font-medium text-[var(--color-text)]">Рейтинг</th>
-                <th className="p-3 font-medium text-[var(--color-text)]">Статус</th>
-                <th className="p-3 font-medium text-[var(--color-text)]">Привязан к аккаунту</th>
-                <th className="p-3 font-medium text-[var(--color-text)]">Ссылка для регистрации</th>
+                <th className="p-3 font-medium text-white">Имя</th>
+                <th className="p-3 font-medium text-white">Должность</th>
+                <th className="p-3 font-medium text-white">Коэфф.</th>
+                <th className="p-3 font-medium text-white">Рейтинг</th>
+                <th className="p-3 font-medium text-white">Статус</th>
+                <th className="p-3 font-medium text-white">Привязан к аккаунту</th>
+                <th className="p-3 font-medium text-white">Ссылка для регистрации</th>
               </tr>
             </thead>
             <tbody>
               {employees.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="p-6 text-center text-[var(--color-text-secondary)]">
+                  <td colSpan={7} className="p-6 text-center text-white/90">
                     Нет сотрудников. Добавьте первого и выдайте ему ссылку для регистрации (1 токен = 1 официант).
                   </td>
                 </tr>
@@ -318,39 +318,39 @@ export default function EstablishmentTeamPage() {
                     key={emp.id}
                     className={`border-b border-[var(--color-dark-gray)]/10 ${!emp.isActive ? "opacity-70" : ""}`}
                   >
-                    <td className="p-3 text-[var(--color-text)]">{emp.name}</td>
-                    <td className="p-3 text-[var(--color-text-secondary)]">{emp.position || "—"}</td>
-                    <td className="p-3 text-[var(--color-text-secondary)]">{emp.coefficient}</td>
-                    <td className="p-3 text-[var(--color-text-secondary)]">
+                    <td className="p-3 text-white">{emp.name}</td>
+                    <td className="p-3 text-white/90">{emp.position || "—"}</td>
+                    <td className="p-3 text-white/90">{emp.coefficient}</td>
+                    <td className="p-3 text-white/90">
                       {emp.reviewsCount > 0
                         ? `${emp.avgRating ?? "—"} (${emp.reviewsCount})`
                         : "—"}
                     </td>
                     <td className="p-3">
-                      <span className={`text-xs ${emp.isActive ? "text-[var(--color-accent-emerald)]" : "text-[var(--color-text-secondary)]"}`}>
+                      <span className={`text-xs ${emp.isActive ? "text-[var(--color-accent-emerald)]" : "text-white/80"}`}>
                         {emp.isActive ? "Активен" : "Неактивен"}
                       </span>
                       <button
                         type="button"
                         onClick={() => toggleActive(emp)}
                         disabled={togglingId === emp.id}
-                        className="ml-2 rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-2 py-1 text-xs text-[var(--color-text)] hover:bg-[var(--color-dark-gray)]/20 disabled:opacity-50"
+                        className="ml-2 rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-2 py-1 text-xs text-white hover:bg-[var(--color-dark-gray)]/20 disabled:opacity-50"
                       >
                         {togglingId === emp.id ? "…" : emp.isActive ? "Деактивировать" : "Активировать"}
                       </button>
                     </td>
-                    <td className="p-3 text-[var(--color-text-secondary)]">
+                    <td className="p-3 text-white/90">
                       {emp.hasUser ? "Да" : "Нет"}
                     </td>
                     <td className="p-3">
                       {emp.hasUser ? (
-                        <span className="text-[var(--color-text-secondary)] text-sm">Уже зарегистрирован</span>
+                        <span className="text-white/90 text-sm">Уже зарегистрирован</span>
                       ) : linkByEmpId[emp.id] ? (
                         <div className="flex flex-wrap items-center gap-2">
                           <button
                             type="button"
                             onClick={() => copyLink(linkByEmpId[emp.id])}
-                            className="inline-flex items-center gap-1 rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-2 py-1.5 text-xs text-[var(--color-text)] hover:bg-[var(--color-dark-gray)]/20"
+                            className="inline-flex items-center gap-1 rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-2 py-1.5 text-xs text-white hover:bg-[var(--color-dark-gray)]/20"
                           >
                             <Copy className="h-3 w-3" /> Копировать
                           </button>
@@ -358,7 +358,7 @@ export default function EstablishmentTeamPage() {
                             type="button"
                             onClick={() => getOrRegenerateToken(emp.id)}
                             disabled={loadingTokenId === emp.id}
-                            className="inline-flex items-center gap-1 rounded-lg bg-[var(--color-brand-gold)]/20 px-2 py-1.5 text-xs text-[var(--color-text)] hover:bg-[var(--color-brand-gold)]/30 disabled:opacity-50"
+                            className="inline-flex items-center gap-1 rounded-lg bg-[var(--color-brand-gold)]/20 px-2 py-1.5 text-xs text-white hover:bg-[var(--color-brand-gold)]/30 disabled:opacity-50"
                           >
                             <RefreshCw
                               className={`h-3 w-3 ${loadingTokenId === emp.id ? "animate-spin" : ""}`}
@@ -380,8 +380,8 @@ export default function EstablishmentTeamPage() {
                             type="button"
                             onClick={() => inviteByEmail(emp.id)}
                             disabled={invitingId === emp.id}
-                            className="inline-flex items-center gap-1 rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-2 py-1.5 text-xs text-[var(--color-text)] hover:bg-[var(--color-dark-gray)]/20 disabled:opacity-50"
-                            title="Пригласить по email"
+                            className="inline-flex items-center gap-1 rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-2 py-1.5 text-xs text-white hover:bg-[var(--color-dark-gray)]/20 disabled:opacity-50"
+                              title="Пригласить по email"
                           >
                             <Mail className="h-3 w-3" />
                             {invitingId === emp.id ? "…" : "Email"}

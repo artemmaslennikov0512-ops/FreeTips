@@ -72,7 +72,7 @@ export default function EstablishmentPage() {
 
   if (loading) {
     return (
-      <div className="text-[var(--color-text-secondary)]">Загрузка…</div>
+      <div className="text-white/90">Загрузка…</div>
     );
   }
 
@@ -95,10 +95,10 @@ export default function EstablishmentPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="font-[family:var(--font-playfair)] text-2xl font-semibold text-[var(--color-text)] mb-2">
+        <h1 className="font-[family:var(--font-playfair)] text-2xl font-semibold text-white mb-2">
           Кабинет заведения
         </h1>
-        <p className="text-[var(--color-text-secondary)]">
+        <p className="text-white/90">
           {info.name} · сводка и быстрые действия
         </p>
       </div>
@@ -108,12 +108,12 @@ export default function EstablishmentPage() {
           href="/establishment/team"
           className="cabinet-block-inner flex flex-col rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 p-6 transition-all hover:bg-[var(--color-accent-gold)]/15 hover:-translate-y-1 shadow-[var(--shadow-subtle)]"
         >
-          <div className="flex items-center gap-3 text-[var(--color-text-secondary)] mb-2">
+          <div className="flex items-center gap-3 text-white/90 mb-2">
             <Users className="h-5 w-5" />
             <span className="text-sm font-medium">Команда</span>
           </div>
-          <p className="text-2xl font-semibold text-[var(--color-text)]">{limitText}</p>
-          <p className="text-sm text-[var(--color-text-secondary)] mt-1">сотрудников</p>
+          <p className="text-2xl font-semibold text-white">{limitText}</p>
+          <p className="text-sm text-white/90 mt-1">сотрудников</p>
           <span className="mt-3 text-sm font-medium text-[var(--color-brand-gold)] hover:underline">
             Управление командой →
           </span>
@@ -123,12 +123,12 @@ export default function EstablishmentPage() {
           href="/establishment/analytics"
           className="cabinet-block-inner flex flex-col rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 p-6 transition-all hover:bg-[var(--color-accent-gold)]/15 hover:-translate-y-1 shadow-[var(--shadow-subtle)]"
         >
-          <div className="flex items-center gap-3 text-[var(--color-text-secondary)] mb-2">
+          <div className="flex items-center gap-3 text-white/90 mb-2">
             <Wallet className="h-5 w-5" />
             <span className="text-sm font-medium">Чаевые за 7 дней</span>
           </div>
-          <p className="text-2xl font-semibold text-[var(--color-text)]">{formatKop(totalTips)}</p>
-          <p className="text-sm text-[var(--color-text-secondary)] mt-1">
+          <p className="text-2xl font-semibold text-white">{formatKop(totalTips)}</p>
+          <p className="text-sm text-white/90 mt-1">
             {txCount} {txCount === 1 ? "транзакция" : "транзакций"}
           </p>
           <span className="mt-3 text-sm font-medium text-[var(--color-brand-gold)] hover:underline">
@@ -140,11 +140,11 @@ export default function EstablishmentPage() {
           href="/establishment/payout-rules"
           className="cabinet-block-inner flex flex-col rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 p-6 transition-all hover:bg-[var(--color-accent-gold)]/15 hover:-translate-y-1 shadow-[var(--shadow-subtle)] sm:col-span-2 lg:col-span-1"
         >
-          <div className="flex items-center gap-3 text-[var(--color-text-secondary)] mb-2">
+          <div className="flex items-center gap-3 text-white/90 mb-2">
             <PieChart className="h-5 w-5" />
             <span className="text-sm font-medium">Распределение</span>
           </div>
-          <p className="text-sm text-[var(--color-text)]">
+          <p className="text-sm text-white">
             Доля заведения и правила распределения пула между командой по коэффициентам.
           </p>
           <span className="mt-3 text-sm font-medium text-[var(--color-brand-gold)] hover:underline">
@@ -155,7 +155,7 @@ export default function EstablishmentPage() {
 
       <div id="quick-actions" className="cabinet-card rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden">
         <div className="border-0 px-6 py-4">
-          <h3 className="font-[family:var(--font-playfair)] text-lg font-semibold text-[var(--color-text)]">
+          <h3 className="font-[family:var(--font-playfair)] text-lg font-semibold text-white">
             Быстрые действия
           </h3>
         </div>
@@ -170,14 +170,14 @@ export default function EstablishmentPage() {
             </Link>
             <Link
               href="/establishment/payout-rules"
-              className="inline-flex items-center gap-2 rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-4 py-2.5 font-medium text-[var(--color-text)] hover:bg-[var(--color-dark-gray)]/20"
+              className="inline-flex items-center gap-2 rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-4 py-2.5 font-medium text-white hover:bg-[var(--color-dark-gray)]/20"
             >
               <PieChart className="h-4 w-4" />
               Распределение
             </Link>
             <Link
               href="/establishment/analytics"
-              className="inline-flex items-center gap-2 rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-4 py-2.5 font-medium text-[var(--color-text)] hover:bg-[var(--color-dark-gray)]/20"
+              className="inline-flex items-center gap-2 rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-4 py-2.5 font-medium text-white hover:bg-[var(--color-dark-gray)]/20"
             >
               <BarChart3 className="h-4 w-4" />
               Аналитика

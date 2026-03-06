@@ -362,8 +362,8 @@ html:not([data-theme="dark"]) .card-block {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
-/* Тёмная тема: у блоков страницы чаевых без обводки */
-[data-theme="dark"] .pay-block,
+/* Тёмная тема: у блоков страницы чаевых без обводки (кроме .pay-page — там своя обводка) */
+[data-theme="dark"] .pay-block:not(.pay-block--page),
 [data-theme="dark"] .pay-block-inner {
   border-color: transparent !important;
 }
@@ -393,43 +393,55 @@ html:not([data-theme="dark"]) .card-block {
 .pay-page {
   --pay-page-bg: var(--color-bg-sides);
   --pay-page-card-bg: var(--color-bg-sides);
-  --pay-page-card-border: rgba(197, 165, 114, 0.5);
+  --pay-page-card-border: 1px solid rgba(197, 165, 114, 0.4);
+  --pay-page-gold-border: 1px solid rgba(197, 165, 114, 0.45);
   --pay-page-text: var(--color-text);
   --pay-page-text-muted: var(--color-text-secondary);
   --pay-page-input-bg: var(--color-light-gray);
-  --pay-page-input-border: rgba(197, 165, 114, 0.4);
+  --pay-page-input-border: 1px solid rgba(197, 165, 114, 0.45);
   --pay-page-input-focus-ring: rgba(197, 165, 114, 0.5);
   --pay-page-amount-btn-bg: var(--color-light-gray);
+  --pay-page-amounts-wrap-bg: transparent;
   --pay-page-amount-btn-active-bg: rgba(197, 165, 114, 0.2);
   --pay-page-amount-btn-active-border: var(--color-brand-gold);
   --pay-page-footer-color: var(--color-muted);
   font-family: var(--font-inter), system-ui, sans-serif;
 }
 
+/* Светлая тема: фон под выбором сумм темнее */
+html:not([data-theme="dark"]) .pay-page {
+  --pay-page-amounts-wrap-bg: rgba(0, 0, 0, 0.05);
+}
+
 [data-theme="dark"] .pay-page {
-  --pay-page-card-bg: rgba(255, 255, 255, 0.06);
-  --pay-page-card-border: rgba(255, 255, 255, 0.12);
+  --pay-page-card-bg: #161616;
+  --pay-page-card-border: 1px solid rgba(192, 192, 192, 0.3);
+  --pay-page-gold-border: 1px solid rgba(197, 165, 114, 0.45);
   --pay-page-text: #fafafa;
   --pay-page-text-muted: rgba(255, 255, 255, 0.75);
   --pay-page-input-bg: #363636;
-  --pay-page-input-border: #5c5c5c;
+  --pay-page-input-border: 1px solid rgba(197, 165, 114, 0.45);
   --pay-page-input-focus-ring: rgba(197, 165, 114, 0.5);
   --pay-page-amount-btn-bg: #363636;
+  --pay-page-amounts-wrap-bg: transparent;
   --pay-page-amount-btn-active-bg: rgba(197, 165, 114, 0.25);
   --pay-page-amount-btn-active-border: var(--color-brand-gold);
   --pay-page-footer-color: rgba(255, 255, 255, 0.5);
 }
 
-.pay-page .pay-block {
+.pay-page .pay-block.pay-block--page {
   background: var(--pay-page-card-bg) !important;
-  border-color: var(--pay-page-card-border) !important;
+  border: var(--pay-page-card-border) !important;
 }
 
-/* Имя получателя — по центру, 20–24px */
+/* Имя получателя — по центру, обводка золотая тонкая */
 .pay-page-recipient {
   text-align: center;
   margin-top: 1.5rem;
   margin-bottom: 1.5rem;
+  padding: 1rem 1.25rem;
+  border-radius: 12px;
+  border: var(--pay-page-gold-border);
 }
 .pay-page-recipient-name {
   font-size: 1.25rem;
@@ -443,10 +455,14 @@ html:not([data-theme="dark"]) .card-block {
   }
 }
 
-/* Блок кнопок сумм — отступы, центрирование */
+/* Блок кнопок сумм — отступы, центрирование, тонкая золотая обводка; в светлой теме фон темнее */
 .pay-page-amounts {
   margin-top: 1.5rem;
   margin-bottom: 0.25rem;
+  padding: 0.75rem;
+  border-radius: 12px;
+  border: var(--pay-page-gold-border);
+  background: var(--pay-page-amounts-wrap-bg);
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -524,7 +540,7 @@ html:not([data-theme="dark"]) .card-block {
   font-size: 1rem;
   padding: 0.75rem 1rem;
   border-radius: 12px;
-  border: 2px solid var(--pay-page-input-border);
+  border: var(--pay-page-input-border);
   background: var(--pay-page-input-bg);
   color: var(--pay-page-text);
   transition: border-color 0.2s, box-shadow 0.2s;

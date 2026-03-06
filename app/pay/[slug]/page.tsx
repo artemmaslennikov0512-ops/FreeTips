@@ -230,7 +230,7 @@ export default function PayPage() {
   return (
     <div className="pay-page mx-auto min-h-[60vh] max-w-md px-4 py-12" style={wrapperStyle}>
       <div
-        className="pay-block relative rounded-2xl border-2 border-[var(--pay-border,var(--color-brand-gold))]/50 p-6 shadow-[var(--shadow-card)]"
+        className="pay-block pay-block--page relative rounded-2xl border-2 p-6 shadow-[var(--shadow-card)]"
         style={Object.keys(cardStyle).length ? cardStyle : undefined}
       >
         {/* Кнопка смены темы */}

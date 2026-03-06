@@ -308,12 +308,12 @@ html:not([data-theme="dark"]) body.admin-page .site-header .site-header-logo-fre
   color: #ffffff !important;
 }
 
-/* Светлая тема: основной блок ЛК и админки — лёгкое затемнение (убраны сильные засветы), не сплошной navy */
+/* Светлая тема: основной блок ЛК и админки — как сайдбар (градиент navy, та же обводка) */
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-main-block:not(.admin-main-block),
 html:not([data-theme="dark"]) .admin-panel .admin-main-block.cabinet-main-block {
-  background: linear-gradient(135deg, color-mix(in srgb, #0a192f 40%, white) 0%, color-mix(in srgb, #0a192f 25%, white) 50%, color-mix(in srgb, #0a192f 40%, white) 100%);
-  border: 1px solid rgba(197, 165, 114, 0.4);
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.04);
+  background: linear-gradient(135deg, #0a192f 0%, color-mix(in srgb, #0a192f 85%, white) 50%, #0a192f 100%);
+  border: 1px solid rgba(197, 165, 114, 0.55);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06);
 }
 
 /* Светлая тема: блоки на основном блоке — тот же фон и рамка, что у блока чата поддержки */

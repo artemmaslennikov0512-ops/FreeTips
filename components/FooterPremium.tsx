@@ -21,11 +21,11 @@ export function FooterPremium() {
   const hasTg = support.telegram && support.telegram.trim() !== "";
 
   return (
-    <footer className="bg-[var(--color-charcoal)] text-[var(--color-text-secondary)] py-12 sm:py-16 lg:py-20 pb-8 sm:pb-10">
+    <footer className="bg-[var(--color-charcoal)] text-[var(--color-text-secondary)] py-14 sm:py-16 lg:py-24 pb-10 sm:pb-12">
       <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8 xl:max-w-7xl 2xl:max-w-screen-2xl">
         {(hasEmail || hasTg) && (
-          <div className="mb-12 flex flex-col sm:flex-row sm:items-center sm:justify-between sm:gap-8 gap-6 rounded-xl border border-white/[0.08] bg-white/[0.04] px-6 py-5 backdrop-blur-sm">
-            <span className="text-sm font-medium uppercase tracking-wider text-white/70 leading-none sm:leading-normal">Связь и поддержка</span>
+          <div className="mb-12 flex flex-col sm:flex-row sm:items-center sm:justify-between sm:gap-8 gap-6 rounded-2xl border border-white/[0.12] bg-white/[0.06] px-6 py-6 backdrop-blur-md shadow-[0_4px_24px_rgba(0,0,0,0.15)]">
+            <span className="text-sm font-medium uppercase tracking-wider text-white/80 leading-none sm:leading-normal">Связь и поддержка</span>
             <div className="flex flex-wrap items-center justify-start sm:justify-end gap-6 sm:gap-8">
               {hasTg && (
                 <a

@@ -3,11 +3,13 @@ import Link from "next/link";
 export function HeroPremium() {
   return (
     <section className="section-dark hero-premium-section relative overflow-hidden w-full bg-[var(--color-navy)] pt-[100px] pb-[48px] sm:pt-[120px] sm:pb-[60px]">
+      {/* Градиент для глубины */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-navy)] via-transparent to-[var(--color-charcoal)]/30 pointer-events-none z-[1]" aria-hidden />
       <div
-        className="absolute inset-0 opacity-[0.03]"
+        className="absolute inset-0 opacity-[0.04] z-[1]"
         style={{
-          backgroundImage: `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><path d='M0,0 L120,0 L120,120' fill='none' stroke='white' stroke-width='2'/></svg>")`,
-          backgroundSize: "120px 120px",
+          backgroundImage: `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80'><path d='M0,0 L80,0 L80,80' fill='none' stroke='white' stroke-width='1.5'/></svg>")`,
+          backgroundSize: "80px 80px",
         }}
         aria-hidden
       />
@@ -25,18 +27,18 @@ export function HeroPremium() {
           <div className="flex flex-wrap gap-4 mb-0">
             <Link
               href="/zayavka"
-              className="inline-flex items-center justify-center gap-2 px-7 py-3 rounded-xl bg-[var(--color-accent-gold)] text-[var(--color-navy)] font-semibold text-[15px] hover:opacity-90 hover:-translate-y-0.5 transition-all duration-300 shadow-[var(--shadow-card)]"
+              className="inline-flex items-center justify-center gap-2 px-7 py-3 rounded-xl bg-[var(--color-accent-gold)] text-[var(--color-navy)] font-semibold text-[15px] transition-all duration-300 shadow-[var(--shadow-button)] hover:shadow-[var(--shadow-button-hover)] hover:-translate-y-0.5 hover:opacity-95"
             >
               Подключить заведение
             </Link>
             <Link
               href="/#features"
-              className="inline-flex items-center justify-center gap-2 px-7 py-3 rounded-xl border-0 text-[var(--color-on-navy)] font-semibold text-[15px] bg-transparent hover:opacity-80 hover:-translate-y-0.5 transition-all duration-300"
+              className="inline-flex items-center justify-center gap-2 px-7 py-3 rounded-xl border border-[var(--color-on-dark-muted)]/40 text-[var(--color-on-navy)] font-semibold text-[15px] bg-white/5 backdrop-blur-sm transition-all duration-300 hover:bg-white/10 hover:border-[var(--color-accent-gold)]/50 hover:-translate-y-0.5"
             >
               Узнать больше
             </Link>
           </div>
-          <div className="flex flex-wrap gap-6 sm:gap-8 lg:gap-10 mt-6 pt-5 sm:mt-8 sm:pt-6 border-0">
+          <div className="flex flex-wrap gap-6 sm:gap-8 lg:gap-10 mt-8 pt-6 sm:mt-10 sm:pt-8 border-t border-white/10">
             <div className="flex flex-col">
               <div className="hero-premium-stat font-[family:var(--font-playfair)] text-3xl sm:text-4xl font-bold text-[var(--color-on-navy)] leading-none">99.8%</div>
               <div className="text-sm text-[var(--color-on-dark-muted)] mt-2 font-medium">Успешных транзакций</div>

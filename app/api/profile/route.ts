@@ -8,19 +8,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuthOrApiKey } from "@/lib/auth-or-api-key";
 import { db } from "@/lib/db";
+import { getPaygineConfig } from "@/lib/config";
 import { patchProfileSchema } from "@/lib/validations";
-import { parseJsonWithLimit, MAX_BODY_SIZE_AUTH } from "@/lib/api/helpers";
+import { parseJsonWithLimit, MAX_BODY_SIZE_AUTH, jsonError, internalError } from "@/lib/api/helpers";
 import { getEffectivePayoutLimits, getEffectiveMonthlyPayoutLimits, getUtcDayStart, getUtcMonthStart } from "@/lib/payout-limits";
 import { sdGetBalance } from "@/lib/payment/paygine/client";
 import { logError, logInfo } from "@/lib/logger";
 import { getRequestId } from "@/lib/security/request";
 
 export async function GET(request: NextRequest) {
-  let userId: string | undefined;
   try {
     const auth = await requireAuthOrApiKey(request);
     if ("response" in auth) return auth.response;
-    userId = auth.userId;
     const id = auth.userId;
     const requestId = getRequestId(request);
 
@@ -107,13 +106,12 @@ export async function GET(request: NextRequest) {
     const monthSumKop = monthPayouts._sum.amountKop ?? BigInt(0);
 
     let balanceKopForStats = Number(balanceCalculated);
-    const sector = process.env.PAYGINE_SECTOR?.trim();
-    const password = process.env.PAYGINE_PASSWORD;
+    const paygineConfig = getPaygineConfig();
     const sdRef = profile.paygineSdRef?.trim();
     let paygineBalanceKop: number | null = null;
-    if (sdRef && sector && password) {
+    if (sdRef && paygineConfig) {
       try {
-        const paygineBalance = await sdGetBalance({ sector, password }, { sdRef });
+        const paygineBalance = await sdGetBalance(paygineConfig, { sdRef });
         if (paygineBalance.ok) {
           paygineBalanceKop = paygineBalance.balanceKop;
           balanceKopForStats = paygineBalance.balanceKop;
@@ -191,16 +189,8 @@ export async function GET(request: NextRequest) {
     };
     return NextResponse.json(body);
   } catch (err) {
-    try {
-      logError("profile.get.error", err, { userId });
-    } catch {
-      console.error("profile.get.error", err);
-    }
-    const message = err instanceof Error ? err.message : String(err);
-    return NextResponse.json(
-      { error: "Не удалось загрузить профиль: " + message },
-      { status: 500 },
-    );
+    logError("profile.get.error", err, { requestId: getRequestId(request) });
+    return internalError("Не удалось загрузить профиль");
   }
 }
 
@@ -213,45 +203,24 @@ export async function PATCH(request: NextRequest) {
 
   const parsed = patchProfileSchema.safeParse(parsedBody.data);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: "Неверные данные", issues: parsed.error.issues },
-      { status: 400 },
-    );
+    return jsonError(400, "Неверные данные", parsed.error.issues);
   }
 
-  const data = parsed.data as {
-    login?: string;
-    email?: string | null;
-    fullName?: string | null;
-    birthDate?: string | null;
-    establishment?: string | null;
-  };
-  if (
-    !data.login &&
-    data.email === undefined &&
-    data.fullName === undefined &&
-    data.birthDate === undefined &&
-    data.establishment === undefined
-  ) {
-    return NextResponse.json({ error: "Нечего обновлять" }, { status: 400 });
+  const data = parsed.data;
+  const allowedKeys = ["login", "email", "fullName", "birthDate", "establishment"] as const;
+  const update = Object.fromEntries(
+    allowedKeys.filter((k) => data[k] !== undefined).map((k) => [k, data[k]])
+  ) as { login?: string; email?: string | null; fullName?: string | null; birthDate?: string | null; establishment?: string | null };
+  if (Object.keys(update).length === 0) {
+    return jsonError(400, "Нечего обновлять");
   }
-
-  const update: {
-    login?: string;
-    email?: string | null;
-    fullName?: string | null;
-    birthDate?: string | null;
-    establishment?: string | null;
-  } = {};
-  if (data.login !== undefined) update.login = data.login;
-  if (data.email !== undefined) update.email = data.email;
-  if (data.fullName !== undefined) update.fullName = data.fullName;
-  if (data.birthDate !== undefined) update.birthDate = data.birthDate;
-  if (data.establishment !== undefined) update.establishment = data.establishment;
 
   if (update.login) {
     const taken = await db.user.findFirst({
-      where: { login: update.login, NOT: { id: auth.userId } },
+      where: {
+        login: { equals: update.login, mode: "insensitive" },
+        NOT: { id: auth.userId },
+      },
     });
     if (taken) {
       return NextResponse.json({ error: "Логин уже занят" }, { status: 409 });
@@ -259,12 +228,17 @@ export async function PATCH(request: NextRequest) {
   }
 
   if (update.email !== undefined && update.email !== null) {
+    const emailNormalized = update.email.trim().toLowerCase();
     const taken = await db.user.findFirst({
-      where: { email: update.email, NOT: { id: auth.userId } },
+      where: {
+        email: { equals: emailNormalized, mode: "insensitive" },
+        NOT: { id: auth.userId },
+      },
     });
     if (taken) {
       return NextResponse.json({ error: "Email уже занят" }, { status: 409 });
     }
+    update.email = emailNormalized;
   }
 
   const profile = await db.user.update({

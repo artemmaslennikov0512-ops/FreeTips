@@ -124,7 +124,7 @@ export default function LoginEstablishmentPage() {
           </p>
 
           {error && (
-            <div className="mt-4 rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 text-sm text-amber-200">
+            <div className="mt-4 rounded-xl border-0 bg-[var(--color-muted)]/10 p-3 text-sm text-[var(--color-accent-red)]" role="alert">
               {error}
             </div>
           )}
@@ -147,7 +147,7 @@ export default function LoginEstablishmentPage() {
                 />
               </div>
               {fieldErrors.login && (
-                <p className="mt-1 text-xs text-[var(--color-text-secondary)]" role="alert">
+                <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">
                   {fieldErrors.login}
                 </p>
               )}
@@ -170,7 +170,7 @@ export default function LoginEstablishmentPage() {
                 />
               </div>
               {fieldErrors.password && (
-                <p className="mt-1 text-xs text-[var(--color-text-secondary)]" role="alert">
+                <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">
                   {fieldErrors.password}
                 </p>
               )}

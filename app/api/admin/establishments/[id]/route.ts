@@ -98,18 +98,30 @@ export async function PATCH(
     }
   }
 
-  const updated = await db.establishment.update({
-    where: { id },
-    data: {
-      ...(data.name != null && { name: data.name }),
-      ...(data.address !== undefined && { address: data.address || null }),
-      ...(data.phone !== undefined && { phone: data.phone || null }),
-      ...(data.uniqueSlug != null && { uniqueSlug: data.uniqueSlug }),
-      ...(data.maxEmployeesCount !== undefined && {
-        maxEmployeesCount: data.maxEmployeesCount,
-      }),
-    },
-  });
+  let updated;
+  try {
+    updated = await db.establishment.update({
+      where: { id },
+      data: {
+        ...(data.name != null && { name: data.name }),
+        ...(data.address !== undefined && { address: data.address || null }),
+        ...(data.phone !== undefined && { phone: data.phone || null }),
+        ...(data.uniqueSlug != null && { uniqueSlug: data.uniqueSlug }),
+        ...(data.maxEmployeesCount !== undefined && {
+          maxEmployeesCount: data.maxEmployeesCount,
+        }),
+      },
+    });
+  } catch (err: unknown) {
+    const code = (err as { code?: string })?.code;
+    if (code === "P2002") {
+      return NextResponse.json(
+        { error: "Заведение с таким slug уже существует" },
+        { status: 409 },
+      );
+    }
+    throw err;
+  }
 
   return NextResponse.json({
     id: updated.id,

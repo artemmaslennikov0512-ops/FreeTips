@@ -131,11 +131,11 @@ export function Header() {
             <span className="site-header-logo-text font-[family:var(--font-playfair)] text-sm font-bold sm:text-base lg:text-lg text-[var(--color-navy)]"><span className="site-header-logo-free">Free</span><span className="text-[var(--color-brand-gold)]">Tips</span></span>
           </Link>
           <nav className="hidden lg:flex shrink-0 items-center justify-center gap-1.5 xl:gap-2 2xl:gap-3" aria-label="Навигация">
-            <Link href="/#features" className="whitespace-nowrap rounded-xl border-0 bg-[var(--color-white)] px-2.5 py-2 font-medium text-[var(--color-navy)] transition-all hover:opacity-90 text-xs xl:px-3 xl:py-2.5 xl:text-sm 2xl:px-4 2xl:text-[15px]">Преимущества</Link>
-            <Link href="/#process" className="whitespace-nowrap rounded-xl border-0 bg-[var(--color-white)] px-2.5 py-2 font-medium text-[var(--color-navy)] transition-all hover:opacity-90 text-xs xl:px-3 xl:py-2.5 xl:text-sm 2xl:px-4 2xl:text-[15px]">Как работает</Link>
-            <Link href="/#business" className="whitespace-nowrap rounded-xl border-0 bg-[var(--color-white)] px-2.5 py-2 font-medium text-[var(--color-navy)] transition-all hover:opacity-90 text-xs xl:px-3 xl:py-2.5 xl:text-sm 2xl:px-4 2xl:text-[15px]">Для бизнеса</Link>
-            <Link href="/oferta" className="whitespace-nowrap rounded-xl border-0 bg-[var(--color-white)] px-2.5 py-2 font-medium text-[var(--color-navy)] transition-all hover:opacity-90 text-xs xl:px-3 xl:py-2.5 xl:text-sm 2xl:px-4 2xl:text-[15px]">Тарифы</Link>
-            <Link href="/kontakty" className="whitespace-nowrap rounded-xl border-0 bg-[var(--color-white)] px-2.5 py-2 font-medium text-[var(--color-navy)] transition-all hover:opacity-90 text-xs xl:px-3 xl:py-2.5 xl:text-sm 2xl:px-4 2xl:text-[15px]">Контакты</Link>
+            <Link href="/#features" className="whitespace-nowrap rounded-xl border-0 bg-[var(--color-white)]/95 backdrop-blur-sm shadow-[var(--shadow-subtle)] px-2.5 py-2 font-medium text-[var(--color-navy)] transition-all hover:shadow-[var(--shadow-soft)] hover:-translate-y-0.5 text-xs xl:px-3 xl:py-2.5 xl:text-sm 2xl:px-4 2xl:text-[15px]">Преимущества</Link>
+            <Link href="/#process" className="whitespace-nowrap rounded-xl border-0 bg-[var(--color-white)]/95 backdrop-blur-sm shadow-[var(--shadow-subtle)] px-2.5 py-2 font-medium text-[var(--color-navy)] transition-all hover:shadow-[var(--shadow-soft)] hover:-translate-y-0.5 text-xs xl:px-3 xl:py-2.5 xl:text-sm 2xl:px-4 2xl:text-[15px]">Как работает</Link>
+            <Link href="/#business" className="whitespace-nowrap rounded-xl border-0 bg-[var(--color-white)]/95 backdrop-blur-sm shadow-[var(--shadow-subtle)] px-2.5 py-2 font-medium text-[var(--color-navy)] transition-all hover:shadow-[var(--shadow-soft)] hover:-translate-y-0.5 text-xs xl:px-3 xl:py-2.5 xl:text-sm 2xl:px-4 2xl:text-[15px]">Для бизнеса</Link>
+            <Link href="/oferta" className="whitespace-nowrap rounded-xl border-0 bg-[var(--color-white)]/95 backdrop-blur-sm shadow-[var(--shadow-subtle)] px-2.5 py-2 font-medium text-[var(--color-navy)] transition-all hover:shadow-[var(--shadow-soft)] hover:-translate-y-0.5 text-xs xl:px-3 xl:py-2.5 xl:text-sm 2xl:px-4 2xl:text-[15px]">Тарифы</Link>
+            <Link href="/kontakty" className="whitespace-nowrap rounded-xl border-0 bg-[var(--color-white)]/95 backdrop-blur-sm shadow-[var(--shadow-subtle)] px-2.5 py-2 font-medium text-[var(--color-navy)] transition-all hover:shadow-[var(--shadow-soft)] hover:-translate-y-0.5 text-xs xl:px-3 xl:py-2.5 xl:text-sm 2xl:px-4 2xl:text-[15px]">Контакты</Link>
           </nav>
           <div className="flex shrink-0 items-center gap-2 sm:gap-3 lg:gap-4">
             {user ? (
@@ -152,7 +152,7 @@ export function Header() {
                 <Link href="/login" className="hidden sm:inline-flex items-center justify-center rounded-xl border-0 bg-[var(--color-white)] px-3 py-2 text-[var(--color-navy)] font-semibold transition-all hover:opacity-90 text-xs lg:px-4 lg:py-2.5 lg:text-sm xl:text-[15px] xl:px-5">
                   Войти
                 </Link>
-                <Link href="/zayavka" className="inline-flex items-center justify-center rounded-xl bg-[var(--color-navy)] px-4 py-2 text-[var(--color-white)] font-semibold transition-all hover:opacity-90 hover:-translate-y-0.5 text-xs sm:px-5 sm:py-2.5 sm:text-sm lg:text-[15px] lg:px-7">
+                <Link href="/zayavka" className="inline-flex items-center justify-center rounded-xl bg-[var(--color-navy)] px-4 py-2 text-[var(--color-white)] font-semibold transition-all shadow-[var(--shadow-subtle)] hover:shadow-[var(--shadow-soft)] hover:-translate-y-0.5 text-xs sm:px-5 sm:py-2.5 sm:text-sm lg:text-[15px] lg:px-7">
                   Начать
                 </Link>
               </>

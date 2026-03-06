@@ -93,7 +93,9 @@ export async function POST(request: NextRequest) {
   const expiresAt = getRegistrationTokenExpiresAt();
   const baseUrl = getBaseUrlFromRequest(request.nextUrl.origin);
 
-  const establishment = await db.$transaction(async (tx) => {
+  let establishment;
+  try {
+    establishment = await db.$transaction(async (tx) => {
     const est = await tx.establishment.create({
       data: {
         name,
@@ -126,6 +128,16 @@ export async function POST(request: NextRequest) {
     });
     return { ...est, tipPoolUserId: poolUser.id };
   });
+  } catch (err: unknown) {
+    const code = (err as { code?: string })?.code;
+    if (code === "P2002") {
+      return NextResponse.json(
+        { error: "Заведение с таким slug уже существует" },
+        { status: 409 },
+      );
+    }
+    throw err;
+  }
 
   const link = `${baseUrl}/register?token=${encodeURIComponent(token)}`;
 

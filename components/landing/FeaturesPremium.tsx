@@ -53,10 +53,10 @@ export function FeaturesPremium() {
           {features.map(({ icon: Icon, title, desc, iconBg, iconColor }) => (
             <div
               key={title}
-              className="relative p-6 sm:p-8 lg:p-10 bg-[var(--process-card-bg)] rounded-xl border border-[var(--process-card-border)] transition-all duration-300 hover:border-[var(--process-card-hover-border)] text-center flex flex-col items-center min-w-0"
+              className="landing-card-hover relative p-6 sm:p-8 lg:p-10 bg-[var(--process-card-bg)] rounded-xl border border-[var(--process-card-border)] hover:border-[var(--process-card-hover-border)] text-center flex flex-col items-center min-w-0"
             >
-              <div className={`w-20 h-20 rounded-full flex items-center justify-center mb-6 shrink-0 ${iconBg} ${iconColor}`}>
-                <Icon className="w-8 h-8" />
+              <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center mb-6 shrink-0 ${iconBg} ${iconColor} shadow-[0_4px_12px_rgba(0,0,0,0.15)]`}>
+                <Icon className="w-7 h-7 sm:w-8 sm:h-8" />
               </div>
               <h3 className="font-[family:var(--font-playfair)] text-xl font-semibold text-[var(--color-on-navy)] mb-4 w-full min-w-0 break-words">{title}</h3>
               <p className="text-[var(--color-on-dark-muted)] leading-relaxed w-full min-w-0">{desc}</p>

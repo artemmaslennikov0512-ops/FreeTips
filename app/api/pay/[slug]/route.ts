@@ -134,7 +134,7 @@ export async function POST(request: NextRequest, { params }: Params) {
 
   const { amountKop, comment, idempotencyKey } = validated.data;
   const amountBigInt = typeof amountKop === "number" ? BigInt(amountKop) : amountKop;
-  const baseUrl = getBaseUrlFromRequest(request.nextUrl.origin);
+  const baseUrl = getBaseUrlFromRequest(request);
 
   const gateway = getPaymentGateway();
   try {

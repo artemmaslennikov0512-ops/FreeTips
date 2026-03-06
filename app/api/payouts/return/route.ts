@@ -54,10 +54,22 @@ export async function GET(request: NextRequest) {
   }
 
   const newStatus = success === "1" ? "COMPLETED" : "REJECTED";
-  await db.payoutRequest.update({
-    where: { id: payout.id },
+  const updated = await db.payoutRequest.updateMany({
+    where: { id: payout.id, status: "PROCESSING" },
     data: { status: newStatus },
   });
+
+  if (updated.count === 0) {
+    const current = await db.payoutRequest.findUnique({
+      where: { id: payout.id },
+      select: { status: true, amountKop: true },
+    });
+    return NextResponse.json({
+      status: current?.status ?? payout.status,
+      amountKop: Number(current?.amountKop ?? payout.amountKop),
+      alreadyProcessed: true,
+    });
+  }
 
   const recipientUserId = payout.userId;
   if (newStatus === "COMPLETED") {

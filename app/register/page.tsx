@@ -103,7 +103,7 @@ function RegisterForm() {
     const email = formData.email.trim();
     const code = emailCode.replace(/\D/g, "");
     if (code.length !== EMAIL_CODE_LENGTH) {
-      setEmailCodeError("Проверьте правильность набранного номера");
+      setEmailCodeError("Проверьте правильность введённого кода");
       return;
     }
     setEmailCodeError(null);
@@ -136,7 +136,7 @@ function RegisterForm() {
     if (digits.length === EMAIL_CODE_LENGTH) {
       setEmailCodeError(null);
     } else if (digits.length > 0) {
-      setEmailCodeError("Проверьте правильность набранного номера");
+      setEmailCodeError("Проверьте правильность введённого кода");
     } else {
       setEmailCodeError(null);
     }
@@ -212,7 +212,7 @@ function RegisterForm() {
           </p>
 
           {error && (
-            <div className="mt-4 rounded-xl border-0 bg-[var(--color-muted)]/10 p-3 text-sm text-[var(--color-text-secondary)]">
+            <div className="mt-4 rounded-xl border-0 bg-[var(--color-muted)]/10 p-3 text-sm text-[var(--color-accent-red)]" role="alert">
               {error}
             </div>
           )}
@@ -303,7 +303,7 @@ function RegisterForm() {
                       value={emailCode}
                       onChange={(e) => handleEmailCodeChange(e.target.value)}
                       placeholder="000000"
-                      className={`w-24 rounded-xl border-0 bg-[var(--color-light-gray)] py-2 px-3 text-center text-[var(--color-text)] tracking-widest placeholder:text-[var(--color-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-brand-gold)]/30 ${emailCodeError ? "ring-2 ring-red-500" : ""}`}
+                      className={`w-24 rounded-xl border-0 bg-[var(--color-light-gray)] py-2 px-3 text-center text-[var(--color-text)] tracking-widest placeholder:text-[var(--color-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-brand-gold)]/30 ${emailCodeError ? "ring-2 ring-[var(--color-accent-red)]" : ""}`}
                     />
                     <button
                       type="button"
@@ -315,7 +315,7 @@ function RegisterForm() {
                     </button>
                   </div>
                   {emailCodeError && (
-                    <p className="text-xs text-red-600 dark:text-red-400" role="alert">{emailCodeError}</p>
+                    <p className="text-xs text-[var(--color-accent-red)]" role="alert">{emailCodeError}</p>
                   )}
                 </div>
               )}

@@ -49,8 +49,8 @@ export async function GET(request: NextRequest) {
   }
 
   const since = new Date();
-  since.setDate(since.getDate() - days);
-  since.setHours(0, 0, 0, 0);
+  since.setUTCDate(since.getUTCDate() - days);
+  since.setUTCHours(0, 0, 0, 0);
 
   const [aggregate, transactions] = await Promise.all([
     db.transaction.aggregate({

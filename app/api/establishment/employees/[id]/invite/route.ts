@@ -54,14 +54,7 @@ export async function POST(request: NextRequest, { params }: Params) {
   const token = generateRegistrationToken();
   const tokenHash = hashRegistrationToken(token);
   const expiresAt = getRegistrationTokenExpiresAt();
-  let origin = "https://example.com";
-  try {
-    const url = new URL(request.url);
-    origin = url.origin;
-  } catch {
-    // ignore
-  }
-  const baseUrl = getBaseUrlFromRequest(origin);
+  const baseUrl = getBaseUrlFromRequest(request);
   const link = `${baseUrl}/register?token=${encodeURIComponent(token)}`;
 
   await db.$transaction([

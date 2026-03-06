@@ -15,8 +15,8 @@ export function LoadingSpinner({ message = "Загрузка…", className = ""
       role="status"
       aria-live="polite"
     >
-      <Loader2 className="h-10 w-10 animate-spin text-[#c5a572]" aria-hidden />
-      <p className="text-sm text-[#64748b]">{message}</p>
+      <Loader2 className="h-10 w-10 animate-spin text-[var(--color-brand-gold)]" aria-hidden />
+      <p className="text-sm text-[var(--color-muted)]">{message}</p>
     </div>
   );
 }

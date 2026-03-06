@@ -40,7 +40,7 @@ export function BusinessPremium() {
           {cards.map(({ icon: Icon, title, text }) => (
             <div
               key={title}
-              className="relative p-6 sm:p-8 lg:p-10 rounded-xl bg-[var(--process-card-bg)] border border-[var(--process-card-border)] transition-all duration-300 hover:border-[var(--process-card-hover-border)]"
+              className="landing-card-hover relative p-6 sm:p-8 lg:p-10 rounded-xl bg-[var(--process-card-bg)] border border-[var(--process-card-border)] hover:border-[var(--process-card-hover-border)]"
             >
               <h3 className="font-[family:var(--font-playfair)] text-2xl font-semibold text-white mb-4 flex items-center gap-3">
                 <span className="text-[var(--color-accent-gold)]">

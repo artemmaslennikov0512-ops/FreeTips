@@ -43,13 +43,13 @@ export function ProcessPremium() {
           {steps.map(({ num, icon: Icon, title, text }) => (
             <div
               key={num}
-              className="relative p-6 sm:p-8 lg:p-10 bg-[var(--process-card-bg)] rounded-xl border-0 transition-all duration-300 hover:opacity-90"
+              className="landing-card-hover relative p-6 sm:p-8 lg:p-10 bg-[var(--process-card-bg)] rounded-xl border border-[var(--process-card-border)] hover:border-[var(--process-card-hover-border)] transition-all duration-300"
             >
-              <div className="absolute -top-5 left-8 w-10 h-10 bg-[var(--color-accent-gold)] text-[var(--color-navy)] rounded-full flex items-center justify-center font-[family:var(--font-playfair)] font-bold text-xl">
+              <div className="absolute -top-4 left-8 w-10 h-10 bg-[var(--color-accent-gold)] text-[var(--color-navy)] rounded-full flex items-center justify-center font-[family:var(--font-playfair)] font-bold text-xl shadow-[var(--shadow-button)]">
                 {num}
               </div>
               <div className="text-[var(--color-accent-gold)] mb-6">
-                <Icon className="w-12 h-12" />
+                <Icon className="w-11 h-11 sm:w-12 sm:h-12" strokeWidth={1.5} />
               </div>
               <h3 className="font-[family:var(--font-playfair)] text-2xl font-semibold text-white mb-4">{title}</h3>
               <p className="text-[var(--color-on-dark-muted)] leading-relaxed">{text}</p>

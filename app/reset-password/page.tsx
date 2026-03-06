@@ -15,7 +15,6 @@ function ResetPasswordForm() {
   const searchParams = useSearchParams();
   const tokenFromUrl = searchParams.get("token") ?? "";
 
-  const [token] = useState(tokenFromUrl);
   const [newPassword, setNewPassword] = useState("");
   const [newPasswordConfirm, setNewPasswordConfirm] = useState("");
   const [loading, setLoading] = useState(false);
@@ -27,8 +26,9 @@ function ResetPasswordForm() {
     setError(null);
     setFieldErrors({});
 
+    const currentToken = searchParams.get("token") ?? "";
     const parsed = resetPasswordSchema.safeParse({
-      token,
+      token: currentToken,
       newPassword,
       newPasswordConfirm,
     });
@@ -111,7 +111,7 @@ function ResetPasswordForm() {
               className={`${AUTH_INPUT_CLASS} ${fieldErrors.newPassword ? AUTH_ERROR_BORDER : ""}`}
             />
             {fieldErrors.newPassword && (
-              <p className="mt-1 text-xs text-[var(--color-text-secondary)]" role="alert">{fieldErrors.newPassword}</p>
+              <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{fieldErrors.newPassword}</p>
             )}
           </div>
           <div className="mt-4">
@@ -128,11 +128,11 @@ function ResetPasswordForm() {
               className={`${AUTH_INPUT_CLASS} ${fieldErrors.newPasswordConfirm ? AUTH_ERROR_BORDER : ""}`}
             />
             {fieldErrors.newPasswordConfirm && (
-              <p className="mt-1 text-xs text-[var(--color-text-secondary)]" role="alert">{fieldErrors.newPasswordConfirm}</p>
+              <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{fieldErrors.newPasswordConfirm}</p>
             )}
           </div>
           {error && (
-            <div className="mt-4 rounded-xl border-0 bg-[var(--color-muted)]/10 p-3 text-sm text-[var(--color-text-secondary)]" role="alert">
+            <div className="mt-4 rounded-xl border-0 bg-[var(--color-muted)]/10 p-3 text-sm text-[var(--color-accent-red)]" role="alert">
               {error}
             </div>
           )}

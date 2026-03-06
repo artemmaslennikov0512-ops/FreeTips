@@ -4,8 +4,19 @@
  * 0.0.0.0 в браузере не открывается — заменяем на localhost.
  */
 
+import type { NextRequest } from "next/server";
+
 /** Хосты, с которыми браузер не может открыть ссылку (адреса биндинга сервера). */
 const UNUSABLE_HOSTS = ["0.0.0.0", "::"];
+
+/** Достаёт origin из NextRequest (для API routes). */
+function getRequestOrigin(request: NextRequest): string {
+  try {
+    return request.nextUrl?.origin ?? new URL(request.url).origin;
+  } catch {
+    return "https://example.com";
+  }
+}
 
 /**
  * Возвращает origin, пригодный для перехода из браузера.
@@ -38,17 +49,14 @@ export function getBaseUrl(): string {
 }
 
 /**
- * Базовый URL на сервере (API routes). Использует NEXT_PUBLIC_APP_URL или origin из request.
- * Нормализует 0.0.0.0 → localhost, чтобы ссылки открывались в браузере.
- * В production без NEXT_PUBLIC_APP_URL не используем origin (защита от open redirect при подмене Host).
+ * Базовый URL на сервере (API routes). Принимает origin или NextRequest.
+ * Использует NEXT_PUBLIC_APP_URL или origin из request.
+ * Нормализует 0.0.0.0 → localhost. В production без NEXT_PUBLIC_APP_URL не используем origin (защита от open redirect).
  */
-export function getBaseUrlFromRequest(origin: string): string {
+export function getBaseUrlFromRequest(originOrRequest: string | NextRequest): string {
+  const origin = typeof originOrRequest === "string" ? originOrRequest : getRequestOrigin(originOrRequest);
   const env = process.env.NEXT_PUBLIC_APP_URL;
-  if (env && typeof env === "string") {
-    return env.replace(/\/$/, "");
-  }
-  if (process.env.NODE_ENV === "production") {
-    return "";
-  }
+  if (env && typeof env === "string") return env.replace(/\/$/, "");
+  if (process.env.NODE_ENV === "production") return "";
   return toClientOrigin(origin);
 }

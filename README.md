@@ -81,7 +81,7 @@
 
 ## API
 
-Документация: [docs/API.md](./docs/API.md).
+Документация: [docs/API.md](./docs/API.md). Версионирование и политика обратной совместимости описаны в начале документа.
 
 **Auth (публичные):**  
 `POST /api/auth/register`, `POST /api/auth/login`, `POST /api/auth/refresh`, `POST /api/auth/logout`

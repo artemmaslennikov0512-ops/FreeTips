@@ -77,7 +77,7 @@ export default function ForgotPasswordPage() {
           {!success && (
             <>
               {error && (
-                <div className="mt-4 rounded-xl border-0 bg-[var(--color-muted)]/10 p-3 text-sm text-[var(--color-text-secondary)]" role="alert">
+                <div className="mt-4 rounded-xl border-0 bg-[var(--color-muted)]/10 p-3 text-sm text-[var(--color-accent-red)]" role="alert">
                   {error}
                 </div>
               )}
@@ -99,7 +99,7 @@ export default function ForgotPasswordPage() {
                     />
                   </div>
                   {fieldErrors.fullName && (
-                    <p className="mt-1 text-xs text-[var(--color-text-secondary)]" role="alert">{fieldErrors.fullName}</p>
+                    <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{fieldErrors.fullName}</p>
                   )}
                 </div>
                 <div>
@@ -119,7 +119,7 @@ export default function ForgotPasswordPage() {
                     />
                   </div>
                   {fieldErrors.login && (
-                    <p className="mt-1 text-xs text-[var(--color-text-secondary)]" role="alert">{fieldErrors.login}</p>
+                    <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{fieldErrors.login}</p>
                   )}
                 </div>
                 <div>
@@ -139,7 +139,7 @@ export default function ForgotPasswordPage() {
                     />
                   </div>
                   {fieldErrors.email && (
-                    <p className="mt-1 text-xs text-[var(--color-text-secondary)]" role="alert">{fieldErrors.email}</p>
+                    <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{fieldErrors.email}</p>
                   )}
                 </div>
                 <button

@@ -68,14 +68,7 @@ export async function POST(request: NextRequest, { params }: Params) {
     });
   });
 
-  let origin = "https://example.com";
-  try {
-    const url = new URL(request.url);
-    origin = url.origin;
-  } catch {
-    // ignore
-  }
-  const baseUrl = getBaseUrlFromRequest(origin);
+  const baseUrl = getBaseUrlFromRequest(request);
   const link = `${baseUrl}/register?token=${encodeURIComponent(token)}`;
   const { subject, html } = templateRegistrationLinkFromRequest({
     link,

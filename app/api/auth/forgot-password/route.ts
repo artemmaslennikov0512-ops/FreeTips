@@ -74,14 +74,7 @@ export async function POST(request: NextRequest) {
         });
       });
 
-      let origin = "https://example.com";
-      try {
-        const url = new URL(request.url);
-        origin = url.origin;
-      } catch {
-        // ignore
-      }
-      const baseUrl = getBaseUrlFromRequest(origin);
+      const baseUrl = getBaseUrlFromRequest(request);
       const resetLink = `${baseUrl}/reset-password?token=${encodeURIComponent(token)}`;
       const { subject, html } = templatePasswordReset({ resetLink });
 

@@ -8,7 +8,7 @@ import { AuthPageShell } from "@/components/AuthPageShell";
 import { changePasswordSchema } from "@/lib/validations";
 import { getFieldErrors } from "@/lib/form-errors";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
-import { AUTH_CARD_CLASS, AUTH_BTN_PRIMARY } from "@/lib/auth-form-classes";
+import { AUTH_CARD_CLASS, AUTH_INPUT_CLASS_NO_ICON, AUTH_ERROR_BORDER, AUTH_BTN_PRIMARY } from "@/lib/auth-form-classes";
 
 export default function ChangePasswordPage() {
   const router = useRouter();
@@ -158,13 +158,12 @@ export default function ChangePasswordPage() {
                   autoComplete="current-password"
                   value={currentPassword}
                   onChange={(e) => setCurrentPassword(e.target.value)}
-                  className={`w-full rounded-xl border-0 bg-[var(--color-light-gray)] px-4 py-2.5 text-[var(--color-text)] placeholder:text-[var(--color-muted)] focus:outline-none focus:outline-none ${
-                    fieldErrors.currentPassword ? "" : ""
-                  }`}
+                  className={`${AUTH_INPUT_CLASS_NO_ICON} ${fieldErrors.currentPassword ? AUTH_ERROR_BORDER : ""}`}
                   placeholder="Введите текущий пароль"
+                  aria-invalid={Boolean(fieldErrors.currentPassword)}
                 />
                 {fieldErrors.currentPassword && (
-                  <p className="mt-1 text-xs text-[var(--color-text-secondary)]" role="alert">{fieldErrors.currentPassword}</p>
+                  <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{fieldErrors.currentPassword}</p>
                 )}
               </div>
 
@@ -181,13 +180,12 @@ export default function ChangePasswordPage() {
                   autoComplete="new-password"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  className={`w-full rounded-xl border-0 bg-[var(--color-light-gray)] px-4 py-2.5 text-[var(--color-text)] placeholder:text-[var(--color-muted)] focus:outline-none focus:outline-none ${
-                    fieldErrors.newPassword ? "" : ""
-                  }`}
+                  className={`${AUTH_INPUT_CLASS_NO_ICON} ${fieldErrors.newPassword ? AUTH_ERROR_BORDER : ""}`}
                   placeholder="Минимум 8 символов, буква и цифра"
+                  aria-invalid={Boolean(fieldErrors.newPassword)}
                 />
                 {fieldErrors.newPassword && (
-                  <p className="mt-1 text-xs text-[var(--color-text-secondary)]" role="alert">{fieldErrors.newPassword}</p>
+                  <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{fieldErrors.newPassword}</p>
                 )}
               </div>
 
@@ -204,19 +202,18 @@ export default function ChangePasswordPage() {
                   autoComplete="new-password"
                   value={newPasswordConfirm}
                   onChange={(e) => setNewPasswordConfirm(e.target.value)}
-                  className={`w-full rounded-xl border-0 bg-[var(--color-light-gray)] px-4 py-2.5 text-[var(--color-text)] placeholder:text-[var(--color-muted)] focus:outline-none focus:outline-none ${
-                    fieldErrors.newPasswordConfirm ? "" : ""
-                  }`}
+                  className={`${AUTH_INPUT_CLASS_NO_ICON} ${fieldErrors.newPasswordConfirm ? AUTH_ERROR_BORDER : ""}`}
                   placeholder="Повторите новый пароль"
+                  aria-invalid={Boolean(fieldErrors.newPasswordConfirm)}
                 />
                 {fieldErrors.newPasswordConfirm && (
-                  <p className="mt-1 text-xs text-[var(--color-text-secondary)]" role="alert">{fieldErrors.newPasswordConfirm}</p>
+                  <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{fieldErrors.newPasswordConfirm}</p>
                 )}
               </div>
 
               {error && (
-                <div className="rounded-lg border border-0 bg-[var(--color-muted)]/10 p-4">
-                  <p className="text-sm text-[var(--color-text-secondary)]">{error}</p>
+                <div className="rounded-xl border-0 bg-[var(--color-muted)]/10 p-4" role="alert">
+                  <p className="text-sm text-[var(--color-accent-red)]">{error}</p>
                 </div>
               )}
 

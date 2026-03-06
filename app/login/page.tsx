@@ -106,7 +106,7 @@ export default function LoginPage() {
           </p>
 
           {error && (
-            <div className="mt-4 rounded-xl border-0 bg-[var(--color-muted)]/10 p-3 text-sm text-[var(--color-text-secondary)]">
+            <div className="mt-4 rounded-xl border-0 bg-[var(--color-muted)]/10 p-3 text-sm text-[var(--color-accent-red)]" role="alert">
               {error}
             </div>
           )}
@@ -129,7 +129,7 @@ export default function LoginPage() {
                 />
               </div>
               {fieldErrors.login && (
-                <p className="mt-1 text-xs text-[var(--color-text-secondary)]" role="alert">{fieldErrors.login}</p>
+                <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{fieldErrors.login}</p>
               )}
             </div>
 
@@ -150,7 +150,7 @@ export default function LoginPage() {
                 />
               </div>
               {fieldErrors.password && (
-                <p className="mt-1 text-xs text-[var(--color-text-secondary)]" role="alert">{fieldErrors.password}</p>
+                <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{fieldErrors.password}</p>
               )}
               <Link
                 href="/forgot-password"

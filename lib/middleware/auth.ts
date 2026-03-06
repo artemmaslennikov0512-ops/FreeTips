@@ -1,11 +1,11 @@
 /**
- * Middleware для проверки JWT и извлечения пользователя
- * Используется в API routes для защиты эндпоинтов
+ * Middleware для проверки JWT и извлечения пользователя.
+ * Использует IUserRepository (по умолчанию — Prisma); в тестах можно подменить через setUserRepository().
  */
 
 import { NextRequest, NextResponse } from "next/server";
 import { verifyAccessToken, type TokenPayload } from "@/lib/auth/jwt";
-import { db } from "@/lib/db";
+import { getUserRepository } from "@/lib/infrastructure/user-repository";
 
 /**
  * Middleware для проверки JWT access token
@@ -37,10 +37,8 @@ export async function requireAuth(
     };
   }
 
-  const user = await db.user.findUnique({
-    where: { id: payload.userId },
-    select: { id: true, role: true, isBlocked: true },
-  });
+  const repo = getUserRepository();
+  const user = await repo.findByIdForAuth(payload.userId);
 
   if (!user) {
     return {
@@ -116,12 +114,10 @@ export async function requireEstablishmentAdmin(
     return { response: authResult.response };
   }
 
-  const u = await db.user.findUnique({
-    where: { id: authResult.user.userId },
-    select: { establishmentId: true },
-  });
+  const repo = getUserRepository();
+  const establishmentId = await repo.findEstablishmentIdByUserId(authResult.user.userId);
 
-  if (!u?.establishmentId) {
+  if (!establishmentId) {
     return {
       response: NextResponse.json(
         { error: "Заведение не привязано к аккаунту" },
@@ -132,6 +128,6 @@ export async function requireEstablishmentAdmin(
 
   return {
     user: authResult.user,
-    establishmentId: u.establishmentId,
+    establishmentId,
   };
 }

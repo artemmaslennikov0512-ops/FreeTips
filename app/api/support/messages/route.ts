@@ -9,7 +9,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/middleware/auth";
 import { db } from "@/lib/db";
 import { supportMessageSchema } from "@/lib/validations";
-import { parseJsonWithLimit, MAX_BODY_SIZE_AUTH } from "@/lib/api/helpers";
+import { parseJsonWithLimit, MAX_BODY_SIZE_AUTH, jsonError, internalError } from "@/lib/api/helpers";
 import { logError } from "@/lib/logger";
 
 const STAFF_ROLES = ["ADMIN", "SUPERADMIN"];
@@ -73,10 +73,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ messages: list, threadId: thread?.id ?? null });
   } catch (err) {
     logError("support.messages.get", err, { userId });
-    return NextResponse.json(
-      { error: "Не удалось загрузить сообщения" },
-      { status: 500 },
-    );
+    return internalError("Не удалось загрузить сообщения");
   }
 }
 
@@ -94,18 +91,24 @@ export async function POST(request: NextRequest) {
 
   const parsed = supportMessageSchema.safeParse(parsedBody.data);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: "Неверные данные", issues: parsed.error.issues },
-      { status: 400 },
-    );
+    return jsonError(400, "Неверные данные", parsed.error.issues);
   }
 
   try {
     let thread = await db.supportThread.findUnique({ where: { userId } });
     if (!thread) {
-      thread = await db.supportThread.create({
-        data: { userId },
-      });
+      try {
+        thread = await db.supportThread.create({
+          data: { userId },
+        });
+      } catch (createErr: unknown) {
+        // Конкурентный запрос мог уже создать тред (unique userId)
+        const code = (createErr as { code?: string })?.code;
+        if (code === "P2002") {
+          thread = await db.supportThread.findUnique({ where: { userId } });
+        }
+        if (!thread) throw createErr;
+      }
     }
 
     const message = await db.supportMessage.create({
@@ -135,9 +138,6 @@ export async function POST(request: NextRequest) {
     });
   } catch (err) {
     logError("support.messages.post", err, { userId });
-    return NextResponse.json(
-      { error: "Не удалось отправить сообщение" },
-      { status: 500 },
-    );
+    return internalError("Не удалось отправить сообщение");
   }
 }

@@ -21,7 +21,7 @@ export function CTAPremium() {
         <div className="flex flex-wrap gap-5 justify-center">
           <Link
             href="/zayavka"
-            className="inline-flex items-center justify-center px-7 py-3 rounded-xl bg-[var(--color-white)] text-[var(--color-navy)] font-semibold text-[15px] hover:opacity-90 transition-all duration-300"
+            className="inline-flex items-center justify-center px-8 py-3.5 rounded-xl bg-[var(--color-white)] text-[var(--color-navy)] font-semibold text-[15px] transition-all duration-300 shadow-[var(--shadow-soft)] hover:shadow-[var(--shadow-card)] hover:-translate-y-0.5 hover:opacity-95"
           >
             Начать бесплатно
           </Link>

@@ -312,7 +312,7 @@ export default function PayPage() {
         </div>
 
         {result === "fail" && resultError && (
-          <p className="mt-4 text-center text-sm text-[var(--color-text-secondary)]" role="alert">{resultError}</p>
+          <p className="mt-4 text-center text-sm text-[var(--color-accent-red)]" role="alert">{resultError}</p>
         )}
 
         <button

@@ -16,7 +16,7 @@ const schema = z.object({
     .string()
     .trim()
     .length(6, "Код должен содержать 6 цифр")
-    .regex(/^\d{6}$/, "Проверьте правильность набранного номера"),
+    .regex(/^\d{6}$/, "Проверьте правильность введённого кода"),
 });
 
 export async function POST(request: NextRequest) {

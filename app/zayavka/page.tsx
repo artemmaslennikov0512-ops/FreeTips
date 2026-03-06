@@ -213,7 +213,7 @@ export default function ZayavkaPage() {
           </div>
 
           {error && (
-            <div className="mt-4 rounded-xl border-0 bg-[var(--color-muted)]/10 p-3 text-sm text-[var(--color-text-secondary)]" role="alert">
+            <div className="mt-4 rounded-xl border-0 bg-[var(--color-muted)]/10 p-3 text-sm text-[var(--color-accent-red)]" role="alert">
               {error}
             </div>
           )}
@@ -267,7 +267,7 @@ export default function ZayavkaPage() {
                         autoComplete="name"
                       />
                     </div>
-                    {fieldErrors.fullName && <p className="mt-1 text-xs text-[var(--color-text-secondary)]" role="alert">{fieldErrors.fullName}</p>}
+                    {fieldErrors.fullName && <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{fieldErrors.fullName}</p>}
                   </div>
                   {!isEstablishment && (
                     <div>
@@ -282,7 +282,7 @@ export default function ZayavkaPage() {
                           className={inputBase}
                         />
                       </div>
-                      {fieldErrors.dateOfBirth && <p className="mt-1 text-xs text-[var(--color-text-secondary)]" role="alert">{fieldErrors.dateOfBirth}</p>}
+                      {fieldErrors.dateOfBirth && <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{fieldErrors.dateOfBirth}</p>}
                     </div>
                   )}
                   <div>
@@ -304,7 +304,7 @@ export default function ZayavkaPage() {
                         aria-invalid={Boolean(fieldErrors.phone)}
                       />
                     </div>
-                    {fieldErrors.phone && <p className="mt-1 text-xs text-[var(--color-text-secondary)]" role="alert">{fieldErrors.phone}</p>}
+                    {fieldErrors.phone && <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{fieldErrors.phone}</p>}
                   </div>
                   <div>
                     <label htmlFor="zayavka-email" className="mb-1.5 block text-sm font-medium text-[var(--color-text)]">Почта</label>
@@ -320,7 +320,7 @@ export default function ZayavkaPage() {
                         autoComplete="email"
                       />
                     </div>
-                    {fieldErrors.email && <p className="mt-1 text-xs text-[var(--color-text-secondary)]" role="alert">{fieldErrors.email}</p>}
+                    {fieldErrors.email && <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{fieldErrors.email}</p>}
                     <p className="mt-1 text-xs text-[var(--color-muted)]">На неё будет выслана ссылка для регистрации после одобрения заявки</p>
                   </div>
                 </section>
@@ -355,7 +355,7 @@ export default function ZayavkaPage() {
                           className={inputBase}
                         />
                       </div>
-                      {fieldErrors.companyName && <p className="mt-1 text-xs text-[var(--color-text-secondary)]" role="alert">{fieldErrors.companyName}</p>}
+                      {fieldErrors.companyName && <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{fieldErrors.companyName}</p>}
                     </div>
                     <div>
                       <label htmlFor="zayavka-companyRole" className="mb-1.5 block text-sm font-medium text-[var(--color-text)]">Роль в компании (кто оставляет заявку)</label>
@@ -370,7 +370,7 @@ export default function ZayavkaPage() {
                           className={inputBase}
                         />
                       </div>
-                      {fieldErrors.companyRole && <p className="mt-1 text-xs text-[var(--color-text-secondary)]" role="alert">{fieldErrors.companyRole}</p>}
+                      {fieldErrors.companyRole && <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{fieldErrors.companyRole}</p>}
                     </div>
                     <div>
                       <label htmlFor="zayavka-employeeCount" className="mb-1.5 block text-sm font-medium text-[var(--color-text)]">Количество сотрудников</label>
@@ -387,7 +387,7 @@ export default function ZayavkaPage() {
                           className={inputBase}
                         />
                       </div>
-                      {fieldErrors.employeeCount && <p className="mt-1 text-xs text-[var(--color-text-secondary)]" role="alert">{fieldErrors.employeeCount}</p>}
+                      {fieldErrors.employeeCount && <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{fieldErrors.employeeCount}</p>}
                     </div>
                   </section>
                 ) : (
@@ -409,7 +409,7 @@ export default function ZayavkaPage() {
                             className={inputBase}
                           />
                         </div>
-                        {fieldErrors.activityType && <p className="mt-1 text-xs text-[var(--color-text-secondary)]" role="alert">{fieldErrors.activityType}</p>}
+                        {fieldErrors.activityType && <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{fieldErrors.activityType}</p>}
                       </div>
                       <div>
                         <label htmlFor="zayavka-establishment" className="mb-1.5 block text-sm font-medium text-[var(--color-text)]">Заведение (если есть)</label>
@@ -424,7 +424,7 @@ export default function ZayavkaPage() {
                             className={inputBase}
                           />
                         </div>
-                        {fieldErrors.establishment && <p className="mt-1 text-xs text-[var(--color-text-secondary)]" role="alert">{fieldErrors.establishment}</p>}
+                        {fieldErrors.establishment && <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{fieldErrors.establishment}</p>}
                       </div>
                     </section>
                     <section className="space-y-4" aria-labelledby="zayavka-admin-heading">
@@ -447,7 +447,7 @@ export default function ZayavkaPage() {
                             className={inputBase}
                           />
                         </div>
-                        {fieldErrors.adminFullName && <p className="mt-1 text-xs text-[var(--color-text-secondary)]" role="alert">{fieldErrors.adminFullName}</p>}
+                        {fieldErrors.adminFullName && <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{fieldErrors.adminFullName}</p>}
                       </div>
                       <div>
                         <label htmlFor="zayavka-adminContactPhone" className="mb-1.5 block text-sm font-medium text-[var(--color-text)]">Телефон администратора</label>
@@ -468,7 +468,7 @@ export default function ZayavkaPage() {
                             aria-invalid={Boolean(fieldErrors.adminContactPhone)}
                           />
                         </div>
-                        {fieldErrors.adminContactPhone && <p className="mt-1 text-xs text-[var(--color-text-secondary)]" role="alert">{fieldErrors.adminContactPhone}</p>}
+                        {fieldErrors.adminContactPhone && <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{fieldErrors.adminContactPhone}</p>}
                       </div>
                     </section>
                   </>

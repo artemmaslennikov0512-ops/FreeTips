@@ -228,7 +228,7 @@ export default function CabinetSettingsPage() {
         </div>
         <div className="p-6">
 
-        {saveError && <p className="mb-4 text-sm text-[var(--color-text)]/90">{saveError}</p>}
+        {saveError && <p className="mb-4 text-sm text-[var(--color-accent-red)]" role="alert">{saveError}</p>}
         {saveOk && (
           <div className="mb-4 flex items-center gap-2 text-sm text-[var(--color-text)]">
             <CheckCircle2 className="h-5 w-5 shrink-0" />
@@ -246,7 +246,7 @@ export default function CabinetSettingsPage() {
               onChange={(e) => setEditLogin(e.target.value)}
               className={cabinetInputClassName(!!profileFieldErrors.login)}
             />
-            {profileFieldErrors.login && <p className="mt-1 text-xs text-[var(--color-text)]/90" role="alert">{profileFieldErrors.login}</p>}
+            {profileFieldErrors.login && <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{profileFieldErrors.login}</p>}
           </div>
           <div>
             <label htmlFor="settings-email" className="mb-1 block text-sm font-medium text-[var(--color-text)]">Email (необязательно)</label>
@@ -258,7 +258,7 @@ export default function CabinetSettingsPage() {
               placeholder="email@example.com"
               className={cabinetInputClassName(!!profileFieldErrors.email)}
             />
-            {profileFieldErrors.email && <p className="mt-1 text-xs text-[var(--color-text)]/90" role="alert">{profileFieldErrors.email}</p>}
+            {profileFieldErrors.email && <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{profileFieldErrors.email}</p>}
           </div>
         </div>
 
@@ -275,7 +275,7 @@ export default function CabinetSettingsPage() {
                 placeholder="Иванов Иван Иванович"
                 className={cabinetInputClassName(!!profileFieldErrors.fullName)}
               />
-              {profileFieldErrors.fullName && <p className="mt-1 text-xs text-[var(--color-text)]/90" role="alert">{profileFieldErrors.fullName}</p>}
+              {profileFieldErrors.fullName && <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{profileFieldErrors.fullName}</p>}
             </div>
             <div>
               <label htmlFor="settings-birthDate" className="mb-1 block text-sm font-medium text-[var(--color-text)]">Дата рождения</label>
@@ -286,7 +286,7 @@ export default function CabinetSettingsPage() {
                 onChange={(e) => setEditBirthDate(e.target.value)}
                 className={cabinetInputClassName(!!profileFieldErrors.birthDate)}
               />
-              {profileFieldErrors.birthDate && <p className="mt-1 text-xs text-[var(--color-text)]/90" role="alert">{profileFieldErrors.birthDate}</p>}
+              {profileFieldErrors.birthDate && <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{profileFieldErrors.birthDate}</p>}
             </div>
             <div>
               <label htmlFor="settings-establishment" className="mb-1 block text-sm font-medium text-[var(--color-text)]">Заведение</label>
@@ -298,7 +298,7 @@ export default function CabinetSettingsPage() {
                 placeholder="Название заведения"
                 className={cabinetInputClassName(!!profileFieldErrors.establishment)}
               />
-              {profileFieldErrors.establishment && <p className="mt-1 text-xs text-[var(--color-text)]/90" role="alert">{profileFieldErrors.establishment}</p>}
+              {profileFieldErrors.establishment && <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{profileFieldErrors.establishment}</p>}
             </div>
           </div>
         </div>
@@ -321,7 +321,7 @@ export default function CabinetSettingsPage() {
         </div>
         <div className="p-6">
 
-        {pwError && <p className="mb-4 text-sm text-[var(--color-text)]/90">{pwError}</p>}
+        {pwError && <p className="mb-4 text-sm text-[var(--color-accent-red)]" role="alert">{pwError}</p>}
         {pwOk && (
           <div className="mb-4 flex items-center gap-2 text-sm text-[var(--color-text)]">
             <CheckCircle2 className="h-5 w-5 shrink-0" />
@@ -340,7 +340,7 @@ export default function CabinetSettingsPage() {
               onChange={(e) => setPwCurrent(e.target.value)}
               className={cabinetInputClassName(!!pwFieldErrors.currentPassword)}
             />
-            {pwFieldErrors.currentPassword && <p className="mt-1 text-xs text-[var(--color-text)]/90" role="alert">{pwFieldErrors.currentPassword}</p>}
+            {pwFieldErrors.currentPassword && <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{pwFieldErrors.currentPassword}</p>}
           </div>
           <div>
             <label htmlFor="settings-pwNew" className="mb-1 block text-sm font-medium text-[var(--color-text)]">Новый пароль</label>
@@ -352,7 +352,7 @@ export default function CabinetSettingsPage() {
               onChange={(e) => setPwNew(e.target.value)}
               className={cabinetInputClassName(!!pwFieldErrors.newPassword)}
             />
-            {pwFieldErrors.newPassword && <p className="mt-1 text-xs text-[var(--color-text)]/90" role="alert">{pwFieldErrors.newPassword}</p>}
+            {pwFieldErrors.newPassword && <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{pwFieldErrors.newPassword}</p>}
           </div>
           <div>
             <label htmlFor="settings-pwConfirm" className="mb-1 block text-sm font-medium text-[var(--color-text)]">Повторите новый пароль</label>
@@ -364,7 +364,7 @@ export default function CabinetSettingsPage() {
               onChange={(e) => setPwConfirm(e.target.value)}
               className={cabinetInputClassName(!!pwFieldErrors.newPasswordConfirm)}
             />
-            {pwFieldErrors.newPasswordConfirm && <p className="mt-1 text-xs text-[var(--color-text)]/90" role="alert">{pwFieldErrors.newPasswordConfirm}</p>}
+            {pwFieldErrors.newPasswordConfirm && <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{pwFieldErrors.newPasswordConfirm}</p>}
           </div>
         </div>
 

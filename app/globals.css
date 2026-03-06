@@ -308,12 +308,12 @@ html:not([data-theme="dark"]) body.admin-page .site-header .site-header-logo-fre
   color: #ffffff !important;
 }
 
-/* Светлая тема: основной блок ЛК и админки — градиент navy */
+/* Светлая тема: основной блок ЛК и админки — лёгкое затемнение (убраны сильные засветы), не сплошной navy */
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-main-block:not(.admin-main-block),
 html:not([data-theme="dark"]) .admin-panel .admin-main-block.cabinet-main-block {
-  background: linear-gradient(135deg, #0a192f 0%, color-mix(in srgb, #0a192f 95%, white) 50%, #0a192f 100%);
-  border: 1px solid rgba(197, 165, 114, 0.55);
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06);
+  background: linear-gradient(135deg, color-mix(in srgb, #0a192f 40%, white) 0%, color-mix(in srgb, #0a192f 25%, white) 50%, color-mix(in srgb, #0a192f 40%, white) 100%);
+  border: 1px solid rgba(197, 165, 114, 0.4);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.04);
 }
 
 /* Светлая тема: блоки на основном блоке — тот же фон и рамка, что у блока чата поддержки */
@@ -483,9 +483,9 @@ html:not([data-theme="dark"]) .cabinet-premium #api-key.cabinet-card .cabinet-bl
   color: rgba(255, 255, 255, 0.85) !important;
 }
 
-/* Светлая тема: страница операций — «Карта официанта» и «История операций» — весь текст белый */
+/* Светлая тема: страница операций — «Карта официанта» и «История операций» — весь текст белый (в т.ч. «Введите сумму не больше…») */
 html:not([data-theme="dark"]) .cabinet-premium #waiter-card.cabinet-card h3,
-html:not([data-theme="dark"]) .cabinet-premium #waiter-card.cabinet-card .p-6 > p,
+html:not([data-theme="dark"]) .cabinet-premium #waiter-card.cabinet-card .p-6 p,
 html:not([data-theme="dark"]) .cabinet-premium #waiter-card.cabinet-card .p-6 [class*="rounded-lg"],
 html:not([data-theme="dark"]) .cabinet-premium #waiter-card.cabinet-card .waiter-card-summary,
 html:not([data-theme="dark"]) .cabinet-premium #waiter-card.cabinet-card .waiter-card-summary * {

@@ -19,6 +19,7 @@ import { logError, logSecurity } from "@/lib/logger";
 import { getRequestId } from "@/lib/security/request";
 import { parseJsonWithLimit, MAX_BODY_SIZE_AUTH, jsonError, internalError } from "@/lib/api/helpers";
 import { verifyCsrfFromRequest } from "@/lib/security/csrf";
+import { consumeEmailVerified } from "@/lib/email-verification-store";
 
 export async function POST(request: NextRequest) {
   const requestId = getRequestId(request);
@@ -45,6 +46,16 @@ export async function POST(request: NextRequest) {
       email?: string;
     };
     const validated = registerSchema.parse(parsed.data) as RegisterPayload;
+
+    if (validated.email) {
+      const verified = consumeEmailVerified(validated.email);
+      if (!verified) {
+        return NextResponse.json(
+          { error: "Подтвердите почту перед регистрацией: введите email, нажмите «Подтвердить почту», введите код из письма." },
+          { status: 400 },
+        );
+      }
+    }
 
     const userRepo = getUserRepository();
     const existing = await userRepo.findByLogin(validated.login);

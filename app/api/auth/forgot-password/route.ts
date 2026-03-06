@@ -1,7 +1,7 @@
 /**
  * POST /api/auth/forgot-password
- * Запрос сброса пароля по логину или email.
- * Создаёт токен и отправляет письмо со ссылкой (Resend или SMTP: Mail.ru, Яндекс и др.).
+ * Запрос сброса пароля: проверяются логин, email и ФИО (как при регистрации).
+ * Создаёт токен и отправляет письмо только при совпадении всех данных.
  * Всегда возвращает успех (не раскрываем наличие аккаунта).
  */
 
@@ -20,9 +20,11 @@ import {
 } from "@/lib/auth/password-reset-token";
 import { getBaseUrlFromRequest } from "@/lib/get-base-url";
 import { sendEmail } from "@/lib/email/send";
+import { templatePasswordReset } from "@/lib/email/templates";
 
-function looksLikeEmail(s: string): boolean {
-  return s.includes("@") && s.length >= 5;
+function normalizeFullName(s: string | null | undefined): string {
+  if (!s || typeof s !== "string") return "";
+  return s.trim().toLowerCase().replace(/\s+/g, " ");
 }
 
 export async function POST(request: NextRequest) {
@@ -45,20 +47,20 @@ export async function POST(request: NextRequest) {
     if (!parsed.ok) return parsed.response;
     const validated = forgotPasswordRequestSchema.safeParse(parsed.data);
     if (!validated.success) {
-      return jsonError(400, "Укажите логин или email", validated.error.issues);
+      return jsonError(400, "Заполните все поля", validated.error.issues);
     }
 
-    const value = validated.data.loginOrEmail.trim();
-    const isEmail = looksLikeEmail(value);
-
+    const { login, email, fullName } = validated.data;
     const user = await db.user.findFirst({
-      where: isEmail
-        ? { email: { equals: value, mode: "insensitive" } }
-        : { login: { equals: value, mode: "insensitive" } },
-      select: { id: true, email: true },
+      where: { login: { equals: login, mode: "insensitive" } },
+      select: { id: true, email: true, fullName: true },
     });
 
-    if (user?.email) {
+    const emailMatch = user?.email && user.email.toLowerCase() === email.trim().toLowerCase();
+    const storedFullName = normalizeFullName(user?.fullName);
+    const fullNameMatch = storedFullName === "" || storedFullName === normalizeFullName(fullName);
+
+    if (user?.email && emailMatch && fullNameMatch) {
       logSecurity("auth.forgot_password.request", { requestId, ip, userId: user.id });
 
       const token = generatePasswordResetToken();
@@ -78,14 +80,7 @@ export async function POST(request: NextRequest) {
       }
       const baseUrl = getBaseUrlFromRequest(origin);
       const resetLink = `${baseUrl}/reset-password?token=${encodeURIComponent(token)}`;
-
-      const subject = "Сброс пароля — FreeTips";
-      const html = `
-        <p>Здравствуйте!</p>
-        <p>Вы запросили сброс пароля в сервисе FreeTips.</p>
-        <p><a href="${resetLink}">Перейти к сбросу пароля</a></p>
-        <p>Ссылка действительна 1 час. Если вы не запрашивали сброс, проигнорируйте это письмо.</p>
-      `;
+      const { subject, html } = templatePasswordReset({ resetLink });
 
       const sendResult = await sendEmail({ to: user.email, subject, html });
       if (!sendResult.ok) {

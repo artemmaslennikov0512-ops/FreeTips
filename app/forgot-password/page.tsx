@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { KeyRound, Mail } from "lucide-react";
+import { KeyRound, Mail, User, UserCircle } from "lucide-react";
 import { AuthPageShell } from "@/components/AuthPageShell";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { AUTH_CARD_CLASS, AUTH_INPUT_CLASS, AUTH_ERROR_BORDER, AUTH_BTN_PRIMARY } from "@/lib/auth-form-classes";
@@ -10,7 +10,9 @@ import { forgotPasswordRequestSchema } from "@/lib/validations";
 import { getFieldErrors } from "@/lib/form-errors";
 
 export default function ForgotPasswordPage() {
-  const [loginOrEmail, setLoginOrEmail] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [login, setLogin] = useState("");
+  const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -21,7 +23,11 @@ export default function ForgotPasswordPage() {
     setError(null);
     setFieldErrors({});
 
-    const parsed = forgotPasswordRequestSchema.safeParse({ loginOrEmail: loginOrEmail.trim() });
+    const parsed = forgotPasswordRequestSchema.safeParse({
+      fullName: fullName.trim(),
+      login: login.trim(),
+      email: email.trim().toLowerCase(),
+    });
     if (!parsed.success) {
       setFieldErrors(getFieldErrors(parsed.error));
       return;
@@ -64,8 +70,8 @@ export default function ForgotPasswordPage() {
           </div>
           <p className="mt-3 text-sm text-[var(--color-text-secondary)]">
             {success
-              ? "Если аккаунт с указанными данными найден, на email придёт ссылка для сброса пароля. Проверьте почту и папку «Спам»."
-              : "Введите логин или email — мы отправим ссылку для сброса пароля."}
+              ? "Если данные совпали с аккаунтом, на email придёт ссылка для сброса пароля. Проверьте почту и папку «Спам»."
+              : "Укажите ФИО, логин и почту как при регистрации — мы отправим ссылку на сброс пароля."}
           </p>
 
           {!success && (
@@ -75,29 +81,71 @@ export default function ForgotPasswordPage() {
                   {error}
                 </div>
               )}
-              <form onSubmit={handleSubmit} className="mt-6 text-left">
-                <label htmlFor="loginOrEmail" className="mb-1.5 block text-sm font-medium text-[var(--color-text)]">
-                  Логин или email
-                </label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--color-muted)]" />
-                  <input
-                    id="loginOrEmail"
-                    type="text"
-                    autoComplete="username email"
-                    value={loginOrEmail}
-                    onChange={(e) => setLoginOrEmail(e.target.value)}
-                    placeholder="Логин или email"
-                    className={`${AUTH_INPUT_CLASS} ${fieldErrors.loginOrEmail ? AUTH_ERROR_BORDER : ""}`}
-                  />
+              <form onSubmit={handleSubmit} className="mt-6 space-y-4 text-left">
+                <div>
+                  <label htmlFor="fullName" className="mb-1.5 block text-sm font-medium text-[var(--color-text)]">
+                    ФИО (как при регистрации)
+                  </label>
+                  <div className="relative">
+                    <UserCircle className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--color-muted)]" />
+                    <input
+                      id="fullName"
+                      type="text"
+                      autoComplete="name"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      placeholder="Иванов Иван Иванович"
+                      className={`${AUTH_INPUT_CLASS} ${fieldErrors.fullName ? AUTH_ERROR_BORDER : ""}`}
+                    />
+                  </div>
+                  {fieldErrors.fullName && (
+                    <p className="mt-1 text-xs text-[var(--color-text-secondary)]" role="alert">{fieldErrors.fullName}</p>
+                  )}
                 </div>
-                {fieldErrors.loginOrEmail && (
-                  <p className="mt-1 text-xs text-[var(--color-text-secondary)]" role="alert">{fieldErrors.loginOrEmail}</p>
-                )}
+                <div>
+                  <label htmlFor="login" className="mb-1.5 block text-sm font-medium text-[var(--color-text)]">
+                    Логин
+                  </label>
+                  <div className="relative">
+                    <User className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--color-muted)]" />
+                    <input
+                      id="login"
+                      type="text"
+                      autoComplete="username"
+                      value={login}
+                      onChange={(e) => setLogin(e.target.value)}
+                      placeholder="Ваш логин"
+                      className={`${AUTH_INPUT_CLASS} ${fieldErrors.login ? AUTH_ERROR_BORDER : ""}`}
+                    />
+                  </div>
+                  {fieldErrors.login && (
+                    <p className="mt-1 text-xs text-[var(--color-text-secondary)]" role="alert">{fieldErrors.login}</p>
+                  )}
+                </div>
+                <div>
+                  <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-[var(--color-text)]">
+                    Email
+                  </label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--color-muted)]" />
+                    <input
+                      id="email"
+                      type="email"
+                      autoComplete="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="email@example.com"
+                      className={`${AUTH_INPUT_CLASS} ${fieldErrors.email ? AUTH_ERROR_BORDER : ""}`}
+                    />
+                  </div>
+                  {fieldErrors.email && (
+                    <p className="mt-1 text-xs text-[var(--color-text-secondary)]" role="alert">{fieldErrors.email}</p>
+                  )}
+                </div>
                 <button
                   type="submit"
                   disabled={loading}
-                  className={`${AUTH_BTN_PRIMARY} mt-4 flex items-center justify-center`}
+                  className={`${AUTH_BTN_PRIMARY} mt-4 flex w-full items-center justify-center`}
                 >
                   {loading ? "Отправка…" : "Отправить ссылку"}
                 </button>

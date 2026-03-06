@@ -72,6 +72,7 @@ export default function AdminDashboardPage() {
   const [requestsLoading, setRequestsLoading] = useState(true);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [approvingId, setApprovingId] = useState<string | null>(null);
+  const [sendingTokenId, setSendingTokenId] = useState<string | null>(null);
   /** Выданные ссылки по id заявки (восстанавливаются из localStorage до истечения срока) */
   const [issuedLinksByRequestId, setIssuedLinksByRequestId] = useState<Record<string, string>>({});
 
@@ -172,6 +173,40 @@ export default function AdminDashboardPage() {
 
   const copyLink = (link: string) => {
     navigator.clipboard.writeText(link);
+  };
+
+  const handleSendToken = async (id: string) => {
+    const token = localStorage.getItem("accessToken");
+    if (!token) return;
+    setSendingTokenId(id);
+    try {
+      const res = await fetch(`/api/admin/registration-requests/${id}/send-token`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        alert(data.error || "Ошибка отправки");
+        return;
+      }
+      if (data.link) {
+        setIssuedLinksByRequestId((prev) => ({ ...prev, [id]: data.link }));
+        const expiresAt = data.expiresAt as string | undefined;
+        if (expiresAt) {
+          try {
+            const raw = localStorage.getItem(STORAGE_KEY_ISSUED_LINKS);
+            const stored = raw ? (JSON.parse(raw) as Record<string, StoredLink>) : {};
+            stored[id] = { link: data.link, expiresAt };
+            localStorage.setItem(STORAGE_KEY_ISSUED_LINKS, JSON.stringify(stored));
+          } catch {
+            // ignore
+          }
+        }
+      }
+      alert(data.message || "Ссылка отправлена на почту из заявки");
+    } finally {
+      setSendingTokenId(null);
+    }
   };
 
   const getLinkForRequest = (requestId: string) => issuedLinksByRequestId[requestId];
@@ -307,7 +342,7 @@ export default function AdminDashboardPage() {
                             )}
                             {linkForRow && (
                               <div className="flex flex-col gap-1">
-                                <div className="flex items-center gap-2">
+                                <div className="flex flex-wrap items-center gap-2">
                                   <input
                                     type="text"
                                     readOnly
@@ -322,12 +357,34 @@ export default function AdminDashboardPage() {
                                   >
                                     <Copy className="h-4 w-4" />
                                   </button>
+                                  <button
+                                    type="button"
+                                    disabled={sendingTokenId === r.id}
+                                    onClick={() => handleSendToken(r.id)}
+                                    className="inline-flex items-center gap-1 rounded-lg border border-[var(--color-brand-gold)] bg-transparent px-2.5 py-1 text-xs font-medium text-[var(--color-brand-gold)] hover:bg-[var(--color-brand-gold)]/10 disabled:opacity-50"
+                                    title={`Выслать ссылку на ${r.email}`}
+                                  >
+                                    <Send className="h-3.5 w-3.5" />
+                                    {sendingTokenId === r.id ? "Отправка…" : "Выслать токен"}
+                                  </button>
                                 </div>
                                 <span className="text-xs text-white/80">Одноразовая ссылка — только одна регистрация</span>
                               </div>
                             )}
                             {r.status === "APPROVED" && r.hasToken && !linkForRow && (
-                              <span className="text-xs text-white/80">Ссылка выдана (одноразовая, скопируйте при выдаче)</span>
+                              <div className="flex flex-wrap items-center gap-2">
+                                <span className="text-xs text-white/80">Ссылка выдана</span>
+                                <button
+                                  type="button"
+                                  disabled={sendingTokenId === r.id}
+                                  onClick={() => handleSendToken(r.id)}
+                                  className="inline-flex items-center gap-1 rounded-lg border border-[var(--color-brand-gold)] bg-transparent px-2.5 py-1 text-xs font-medium text-[var(--color-brand-gold)] hover:bg-[var(--color-brand-gold)]/10 disabled:opacity-50"
+                                  title={`Выслать ссылку на ${r.email}`}
+                                >
+                                  <Send className="h-3.5 w-3.5" />
+                                  {sendingTokenId === r.id ? "Отправка…" : "Выслать токен"}
+                                </button>
+                              </div>
                             )}
                           </td>
                         </tr>

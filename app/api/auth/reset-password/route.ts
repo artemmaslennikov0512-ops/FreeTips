@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
     if (!parsed.ok) return parsed.response;
     const validated = resetPasswordSchema.safeParse(parsed.data);
     if (!validated.success) {
-      return jsonError(400, "Неверные данные", validated.error.issues);
+      return jsonError(400, "Неверные данные", validated.error.issues, { hideDetailsInProduction: true });
     }
 
     const { token, newPassword } = validated.data;

@@ -1,6 +1,6 @@
 /**
  * Интеграционный тест: GET /api/health
- * Проверяет, что хендлер возвращает JSON с полями status, db, paygineConfigured.
+ * Проверяет, что хендлер возвращает JSON с полями status, db, latencyMs, timestamp.
  */
 
 import assert from "node:assert/strict";
@@ -15,7 +15,6 @@ test("health route returns JSON with status and db", async () => {
   assert.ok(body.status === "ok" || body.status === "degraded");
   assert.equal(typeof body.db, "string");
   assert.ok(body.db === "ok" || body.db === "error");
-  assert.equal(typeof body.paygineConfigured, "boolean");
   assert.ok(typeof body.latencyMs === "number");
   assert.ok(typeof body.timestamp === "string");
 

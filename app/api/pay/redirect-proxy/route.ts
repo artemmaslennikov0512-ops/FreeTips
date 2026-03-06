@@ -1,10 +1,13 @@
 /**
- * POST /api/pay/redirect-proxy — прокидывает форму на Paygine (SDPayIn).
- * Нужен, когда CSP или туннель блокируют прямой action на внешний домен.
+ * POST /api/pay/redirect-proxy — редирект на платёжную форму Paygine (SDPayIn).
+ * Принимает только tid + подписанный redirectToken; форму собирает сервер (защита от подделки параметров).
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { getSDPayInEndpoint } from "@/lib/payment/paygine/client";
+import { db } from "@/lib/db";
+import { getPaygineConfig, getAppUrl } from "@/lib/config";
+import { getSDPayInEndpoint, buildSDPayInFormParams } from "@/lib/payment/paygine/client";
+import { verifyPayRedirectToken } from "@/lib/payment/redirect-token";
 
 function escapeHtml(s: string): string {
   return s
@@ -22,8 +25,6 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
-  const paygineUrl = getSDPayInEndpoint();
-
   let formData: FormData;
   try {
     formData = await request.formData();
@@ -31,12 +32,48 @@ export async function POST(request: NextRequest) {
     return new NextResponse("Invalid form data", { status: 400 });
   }
 
-  const inputs = Array.from(formData.entries())
-    .filter((entry): entry is [string, string] => typeof entry[1] === "string")
-    .map(
-      ([name, value]) =>
-        `<input type="hidden" name="${escapeHtml(name)}" value="${escapeHtml(value)}" />`,
-    )
+  const tid = formData.get("tid");
+  const redirectToken = formData.get("redirectToken");
+  if (typeof tid !== "string" || typeof redirectToken !== "string" || !tid.trim() || !redirectToken.trim()) {
+    return new NextResponse("Неверные параметры редиректа. Перейдите к оплате заново.", { status: 400 });
+  }
+
+  const verifiedTid = verifyPayRedirectToken(redirectToken.trim());
+  if (!verifiedTid || verifiedTid !== tid.trim()) {
+    return new NextResponse("Ссылка на оплату недействительна или истекла. Перейдите к оплате заново.", { status: 400 });
+  }
+
+  const config = getPaygineConfig();
+  const baseUrl = getAppUrl();
+  if (!config || !baseUrl) {
+    return new NextResponse("Платёжный шлюз не настроен.", { status: 503 });
+  }
+
+  const tx = await db.transaction.findUnique({
+    where: { id: verifiedTid },
+    select: { id: true, status: true, externalId: true, amountKop: true, paygineOrderSdRef: true },
+  });
+
+  if (!tx || tx.status !== "PENDING" || !tx.externalId || !tx.paygineOrderSdRef?.trim()) {
+    return new NextResponse("Платёж не найден или уже обработан. Создайте платёж заново.", { status: 400 });
+  }
+
+  const orderId = parseInt(tx.externalId, 10);
+  if (!Number.isFinite(orderId)) {
+    return new NextResponse("Неверные данные платежа.", { status: 400 });
+  }
+
+  const formParams = buildSDPayInFormParams(config, {
+    orderId,
+    amountKop: Number(tx.amountKop),
+    sdRef: tx.paygineOrderSdRef.trim(),
+    url: `${baseUrl}/pay/result?tid=${tx.id}&outcome=success`,
+    failurl: `${baseUrl}/pay/result?tid=${tx.id}&outcome=fail`,
+  });
+
+  const paygineUrl = getSDPayInEndpoint();
+  const inputs = Object.entries(formParams)
+    .map(([name, value]) => `<input type="hidden" name="${escapeHtml(name)}" value="${escapeHtml(String(value))}" />`)
     .join("\n");
 
   const html = `<!DOCTYPE html>

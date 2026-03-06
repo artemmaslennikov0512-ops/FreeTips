@@ -1,7 +1,7 @@
 /**
  * Отправка тестовых писем на указанный email (все 4 шаблона).
- * Запуск из корня проекта: npx tsx scripts/send-test-emails.ts
- * Требуется настроенная почта в .env (SMTP_* или RESEND_*).
+ * Запуск из корня проекта: TEST_EMAIL=your@mail.ru npx tsx scripts/send-test-emails.ts
+ * Требуется в .env: настроенная почта (SMTP_* или RESEND_*) и TEST_EMAIL — адрес получателя.
  */
 
 import dotenv from "dotenv";
@@ -9,7 +9,11 @@ import path from "path";
 
 dotenv.config({ path: path.join(process.cwd(), ".env") });
 
-const TEST_EMAIL = "yeup.ukpukp@mail.ru";
+const TEST_EMAIL = process.env.TEST_EMAIL?.trim();
+if (!TEST_EMAIL) {
+  console.error("Укажите TEST_EMAIL в .env или в переменных окружения (адрес для тестовых писем).");
+  process.exit(1);
+}
 
 async function main() {
   const { sendEmail } = await import("../lib/email/send");

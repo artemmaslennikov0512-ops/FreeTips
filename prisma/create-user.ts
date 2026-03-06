@@ -20,11 +20,13 @@ const prisma = new PrismaClient();
 
 async function main() {
   const login = process.argv[2]?.trim();
-  const password = process.argv[3]?.trim();
+  const passwordFromArg = process.argv[3]?.trim();
   const roleArg = process.argv[4]?.toUpperCase().trim();
+  const password = process.env.CREATE_USER_PASSWORD?.trim() || passwordFromArg;
 
   if (!login || !password) {
-    console.error("Использование: npx tsx prisma/create-user.ts <логин> <пароль> [RECIPIENT|ADMIN]");
+    console.error("Использование: npx tsx prisma/create-user.ts <логин> [пароль] [RECIPIENT|ADMIN]");
+    console.error("Пароль можно задать через CREATE_USER_PASSWORD в .env или третьим аргументом.");
     process.exit(1);
   }
 

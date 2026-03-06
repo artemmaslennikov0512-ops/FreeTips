@@ -12,17 +12,12 @@ export const runtime = "nodejs";
 
 export async function GET() {
   const start = Date.now();
-  const paygineConfigured = !!(
-    process.env.PAYGINE_SECTOR?.trim() &&
-    process.env.PAYGINE_PASSWORD?.trim()
-  );
   try {
     await db.$queryRaw(Prisma.sql`SELECT 1`);
     const latencyMs = Date.now() - start;
     return NextResponse.json({
       status: "ok",
       db: "ok",
-      paygineConfigured,
       latencyMs,
       timestamp: new Date().toISOString(),
     });
@@ -32,7 +27,6 @@ export async function GET() {
       {
         status: "degraded",
         db: "error",
-        paygineConfigured,
         latencyMs,
         timestamp: new Date().toISOString(),
       },

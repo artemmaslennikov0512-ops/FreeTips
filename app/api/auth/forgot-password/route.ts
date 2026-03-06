@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
     if (!parsed.ok) return parsed.response;
     const validated = forgotPasswordRequestSchema.safeParse(parsed.data);
     if (!validated.success) {
-      return jsonError(400, "Заполните все поля", validated.error.issues);
+      return jsonError(400, "Заполните все поля", validated.error.issues, { hideDetailsInProduction: true });
     }
 
     const { login, email, fullName } = validated.data;
@@ -67,8 +67,11 @@ export async function POST(request: NextRequest) {
       const tokenHash = hashPasswordResetToken(token);
       const expiresAt = getPasswordResetTokenExpiresAt();
 
-      await db.passwordResetToken.create({
-        data: { userId: user.id, tokenHash, expiresAt },
+      await db.$transaction(async (tx) => {
+        await tx.passwordResetToken.deleteMany({ where: { userId: user.id } });
+        await tx.passwordResetToken.create({
+          data: { userId: user.id, tokenHash, expiresAt },
+        });
       });
 
       let origin = "https://example.com";

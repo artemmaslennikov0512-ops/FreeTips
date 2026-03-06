@@ -53,11 +53,11 @@ export async function generateRefreshToken(payload: TokenPayload): Promise<strin
 }
 
 /**
- * Валидирует access token
+ * Валидирует access token (явно только HS256).
  */
 export async function verifyAccessToken(token: string): Promise<TokenPayload | null> {
   try {
-    const { payload } = await jwtVerify(token, getJWTSecretKey());
+    const { payload } = await jwtVerify(token, getJWTSecretKey(), { algorithms: ["HS256"] });
     return payload as TokenPayload;
   } catch {
     return null;
@@ -65,11 +65,11 @@ export async function verifyAccessToken(token: string): Promise<TokenPayload | n
 }
 
 /**
- * Валидирует refresh token
+ * Валидирует refresh token (явно только HS256).
  */
 export async function verifyRefreshToken(token: string): Promise<TokenPayload | null> {
   try {
-    const { payload } = await jwtVerify(token, getJWTRefreshSecretKey());
+    const { payload } = await jwtVerify(token, getJWTRefreshSecretKey(), { algorithms: ["HS256"] });
     return payload as TokenPayload;
   } catch {
     return null;

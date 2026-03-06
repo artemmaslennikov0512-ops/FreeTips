@@ -83,14 +83,17 @@ export async function readTextWithLimit(
 
 /**
  * Единый формат JSON-ошибки: { error: string, details?: unknown }
+ * При hideDetailsInProduction: true в production details не включаются в ответ.
  */
 export function jsonError(
   status: number,
   message: string,
   details?: unknown,
+  options?: { hideDetailsInProduction?: boolean },
 ): NextResponse<ApiErrorBody> {
   const body: ApiErrorBody = { error: message };
-  if (details !== undefined) body.details = details;
+  const hideInProd = options?.hideDetailsInProduction && getNodeEnv() === "production";
+  if (details !== undefined && !hideInProd) body.details = details;
   return NextResponse.json(body, { status });
 }
 

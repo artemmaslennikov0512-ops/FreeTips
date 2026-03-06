@@ -6,18 +6,18 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { AutoSubmitForm } from "@/components/AutoSubmitForm";
+import { getPaygineConfig, getAppUrl } from "@/lib/config";
 import { buildSDPayInFormParams } from "@/lib/payment/paygine/client";
-
-const PAYGINE_SECTOR = process.env.PAYGINE_SECTOR;
-const PAYGINE_PASSWORD = process.env.PAYGINE_PASSWORD;
-const APP_BASE_URL = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ?? "";
+import { createPayRedirectToken } from "@/lib/payment/redirect-token";
 
 export default async function PayRedirectPage({ searchParams }: { searchParams: Promise<{ tid?: string; method?: string }> }) {
   const { tid, method } = await searchParams;
   if (!tid) redirect("/");
   if (method && method !== "card") redirect(`/pay/redirect?tid=${tid}`);
 
-  if (!PAYGINE_SECTOR || !PAYGINE_PASSWORD) {
+  const config = getPaygineConfig();
+  const APP_BASE_URL = getAppUrl();
+  if (!config) {
     return (
       <div className="mx-auto max-w-md px-4 py-12 text-center">
         <p className="text-[var(--color-text-secondary)]">Платёжный шлюз не настроен.</p>
@@ -79,23 +79,15 @@ export default async function PayRedirectPage({ searchParams }: { searchParams: 
     );
   }
 
-  const config = { sector: PAYGINE_SECTOR, password: PAYGINE_PASSWORD };
-  const formParams = buildSDPayInFormParams(config, {
-    orderId,
-    amountKop: Number(tx.amountKop),
-    sdRef: orderSdRef,
-    url: `${APP_BASE_URL}/pay/result?tid=${tx.id}&outcome=success`,
-    failurl: `${APP_BASE_URL}/pay/result?tid=${tx.id}&outcome=fail`,
-  });
+  const redirectToken = createPayRedirectToken(tx.id);
   const action = "/api/pay/redirect-proxy";
 
   return (
     <div className="mx-auto max-w-md px-4 py-12 text-center">
       <p className="text-[var(--color-text)]">Перенаправление на платёжную форму…</p>
       <form id="paygine-form" method="POST" action={action}>
-        {Object.entries(formParams).map(([name, value]) => (
-          <input key={name} type="hidden" name={name} value={value} />
-        ))}
+        <input type="hidden" name="tid" value={tx.id} />
+        <input type="hidden" name="redirectToken" value={redirectToken} />
         <button
           type="submit"
           className="mt-6 rounded-xl bg-[var(--color-accent-gold)] px-6 py-3 font-semibold text-[var(--color-navy)] hover:opacity-90"

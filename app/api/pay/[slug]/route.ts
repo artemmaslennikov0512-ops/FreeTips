@@ -19,6 +19,7 @@ import {
   PAY_RATE_LIMIT_SLUG,
 } from "@/lib/middleware/rate-limit";
 import { parseJsonWithLimit, MAX_BODY_SIZE_DEFAULT, jsonError, internalError } from "@/lib/api/helpers";
+import { verifyCsrfFromRequest } from "@/lib/security/csrf";
 import { site } from "@/config/site";
 
 const DEMO_SLUG = "demoPaySlug" in site && typeof site.demoPaySlug === "string" ? site.demoPaySlug : null;
@@ -100,6 +101,11 @@ export async function POST(request: NextRequest, { params }: Params) {
   if (!rateLimitSlug.allowed) {
     logSecurity("pay.init.rate_limit_slug", { requestId, ip, slug });
     return NextResponse.json({ error: "Слишком много запросов на эту ссылку. Попробуйте позже." }, { status: 429 });
+  }
+
+  if (!verifyCsrfFromRequest(request)) {
+    logSecurity("pay.init.csrf_invalid", { requestId, ip, slug });
+    return NextResponse.json({ error: "Некорректный запрос. Обновите страницу и попробуйте снова." }, { status: 403 });
   }
 
   const tipLink = await db.tipLink.findUnique({

@@ -160,17 +160,19 @@ export async function checkRateLimitByUserId(
 
 /**
  * Получает IP адрес из request.
- * В production прокси должен передавать x-forwarded-for или x-real-ip.
+ * Если TRUST_PROXY=true|1 — используем x-forwarded-for / x-real-ip (должен выставлять доверенный прокси).
+ * Иначе — только request.ip если есть (Vercel и др.), чтобы не доверять подделываемым заголовкам.
  */
 export function getClientIP(request: NextRequest): string {
-  const forwarded = request.headers.get("x-forwarded-for");
-  if (forwarded) {
-    return forwarded.split(",")[0].trim();
+  const trustProxy = process.env.TRUST_PROXY === "true" || process.env.TRUST_PROXY === "1";
+  if (trustProxy) {
+    const forwarded = request.headers.get("x-forwarded-for");
+    if (forwarded) return forwarded.split(",")[0].trim();
+    const realIP = request.headers.get("x-real-ip");
+    if (realIP) return realIP;
   }
-  const realIP = request.headers.get("x-real-ip");
-  if (realIP) {
-    return realIP;
-  }
+  const req = request as NextRequest & { ip?: string };
+  if (typeof req.ip === "string" && req.ip) return req.ip;
   return "unknown";
 }
 

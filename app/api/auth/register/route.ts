@@ -180,7 +180,7 @@ export async function POST(request: NextRequest) {
         message: e.message,
       }));
       const message = details[0]?.message ?? "Неверные данные";
-      return jsonError(400, message, details);
+      return jsonError(400, message, details, { hideDetailsInProduction: true });
     }
     if (error instanceof Error && error.message === "TOKEN_ALREADY_USED") {
       return NextResponse.json(

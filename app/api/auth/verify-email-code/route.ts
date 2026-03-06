@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
     if (!result.success) {
       const first = result.error.issues[0];
       const message = first?.path.includes("code") ? first.message : "Неверные данные";
-      return jsonError(400, message, result.error.issues);
+      return jsonError(400, message, result.error.issues, { hideDetailsInProduction: true });
     }
 
     const { email, code } = result.data;

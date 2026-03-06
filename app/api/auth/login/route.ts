@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
     const user = await userRepo.findByLogin(validated.login);
 
     if (!user) {
-      logSecurity("auth.login.failed", { requestId, ip, login: validated.login });
+      logSecurity("auth.login.failed", { requestId, ip });
       return NextResponse.json(
         { error: "Неверный логин или пароль" },
         { status: 401 },
@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
 
     const isValidPassword = await verifyPassword(validated.password, user.passwordHash);
     if (!isValidPassword) {
-      logSecurity("auth.login.failed", { requestId, ip, userId: user.id });
+      logSecurity("auth.login.failed", { requestId, ip });
       return NextResponse.json(
         { error: "Неверный логин или пароль" },
         { status: 401 },
@@ -106,7 +106,7 @@ export async function POST(request: NextRequest) {
         message: e.message,
       }));
       const message = details[0]?.message ?? "Неверные данные";
-      return jsonError(400, message, details);
+      return jsonError(400, message, details, { hideDetailsInProduction: true });
     }
 
     logError("auth.login.error", error, { requestId, ip });

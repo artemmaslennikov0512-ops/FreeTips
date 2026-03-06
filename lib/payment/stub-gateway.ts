@@ -21,7 +21,7 @@ const WEBHOOK_SIGNATURE_PREFIX = "sha256=";
 function verifyWebhookSignature(rawBody: string, signature: string | null): boolean {
   const secret = process.env.PAYMENT_WEBHOOK_SECRET;
   if (!secret || typeof secret !== "string" || secret.length === 0) {
-    return process.env.NODE_ENV !== "production";
+    return false;
   }
   if (!signature || typeof signature !== "string") {
     return false;

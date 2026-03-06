@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
     if (!parsed.ok) return parsed.response;
     const result = schema.safeParse(parsed.data);
     if (!result.success) {
-      return jsonError(400, "Укажите корректный email", result.error.issues);
+      return jsonError(400, "Укажите корректный email", result.error.issues, { hideDetailsInProduction: true });
     }
 
     const email = result.data.email;

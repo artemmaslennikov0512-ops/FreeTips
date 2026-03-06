@@ -228,135 +228,142 @@ export default function PayPage() {
   if (fontClr) cardStyle["--pay-font" as string] = fontClr;
 
   return (
-    <div className="pay-page pay-page--cards mx-auto min-h-[60vh] max-w-md px-4 py-8" style={wrapperStyle}>
-      {/* Логотип и переключатель темы */}
-      <div className="pay-page-header relative flex flex-col items-center gap-4 pb-4">
-        <div className="absolute right-0 top-0">
+    <div className="pay-page pay-page--cards mx-auto min-h-[60vh] max-w-lg px-4 py-8" style={wrapperStyle}>
+      {/* Основной блок со скруглёнными краями и отступами — внутри все карточки */}
+      <div
+        className="pay-page-outer-block relative rounded-2xl border-2 p-5 shadow-[var(--shadow-card)]"
+        style={Object.keys(cardStyle).length ? cardStyle : undefined}
+      >
+        <div className="absolute right-4 top-4">
           <ThemeToggle />
         </div>
-        <div className="flex items-center gap-2">
-          {branding?.logoUrl ? (
-            <img src={branding.logoUrl} alt="" className="h-10 w-auto max-w-[120px] object-contain" />
+
+        {/* Логотип */}
+        <div className="flex justify-center">
+          <div className="flex items-center gap-2">
+            {branding?.logoUrl ? (
+              <img src={branding.logoUrl} alt="" className="h-10 w-auto max-w-[120px] object-contain" />
+            ) : (
+              <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--pay-page-accent)] text-sm font-bold text-white">FT</span>
+            )}
+            <span
+              className="font-[family:var(--font-playfair)] text-xl font-bold"
+              style={{ color: fontClr ?? "var(--color-text)" }}
+            >
+              <span style={{ color: fontClr ? "inherit" : "var(--color-navy)", opacity: 0.9 }}>Free</span>
+              <span className="text-[var(--pay-page-accent)]">Tips</span>
+            </span>
+          </div>
+        </div>
+
+        {/* Карточка: получатель */}
+        <div className="pay-page-card card" style={Object.keys(cardStyle).length ? cardStyle : undefined}>
+          <div className="pay-page-recipient">
+            <div className="flex flex-col items-center gap-2">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--pay-page-accent)]/15 text-[var(--pay-page-accent)]">
+                <User className="h-6 w-6" />
+              </div>
+              <p className="pay-page-recipient-name min-w-0 max-w-full truncate text-center" style={{ color: fontClr ?? undefined }}>
+                {recipientName}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Карточка: сумма чаевых */}
+        <div className="pay-page-card card" style={Object.keys(cardStyle).length ? cardStyle : undefined}>
+          <p className="pay-page-section-title">Сумма чаевых</p>
+          <div className="pay-page-amounts">
+            {PRESETS.map((r) => {
+              const numCustom = customAmount.trim() ? Number(customAmount.replace(",", ".")) : null;
+              const isSelected = (numCustom != null && !Number.isNaN(numCustom) && numCustom === r) || (numCustom == null && amount === r);
+              return (
+                <button
+                  key={r}
+                  type="button"
+                  onClick={() => {
+                    setAmount(r);
+                    setCustomAmount(String(r));
+                  }}
+                  className={`pay-page-amount-btn amount-btn ${isSelected ? "is-active active" : ""}`}
+                >
+                  {r} ₽
+                </button>
+              );
+            })}
+          </div>
+          <p className="pay-page-label">Выберите сумму или введите свою</p>
+          <div className="pay-page-input-wrap custom-amount has-icon">
+            <span className="pay-page-currency" aria-hidden="true">₽</span>
+            <input
+              type="text"
+              inputMode="decimal"
+              placeholder="100"
+              value={customAmount}
+              onChange={(e) => setCustomAmount(e.target.value)}
+              aria-label="Своя сумма в рублях"
+            />
+          </div>
+        </div>
+
+        {/* Карточка: отзыв */}
+        <div className="pay-page-card card" style={Object.keys(cardStyle).length ? cardStyle : undefined}>
+          <p className="pay-page-section-title">Отзыв (необязательно)</p>
+          <div className="pay-page-input-wrap">
+            <textarea
+              className="review-textarea"
+              rows={3}
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              maxLength={500}
+              placeholder="Спасибо за отличный сервис!"
+              aria-label="Отзыв"
+            />
+          </div>
+        </div>
+
+        {result === "fail" && resultError && (
+          <p className="mt-2 text-center text-sm text-[var(--color-accent-red)]" role="alert">
+            {resultError}
+          </p>
+        )}
+
+        <button
+          type="button"
+          onClick={handlePay}
+          disabled={paying || kop < 100}
+          className="pay-button pay-page-submit"
+        >
+          {paying ? (
+            <span className="inline-flex items-center justify-center gap-2">
+              <Loader2 className="h-5 w-5 animate-spin" />
+              Отправка…
+            </span>
           ) : (
-            <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--pay-page-accent)] text-sm font-bold text-white">FT</span>
+            `Оплатить ${rub.toFixed(rub >= 1 ? 0 : 2)} ₽`
           )}
-          <span
-            className="font-[family:var(--font-playfair)] text-xl font-bold"
-            style={{ color: fontClr ?? "var(--color-text)" }}
-          >
-            <span style={{ color: fontClr ? "inherit" : "var(--color-navy)", opacity: 0.9 }}>Free</span>
-            <span className="text-[var(--pay-page-accent)]">Tips</span>
-          </span>
-        </div>
-      </div>
+        </button>
 
-      {/* Карточка: получатель */}
-      <div className="pay-page-card card" style={Object.keys(cardStyle).length ? cardStyle : undefined}>
-        <div className="pay-page-recipient">
-          <div className="flex flex-col items-center gap-2">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--pay-page-accent)]/15 text-[var(--pay-page-accent)]">
-              <User className="h-6 w-6" />
-            </div>
-            <p className="pay-page-recipient-name min-w-0 max-w-full truncate text-center" style={{ color: fontClr ?? undefined }}>
-              {recipientName}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Карточка: сумма чаевых */}
-      <div className="pay-page-card card" style={Object.keys(cardStyle).length ? cardStyle : undefined}>
-        <p className="pay-page-section-title">Сумма чаевых</p>
-        <div className="pay-page-amounts">
-          {PRESETS.map((r) => {
-            const numCustom = customAmount.trim() ? Number(customAmount.replace(",", ".")) : null;
-            const isSelected = (numCustom != null && !Number.isNaN(numCustom) && numCustom === r) || (numCustom == null && amount === r);
-            return (
-              <button
-                key={r}
-                type="button"
-                onClick={() => {
-                  setAmount(r);
-                  setCustomAmount(String(r));
-                }}
-                className={`pay-page-amount-btn amount-btn ${isSelected ? "is-active active" : ""}`}
-              >
-                {r} ₽
-              </button>
-            );
-          })}
-        </div>
-        <p className="pay-page-label">Выберите сумму или введите свою</p>
-        <div className="pay-page-input-wrap custom-amount has-icon">
-          <span className="pay-page-currency" aria-hidden="true">₽</span>
-          <input
-            type="text"
-            inputMode="decimal"
-            placeholder="100"
-            value={customAmount}
-            onChange={(e) => setCustomAmount(e.target.value)}
-            aria-label="Своя сумма в рублях"
-          />
-        </div>
-      </div>
-
-      {/* Карточка: отзыв */}
-      <div className="pay-page-card card" style={Object.keys(cardStyle).length ? cardStyle : undefined}>
-        <p className="pay-page-section-title">Отзыв (необязательно)</p>
-        <div className="pay-page-input-wrap">
-          <textarea
-            className="review-textarea"
-            rows={3}
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-            maxLength={500}
-            placeholder="Спасибо за отличный сервис!"
-            aria-label="Отзыв"
-          />
-        </div>
-      </div>
-
-      {result === "fail" && resultError && (
-        <p className="mt-2 text-center text-sm text-[var(--color-accent-red)]" role="alert">
-          {resultError}
-        </p>
-      )}
-
-      <button
-        type="button"
-        onClick={handlePay}
-        disabled={paying || kop < 100}
-        className="pay-button pay-page-submit"
-      >
-        {paying ? (
-          <span className="inline-flex items-center justify-center gap-2">
-            <Loader2 className="h-5 w-5 animate-spin" />
-            Отправка…
-          </span>
-        ) : (
-          `Оплатить ${rub.toFixed(rub >= 1 ? 0 : 2)} ₽`
-        )}
-      </button>
-
-      {/* Информационный блок */}
-      <div className="pay-page-card card pay-page-info-card" style={Object.keys(cardStyle).length ? cardStyle : undefined}>
-        <div className="info-block">
-          {qrDataUrl && (
+        {/* Информационный блок */}
+        <div className="pay-page-card card pay-page-info-card" style={Object.keys(cardStyle).length ? cardStyle : undefined}>
+          <div className="info-block">
+            {qrDataUrl && (
+              <div className="info-row">
+                <Smartphone className="info-block-icon size-5 shrink-0" aria-hidden />
+                <span>Покажите QR — гость отсканирует эту страницу</span>
+              </div>
+            )}
             <div className="info-row">
-              <Smartphone className="info-block-icon size-5 shrink-0" aria-hidden />
-              <span>Покажите QR — гость отсканирует эту страницу</span>
+              <CreditCard className="info-block-icon size-5 shrink-0" aria-hidden />
+              <span>Оплата банковской картой. Регистрация не нужна.</span>
+            </div>
+          </div>
+          {qrDataUrl && (
+            <div className="mt-4 flex justify-center">
+              <img src={qrDataUrl} alt="QR страницы" className="rounded-lg border border-[var(--pay-page-card-border)] bg-[var(--pay-page-card-bg)]" width={140} height={140} />
             </div>
           )}
-          <div className="info-row">
-            <CreditCard className="info-block-icon size-5 shrink-0" aria-hidden />
-            <span>Оплата банковской картой. Регистрация не нужна.</span>
-          </div>
         </div>
-        {qrDataUrl && (
-          <div className="mt-4 flex justify-center">
-            <img src={qrDataUrl} alt="QR страницы" className="rounded-lg border border-[var(--pay-page-card-border)] bg-[var(--pay-page-card-bg)]" width={140} height={140} />
-          </div>
-        )}
       </div>
     </div>
   );

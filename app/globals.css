@@ -444,6 +444,12 @@ html:not([data-theme="dark"]) .pay-page {
   border: var(--pay-page-card-border) !important;
 }
 
+/* Основной блок — скруглённые края и отступы, внутри остаются карточки */
+.pay-page .pay-page-outer-block {
+  background: var(--pay-page-card-bg) !important;
+  border: var(--pay-page-card-border) !important;
+}
+
 /* Фон страницы оплаты (карточный режим): светло-серый / тёмный */
 .pay-page.pay-page--cards {
   background: #f5f7fa;
@@ -453,7 +459,7 @@ html:not([data-theme="dark"]) .pay-page {
   background: #1a1f2e;
 }
 
-/* Карточки блоков на странице оплаты */
+/* Внутренние карточки внутри основного блока */
 .pay-page .pay-page-card.card {
   background: #fff;
   border-radius: 20px;

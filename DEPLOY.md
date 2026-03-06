@@ -47,7 +47,7 @@ cd 1tips
 
 Создай на сервере файл `.env` (скопируй с локальной машины через `scp` или вставь вручную). Обязательно задай:
 
-- `NEXT_PUBLIC_APP_URL=https://твой-домен.ru`
+- `NEXT_PUBLIC_APP_URL=https://free-tips.ru`
 - остальные переменные из твоего локального `.env` (JWT_*, POSTGRES_*, PAYGINE_* и т.д.).
 
 ### 4. Запуск приложения
@@ -69,7 +69,7 @@ docker compose exec web sh -c "npx tsx prisma/seed.ts"
 
 ```bash
 apt install -y nginx certbot python3-certbot-nginx
-certbot --nginx -d твой-домен.ru
+certbot --nginx -d free-tips.ru
 ```
 
 Пример конфига Nginx для сайта (файл `/etc/nginx/sites-available/1tips`, затем `ln -s /etc/nginx/sites-available/1tips /etc/nginx/sites-enabled/` и `nginx -t && systemctl reload nginx`):
@@ -77,7 +77,7 @@ certbot --nginx -d твой-домен.ru
 ```nginx
 server {
     listen 80;
-    server_name твой-домен.ru www.твой-домен.ru;
+    server_name free-tips.ru www.free-tips.ru;
     location / {
         proxy_pass http://127.0.0.1:3000;
         proxy_http_version 1.1;
@@ -91,7 +91,7 @@ server {
 }
 ```
 
-После этого запусти получение сертификата: `certbot --nginx -d твой-домен.ru`. Certbot сам добавит HTTPS. Либо можно использовать Caddy — он сам получает сертификаты.
+После этого запусти получение сертификата: `certbot --nginx -d free-tips.ru`. Certbot сам добавит HTTPS. Либо можно использовать Caddy — он сам получает сертификаты.
 
 После этого обновления делаешь как в общих вариантах выше: **вариант 1** — правки в Cursor локально → `git push` → на сервере `git pull` и `./scripts/deploy-update.sh`; **вариант 2** — Cursor Remote SSH к этому VPS, правки в папке `/var/www/1tips`, затем `./scripts/deploy-update.sh`.
 
@@ -126,7 +126,7 @@ server {
   ```
 - Создай на сервере файл `.env` (скопируй с локальной машины или заполни вручную). **Секреты и пароли только в `.env` на сервере, не в репозитории.**
 - Задай в `.env` на сервере:
-  - `NEXT_PUBLIC_APP_URL=https://твой-домен.ru`
+  - `NEXT_PUBLIC_APP_URL=https://free-tips.ru`
   - Все нужные переменные (JWT_*, POSTGRES_*, PAYGINE_* и т.д.).
 - Запуск:
   ```bash
@@ -210,7 +210,7 @@ cd /var/www/1tips
 
 ## Что важно для продакшена
 
-- В `.env` на сервере обязательно задать **`NEXT_PUBLIC_APP_URL`** (полный URL сайта, например `https://твой-домен.ru`) — иначе редиректы оплаты не будут работать.
+- В `.env` на сервере обязательно задать **`NEXT_PUBLIC_APP_URL`** (полный URL сайта, например `https://free-tips.ru`) — иначе редиректы оплаты не будут работать.
 - Секреты (JWT_*, POSTGRES_*, PAYGINE_*, SUPERADMIN_*) хранить только в `.env` на сервере или в секрет-менеджере, не в репозитории.
 - Перед приложением поставить обратный прокси (Nginx/Caddy) с HTTPS (Let's Encrypt).
 - Регулярно делать бэкапы БД (volume `pgdata` или `pg_dump`).
@@ -223,4 +223,4 @@ cd /var/www/1tips
 |--------|--------|
 | Редактировать в Cursor и не заменять папку на сервере | **Вариант 1:** правки локально → `git push` → на сервере `git pull` + `./scripts/deploy-update.sh`. **Вариант 2:** Cursor Remote SSH → открываешь папку на сервере и правишь там; для применения — `./scripts/deploy-update.sh`. |
 | Где хранить секреты | Только в `.env` на сервере (или в секрет-менеджере), не в Git. |
-| Обязательная переменная в проде | `NEXT_PUBLIC_APP_URL=https://твой-домен.ru` |
+| Обязательная переменная в проде | `NEXT_PUBLIC_APP_URL=https://free-tips.ru` |

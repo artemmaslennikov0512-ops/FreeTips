@@ -400,6 +400,7 @@ html:not([data-theme="dark"]) .card-block {
 /* ===== СТРАНИЦА ОПЛАТЫ (/pay/[slug]) — выравнивание, кнопки сумм, поля, типографика ===== */
 /* Переменные для светлой и тёмной темы (бренд заведения может переопределять --pay-brand-primary) */
 .pay-page {
+  --pay-page-accent: var(--pay-brand-primary, #4A6FA5);
   --pay-page-bg: var(--color-bg-sides);
   --pay-page-card-bg: var(--color-bg-sides);
   --pay-page-card-border: 1px solid rgba(197, 165, 114, 0.4);
@@ -443,64 +444,111 @@ html:not([data-theme="dark"]) .pay-page {
   border: var(--pay-page-card-border) !important;
 }
 
-/* Имя получателя — по центру, обводка золотая тонкая */
+/* Фон страницы оплаты (карточный режим): светло-серый / тёмный */
+.pay-page.pay-page--cards {
+  background: #f5f7fa;
+  padding: 20px;
+}
+[data-theme="dark"] .pay-page.pay-page--cards {
+  background: #1a1f2e;
+}
+
+/* Карточки блоков на странице оплаты */
+.pay-page .pay-page-card.card {
+  background: #fff;
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  margin-bottom: 16px;
+  border: none;
+}
+[data-theme="dark"] .pay-page .pay-page-card.card {
+  background: #2d3748;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Имя получателя — по центру, внутри карточки */
 .pay-page-recipient {
   text-align: center;
-  margin-top: 1.5rem;
-  margin-bottom: 1.5rem;
-  padding: 1rem 1.25rem;
-  border-radius: 12px;
-  border: var(--pay-page-gold-border);
+  margin-top: 0;
+  margin-bottom: 0;
+  padding: 0.25rem 0;
+  border: none;
+  border-radius: 0;
 }
 .pay-page-recipient-name {
-  font-size: 1.25rem;
+  font-size: 1.35rem;
   font-weight: 600;
   line-height: 1.3;
   color: var(--pay-page-text);
 }
 @media (min-width: 640px) {
   .pay-page-recipient-name {
-    font-size: 1.5rem;
+    font-size: 1.6rem;
   }
 }
 
-/* Блок кнопок сумм — отступы, центрирование, тонкая золотая обводка; в светлой теме фон темнее */
+/* Заголовки секций — мелкий шрифт, цвет бренда */
+.pay-page-section-title {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--pay-page-accent);
+  text-align: center;
+  margin: 0 0 1rem;
+}
+
+/* Блок кнопок сумм — пилюли, активная залита цветом бренда */
 .pay-page-amounts {
-  margin-top: 1.5rem;
-  margin-bottom: 0.25rem;
-  padding: 0.75rem;
-  border-radius: 12px;
-  border: var(--pay-page-gold-border);
-  background: var(--pay-page-amounts-wrap-bg);
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  padding: 0;
+  border-radius: 0;
+  border: none;
+  background: transparent;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   gap: 0.75rem;
 }
+.pay-page-amount-btn.amount-btn,
 .pay-page-amount-btn {
   min-height: 48px;
   min-width: 56px;
-  padding: 0.75rem 1.25rem;
+  padding: 12px 1.25rem;
   font-size: 1rem;
   font-weight: 500;
   font-family: inherit;
-  border-radius: 12px;
-  border: 2px solid var(--pay-page-amount-btn-bg);
-  background: var(--pay-page-amount-btn-bg);
+  border-radius: 40px;
+  border: 1px solid #e0e4ec;
+  background: #f2f4f8;
   color: var(--pay-page-text);
   cursor: pointer;
-  transition: background 0.2s, border-color 0.2s, transform 0.15s;
+  transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.15s;
   touch-action: manipulation;
 }
 .pay-page-amount-btn:hover {
-  border-color: var(--pay-page-input-border);
-  background: var(--pay-page-input-bg);
+  background: #e8ebf0;
+  border-color: #d0d5de;
 }
-.pay-page-amount-btn.is-active {
-  border-color: var(--pay-brand-primary, var(--pay-page-amount-btn-active-border));
-  background: var(--pay-brand-primary, var(--pay-page-amount-btn-active-bg));
-  color: var(--pay-page-text);
-  box-shadow: 0 0 0 1px var(--pay-brand-primary, var(--color-brand-gold));
+.pay-page-amount-btn.is-active.active {
+  background: var(--pay-page-accent);
+  border-color: var(--pay-page-accent);
+  color: #fff;
+  box-shadow: none;
+}
+[data-theme="dark"] .pay-page-amount-btn.amount-btn,
+[data-theme="dark"] .pay-page-amount-btn {
+  background: #3a4559;
+  border-color: #4a5568;
+  color: #e2e8f0;
+}
+[data-theme="dark"] .pay-page-amount-btn:hover {
+  background: #454f63;
+}
+[data-theme="dark"] .pay-page-amount-btn.is-active.active {
+  background: var(--pay-page-accent);
+  border-color: var(--pay-page-accent);
+  color: #fff;
 }
 
 /* Подпись над полем */
@@ -509,15 +557,22 @@ html:not([data-theme="dark"]) .pay-page {
   font-weight: 500;
   color: var(--pay-page-text-muted);
   text-align: center;
-  margin-top: 1.25rem;
+  margin-top: 0.5rem;
   margin-bottom: 0.5rem;
 }
 
-/* Поле суммы и поле отзыва — скругление, рамка, иконка рубля */
+/* Поле своей суммы — пилюля, фокус подсветка брендом */
 .pay-page-input-wrap {
   display: flex;
   justify-content: center;
   margin-bottom: 0;
+}
+.pay-page-input-wrap.custom-amount.has-icon {
+  position: relative;
+  width: 100%;
+  max-width: 280px;
+  margin-left: auto;
+  margin-right: auto;
 }
 .pay-page-input-wrap.has-icon {
   position: relative;
@@ -539,6 +594,28 @@ html:not([data-theme="dark"]) .pay-page {
 .pay-page-input-wrap.has-icon input {
   padding-left: 2.5rem;
 }
+.pay-page .custom-amount input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid #e0e4ec;
+  border-radius: 40px;
+  font-size: 16px;
+  font-family: inherit;
+  background: #f9fafc;
+  color: var(--pay-page-text);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.pay-page .custom-amount input:focus {
+  outline: none;
+  border-color: var(--pay-page-accent);
+  box-shadow: 0 0 0 3px rgba(74, 111, 165, 0.2);
+}
+[data-theme="dark"] .pay-page .custom-amount input {
+  background: #3a4559;
+  border-color: #4a5568;
+  color: #f7fafc;
+}
+
 .pay-page-input-wrap input,
 .pay-page-input-wrap textarea {
   width: 100%;
@@ -562,42 +639,96 @@ html:not([data-theme="dark"]) .pay-page {
 .pay-page-input-wrap input:focus,
 .pay-page-input-wrap textarea:focus {
   outline: none;
-  border-color: var(--pay-brand-primary, var(--color-brand-gold));
-  box-shadow: 0 0 0 3px var(--pay-page-input-focus-ring);
-}
-.pay-page-input-wrap textarea {
-  resize: none;
-  min-height: 2.75rem;
+  border-color: var(--pay-page-accent);
+  box-shadow: 0 0 0 3px rgba(74, 111, 165, 0.2);
 }
 
-/* Кнопка оплаты — крупная, бренд, hover */
-.pay-page .pay-page-submit {
-  margin-top: 1.5rem;
+/* Поле отзыва — многострочное, скругление 20px, мин. высота 80px */
+.pay-page .review-textarea {
   width: 100%;
-  min-height: 52px;
-  padding: 0.875rem 1.5rem;
-  font-size: 1.125rem;
+  max-width: none;
+  padding: 14px 16px;
+  border: 1px solid #e0e4ec;
+  border-radius: 20px;
+  font-family: inherit;
+  font-size: 14px;
+  resize: vertical;
+  min-height: 80px;
+  background: #f9fafc;
+  color: var(--pay-page-text);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.pay-page .review-textarea::placeholder {
+  color: var(--pay-page-text-muted);
+  opacity: 0.85;
+}
+[data-theme="dark"] .pay-page .review-textarea {
+  background: #3a4559;
+  border-color: #4a5568;
+  color: #f7fafc;
+}
+
+/* Кнопка оплаты — яркая, пилюля 60px, тень, сумма в тексте */
+.pay-page .pay-button.pay-page-submit,
+.pay-page .pay-page-submit {
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  width: 100%;
+  padding: 18px;
+  min-height: 56px;
+  font-size: 18px;
   font-weight: 600;
   font-family: inherit;
-  border-radius: 12px;
+  border-radius: 60px;
   border: none;
-  background: var(--pay-brand-primary, var(--color-brand-gold));
-  color: #0a192f;
+  background: var(--pay-page-accent);
+  color: #fff;
   cursor: pointer;
-  transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 8px 16px rgba(74, 111, 165, 0.3);
 }
+.pay-page .pay-button.pay-page-submit:hover:not(:disabled),
 .pay-page .pay-page-submit:hover:not(:disabled) {
-  opacity: 0.92;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  background: #3a5a8c;
+  transform: scale(1.02);
+  box-shadow: 0 8px 20px rgba(74, 111, 165, 0.4);
+}
+[data-theme="dark"] .pay-page .pay-button.pay-page-submit,
+[data-theme="dark"] .pay-page .pay-page-submit {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
 }
 .pay-page .pay-page-submit:active:not(:disabled) {
-  transform: translateY(0);
+  transform: scale(1);
 }
 .pay-page .pay-page-submit:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+  transform: none;
+}
+
+/* Информационный блок — подсказки с иконками */
+.pay-page .info-block {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  background: #f0f2f5;
+  border-radius: 16px;
+  font-size: 14px;
+  color: #4a5568;
+}
+.pay-page .info-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.pay-page .info-block-icon {
+  color: var(--pay-page-accent);
+  flex-shrink: 0;
+}
+[data-theme="dark"] .pay-page .info-block {
+  background: #2d3748;
+  color: #a0aec0;
 }
 
 /* Текст внизу — мелкий, приглушённый */

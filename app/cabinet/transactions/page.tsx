@@ -286,7 +286,7 @@ export default function CabinetTransactionsPage() {
                       parseFloat(sdPageAmount) < 100 ||
                       Math.round(parseFloat(sdPageAmount) * 100) > maxPayoutPerRequestKop
                     }
-                    className="cabinet-btn-gold w-auto rounded-xl bg-[var(--color-brand-gold)] px-6 py-3 font-semibold text-[#0a192f] transition-all hover:opacity-90 disabled:opacity-50 disabled:pointer-events-none"
+                    className="cabinet-btn-gold w-auto rounded-xl bg-[var(--color-brand-gold)] px-6 py-3 text-[14px] font-semibold text-[#0a192f] transition-all hover:opacity-90 disabled:opacity-50 disabled:pointer-events-none"
                   >
                     {sdPageLoading ? "Переход…" : "Вывести средства"}
                   </button>

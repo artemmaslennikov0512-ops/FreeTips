@@ -309,7 +309,7 @@ function RegisterForm() {
                       type="button"
                       onClick={handleVerifyEmailCode}
                       disabled={verifyingCode || emailCode.length !== EMAIL_CODE_LENGTH}
-                      className="rounded-xl bg-[var(--color-brand-gold)] px-3 py-2 text-sm font-semibold text-[#0a192f] hover:opacity-90 disabled:opacity-50"
+                      className="rounded-xl bg-[var(--color-brand-gold)] px-3 py-2 text-[14px] font-semibold text-[#0a192f] hover:opacity-90 disabled:opacity-50"
                     >
                       {verifyingCode ? "Проверка…" : "Проверить"}
                     </button>

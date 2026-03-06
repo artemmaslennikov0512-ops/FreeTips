@@ -262,7 +262,7 @@ export default function AdminUsersPage() {
               type="button"
               onClick={handleCreateToken}
               disabled={tokenLoading}
-              className="admin-users-token-btn inline-flex items-center gap-2 rounded-xl bg-[var(--color-brand-gold)] px-4 py-2.5 text-sm font-semibold text-[#0a192f] transition-colors hover:opacity-90 disabled:opacity-60"
+              className="admin-users-token-btn inline-flex items-center gap-2 rounded-xl bg-[var(--color-brand-gold)] px-4 py-2.5 text-[14px] font-semibold text-[#0a192f] transition-colors hover:opacity-90 disabled:opacity-60"
             >
               {tokenLoading ? "Создание..." : "Выдать токен регистрации"}
             </button>
@@ -270,7 +270,7 @@ export default function AdminUsersPage() {
               type="button"
               onClick={handleBlockAll}
               disabled={blockAllLoading}
-              className="inline-flex items-center gap-1.5 rounded-xl border-0 bg-black px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#1a1a1a] disabled:opacity-60"
+              className="inline-flex items-center gap-1.5 rounded-xl border-0 bg-black px-4 py-2.5 text-[14px] font-semibold text-white transition-colors hover:bg-[#1a1a1a] disabled:opacity-60"
             >
               <Lock className="h-4 w-4" />
               {blockAllLoading ? "Выполняется..." : "Заблокировать всех"}

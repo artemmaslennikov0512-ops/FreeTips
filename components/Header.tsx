@@ -131,28 +131,28 @@ export function Header() {
             <span className="site-header-logo-text font-[family:var(--font-playfair)] text-sm font-bold sm:text-base lg:text-lg text-[var(--color-navy)]"><span className="site-header-logo-free">Free</span><span className="text-[var(--color-brand-gold)]">Tips</span></span>
           </Link>
           <nav className="hidden lg:flex shrink-0 items-center justify-center gap-1.5 xl:gap-2 2xl:gap-3" aria-label="Навигация">
-            <Link href="/#features" className="whitespace-nowrap rounded-xl border-0 bg-[var(--color-white)]/95 backdrop-blur-sm shadow-[var(--shadow-subtle)] px-2.5 py-2 font-medium text-[var(--color-navy)] transition-all hover:shadow-[var(--shadow-soft)] hover:-translate-y-0.5 text-xs xl:px-3 xl:py-2.5 xl:text-sm 2xl:px-4 2xl:text-[15px]">Преимущества</Link>
-            <Link href="/#process" className="whitespace-nowrap rounded-xl border-0 bg-[var(--color-white)]/95 backdrop-blur-sm shadow-[var(--shadow-subtle)] px-2.5 py-2 font-medium text-[var(--color-navy)] transition-all hover:shadow-[var(--shadow-soft)] hover:-translate-y-0.5 text-xs xl:px-3 xl:py-2.5 xl:text-sm 2xl:px-4 2xl:text-[15px]">Как работает</Link>
-            <Link href="/#business" className="whitespace-nowrap rounded-xl border-0 bg-[var(--color-white)]/95 backdrop-blur-sm shadow-[var(--shadow-subtle)] px-2.5 py-2 font-medium text-[var(--color-navy)] transition-all hover:shadow-[var(--shadow-soft)] hover:-translate-y-0.5 text-xs xl:px-3 xl:py-2.5 xl:text-sm 2xl:px-4 2xl:text-[15px]">Для бизнеса</Link>
-            <Link href="/oferta" className="whitespace-nowrap rounded-xl border-0 bg-[var(--color-white)]/95 backdrop-blur-sm shadow-[var(--shadow-subtle)] px-2.5 py-2 font-medium text-[var(--color-navy)] transition-all hover:shadow-[var(--shadow-soft)] hover:-translate-y-0.5 text-xs xl:px-3 xl:py-2.5 xl:text-sm 2xl:px-4 2xl:text-[15px]">Тарифы</Link>
-            <Link href="/kontakty" className="whitespace-nowrap rounded-xl border-0 bg-[var(--color-white)]/95 backdrop-blur-sm shadow-[var(--shadow-subtle)] px-2.5 py-2 font-medium text-[var(--color-navy)] transition-all hover:shadow-[var(--shadow-soft)] hover:-translate-y-0.5 text-xs xl:px-3 xl:py-2.5 xl:text-sm 2xl:px-4 2xl:text-[15px]">Контакты</Link>
+            <Link href="/#features" className="whitespace-nowrap rounded-xl border-0 bg-[var(--color-white)]/95 backdrop-blur-sm shadow-[var(--shadow-subtle)] px-2.5 py-2 font-medium text-[14px] text-[var(--color-navy)] transition-all hover:shadow-[var(--shadow-soft)] hover:-translate-y-0.5 xl:px-3 xl:py-2.5 2xl:px-4">Преимущества</Link>
+            <Link href="/#process" className="whitespace-nowrap rounded-xl border-0 bg-[var(--color-white)]/95 backdrop-blur-sm shadow-[var(--shadow-subtle)] px-2.5 py-2 font-medium text-[14px] text-[var(--color-navy)] transition-all hover:shadow-[var(--shadow-soft)] hover:-translate-y-0.5 xl:px-3 xl:py-2.5 2xl:px-4">Как работает</Link>
+            <Link href="/#business" className="whitespace-nowrap rounded-xl border-0 bg-[var(--color-white)]/95 backdrop-blur-sm shadow-[var(--shadow-subtle)] px-2.5 py-2 font-medium text-[14px] text-[var(--color-navy)] transition-all hover:shadow-[var(--shadow-soft)] hover:-translate-y-0.5 xl:px-3 xl:py-2.5 2xl:px-4">Для бизнеса</Link>
+            <Link href="/oferta" className="whitespace-nowrap rounded-xl border-0 bg-[var(--color-white)]/95 backdrop-blur-sm shadow-[var(--shadow-subtle)] px-2.5 py-2 font-medium text-[14px] text-[var(--color-navy)] transition-all hover:shadow-[var(--shadow-soft)] hover:-translate-y-0.5 xl:px-3 xl:py-2.5 2xl:px-4">Тарифы</Link>
+            <Link href="/kontakty" className="whitespace-nowrap rounded-xl border-0 bg-[var(--color-white)]/95 backdrop-blur-sm shadow-[var(--shadow-subtle)] px-2.5 py-2 font-medium text-[14px] text-[var(--color-navy)] transition-all hover:shadow-[var(--shadow-soft)] hover:-translate-y-0.5 xl:px-3 xl:py-2.5 2xl:px-4">Контакты</Link>
           </nav>
           <div className="flex shrink-0 items-center gap-2 sm:gap-3 lg:gap-4">
             {user ? (
               <>
-                <Link href={cabinetHref} className="hidden sm:inline-flex max-w-[140px] truncate items-center justify-center rounded-xl bg-[var(--color-navy)] px-3 py-2 text-[var(--color-white)] font-semibold transition-all hover:opacity-90 hover:-translate-y-0.5 text-xs lg:max-w-[180px] lg:px-4 lg:py-2.5 lg:text-sm xl:text-[15px] xl:max-w-none">
+                <Link href={cabinetHref} className="hidden sm:inline-flex max-w-[140px] truncate items-center justify-center rounded-xl bg-[var(--color-navy)] px-3 py-2 text-[14px] text-[var(--color-white)] font-semibold transition-all hover:opacity-90 hover:-translate-y-0.5 lg:max-w-[180px] lg:px-4 lg:py-2.5 xl:max-w-none">
                   {displayName}
                 </Link>
-                <button type="button" onClick={handleLogout} className="inline-flex items-center justify-center rounded-xl bg-[var(--color-navy)] px-3 py-2 text-[var(--color-white)] font-semibold transition-all hover:opacity-90 hover:-translate-y-0.5 text-xs sm:px-4 sm:py-2.5 sm:text-sm lg:text-[15px] lg:px-5">
+                <button type="button" onClick={handleLogout} className="inline-flex items-center justify-center rounded-xl bg-[var(--color-navy)] px-3 py-2 text-[14px] text-[var(--color-white)] font-semibold transition-all hover:opacity-90 hover:-translate-y-0.5 sm:px-4 sm:py-2.5 lg:px-5">
                   Выйти
                 </button>
               </>
             ) : (
               <>
-                <Link href="/login" className="hidden sm:inline-flex items-center justify-center rounded-xl border-0 bg-[var(--color-white)] px-3 py-2 text-[var(--color-navy)] font-semibold transition-all hover:opacity-90 text-xs lg:px-4 lg:py-2.5 lg:text-sm xl:text-[15px] xl:px-5">
+                <Link href="/login" className="hidden sm:inline-flex items-center justify-center rounded-xl border-0 bg-[var(--color-white)] px-3 py-2 text-[14px] text-[var(--color-navy)] font-semibold transition-all hover:opacity-90 lg:px-4 lg:py-2.5 xl:px-5">
                   Войти
                 </Link>
-                <Link href="/zayavka" className="inline-flex items-center justify-center rounded-xl bg-[var(--color-navy)] px-4 py-2 text-[var(--color-white)] font-semibold transition-all shadow-[var(--shadow-subtle)] hover:shadow-[var(--shadow-soft)] hover:-translate-y-0.5 text-xs sm:px-5 sm:py-2.5 sm:text-sm lg:text-[15px] lg:px-7">
+                <Link href="/zayavka" className="inline-flex items-center justify-center rounded-xl bg-[var(--color-navy)] px-4 py-2 text-[14px] text-[var(--color-white)] font-semibold transition-all shadow-[var(--shadow-subtle)] hover:shadow-[var(--shadow-soft)] hover:-translate-y-0.5 sm:px-5 sm:py-2.5 lg:px-7">
                   Начать
                 </Link>
               </>
@@ -180,21 +180,21 @@ export function Header() {
                 </button>
               </div>
               <nav className="flex flex-col gap-2">
-                <Link href="/#features" onClick={close} className="py-3 font-medium text-white hover:text-[var(--color-brand-gold)]">Преимущества</Link>
-                <Link href="/#process" onClick={close} className="py-3 font-medium text-white hover:text-[var(--color-brand-gold)]">Как работает</Link>
-                <Link href="/#business" onClick={close} className="py-3 font-medium text-white hover:text-[var(--color-brand-gold)]">Для бизнеса</Link>
-                <Link href="/oferta" onClick={close} className="py-3 font-medium text-white hover:text-[var(--color-brand-gold)]">Тарифы</Link>
-                <Link href="/kontakty" onClick={close} className="py-3 font-medium text-white hover:text-[var(--color-brand-gold)]">Контакты</Link>
+                <Link href="/#features" onClick={close} className="py-3 text-[14px] font-medium text-white hover:text-[var(--color-brand-gold)]">Преимущества</Link>
+                <Link href="/#process" onClick={close} className="py-3 text-[14px] font-medium text-white hover:text-[var(--color-brand-gold)]">Как работает</Link>
+                <Link href="/#business" onClick={close} className="py-3 text-[14px] font-medium text-white hover:text-[var(--color-brand-gold)]">Для бизнеса</Link>
+                <Link href="/oferta" onClick={close} className="py-3 text-[14px] font-medium text-white hover:text-[var(--color-brand-gold)]">Тарифы</Link>
+                <Link href="/kontakty" onClick={close} className="py-3 text-[14px] font-medium text-white hover:text-[var(--color-brand-gold)]">Контакты</Link>
                 <div className="mt-6 pt-6 border-t border-white/20 flex flex-col gap-3">
                   {user ? (
                     <>
-                      <Link href={cabinetHref} onClick={close} className="py-3 text-center font-semibold text-[var(--color-white)] bg-[var(--color-brand-gold)] text-[#0a192f] rounded-xl hover:opacity-90">Кабинет</Link>
-                      <button type="button" onClick={handleLogout} className="py-3 text-center font-semibold text-[var(--color-white)] bg-white/10 rounded-xl hover:bg-white/20">Выйти</button>
+                      <Link href={cabinetHref} onClick={close} className="py-3 text-[14px] text-center font-semibold text-[var(--color-white)] bg-[var(--color-brand-gold)] text-[#0a192f] rounded-xl hover:opacity-90">Кабинет</Link>
+                      <button type="button" onClick={handleLogout} className="py-3 text-[14px] text-center font-semibold text-[var(--color-white)] bg-white/10 rounded-xl hover:bg-white/20">Выйти</button>
                     </>
                   ) : (
                     <>
-                      <Link href="/login" onClick={close} className="py-3 text-center font-semibold bg-[var(--color-brand-gold)] text-[#0a192f] rounded-xl hover:opacity-90">Войти</Link>
-                      <Link href="/zayavka" onClick={close} className="py-3 text-center font-semibold text-[var(--color-white)] bg-white/10 rounded-xl hover:bg-white/20">Начать</Link>
+                      <Link href="/login" onClick={close} className="py-3 text-[14px] text-center font-semibold bg-[var(--color-brand-gold)] text-[#0a192f] rounded-xl hover:opacity-90">Войти</Link>
+                      <Link href="/zayavka" onClick={close} className="py-3 text-[14px] text-center font-semibold text-[var(--color-white)] bg-white/10 rounded-xl hover:bg-white/20">Начать</Link>
                     </>
                   )}
                 </div>
@@ -228,7 +228,7 @@ export function Header() {
             >
               <button
                 type="button"
-                className="min-h-[44px] inline-flex items-center justify-center gap-2 rounded-xl border-0 bg-[var(--color-brand-gold)] px-4 py-2.5 text-sm font-semibold text-[#0a192f] hover:opacity-90 transition-all"
+                className="min-h-[44px] inline-flex items-center justify-center gap-2 rounded-xl border-0 bg-[var(--color-brand-gold)] px-4 py-2.5 text-[14px] font-semibold text-[#0a192f] hover:opacity-90 transition-all"
                 aria-haspopup="true"
                 aria-expanded={navOpen}
                 aria-label="Навигация по сайту"
@@ -246,7 +246,7 @@ export function Header() {
                   <Link
                     key={item.href}
                     href={item.href}
-                    className="block mx-1.5 px-3 py-2.5 text-sm font-medium text-[var(--color-navy)] hover:text-[var(--color-accent-gold)] hover:bg-[var(--color-light-gray)] rounded-lg transition-all"
+                    className="block mx-1.5 px-3 py-2.5 text-[14px] font-medium text-[var(--color-navy)] hover:text-[var(--color-accent-gold)] hover:bg-[var(--color-light-gray)] rounded-lg transition-all"
                   >
                     {item.label}
                   </Link>
@@ -258,7 +258,7 @@ export function Header() {
             <>
               <Link
                 href={cabinetHref}
-                className="min-h-[44px] inline-flex items-center justify-center gap-2 rounded-xl bg-[var(--color-brand-gold)] px-4 py-2.5 text-sm font-semibold text-[#0a192f] hover:opacity-90 hover:-translate-y-0.5 transition-all shadow-[var(--shadow-subtle)]"
+                className="min-h-[44px] inline-flex items-center justify-center gap-2 rounded-xl bg-[var(--color-brand-gold)] px-4 py-2.5 text-[14px] font-semibold text-[#0a192f] hover:opacity-90 hover:-translate-y-0.5 transition-all shadow-[var(--shadow-subtle)]"
               >
                 <User className="h-4 w-4" />
                 {displayName}
@@ -266,7 +266,7 @@ export function Header() {
               <button
                 type="button"
                 onClick={handleLogout}
-                className="min-h-[44px] inline-flex items-center justify-center gap-2 rounded-xl bg-[var(--color-brand-gold)] px-4 py-2.5 text-sm font-semibold text-[#0a192f] hover:opacity-90 hover:-translate-y-0.5 transition-all shadow-[var(--shadow-subtle)]"
+                className="min-h-[44px] inline-flex items-center justify-center gap-2 rounded-xl bg-[var(--color-brand-gold)] px-4 py-2.5 text-[14px] font-semibold text-[#0a192f] hover:opacity-90 hover:-translate-y-0.5 transition-all shadow-[var(--shadow-subtle)]"
               >
                 <LogOut className="h-3.5 w-3.5" />
                 Выйти
@@ -276,13 +276,13 @@ export function Header() {
             <>
               <Link
                 href={site.register.href}
-                className="site-header-register min-h-[44px] inline-flex items-center justify-center rounded-xl border-0 px-4 py-2.5 text-sm font-semibold text-[var(--color-navy)] hover:opacity-90 transition-all"
+                className="site-header-register min-h-[44px] inline-flex items-center justify-center rounded-xl border-0 px-4 py-2.5 text-[14px] font-semibold text-[var(--color-navy)] hover:opacity-90 transition-all"
               >
                 {site.register.label}
               </Link>
               <Link
                 href={site.cta.href}
-                className="site-header-cta min-h-[44px] inline-flex items-center justify-center rounded-xl bg-[var(--color-navy)] px-4 py-2.5 text-sm font-semibold text-[var(--color-white)] hover:opacity-90 hover:-translate-y-0.5 transition-all shadow-[var(--shadow-subtle)]"
+                className="site-header-cta min-h-[44px] inline-flex items-center justify-center rounded-xl bg-[var(--color-navy)] px-4 py-2.5 text-[14px] font-semibold text-[var(--color-white)] hover:opacity-90 hover:-translate-y-0.5 transition-all shadow-[var(--shadow-subtle)]"
               >
                 {site.cta.label}
               </Link>
@@ -346,7 +346,7 @@ export function Header() {
                     key={item.href}
                     href={item.href}
                     onClick={close}
-                    className="min-h-[48px] flex items-center rounded-xl px-4 py-3 text-white hover:bg-white/10 hover:text-[var(--color-brand-gold)] font-medium transition-all"
+                    className="min-h-[48px] flex items-center rounded-xl px-4 py-3 text-[14px] text-white hover:bg-white/10 hover:text-[var(--color-brand-gold)] font-medium transition-all"
                   >
                     {item.label}
                   </Link>
@@ -357,7 +357,7 @@ export function Header() {
                       <Link
                         href={cabinetHref}
                         onClick={close}
-                        className="flex items-center justify-center gap-2 rounded-xl bg-[var(--color-brand-gold)] px-4 py-3 font-semibold text-[#0a192f] hover:opacity-90 transition-all"
+                        className="flex items-center justify-center gap-2 rounded-xl bg-[var(--color-brand-gold)] px-4 py-3 text-[14px] font-semibold text-[#0a192f] hover:opacity-90 transition-all"
                       >
                         <User className="h-4 w-4" />
                         {displayName}
@@ -365,7 +365,7 @@ export function Header() {
                       <button
                         type="button"
                         onClick={handleLogout}
-                        className="w-full flex items-center justify-center gap-2 rounded-xl bg-white/10 px-4 py-3 font-semibold text-white hover:bg-white/20 transition-all"
+                        className="w-full flex items-center justify-center gap-2 rounded-xl bg-white/10 px-4 py-3 text-[14px] font-semibold text-white hover:bg-white/20 transition-all"
                       >
                         <LogOut className="h-3.5 w-3.5" />
                         Выйти
@@ -376,14 +376,14 @@ export function Header() {
                       <Link
                         href={site.register.href}
                         onClick={close}
-                        className="block rounded-xl border-0 px-4 py-3 text-center font-semibold text-white hover:bg-white/10 transition-all"
+                        className="block rounded-xl border-0 px-4 py-3 text-center text-[14px] font-semibold text-white hover:bg-white/10 transition-all"
                       >
                         {site.register.label}
                       </Link>
                       <Link
                         href={site.cta.href}
                         onClick={close}
-                        className="block rounded-xl bg-[var(--color-brand-gold)] px-4 py-3 text-center font-semibold text-[#0a192f] hover:opacity-90 transition-all"
+                        className="block rounded-xl bg-[var(--color-brand-gold)] px-4 py-3 text-center text-[14px] font-semibold text-[#0a192f] hover:opacity-90 transition-all"
                       >
                         {site.cta.label}
                       </Link>

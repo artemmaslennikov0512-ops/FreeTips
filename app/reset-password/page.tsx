@@ -73,7 +73,7 @@ function ResetPasswordForm() {
           </p>
           <Link
             href="/forgot-password"
-            className="auth-btn-primary mt-6 inline-block rounded-xl bg-[var(--color-brand-gold)] px-6 py-2.5 font-semibold text-[#0a192f] hover:opacity-90 transition-all"
+            className="auth-btn-primary mt-6 inline-block rounded-xl bg-[var(--color-brand-gold)] px-6 py-2.5 text-[14px] font-semibold text-[#0a192f] hover:opacity-90 transition-all"
           >
             Запросить сброс пароля
           </Link>

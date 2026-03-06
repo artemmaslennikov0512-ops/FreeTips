@@ -174,7 +174,7 @@ export default function ZayavkaPage() {
             </p>
             <Link
               href="/login"
-              className="auth-btn-primary mt-6 inline-block rounded-xl bg-[var(--color-brand-gold)] px-6 py-2.5 font-semibold text-[#0a192f] shadow-[var(--shadow-card)] hover:opacity-90 hover:-translate-y-0.5 transition-all duration-200"
+              className="auth-btn-primary mt-6 inline-block rounded-xl bg-[var(--color-brand-gold)] px-6 py-2.5 text-[14px] font-semibold text-[#0a192f] shadow-[var(--shadow-card)] hover:opacity-90 hover:-translate-y-0.5 transition-all duration-200"
             >
               К странице входа
             </Link>
@@ -328,7 +328,7 @@ export default function ZayavkaPage() {
                 <button
                   type="button"
                   onClick={handleNext}
-                  className="auth-btn-primary flex w-full items-center justify-center gap-2 rounded-xl bg-[var(--color-brand-gold)] px-4 py-3 font-semibold text-[#0a192f] shadow-[var(--shadow-card)] hover:opacity-90 hover:-translate-y-0.5 transition-all duration-200"
+                  className="auth-btn-primary flex w-full items-center justify-center gap-2 rounded-xl bg-[var(--color-brand-gold)] px-4 py-3 text-[14px] font-semibold text-[#0a192f] shadow-[var(--shadow-card)] hover:opacity-90 hover:-translate-y-0.5 transition-all duration-200"
                 >
                   Далее <ArrowRight className="h-5 w-5" />
                 </button>
@@ -478,14 +478,14 @@ export default function ZayavkaPage() {
                   <button
                     type="button"
                     onClick={handleBack}
-                    className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-[var(--color-muted)]/40 bg-transparent px-4 py-3 font-semibold text-[var(--color-text)] hover:bg-[var(--color-light-gray)]/50 transition-colors"
+                    className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-[var(--color-muted)]/40 bg-transparent px-4 py-3 text-[14px] font-semibold text-[var(--color-text)] hover:bg-[var(--color-light-gray)]/50 transition-colors"
                   >
                     <ArrowLeft className="h-5 w-5" /> Назад
                   </button>
                   <button
                     type="submit"
                     disabled={loading}
-                    className="auth-btn-primary flex flex-1 items-center justify-center rounded-xl bg-[var(--color-brand-gold)] px-4 py-3 font-semibold text-[#0a192f] shadow-[var(--shadow-card)] hover:opacity-90 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                    className="auth-btn-primary flex flex-1 items-center justify-center rounded-xl bg-[var(--color-brand-gold)] px-4 py-3 text-[14px] font-semibold text-[#0a192f] shadow-[var(--shadow-card)] hover:opacity-90 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
                   >
                     {loading ? "Отправка..." : "Оставить заявку"}
                   </button>

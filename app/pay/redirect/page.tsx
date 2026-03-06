@@ -90,7 +90,7 @@ export default async function PayRedirectPage({ searchParams }: { searchParams: 
         <input type="hidden" name="redirectToken" value={redirectToken} />
         <button
           type="submit"
-          className="mt-6 rounded-xl bg-[var(--color-accent-gold)] px-6 py-3 font-semibold text-[var(--color-navy)] hover:opacity-90"
+          className="mt-6 rounded-xl bg-[var(--color-accent-gold)] px-6 py-3 text-[14px] font-semibold text-[var(--color-navy)] hover:opacity-90"
         >
           Перейти к оплате
         </button>

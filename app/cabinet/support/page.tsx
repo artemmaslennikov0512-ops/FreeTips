@@ -152,7 +152,7 @@ export default function CabinetSupportPage() {
       )}
 
       <div className="mt-6 flex flex-col rounded-2xl border border-white/10 bg-white/[0.04] overflow-hidden">
-        <div className="support-chat-messages flex min-h-[320px] max-h-[50vh] flex-col overflow-y-auto p-4 space-y-4">
+        <div className="support-chat-messages flex min-h-[320px] max-h-[50vh] flex-col overflow-y-auto pl-4 pt-4 pb-4 pr-8 space-y-4">
           {/* Приветственное сообщение при открытии чата */}
           <div className="flex justify-start">
             <div className="max-w-[85%] rounded-2xl rounded-bl-md border border-[var(--color-brand-gold)]/30 bg-[var(--color-brand-gold)]/10 px-4 py-3">
@@ -227,7 +227,7 @@ export default function CabinetSupportPage() {
           <div ref={listEndRef} />
         </div>
 
-        <div className="border-t border-white/10 p-3">
+        <div className="border-t border-white/10 pt-3 pb-3 pl-4 pr-8">
           <form
             onSubmit={(e) => {
               e.preventDefault();

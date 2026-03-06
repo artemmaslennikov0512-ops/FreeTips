@@ -4,10 +4,10 @@ export function CTAPremium() {
   return (
     <section className="section-dark relative overflow-hidden w-full py-12 sm:py-16 lg:py-[100px] bg-gradient-to-br from-[var(--color-navy)] to-[var(--color-charcoal)] text-[var(--color-on-navy)] text-center">
       <div
-        className="absolute inset-0 opacity-[0.03]"
+        className="absolute inset-0 opacity-[0.04] z-[1]"
         style={{
-          backgroundImage: `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><path d='M0,0 L120,0 L120,120' fill='none' stroke='white' stroke-width='2'/></svg>")`,
-          backgroundSize: "120px 120px",
+          backgroundImage: `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80'><path d='M0,0 L80,0 L80,80' fill='none' stroke='white' stroke-width='1.5'/></svg>")`,
+          backgroundSize: "80px 80px",
         }}
         aria-hidden
       />

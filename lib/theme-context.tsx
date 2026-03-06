@@ -27,7 +27,8 @@ function isThemeScope(pathname: string | null): boolean {
     pathname.startsWith("/register") ||
     pathname.startsWith("/zayavka") ||
     pathname.startsWith("/forgot-password") ||
-    pathname.startsWith("/change-password")
+    pathname.startsWith("/change-password") ||
+    pathname.startsWith("/reset-password")
   );
 }
 

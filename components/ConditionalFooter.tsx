@@ -13,7 +13,10 @@ export function ConditionalFooter() {
     pathname.startsWith("/pay") ||
     pathname === "/login" ||
     pathname === "/register" ||
-    pathname === "/zayavka"
+    pathname === "/zayavka" ||
+    pathname.startsWith("/forgot-password") ||
+    pathname.startsWith("/change-password") ||
+    pathname.startsWith("/reset-password")
   ) {
     return null;
   }

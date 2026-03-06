@@ -106,6 +106,11 @@ export const loginRequestSchema = z.object({
   password: z.string().min(1, "Пароль обязателен").max(PASSWORD_MAX_LENGTH, "Пароль слишком длинный"),
 });
 
+// Запрос сброса пароля (логин или email)
+export const forgotPasswordRequestSchema = z.object({
+  loginOrEmail: z.string().trim().min(1, "Укажите логин или email").max(255, "Слишком длинное значение"),
+});
+
 // Создание ссылки
 export const createLinkSchema = z.object({
   slug: slugSchema.optional(), // если не указан, генерируем автоматически
@@ -199,6 +204,18 @@ export const supportMessageSchema = z.object({
 export const changePasswordSchema = z
   .object({
     currentPassword: z.string().min(1, "Введите текущий пароль"),
+    newPassword: passwordSchema,
+    newPasswordConfirm: z.string().min(1, "Подтвердите новый пароль"),
+  })
+  .refine((d) => d.newPassword === d.newPasswordConfirm, {
+    message: "Пароли не совпадают",
+    path: ["newPasswordConfirm"],
+  });
+
+// Сброс пароля по токену (страница «Забыли пароль» → ссылка из письма)
+export const resetPasswordSchema = z
+  .object({
+    token: z.string().min(1, "Токен сброса отсутствует").max(512),
     newPassword: passwordSchema,
     newPasswordConfirm: z.string().min(1, "Подтвердите новый пароль"),
   })

@@ -69,6 +69,7 @@ model User {
   poolForEstablishment  Establishment? @relation("TipPoolUser") // пользователь-пул для чаевых заведения (RECIPIENT, без входа)
   employeeProfile       Employee?      // если роль EMPLOYEE — привязка к сотруднику заведения
   sessions              Session[]
+  passwordResetTokens   PasswordResetToken[]
   tipLinks              TipLink[]
   transactions          Transaction[] @relation("RecipientTransactions")
   payoutRequests        PayoutRequest[]
@@ -114,6 +115,21 @@ model Session {
   @@index([refreshToken])
   @@index([expiresAt])
   @@map("sessions")
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  userId    String
+  tokenHash String   @unique @db.VarChar(64)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([tokenHash])
+  @@index([expiresAt])
+  @@map("password_reset_tokens")
 }
 
 model TipLink {

@@ -90,7 +90,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body className="min-h-screen w-full max-w-full overflow-x-hidden flex flex-col font-sans antialiased bg-[var(--color-bg)] text-[var(--color-text)]">
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){var p=typeof location!=='undefined'?location.pathname:'';var ok=p.startsWith('/cabinet')||p.startsWith('/admin')||p.startsWith('/establishment')||p.startsWith('/pay')||p.startsWith('/login')||p.startsWith('/register')||p.startsWith('/zayavka')||p.startsWith('/forgot-password')||p.startsWith('/change-password');var t=ok?localStorage.getItem('theme'):null;document.documentElement.setAttribute('data-theme',t==='dark'?'dark':'light');})();`,
+            __html: `(function(){var p=typeof location!=='undefined'?location.pathname:'';var ok=p.startsWith('/cabinet')||p.startsWith('/admin')||p.startsWith('/establishment')||p.startsWith('/pay')||p.startsWith('/login')||p.startsWith('/register')||p.startsWith('/zayavka')||p.startsWith('/forgot-password')||p.startsWith('/change-password')||p.startsWith('/reset-password');var t=ok?localStorage.getItem('theme'):null;document.documentElement.setAttribute('data-theme',t==='dark'?'dark':'light');})();`,
           }}
         />
         <GridCursorEffect />

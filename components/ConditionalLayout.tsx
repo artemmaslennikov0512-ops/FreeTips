@@ -10,7 +10,14 @@ export function ConditionalLayout({ children }: { children: React.ReactNode }) {
   const isCabinet = pathname.startsWith("/cabinet");
   const isAdmin = pathname.startsWith("/admin");
   const isEstablishment = pathname.startsWith("/establishment");
-  const isAuthPage = pathname === "/login" || pathname === "/register" || pathname === "/zayavka";
+  const isAuthPage =
+    pathname === "/login" ||
+    pathname.startsWith("/login/") ||
+    pathname === "/register" ||
+    pathname === "/zayavka" ||
+    pathname.startsWith("/forgot-password") ||
+    pathname.startsWith("/change-password") ||
+    pathname.startsWith("/reset-password");
   const isPayPage = pathname.startsWith("/pay");
   const widthClass = isCabinet || isAdmin || isEstablishment ? "max-w-none bg-transparent" : isLanding ? "max-w-none bg-[var(--color-bg)]" : "mx-auto max-w-6xl xl:max-w-7xl 2xl:max-w-screen-2xl bg-[var(--color-bg)]";
 

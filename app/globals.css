@@ -388,6 +388,218 @@ html:not([data-theme="dark"]) .card-block {
   color: #0a192f !important;
 }
 
+/* ===== СТРАНИЦА ОПЛАТЫ (/pay/[slug]) — выравнивание, кнопки сумм, поля, типографика ===== */
+/* Переменные для светлой и тёмной темы (бренд заведения может переопределять --pay-brand-primary) */
+.pay-page {
+  --pay-page-bg: var(--color-bg-sides);
+  --pay-page-card-bg: var(--color-bg-sides);
+  --pay-page-card-border: rgba(197, 165, 114, 0.5);
+  --pay-page-text: var(--color-text);
+  --pay-page-text-muted: var(--color-text-secondary);
+  --pay-page-input-bg: var(--color-light-gray);
+  --pay-page-input-border: rgba(197, 165, 114, 0.4);
+  --pay-page-input-focus-ring: rgba(197, 165, 114, 0.5);
+  --pay-page-amount-btn-bg: var(--color-light-gray);
+  --pay-page-amount-btn-active-bg: rgba(197, 165, 114, 0.2);
+  --pay-page-amount-btn-active-border: var(--color-brand-gold);
+  --pay-page-footer-color: var(--color-muted);
+  font-family: var(--font-inter), system-ui, sans-serif;
+}
+
+[data-theme="dark"] .pay-page {
+  --pay-page-card-bg: rgba(255, 255, 255, 0.06);
+  --pay-page-card-border: rgba(255, 255, 255, 0.12);
+  --pay-page-text: #fafafa;
+  --pay-page-text-muted: rgba(255, 255, 255, 0.75);
+  --pay-page-input-bg: #363636;
+  --pay-page-input-border: #5c5c5c;
+  --pay-page-input-focus-ring: rgba(197, 165, 114, 0.5);
+  --pay-page-amount-btn-bg: #363636;
+  --pay-page-amount-btn-active-bg: rgba(197, 165, 114, 0.25);
+  --pay-page-amount-btn-active-border: var(--color-brand-gold);
+  --pay-page-footer-color: rgba(255, 255, 255, 0.5);
+}
+
+.pay-page .pay-block {
+  background: var(--pay-page-card-bg) !important;
+  border-color: var(--pay-page-card-border) !important;
+}
+
+/* Имя получателя — по центру, 20–24px */
+.pay-page-recipient {
+  text-align: center;
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+.pay-page-recipient-name {
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--pay-page-text);
+}
+@media (min-width: 640px) {
+  .pay-page-recipient-name {
+    font-size: 1.5rem;
+  }
+}
+
+/* Блок кнопок сумм — отступы, центрирование */
+.pay-page-amounts {
+  margin-top: 1.5rem;
+  margin-bottom: 0.25rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+}
+.pay-page-amount-btn {
+  min-height: 48px;
+  min-width: 56px;
+  padding: 0.75rem 1.25rem;
+  font-size: 1rem;
+  font-weight: 500;
+  font-family: inherit;
+  border-radius: 12px;
+  border: 2px solid var(--pay-page-amount-btn-bg);
+  background: var(--pay-page-amount-btn-bg);
+  color: var(--pay-page-text);
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, transform 0.15s;
+  touch-action: manipulation;
+}
+.pay-page-amount-btn:hover {
+  border-color: var(--pay-page-input-border);
+  background: var(--pay-page-input-bg);
+}
+.pay-page-amount-btn.is-active {
+  border-color: var(--pay-brand-primary, var(--pay-page-amount-btn-active-border));
+  background: var(--pay-brand-primary, var(--pay-page-amount-btn-active-bg));
+  color: var(--pay-page-text);
+  box-shadow: 0 0 0 1px var(--pay-brand-primary, var(--color-brand-gold));
+}
+
+/* Подпись над полем */
+.pay-page-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--pay-page-text-muted);
+  text-align: center;
+  margin-top: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Поле суммы и поле отзыва — скругление, рамка, иконка рубля */
+.pay-page-input-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 0;
+}
+.pay-page-input-wrap.has-icon {
+  position: relative;
+  width: 100%;
+  max-width: 280px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.pay-page-input-wrap .pay-page-currency {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--pay-page-text-muted);
+  pointer-events: none;
+}
+.pay-page-input-wrap.has-icon input {
+  padding-left: 2.5rem;
+}
+.pay-page-input-wrap input,
+.pay-page-input-wrap textarea {
+  width: 100%;
+  max-width: 280px;
+  margin-left: auto;
+  margin-right: auto;
+  font-family: inherit;
+  font-size: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  border: 2px solid var(--pay-page-input-border);
+  background: var(--pay-page-input-bg);
+  color: var(--pay-page-text);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.pay-page-input-wrap input::placeholder,
+.pay-page-input-wrap textarea::placeholder {
+  color: var(--pay-page-text-muted);
+  opacity: 0.9;
+}
+.pay-page-input-wrap input:focus,
+.pay-page-input-wrap textarea:focus {
+  outline: none;
+  border-color: var(--pay-brand-primary, var(--color-brand-gold));
+  box-shadow: 0 0 0 3px var(--pay-page-input-focus-ring);
+}
+.pay-page-input-wrap textarea {
+  resize: none;
+  min-height: 2.75rem;
+}
+
+/* Кнопка оплаты — крупная, бренд, hover */
+.pay-page .pay-page-submit {
+  margin-top: 1.5rem;
+  width: 100%;
+  min-height: 52px;
+  padding: 0.875rem 1.5rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+  font-family: inherit;
+  border-radius: 12px;
+  border: none;
+  background: var(--pay-brand-primary, var(--color-brand-gold));
+  color: #0a192f;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+.pay-page .pay-page-submit:hover:not(:disabled) {
+  opacity: 0.92;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+.pay-page .pay-page-submit:active:not(:disabled) {
+  transform: translateY(0);
+}
+.pay-page .pay-page-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Текст внизу — мелкий, приглушённый */
+.pay-page-footer {
+  margin-top: 1.5rem;
+  font-size: 0.8125rem;
+  color: var(--pay-page-footer-color);
+  text-align: center;
+}
+
+@media (max-width: 640px) {
+  .pay-page-amounts {
+    gap: 0.5rem;
+  }
+  .pay-page-amount-btn {
+    min-height: 44px;
+    min-width: 52px;
+    padding: 0.625rem 1rem;
+    font-size: 0.9375rem;
+  }
+  .pay-page-input-wrap.has-icon,
+  .pay-page-input-wrap input,
+  .pay-page-input-wrap textarea {
+    max-width: none;
+  }
+}
+
 /* Светлая тема: кнопка «Вывести» — всегда золотая */
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-btn-gold {
   background: var(--color-brand-gold) !important;

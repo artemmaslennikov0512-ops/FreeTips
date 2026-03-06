@@ -228,9 +228,9 @@ export default function PayPage() {
   if (fontClr) cardStyle["--pay-font" as string] = fontClr;
 
   return (
-    <div className="mx-auto min-h-[60vh] max-w-md px-4 py-12" style={wrapperStyle}>
+    <div className="pay-page mx-auto min-h-[60vh] max-w-md px-4 py-12" style={wrapperStyle}>
       <div
-        className="pay-block relative rounded-2xl border-2 border-[var(--pay-border,var(--color-brand-gold))]/50 bg-[var(--color-bg-sides)] p-6 shadow-[var(--shadow-card)]"
+        className="pay-block relative rounded-2xl border-2 border-[var(--pay-border,var(--color-brand-gold))]/50 p-6 shadow-[var(--shadow-card)]"
         style={Object.keys(cardStyle).length ? cardStyle : undefined}
       >
         {/* Кнопка смены темы */}
@@ -255,29 +255,18 @@ export default function PayPage() {
           </div>
         </div>
 
-        {/* Деловая визитка — фон блока = доп. цвет или фон блоков, обводка */}
-        <div
-          className="pay-block-inner mt-4 rounded-xl border-2 p-4 text-center"
-          style={{
-            backgroundColor: blocksBg ?? "var(--color-light-gray)",
-            borderColor: borderClr ?? "var(--color-brand-gold)",
-          }}
-        >
-          <div className="flex flex-col items-center justify-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--pay-brand-primary,var(--color-accent-gold))]/20 text-[var(--pay-brand-primary,var(--color-accent-gold))]">
-              <User className="h-4 w-4" />
+        {/* Имя получателя — по центру, выделено */}
+        <div className="pay-page-recipient">
+          <div className="flex flex-col items-center gap-2">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--pay-brand-primary,var(--color-accent-gold))]/20 text-[var(--pay-brand-primary,var(--color-accent-gold))]">
+              <User className="h-5 w-5" />
             </div>
-            <p className="min-w-0 truncate text-sm font-semibold" style={{ color: fontClr ?? "var(--color-text)" }}>{recipientName}</p>
+            <p className="pay-page-recipient-name min-w-0 truncate max-w-full text-center" style={{ color: fontClr ?? undefined }}>{recipientName}</p>
           </div>
         </div>
 
-        <div
-          className="pay-block-inner mt-6 flex flex-wrap justify-center gap-3 rounded-xl border-2 p-3"
-          style={{
-            backgroundColor: blocksBg ? `${blocksBg}80` : "var(--color-light-gray)",
-            borderColor: borderClr ?? "var(--color-brand-gold)",
-          }}
-        >
+        {/* Кнопки сумм — центрированы, активная выделена */}
+        <div className="pay-page-amounts">
           {PRESETS.map((r) => {
             const numCustom = customAmount.trim() ? Number(customAmount.replace(",", ".")) : null;
             const isSelected = (numCustom != null && !Number.isNaN(numCustom) && numCustom === r) || (numCustom == null && amount === r);
@@ -289,54 +278,48 @@ export default function PayPage() {
                   setAmount(r);
                   setCustomAmount(String(r));
                 }}
-                className={`min-h-[44px] min-w-[44px] inline-flex flex-col items-center justify-center rounded-xl border px-4 py-2.5 text-sm font-medium transition-colors touch-manipulation sm:flex-row sm:gap-1 ${
-                  isSelected
-                    ? "border-0 bg-[var(--pay-brand-primary,var(--color-accent-gold))]/10 text-[var(--color-text)]"
-                    : "border-0 bg-[var(--color-light-gray)] text-[var(--color-text)] "
-                }`}
+                className={`pay-page-amount-btn ${isSelected ? "is-active" : ""}`}
               >
-                <span>{r} ₽</span>
+                {r} ₽
               </button>
             );
           })}
         </div>
 
-        <p className="mt-4 text-center text-sm font-medium" style={{ color: fontClr ?? "var(--color-text)" }}>Выберите сумму или введите свою</p>
-
-        <div className="mt-2 flex justify-center">
+        <p className="pay-page-label">Выберите сумму или введите свою</p>
+        <div className="pay-page-input-wrap has-icon">
+          <span className="pay-page-currency" aria-hidden="true">₽</span>
           <input
             type="text"
             inputMode="decimal"
             placeholder="100"
             value={customAmount}
             onChange={(e) => setCustomAmount(e.target.value)}
-            className="pay-block-inner w-full max-w-sm rounded-xl border border-[var(--pay-brand-primary,var(--color-brand-gold))]/50 bg-white px-4 py-2.5 text-center text-[#0a192f] placeholder:text-[var(--color-text-secondary)] focus:outline-none focus:ring-2 focus:ring-[var(--pay-brand-primary,var(--color-brand-gold))]/40"
             aria-label="Своя сумма в рублях"
           />
         </div>
 
-        <p className="mt-6 text-center text-sm font-medium" style={{ color: fontClr ?? "var(--color-text)" }}>Оставьте отзыв!)</p>
-        <div className="mt-2 flex justify-center">
+        <p className="pay-page-label">Оставьте отзыв</p>
+        <div className="pay-page-input-wrap">
           <textarea
             rows={2}
             value={comment}
             onChange={(e) => setComment(e.target.value)}
             maxLength={500}
             placeholder="Спасибо за отличный сервис!"
-            className="pay-block-inner w-full max-w-sm resize-none rounded-xl border border-[var(--pay-brand-primary,var(--color-brand-gold))]/50 bg-white px-4 py-2.5 text-center text-[#0a192f] placeholder:text-[var(--color-text-secondary)] focus:outline-none focus:ring-2 focus:ring-[var(--pay-brand-primary,var(--color-brand-gold))]/40"
             aria-label="Отзыв"
           />
         </div>
 
         {result === "fail" && resultError && (
-          <p className="mt-4 text-sm text-[var(--color-text-secondary)]">{resultError}</p>
+          <p className="mt-4 text-center text-sm text-[var(--color-text-secondary)]" role="alert">{resultError}</p>
         )}
 
         <button
           type="button"
           onClick={handlePay}
           disabled={paying || kop < 100}
-          className="pay-btn-gold mt-6 w-full rounded-xl bg-[var(--pay-brand-primary,var(--color-brand-gold))] py-3 font-semibold text-[#0a192f] transition-colors hover:opacity-90 disabled:opacity-50"
+          className="pay-btn-gold pay-page-submit"
         >
           {paying ? (
             <span className="inline-flex items-center justify-center gap-2">
@@ -349,14 +332,14 @@ export default function PayPage() {
         </button>
 
         {qrDataUrl && (
-          <div className="mt-6 flex flex-col items-center border-0 pt-6">
-            <p className="text-sm text-[var(--color-muted)]">Покажите QR — гость отсканирует эту страницу</p>
-            <img src={qrDataUrl} alt="QR страницы" className="mt-2 rounded-lg border-0 bg-[var(--color-bg-sides)]" width={140} height={140} />
+          <div className="mt-8 flex flex-col items-center border-t border-[var(--pay-page-card-border)] pt-6">
+            <p className="pay-page-label mb-2">Покажите QR — гость отсканирует эту страницу</p>
+            <img src={qrDataUrl} alt="QR страницы" className="rounded-lg border border-[var(--pay-page-card-border)] bg-[var(--pay-page-card-bg)]" width={140} height={140} />
           </div>
         )}
       </div>
 
-      <p className="mt-6 text-center text-sm text-[var(--color-muted)]" style={fontClr ? { color: fontClr, opacity: 0.8 } : undefined}>
+      <p className="pay-page-footer" style={fontClr ? { color: fontClr, opacity: 0.8 } : undefined}>
         Оплата банковской картой. Регистрация не нужна.
       </p>
     </div>

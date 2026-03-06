@@ -82,17 +82,18 @@
   --section-dark-heading: #171717;
 }
 
-/* Светлая тема: основной фон ЛК и админки — тёмно-синий (как на первом фото) */
+/* Светлая тема: основной фон ЛК и админки — тёмно-синий */
 html:not([data-theme="dark"]) body.cabinet-page,
 html:not([data-theme="dark"]) body.admin-page,
 html:not([data-theme="dark"]) .cabinet-premium {
   background: #1a2337;
 }
 
-/* Светлая тема: сайдбар — блок #1c253b, золотая обводка, светлый текст */
+/* Светлая тема: сайдбар — тёмно-синее стекло, светлый текст */
+/* Светлая тема: сайдбар — фон как у виртуальной карты (градиент navy) */
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-sidebar:not(.admin-sidebar) {
-  background: #1c253b;
-  border: 2px solid rgba(197, 165, 114, 0.7);
+  background: linear-gradient(135deg, #0a192f 0%, color-mix(in srgb, #0a192f 85%, white) 50%, #0a192f 100%);
+  border: 1px solid rgba(197, 165, 114, 0.55);
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06);
   color: rgba(255, 255, 255, 0.92);
 }
@@ -122,8 +123,8 @@ html:not([data-theme="dark"]) .cabinet-premium .cabinet-sidebar:not(.admin-sideb
 
 /* Светлая тема: сайдбар админки — градиент как у ЛК, разделы видны (светлый текст), шрифт, подсветка активного */
 html:not([data-theme="dark"]) .admin-panel .admin-sidebar {
-  background: #1c253b !important;
-  border: 2px solid rgba(197, 165, 114, 0.7) !important;
+  background: linear-gradient(135deg, #0a192f 0%, color-mix(in srgb, #0a192f 85%, white) 50%, #0a192f 100%) !important;
+  border-color: rgba(197, 165, 114, 0.55) !important;
   color: rgba(255, 255, 255, 0.95);
   font-family: var(--font-inter), system-ui, sans-serif;
 }
@@ -145,14 +146,14 @@ html:not([data-theme="dark"]) .admin-panel .admin-sidebar .cabinet-nav-active {
 /* Фон блока пользователя в сайдбаре админки — как в карточках (полупрозрачный, светлая обводка) */
 html:not([data-theme="dark"]) .admin-panel .admin-sidebar .cabinet-sidebar-profile {
   background: rgba(255, 255, 255, 0.15) !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border: 1px solid rgba(197, 165, 114, 0.5) !important;
   color: #fff !important;
 }
 
 /* Светлая тема: блок профиля в сайдбаре — белый фон, обводка как у активного подсвечивающего блока; аватар — золотой фон, тёмные инициалы */
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-sidebar-profile {
   background: #ffffff !important;
-  border: 1px solid rgba(255, 255, 255, 0.5) !important;
+  border: 1px solid rgba(197, 165, 114, 0.55) !important;
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.15);
 }
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-sidebar-avatar {
@@ -290,8 +291,8 @@ body.admin-page .site-header {
 /* Светлая тема: шапка — фон как у виртуальной карты (градиент navy) */
 html:not([data-theme="dark"]) body.cabinet-page .site-header,
 html:not([data-theme="dark"]) body.admin-page .site-header {
-  background: #131926;
-  border: 2px solid rgba(197, 165, 114, 0.55);
+  background: linear-gradient(135deg, #0a192f 0%, color-mix(in srgb, #0a192f 85%, white) 50%, #0a192f 100%);
+  border: 1px solid rgba(197, 165, 114, 0.55);
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06);
   color: rgba(255, 255, 255, 0.92);
 }
@@ -310,8 +311,8 @@ html:not([data-theme="dark"]) body.admin-page .site-header .site-header-logo-fre
 /* Светлая тема: основной блок ЛК и админки — градиент navy */
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-main-block:not(.admin-main-block),
 html:not([data-theme="dark"]) .admin-panel .admin-main-block.cabinet-main-block {
-  background: #1c253b;
-  border: 2px solid rgba(197, 165, 114, 0.7);
+  background: linear-gradient(135deg, #0a192f 0%, color-mix(in srgb, #0a192f 85%, white) 50%, #0a192f 100%);
+  border: 1px solid rgba(197, 165, 114, 0.55);
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06);
 }
 
@@ -319,7 +320,7 @@ html:not([data-theme="dark"]) .admin-panel .admin-main-block.cabinet-main-block 
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-card,
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-section-header {
   background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(197, 165, 114, 0.5);
   border-radius: 1rem;
 }
 
@@ -402,7 +403,7 @@ html:not([data-theme="dark"]) .cabinet-premium .cabinet-btn-gold {
 /* Светлая тема: карточки внутри блоков — как на фото (пузырь «Поддержка»: полупрозрачный тёмный фон, светлая обводка) */
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-block-inner {
   background: var(--cabinet-block-bg, rgba(255, 255, 255, 0.15)) !important;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(197, 165, 114, 0.5);
   color: rgba(255, 255, 255, 0.95);
 }
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-block-inner .cabinet-limits-label,
@@ -413,7 +414,7 @@ html:not([data-theme="dark"]) .cabinet-premium .cabinet-block-inner [class*="tex
 
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-input-window {
   background: rgba(255, 255, 255, 0.15) !important;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(197, 165, 114, 0.5);
   color: #fff !important;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
@@ -571,11 +572,11 @@ html:not([data-theme="dark"]) .cabinet-premium #operations-history.cabinet-card 
 /* Светлая тема: блок «Доступные лимиты» — как на фото (полупрозрачный фон, светлая обводка) */
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-limits-block {
   background: rgba(255, 255, 255, 0.15) !important;
-  border-color: rgba(255, 255, 255, 0.2);
+  border-color: rgba(197, 165, 114, 0.5);
 }
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-card .cabinet-limits-block {
   background: rgba(255, 255, 255, 0.15) !important;
-  border-color: rgba(255, 255, 255, 0.2);
+  border-color: rgba(197, 165, 114, 0.5);
 }
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-limits-block .cabinet-limits-track {
   background: rgba(0, 0, 0, 0.25) !important;

@@ -1,17 +1,11 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans, Syne, Playfair_Display, Inter } from "next/font/google";
+import { Syne, Playfair_Display, Inter } from "next/font/google";
 import "./globals.css";
 import { CookieConsent } from "@/components/CookieConsent";
 import { GridCursorEffect } from "@/components/GridCursorEffect";
 import { LandingWrapper } from "@/components/LandingWrapper";
 import { ConditionalLayout } from "@/components/ConditionalLayout";
 import { ThemeProvider } from "@/lib/theme-context";
-
-const plusJakartaSans = Plus_Jakarta_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  display: "swap",
-});
 
 const syne = Syne({
   subsets: ["latin"],
@@ -34,7 +28,7 @@ const inter = Inter({
   weight: ["300", "400", "500", "600", "700"],
   display: "swap",
   variable: "--font-inter",
-  preload: false,
+  preload: true,
 });
 
 const siteName = "FreeTips";
@@ -83,7 +77,7 @@ export const viewport = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="ru" className={`${plusJakartaSans.className} ${syne.variable} ${playfair.variable} ${inter.variable}`} suppressHydrationWarning>
+    <html lang="ru" className={`${inter.className} ${inter.variable} ${syne.variable} ${playfair.variable}`} suppressHydrationWarning>
       <head>
         <link rel="sitemap" type="application/xml" href={`${baseUrl}/sitemap.xml`} title="Sitemap" />
       </head>

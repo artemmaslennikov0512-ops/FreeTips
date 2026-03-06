@@ -907,11 +907,88 @@ img, video, svg {
   color: rgba(255, 255, 255, 0.8) !important;
 }
 
-h1, h2, h3, h4, h5, h6 {
-  font-weight: 600;
+/* ===== РЕВИЗИЯ ТИПОГРАФИКИ (до унификации) =====
+   Глобально было: h1 clamp(36px–60px), h2 clamp(30–40px), h3 clamp(24–30px); font-weight 600; color var(--color-navy).
+   На страницах использовались Tailwind-классы: text-xl, text-2xl, text-3xl, text-4xl, text-lg, text-sm и т.д.,
+   из‑за чего размеры заголовков одного уровня отличались (главная, заявка, кабинет). Ниже — единая шкала.
+   ===== ТИПОГРАФИКА — единая шкала для всего сайта ===== */
+h1, h2, h3, h4, h5, h6, p {
+  font-family: inherit;
+  text-align: left;
+  font-weight: normal;
+  line-height: 1.5;
+  word-break: normal;
+  hyphens: none;
+}
+
+h1 {
+  font-size: 36px;
+  font-weight: 700;
   line-height: 1.2;
-  letter-spacing: -0.01em;
+  margin: 0 0 24px 0;
   color: var(--color-navy);
+}
+
+h2 {
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 1.3;
+  margin: 0 0 20px 0;
+  color: var(--color-navy);
+}
+
+h3 {
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.4;
+  margin: 0 0 16px 0;
+  color: var(--color-navy);
+}
+
+h4 {
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.5;
+  margin: 0 0 12px 0;
+  color: var(--color-navy);
+}
+
+h5 {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.5;
+  margin: 0 0 10px 0;
+  color: var(--color-navy);
+}
+
+h6 {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+  margin: 0 0 8px 0;
+  color: var(--color-navy);
+}
+
+p {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.6;
+  margin: 0 0 20px 0;
+}
+
+@media (max-width: 768px) {
+  h1 { font-size: 28px; }
+  h2 { font-size: 22px; }
+  h3 { font-size: 18px; }
+  h4 { font-size: 16px; }
+  h5 { font-size: 15px; }
+  h6 { font-size: 13px; }
+  p { font-size: 15px; }
+}
+
+/* Центрирование — только где нужно (например, главная) */
+.text-center {
+  text-align: center !important;
 }
 
 .section-dark h1,
@@ -928,9 +1005,27 @@ footer h4 {
   color: #ffffff !important;
 }
 
-h1 { font-size: clamp(2.25rem, 5vw, 3.75rem); }
-h2 { font-size: clamp(1.875rem, 4vw, 2.5rem); }
-h3 { font-size: clamp(1.5rem, 3vw, 1.875rem); }
+/* Защита от вылезания длинных слов */
+h1, h2, h3, h4, h5, h6, p, a, span, div {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+}
+
+.break-all {
+  word-break: break-all;
+}
+
+.nowrap {
+  white-space: nowrap;
+}
+
+/* Поля ввода и кнопки — тот же шрифт и читаемый размер (избегаем зума на iOS) */
+input, textarea, select, button {
+  font-family: inherit;
+  font-size: 16px;
+  line-height: 1.5;
+}
 
 /* ============================================
    ACCESSIBILITY & FOCUS STATES

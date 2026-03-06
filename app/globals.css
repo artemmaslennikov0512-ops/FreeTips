@@ -515,14 +515,41 @@ html:not([data-theme="dark"]) .cabinet-premium #operations-history.cabinet-card 
   color: #64748b !important;
 }
 
-/* Тёмная тема: текст в полях ввода — белый */
+/* Тёмная тема: поля ввода — тёмно-серый фон как в чате (#363636), светлый текст, плейсхолдер #8e8e8e */
 [data-theme="dark"] .cabinet-premium input,
 [data-theme="dark"] .cabinet-premium textarea {
   color: #ffffff !important;
+  background: #363636 !important;
+  border: 1px solid #5c5c5c !important;
+  -webkit-text-fill-color: #ffffff;
 }
 [data-theme="dark"] .cabinet-premium input::placeholder,
 [data-theme="dark"] .cabinet-premium textarea::placeholder {
-  color: rgba(255, 255, 255, 0.5) !important;
+  color: #8e8e8e !important;
+  -webkit-text-fill-color: #8e8e8e;
+}
+[data-theme="dark"] .cabinet-premium .cabinet-input-window {
+  background: #363636 !important;
+  border: 1px solid #5c5c5c !important;
+}
+[data-theme="dark"] .cabinet-premium .cabinet-input-window input,
+[data-theme="dark"] .cabinet-premium .cabinet-input-window textarea {
+  background: transparent !important;
+  border: none !important;
+}
+
+/* Тёмная тема: те же поля ввода в админке и ЛК заведения */
+[data-theme="dark"] .admin-panel input,
+[data-theme="dark"] .admin-panel textarea {
+  background: #363636 !important;
+  color: #ffffff !important;
+  border: 1px solid #5c5c5c !important;
+  -webkit-text-fill-color: #ffffff;
+}
+[data-theme="dark"] .admin-panel input::placeholder,
+[data-theme="dark"] .admin-panel textarea::placeholder {
+  color: #8e8e8e !important;
+  -webkit-text-fill-color: #8e8e8e;
 }
 
 /* Чат поддержки: поле ввода на тёмном фоне — белый текст всегда */
@@ -751,16 +778,16 @@ html:not([data-theme="dark"]) .admin-panel .antifraud-inner .antifraud-value {
   border-bottom: 1px solid rgba(197, 165, 114, 0.28);
 }
 
-/* Поля ввода значений лимитов («окна») — только эти инпуты; в тёмной теме текст белый, чтобы цифры были видны при «Изменить» */
+/* Поля ввода значений лимитов — в тёмной теме тот же стиль, что и у остальных полей (#363636) */
 [data-theme="dark"] .admin-panel .antifraud-input {
-  background: #1a1a1a !important;
-  border: 1px solid rgba(197, 165, 114, 0.35);
+  background: #363636 !important;
+  border: 1px solid #5c5c5c !important;
   color: #ffffff !important;
   -webkit-text-fill-color: #ffffff;
 }
 [data-theme="dark"] .admin-panel .antifraud-input::placeholder {
-  color: rgba(255, 255, 255, 0.55);
-  -webkit-text-fill-color: rgba(255, 255, 255, 0.55);
+  color: #8e8e8e !important;
+  -webkit-text-fill-color: #8e8e8e;
 }
 
 /* Таблицы админки — в тёмной теме лёгкие золотистые границы между строками */
@@ -989,6 +1016,38 @@ p {
 /* Центрирование — только где нужно (например, главная) */
 .text-center {
   text-align: center !important;
+}
+
+/* Герой-секция лендинга: вернуть исходные размеры заголовка и текста (не трогать глобальной шкалой) */
+.hero-premium-section .hero-premium-title,
+.hero-premium-section h1 {
+  font-size: 2.25rem;
+  line-height: 1.15;
+  margin-bottom: 1rem;
+}
+@media (min-width: 640px) {
+  .hero-premium-section .hero-premium-title,
+  .hero-premium-section h1 {
+    font-size: 3rem;
+  }
+}
+@media (min-width: 1024px) {
+  .hero-premium-section .hero-premium-title,
+  .hero-premium-section h1 {
+    font-size: 3.75rem;
+  }
+}
+.hero-premium-section .hero-premium-lead {
+  font-size: 1.125rem;
+  margin-bottom: 1.5rem;
+}
+.hero-premium-section .hero-premium-stat {
+  font-size: 1.875rem;
+}
+@media (min-width: 640px) {
+  .hero-premium-section .hero-premium-stat {
+    font-size: 2.25rem;
+  }
 }
 
 .section-dark h1,

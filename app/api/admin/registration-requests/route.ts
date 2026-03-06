@@ -15,6 +15,7 @@ export async function GET(request: NextRequest) {
     orderBy: { createdAt: "desc" },
     select: {
       id: true,
+      requestType: true,
       fullName: true,
       dateOfBirth: true,
       establishment: true,
@@ -24,12 +25,18 @@ export async function GET(request: NextRequest) {
       status: true,
       createdAt: true,
       registrationTokenId: true,
+      companyName: true,
+      companyRole: true,
+      employeeCount: true,
+      adminFullName: true,
+      adminContactPhone: true,
       registrationToken: { select: { expiresAt: true } },
     },
   });
 
   const requests = list.map((r) => ({
     id: r.id,
+    requestType: r.requestType ?? "individual",
     fullName: r.fullName,
     dateOfBirth: r.dateOfBirth,
     establishment: r.establishment,
@@ -40,6 +47,11 @@ export async function GET(request: NextRequest) {
     createdAt: r.createdAt.toISOString(),
     hasToken: !!r.registrationTokenId,
     tokenExpiresAt: r.registrationToken?.expiresAt?.toISOString() ?? null,
+    companyName: r.companyName,
+    companyRole: r.companyRole,
+    employeeCount: r.employeeCount,
+    adminFullName: r.adminFullName,
+    adminContactPhone: r.adminContactPhone,
   }));
 
   return NextResponse.json({ requests });

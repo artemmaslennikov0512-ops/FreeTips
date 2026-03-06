@@ -156,15 +156,29 @@ export const createPayoutSchema = z.object({
   pan: panSchema.optional(),
 });
 
-// Заявка на подключение (оставить заявку)
-export const createRegistrationRequestSchema = z.object({
-  fullName: z.string().trim().min(1, "Укажите ФИО").max(255),
-  dateOfBirth: z.string().trim().min(1, "Укажите дату рождения").max(20),
-  phone: phoneRegistrationSchema,
-  activityType: z.string().trim().min(1, "Укажите вид деятельности").max(255),
-  establishment: z.string().trim().max(255).optional().default(""),
-  email: emailSchema,
-});
+// Заявка на подключение (оставить заявку): заведение или отдельный получатель чаевых
+export const createRegistrationRequestSchema = z.discriminatedUnion("requestType", [
+  z.object({
+    requestType: z.literal("establishment"),
+    fullName: z.string().trim().min(1, "Укажите ФИО").max(255),
+    companyName: z.string().trim().min(1, "Укажите название компании").max(255),
+    companyRole: z.string().trim().min(1, "Укажите роль в компании").max(255),
+    phone: phoneRegistrationSchema,
+    email: emailSchema,
+    employeeCount: z.coerce.number().int().min(1, "Укажите количество сотрудников").max(10000),
+  }),
+  z.object({
+    requestType: z.literal("individual"),
+    fullName: z.string().trim().min(1, "Укажите ФИО").max(255),
+    dateOfBirth: z.string().trim().min(1, "Укажите дату рождения").max(20),
+    phone: phoneRegistrationSchema,
+    email: emailSchema,
+    activityType: z.string().trim().min(1, "Укажите вид деятельности").max(255),
+    establishment: z.string().trim().max(255).optional().default(""),
+    adminFullName: z.string().trim().min(1, "Укажите ФИО администратора для подтверждения").max(255),
+    adminContactPhone: phoneRegistrationSchema,
+  }),
+]);
 
 // PATCH /api/profile — обновление логина, email, анкеты (частичное)
 export const patchProfileSchema = z.object({

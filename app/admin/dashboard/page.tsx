@@ -52,6 +52,7 @@ function loadIssuedLinksFromStorage(): Record<string, string> {
 
 interface RegistrationRequestRow {
   id: string;
+  requestType: string;
   fullName: string;
   dateOfBirth: string;
   establishment: string;
@@ -62,6 +63,11 @@ interface RegistrationRequestRow {
   createdAt: string;
   hasToken: boolean;
   tokenExpiresAt: string | null;
+  companyName?: string | null;
+  companyRole?: string | null;
+  employeeCount?: number | null;
+  adminFullName?: string | null;
+  adminContactPhone?: string | null;
 }
 
 export default function AdminDashboardPage() {
@@ -277,6 +283,7 @@ export default function AdminDashboardPage() {
                 <thead>
                   <tr className="border-0 bg-white/10">
                     <th className="w-8 p-3 text-white/80"></th>
+                    <th className="p-3 font-medium text-white">Тип</th>
                     <th className="p-3 font-medium text-white">ФИО</th>
                     <th className="p-3 font-medium text-white">Почта</th>
                     <th className="p-3 font-medium text-white">Дата заявки</th>
@@ -303,6 +310,11 @@ export default function AdminDashboardPage() {
                             >
                               {isExpanded ? <ChevronDown className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
                             </button>
+                          </td>
+                          <td className="p-3 text-white/90">
+                            <span className="text-xs">
+                              {r.requestType === "establishment" ? "Заведение" : "Получатель"}
+                            </span>
                           </td>
                           <td className="p-3 text-white/90">{r.fullName}</td>
                           <td className="p-3 text-white/90">{r.email}</td>
@@ -390,13 +402,26 @@ export default function AdminDashboardPage() {
                         </tr>
                         {isExpanded && (
                           <tr className="border-0 bg-white/10">
-                            <td colSpan={6} className="p-4">
-                              <div className="grid gap-2 text-white/90 sm:grid-cols-2">
-                                <p><span className="text-white/70">Дата рождения:</span> {r.dateOfBirth}</p>
-                                <p><span className="text-white/70">Заведение:</span> {r.establishment}</p>
-                                <p><span className="text-white/70">Телефон:</span> {r.phone}</p>
-                                <p><span className="text-white/70">Вид деятельности:</span> {r.activityType}</p>
-                              </div>
+                            <td colSpan={7} className="p-4">
+                              {r.requestType === "establishment" ? (
+                                <div className="grid gap-2 text-white/90 sm:grid-cols-2">
+                                  <p><span className="text-white/70">Компания:</span> {r.companyName ?? "—"}</p>
+                                  <p><span className="text-white/70">Роль в компании:</span> {r.companyRole ?? "—"}</p>
+                                  <p><span className="text-white/70">Сотрудников:</span> {r.employeeCount ?? "—"}</p>
+                                  <p><span className="text-white/70">Телефон:</span> {r.phone}</p>
+                                  <p><span className="text-white/70">ФИО:</span> {r.fullName}</p>
+                                  <p><span className="text-white/70">Почта:</span> {r.email}</p>
+                                </div>
+                              ) : (
+                                <div className="grid gap-2 text-white/90 sm:grid-cols-2">
+                                  <p><span className="text-white/70">Дата рождения:</span> {r.dateOfBirth}</p>
+                                  <p><span className="text-white/70">Заведение:</span> {r.establishment || "—"}</p>
+                                  <p><span className="text-white/70">Телефон:</span> {r.phone}</p>
+                                  <p><span className="text-white/70">Вид деятельности:</span> {r.activityType}</p>
+                                  <p><span className="text-white/70">ФИО администратора:</span> {r.adminFullName ?? "—"}</p>
+                                  <p><span className="text-white/70">Телефон администратора:</span> {r.adminContactPhone ?? "—"}</p>
+                                </div>
+                              )}
                             </td>
                           </tr>
                         )}

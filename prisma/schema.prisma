@@ -231,6 +231,7 @@ model RegistrationToken {
 
 model RegistrationRequest {
   id                   String                     @id @default(cuid())
+  requestType          String                     @default("individual") @db.VarChar(20) // "establishment" | "individual"
   fullName             String                     @db.VarChar(255)
   dateOfBirth          String                     @db.VarChar(20)
   establishment        String                     @db.VarChar(255)
@@ -240,11 +241,19 @@ model RegistrationRequest {
   status               RegistrationRequestStatus @default(PENDING)
   registrationTokenId  String?                    @unique
   createdAt            DateTime                   @default(now())
+  // Заведение: данные о компании и контактном лице
+  companyName          String?                    @db.VarChar(255)
+  companyRole          String?                    @db.VarChar(255)
+  employeeCount        Int?
+  // Отдельный получатель: контакт администратора для подтверждения
+  adminFullName        String?                    @db.VarChar(255)
+  adminContactPhone    String?                    @db.VarChar(50)
 
   registrationToken RegistrationToken? @relation(fields: [registrationTokenId], references: [id], onDelete: SetNull)
 
   @@index([status])
   @@index([createdAt])
+  @@index([requestType])
   @@map("registration_requests")
 }
 

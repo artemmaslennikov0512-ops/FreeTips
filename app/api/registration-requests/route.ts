@@ -28,15 +28,22 @@ export async function POST(request: NextRequest) {
   }
 
   const data = validated.data;
+  const isEstablishment = data.requestType === "establishment";
 
   const req = await db.registrationRequest.create({
     data: {
+      requestType: data.requestType,
       fullName: data.fullName,
-      dateOfBirth: data.dateOfBirth,
+      dateOfBirth: isEstablishment ? "" : data.dateOfBirth,
       phone: data.phone,
-      activityType: data.activityType,
-      establishment: data.establishment ?? "",
+      activityType: isEstablishment ? "" : data.activityType,
+      establishment: isEstablishment ? "" : (data.establishment ?? ""),
       email: data.email,
+      companyName: isEstablishment ? data.companyName : null,
+      companyRole: isEstablishment ? data.companyRole : null,
+      employeeCount: isEstablishment ? data.employeeCount : null,
+      adminFullName: !isEstablishment ? data.adminFullName : null,
+      adminContactPhone: !isEstablishment ? data.adminContactPhone : null,
     },
     select: { id: true, createdAt: true },
   });

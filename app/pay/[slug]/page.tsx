@@ -228,10 +228,11 @@ export default function PayPage() {
   if (fontClr) cardStyle["--pay-font" as string] = fontClr;
 
   return (
-    <div className="pay-page pay-page--cards mx-auto min-h-[60vh] max-w-lg px-4 py-8" style={wrapperStyle}>
-      {/* Основной блок со скруглёнными краями и отступами — внутри все карточки */}
-      <div
-        className="pay-page-outer-block relative rounded-2xl border-2 p-5 shadow-[var(--shadow-card)]"
+    <div className="pay-page pay-page--cards min-h-[60vh] w-full px-4 py-8" style={wrapperStyle}>
+      <div className="mx-auto max-w-lg">
+        {/* Основной блок со скруглёнными краями и отступами — внутри все карточки */}
+        <div
+          className="pay-page-outer-block relative rounded-2xl border-2 p-5 shadow-[var(--shadow-card)]"
         style={Object.keys(cardStyle).length ? cardStyle : undefined}
       >
         <div className="absolute right-4 top-4">
@@ -256,17 +257,22 @@ export default function PayPage() {
           </div>
         </div>
 
-        {/* Карточка: получатель */}
-        <div className="pay-page-card card" style={Object.keys(cardStyle).length ? cardStyle : undefined}>
-          <div className="pay-page-recipient">
-            <div className="flex flex-col items-center gap-2">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--pay-page-accent)]/15 text-[var(--pay-page-accent)]">
+        {/* Карточка: получатель + QR */}
+        <div className="pay-page-card card pay-page-recipient-card" style={Object.keys(cardStyle).length ? cardStyle : undefined}>
+          <div className="pay-page-recipient pay-page-recipient--with-qr">
+            <div className="pay-page-recipient-profile">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[var(--pay-page-accent)]/15 text-[var(--pay-page-accent)]">
                 <User className="h-6 w-6" />
               </div>
-              <p className="pay-page-recipient-name min-w-0 max-w-full truncate text-center" style={{ color: fontClr ?? undefined }}>
+              <p className="pay-page-recipient-name min-w-0 truncate" style={{ color: fontClr ?? undefined }}>
                 {recipientName}
               </p>
             </div>
+            {qrDataUrl && (
+              <div className="pay-page-recipient-qr shrink-0">
+                <img src={qrDataUrl} alt="QR страницы" className="rounded-lg border border-[var(--pay-page-card-border)] bg-[var(--pay-page-card-bg)]" width={80} height={80} />
+              </div>
+            )}
           </div>
         </div>
 
@@ -358,12 +364,8 @@ export default function PayPage() {
               <span>Оплата банковской картой. Регистрация не нужна.</span>
             </div>
           </div>
-          {qrDataUrl && (
-            <div className="mt-4 flex justify-center">
-              <img src={qrDataUrl} alt="QR страницы" className="rounded-lg border border-[var(--pay-page-card-border)] bg-[var(--pay-page-card-bg)]" width={140} height={140} />
-            </div>
-          )}
         </div>
+      </div>
       </div>
     </div>
   );

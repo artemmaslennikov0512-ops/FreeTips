@@ -453,12 +453,11 @@ html:not([data-theme="dark"]) .pay-page {
 
 /* Фон страницы оплаты (карточный режим): светло-серый / тёмный */
 .pay-page.pay-page--cards {
-  background: #f5f7fa;
+  background: #fff;
   padding: 20px;
 }
 [data-theme="dark"] .pay-page.pay-page--cards {
-  /* Тот же тон, что и блок — без чёрных полос по бокам */
-  background: #2d3748;
+  background: #fff;
 }
 
 /* Внутренние карточки внутри основного блока */
@@ -483,6 +482,35 @@ html:not([data-theme="dark"]) .pay-page {
   padding: 0.25rem 0;
   border: none;
   border-radius: 0;
+}
+
+/* Блок получателя: иконка + имя в одной обводке, QR справа */
+.pay-page-recipient--with-qr {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.5rem 0;
+}
+.pay-page-recipient-profile {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 1rem;
+  border: 2px solid color-mix(in srgb, var(--pay-page-accent) 50%, transparent);
+  border-radius: 9999px;
+  flex-shrink: 1;
+  min-width: 0;
+}
+.pay-page-recipient-profile .pay-page-recipient-name {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+}
+.pay-page-recipient-qr img {
+  display: block;
 }
 .pay-page-recipient-name {
   font-size: 1.35rem;

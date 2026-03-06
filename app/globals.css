@@ -424,8 +424,9 @@ html:not([data-theme="dark"]) .pay-page {
 }
 
 [data-theme="dark"] .pay-page {
-  --pay-page-card-bg: #161616;
-  --pay-page-card-border: 1px solid rgba(192, 192, 192, 0.3);
+  /* Фон блока совпадает с фоном страницы — единый тёмно-серый тон */
+  --pay-page-card-bg: #2d3748;
+  --pay-page-card-border: 1px solid rgba(192, 192, 192, 0.2);
   --pay-page-gold-border: 1px solid rgba(197, 165, 114, 0.45);
   --pay-page-text: #fafafa;
   --pay-page-text-muted: rgba(255, 255, 255, 0.75);
@@ -456,7 +457,8 @@ html:not([data-theme="dark"]) .pay-page {
   padding: 20px;
 }
 [data-theme="dark"] .pay-page.pay-page--cards {
-  background: #1a1f2e;
+  /* Тот же тон, что и блок — без чёрных полос по бокам */
+  background: #2d3748;
 }
 
 /* Внутренние карточки внутри основного блока */
@@ -469,7 +471,7 @@ html:not([data-theme="dark"]) .pay-page {
   border: none;
 }
 [data-theme="dark"] .pay-page .pay-page-card.card {
-  background: #2d3748;
+  background: #374151;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 

@@ -167,7 +167,7 @@ export default function CabinetSupportPage() {
                   Поддержка FreeTips
                 </span>
               </div>
-              <p className="whitespace-pre-wrap text-sm text-[var(--color-text)]/95">
+              <p className="support-chat-msg-body whitespace-pre-wrap text-sm text-[var(--color-text)]/95">
                 {WELCOME_LINES.join("\n\n")}
               </p>
             </div>
@@ -209,10 +209,10 @@ export default function CabinetSupportPage() {
                     </span>
                   </div>
                 )}
-                <div className="whitespace-pre-wrap break-words text-sm text-[var(--color-text)]">{m.body}</div>
+                <div className="support-chat-msg-body whitespace-pre-wrap break-words text-sm text-[var(--color-text)]">{m.body}</div>
               </div>
               <div
-                className="mt-1 px-1 text-[10px] text-[var(--color-text)]/50"
+                className="support-chat-msg-date mt-1 px-1 text-[10px] text-[var(--color-text)]/50"
                 aria-label="Дата и время сообщения"
               >
                 {new Date(m.createdAt).toLocaleString("ru-RU", {

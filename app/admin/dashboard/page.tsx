@@ -292,7 +292,7 @@ export default function AdminDashboardPage() {
                     return (
                       <Fragment key={r.id}>
                         <tr
-                          className="border-0 hover:bg-[var(--color-light-gray)] transition-colors"
+                          className="border-0 hover:bg-white/10 transition-colors"
                         >
                           <td className="p-2">
                             <button

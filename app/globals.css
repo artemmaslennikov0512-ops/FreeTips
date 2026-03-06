@@ -546,6 +546,15 @@ html:not([data-theme="dark"]) .cabinet-premium #operations-history.cabinet-card 
   color: #fff !important;
 }
 
+/* Чат поддержки: текст сообщений и дата — белые */
+.cabinet-premium .support-chat-msg-body,
+.cabinet-premium .support-chat-msg-date {
+  color: #fff !important;
+}
+.cabinet-premium .support-chat-msg-date {
+  opacity: 0.9;
+}
+
 /* Чат поддержки: скрыть полосу прокрутки, прокрутка остаётся */
 .support-chat-messages {
   scrollbar-width: none;

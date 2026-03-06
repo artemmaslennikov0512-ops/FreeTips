@@ -252,7 +252,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
       <main className="min-h-screen min-w-0 flex-1 overflow-x-hidden lg:ml-0 flex flex-col">
         {/* Основной блок — как шторка: отступы от краёв */}
         <div
-          className="cabinet-main-block mt-4 mr-0 mb-4 ml-4 lg:mr-4 lg:ml-4 flex flex-1 flex-col rounded-2xl border border-white/10 backdrop-blur-xl"
+          className="cabinet-main-block mt-4 mr-0 mb-4 ml-4 lg:mr-4 lg:ml-4 flex w-full flex-col self-start rounded-2xl border border-white/10 backdrop-blur-xl"
           style={mainBlockStyle}
         >
           <div className="p-6 lg:p-8" id="main-content">

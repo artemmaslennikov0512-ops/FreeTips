@@ -19,7 +19,14 @@ export function ConditionalLayout({ children }: { children: React.ReactNode }) {
     pathname.startsWith("/change-password") ||
     pathname.startsWith("/reset-password");
   const isPayPage = pathname.startsWith("/pay");
-  const widthClass = isCabinet || isAdmin || isEstablishment ? "max-w-none bg-transparent" : isLanding ? "max-w-none bg-[var(--color-bg)]" : "mx-auto max-w-6xl xl:max-w-7xl 2xl:max-w-screen-2xl bg-[var(--color-bg)]";
+  const widthClass =
+    isCabinet || isAdmin || isEstablishment
+      ? "max-w-none bg-transparent"
+      : isLanding
+        ? "max-w-none bg-[var(--color-bg)]"
+        : isPayPage
+          ? "max-w-none bg-white"
+          : "mx-auto max-w-6xl xl:max-w-7xl 2xl:max-w-screen-2xl bg-[var(--color-bg)]";
 
   return (
     <div className={`flex min-h-screen w-full min-w-0 flex-1 flex-col border-0 ${widthClass} ${isAuthPage ? "layout-auth" : ""}`}

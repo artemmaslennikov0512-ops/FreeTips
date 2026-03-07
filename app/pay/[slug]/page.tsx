@@ -240,36 +240,36 @@ export default function PayPage() {
         </div>
 
         {/* Логотип */}
-        <div className="flex justify-center">
+        <div className="pay-page-logo-wrap flex justify-center mb-5">
           <div className="flex items-center gap-2">
             {branding?.logoUrl ? (
               <img src={branding.logoUrl} alt="" className="h-10 w-auto max-w-[120px] object-contain" />
             ) : (
-              <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--pay-page-accent)] text-sm font-bold text-white">FT</span>
+              <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--color-brand-gold)] text-sm font-bold text-[#0a192f]">FT</span>
             )}
             <span
               className="font-[family:var(--font-playfair)] text-xl font-bold"
               style={{ color: fontClr ?? "var(--color-text)" }}
             >
               <span style={{ color: fontClr ? "inherit" : "var(--color-navy)", opacity: 0.9 }}>Free</span>
-              <span className="text-[var(--pay-page-accent)]">Tips</span>
+              <span className="text-[var(--color-brand-gold)]">Tips</span>
             </span>
           </div>
         </div>
 
-        {/* Карточка: получатель + QR */}
+        {/* Карточка: получатель + QR в одной обводке */}
         <div className="pay-page-card card pay-page-recipient-card" style={Object.keys(cardStyle).length ? cardStyle : undefined}>
           <div className="pay-page-recipient pay-page-recipient--with-qr">
             <div className="pay-page-recipient-profile">
               <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[var(--pay-page-accent)]/15 text-[var(--pay-page-accent)]">
                 <User className="h-6 w-6" />
               </div>
-              <p className="pay-page-recipient-name min-w-0 truncate" style={{ color: fontClr ?? undefined }}>
+              <p className="pay-page-recipient-name min-w-0 truncate flex items-center" style={{ color: fontClr ?? undefined }}>
                 {recipientName}
               </p>
             </div>
             {qrDataUrl && (
-              <div className="pay-page-recipient-qr shrink-0">
+              <div className="pay-page-recipient-qr shrink-0 flex items-center">
                 <img src={qrDataUrl} alt="QR страницы" className="rounded-lg border border-[var(--pay-page-card-border)] bg-[var(--pay-page-card-bg)]" width={80} height={80} />
               </div>
             )}

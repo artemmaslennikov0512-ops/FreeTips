@@ -451,6 +451,11 @@ html:not([data-theme="dark"]) .pay-page {
   border: var(--pay-page-card-border) !important;
 }
 
+/* Отступ логотипа от блока ниже */
+.pay-page .pay-page-logo-wrap {
+  margin-bottom: 1.5rem;
+}
+
 /* Фон страницы оплаты (карточный режим): светло-серый / тёмный */
 .pay-page.pay-page--cards {
   background: #fff;
@@ -484,23 +489,22 @@ html:not([data-theme="dark"]) .pay-page {
   border-radius: 0;
 }
 
-/* Блок получателя: иконка + имя в одной обводке, QR справа */
+/* Блок получателя: обводка на всю строку — иконка + имя + QR */
 .pay-page-recipient--with-qr {
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  padding: 0.5rem 0;
+  padding: 0.75rem 1rem;
+  border: 2px solid color-mix(in srgb, var(--pay-page-accent) 50%, transparent);
+  border-radius: 20px;
 }
 .pay-page-recipient-profile {
   display: flex;
   flex-direction: row;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.5rem 1rem;
-  border: 2px solid color-mix(in srgb, var(--pay-page-accent) 50%, transparent);
-  border-radius: 9999px;
   flex-shrink: 1;
   min-width: 0;
 }
@@ -508,6 +512,9 @@ html:not([data-theme="dark"]) .pay-page {
   flex: 1;
   min-width: 0;
   text-align: left;
+  line-height: 1.2;
+  display: flex;
+  align-items: center;
 }
 .pay-page-recipient-qr img {
   display: block;

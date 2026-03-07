@@ -257,7 +257,7 @@ export default function PayPage() {
           </div>
         </div>
 
-        {/* Карточка: получатель + QR в одной обводке */}
+        {/* Карточка: получатель (обводка до QR, QR с отступом) */}
         <div className="pay-page-card card pay-page-recipient-card" style={Object.keys(cardStyle).length ? cardStyle : undefined}>
           <div className="pay-page-recipient pay-page-recipient--with-qr">
             <div className="pay-page-recipient-profile">
@@ -299,8 +299,8 @@ export default function PayPage() {
             })}
           </div>
           <p className="pay-page-label">Выберите сумму или введите свою</p>
-          <div className="pay-page-input-wrap custom-amount has-icon">
-            <span className="pay-page-currency" aria-hidden="true">₽</span>
+          <div className="pay-page-input-wrap custom-amount pay-page-custom-amount-row">
+            <span className="pay-page-currency-outside" aria-hidden="true">₽</span>
             <input
               type="text"
               inputMode="decimal"

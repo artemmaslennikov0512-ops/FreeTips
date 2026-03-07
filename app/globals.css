@@ -445,10 +445,21 @@ html:not([data-theme="dark"]) .pay-page {
   border: var(--pay-page-card-border) !important;
 }
 
-/* Основной блок — скруглённые края и отступы, внутри остаются карточки */
+/* Основной блок — золотая обводка и тень, выделяется от фона */
 .pay-page .pay-page-outer-block {
   background: var(--pay-page-card-bg) !important;
-  border: var(--pay-page-card-border) !important;
+  border: 2px solid rgba(197, 165, 114, 0.65) !important;
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.08),
+    0 10px 20px -5px rgba(0, 0, 0, 0.1),
+    0 0 0 1px rgba(197, 165, 114, 0.15);
+}
+[data-theme="dark"] .pay-page .pay-page-outer-block {
+  border-color: rgba(197, 165, 114, 0.5) !important;
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.2),
+    0 10px 25px -5px rgba(0, 0, 0, 0.35),
+    0 0 0 1px rgba(197, 165, 114, 0.25);
 }
 
 /* Отступ логотипа от блока ниже */
@@ -489,16 +500,14 @@ html:not([data-theme="dark"]) .pay-page {
   border-radius: 0;
 }
 
-/* Блок получателя: обводка на всю строку — иконка + имя + QR */
+/* Блок получателя: обводка только у иконки и логина, QR снаружи с отступом */
 .pay-page-recipient--with-qr {
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
-  padding: 0.75rem 1rem;
-  border: 2px solid color-mix(in srgb, var(--pay-page-accent) 50%, transparent);
-  border-radius: 20px;
+  gap: 1.25rem;
+  padding: 0;
 }
 .pay-page-recipient-profile {
   display: flex;
@@ -507,14 +516,20 @@ html:not([data-theme="dark"]) .pay-page {
   gap: 0.75rem;
   flex-shrink: 1;
   min-width: 0;
+  padding: 0.5rem 1rem;
+  border: 2px solid color-mix(in srgb, var(--pay-page-accent) 50%, transparent);
+  border-radius: 9999px;
 }
 .pay-page-recipient-profile .pay-page-recipient-name {
   flex: 1;
   min-width: 0;
+  margin: 0;
+  padding: 0;
   text-align: left;
   line-height: 1.2;
   display: flex;
   align-items: center;
+  align-self: center;
 }
 .pay-page-recipient-qr img {
   display: block;
@@ -610,12 +625,24 @@ html:not([data-theme="dark"]) .pay-page {
   justify-content: center;
   margin-bottom: 0;
 }
-.pay-page-input-wrap.custom-amount.has-icon {
-  position: relative;
+.pay-page-input-wrap.custom-amount {
   width: 100%;
   max-width: 280px;
   margin-left: auto;
   margin-right: auto;
+}
+.pay-page-custom-amount-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+}
+.pay-page-currency-outside {
+  flex-shrink: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--pay-page-text-muted);
+  line-height: 1;
 }
 .pay-page-input-wrap.has-icon {
   position: relative;
@@ -638,7 +665,8 @@ html:not([data-theme="dark"]) .pay-page {
   padding-left: 2.5rem;
 }
 .pay-page .custom-amount input {
-  width: 100%;
+  flex: 1;
+  min-width: 0;
   padding: 14px 16px;
   border: 1px solid #e0e4ec;
   border-radius: 40px;
@@ -699,11 +727,13 @@ html:not([data-theme="dark"]) .pay-page {
   min-height: 80px;
   background: #f9fafc;
   color: var(--pay-page-text);
+  text-align: center;
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 .pay-page .review-textarea::placeholder {
   color: var(--pay-page-text-muted);
   opacity: 0.85;
+  text-align: center;
 }
 [data-theme="dark"] .pay-page .review-textarea {
   background: #3a4559;

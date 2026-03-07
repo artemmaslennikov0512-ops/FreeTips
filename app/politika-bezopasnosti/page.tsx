@@ -22,6 +22,8 @@ export default function PolitikaBezopasnostiPage() {
           src={site.logo.src}
           alt={site.logo.alt}
           className="h-12 w-12"
+          loading="lazy"
+          fetchPriority="low"
         />
         <h1 className="text-3xl font-bold text-[var(--color-text)] sm:text-4xl">
           Политика безопасности платежей
@@ -35,6 +37,8 @@ export default function PolitikaBezopasnostiPage() {
             src={src}
             alt={alt}
             className="h-10 object-contain"
+            loading="lazy"
+            fetchPriority="low"
           />
         ))}
       </div>

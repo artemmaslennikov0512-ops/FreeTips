@@ -1,10 +1,9 @@
 import { ImageResponse } from "next/og";
 
-/* 1024px — максимальная чёткость при масштабировании во вкладке и автозаполнении */
-export const size = { width: 1024, height: 1024 };
-export const contentType = "image/png";
+/** Иконка 32×32 для вкладки браузера — без масштабирования, чёткая. */
+export const runtime = "edge";
 
-export default function Icon() {
+export async function GET() {
   return new ImageResponse(
     (
       <div
@@ -20,7 +19,7 @@ export default function Icon() {
       >
         <span
           style={{
-            fontSize: 400,
+            fontSize: 20,
             fontWeight: 800,
             color: "#ffffff",
             fontFamily: "system-ui, -apple-system, sans-serif",
@@ -31,6 +30,6 @@ export default function Icon() {
         </span>
       </div>
     ),
-    { ...size }
+    { width: 32, height: 32 }
   );
 }

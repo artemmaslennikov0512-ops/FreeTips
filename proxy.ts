@@ -85,10 +85,11 @@ function shouldCheckCsrf(request: NextRequest, pathname: string): boolean {
 
 /**
  * CSP: 'unsafe-inline' для script/style требуется Next.js для инлайновых скриптов/стилей.
- * В production unsafe-eval не используется (только в dev для HMR).
+ * unsafe-eval: в dev для HMR; в production только если ALLOW_CSP_UNSAFE_EVAL=true (некоторые чанки/библиотеки используют eval).
  */
 function buildCsp(isDev: boolean): string {
-  const evalToken = isDev ? " 'unsafe-eval'" : "";
+  const allowUnsafeEval = isDev || process.env.ALLOW_CSP_UNSAFE_EVAL === "true";
+  const evalToken = allowUnsafeEval ? " 'unsafe-eval'" : "";
   const devConnect = isDev ? " ws:" : "";
   return [
     "default-src 'self'",

@@ -6,7 +6,7 @@ const PAYGINE_ORIGINS = "https://test.paygine.com https://pay.paygine.com";
 const nextConfig: NextConfig = {
   output: "standalone",
   async redirects() {
-    return [{ source: "/favicon.ico", destination: "/icon.svg", permanent: false }];
+    return [{ source: "/favicon.ico", destination: "/icon-32x32", permanent: false }];
   },
   images: {
     remotePatterns: [
@@ -30,12 +30,6 @@ const nextConfig: NextConfig = {
       });
     }
     return [
-      {
-        source: "/favicon.png",
-        headers: [
-          { key: "Cache-Control", value: "no-store, no-cache, must-revalidate" },
-        ],
-      },
       {
         source: "/:path*",
         headers: securityHeaders,

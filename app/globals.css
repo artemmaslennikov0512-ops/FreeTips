@@ -316,12 +316,22 @@ html:not([data-theme="dark"]) body.cabinet-page .site-header .site-header-logo-f
 html:not([data-theme="dark"]) body.admin-page .site-header .site-header-logo-free {
   color: #ffffff !important;
 }
-/* Светлая тема: иконка FT в логотипе — тёмно-синий фон, белый текст (все страницы) */
+/* Светлая тема: иконка FT в логотипе — тёмно-синий фон, белый текст (лендинг, авторизация и т.д.) */
 html:not([data-theme="dark"]) .site-header .site-header-logo-icon {
   background: #0a192f !important;
   color: #ffffff !important;
 }
 html:not([data-theme="dark"]) .site-header .site-header-logo-icon span {
+  color: inherit;
+}
+/* Светлая тема: в ЛК и админке — белый фон иконки, тёмно-синий FT */
+html:not([data-theme="dark"]) body.cabinet-page .site-header .site-header-logo-icon,
+html:not([data-theme="dark"]) body.admin-page .site-header .site-header-logo-icon {
+  background: #ffffff !important;
+  color: #0a192f !important;
+}
+html:not([data-theme="dark"]) body.cabinet-page .site-header .site-header-logo-icon span,
+html:not([data-theme="dark"]) body.admin-page .site-header .site-header-logo-icon span {
   color: inherit;
 }
 
@@ -484,11 +494,11 @@ html:not([data-theme="dark"]) .pay-page .pay-page-outer-block .pay-page-logo-wra
 }
 
 /* Отступ логотипа от блока ниже */
-/* Параметры шрифта аббревиатуры логотипа FT (как в шапке: жирный sans-serif) */
+/* Параметры шрифта аббревиатуры логотипа FT (как в шапке: жирный sans-serif, небольшой отступ между буквами) */
 .logo-ft-abbr {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-weight: 800;
-  letter-spacing: -0.02em;
+  letter-spacing: 0.05em;
 }
 
 .pay-page .pay-page-logo-wrap {
@@ -502,11 +512,14 @@ html:not([data-theme="dark"]) .pay-page .pay-page-outer-block .pay-page-logo-wra
     0 2px 4px rgba(0, 0, 0, 0.15);
 }
 
-/* Фон страницы оплаты: в светлой теме как в ЛК (#1a2337), в тёмной — var(--color-bg) */
+/* Фон страницы оплаты (светлая тема): слегка светлее navy */
 html:not([data-theme="dark"]) .layout-pay {
+  background: #263350 !important;
+}
+/* Страница «Оставить заявку» — один фон на всю страницу (body + контейнер), без «растянутой» шапки */
+html:not([data-theme="dark"]) body:has(.layout-zayavka) {
   background: #1a2337 !important;
 }
-/* Фон страницы «Оставить заявку» — как в ЛК */
 html:not([data-theme="dark"]) .layout-zayavka {
   background: #1a2337 !important;
 }
@@ -1198,9 +1211,10 @@ html:not([data-theme="dark"]) .cabinet-premium .cabinet-limits-block .font-mediu
 [data-theme="dark"] .site-header .site-header-logo-free {
   color: #ffffff !important;
 }
-/* Тёмная тема: в логотипе буквы FT — белые */
+/* Тёмная тема: в логотипе FT — тёмно-синий текст, светлый фон для читаемости */
 [data-theme="dark"] .site-header .site-header-logo-icon {
-  color: #ffffff !important;
+  background: #ffffff !important;
+  color: #0a192f !important;
 }
 [data-theme="dark"] .site-header .site-header-logo-icon span {
   color: inherit;
@@ -1485,6 +1499,9 @@ body {
    ============================================ */
 :where(input, textarea, select, button) {
   font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  /* Чёткий текст в полях (antialiased на html даёт размытость в инпутах на части экранов) */
+  -webkit-font-smoothing: subpixel-antialiased;
+  -moz-osx-font-smoothing: auto;
 }
 
 :where(input::placeholder),

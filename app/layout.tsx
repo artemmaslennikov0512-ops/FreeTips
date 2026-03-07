@@ -63,7 +63,9 @@ export const metadata: Metadata = {
     description: defaultDescription,
   },
   alternates: { canonical: baseUrl },
+  // Фавикон: 32×32 для вкладки (чётко), SVG и 1024 PNG для остального
   icons: [
+    { url: "/icon-32x32", type: "image/png", sizes: "32x32" },
     { url: "/icon.svg", type: "image/svg+xml", sizes: "any" },
     { url: "/icon?v=3", type: "image/png", sizes: "1024x1024" },
   ],

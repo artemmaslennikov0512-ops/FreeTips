@@ -463,9 +463,9 @@ html:not([data-theme="dark"]) .pay-page {
   border: none !important;
 }
 
-/* Основной блок — без обводки, тень для объёма */
+/* Основной блок — тонкая золотая обводка, тень для объёма */
 .pay-page .pay-page-outer-block {
-  border: none !important;
+  border: 1px solid rgba(197, 165, 114, 0.45) !important;
   box-shadow: var(--shadow-card);
 }
 html:not([data-theme="dark"]) .pay-page .pay-page-outer-block {
@@ -474,6 +474,7 @@ html:not([data-theme="dark"]) .pay-page .pay-page-outer-block {
 }
 [data-theme="dark"] .pay-page .pay-page-outer-block {
   background: #161616 !important;
+  border: 1px solid rgba(197, 165, 114, 0.45) !important;
   box-shadow: var(--shadow-card);
 }
 
@@ -512,16 +513,21 @@ html:not([data-theme="dark"]) .pay-page .pay-page-outer-block .pay-page-logo-wra
     0 2px 4px rgba(0, 0, 0, 0.15);
 }
 
-/* Фон страницы оплаты (светлая тема): слегка светлее navy */
+/* Фон страницы оплаты (светлая тема): как у блока с суммами — тот же градиент navy */
 html:not([data-theme="dark"]) .layout-pay {
-  background: #263350 !important;
+  background: linear-gradient(135deg, #0a192f 0%, color-mix(in srgb, #0a192f 85%, white) 50%, #0a192f 100%) !important;
 }
-/* Страница «Оставить заявку» — один фон на всю страницу (body + контейнер), без «растянутой» шапки */
+/* Страница «Оставить заявку» — один фон navy на всю страницу; контент и шапка в колонке по ширине (как Вход/Регистрация) */
+html:not([data-theme="dark"]) .zayavka-page-wrapper {
+  min-height: 100vh;
+  width: 100%;
+  background: #1a2337 !important;
+}
 html:not([data-theme="dark"]) body:has(.layout-zayavka) {
   background: #1a2337 !important;
 }
 html:not([data-theme="dark"]) .layout-zayavka {
-  background: #1a2337 !important;
+  background: transparent !important;
 }
 .pay-page.pay-page--cards {
   background: transparent;

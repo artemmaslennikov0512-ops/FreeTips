@@ -179,17 +179,19 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
       className="cabinet-premium flex min-h-screen w-full max-w-full overflow-x-hidden bg-[var(--color-bg)] font-[family:var(--font-inter)] text-[var(--color-text)] pt-4"
       style={Object.keys(brandStyle).length ? brandStyle : undefined}
     >
-      {/* Шторка — стиль как на блоке: тёмное стекло, размытие, тонкая светлая обводка */}
+      {/* Мобильная шторка — как на лендинге: на весь экран, без зазоров, показ через opacity */}
       <div
-        className={`cabinet-overlay fixed inset-0 z-30 rounded-xl border border-white/[0.12] bg-[rgba(15,23,42,0.65)] backdrop-blur-xl lg:hidden ml-4 mr-4 mt-4 mb-4 ${sidebarOpen ? "block" : "hidden"}`}
+        className={`cabinet-overlay fixed inset-0 z-30 bg-[rgba(15,23,42,0.65)] backdrop-blur-xl transition-opacity duration-300 lg:hidden ${
+          sidebarOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+        }`}
         onClick={closeSidebar}
         aria-hidden
       />
 
-      {/* Левое меню — как шторка: отступы от краёв */}
+      {/* Левое меню: на мобильном — выезд слева от края (как на лендинге справа), без зазора */}
       <div
-        className={`cabinet-sidebar fixed left-4 top-4 z-40 flex h-auto max-h-[calc(100vh-2rem)] w-[260px] shrink-0 flex-col overflow-hidden rounded-2xl border border-white/10 py-6 shadow-sm backdrop-blur-xl transition-transform duration-300 lg:static lg:left-auto lg:top-auto lg:ml-4 lg:mt-4 lg:mr-0 lg:mb-0 lg:max-h-none lg:self-start lg:translate-x-0 ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-[calc(100%+1rem)]"
+        className={`cabinet-sidebar fixed left-0 top-0 z-40 flex h-full w-[min(calc(100vw-4rem),20rem)] max-w-[20rem] flex-col overflow-hidden border-0 border-r border-white/10 py-6 shadow-2xl backdrop-blur-xl transition-[transform] duration-300 ease-out lg:static lg:left-auto lg:top-auto lg:ml-4 lg:mt-4 lg:mr-0 lg:mb-0 lg:h-auto lg:max-h-none lg:w-[260px] lg:max-w-none lg:translate-x-0 lg:rounded-2xl lg:border ${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
         style={sidebarStyle}
       >
@@ -252,7 +254,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
       <main className="min-h-screen min-w-0 flex-1 overflow-x-hidden lg:ml-0 flex flex-col">
         {/* Основной блок — как шторка: отступы от краёв */}
         <div
-          className="cabinet-main-block mt-4 mr-0 mb-4 ml-4 lg:mr-4 lg:ml-4 flex w-full flex-col self-start rounded-2xl border border-white/10 backdrop-blur-xl"
+          className="cabinet-main-block mt-4 mr-4 mb-4 ml-4 flex w-full flex-col self-start rounded-2xl border border-white/10 backdrop-blur-xl"
           style={mainBlockStyle}
         >
           <div className="p-6 lg:p-8" id="main-content">

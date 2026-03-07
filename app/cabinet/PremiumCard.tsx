@@ -66,7 +66,6 @@ const CARD_STYLES = `
   justify-content: center;
   font-size: 12px;
   color: #000;
-  font-weight: bold;
 }
 .premium-card-brand {
   color: #4a4a4a;
@@ -123,7 +122,7 @@ export function PremiumCard({ fullName, balanceKop, compact }: Props) {
                 aria-hidden
               />
               <div className="absolute left-[12px] bottom-[28px] z-[3] flex items-center gap-1.5">
-                <div className="premium-logo-icon">FT</div>
+                <div className="premium-logo-icon logo-ft-abbr">FT</div>
                 <span className="premium-card-brand text-xs font-extrabold">
                   FreeTips
                 </span>

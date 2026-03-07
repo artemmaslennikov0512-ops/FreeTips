@@ -65,7 +65,7 @@ export default function AdminSupportPage() {
 
   return (
     <div className="admin-support-page">
-      <h1 className="flex items-center gap-2 text-2xl font-bold text-white">
+      <h1 className="flex items-center justify-center gap-2 text-2xl font-bold text-white w-full">
         <MessageCircle className="h-7 w-7 text-[var(--color-brand-gold)]" />
         Обращения в поддержку
       </h1>

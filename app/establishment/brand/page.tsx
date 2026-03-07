@@ -133,7 +133,7 @@ export default function EstablishmentBrandPage() {
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <div>
-        <h1 className="font-[family:var(--font-playfair)] text-xl font-semibold text-white flex items-center gap-2">
+        <h1 className="font-[family:var(--font-playfair)] text-xl font-semibold text-white flex items-center justify-center gap-2 w-full">
           <Palette className="h-5 w-5" />
           Бренд заведения
         </h1>

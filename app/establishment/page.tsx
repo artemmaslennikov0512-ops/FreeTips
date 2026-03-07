@@ -95,7 +95,7 @@ export default function EstablishmentPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="font-[family:var(--font-playfair)] text-2xl font-semibold text-white mb-2">
+        <h1 className="font-[family:var(--font-playfair)] text-2xl font-semibold text-white mb-2 text-center">
           Кабинет заведения
         </h1>
         <p className="text-white/90">

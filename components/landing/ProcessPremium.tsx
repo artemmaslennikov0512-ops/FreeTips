@@ -36,14 +36,14 @@ export function ProcessPremium() {
       />
       <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8 xl:max-w-7xl 2xl:max-w-screen-2xl relative z-10">
         <div className="text-center max-w-[700px] mx-auto mb-10 sm:mb-16">
-          <h2 className="font-[family:var(--font-playfair)] text-2xl sm:text-3xl lg:text-4xl font-semibold text-white mb-4">Безупречный процесс</h2>
-          <p className="text-lg text-[var(--color-on-dark-muted)]">Три простых шага, которые отражают наше стремление к совершенству в каждой детали.</p>
+          <h2 className="font-[family:var(--font-playfair)] text-2xl sm:text-3xl lg:text-4xl font-semibold text-white mb-4 text-center">Безупречный процесс</h2>
+          <p className="text-lg text-[var(--color-on-dark-muted)] text-center">Три простых шага, которые отражают наше стремление к совершенству в каждой детали.</p>
         </div>
         <div className="grid gap-6 sm:gap-10 sm:grid-cols-3 mt-10 sm:mt-16">
           {steps.map(({ num, icon: Icon, title, text }) => (
             <div
               key={num}
-              className="landing-card-hover relative p-6 sm:p-8 lg:p-10 bg-[var(--process-card-bg)] rounded-xl border border-[var(--process-card-border)] hover:border-[var(--process-card-hover-border)] transition-all duration-300"
+              className="landing-card-hover relative p-6 sm:p-8 lg:p-10 bg-[var(--process-card-bg)] rounded-xl border border-[var(--process-card-border)] hover:border-[var(--process-card-hover-border)] transition-all duration-300 text-center"
             >
               <div className="absolute -top-4 left-8 w-10 h-10 bg-[var(--color-accent-gold)] text-[var(--color-navy)] rounded-full flex items-center justify-center font-[family:var(--font-playfair)] font-bold text-xl shadow-[var(--shadow-button)]">
                 {num}
@@ -51,8 +51,8 @@ export function ProcessPremium() {
               <div className="text-[var(--color-accent-gold)] mb-6">
                 <Icon className="w-11 h-11 sm:w-12 sm:h-12" strokeWidth={1.5} />
               </div>
-              <h3 className="font-[family:var(--font-playfair)] text-2xl font-semibold text-white mb-4">{title}</h3>
-              <p className="text-[var(--color-on-dark-muted)] leading-relaxed">{text}</p>
+              <h3 className="font-[family:var(--font-playfair)] text-2xl font-semibold text-white mb-4 text-center">{title}</h3>
+              <p className="text-[var(--color-on-dark-muted)] leading-relaxed text-center">{text}</p>
             </div>
           ))}
         </div>

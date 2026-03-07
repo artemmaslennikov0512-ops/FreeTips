@@ -132,7 +132,7 @@ export default function PayoutRulesPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <div>
-        <h1 className="font-[family:var(--font-playfair)] text-xl font-semibold text-white">
+        <h1 className="font-[family:var(--font-playfair)] text-xl font-semibold text-white text-center">
           Правила распределения
         </h1>
         <p className="text-white/90 text-sm mt-1">

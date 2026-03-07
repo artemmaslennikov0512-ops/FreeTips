@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Link2, List, Key, Copy, RotateCw, Settings } from "lucide-react";
+import { Link2, List, Key, Copy, RotateCw, Settings, ExternalLink } from "lucide-react";
 import { PremiumCard } from "./PremiumCard";
 import { formatMoney } from "@/lib/utils";
 import { getBaseUrl } from "@/lib/get-base-url";
@@ -282,14 +282,25 @@ export default function CabinetDashboardPage() {
                 <div className="cabinet-input-window mb-3 break-all rounded-lg bg-[var(--color-bg-sides)] px-3 py-2 font-mono text-xs text-[var(--color-text)]/90">
                   {tipLink}
                 </div>
-                <button
-                  type="button"
-                  onClick={copyTipLink}
-                  className="inline-flex items-center justify-center gap-2 rounded-[10px] bg-[var(--color-brand-gold)] px-4 py-2 text-[14px] font-semibold text-[#0a192f] transition-all hover:opacity-90"
-                >
-                  <Copy className="h-4 w-4" />
-                  {linkCopied ? "Скопировано!" : "Копировать ссылку"}
-                </button>
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={copyTipLink}
+                    className="inline-flex items-center justify-center gap-2 rounded-[10px] bg-[var(--color-brand-gold)] px-4 py-2 text-[14px] font-semibold text-[#0a192f] transition-all hover:opacity-90"
+                  >
+                    <Copy className="h-4 w-4" />
+                    {linkCopied ? "Скопировано!" : "Копировать ссылку"}
+                  </button>
+                  <a
+                    href={tipLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center gap-2 rounded-[10px] bg-[var(--color-brand-gold)] px-4 py-2 text-[14px] font-semibold text-[#0a192f] transition-all hover:opacity-90"
+                  >
+                    <ExternalLink className="h-4 w-4" />
+                    Перейти по ссылке
+                  </a>
+                </div>
               </div>
             )}
             <div className="grid grid-cols-2 gap-4">

@@ -126,9 +126,9 @@ export function Header() {
     return (
       <header className="site-header site-header-landing sticky top-0 z-30 mt-4 w-full max-w-none rounded-none bg-transparent">
         <div className="mx-auto flex h-16 w-full items-center justify-between gap-2 px-4 sm:px-6 lg:px-8">
-          <Link href="/" className="flex shrink-0 items-center gap-1.5 rounded-lg border-0 px-1.5 py-1.5 hover:bg-[var(--color-light-gray)] transition-all sm:gap-2 sm:px-2 sm:py-2" aria-label="На главную">
-            <span className="flex h-6 w-6 items-center justify-center rounded-md bg-[var(--color-brand-gold)] text-xs font-bold sm:h-7 sm:w-7 lg:h-8 lg:w-8 lg:text-sm"><span className="text-black">F</span><span className="text-black">T</span></span>
-            <span className="site-header-logo-text font-[family:var(--font-playfair)] text-sm font-bold sm:text-base lg:text-lg text-[var(--color-navy)]"><span className="site-header-logo-free">Free</span><span className="text-[var(--color-brand-gold)]">Tips</span></span>
+          <Link href="/" className="flex shrink-0 items-center gap-2 rounded-lg border-0 px-1.5 py-1.5 hover:bg-[var(--color-light-gray)] transition-all sm:gap-2.5 sm:px-2 sm:py-2" aria-label="На главную">
+            <span className="site-header-logo-icon flex h-8 w-8 items-center justify-center rounded-md bg-[var(--color-brand-gold)] text-sm sm:h-9 sm:w-9 lg:h-10 lg:w-10 lg:text-base logo-ft-abbr text-[#0a192f]"><span>F</span><span>T</span></span>
+            <span className="site-header-logo-text font-[family:var(--font-playfair)] text-base font-bold sm:text-lg lg:text-xl text-[var(--color-navy)]"><span className="site-header-logo-free">Free</span><span className="text-[var(--color-brand-gold)]">Tips</span></span>
           </Link>
           <nav className="hidden lg:flex shrink-0 items-center justify-center gap-1.5 xl:gap-2 2xl:gap-3" aria-label="Навигация">
             <Link href="/#features" className="whitespace-nowrap rounded-xl border-0 bg-[var(--color-white)]/95 backdrop-blur-sm shadow-[var(--shadow-subtle)] px-2.5 py-2 font-medium text-[14px] text-[var(--color-navy)] transition-all hover:shadow-[var(--shadow-soft)] hover:-translate-y-0.5 xl:px-3 xl:py-2.5 2xl:px-4">Преимущества</Link>
@@ -169,39 +169,53 @@ export function Header() {
             </button>
           </div>
         </div>
-        {sideOpen && (
-          <>
-            <div className="header-mobile-overlay fixed inset-0 z-40 bg-black/20 lg:hidden" onClick={close} aria-hidden />
-            <aside ref={(el) => { sideMenuRef.current = el; }} className="header-mobile-panel fixed top-0 right-0 z-50 h-full w-[min(100vw-4rem,20rem)] bg-[#0a192f] shadow-2xl lg:hidden p-6">
-              <div className="flex justify-between items-center mb-6">
-                <span className="font-[family:var(--font-playfair)] font-bold"><span className="text-white">Free</span><span className="text-[var(--color-brand-gold)]">Tips</span></span>
-                <button type="button" onClick={close} className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg text-white hover:bg-white/10" aria-label="Закрыть">
-                  <X className="h-5 w-5" />
-                </button>
+        {/* Мобильное меню: всегда в DOM, открытие/закрытие только через opacity и transform — без «прыжка» */}
+        <div
+          id="side-menu"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Меню навигации"
+          className={`header-mobile-overlay lg:hidden fixed inset-0 z-40 overflow-hidden transition-opacity duration-300 ${
+            sideOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+          }`}
+          onClick={close}
+        >
+          <div className="absolute inset-0 cursor-pointer bg-black/20 backdrop-blur-sm" aria-hidden />
+          <aside
+            ref={(el) => { sideMenuRef.current = el; }}
+            className={`header-mobile-panel fixed top-0 right-0 z-50 flex h-full w-[min(calc(100vw-4rem),20rem)] flex-col border-0 bg-[#0a192f] shadow-2xl p-6 transition-[transform] duration-300 ease-out ${
+              sideOpen ? "translate-x-0" : "translate-x-full"
+            }`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-between items-center mb-6">
+              <span className="font-[family:var(--font-playfair)] font-bold"><span className="text-white">Free</span><span className="text-[var(--color-brand-gold)]">Tips</span></span>
+              <button type="button" onClick={close} className="min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg text-white hover:bg-white/10" aria-label="Закрыть">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <nav className="flex flex-col gap-2">
+              <Link href="/#features" onClick={close} className="py-3 text-[14px] font-medium text-white hover:text-[var(--color-brand-gold)]">Преимущества</Link>
+              <Link href="/#process" onClick={close} className="py-3 text-[14px] font-medium text-white hover:text-[var(--color-brand-gold)]">Как работает</Link>
+              <Link href="/#business" onClick={close} className="py-3 text-[14px] font-medium text-white hover:text-[var(--color-brand-gold)]">Для бизнеса</Link>
+              <Link href="/oferta" onClick={close} className="py-3 text-[14px] font-medium text-white hover:text-[var(--color-brand-gold)]">Тарифы</Link>
+              <Link href="/kontakty" onClick={close} className="py-3 text-[14px] font-medium text-white hover:text-[var(--color-brand-gold)]">Контакты</Link>
+              <div className="mt-6 pt-6 border-t border-white/20 flex flex-col gap-3">
+                {user ? (
+                  <>
+                    <Link href={cabinetHref} onClick={close} className="py-3 text-[14px] text-center font-semibold text-[var(--color-white)] bg-[var(--color-brand-gold)] text-[#0a192f] rounded-xl hover:opacity-90">Кабинет</Link>
+                    <button type="button" onClick={handleLogout} className="py-3 text-[14px] text-center font-semibold text-[var(--color-white)] bg-white/10 rounded-xl hover:bg-white/20">Выйти</button>
+                  </>
+                ) : (
+                  <>
+                    <Link href="/login" onClick={close} className="py-3 text-[14px] text-center font-semibold bg-[var(--color-brand-gold)] text-[#0a192f] rounded-xl hover:opacity-90">Войти</Link>
+                    <Link href="/zayavka" onClick={close} className="py-3 text-[14px] text-center font-semibold text-[var(--color-white)] bg-white/10 rounded-xl hover:bg-white/20">Начать</Link>
+                  </>
+                )}
               </div>
-              <nav className="flex flex-col gap-2">
-                <Link href="/#features" onClick={close} className="py-3 text-[14px] font-medium text-white hover:text-[var(--color-brand-gold)]">Преимущества</Link>
-                <Link href="/#process" onClick={close} className="py-3 text-[14px] font-medium text-white hover:text-[var(--color-brand-gold)]">Как работает</Link>
-                <Link href="/#business" onClick={close} className="py-3 text-[14px] font-medium text-white hover:text-[var(--color-brand-gold)]">Для бизнеса</Link>
-                <Link href="/oferta" onClick={close} className="py-3 text-[14px] font-medium text-white hover:text-[var(--color-brand-gold)]">Тарифы</Link>
-                <Link href="/kontakty" onClick={close} className="py-3 text-[14px] font-medium text-white hover:text-[var(--color-brand-gold)]">Контакты</Link>
-                <div className="mt-6 pt-6 border-t border-white/20 flex flex-col gap-3">
-                  {user ? (
-                    <>
-                      <Link href={cabinetHref} onClick={close} className="py-3 text-[14px] text-center font-semibold text-[var(--color-white)] bg-[var(--color-brand-gold)] text-[#0a192f] rounded-xl hover:opacity-90">Кабинет</Link>
-                      <button type="button" onClick={handleLogout} className="py-3 text-[14px] text-center font-semibold text-[var(--color-white)] bg-white/10 rounded-xl hover:bg-white/20">Выйти</button>
-                    </>
-                  ) : (
-                    <>
-                      <Link href="/login" onClick={close} className="py-3 text-[14px] text-center font-semibold bg-[var(--color-brand-gold)] text-[#0a192f] rounded-xl hover:opacity-90">Войти</Link>
-                      <Link href="/zayavka" onClick={close} className="py-3 text-[14px] text-center font-semibold text-[var(--color-white)] bg-white/10 rounded-xl hover:bg-white/20">Начать</Link>
-                    </>
-                  )}
-                </div>
-              </nav>
-            </aside>
-          </>
-        )}
+            </nav>
+          </aside>
+        </div>
       </header>
     );
   }
@@ -214,8 +228,8 @@ export function Header() {
           className="flex items-center gap-2"
           aria-label="На главную"
         >
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--color-brand-gold)] text-sm font-bold"><span className="text-black">F</span><span className="text-black">T</span></span>
-          <span className="site-header-logo-text font-[family:var(--font-playfair)] text-lg font-bold text-[var(--color-navy)]"><span className="site-header-logo-free">Free</span><span className="text-[var(--color-brand-gold)]">Tips</span></span>
+          <span className="site-header-logo-icon flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--color-brand-gold)] text-base logo-ft-abbr text-[#0a192f]"><span>F</span><span>T</span></span>
+          <span className="site-header-logo-text font-[family:var(--font-playfair)] text-xl font-bold text-[var(--color-navy)]"><span className="site-header-logo-free">Free</span><span className="text-[var(--color-brand-gold)]">Tips</span></span>
         </Link>
 
         <div className="hidden md:flex items-center gap-3">

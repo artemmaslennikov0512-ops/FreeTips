@@ -243,12 +243,12 @@ export default function PayPage() {
         <div className="pay-page-logo-wrap flex justify-center mb-5">
           <div className="flex items-center gap-2">
             {branding?.logoUrl ? (
-              <img src={branding.logoUrl} alt="" className="h-10 w-auto max-w-[120px] object-contain" />
+              <img src={branding.logoUrl} alt="" className="h-12 w-auto max-w-[140px] object-contain" />
             ) : (
-              <span className="pay-page-logo-ft flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--color-brand-gold)] text-base font-extrabold text-[#0a192f] tracking-tight">FT</span>
+              <span className="pay-page-logo-ft logo-ft-abbr flex h-12 w-12 items-center justify-center rounded-lg bg-[var(--color-brand-gold)] text-lg text-[#0a192f]">FT</span>
             )}
             <span
-              className="font-[family:var(--font-playfair)] text-xl font-bold"
+              className="font-[family:var(--font-playfair)] text-2xl font-bold"
               style={{ color: fontClr ?? "var(--color-text)" }}
             >
               <span style={{ color: fontClr ? "inherit" : "var(--color-navy)", opacity: 0.9 }}>Free</span>
@@ -257,16 +257,18 @@ export default function PayPage() {
           </div>
         </div>
 
-        {/* Карточка: получатель (обводка до QR, QR с отступом) */}
+        {/* Карточка: получатель — обводка до QR, отступ от QR как слева от блока */}
         <div className="pay-page-card card pay-page-recipient-card" style={Object.keys(cardStyle).length ? cardStyle : undefined}>
           <div className="pay-page-recipient pay-page-recipient--with-qr">
-            <div className="pay-page-recipient-profile">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[var(--pay-page-accent)]/15 text-[var(--pay-page-accent)]">
-                <User className="h-6 w-6" />
+            <div className="pay-page-recipient-bordered">
+              <div className="pay-page-recipient-profile">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[var(--pay-page-accent)]/15 text-[var(--pay-page-accent)]">
+                  <User className="h-6 w-6" />
+                </div>
+                <p className="pay-page-recipient-name min-w-0 truncate flex items-center" style={{ color: fontClr ?? undefined }}>
+                  {recipientName}
+                </p>
               </div>
-              <p className="pay-page-recipient-name min-w-0 truncate flex items-center" style={{ color: fontClr ?? undefined }}>
-                {recipientName}
-              </p>
             </div>
             {qrDataUrl && (
               <div className="pay-page-recipient-qr shrink-0 flex items-center">
@@ -300,7 +302,6 @@ export default function PayPage() {
           </div>
           <p className="pay-page-label">Выберите сумму или введите свою</p>
           <div className="pay-page-input-wrap custom-amount pay-page-custom-amount-row">
-            <span className="pay-page-currency-outside" aria-hidden="true">₽</span>
             <input
               type="text"
               inputMode="decimal"

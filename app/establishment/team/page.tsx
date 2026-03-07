@@ -211,7 +211,7 @@ export default function EstablishmentTeamPage() {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="font-[family:var(--font-playfair)] text-xl font-semibold text-white">
+        <h1 className="font-[family:var(--font-playfair)] text-xl font-semibold text-white text-center">
           Команда
         </h1>
         <div className="flex flex-wrap items-center gap-2">

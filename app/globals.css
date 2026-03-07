@@ -316,6 +316,18 @@ html:not([data-theme="dark"]) body.cabinet-page .site-header .site-header-logo-f
 html:not([data-theme="dark"]) body.admin-page .site-header .site-header-logo-free {
   color: #ffffff !important;
 }
+/* Светлая тема: иконка FT в шапке ЛК/админки — как на лого (тёмно-синий круг, белый FT) */
+html:not([data-theme="dark"]) body.cabinet-page .site-header .site-header-logo-icon,
+html:not([data-theme="dark"]) body.admin-page .site-header .site-header-logo-icon,
+html:not([data-theme="dark"]) .layout-auth .site-header .site-header-logo-icon {
+  background: #0a192f !important;
+  color: #ffffff !important;
+}
+html:not([data-theme="dark"]) body.cabinet-page .site-header .site-header-logo-icon span,
+html:not([data-theme="dark"]) body.admin-page .site-header .site-header-logo-icon span,
+html:not([data-theme="dark"]) .layout-auth .site-header .site-header-logo-icon span {
+  color: inherit;
+}
 
 /* Светлая тема: основной блок ЛК и админки — как сайдбар (градиент navy, та же обводка) */
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-main-block:not(.admin-main-block),
@@ -472,17 +484,22 @@ html:not([data-theme="dark"]) .pay-page .pay-page-outer-block .pay-page-logo-wra
 }
 
 /* Отступ логотипа от блока ниже */
+/* Параметры шрифта аббревиатуры логотипа FT (как в шапке: жирный sans-serif) */
+.logo-ft-abbr {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
 .pay-page .pay-page-logo-wrap {
   margin-bottom: 1.5rem;
 }
 
-/* Логотип FT — жирнее, объёмнее */
+/* Логотип FT на странице оплаты — общий класс + тень */
 .pay-page .pay-page-logo-ft {
-  font-weight: 800;
   text-shadow:
     0 1px 0 rgba(255, 255, 255, 0.4),
     0 2px 4px rgba(0, 0, 0, 0.15);
-  letter-spacing: -0.02em;
 }
 
 /* Фон страницы оплаты (карточный режим): светло-серый / тёмный */
@@ -492,18 +509,36 @@ html:not([data-theme="dark"]) .pay-page .pay-page-outer-block .pay-page-logo-wra
   padding: 20px;
 }
 
-/* Внутренние карточки — как блок входа (--color-bg-sides) */
+/* Внутренние карточки: светлая тема — как фон чата в поддержке */
 .pay-page .pay-page-card.card {
-  background: var(--color-bg-sides);
   border-radius: 20px;
   padding: 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   margin-bottom: 16px;
-  border: none;
 }
+html:not([data-theme="dark"]) .pay-page .pay-page-card.card {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid rgba(197, 165, 114, 0.5);
+  box-shadow: none;
+}
+html:not([data-theme="dark"]) .pay-page .pay-page-card.card .pay-page-recipient-name,
+html:not([data-theme="dark"]) .pay-page .pay-page-card.card .pay-page-section-title,
+html:not([data-theme="dark"]) .pay-page .pay-page-card.card .pay-page-label,
+html:not([data-theme="dark"]) .pay-page .pay-page-card.card .info-block,
+html:not([data-theme="dark"]) .pay-page .pay-page-card.card .info-row,
+html:not([data-theme="dark"]) .pay-page .pay-page-card.card .info-row span {
+  color: rgba(255, 255, 255, 0.95) !important;
+}
+html:not([data-theme="dark"]) .pay-page .pay-page-card.card .info-block {
+  background: rgba(255, 255, 255, 0.08);
+}
+/* Тёмная тема: фон блоков — как у чата поддержки */
 [data-theme="dark"] .pay-page .pay-page-card.card {
-  background: #161616;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: none;
+}
+[data-theme="dark"] .pay-page .pay-page-card.card .info-block {
+  background: rgba(255, 255, 255, 0.06);
 }
 
 /* Имя получателя — по центру, внутри карточки */
@@ -516,14 +551,21 @@ html:not([data-theme="dark"]) .pay-page .pay-page-outer-block .pay-page-logo-wra
   border-radius: 0;
 }
 
-/* Блок получателя: обводка только у иконки и логина, QR снаружи с отступом */
+/* Блок получателя: обводка протянута до QR, отступ от QR как слева от контента */
 .pay-page-recipient--with-qr {
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  gap: 1.25rem;
+  gap: 1rem;
   padding: 0;
+}
+.pay-page-recipient-bordered {
+  flex: 1;
+  min-width: 0;
+  padding: 0.75rem 1rem;
+  border: 2px solid color-mix(in srgb, var(--pay-page-accent) 50%, transparent);
+  border-radius: 20px;
 }
 .pay-page-recipient-profile {
   display: flex;
@@ -532,9 +574,9 @@ html:not([data-theme="dark"]) .pay-page .pay-page-outer-block .pay-page-logo-wra
   gap: 0.75rem;
   flex-shrink: 1;
   min-width: 0;
-  padding: 0.5rem 1rem;
-  border: 2px solid color-mix(in srgb, var(--pay-page-accent) 50%, transparent);
-  border-radius: 9999px;
+  padding: 0;
+  border: none;
+  border-radius: 0;
 }
 .pay-page-recipient-profile .pay-page-recipient-name {
   flex: 1;
@@ -653,13 +695,6 @@ html:not([data-theme="dark"]) .pay-page .pay-page-outer-block .pay-page-logo-wra
   gap: 0.75rem;
   width: 100%;
 }
-.pay-page-currency-outside {
-  flex-shrink: 0;
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: var(--pay-page-text-muted);
-  line-height: 1;
-}
 .pay-page-input-wrap.has-icon {
   position: relative;
   width: 100%;
@@ -757,7 +792,7 @@ html:not([data-theme="dark"]) .pay-page .pay-page-outer-block .pay-page-logo-wra
   color: #f7fafc;
 }
 
-/* Кнопка оплаты — яркая, пилюля 60px, тень, сумма в тексте */
+/* Кнопка оплаты — пилюля 60px, сумма в тексте */
 .pay-page .pay-button.pay-page-submit,
 .pay-page .pay-page-submit {
   margin-top: 1rem;
@@ -776,14 +811,27 @@ html:not([data-theme="dark"]) .pay-page .pay-page-outer-block .pay-page-logo-wra
   transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
   box-shadow: 0 8px 16px rgba(74, 111, 165, 0.3);
 }
+/* Светлая тема: кнопка «Оплатить» — золотая */
+html:not([data-theme="dark"]) .pay-page .pay-button.pay-page-submit,
+html:not([data-theme="dark"]) .pay-page .pay-page-submit {
+  background: var(--color-brand-gold) !important;
+  color: #0a192f !important;
+  box-shadow: 0 4px 12px rgba(197, 165, 114, 0.35);
+}
 .pay-page .pay-button.pay-page-submit:hover:not(:disabled),
 .pay-page .pay-page-submit:hover:not(:disabled) {
   background: #3a5a8c;
   transform: scale(1.02);
   box-shadow: 0 8px 20px rgba(74, 111, 165, 0.4);
 }
+html:not([data-theme="dark"]) .pay-page .pay-button.pay-page-submit:hover:not(:disabled),
+html:not([data-theme="dark"]) .pay-page .pay-page-submit:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--color-brand-gold) 85%, #0a192f) !important;
+  box-shadow: 0 6px 16px rgba(197, 165, 114, 0.4);
+}
 [data-theme="dark"] .pay-page .pay-button.pay-page-submit,
 [data-theme="dark"] .pay-page .pay-page-submit {
+  border: 2px solid rgba(197, 165, 114, 0.6);
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
 }
 .pay-page .pay-page-submit:active:not(:disabled) {
@@ -1102,6 +1150,18 @@ html:not([data-theme="dark"]) .cabinet-premium .cabinet-limits-block .font-mediu
 }
 [data-theme="dark"] .site-header .site-header-logo-free {
   color: #ffffff !important;
+}
+/* Тёмная тема: иконка FT в шапке — тёмно-синий круг, белый FT (как во вкладке) */
+[data-theme="dark"] body.cabinet-page .site-header .site-header-logo-icon,
+[data-theme="dark"] body.admin-page .site-header .site-header-logo-icon,
+[data-theme="dark"] .layout-auth .site-header .site-header-logo-icon {
+  background: #0a192f !important;
+  color: #ffffff !important;
+}
+[data-theme="dark"] body.cabinet-page .site-header .site-header-logo-icon span,
+[data-theme="dark"] body.admin-page .site-header .site-header-logo-icon span,
+[data-theme="dark"] .layout-auth .site-header .site-header-logo-icon span {
+  color: inherit;
 }
 
 [data-theme="dark"] .theme-toggle-btn {

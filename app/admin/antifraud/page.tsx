@@ -321,7 +321,7 @@ export default function AdminAntifraudPage() {
 
   return (
     <div className="min-w-0 max-w-full">
-      <h1 className="antifraud-page-title mb-6 text-xl font-semibold text-white">Антифрод и лимиты</h1>
+      <h1 className="antifraud-page-title mb-6 text-xl font-semibold text-white text-center">Антифрод и лимиты</h1>
 
       <section className="cabinet-section-header rounded-2xl border-0 p-4 sm:p-6">
         <div className="antifraud-inner cabinet-block-inner min-w-0 rounded-xl border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/85 p-4 sm:p-5">

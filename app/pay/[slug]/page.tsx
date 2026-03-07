@@ -245,7 +245,7 @@ export default function PayPage() {
             {branding?.logoUrl ? (
               <img src={branding.logoUrl} alt="" className="h-10 w-auto max-w-[120px] object-contain" />
             ) : (
-              <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--color-brand-gold)] text-sm font-bold text-[#0a192f]">FT</span>
+              <span className="pay-page-logo-ft flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--color-brand-gold)] text-base font-extrabold text-[#0a192f] tracking-tight">FT</span>
             )}
             <span
               className="font-[family:var(--font-playfair)] text-xl font-bold"

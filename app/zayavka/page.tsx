@@ -159,8 +159,8 @@ export default function ZayavkaPage() {
     const supportEmail = site.footer.support.email;
     return (
       <AuthPageShell>
-        <div className="mx-auto flex min-h-[80vh] max-w-md flex-col justify-center overflow-visible px-4 py-16">
-          <div className={`${AUTH_CARD_CLASS} text-center`}>
+        <div className="zayavka-page mx-auto flex min-h-[80vh] max-w-md flex-col justify-center overflow-visible px-4 py-16">
+          <div className={`${AUTH_CARD_CLASS} zayavka-card text-center`}>
             <h1 className="font-[family:var(--font-playfair)] text-2xl font-semibold text-[var(--color-text)]">Спасибо за оставление заявки</h1>
             <p className="mt-3 text-[var(--color-text-secondary)]">
               Ожидайте, с вами свяжутся в рабочие часы.
@@ -192,8 +192,8 @@ export default function ZayavkaPage() {
 
   return (
     <AuthPageShell>
-      <div className="mx-auto flex min-h-[80vh] max-w-md flex-col justify-center overflow-visible px-4 py-16">
-        <div className={`${AUTH_CARD_CLASS} overflow-visible`}>
+      <div className="zayavka-page mx-auto flex min-h-[80vh] max-w-md flex-col justify-center overflow-visible px-4 py-16">
+        <div className={`${AUTH_CARD_CLASS} zayavka-card overflow-visible`}>
           <h1 className="font-[family:var(--font-playfair)] text-2xl font-semibold text-[var(--color-text)]">Оставить заявку</h1>
           <p className="mt-2 text-[var(--color-text-secondary)]">
             {step === 1

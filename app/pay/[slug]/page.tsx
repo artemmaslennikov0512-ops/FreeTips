@@ -248,10 +248,10 @@ export default function PayPage() {
               <span className="pay-page-logo-ft logo-ft-abbr flex h-12 w-12 items-center justify-center rounded-lg bg-[var(--color-brand-gold)] text-lg text-[#0a192f]">FT</span>
             )}
             <span
-              className="font-[family:var(--font-playfair)] text-2xl font-bold"
+              className="font-[family:var(--font-playfair)] text-2xl font-bold pay-page-logo-text"
               style={{ color: fontClr ?? "var(--color-text)" }}
             >
-              <span style={{ color: fontClr ? "inherit" : "var(--color-navy)", opacity: 0.9 }}>Free</span>
+              <span className="pay-page-logo-free" style={{ color: fontClr ? "inherit" : undefined, opacity: fontClr ? undefined : 0.95 }}>Free</span>
               <span className="text-[var(--color-brand-gold)]">Tips</span>
             </span>
           </div>

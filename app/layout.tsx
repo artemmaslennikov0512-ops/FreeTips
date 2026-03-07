@@ -64,7 +64,7 @@ export const metadata: Metadata = {
   },
   alternates: { canonical: baseUrl },
   icons: [
-    { url: "/icon", type: "image/png", sizes: "192x192" },
+    { url: "/icon?v=2", type: "image/png", sizes: "512x512" },
     { url: "/icon.svg", type: "image/svg+xml", sizes: "any" },
   ],
 };

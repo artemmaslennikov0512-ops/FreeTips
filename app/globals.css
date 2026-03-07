@@ -436,16 +436,16 @@ html:not([data-theme="dark"]) .pay-page {
 }
 
 [data-theme="dark"] .pay-page {
-  /* Тёмная тема: фон блока и страницы — как на странице входа */
+  /* Тёмная тема: фон полей/кнопок сумм и отзыва — как фон сообщения в чате поддержки (gold/10) */
   --pay-page-card-bg: #161616;
   --pay-page-card-border: 1px solid rgba(192, 192, 192, 0.3);
   --pay-page-gold-border: 1px solid rgba(197, 165, 114, 0.45);
   --pay-page-text: #fafafa;
   --pay-page-text-muted: rgba(255, 255, 255, 0.75);
-  --pay-page-input-bg: #363636;
+  --pay-page-input-bg: rgba(197, 165, 114, 0.1);
   --pay-page-input-border: 1px solid rgba(197, 165, 114, 0.45);
   --pay-page-input-focus-ring: rgba(197, 165, 114, 0.5);
-  --pay-page-amount-btn-bg: #363636;
+  --pay-page-amount-btn-bg: rgba(197, 165, 114, 0.1);
   --pay-page-amounts-wrap-bg: transparent;
   --pay-page-amount-btn-active-bg: rgba(197, 165, 114, 0.25);
   --pay-page-amount-btn-active-border: var(--color-brand-gold);
@@ -457,13 +457,14 @@ html:not([data-theme="dark"]) .pay-page {
   border: var(--pay-page-card-border) !important;
 }
 
-/* Основной блок — как основной блок ЛК (градиент navy / стекло), золотая обводка */
+/* Основной блок — как основной блок ЛК (градиент navy, золотая обводка как в ЛК) */
 .pay-page .pay-page-outer-block {
   border: 1px solid rgba(197, 165, 114, 0.55) !important;
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06);
 }
 html:not([data-theme="dark"]) .pay-page .pay-page-outer-block {
   background: linear-gradient(135deg, #0a192f 0%, color-mix(in srgb, #0a192f 85%, white) 50%, #0a192f 100%) !important;
+  border: 1px solid rgba(197, 165, 114, 0.55) !important;
 }
 [data-theme="dark"] .pay-page .pay-page-outer-block {
   background: #161616 !important;
@@ -481,6 +482,10 @@ html:not([data-theme="dark"]) .pay-page .pay-page-outer-block .pay-page-logo-wra
 }
 html:not([data-theme="dark"]) .pay-page .pay-page-outer-block .pay-page-logo-wrap span.text-\[\var\(--color-brand-gold\)\] {
   color: var(--color-brand-gold) !important;
+}
+/* Светлая тема: «Free» в логотипе страницы оплаты — белый на тёмном фоне блока */
+html:not([data-theme="dark"]) .pay-page .pay-page-outer-block .pay-page-logo-wrap .pay-page-logo-free {
+  color: #ffffff !important;
 }
 
 /* Отступ логотипа от блока ниже */
@@ -502,10 +507,16 @@ html:not([data-theme="dark"]) .pay-page .pay-page-outer-block .pay-page-logo-wra
     0 2px 4px rgba(0, 0, 0, 0.15);
 }
 
-/* Фон страницы оплаты (карточный режим): светло-серый / тёмный */
-/* Фон страницы оплаты — как у страницы входа */
+/* Фон страницы оплаты: в светлой теме как в ЛК (#1a2337), в тёмной — var(--color-bg) */
+html:not([data-theme="dark"]) .layout-pay {
+  background: #1a2337 !important;
+}
+/* Фон страницы «Оставить заявку» — как в ЛК */
+html:not([data-theme="dark"]) .layout-zayavka {
+  background: #1a2337 !important;
+}
 .pay-page.pay-page--cards {
-  background: var(--color-bg);
+  background: transparent;
   padding: 20px;
 }
 
@@ -531,11 +542,15 @@ html:not([data-theme="dark"]) .pay-page .pay-page-card.card .info-row span {
 html:not([data-theme="dark"]) .pay-page .pay-page-card.card .info-block {
   background: rgba(255, 255, 255, 0.08);
 }
-/* Тёмная тема: фон блоков — как у чата поддержки */
+/* Тёмная тема: обводка блоков — как в светлой (1px, золотая) */
 [data-theme="dark"] .pay-page .pay-page-card.card {
   background: rgba(255, 255, 255, 0.04) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(197, 165, 114, 0.5);
   box-shadow: none;
+}
+[data-theme="dark"] .pay-page .pay-page-recipient-card.pay-page-card.card {
+  background: rgba(197, 165, 114, 0.12) !important;
+  border: 1px solid rgba(197, 165, 114, 0.5);
 }
 [data-theme="dark"] .pay-page .pay-page-card.card .info-block {
   background: rgba(255, 255, 255, 0.06);
@@ -567,6 +582,20 @@ html:not([data-theme="dark"]) .pay-page .pay-page-card.card .info-block {
   border: 2px solid color-mix(in srgb, var(--pay-page-accent) 50%, transparent);
   border-radius: 20px;
 }
+/* Светлая тема: блок получателя (логин/имя) — белый фон */
+html:not([data-theme="dark"]) .pay-page .pay-page-recipient-bordered {
+  background: #ffffff;
+}
+html:not([data-theme="dark"]) .pay-page .pay-page-recipient-bordered .pay-page-recipient-name {
+  color: #0a192f !important;
+}
+html:not([data-theme="dark"]) .pay-page .pay-page-recipient-profile .rounded-full {
+  background: rgba(10, 25, 47, 0.08) !important;
+  color: #0a192f !important;
+}
+[data-theme="dark"] .pay-page .pay-page-recipient-bordered {
+  border-color: rgba(197, 165, 114, 0.6);
+}
 .pay-page-recipient-profile {
   display: flex;
   flex-direction: row;
@@ -591,6 +620,9 @@ html:not([data-theme="dark"]) .pay-page .pay-page-card.card .info-block {
 }
 .pay-page-recipient-qr img {
   display: block;
+}
+[data-theme="dark"] .pay-page .pay-page-recipient-qr img {
+  border-color: rgba(197, 165, 114, 0.6) !important;
 }
 .pay-page-recipient-name {
   font-size: 0.675rem;
@@ -639,8 +671,9 @@ html:not([data-theme="dark"]) .pay-page .pay-page-card.card .info-block {
   background: #f2f4f8;
   color: var(--pay-page-text);
   cursor: pointer;
-  transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.15s;
+  transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.15s, box-shadow 0.2s;
   touch-action: manipulation;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 .pay-page-amount-btn:hover {
   background: #e8ebf0;
@@ -654,12 +687,14 @@ html:not([data-theme="dark"]) .pay-page .pay-page-card.card .info-block {
 }
 [data-theme="dark"] .pay-page-amount-btn.amount-btn,
 [data-theme="dark"] .pay-page-amount-btn {
-  background: #3a4559;
-  border-color: #4a5568;
+  background: rgba(197, 165, 114, 0.1);
+  border-color: rgba(197, 165, 114, 0.3);
   color: #e2e8f0;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
 [data-theme="dark"] .pay-page-amount-btn:hover {
-  background: #454f63;
+  background: rgba(197, 165, 114, 0.15);
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.25);
 }
 [data-theme="dark"] .pay-page-amount-btn.is-active.active {
   background: var(--pay-page-accent);
@@ -733,8 +768,8 @@ html:not([data-theme="dark"]) .pay-page .pay-page-card.card .info-block {
   box-shadow: 0 0 0 3px rgba(74, 111, 165, 0.2);
 }
 [data-theme="dark"] .pay-page .custom-amount input {
-  background: #3a4559;
-  border-color: #4a5568;
+  background: rgba(197, 165, 114, 0.1);
+  border-color: rgba(197, 165, 114, 0.35);
   color: #f7fafc;
 }
 
@@ -752,6 +787,11 @@ html:not([data-theme="dark"]) .pay-page .pay-page-card.card .info-block {
   background: var(--pay-page-input-bg);
   color: var(--pay-page-text);
   transition: border-color 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+[data-theme="dark"] .pay-page .pay-page-input-wrap input,
+[data-theme="dark"] .pay-page .pay-page-input-wrap textarea {
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
 .pay-page-input-wrap input::placeholder,
 .pay-page-input-wrap textarea::placeholder {
@@ -780,6 +820,7 @@ html:not([data-theme="dark"]) .pay-page .pay-page-card.card .info-block {
   color: var(--pay-page-text);
   text-align: center;
   transition: border-color 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 .pay-page .review-textarea::placeholder {
   color: var(--pay-page-text-muted);
@@ -787,16 +828,17 @@ html:not([data-theme="dark"]) .pay-page .pay-page-card.card .info-block {
   text-align: center;
 }
 [data-theme="dark"] .pay-page .review-textarea {
-  background: #3a4559;
-  border-color: #4a5568;
+  background: rgba(197, 165, 114, 0.1);
+  border-color: rgba(197, 165, 114, 0.35);
   color: #f7fafc;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
 
 /* Кнопка оплаты — пилюля 60px, сумма в тексте */
 .pay-page .pay-button.pay-page-submit,
 .pay-page .pay-page-submit {
   margin-top: 1rem;
-  margin-bottom: 0.5rem;
+  margin-bottom: 1.25rem;
   width: 100%;
   padding: 18px;
   min-height: 56px;
@@ -831,7 +873,7 @@ html:not([data-theme="dark"]) .pay-page .pay-page-submit:hover:not(:disabled) {
 }
 [data-theme="dark"] .pay-page .pay-button.pay-page-submit,
 [data-theme="dark"] .pay-page .pay-page-submit {
-  border: 2px solid rgba(197, 165, 114, 0.6);
+  border: none;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
 }
 .pay-page .pay-page-submit:active:not(:disabled) {
@@ -961,11 +1003,13 @@ html:not([data-theme="dark"]) .cabinet-premium #link-payment.cabinet-card .font-
 html:not([data-theme="dark"]) .cabinet-premium #link-payment.cabinet-card .cabinet-input-window {
   color: #fff !important;
 }
-/* Кнопки в ЛК — уменьшенный шрифт */
+/* Кнопки в ЛК — только уменьшенный текст, размер кнопок не трогаем */
 .cabinet-premium .cabinet-main-block button,
 .cabinet-premium .cabinet-card button,
 .cabinet-premium .cabinet-card .cabinet-block-inner button {
   font-size: 0.75rem !important;
+  min-height: 2.5rem;
+  padding: 0.5rem 1rem;
 }
 
 /* Кнопки в карточках ЛК официанта — чёрный шрифт */
@@ -1151,18 +1195,7 @@ html:not([data-theme="dark"]) .cabinet-premium .cabinet-limits-block .font-mediu
 [data-theme="dark"] .site-header .site-header-logo-free {
   color: #ffffff !important;
 }
-/* Тёмная тема: иконка FT в шапке — тёмно-синий круг, белый FT (как во вкладке) */
-[data-theme="dark"] body.cabinet-page .site-header .site-header-logo-icon,
-[data-theme="dark"] body.admin-page .site-header .site-header-logo-icon,
-[data-theme="dark"] .layout-auth .site-header .site-header-logo-icon {
-  background: #0a192f !important;
-  color: #ffffff !important;
-}
-[data-theme="dark"] body.cabinet-page .site-header .site-header-logo-icon span,
-[data-theme="dark"] body.admin-page .site-header .site-header-logo-icon span,
-[data-theme="dark"] .layout-auth .site-header .site-header-logo-icon span {
-  color: inherit;
-}
+/* В тёмной теме иконку FT не перекрашиваем — остаётся золотой круг и тёмный текст (хорошо читается на тёмном фоне) */
 
 [data-theme="dark"] .theme-toggle-btn {
   border-color: rgba(192, 192, 192, 0.55);
@@ -1751,6 +1784,57 @@ input, textarea, select, button {
 .landing-card-hover:hover {
   transform: translateY(-3px);
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+}
+/* Секция «Надёжность»: заголовки и текст в блоках по центру */
+.features-premium-card {
+  text-align: center;
+}
+.features-premium-card h3,
+.features-premium-card p {
+  text-align: center;
+}
+/* Секция «Безупречный процесс»: заголовок и подзаголовок по центру */
+.landing-page .process-premium-header,
+.process-premium-header {
+  text-align: center;
+}
+.landing-page .process-premium-header h2,
+.landing-page .process-premium-header p,
+.process-premium-header h2,
+.process-premium-header p {
+  text-align: center;
+}
+/* Секция «Решение для бизнеса»: заголовок, подзаголовок и текст в блоках по центру */
+.landing-page .business-premium-header,
+.business-premium-header {
+  text-align: center;
+}
+.landing-page .business-premium-header h2,
+.landing-page .business-premium-header p,
+.business-premium-header h2,
+.business-premium-header p {
+  text-align: center;
+}
+.landing-page .business-premium-card,
+.business-premium-card {
+  text-align: center;
+}
+.landing-page .business-premium-card h3,
+.landing-page .business-premium-card p,
+.business-premium-card h3,
+.business-premium-card p {
+  text-align: center;
+}
+/* Секция CTA «Готовы повысить стандарты?»: заголовок и подзаголовок по центру */
+.landing-page .cta-premium-block,
+.cta-premium-block {
+  text-align: center;
+}
+.landing-page .cta-premium-block h2,
+.landing-page .cta-premium-block p,
+.cta-premium-block h2,
+.cta-premium-block p {
+  text-align: center;
 }
 
 /* ============================================

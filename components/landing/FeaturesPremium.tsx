@@ -45,21 +45,21 @@ export function FeaturesPremium() {
         aria-hidden
       />
       <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8 xl:max-w-7xl 2xl:max-w-screen-2xl relative z-10">
-        <div className="text-center max-w-[700px] mx-auto mb-10 sm:mb-16">
-          <h2 className="font-[family:var(--font-playfair)] text-2xl sm:text-3xl lg:text-4xl font-semibold text-white mb-4 text-center">Надёжность, заслуживающая доверия</h2>
-          <p className="text-lg text-[var(--color-on-dark-muted)] text-center">Мы создали сервис, который ценит время и труд как сотрудников, так и гостей.</p>
+        <div className="max-w-[700px] mx-auto mb-10 sm:mb-16 text-center">
+          <h2 className="font-[family:var(--font-playfair)] text-2xl sm:text-3xl lg:text-4xl font-semibold text-white mb-4">Надёжность, заслуживающая доверия</h2>
+          <p className="text-lg text-[var(--color-on-dark-muted)]">Мы создали сервис, который ценит время и труд как сотрудников, так и гостей.</p>
         </div>
         <div className="grid gap-6 sm:gap-8 sm:grid-cols-2 lg:grid-cols-4">
           {features.map(({ icon: Icon, title, desc, iconBg, iconColor }) => (
             <div
               key={title}
-              className="landing-card-hover relative p-6 sm:p-8 lg:p-10 bg-[var(--process-card-bg)] rounded-xl border border-[var(--process-card-border)] hover:border-[var(--process-card-hover-border)] text-center flex flex-col items-center min-w-0"
+              className="landing-card-hover features-premium-card relative p-6 sm:p-8 lg:p-10 bg-[var(--process-card-bg)] rounded-xl border border-[var(--process-card-border)] hover:border-[var(--process-card-hover-border)] flex flex-col items-center min-w-0"
             >
               <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center mb-6 shrink-0 ${iconBg} ${iconColor} shadow-[0_4px_12px_rgba(0,0,0,0.15)]`}>
                 <Icon className="w-7 h-7 sm:w-8 sm:h-8" />
               </div>
-              <h3 className="font-[family:var(--font-playfair)] text-xl font-semibold text-[var(--color-on-navy)] mb-4 w-full min-w-0 break-words text-center">{title}</h3>
-              <p className="text-[var(--color-on-dark-muted)] leading-relaxed w-full min-w-0 text-center">{desc}</p>
+              <h3 className="font-[family:var(--font-playfair)] text-xl font-semibold text-[var(--color-on-navy)] mb-4 w-full min-w-0 break-words">{title}</h3>
+              <p className="text-[var(--color-on-dark-muted)] leading-relaxed w-full min-w-0">{desc}</p>
             </div>
           ))}
         </div>

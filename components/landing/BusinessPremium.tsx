@@ -32,15 +32,15 @@ export function BusinessPremium() {
         aria-hidden
       />
       <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8 xl:max-w-7xl 2xl:max-w-screen-2xl relative z-10">
-        <div className="text-center max-w-[700px] mx-auto mb-10 sm:mb-16">
-          <h2 className="font-[family:var(--font-playfair)] text-2xl sm:text-3xl lg:text-4xl font-semibold text-white mb-4 text-center">Решение для серьёзного бизнеса</h2>
-          <p className="text-lg text-[var(--color-on-dark-muted)] text-center">Инструмент, который повышает стандарты сервиса и мотивацию команды.</p>
+        <div className="business-premium-header max-w-[700px] mx-auto mb-10 sm:mb-16">
+          <h2 className="font-[family:var(--font-playfair)] text-2xl sm:text-3xl lg:text-4xl font-semibold text-white mb-4">Решение для серьёзного бизнеса</h2>
+          <p className="text-lg text-[var(--color-on-dark-muted)]">Инструмент, который повышает стандарты сервиса и мотивацию команды.</p>
         </div>
         <div className="grid gap-6 sm:gap-8 sm:grid-cols-3">
           {cards.map(({ icon: Icon, title, text }) => (
             <div
               key={title}
-              className="landing-card-hover relative p-6 sm:p-8 lg:p-10 rounded-xl bg-[var(--process-card-bg)] border border-[var(--process-card-border)] hover:border-[var(--process-card-hover-border)] text-center"
+              className="landing-card-hover business-premium-card relative p-6 sm:p-8 lg:p-10 rounded-xl bg-[var(--process-card-bg)] border border-[var(--process-card-border)] hover:border-[var(--process-card-hover-border)]"
             >
               <h3 className="font-[family:var(--font-playfair)] text-2xl font-semibold text-white mb-4 flex items-center justify-center gap-3">
                 <span className="text-[var(--color-accent-gold)]">
@@ -48,7 +48,7 @@ export function BusinessPremium() {
                 </span>
                 {title}
               </h3>
-              <p className="text-[var(--color-on-dark-muted)] leading-relaxed text-center">{text}</p>
+              <p className="text-[var(--color-on-dark-muted)] leading-relaxed">{text}</p>
             </div>
           ))}
         </div>

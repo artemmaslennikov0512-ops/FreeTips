@@ -35,9 +35,9 @@ export function ProcessPremium() {
         aria-hidden
       />
       <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8 xl:max-w-7xl 2xl:max-w-screen-2xl relative z-10">
-        <div className="text-center max-w-[700px] mx-auto mb-10 sm:mb-16">
-          <h2 className="font-[family:var(--font-playfair)] text-2xl sm:text-3xl lg:text-4xl font-semibold text-white mb-4 text-center">Безупречный процесс</h2>
-          <p className="text-lg text-[var(--color-on-dark-muted)] text-center">Три простых шага, которые отражают наше стремление к совершенству в каждой детали.</p>
+        <div className="process-premium-header max-w-[700px] mx-auto mb-10 sm:mb-16">
+          <h2 className="font-[family:var(--font-playfair)] text-2xl sm:text-3xl lg:text-4xl font-semibold text-white mb-4">Безупречный процесс</h2>
+          <p className="text-lg text-[var(--color-on-dark-muted)]">Три простых шага, которые отражают наше стремление к совершенству в каждой детали.</p>
         </div>
         <div className="grid gap-6 sm:gap-10 sm:grid-cols-3 mt-10 sm:mt-16">
           {steps.map(({ num, icon: Icon, title, text }) => (

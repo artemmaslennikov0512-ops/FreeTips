@@ -232,7 +232,7 @@ export default function PayPage() {
       <div className="mx-auto max-w-lg">
         {/* Основной блок со скруглёнными краями и отступами — внутри все карточки */}
         <div
-          className="pay-page-outer-block relative rounded-2xl border-2 p-5 shadow-[var(--shadow-card)]"
+          className="pay-page-outer-block relative rounded-2xl border-0 p-5 shadow-[var(--shadow-card)]"
         style={Object.keys(cardStyle).length ? cardStyle : undefined}
       >
         <div className="absolute right-4 top-4">
@@ -272,7 +272,7 @@ export default function PayPage() {
             </div>
             {qrDataUrl && (
               <div className="pay-page-recipient-qr shrink-0 flex items-center">
-                <img src={qrDataUrl} alt="QR страницы" className="rounded-lg border border-[var(--pay-page-card-border)] bg-[var(--pay-page-card-bg)]" width={80} height={80} />
+                <img src={qrDataUrl} alt="QR страницы" className="rounded-lg bg-[var(--pay-page-card-bg)] shadow-[0_2px_8px_rgba(0,0,0,0.12)]" width={80} height={80} />
               </div>
             )}
           </div>

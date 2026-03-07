@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
-/* 512px — чтобы в автозаполнении/вкладке при масштабировании не было смаза */
-export const size = { width: 512, height: 512 };
+/* 1024px — максимальная чёткость при масштабировании во вкладке и автозаполнении */
+export const size = { width: 1024, height: 1024 };
 export const contentType = "image/png";
 
 export default function Icon() {
@@ -20,7 +20,7 @@ export default function Icon() {
       >
         <span
           style={{
-            fontSize: 224,
+            fontSize: 448,
             fontWeight: 800,
             color: "#ffffff",
             fontFamily: "system-ui, -apple-system, sans-serif",

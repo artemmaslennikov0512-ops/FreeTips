@@ -272,7 +272,7 @@ export function Header() {
             <>
               <Link
                 href={cabinetHref}
-                className="min-h-[44px] inline-flex items-center justify-center gap-2 rounded-xl bg-[var(--color-brand-gold)] px-4 py-2.5 text-[14px] font-semibold text-[#0a192f] hover:opacity-90 hover:-translate-y-0.5 transition-all shadow-[var(--shadow-subtle)]"
+                className="min-h-[44px] inline-flex items-center justify-center gap-2 rounded-xl bg-[var(--color-brand-gold)] px-4 py-2.5 text-[12px] font-semibold text-[#0a192f] hover:opacity-90 hover:-translate-y-0.5 transition-all shadow-[var(--shadow-subtle)]"
               >
                 <User className="h-4 w-4" />
                 {displayName}
@@ -280,7 +280,7 @@ export function Header() {
               <button
                 type="button"
                 onClick={handleLogout}
-                className="min-h-[44px] inline-flex items-center justify-center gap-2 rounded-xl bg-[var(--color-brand-gold)] px-4 py-2.5 text-[14px] font-semibold text-[#0a192f] hover:opacity-90 hover:-translate-y-0.5 transition-all shadow-[var(--shadow-subtle)]"
+                className="min-h-[44px] inline-flex items-center justify-center gap-2 rounded-xl bg-[var(--color-brand-gold)] px-4 py-2.5 text-[12px] font-semibold text-[#0a192f] hover:opacity-90 hover:-translate-y-0.5 transition-all shadow-[var(--shadow-subtle)]"
               >
                 <LogOut className="h-3.5 w-3.5" />
                 Выйти

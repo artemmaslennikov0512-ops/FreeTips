@@ -316,16 +316,12 @@ html:not([data-theme="dark"]) body.cabinet-page .site-header .site-header-logo-f
 html:not([data-theme="dark"]) body.admin-page .site-header .site-header-logo-free {
   color: #ffffff !important;
 }
-/* Светлая тема: иконка FT в шапке ЛК/админки — как на лого (тёмно-синий круг, белый FT) */
-html:not([data-theme="dark"]) body.cabinet-page .site-header .site-header-logo-icon,
-html:not([data-theme="dark"]) body.admin-page .site-header .site-header-logo-icon,
-html:not([data-theme="dark"]) .layout-auth .site-header .site-header-logo-icon {
+/* Светлая тема: иконка FT в логотипе — тёмно-синий фон, белый текст (все страницы) */
+html:not([data-theme="dark"]) .site-header .site-header-logo-icon {
   background: #0a192f !important;
   color: #ffffff !important;
 }
-html:not([data-theme="dark"]) body.cabinet-page .site-header .site-header-logo-icon span,
-html:not([data-theme="dark"]) body.admin-page .site-header .site-header-logo-icon span,
-html:not([data-theme="dark"]) .layout-auth .site-header .site-header-logo-icon span {
+html:not([data-theme="dark"]) .site-header .site-header-logo-icon span {
   color: inherit;
 }
 
@@ -454,22 +450,21 @@ html:not([data-theme="dark"]) .pay-page {
 
 .pay-page .pay-block.pay-block--page {
   background: var(--pay-page-card-bg) !important;
-  border: var(--pay-page-card-border) !important;
+  border: none !important;
 }
 
-/* Основной блок — как основной блок ЛК (градиент navy, золотая обводка как в ЛК) */
+/* Основной блок — без обводки, тень для объёма */
 .pay-page .pay-page-outer-block {
-  border: 1px solid rgba(197, 165, 114, 0.55) !important;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06);
+  border: none !important;
+  box-shadow: var(--shadow-card);
 }
 html:not([data-theme="dark"]) .pay-page .pay-page-outer-block {
   background: linear-gradient(135deg, #0a192f 0%, color-mix(in srgb, #0a192f 85%, white) 50%, #0a192f 100%) !important;
-  border: 1px solid rgba(197, 165, 114, 0.55) !important;
+  box-shadow: var(--shadow-card);
 }
 [data-theme="dark"] .pay-page .pay-page-outer-block {
   background: #161616 !important;
-  border: 1px solid rgba(192, 192, 192, 0.3) !important;
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05);
+  box-shadow: var(--shadow-card);
 }
 
 /* Светлая тема: на тёмном фоне основного блока логотип — светлый */
@@ -520,16 +515,17 @@ html:not([data-theme="dark"]) .layout-zayavka {
   padding: 20px;
 }
 
-/* Внутренние карточки: светлая тема — как фон чата в поддержке */
+/* Внутренние карточки: очень тонкая обводка, тень для объёма */
 .pay-page .pay-page-card.card {
   border-radius: 20px;
   padding: 20px;
   margin-bottom: 16px;
+  border: 0.5px solid rgba(197, 165, 114, 0.22);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
 }
 html:not([data-theme="dark"]) .pay-page .pay-page-card.card {
   background: rgba(255, 255, 255, 0.04) !important;
-  border: 1px solid rgba(197, 165, 114, 0.5);
-  box-shadow: none;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
 }
 html:not([data-theme="dark"]) .pay-page .pay-page-card.card .pay-page-recipient-name,
 html:not([data-theme="dark"]) .pay-page .pay-page-card.card .pay-page-section-title,
@@ -542,15 +538,13 @@ html:not([data-theme="dark"]) .pay-page .pay-page-card.card .info-row span {
 html:not([data-theme="dark"]) .pay-page .pay-page-card.card .info-block {
   background: rgba(255, 255, 255, 0.08);
 }
-/* Тёмная тема: обводка блоков — как в светлой (1px, золотая) */
 [data-theme="dark"] .pay-page .pay-page-card.card {
   background: rgba(255, 255, 255, 0.04) !important;
-  border: 1px solid rgba(197, 165, 114, 0.5);
-  box-shadow: none;
+  border: 0.5px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
 }
 [data-theme="dark"] .pay-page .pay-page-recipient-card.pay-page-card.card {
-  background: rgba(197, 165, 114, 0.12) !important;
-  border: 1px solid rgba(197, 165, 114, 0.5);
+  background: rgba(255, 255, 255, 0.04) !important;
 }
 [data-theme="dark"] .pay-page .pay-page-card.card .info-block {
   background: rgba(255, 255, 255, 0.06);
@@ -579,22 +573,13 @@ html:not([data-theme="dark"]) .pay-page .pay-page-card.card .info-block {
   flex: 1;
   min-width: 0;
   padding: 0.75rem 1rem;
-  border: 2px solid color-mix(in srgb, var(--pay-page-accent) 50%, transparent);
+  border: 0.5px solid rgba(197, 165, 114, 0.22);
   border-radius: 20px;
-}
-/* Светлая тема: блок получателя (логин/имя) — белый фон */
-html:not([data-theme="dark"]) .pay-page .pay-page-recipient-bordered {
-  background: #ffffff;
-}
-html:not([data-theme="dark"]) .pay-page .pay-page-recipient-bordered .pay-page-recipient-name {
-  color: #0a192f !important;
-}
-html:not([data-theme="dark"]) .pay-page .pay-page-recipient-profile .rounded-full {
-  background: rgba(10, 25, 47, 0.08) !important;
-  color: #0a192f !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 [data-theme="dark"] .pay-page .pay-page-recipient-bordered {
-  border-color: rgba(197, 165, 114, 0.6);
+  border: 0.5px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
 .pay-page-recipient-profile {
   display: flex;
@@ -620,9 +605,11 @@ html:not([data-theme="dark"]) .pay-page .pay-page-recipient-profile .rounded-ful
 }
 .pay-page-recipient-qr img {
   display: block;
+  border: 0.5px solid rgba(197, 165, 114, 0.22);
 }
 [data-theme="dark"] .pay-page .pay-page-recipient-qr img {
-  border-color: rgba(197, 165, 114, 0.6) !important;
+  border: 0.5px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
 .pay-page-recipient-name {
   font-size: 0.675rem;
@@ -667,7 +654,7 @@ html:not([data-theme="dark"]) .pay-page .pay-page-recipient-profile .rounded-ful
   font-weight: 500;
   font-family: inherit;
   border-radius: 40px;
-  border: 1px solid #e0e4ec;
+  border: 0.5px solid rgba(197, 165, 114, 0.22);
   background: #f2f4f8;
   color: var(--pay-page-text);
   cursor: pointer;
@@ -677,18 +664,20 @@ html:not([data-theme="dark"]) .pay-page .pay-page-recipient-profile .rounded-ful
 }
 .pay-page-amount-btn:hover {
   background: #e8ebf0;
-  border-color: #d0d5de;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
 }
+/* Выделение: светлая тема — золотая рамка + фон; тёмная — как выбор раздела в ЛК (белая подсветка) */
 .pay-page-amount-btn.is-active.active {
-  background: var(--pay-page-accent);
-  border-color: var(--pay-page-accent);
+  border: 1px solid rgba(197, 165, 114, 0.45);
+  background: rgba(197, 165, 114, 0.15);
   color: #fff;
-  box-shadow: none;
+  font-weight: 600;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
 }
 [data-theme="dark"] .pay-page-amount-btn.amount-btn,
 [data-theme="dark"] .pay-page-amount-btn {
   background: rgba(197, 165, 114, 0.1);
-  border-color: rgba(197, 165, 114, 0.3);
+  border: 0.5px solid rgba(197, 165, 114, 0.2);
   color: #e2e8f0;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
@@ -696,10 +685,13 @@ html:not([data-theme="dark"]) .pay-page .pay-page-recipient-profile .rounded-ful
   background: rgba(197, 165, 114, 0.15);
   box-shadow: 0 3px 12px rgba(0, 0, 0, 0.25);
 }
+/* Как выбор раздела в тёмной теме ЛК: белая рамка + светлый фон */
 [data-theme="dark"] .pay-page-amount-btn.is-active.active {
-  background: var(--pay-page-accent);
-  border-color: var(--pay-page-accent);
-  color: #fff;
+  border-color: rgba(255, 255, 255, 0.25) !important;
+  background: rgba(255, 255, 255, 0.12) !important;
+  color: #fafafa !important;
+  font-weight: 600;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
 
 /* Подпись над полем */
@@ -754,7 +746,7 @@ html:not([data-theme="dark"]) .pay-page .pay-page-recipient-profile .rounded-ful
   flex: 1;
   min-width: 0;
   padding: 14px 16px;
-  border: 1px solid #e0e4ec;
+  border: 0.5px solid rgba(197, 165, 114, 0.22);
   border-radius: 40px;
   font-size: 16px;
   font-family: inherit;
@@ -764,12 +756,11 @@ html:not([data-theme="dark"]) .pay-page .pay-page-recipient-profile .rounded-ful
 }
 .pay-page .custom-amount input:focus {
   outline: none;
-  border-color: var(--pay-page-accent);
-  box-shadow: 0 0 0 3px rgba(74, 111, 165, 0.2);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1), 0 0 0 2px rgba(197, 165, 114, 0.35);
 }
 [data-theme="dark"] .pay-page .custom-amount input {
   background: rgba(197, 165, 114, 0.1);
-  border-color: rgba(197, 165, 114, 0.35);
+  border: 0.5px solid rgba(255, 255, 255, 0.12);
   color: #f7fafc;
 }
 
@@ -783,14 +774,15 @@ html:not([data-theme="dark"]) .pay-page .pay-page-recipient-profile .rounded-ful
   font-size: 1rem;
   padding: 0.75rem 1rem;
   border-radius: 12px;
-  border: var(--pay-page-input-border);
+  border: 0.5px solid rgba(197, 165, 114, 0.22);
   background: var(--pay-page-input-bg);
   color: var(--pay-page-text);
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: box-shadow 0.2s, border-color 0.2s;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 [data-theme="dark"] .pay-page .pay-page-input-wrap input,
 [data-theme="dark"] .pay-page .pay-page-input-wrap textarea {
+  border: 0.5px solid rgba(255, 255, 255, 0.12);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
 .pay-page-input-wrap input::placeholder,
@@ -801,8 +793,7 @@ html:not([data-theme="dark"]) .pay-page .pay-page-recipient-profile .rounded-ful
 .pay-page-input-wrap input:focus,
 .pay-page-input-wrap textarea:focus {
   outline: none;
-  border-color: var(--pay-page-accent);
-  box-shadow: 0 0 0 3px rgba(74, 111, 165, 0.2);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1), 0 0 0 2px rgba(197, 165, 114, 0.35);
 }
 
 /* Поле отзыва — многострочное, скругление 20px, мин. высота 80px */
@@ -810,7 +801,7 @@ html:not([data-theme="dark"]) .pay-page .pay-page-recipient-profile .rounded-ful
   width: 100%;
   max-width: none;
   padding: 14px 16px;
-  border: 1px solid #e0e4ec;
+  border: 0.5px solid rgba(197, 165, 114, 0.22);
   border-radius: 20px;
   font-family: inherit;
   font-size: 14px;
@@ -819,7 +810,7 @@ html:not([data-theme="dark"]) .pay-page .pay-page-recipient-profile .rounded-ful
   background: #f9fafc;
   color: var(--pay-page-text);
   text-align: center;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: box-shadow 0.2s;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 .pay-page .review-textarea::placeholder {
@@ -829,7 +820,7 @@ html:not([data-theme="dark"]) .pay-page .pay-page-recipient-profile .rounded-ful
 }
 [data-theme="dark"] .pay-page .review-textarea {
   background: rgba(197, 165, 114, 0.1);
-  border-color: rgba(197, 165, 114, 0.35);
+  border: 0.5px solid rgba(255, 255, 255, 0.12);
   color: #f7fafc;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
@@ -873,8 +864,15 @@ html:not([data-theme="dark"]) .pay-page .pay-page-submit:hover:not(:disabled) {
 }
 [data-theme="dark"] .pay-page .pay-button.pay-page-submit,
 [data-theme="dark"] .pay-page .pay-page-submit {
+  background: var(--color-brand-gold) !important;
+  color: #0a192f !important;
   border: none;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 4px 12px rgba(197, 165, 114, 0.35);
+}
+[data-theme="dark"] .pay-page .pay-button.pay-page-submit:hover:not(:disabled),
+[data-theme="dark"] .pay-page .pay-page-submit:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--color-brand-gold) 85%, #0a192f) !important;
+  box-shadow: 0 6px 16px rgba(197, 165, 114, 0.4);
 }
 .pay-page .pay-page-submit:active:not(:disabled) {
   transform: scale(1);
@@ -885,7 +883,7 @@ html:not([data-theme="dark"]) .pay-page .pay-page-submit:hover:not(:disabled) {
   transform: none;
 }
 
-/* Информационный блок — подсказки с иконками */
+/* Информационный блок — тонкая обводка, тень для объёма */
 .pay-page .info-block {
   display: flex;
   flex-direction: column;
@@ -893,8 +891,10 @@ html:not([data-theme="dark"]) .pay-page .pay-page-submit:hover:not(:disabled) {
   padding: 16px;
   background: #f0f2f5;
   border-radius: 16px;
+  border: 0.5px solid rgba(197, 165, 114, 0.22);
   font-size: 14px;
   color: #4a5568;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
 }
 .pay-page .info-row {
   display: flex;
@@ -907,7 +907,9 @@ html:not([data-theme="dark"]) .pay-page .pay-page-submit:hover:not(:disabled) {
 }
 [data-theme="dark"] .pay-page .info-block {
   background: #2d3748;
+  border: 0.5px solid rgba(255, 255, 255, 0.12);
   color: #a0aec0;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
 }
 
 /* Текст внизу — мелкий, приглушённый */
@@ -1003,10 +1005,11 @@ html:not([data-theme="dark"]) .cabinet-premium #link-payment.cabinet-card .font-
 html:not([data-theme="dark"]) .cabinet-premium #link-payment.cabinet-card .cabinet-input-window {
   color: #fff !important;
 }
-/* Кнопки в ЛК — только уменьшенный текст, размер кнопок не трогаем */
+/* Кнопки в ЛК — только уменьшенный текст, размер кнопок не трогаем (и ссылки-кнопки в том же стиле) */
 .cabinet-premium .cabinet-main-block button,
 .cabinet-premium .cabinet-card button,
-.cabinet-premium .cabinet-card .cabinet-block-inner button {
+.cabinet-premium .cabinet-card .cabinet-block-inner button,
+.cabinet-premium .cabinet-card a.cabinet-card-btn-link {
   font-size: 0.75rem !important;
   min-height: 2.5rem;
   padding: 0.5rem 1rem;
@@ -1195,7 +1198,13 @@ html:not([data-theme="dark"]) .cabinet-premium .cabinet-limits-block .font-mediu
 [data-theme="dark"] .site-header .site-header-logo-free {
   color: #ffffff !important;
 }
-/* В тёмной теме иконку FT не перекрашиваем — остаётся золотой круг и тёмный текст (хорошо читается на тёмном фоне) */
+/* Тёмная тема: в логотипе буквы FT — белые */
+[data-theme="dark"] .site-header .site-header-logo-icon {
+  color: #ffffff !important;
+}
+[data-theme="dark"] .site-header .site-header-logo-icon span {
+  color: inherit;
+}
 
 [data-theme="dark"] .theme-toggle-btn {
   border-color: rgba(192, 192, 192, 0.55);

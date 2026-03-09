@@ -494,7 +494,7 @@ export default function ZayavkaPage() {
             )}
           </form>
 
-          <div className="mt-6 text-center text-sm text-[var(--color-text-secondary)]">
+          <div className="mt-6 text-center text-sm text-white">
             Уже есть аккаунт?{" "}
             <Link href="/login" className="font-medium text-[var(--color-accent-gold)] hover:opacity-90 hover:underline transition-colors">
               Войти

@@ -100,10 +100,12 @@ export default function LoginPage() {
     <AuthPageShell>
       <div className="mx-auto flex min-h-[80vh] max-w-md flex-col justify-center px-4 py-16">
         <div className={AUTH_CARD_CLASS}>
-          <h1 className="font-[family:var(--font-playfair)] text-2xl font-semibold text-[var(--color-text)]">Вход</h1>
-          <p className="mt-2 text-[var(--color-text-secondary)]">
-            Войдите в личный кабинет для управления чаевыми
-          </p>
+          <div className="text-center">
+            <h1 className="font-[family:var(--font-playfair)] text-2xl font-semibold text-[var(--color-text)]">Вход</h1>
+            <p className="mt-2 text-[var(--color-text-secondary)]">
+              Войдите в личный кабинет для управления чаевыми
+            </p>
+          </div>
 
           {error && (
             <div className="mt-4 rounded-xl border-0 bg-[var(--color-muted)]/10 p-3 text-sm text-[var(--color-accent-red)]" role="alert">

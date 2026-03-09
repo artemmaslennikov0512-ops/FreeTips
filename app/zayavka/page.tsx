@@ -243,7 +243,7 @@ export default function ZayavkaPage() {
                       </select>
                       <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-[var(--color-muted)]" aria-hidden="true">▼</span>
                     </div>
-                    <p id="zayavka-requestType-desc" className="mt-1 text-[0.6875rem] text-[var(--color-muted)]">
+                    <p id="zayavka-requestType-desc" className="mt-1 text-[0.625rem] text-[var(--color-muted)]">
                       {isEstablishment ? "Данные компании и контактного лица" : "Официант, курьер и т.д. — с контактом администратора для подтверждения"}
                     </p>
                   </div>
@@ -321,7 +321,7 @@ export default function ZayavkaPage() {
                       />
                     </div>
                     {fieldErrors.email && <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{fieldErrors.email}</p>}
-                    <p className="mt-1 text-[0.6875rem] text-[var(--color-muted)]">На неё будет выслана ссылка для регистрации после одобрения заявки</p>
+                    <p className="mt-1 text-[0.625rem] text-[var(--color-muted)]">На неё будет выслана ссылка для регистрации после одобрения заявки</p>
                   </div>
                 </section>
 

@@ -176,7 +176,7 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <div className="mt-6 space-y-2 text-center text-sm text-[var(--color-text-secondary)]">
+          <div className="mt-4 space-y-1 text-center text-xs text-[var(--color-text-secondary)]">
             <p>
               Нет аккаунта?{" "}
               <Link href="/zayavka" className="font-medium text-[var(--color-accent-gold)] hover:opacity-90 hover:underline transition-colors">
@@ -192,7 +192,7 @@ export default function LoginPage() {
 
           <Link
             href="/"
-            className="mt-4 block text-center text-sm text-[var(--color-muted)] hover:text-[var(--color-text)] transition-colors"
+            className="mt-2 block text-center text-xs text-[var(--color-muted)] hover:text-[var(--color-text)] transition-colors"
           >
             ← На главную
           </Link>

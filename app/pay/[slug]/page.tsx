@@ -44,7 +44,7 @@ export default function PayPage() {
   useEffect(() => {
     if (typeof window !== "undefined" && slug) {
       const url = `${getBaseUrl()}/pay/${slug}`;
-      QRCode.toDataURL(url, { width: 140, margin: 1 }).then(setQrDataUrl).catch(() => {});
+      QRCode.toDataURL(url, { width: 128, margin: 1 }).then(setQrDataUrl).catch(() => {});
     }
   }, [slug]);
 
@@ -232,7 +232,7 @@ export default function PayPage() {
       <div className="mx-auto max-w-lg">
         {/* Основной блок со скруглёнными краями и отступами — внутри все карточки */}
         <div
-          className="pay-page-outer-block relative rounded-2xl border-0 p-5 shadow-[var(--shadow-card)]"
+          className="pay-page-outer-block relative rounded-2xl border-0 p-4 shadow-[var(--shadow-card)]"
         style={Object.keys(cardStyle).length ? cardStyle : undefined}
       >
         <div className="absolute right-4 top-4">
@@ -240,15 +240,15 @@ export default function PayPage() {
         </div>
 
         {/* Логотип */}
-        <div className="pay-page-logo-wrap flex justify-center mb-5">
+        <div className="pay-page-logo-wrap flex justify-center mb-3">
           <div className="flex items-center gap-2">
             {branding?.logoUrl ? (
-              <img src={branding.logoUrl} alt="" className="h-12 w-auto max-w-[140px] object-contain" />
+              <img src={branding.logoUrl} alt="" className="h-10 w-auto max-w-[120px] object-contain" />
             ) : (
-              <span className="pay-page-logo-ft logo-ft-abbr flex h-12 w-12 items-center justify-center rounded-lg bg-[var(--color-brand-gold)] text-lg text-[#0a192f]">FT</span>
+              <span className="pay-page-logo-ft logo-ft-abbr flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--color-brand-gold)] text-base text-[#0a192f]">FT</span>
             )}
             <span
-              className="font-[family:var(--font-playfair)] text-2xl font-bold pay-page-logo-text"
+              className="font-[family:var(--font-playfair)] text-xl font-bold pay-page-logo-text"
               style={{ color: fontClr ?? "var(--color-text)" }}
             >
               <span className="pay-page-logo-free" style={{ color: fontClr ? "inherit" : undefined, opacity: fontClr ? undefined : 0.95 }}>Free</span>
@@ -262,8 +262,8 @@ export default function PayPage() {
           <div className="pay-page-recipient pay-page-recipient--with-qr">
             <div className="pay-page-recipient-bordered">
               <div className="pay-page-recipient-profile">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[var(--pay-page-accent)]/15 text-[var(--pay-page-accent)]">
-                  <User className="h-6 w-6" />
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--pay-page-accent)]/15 text-[var(--pay-page-accent)]">
+                  <User className="h-5 w-5" />
                 </div>
                 <p className="pay-page-recipient-name min-w-0 truncate flex items-center" style={{ color: fontClr ?? undefined }}>
                   {recipientName}
@@ -272,7 +272,7 @@ export default function PayPage() {
             </div>
             {qrDataUrl && (
               <div className="pay-page-recipient-qr shrink-0 flex items-center">
-                <img src={qrDataUrl} alt="QR страницы" className="rounded-lg bg-[var(--pay-page-card-bg)] shadow-[0_2px_8px_rgba(0,0,0,0.12)]" width={80} height={80} />
+                <img src={qrDataUrl} alt="QR страницы" className="rounded-lg bg-[var(--pay-page-card-bg)] shadow-[0_2px_8px_rgba(0,0,0,0.12)]" width={64} height={64} />
               </div>
             )}
           </div>
@@ -319,7 +319,7 @@ export default function PayPage() {
           <div className="pay-page-input-wrap">
             <textarea
               className="review-textarea"
-              rows={3}
+              rows={2}
               value={comment}
               onChange={(e) => setComment(e.target.value)}
               maxLength={500}

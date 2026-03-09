@@ -194,7 +194,7 @@ export default function ZayavkaPage() {
     <AuthPageShell>
       <div className="zayavka-page mx-auto flex min-h-[80vh] max-w-md flex-col justify-center overflow-visible px-4 py-16">
         <div className={`${AUTH_CARD_CLASS} zayavka-card min-w-0 overflow-visible`}>
-          <h1 className="font-[family:var(--font-playfair)] text-2xl font-semibold text-[var(--color-text)]">Оставить заявку</h1>
+          <h1 className="font-[family:var(--font-playfair)] text-2xl font-semibold text-[var(--color-text)] text-center">Оставить заявку</h1>
           <p className="mt-2 text-[var(--color-text-secondary)]">
             {step === 1
               ? "Сначала укажите тип подключения и контактные данные."
@@ -222,7 +222,7 @@ export default function ZayavkaPage() {
             {step === 1 && (
               <>
                 <section className="space-y-4" aria-labelledby="zayavka-type-heading">
-                  <h2 id="zayavka-type-heading" className="text-sm font-semibold text-[var(--color-text)] border-0 pb-2">
+                  <h2 id="zayavka-type-heading" className="text-sm font-semibold text-[var(--color-text)] border-0 pb-2 text-center">
                     Тип подключения
                   </h2>
                   <div>
@@ -243,14 +243,14 @@ export default function ZayavkaPage() {
                       </select>
                       <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-[var(--color-muted)]" aria-hidden="true">▼</span>
                     </div>
-                    <p id="zayavka-requestType-desc" className="mt-1 text-xs text-[var(--color-muted)]">
+                    <p id="zayavka-requestType-desc" className="mt-1 text-[0.6875rem] text-[var(--color-muted)]">
                       {isEstablishment ? "Данные компании и контактного лица" : "Официант, курьер и т.д. — с контактом администратора для подтверждения"}
                     </p>
                   </div>
                 </section>
 
                 <section className="space-y-4" aria-labelledby="zayavka-personal-heading">
-                  <h2 id="zayavka-personal-heading" className="text-sm font-semibold text-[var(--color-text)] border-0 pb-2">
+                  <h2 id="zayavka-personal-heading" className="text-sm font-semibold text-[var(--color-text)] border-0 pb-2 text-center">
                     Личные данные
                   </h2>
                   <div>
@@ -321,7 +321,7 @@ export default function ZayavkaPage() {
                       />
                     </div>
                     {fieldErrors.email && <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{fieldErrors.email}</p>}
-                    <p className="mt-1 text-xs text-[var(--color-muted)]">На неё будет выслана ссылка для регистрации после одобрения заявки</p>
+                    <p className="mt-1 text-[0.6875rem] text-[var(--color-muted)]">На неё будет выслана ссылка для регистрации после одобрения заявки</p>
                   </div>
                 </section>
 
@@ -393,7 +393,7 @@ export default function ZayavkaPage() {
                 ) : (
                   <>
                     <section className="space-y-4" aria-labelledby="zayavka-activity-heading">
-                      <h2 id="zayavka-activity-heading" className="text-sm font-semibold text-[var(--color-text)] border-0 pb-2">
+                      <h2 id="zayavka-activity-heading" className="text-sm font-semibold text-[var(--color-text)] border-0 pb-2 text-center">
                         Информация о заведении и деятельности
                       </h2>
                       <div>
@@ -428,7 +428,7 @@ export default function ZayavkaPage() {
                       </div>
                     </section>
                     <section className="space-y-4" aria-labelledby="zayavka-admin-heading">
-                      <h2 id="zayavka-admin-heading" className="text-sm font-semibold text-[var(--color-text)] border-0 pb-2">
+                      <h2 id="zayavka-admin-heading" className="text-sm font-semibold text-[var(--color-text)] border-0 pb-2 text-center">
                         Контакт администратора
                       </h2>
                       <p className="text-xs text-[var(--color-muted)]">
@@ -478,7 +478,7 @@ export default function ZayavkaPage() {
                   <button
                     type="button"
                     onClick={handleBack}
-                    className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-[var(--color-muted)]/40 bg-transparent px-4 py-3 text-[14px] font-semibold text-[var(--color-text)] hover:bg-[var(--color-light-gray)]/50 transition-colors"
+                    className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-[var(--color-muted)]/40 bg-white/10 px-4 py-3 text-[14px] font-semibold text-[var(--color-text)] hover:bg-white/20 transition-colors"
                   >
                     <ArrowLeft className="h-5 w-5" /> Назад
                   </button>

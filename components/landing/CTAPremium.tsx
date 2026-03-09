@@ -12,9 +12,9 @@ export function CTAPremium() {
         aria-hidden
       />
       <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8 xl:max-w-7xl 2xl:max-w-screen-2xl relative z-10">
-        <div className="cta-premium-block max-w-[700px] mx-auto mb-10">
+        <div className="cta-premium-block max-w-[700px] mx-auto mb-10 text-center">
           <h2 className="font-[family:var(--font-playfair)] text-2xl sm:text-3xl lg:text-4xl font-semibold text-white mb-4">Готовы повысить стандарты?</h2>
-          <p className="text-lg text-[var(--color-on-dark-muted)] max-w-[600px] mx-auto mb-10">
+          <p className="text-lg text-[var(--color-on-dark-muted)] mx-auto mb-10 text-center max-w-[700px]">
             Присоединяйтесь к компаниям, которые уже используют FreeTips для развития культуры качественного сервиса.
           </p>
         </div>

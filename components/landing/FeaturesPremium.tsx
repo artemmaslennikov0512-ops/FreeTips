@@ -45,9 +45,9 @@ export function FeaturesPremium() {
         aria-hidden
       />
       <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8 xl:max-w-7xl 2xl:max-w-screen-2xl relative z-10">
-        <div className="max-w-[700px] mx-auto mb-10 sm:mb-16 text-center">
-          <h2 className="font-[family:var(--font-playfair)] text-2xl sm:text-3xl lg:text-4xl font-semibold text-white mb-4">Надёжность, заслуживающая доверия</h2>
-          <p className="text-lg text-[var(--color-on-dark-muted)]">Мы создали сервис, который ценит время и труд как сотрудников, так и гостей.</p>
+        <div className="features-premium-intro max-w-[700px] mx-auto mb-10 sm:mb-16 flex flex-col items-center text-center">
+          <h2 className="font-[family:var(--font-playfair)] text-2xl sm:text-3xl lg:text-4xl font-semibold text-white mb-4 w-full">Надёжность, заслуживающая доверия</h2>
+          <p className="text-lg text-[var(--color-on-dark-muted)] w-full">Мы создали сервис, который ценит время и труд как сотрудников, так и гостей.</p>
         </div>
         <div className="grid gap-6 sm:gap-8 sm:grid-cols-2 lg:grid-cols-4">
           {features.map(({ icon: Icon, title, desc, iconBg, iconColor }) => (

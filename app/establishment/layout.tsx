@@ -172,8 +172,8 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
           </button>
         </nav>
       </aside>
-      <main className="min-w-0 flex-1 overflow-x-hidden lg:ml-0 flex flex-col">
-        <div className="cabinet-main-block mt-4 mr-0 mb-4 ml-4 lg:mr-4 lg:ml-4 flex flex-col rounded-2xl border border-white/10 bg-white/[0.06] backdrop-blur-xl">
+      <main className="min-w-0 flex-1 overflow-x-hidden pl-4 pr-4 lg:pl-0 lg:pr-0 lg:ml-0 flex flex-col">
+        <div className="cabinet-main-block mt-4 mr-0 mb-4 ml-0 lg:mr-4 lg:ml-4 flex flex-col rounded-2xl border border-white/10 bg-white/[0.06] backdrop-blur-xl">
           <div className="p-6 lg:p-8">
             {children}
           </div>

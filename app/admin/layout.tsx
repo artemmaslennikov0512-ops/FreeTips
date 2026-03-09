@@ -223,17 +223,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
       </aside>
 
-      <main className="min-h-screen min-w-0 flex-1 overflow-x-hidden lg:ml-0 flex flex-col">
-        <div className="admin-main-block cabinet-main-block mt-4 mr-4 mb-4 ml-4 lg:ml-4 flex min-h-[calc(100vh-2rem)] flex-1 flex-col rounded-2xl border border-white/10 bg-white/[0.06] backdrop-blur-xl">
+      <main className="min-h-screen min-w-0 flex-1 overflow-x-hidden pl-4 pr-4 lg:pl-0 lg:pr-0 lg:ml-0 flex flex-col">
+        <div className="admin-main-block cabinet-main-block mt-4 mr-0 mb-4 ml-0 lg:mr-4 lg:ml-4 flex min-h-[calc(100vh-2rem)] flex-1 flex-col rounded-2xl border border-white/10 bg-white/[0.06] backdrop-blur-xl">
           <div className="p-4 sm:p-6 lg:p-8 min-w-0 max-w-full flex-1 overflow-x-hidden flex flex-col" id="main-content">
             <div className="mb-4 flex justify-start lg:hidden">
               <button
                 type="button"
                 onClick={() => setSidebarOpen(true)}
-                className="flex h-10 w-10 items-center justify-center rounded-lg text-[var(--color-brand-gold)] hover:bg-[var(--color-brand-gold)]/10"
+                className="flex h-14 w-14 min-w-14 items-center justify-center rounded-xl border border-white/20 bg-white/10 text-[var(--color-brand-gold)] hover:bg-[var(--color-brand-gold)]/20 hover:border-[var(--color-brand-gold)]/40 active:scale-95"
                 aria-label="Меню"
               >
-                <Menu className="h-5 w-5" />
+                <Menu className="h-7 w-7" strokeWidth={2} />
               </button>
             </div>
             {children}

@@ -193,7 +193,7 @@ export default function ZayavkaPage() {
   return (
     <AuthPageShell>
       <div className="zayavka-page mx-auto flex min-h-[80vh] max-w-md flex-col justify-center overflow-visible px-4 py-16">
-        <div className={`${AUTH_CARD_CLASS} zayavka-card overflow-visible`}>
+        <div className={`${AUTH_CARD_CLASS} zayavka-card min-w-0 overflow-visible`}>
           <h1 className="font-[family:var(--font-playfair)] text-2xl font-semibold text-[var(--color-text)]">Оставить заявку</h1>
           <p className="mt-2 text-[var(--color-text-secondary)]">
             {step === 1
@@ -218,7 +218,7 @@ export default function ZayavkaPage() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="mt-6 space-y-6">
+          <form onSubmit={handleSubmit} className="mt-6 min-w-0 space-y-6">
             {step === 1 && (
               <>
                 <section className="space-y-4" aria-labelledby="zayavka-type-heading">
@@ -270,16 +270,16 @@ export default function ZayavkaPage() {
                     {fieldErrors.fullName && <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{fieldErrors.fullName}</p>}
                   </div>
                   {!isEstablishment && (
-                    <div>
+                    <div className="min-w-0">
                       <label htmlFor="zayavka-dateOfBirth" className="mb-1.5 block text-sm font-medium text-[var(--color-text)]">Дата рождения</label>
-                      <div className="relative">
-                        <Calendar className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--color-muted)]" />
+                      <div className="relative min-w-0 overflow-hidden rounded-xl focus-within:ring-2 focus-within:ring-[var(--color-accent-gold)]/40 focus-within:ring-offset-2 focus-within:ring-offset-[var(--color-bg)]">
+                        <Calendar className="absolute left-3 top-1/2 h-5 w-5 shrink-0 -translate-y-1/2 text-[var(--color-muted)]" />
                         <input
                           id="zayavka-dateOfBirth"
                           type="date"
                           value={formData.dateOfBirth}
                           onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
-                          className={inputBase}
+                          className={`${inputBase} min-w-0 max-w-full box-border`}
                         />
                       </div>
                       {fieldErrors.dateOfBirth && <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{fieldErrors.dateOfBirth}</p>}

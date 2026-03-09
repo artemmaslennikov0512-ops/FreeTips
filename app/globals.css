@@ -271,19 +271,34 @@ html:not([data-theme="dark"]) .cabinet-premium .cabinet-sidebar-avatar {
   box-shadow: none;
 }
 
-/* Светлая тема: шторка белая на страницах входа, регистрации и заявки */
-html:not([data-theme="dark"]) .layout-auth .site-header {
+/* Светлая тема: шторка белая на страницах входа и регистрации */
+html:not([data-theme="dark"]) .layout-auth:not(.layout-zayavka) .site-header {
   background: #ffffff;
   border: 1px solid rgba(10, 25, 47, 0.12);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
   color: var(--color-text);
 }
-html:not([data-theme="dark"]) .layout-auth .site-header .site-header-logo-text,
-html:not([data-theme="dark"]) .layout-auth .site-header .site-header-logo-free,
-html:not([data-theme="dark"]) .layout-auth .site-header a:not([class*="bg-"]) {
+/* Страница заявки: шапка в одном цвете с фоном страницы (единый navy) */
+html:not([data-theme="dark"]) .layout-zayavka .site-header {
+  background: #1a2337;
+  border: 1px solid rgba(197, 165, 114, 0.25);
+  box-shadow: none;
+  color: rgba(255, 255, 255, 0.95);
+}
+html:not([data-theme="dark"]) .layout-zayavka .site-header .site-header-logo-text,
+html:not([data-theme="dark"]) .layout-zayavka .site-header .site-header-logo-free,
+html:not([data-theme="dark"]) .layout-zayavka .site-header a:not([class*="bg-"]) {
+  color: rgba(255, 255, 255, 0.95);
+}
+html:not([data-theme="dark"]) .layout-zayavka .site-header .site-header-logo-free {
+  color: rgba(255, 255, 255, 0.95) !important;
+}
+html:not([data-theme="dark"]) .layout-auth:not(.layout-zayavka) .site-header .site-header-logo-text,
+html:not([data-theme="dark"]) .layout-auth:not(.layout-zayavka) .site-header .site-header-logo-free,
+html:not([data-theme="dark"]) .layout-auth:not(.layout-zayavka) .site-header a:not([class*="bg-"]) {
   color: var(--color-navy);
 }
-html:not([data-theme="dark"]) .layout-auth .site-header .site-header-logo-free {
+html:not([data-theme="dark"]) .layout-auth:not(.layout-zayavka) .site-header .site-header-logo-free {
   color: var(--color-navy) !important;
 }
 

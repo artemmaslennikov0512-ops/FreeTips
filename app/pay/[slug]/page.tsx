@@ -168,17 +168,17 @@ export default function PayPage() {
 
   if (result === "success") {
     return (
-      <div className="mx-auto flex min-h-[60vh] max-w-md flex-col items-center justify-center px-4 py-8">
-        <div className="pay-success-card w-full max-w-sm rounded-2xl border border-[var(--color-brand-gold)]/40 bg-[var(--color-brand-gold)]/20 p-8 text-center shadow-[var(--shadow-card)]">
+      <div className="pay-success-always-light flex min-h-screen w-full flex-col items-center justify-center px-4 py-8">
+        <div className="pay-success-card w-full max-w-sm rounded-2xl border border-[var(--color-brand-gold)]/40 bg-white p-8 text-center shadow-[var(--shadow-card)]">
           <div className="pay-result-icon pay-result-icon-success mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[var(--color-accent-emerald)]/15">
             <CheckCircle2 className="h-9 w-9 text-[var(--color-accent-emerald)]" />
           </div>
           <div className="mt-8 flex flex-col items-center text-center">
-            <h1 className="font-[family:var(--font-playfair)] text-2xl font-semibold text-[var(--color-text)]">
+            <h1 className="font-[family:var(--font-playfair)] text-2xl font-semibold text-[#0a192f]">
               Спасибо!
             </h1>
-            <p className="mt-1 text-lg font-medium text-[var(--color-text)]">Чаевые зачислены.</p>
-            <p className="mt-3 text-sm text-[var(--color-text-secondary)]">
+            <p className="mt-1 text-center text-lg font-medium text-[#0a192f]">Чаевые зачислены.</p>
+            <p className="mt-3 text-center text-sm text-[#2d3748]">
               {recipientName} получил вашу благодарность.
             </p>
           </div>
@@ -230,8 +230,8 @@ export default function PayPage() {
   if (fontClr) cardStyle["--pay-font" as string] = fontClr;
 
   return (
-    <div className="pay-page pay-page--cards min-h-[60vh] w-full px-4 py-8" style={wrapperStyle}>
-      <div className="mx-auto max-w-lg">
+    <div className="pay-page pay-page--cards flex min-h-screen w-full flex-col justify-center px-4 py-8" style={wrapperStyle}>
+      <div className="mx-auto w-full max-w-lg">
         {/* Основной блок со скруглёнными краями и отступами — внутри все карточки */}
         <div
           className="pay-page-outer-block relative rounded-2xl border-0 p-4 shadow-[var(--shadow-card)]"

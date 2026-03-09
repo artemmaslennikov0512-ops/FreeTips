@@ -99,21 +99,21 @@ export default function LoginPage() {
   return (
     <AuthPageShell>
       <div className="mx-auto flex min-h-[80vh] max-w-md flex-col justify-center px-4 py-16">
-        <div className={AUTH_CARD_CLASS}>
-          <div className="text-center">
-            <h1 className="font-[family:var(--font-playfair)] text-2xl font-semibold text-[var(--color-text)]">Вход</h1>
-            <p className="mt-2 text-[var(--color-text-secondary)]">
+        <div className={`${AUTH_CARD_CLASS} flex flex-col items-center text-center`}>
+          <div className="w-full flex flex-col items-center text-center">
+            <h1 className="font-[family:var(--font-playfair)] text-2xl font-semibold text-[var(--color-text)] text-center">Вход</h1>
+            <p className="mt-2 text-center text-[var(--color-text-secondary)]">
               Войдите в личный кабинет для управления чаевыми
             </p>
           </div>
 
           {error && (
-            <div className="mt-4 rounded-xl border-0 bg-[var(--color-muted)]/10 p-3 text-sm text-[var(--color-accent-red)]" role="alert">
+            <div className="mt-4 w-full rounded-xl border-0 bg-[var(--color-muted)]/10 p-3 text-sm text-[var(--color-accent-red)]" role="alert">
               {error}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+          <form onSubmit={handleSubmit} className="mt-6 w-full space-y-4">
             <div>
               <label htmlFor="login" className="mb-1.5 block text-sm font-medium text-[var(--color-text)]">
                 Логин
@@ -176,14 +176,14 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <div className="mt-3 space-y-0 text-center text-[11px] text-[var(--color-text-secondary)]">
-            <p>
+          <div className="mt-3 flex w-full flex-col items-center space-y-0 text-center text-[10px] text-[var(--color-text-secondary)]">
+            <p className="text-center">
               Нет аккаунта?{" "}
               <Link href="/zayavka" className="font-medium text-[var(--color-accent-gold)] hover:opacity-90 hover:underline transition-colors">
                 Оставить заявку
               </Link>
             </p>
-            <p>
+            <p className="text-center">
               <Link href="/login/establishment" className="font-medium text-[var(--color-accent-gold)] hover:opacity-90 hover:underline transition-colors">
                 Вход для управляющего заведением →
               </Link>
@@ -192,7 +192,7 @@ export default function LoginPage() {
 
           <Link
             href="/"
-            className="mt-0 block text-center text-[11px] text-[var(--color-muted)] hover:text-[var(--color-text)] transition-colors"
+            className="mt-0 block text-center text-[10px] text-[var(--color-muted)] hover:text-[var(--color-text)] transition-colors"
           >
             ← На главную
           </Link>

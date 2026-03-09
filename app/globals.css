@@ -409,6 +409,23 @@ html:not([data-theme="dark"]) .card-block {
   color: #dc2626 !important;
 }
 
+/* Блок «Спасибо!» после оплаты — всегда светлый (игнорируем тёмную тему) */
+[data-theme="dark"] .pay-success-always-light .pay-success-card {
+  background: #ffffff !important;
+  border-color: rgba(197, 165, 114, 0.4) !important;
+}
+[data-theme="dark"] .pay-success-always-light .pay-success-card h1,
+[data-theme="dark"] .pay-success-always-light .pay-success-card p {
+  color: #0a192f !important;
+}
+[data-theme="dark"] .pay-success-always-light .pay-success-card p.text-sm {
+  color: #2d3748 !important;
+}
+[data-theme="dark"] .pay-success-always-light .pay-success-card a {
+  background: #0a192f !important;
+  color: #ffffff !important;
+}
+
 /* Кнопка «Оплатить» на странице чаевых — всегда золотая (светлая и тёмная тема) */
 .pay-btn-gold {
   background: var(--color-brand-gold) !important;
@@ -1500,6 +1517,18 @@ html:not([data-theme="dark"]) .zayavka-page .zayavka-card a:not(.auth-btn-primar
 [data-theme="dark"] .layout-zayavka .zayavka-card .mt-6.text-center a[href="/login"],
 [data-theme="dark"] .layout-zayavka .zayavka-card a[href="/"] {
   color: var(--color-brand-gold) !important;
+}
+/* Подсказки под полями заявки — мелкий шрифт, перебивает глобальный p */
+.zayavka-hint {
+  font-size: 0.5625rem !important; /* 9px */
+  line-height: 1.4;
+}
+/* Префикс +7 в поле телефона — контраст на светлом фоне поля (карточка заявки может задавать белый текст) */
+html:not([data-theme="dark"]) .zayavka-phone-field .zayavka-phone-prefix {
+  color: #0a192f !important;
+}
+[data-theme="dark"] .zayavka-phone-field .zayavka-phone-prefix {
+  color: var(--color-text) !important;
 }
 /* Шапка на Вход/Регистрация/Заявка: в тёмной теме кнопка «Войти» — золотая, ссылка «Оставить заявку» — видимая */
 [data-theme="dark"] .layout-auth .site-header {

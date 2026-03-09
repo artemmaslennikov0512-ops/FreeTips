@@ -226,7 +226,7 @@ export default function ZayavkaPage() {
                     Тип подключения
                   </h2>
                   <div>
-                    <label htmlFor="zayavka-requestType" className="mb-1.5 block text-sm font-medium text-[var(--color-text)]">
+                    <label htmlFor="zayavka-requestType" className="mb-1.5 block text-center text-sm font-medium text-[var(--color-text)]">
                       Подключается
                     </label>
                     <div className="relative">
@@ -243,7 +243,7 @@ export default function ZayavkaPage() {
                       </select>
                       <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-[var(--color-muted)]" aria-hidden="true">▼</span>
                     </div>
-                    <p id="zayavka-requestType-desc" className="mt-1 text-[0.625rem] text-[var(--color-muted)]">
+                    <p id="zayavka-requestType-desc" className="zayavka-hint mt-1 text-center text-[var(--color-muted)]">
                       {isEstablishment ? "Данные компании и контактного лица" : "Официант, курьер и т.д. — с контактом администратора для подтверждения"}
                     </p>
                   </div>
@@ -254,7 +254,7 @@ export default function ZayavkaPage() {
                     Личные данные
                   </h2>
                   <div>
-                    <label htmlFor="zayavka-fullName" className="mb-1.5 block text-sm font-medium text-[var(--color-text)]">ФИО</label>
+                    <label htmlFor="zayavka-fullName" className="mb-1.5 block text-center text-sm font-medium text-[var(--color-text)]">ФИО</label>
                     <div className="relative">
                       <User className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--color-muted)]" />
                       <input
@@ -271,7 +271,7 @@ export default function ZayavkaPage() {
                   </div>
                   {!isEstablishment && (
                     <div className="min-w-0">
-                      <label htmlFor="zayavka-dateOfBirth" className="mb-1.5 block text-sm font-medium text-[var(--color-text)]">Дата рождения</label>
+                      <label htmlFor="zayavka-dateOfBirth" className="mb-1.5 block text-center text-sm font-medium text-[var(--color-text)]">Дата рождения</label>
                       <div className="relative min-w-0 overflow-hidden rounded-xl focus-within:ring-2 focus-within:ring-[var(--color-accent-gold)]/40 focus-within:ring-offset-2 focus-within:ring-offset-[var(--color-bg)]">
                         <Calendar className="absolute left-3 top-1/2 h-5 w-5 shrink-0 -translate-y-1/2 text-[var(--color-muted)]" />
                         <input
@@ -286,11 +286,11 @@ export default function ZayavkaPage() {
                     </div>
                   )}
                   <div>
-                    <label htmlFor="zayavka-phone" className="mb-1.5 block text-sm font-medium text-[var(--color-text)]">Номер телефона</label>
+                    <label htmlFor="zayavka-phone" className="mb-1.5 block text-center text-sm font-medium text-[var(--color-text)]">Номер телефона</label>
                     <div className="zayavka-phone-field relative flex rounded-xl border-0 bg-[var(--color-light-gray)] overflow-hidden focus-within:ring-2 focus-within:ring-[var(--color-accent-gold)]/40 focus-within:ring-offset-2 focus-within:ring-offset-[var(--color-bg)]">
                       <span className="flex items-center gap-1 pl-3 text-[var(--color-text)]" aria-hidden="true">
-                        <Phone className="h-5 w-5 text-[var(--color-muted)]" />
-                        <span className="font-medium text-[var(--color-text)]">+7</span>
+                        <Phone className="zayavka-phone-prefix h-5 w-5 text-[var(--color-muted)]" />
+                        <span className="zayavka-phone-prefix font-medium text-[var(--color-text)]">+7</span>
                       </span>
                       <input
                         id="zayavka-phone"
@@ -307,7 +307,7 @@ export default function ZayavkaPage() {
                     {fieldErrors.phone && <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{fieldErrors.phone}</p>}
                   </div>
                   <div>
-                    <label htmlFor="zayavka-email" className="mb-1.5 block text-sm font-medium text-[var(--color-text)]">Почта</label>
+                    <label htmlFor="zayavka-email" className="mb-1.5 block text-center text-sm font-medium text-[var(--color-text)]">Почта</label>
                     <div className="relative">
                       <Mail className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--color-muted)]" />
                       <input
@@ -321,7 +321,7 @@ export default function ZayavkaPage() {
                       />
                     </div>
                     {fieldErrors.email && <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{fieldErrors.email}</p>}
-                    <p className="mt-1 text-[0.625rem] text-[var(--color-muted)]">На неё будет выслана ссылка для регистрации после одобрения заявки</p>
+                    <p className="zayavka-hint mt-1 text-center text-[var(--color-muted)]">На неё будет выслана ссылка для регистрации после одобрения заявки</p>
                   </div>
                 </section>
 
@@ -397,7 +397,7 @@ export default function ZayavkaPage() {
                         Информация о заведении и деятельности
                       </h2>
                       <div>
-                        <label htmlFor="zayavka-activityType" className="mb-1.5 block text-sm font-medium text-[var(--color-text)]">Вид деятельности</label>
+                        <label htmlFor="zayavka-activityType" className="mb-1.5 block text-center text-sm font-medium text-[var(--color-text)]">Вид деятельности</label>
                         <div className="relative">
                           <Briefcase className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--color-muted)]" />
                           <input
@@ -412,7 +412,7 @@ export default function ZayavkaPage() {
                         {fieldErrors.activityType && <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{fieldErrors.activityType}</p>}
                       </div>
                       <div>
-                        <label htmlFor="zayavka-establishment" className="mb-1.5 block text-sm font-medium text-[var(--color-text)]">Заведение (если есть)</label>
+                        <label htmlFor="zayavka-establishment" className="mb-1.5 block text-center text-sm font-medium text-[var(--color-text)]">Заведение (если есть)</label>
                         <div className="relative">
                           <Building2 className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--color-muted)]" />
                           <input
@@ -431,11 +431,11 @@ export default function ZayavkaPage() {
                       <h2 id="zayavka-admin-heading" className="text-sm font-semibold text-[var(--color-text)] border-0 pb-2 text-center">
                         Контакт администратора
                       </h2>
-                      <p className="text-xs text-[var(--color-muted)]">
+                      <p className="zayavka-hint mt-0.5 text-center text-[var(--color-muted)]">
                         Для подтверждения, что вы работаете в указанном заведении.
                       </p>
                       <div>
-                        <label htmlFor="zayavka-adminFullName" className="mb-1.5 block text-sm font-medium text-[var(--color-text)]">ФИО администратора</label>
+                        <label htmlFor="zayavka-adminFullName" className="mb-1.5 block text-center text-sm font-medium text-[var(--color-text)]">ФИО администратора</label>
                         <div className="relative">
                           <User className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--color-muted)]" />
                           <input
@@ -450,11 +450,11 @@ export default function ZayavkaPage() {
                         {fieldErrors.adminFullName && <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{fieldErrors.adminFullName}</p>}
                       </div>
                       <div>
-                        <label htmlFor="zayavka-adminContactPhone" className="mb-1.5 block text-sm font-medium text-[var(--color-text)]">Телефон администратора</label>
+                        <label htmlFor="zayavka-adminContactPhone" className="mb-1.5 block text-center text-sm font-medium text-[var(--color-text)]">Телефон администратора</label>
                         <div className="zayavka-phone-field relative flex rounded-xl border-0 bg-[var(--color-light-gray)] overflow-hidden focus-within:ring-2 focus-within:ring-[var(--color-accent-gold)]/40 focus-within:ring-offset-2 focus-within:ring-offset-[var(--color-bg)]">
                           <span className="flex items-center gap-1 pl-3 text-[var(--color-text)]" aria-hidden="true">
-                            <Phone className="h-5 w-5 text-[var(--color-muted)]" />
-                            <span className="font-medium text-[var(--color-text)]">+7</span>
+                            <Phone className="zayavka-phone-prefix h-5 w-5 text-[var(--color-muted)]" />
+                            <span className="zayavka-phone-prefix font-medium text-[var(--color-text)]">+7</span>
                           </span>
                           <input
                             id="zayavka-adminContactPhone"
@@ -490,6 +490,21 @@ export default function ZayavkaPage() {
                     {loading ? "Отправка..." : "Оставить заявку"}
                   </button>
                 </div>
+                <p className="zayavka-hint mt-3 text-center text-[var(--color-muted)]">
+                  Нажимая «Оставить заявку», вы соглашаетесь с{" "}
+                  <Link href="/politika" className="text-[var(--color-accent-gold)] hover:opacity-90 hover:underline">
+                    условиями обработки персональных данных
+                  </Link>
+                  ,{" "}
+                  <Link href="/oferta" className="text-[var(--color-accent-gold)] hover:opacity-90 hover:underline">
+                    пользовательским соглашением
+                  </Link>
+                  {" "}и{" "}
+                  <Link href="/politika-bezopasnosti" className="text-[var(--color-accent-gold)] hover:opacity-90 hover:underline">
+                    политикой безопасности платежей
+                  </Link>
+                  .
+                </p>
               </>
             )}
           </form>

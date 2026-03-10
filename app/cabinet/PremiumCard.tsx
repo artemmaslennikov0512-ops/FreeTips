@@ -121,16 +121,16 @@ export function PremiumCard({ fullName, balanceKop, compact }: Props) {
                 style={{ background: `${graffitiSvg} no-repeat center` }}
                 aria-hidden
               />
-              <div className="absolute left-[12px] bottom-[28px] z-[3] flex items-center gap-1.5">
-                <div className="premium-logo-icon logo-ft-abbr">FT</div>
-                <span className="premium-card-brand text-xs font-extrabold">
+              <div className="absolute left-[12px] bottom-[28px] z-[3] flex items-end gap-1.5">
+                <div className="premium-logo-icon logo-ft-abbr shrink-0">FT</div>
+                <span className="premium-card-brand text-xs font-extrabold leading-none">
                   FreeTips
                 </span>
               </div>
               <div className="absolute left-[12px] top-[10px] z-[3]">
                 <div className="premium-badge">VIRTUAL</div>
               </div>
-              <div className="premium-card-balance-block absolute bottom-[28px] right-[12px] z-[3] flex items-center justify-end">
+              <div className="premium-card-balance-block absolute bottom-[28px] right-[12px] z-[3] flex items-end justify-end">
                 <p className={`text-[13px] font-medium text-white/90 m-0 leading-tight ${showBalance ? "text-right" : "truncate max-w-[160px]"}`}>
                   {showBalance ? formatMoney(BigInt(balanceKop)) : holderName}
                 </p>

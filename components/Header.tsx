@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { useState, useCallback, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
-import { Menu, X, LogOut, User, Compass } from "lucide-react";
+import { Menu, X, LogOut, Compass } from "lucide-react";
 import { site } from "@/config/site";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { getAccessToken, authHeaders, clearAccessToken } from "@/lib/auth-client";
@@ -47,14 +47,6 @@ export function Header() {
       })
       .catch(() => setUser(null));
   }, [pathname]);
-
-  const displayName = (() => {
-    if (!user) return "";
-    if (user.role === "SUPERADMIN" || user.role === "ADMIN") return "Админ";
-    if (user.role === "ESTABLISHMENT_ADMIN") return "Управляющий";
-    if (user.fullName?.trim()) return user.fullName.trim();
-    return user.login;
-  })();
 
   const cabinetHref =
     user?.role === "ADMIN" || user?.role === "SUPERADMIN"
@@ -140,8 +132,8 @@ export function Header() {
           <div className="flex shrink-0 items-center gap-2 sm:gap-3 lg:gap-4">
             {user ? (
               <>
-                <Link href={cabinetHref} className="hidden sm:inline-flex max-w-[140px] truncate items-center justify-center rounded-xl bg-[var(--color-navy)] px-3 py-2 text-[14px] text-[var(--color-white)] font-semibold transition-all hover:opacity-90 hover:-translate-y-0.5 lg:max-w-[180px] lg:px-4 lg:py-2.5 xl:max-w-none">
-                  {displayName}
+                <Link href={cabinetHref} className="hidden sm:inline-flex items-center justify-center rounded-xl border-0 bg-[var(--color-white)] px-3 py-2 text-[14px] text-[var(--color-navy)] font-semibold transition-all hover:opacity-90 hover:-translate-y-0.5 lg:px-4 lg:py-2.5">
+                  Кабинет
                 </Link>
                 <button type="button" onClick={handleLogout} className="inline-flex items-center justify-center rounded-xl bg-[var(--color-navy)] px-3 py-2 text-[14px] text-[var(--color-white)] font-semibold transition-all hover:opacity-90 hover:-translate-y-0.5 sm:px-4 sm:py-2.5 lg:px-5">
                   Выйти
@@ -269,23 +261,14 @@ export function Header() {
             </div>
           )}
           {user ? (
-            <>
-              <Link
-                href={cabinetHref}
-                className="min-h-[44px] inline-flex items-center justify-center gap-2 rounded-xl bg-[var(--color-brand-gold)] px-4 py-2.5 text-[12px] font-semibold text-[#0a192f] hover:opacity-90 hover:-translate-y-0.5 transition-all shadow-[var(--shadow-subtle)]"
-              >
-                <User className="h-4 w-4" />
-                {displayName}
-              </Link>
-              <button
-                type="button"
-                onClick={handleLogout}
-                className="min-h-[44px] inline-flex items-center justify-center gap-2 rounded-xl bg-[var(--color-brand-gold)] px-4 py-2.5 text-[12px] font-semibold text-[#0a192f] hover:opacity-90 hover:-translate-y-0.5 transition-all shadow-[var(--shadow-subtle)]"
-              >
-                <LogOut className="h-3.5 w-3.5" />
-                Выйти
-              </button>
-            </>
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="min-h-[44px] inline-flex items-center justify-center gap-2 rounded-xl bg-[var(--color-brand-gold)] px-4 py-2.5 text-[12px] font-semibold text-[#0a192f] hover:opacity-90 hover:-translate-y-0.5 transition-all shadow-[var(--shadow-subtle)]"
+            >
+              <LogOut className="h-3.5 w-3.5" />
+              Выйти
+            </button>
           ) : (
             <>
               <Link
@@ -367,24 +350,14 @@ export function Header() {
                 ))}
                 <div className="mt-4 pt-4 border-t border-white/20 space-y-2">
                   {user ? (
-                    <>
-                      <Link
-                        href={cabinetHref}
-                        onClick={close}
-                        className="flex items-center justify-center gap-2 rounded-xl bg-[var(--color-brand-gold)] px-4 py-3 text-[14px] font-semibold text-[#0a192f] hover:opacity-90 transition-all"
-                      >
-                        <User className="h-4 w-4" />
-                        {displayName}
-                      </Link>
-                      <button
-                        type="button"
-                        onClick={handleLogout}
-                        className="w-full flex items-center justify-center gap-2 rounded-xl bg-white/10 px-4 py-3 text-[14px] font-semibold text-white hover:bg-white/20 transition-all"
-                      >
-                        <LogOut className="h-3.5 w-3.5" />
-                        Выйти
-                      </button>
-                    </>
+                    <button
+                      type="button"
+                      onClick={handleLogout}
+                      className="w-full flex items-center justify-center gap-2 rounded-xl bg-white/10 px-4 py-3 text-[14px] font-semibold text-white hover:bg-white/20 transition-all"
+                    >
+                      <LogOut className="h-3.5 w-3.5" />
+                      Выйти
+                    </button>
                   ) : (
                     <>
                       <Link

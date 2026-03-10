@@ -176,21 +176,19 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <div className="auth-page-footer-links mt-2 flex w-full flex-col items-center gap-0 text-center text-[0.6875rem] leading-tight text-[var(--color-text-secondary)]">
+          <div className="auth-page-footer-links mt-4 flex w-full flex-col items-center gap-2 text-center text-sm leading-snug">
             <div className="m-0 text-center">
-              Нет аккаунта?{" "}
+              <span className="text-white">Нет аккаунта? </span>
               <Link href="/zayavka" className="font-medium text-[var(--color-accent-gold)] hover:opacity-90 hover:underline transition-colors">
                 Оставить заявку
               </Link>
             </div>
-            <div className="m-0 text-center">
-              <Link href="/login/establishment" className="font-medium text-[var(--color-accent-gold)] hover:opacity-90 hover:underline transition-colors">
-                Вход для управляющего заведением →
-              </Link>
-            </div>
+            <Link href="/login/establishment" className="m-0 text-center font-medium text-[var(--color-accent-gold)] hover:opacity-90 hover:underline transition-colors">
+              Вход для управляющего заведением →
+            </Link>
             <Link
               href="/"
-              className="m-0 block text-center text-sm text-[var(--color-muted)] hover:text-[var(--color-text)] transition-colors"
+              className="m-0 block text-center text-[var(--color-muted)] hover:text-[var(--color-text)] transition-colors"
             >
               ← На главную
             </Link>

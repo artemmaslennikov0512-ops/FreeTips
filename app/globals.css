@@ -102,8 +102,8 @@ html:not([data-theme="dark"]) .cabinet-premium {
 /* Светлая тема: сайдбар — фон как у виртуальной карты (градиент navy) */
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-sidebar:not(.admin-sidebar) {
   background: linear-gradient(135deg, #0a192f 0%, color-mix(in srgb, #0a192f 85%, white) 50%, #0a192f 100%);
-  border: 1px solid rgba(197, 165, 114, 0.55);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.06);
+  border: none;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.08);
   color: rgba(255, 255, 255, 0.92);
 }
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-sidebar:not(.admin-sidebar) a,
@@ -203,9 +203,9 @@ html:not([data-theme="dark"]) .cabinet-premium .cabinet-sidebar-avatar {
 }
 
 [data-theme="dark"] .cabinet-premium .cabinet-sidebar {
-  background: #262626;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35), 0 2px 6px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(0, 0, 0, 0.2);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(192, 192, 192, 0.4);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3), 0 2px 6px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(192, 192, 192, 0.08);
   color: #fafafa;
 }
 [data-theme="dark"] .cabinet-premium .cabinet-sidebar a,
@@ -343,12 +343,21 @@ body.admin-page .site-header {
   margin-top: 1rem;
 }
 
+/* Основной блок ЛК и админки — те же отступы от краёв, что у шапки (визуальное выравнивание справа) */
+body.cabinet-page .cabinet-premium,
+body.admin-page .admin-panel.cabinet-premium {
+  margin-left: 1rem;
+  margin-right: 1rem;
+  width: calc(100% - 2rem);
+  max-width: none;
+}
+
 /* Светлая тема: шапка — фон как у виртуальной карты (градиент navy) */
 html:not([data-theme="dark"]) body.cabinet-page .site-header,
 html:not([data-theme="dark"]) body.admin-page .site-header {
   background: linear-gradient(135deg, #0a192f 0%, color-mix(in srgb, #0a192f 85%, white) 50%, #0a192f 100%);
-  border: 1px solid rgba(197, 165, 114, 0.55);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.06);
+  border: none;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.08);
   color: rgba(255, 255, 255, 0.92);
 }
 html:not([data-theme="dark"]) body.cabinet-page .site-header .site-header-logo-text,
@@ -381,12 +390,12 @@ html:not([data-theme="dark"]) body.admin-page .site-header .site-header-logo-ico
   color: inherit;
 }
 
-/* Светлая тема: основной блок ЛК и админки — как сайдбар (градиент navy, обводка, тень) */
+/* Светлая тема: основной блок ЛК и админки — как сайдбар (градиент navy, без обводки, тень) */
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-main-block:not(.admin-main-block),
 html:not([data-theme="dark"]) .admin-panel .admin-main-block.cabinet-main-block {
   background: linear-gradient(135deg, #0a192f 0%, color-mix(in srgb, #0a192f 85%, white) 50%, #0a192f 100%);
-  border: 1px solid rgba(197, 165, 114, 0.55);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.06);
+  border: none;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.08);
 }
 
 /* Светлая тема: блоки на основном блоке — тот же фон и рамка, что у блока чата поддержки */
@@ -542,10 +551,11 @@ html:not([data-theme="dark"]) .pay-page {
   border: none !important;
 }
 
-/* Основной блок — тонкая золотая обводка, тень для объёма */
+/* Основной блок — тонкая золотая обводка, тень, умеренное скругление */
 .pay-page .pay-page-outer-block {
   border: 1px solid rgba(197, 165, 114, 0.45) !important;
   box-shadow: var(--shadow-card);
+  border-radius: 10px !important;
 }
 html:not([data-theme="dark"]) .pay-page .pay-page-outer-block {
   background: linear-gradient(135deg, #0a192f 0%, color-mix(in srgb, #0a192f 85%, white) 50%, #0a192f 100%) !important;
@@ -651,7 +661,7 @@ html:not([data-theme="dark"]) .layout-login .auth-page-card a:not(.auth-btn-prim
 }
 /* Блок ссылок под кнопкой «Войти»: без отступов между строками */
 .layout-login .auth-page-card .auth-page-footer-links {
-  gap: 0 !important;
+  gap: 0.5rem !important;
 }
 .layout-login .auth-page-card .auth-page-footer-links > * {
   margin: 0 !important;
@@ -674,9 +684,9 @@ html:not([data-theme="dark"]) .layout-login .auth-page-card a:not(.auth-btn-prim
   padding: 16px;
 }
 
-/* Внутренние карточки: очень тонкая обводка, тень для объёма; увеличенные отступы по вертикали */
+/* Внутренние карточки: тонкая обводка, тень, небольшое скругление */
 .pay-page .pay-page-card.card {
-  border-radius: 14px;
+  border-radius: 10px;
   padding: 20px 18px;
   margin-bottom: 16px;
   border: 0.5px solid rgba(197, 165, 114, 0.22);
@@ -736,7 +746,7 @@ html:not([data-theme="dark"]) .pay-page .pay-page-card.card .info-block {
   justify-content: center;
   padding: 0.75rem 1rem;
   border: 0.5px solid rgba(197, 165, 114, 0.22);
-  border-radius: 14px;
+  border-radius: 10px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 [data-theme="dark"] .pay-page .pay-page-recipient-bordered {
@@ -815,7 +825,7 @@ html:not([data-theme="dark"]) .pay-page .pay-page-card.card .info-block {
   font-size: 0.9375rem;
   font-weight: 500;
   font-family: inherit;
-  border-radius: 32px;
+  border-radius: 10px;
   border: 0.5px solid rgba(197, 165, 114, 0.22);
   background: #f2f4f8;
   color: var(--pay-page-text);
@@ -910,7 +920,7 @@ html:not([data-theme="dark"]) .pay-page .pay-page-card.card .info-block {
   min-width: 0;
   padding: 10px 12px;
   border: 0.5px solid rgba(197, 165, 114, 0.22);
-  border-radius: 32px;
+  border-radius: 10px;
   text-align: center;
   font-size: 15px;
   font-family: inherit;
@@ -967,7 +977,7 @@ html:not([data-theme="dark"]) .pay-page .pay-page-card.card .info-block {
   min-height: 72px;
   padding: 12px 14px;
   border: 0.5px solid rgba(197, 165, 114, 0.22);
-  border-radius: 12px;
+  border-radius: 10px;
   font-family: inherit;
   font-size: 13px;
   resize: vertical;
@@ -990,7 +1000,7 @@ html:not([data-theme="dark"]) .pay-page .pay-page-card.card .info-block {
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
 
-/* Кнопка оплаты — компактная пилюля, не перегруженная размером */
+/* Кнопка оплаты — прямоугольная с небольшими скруглениями */
 .pay-page .pay-button.pay-page-submit,
 .pay-page .pay-page-submit {
   margin-top: 1rem;
@@ -1002,7 +1012,7 @@ html:not([data-theme="dark"]) .pay-page .pay-page-card.card .info-block {
   font-weight: 600;
   font-family: inherit;
   letter-spacing: 0.01em;
-  border-radius: 48px;
+  border-radius: 8px;
   border: none;
   background: var(--pay-page-accent);
   color: #fff;
@@ -1056,7 +1066,7 @@ html:not([data-theme="dark"]) .pay-page .pay-page-submit:hover:not(:disabled) {
   gap: 10px;
   padding: 16px 14px;
   background: #f0f2f5;
-  border-radius: 12px;
+  border-radius: 10px;
   border: 0.5px solid rgba(197, 165, 114, 0.22);
   font-size: 13px;
   color: #4a5568;
@@ -1915,6 +1925,7 @@ button {
   padding-top: 0.5rem !important;
   padding-bottom: 0.5rem !important;
   min-height: 2.25rem;
+  border-radius: 8px !important;
 }
 
 /* ============================================

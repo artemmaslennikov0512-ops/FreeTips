@@ -223,7 +223,7 @@ export default function CabinetDashboardPage() {
                   </div>
                 ) : (
                   <div className="flex flex-col items-center text-center">
-                    <p className="mb-2 font-semibold text-white">Уважаемый клиент</p>
+                    <p className="mb-2 font-semibold text-white">Уважаемый клиент,</p>
                     <p className="mb-3 text-sm text-white/90">
                       Чтобы пользоваться услугами сервиса, вам необходимо пройти верификацию.
                     </p>
@@ -319,7 +319,7 @@ export default function CabinetDashboardPage() {
 
         <div id="quick-actions" className="cabinet-card rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden">
           <div className="border-0 px-6 py-4 text-center">
-            <h3 className="font-[family:var(--font-playfair)] text-lg font-semibold text-[var(--color-text)]">
+            <h3 className="font-[family:var(--font-playfair)] text-lg font-semibold text-[var(--color-text)] text-center">
               Быстрые действия
             </h3>
           </div>

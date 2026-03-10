@@ -63,7 +63,7 @@ export async function GET(request: NextRequest, { params }: Params) {
   }
 
   const nameFromProfile = tipLink.user.fullName?.trim() || tipLink.employee?.name?.trim() || tipLink.user.login || "";
-  const recipientName = nameFromProfile ? `Официант ${nameFromProfile}` : "Официант";
+  const recipientName = nameFromProfile ? `Официант, ${nameFromProfile}` : "Официант";
   const branding =
     tipLink.employee?.establishment
       ? {

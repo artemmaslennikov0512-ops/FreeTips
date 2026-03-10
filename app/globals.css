@@ -215,6 +215,10 @@ html:not([data-theme="dark"]) .cabinet-premium .cabinet-sidebar-avatar {
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1);
 }
 
+[data-theme="dark"] .cabinet-premium .cabinet-card input[type="file"] {
+  background-color: transparent;
+}
+
 [data-theme="dark"] .cabinet-premium .premium-card-front {
   background: #161616 !important;
   background-image: none !important;
@@ -606,11 +610,11 @@ html:not([data-theme="dark"]) .layout-login .auth-page-card a:not(.auth-btn-prim
   padding: 16px;
 }
 
-/* Внутренние карточки: очень тонкая обводка, тень для объёма */
+/* Внутренние карточки: очень тонкая обводка, тень для объёма; увеличенные отступы по вертикали */
 .pay-page .pay-page-card.card {
   border-radius: 14px;
-  padding: 14px;
-  margin-bottom: 10px;
+  padding: 20px 18px;
+  margin-bottom: 16px;
   border: 0.5px solid rgba(197, 165, 114, 0.22);
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
 }
@@ -646,7 +650,7 @@ html:not([data-theme="dark"]) .pay-page .pay-page-card.card .info-block {
   text-align: center;
   margin-top: 0;
   margin-bottom: 0;
-  padding: 0.25rem 0;
+  padding: 0.5rem 0;
   border: none;
   border-radius: 0;
 }
@@ -666,7 +670,7 @@ html:not([data-theme="dark"]) .pay-page .pay-page-card.card .info-block {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0.5rem 0.75rem;
+  padding: 0.75rem 1rem;
   border: 0.5px solid rgba(197, 165, 114, 0.22);
   border-radius: 14px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -723,13 +727,13 @@ html:not([data-theme="dark"]) .pay-page .pay-page-card.card .info-block {
   font-weight: 600;
   color: var(--pay-page-accent);
   text-align: center;
-  margin: 0 0 0.5rem;
+  margin: 0 0 0.75rem;
 }
 
 /* Блок кнопок сумм — пилюли, активная залита цветом бренда */
 .pay-page-amounts {
   margin-top: 0;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
   padding: 0;
   border-radius: 0;
   border: none;
@@ -794,7 +798,7 @@ html:not([data-theme="dark"]) .pay-page .pay-page-card.card .info-block {
   font-weight: 500;
   color: var(--pay-page-text-muted);
   text-align: center;
-  margin-top: 0.25rem;
+  margin-top: 0.5rem;
   margin-bottom: 0.375rem;
 }
 
@@ -815,6 +819,7 @@ html:not([data-theme="dark"]) .pay-page .pay-page-card.card .info-block {
   align-items: center;
   gap: 0.75rem;
   width: 100%;
+  margin-top: 0.25rem;
 }
 .pay-page-input-wrap.has-icon {
   position: relative;
@@ -891,11 +896,12 @@ html:not([data-theme="dark"]) .pay-page .pay-page-card.card .info-block {
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1), 0 0 0 2px rgba(197, 165, 114, 0.35);
 }
 
-/* Поле отзыва — многострочное, компактное */
+/* Поле отзыва — многострочное, увеличенные отступы по вертикали */
 .pay-page .review-textarea {
   width: 100%;
   max-width: none;
-  padding: 10px 12px;
+  min-height: 72px;
+  padding: 12px 14px;
   border: 0.5px solid rgba(197, 165, 114, 0.22);
   border-radius: 12px;
   font-family: inherit;
@@ -923,11 +929,11 @@ html:not([data-theme="dark"]) .pay-page .pay-page-card.card .info-block {
 /* Кнопка оплаты — компактная пилюля */
 .pay-page .pay-button.pay-page-submit,
 .pay-page .pay-page-submit {
-  margin-top: 0.75rem;
-  margin-bottom: 1rem;
+  margin-top: 1rem;
+  margin-bottom: 1.25rem;
   width: 100%;
-  padding: 14px;
-  min-height: 48px;
+  padding: 16px;
+  min-height: 52px;
   font-size: 16px;
   font-weight: 600;
   font-family: inherit;
@@ -982,8 +988,8 @@ html:not([data-theme="dark"]) .pay-page .pay-page-submit:hover:not(:disabled) {
 .pay-page .info-block {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  padding: 12px;
+  gap: 10px;
+  padding: 16px 14px;
   background: #f0f2f5;
   border-radius: 12px;
   border: 0.5px solid rgba(197, 165, 114, 0.22);
@@ -994,7 +1000,7 @@ html:not([data-theme="dark"]) .pay-page .pay-page-submit:hover:not(:disabled) {
 .pay-page .info-row {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
 .pay-page .info-block-icon {
   color: var(--pay-page-accent);

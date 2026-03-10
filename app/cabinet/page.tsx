@@ -189,8 +189,13 @@ export default function CabinetDashboardPage() {
         <div className="cabinet-card rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden">
           <div className="p-6">
             <div className="flex flex-col items-center">
-              <div className="w-full max-w-[320px] overflow-hidden rounded-2xl">
-                <PremiumCard fullName={fullName} uniqueId={uniqueId} balanceKop={stats?.balanceKop ?? undefined} compact />
+              <div className="w-full max-w-[320px] flex flex-col items-center">
+                <p className="w-full text-center text-lg font-semibold text-[var(--color-text)] mb-3">
+                  {fullName?.trim() || "Официант"}
+                </p>
+                <div className="w-full overflow-hidden">
+                  <PremiumCard fullName={fullName} uniqueId={uniqueId} balanceKop={stats?.balanceKop ?? undefined} compact />
+                </div>
               </div>
             </div>
 
@@ -217,9 +222,9 @@ export default function CabinetDashboardPage() {
                     </div>
                   </div>
                 ) : (
-                  <div>
-                    <p className="mb-2 font-semibold text-[var(--color-text)]">Уважаемый клиент</p>
-                    <p className="mb-3 text-sm text-[var(--color-text)]/90">
+                  <div className="flex flex-col items-center text-center">
+                    <p className="mb-2 font-semibold text-white">Уважаемый клиент</p>
+                    <p className="mb-3 text-sm text-white/90">
                       Чтобы пользоваться услугами сервиса, вам необходимо пройти верификацию.
                     </p>
                     <Link

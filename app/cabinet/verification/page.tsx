@@ -49,6 +49,7 @@ export default function CabinetVerificationPage() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState<Record<string, boolean>>({});
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const [submitOk, setSubmitOk] = useState(false);
 
   const fetchVerification = useCallback(async () => {
@@ -130,6 +131,7 @@ export default function CabinetVerificationPage() {
 
   const handleUpload = async (type: string, file: File) => {
     if (!requestId || !file) return;
+    setUploadError(null);
     setUploading((prev) => ({ ...prev, [type]: true }));
     try {
       const token = localStorage.getItem("accessToken");
@@ -144,7 +146,12 @@ export default function CabinetVerificationPage() {
       });
       if (res.ok) {
         await fetchVerification();
+      } else {
+        const body = await res.json().catch(() => ({})) as { error?: string };
+        setUploadError(body.error ?? `Ошибка загрузки (${res.status})`);
       }
+    } catch {
+      setUploadError("Ошибка соединения");
     } finally {
       setUploading((prev) => ({ ...prev, [type]: false }));
     }
@@ -253,7 +260,7 @@ export default function CabinetVerificationPage() {
 
   return (
     <div className="space-y-8">
-      <h1 className="font-[family:var(--font-playfair)] text-xl font-semibold text-[var(--color-text)]">
+      <h1 className="font-[family:var(--font-playfair)] text-xl font-semibold text-[var(--color-text)] text-center">
         Верификация
       </h1>
 
@@ -268,9 +275,9 @@ export default function CabinetVerificationPage() {
         </div>
       )}
 
-      <div className="cabinet-card rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden">
+      <div className="cabinet-card mx-auto max-w-xl rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden">
         <div className="border-0 px-6 py-4">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center justify-center gap-2">
             <span className="rounded-full bg-[var(--color-brand-gold)]/20 px-2.5 py-0.5 text-sm font-medium text-[var(--color-brand-gold)]">
               Этап {step} из 2
             </span>
@@ -280,7 +287,7 @@ export default function CabinetVerificationPage() {
           {step === 1 && (
             <div className="space-y-4">
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-[var(--color-text)]">ФИО</label>
+                <label className="mb-1.5 block text-sm font-medium text-white">ФИО</label>
                 <input
                   type="text"
                   value={fullName}
@@ -291,7 +298,7 @@ export default function CabinetVerificationPage() {
                 {fieldErrors.fullName && <p className="mt-1 text-sm text-red-500">{fieldErrors.fullName}</p>}
               </div>
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-[var(--color-text)]">Дата рождения</label>
+                <label className="mb-1.5 block text-sm font-medium text-white">Дата рождения</label>
                 <input
                   type="date"
                   value={birthDate}
@@ -302,7 +309,7 @@ export default function CabinetVerificationPage() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="mb-1.5 block text-sm font-medium text-[var(--color-text)]">Серия паспорта</label>
+                  <label className="mb-1.5 block text-sm font-medium text-white">Серия паспорта</label>
                   <input
                     type="text"
                     inputMode="numeric"
@@ -315,7 +322,7 @@ export default function CabinetVerificationPage() {
                   {fieldErrors.passportSeries && <p className="mt-1 text-sm text-red-500">{fieldErrors.passportSeries}</p>}
                 </div>
                 <div>
-                  <label className="mb-1.5 block text-sm font-medium text-[var(--color-text)]">Номер паспорта</label>
+                  <label className="mb-1.5 block text-sm font-medium text-white">Номер паспорта</label>
                   <input
                     type="text"
                     inputMode="numeric"
@@ -329,7 +336,7 @@ export default function CabinetVerificationPage() {
                 </div>
               </div>
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-[var(--color-text)]">ИНН</label>
+                <label className="mb-1.5 block text-sm font-medium text-white">ИНН</label>
                 <input
                   type="text"
                   inputMode="numeric"
@@ -355,14 +362,19 @@ export default function CabinetVerificationPage() {
 
           {step === 2 && (
             <div className="space-y-6">
-              <p className="text-sm text-[var(--color-text)]/80">
+              <p className="text-sm text-white/90">
                 Загрузите фото документов (JPEG, PNG или WebP, до 10 МБ каждое).
               </p>
+              {uploadError && (
+                <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+                  {uploadError}
+                </div>
+              )}
               {(["passport_main", "passport_spread", "selfie"] as const).map((type) => (
                 <div key={type} className="rounded-xl border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/5 p-4">
                   <div className="mb-2 flex items-center gap-2">
                     <FileImage className="h-5 w-5 text-[var(--color-brand-gold)]" />
-                    <span className="font-medium text-[var(--color-text)]">{DOC_LABELS[type]}</span>
+                    <span className="font-medium text-white">{DOC_LABELS[type]}</span>
                     {data?.currentRequest &&
                       (type === "passport_main"
                         ? data.currentRequest.hasPassportMain
@@ -375,7 +387,7 @@ export default function CabinetVerificationPage() {
                   <input
                     type="file"
                     accept="image/jpeg,image/png,image/webp"
-                    className="block w-full text-sm text-[var(--color-text)]/80 file:mr-3 file:rounded-lg file:border-0 file:bg-[var(--color-brand-gold)] file:px-4 file:py-2 file:text-[#0a192f] file:font-semibold"
+                    className="block w-full text-sm text-white file:mr-3 file:rounded-lg file:border-0 file:bg-[var(--color-brand-gold)] file:px-4 file:py-2 file:text-[#0a192f] file:font-semibold"
                     onChange={(e) => {
                       const f = e.target.files?.[0];
                       if (f) handleUpload(type, f);
@@ -383,7 +395,7 @@ export default function CabinetVerificationPage() {
                     }}
                     disabled={uploading[type]}
                   />
-                  {uploading[type] && <p className="mt-1 text-xs text-[var(--color-text)]/60">Загрузка…</p>}
+                  {uploading[type] && <p className="mt-1 text-xs text-white/80">Загрузка…</p>}
                 </div>
               ))}
 
@@ -395,7 +407,7 @@ export default function CabinetVerificationPage() {
                     onChange={(e) => setConsent(e.target.checked)}
                     className="mt-1 h-4 w-4 rounded border-[var(--color-dark-gray)]/40 text-[var(--color-brand-gold)] focus:ring-[var(--color-brand-gold)]"
                   />
-                  <span className="text-sm text-[var(--color-text)]/90">
+                  <span className="text-sm text-white">
                     Я соглашаюсь на сбор и обработку персональных данных в соответствии с{" "}
                     <Link href="/politika" className="text-[var(--color-brand-gold)] hover:underline">
                       Политикой обработки персональных данных
@@ -420,7 +432,7 @@ export default function CabinetVerificationPage() {
                 <button
                   type="button"
                   onClick={() => setStep(1)}
-                  className="rounded-[10px] border border-[var(--color-brand-gold)]/40 px-5 py-2.5 text-[14px] font-semibold text-[var(--color-text)] hover:bg-[var(--color-dark-gray)]/10"
+                  className="rounded-[10px] border border-[var(--color-brand-gold)]/40 px-5 py-2.5 text-[14px] font-semibold text-white hover:bg-[var(--color-dark-gray)]/10"
                 >
                   Назад
                 </button>

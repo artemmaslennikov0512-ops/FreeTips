@@ -47,7 +47,8 @@ COPY --from=builder /app/scripts ./scripts
 COPY --from=builder /app/package.json /app/package-lock.json ./
 USER root
 RUN npm config set fetch-retries 5 && npm config set fetch-retry-mintimeout 20000 && npm config set fetch-timeout 120000 \
-    && npm install tsx bcryptjs --omit=dev --ignore-scripts && chown -R nextjs:nodejs /app/node_modules
+    && npm install tsx bcryptjs --omit=dev --ignore-scripts && chown -R nextjs:nodejs /app/node_modules \
+    && mkdir -p /app/storage && chown -R nextjs:nodejs /app/storage
 USER nextjs
 
 EXPOSE 3000

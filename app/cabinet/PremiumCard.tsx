@@ -20,14 +20,14 @@ const CARD_STYLES = `
   aspect-ratio: 320 / 192;
   max-height: 192px;
   position: relative;
-  border-radius: 12px;
+  border-radius: 0;
   overflow: hidden;
   box-shadow: 0 8px 24px color-mix(in srgb, var(--color-navy) 25%, transparent);
 }
 .premium-card-face {
   position: absolute;
   inset: 0;
-  border-radius: 12px;
+  border-radius: 0;
   overflow: hidden;
 }
 .premium-card-front {
@@ -37,7 +37,7 @@ const CARD_STYLES = `
 .premium-card-shine {
   position: absolute;
   inset: 0;
-  border-radius: 12px;
+  border-radius: 0;
   background: linear-gradient(135deg, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0.08) 40%, transparent 60%);
   pointer-events: none;
   z-index: 1;
@@ -53,14 +53,14 @@ const CARD_STYLES = `
   position: absolute;
   inset: 0;
   background: linear-gradient(180deg, rgba(255,255,255,0.12) 0%, transparent 50%, rgba(0,0,0,0.05) 100%);
-  border-radius: 12px;
+  border-radius: 0;
   z-index: 1;
 }
 .premium-logo-icon {
   width: 24px;
   height: 24px;
   background: linear-gradient(135deg, #fff, #ccc);
-  border-radius: 6px;
+  border-radius: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -75,7 +75,7 @@ const CARD_STYLES = `
   background: linear-gradient(90deg, #fff, #ccc);
   color: #000;
   padding: 2px 6px;
-  border-radius: 10px;
+  border-radius: 0;
   font-size: 0.5rem;
   font-weight: bold;
 }

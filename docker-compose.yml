@@ -3,6 +3,10 @@ services:
     build: .
     ports:
       - "3000:3000"
+    volumes:
+      # Файлы верификации и др. — сохраняются при перезапуске контейнера.
+      # Один раз на хосте: mkdir -p storage && chown 1001:1001 storage
+      - ./storage:/app/storage
     environment:
       - NODE_ENV=production
       # В контейнере хост БД — «db». Не подставлять DATABASE_URL из .env с localhost.

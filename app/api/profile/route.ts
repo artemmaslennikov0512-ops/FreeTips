@@ -57,6 +57,8 @@ export async function GET(request: NextRequest) {
             apiKeyHash: true,
             paygineSdRef: true,
             autoConfirmPayoutThresholdKop: true,
+            verificationStatus: true,
+            verificationRejectionReason: true,
           },
         }),
         db.transaction.aggregate({
@@ -186,6 +188,8 @@ export async function GET(request: NextRequest) {
         profile.autoConfirmPayoutThresholdKop != null
           ? Number(profile.autoConfirmPayoutThresholdKop)
           : 10_000_000, // 100 000 ₽ по умолчанию
+      verificationStatus: String(profile.verificationStatus),
+      verificationRejectionReason: profile.verificationRejectionReason != null ? String(profile.verificationRejectionReason) : null,
     };
     return NextResponse.json(body);
   } catch (err) {

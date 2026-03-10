@@ -39,10 +39,12 @@ export default async function PayResultPage({
             <div className="pay-result-icon pay-result-icon-error mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[var(--color-accent-red)]/15">
               <XCircle className="h-9 w-9 text-[var(--color-accent-red)]" />
             </div>
-            <h1 className="mt-5 text-xl font-semibold text-[var(--color-text)]">Оплата не прошла</h1>
-            <p className="mt-3 text-sm text-[var(--color-text-secondary)]">
-              Платёж был отклонён или отменён. Вы можете попробовать снова на странице получателя.
-            </p>
+            <div className="mt-8 flex flex-col items-center text-center">
+              <h1 className="text-xl font-semibold text-[var(--color-text)]">Оплата не прошла</h1>
+              <p className="mt-3 text-sm text-[var(--color-text-secondary)]">
+                Платёж был отклонён или отменён. Вы можете попробовать снова на странице получателя.
+              </p>
+            </div>
           </>
         )}
         <Link

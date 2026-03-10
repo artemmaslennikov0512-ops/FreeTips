@@ -13,4 +13,4 @@ export const AUTH_INPUT_CLASS_NO_ICON =
 export const AUTH_ERROR_BORDER = "border-2 border-[var(--color-accent-red)] focus:ring-[var(--color-accent-red)]/30";
 
 export const AUTH_BTN_PRIMARY =
-  "auth-btn-primary w-full rounded-xl bg-[var(--color-brand-gold)] px-4 py-3 text-[14px] font-semibold text-[#0a192f] shadow-[var(--shadow-card)] hover:opacity-90 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200";
+  "auth-btn-primary w-full rounded-xl bg-[var(--color-brand-gold)] px-4 py-3 text-sm font-semibold text-[#0a192f] shadow-[var(--shadow-card)] hover:opacity-90 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200";

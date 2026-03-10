@@ -12,6 +12,7 @@ import {
   ShieldCheck,
   MessageCircle,
   Building2,
+  FileCheck,
 } from "lucide-react";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
@@ -29,6 +30,7 @@ const NAV = [
   { label: "Заведения", href: "/admin/establishments", icon: Building2 },
   { label: "Выводы", href: "/admin/payouts", icon: Send },
   { label: "Пользователи", href: "/admin/users", icon: Users },
+  { label: "Заявки на верификацию", href: "/admin/verification-requests", icon: FileCheck },
   { label: "Поддержка", href: "/admin/support", icon: MessageCircle },
   { label: "Антифрод", href: "/admin/antifraud", icon: ShieldCheck },
 ] as const;
@@ -43,6 +45,7 @@ function getAdminTitle(pathname: string | null): string {
   if (pathname === "/admin/support") return "Поддержка";
   if (pathname.startsWith("/admin/support/")) return "Чат с клиентом";
   if (pathname === "/admin/antifraud") return "Антифрод";
+  if (pathname === "/admin/verification-requests") return "Заявки на верификацию";
   return "Админ-панель";
 }
 

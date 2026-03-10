@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Link2, List, Key, Copy, RotateCw, Settings, ExternalLink } from "lucide-react";
+import { Link2, List, Key, Copy, RotateCw, Settings, ExternalLink, ShieldCheck, ShieldAlert } from "lucide-react";
 import { PremiumCard } from "./PremiumCard";
 import { formatMoney } from "@/lib/utils";
 import { getBaseUrl } from "@/lib/get-base-url";
@@ -38,6 +38,7 @@ export default function CabinetDashboardPage() {
   const [error, setError] = useState<string | null>(null);
   const [tipLink, setTipLink] = useState<string | null>(null);
   const [linkCopied, setLinkCopied] = useState(false);
+  const [verificationStatus, setVerificationStatus] = useState<string | null>(null);
 
   const fetchProfileAndData = useCallback(async () => {
     const token = localStorage.getItem("accessToken");
@@ -69,6 +70,7 @@ export default function CabinetDashboardPage() {
         payoutLimits?: { dailyLimitCount: number; dailyLimitKop: number; monthlyLimitCount?: number; monthlyLimitKop?: number };
         payoutUsageToday?: { count: number; sumKop: number };
         payoutUsageMonth?: { count: number; sumKop: number };
+        verificationStatus?: string;
       };
       setStats(profile.stats ?? null);
       setHasApiKey(profile.hasApiKey ?? false);
@@ -78,6 +80,7 @@ export default function CabinetDashboardPage() {
       setPayoutLimits(profile.payoutLimits ?? null);
       setPayoutUsageToday(profile.payoutUsageToday ?? null);
       setPayoutUsageMonth(profile.payoutUsageMonth ?? null);
+      setVerificationStatus(profile.verificationStatus ?? null);
       const linksRes = await fetch("/api/links", { headers: { Authorization: `Bearer ${token}` } });
       if (linksRes.ok) {
         const linksData = (await linksRes.json()) as { links: { slug: string }[] };
@@ -190,6 +193,46 @@ export default function CabinetDashboardPage() {
                 <PremiumCard fullName={fullName} uniqueId={uniqueId} balanceKop={stats?.balanceKop ?? undefined} compact />
               </div>
             </div>
+
+            {verificationStatus && (
+              <div className="cabinet-limits-block mt-6 rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 p-5">
+                {verificationStatus === "VERIFIED" ? (
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-green-600/20 text-green-500">
+                      <ShieldCheck className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-[var(--color-text)]">Аккаунт верифицирован!</p>
+                      <p className="text-sm text-[var(--color-text)]/80">Ваша личность подтверждена.</p>
+                    </div>
+                  </div>
+                ) : verificationStatus === "PENDING" ? (
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-500/20 text-amber-500">
+                      <ShieldAlert className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-[var(--color-text)]">Заявка на рассмотрении</p>
+                      <p className="text-sm text-[var(--color-text)]/80">Ожидайте результата проверки документов.</p>
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    <p className="mb-2 font-semibold text-[var(--color-text)]">Уважаемый клиент</p>
+                    <p className="mb-3 text-sm text-[var(--color-text)]/90">
+                      Чтобы пользоваться услугами сервиса, вам необходимо пройти верификацию.
+                    </p>
+                    <Link
+                      href="/cabinet/verification"
+                      className="inline-flex items-center gap-2 rounded-[10px] bg-[var(--color-brand-gold)] px-4 py-2 text-sm font-semibold text-[#0a192f] hover:opacity-90"
+                    >
+                      <ShieldCheck className="h-4 w-4" />
+                      Пройти верификацию
+                    </Link>
+                  </div>
+                )}
+              </div>
+            )}
 
             {payoutLimits && (
               <div className="cabinet-limits-block mt-6 rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 p-5">

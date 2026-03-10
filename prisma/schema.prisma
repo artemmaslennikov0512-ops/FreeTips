@@ -38,6 +38,13 @@ enum RegistrationRequestStatus {
   REJECTED  // отклонена
 }
 
+enum VerificationStatus {
+  NONE       // заявка не подавалась
+  PENDING    // заявка на рассмотрении
+  VERIFIED   // верифицирован
+  REJECTED   // отклонён (клиент видит причину, может подать заново)
+}
+
 model User {
   id                String    @id @default(cuid())
   uniqueId          Int       @unique @default(autoincrement())
@@ -61,6 +68,8 @@ model User {
   autoConfirmPayouts    Boolean @default(false) // автоподтверждение выводов
   autoConfirmPayoutThresholdKop BigInt? // порог в коп: заявки до этой суммы подтверждаются автоматически (null = любая сумма при включённом флаге)
   paygineSdRef       String?   @db.VarChar(128) // кубышка официанта (присваивается при регистрации, в Paygine создаётся при первом зачислении)
+  verificationStatus VerificationStatus @default(NONE)
+  verificationRejectionReason String?   @db.VarChar(1000) // причина отказа (видна клиенту)
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
 
@@ -78,6 +87,7 @@ model User {
   paygineCubbies            PaygineCubbie[]
   supportThread             SupportThread?
   supportMessagesAuthored   SupportMessage[] @relation("SupportMessageAuthor")
+  verificationRequests     VerificationRequest[]
 
   @@index([login])
   @@index([email])
@@ -255,6 +265,47 @@ model RegistrationRequest {
   @@index([createdAt])
   @@index([requestType])
   @@map("registration_requests")
+}
+
+// Заявка на верификацию официанта: ФИО, дата рождения, паспорт, ИНН, документы.
+model VerificationRequest {
+  id                String   @id @default(cuid())
+  userId            String
+  fullName          String   @db.VarChar(255)
+  birthDate         String   @db.VarChar(20)
+  passportSeries    String   @db.VarChar(10)
+  passportNumber   String   @db.VarChar(20)
+  inn               String   @db.VarChar(20)
+  status            RegistrationRequestStatus @default(PENDING) // PENDING | APPROVED | REJECTED
+  rejectionReason   String?  @db.VarChar(1000)
+  reviewedAt        DateTime?
+  reviewedByUserId  String?  @db.VarChar(64)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  user     User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  documents VerificationDocument[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("verification_requests")
+}
+
+// Документы верификации: фото паспорта, разворот, селфи. После выгрузки админом — удаление через 24 ч.
+model VerificationDocument {
+  id          String   @id @default(cuid())
+  requestId   String
+  type        String   @db.VarChar(20) // passport_main | passport_spread | selfie
+  filePath    String   @db.VarChar(512) // относительный путь в storage/verification
+  downloadedAt DateTime? // когда админ выгрузил; через 24 ч — автоудаление файла и записи
+  createdAt   DateTime @default(now())
+
+  request VerificationRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+
+  @@index([requestId])
+  @@index([downloadedAt])
+  @@map("verification_documents")
 }
 
 // Заведение (кафе, ресторан): управляющий, сотрудники, правила распределения чаевых.

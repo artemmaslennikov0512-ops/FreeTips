@@ -62,8 +62,8 @@ export async function GET(request: NextRequest, { params }: Params) {
     return NextResponse.json({ error: "Ссылка не найдена" }, { status: 404 });
   }
 
-  const recipientName =
-    tipLink.employee?.name ?? tipLink.user.fullName ?? tipLink.user.login;
+  const nameFromProfile = tipLink.user.fullName?.trim() || tipLink.employee?.name?.trim() || tipLink.user.login || "";
+  const recipientName = nameFromProfile ? `Официант ${nameFromProfile}` : "Официант";
   const branding =
     tipLink.employee?.establishment
       ? {

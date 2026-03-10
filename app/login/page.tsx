@@ -98,7 +98,7 @@ export default function LoginPage() {
 
   return (
     <AuthPageShell>
-      <div className="mx-auto flex min-h-[80vh] max-w-md flex-col justify-center px-4 py-16">
+      <div className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-4 py-8">
         <div className={`${AUTH_CARD_CLASS} flex flex-col items-center text-center`}>
           <div className="w-full flex flex-col items-center text-center">
             <h1 className="font-[family:var(--font-playfair)] text-2xl font-semibold text-[var(--color-text)] text-center">Вход</h1>
@@ -176,7 +176,7 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <div className="mt-3 flex w-full flex-col items-center space-y-0 text-center text-[10px] text-[var(--color-text-secondary)]">
+          <div className="mt-3 flex w-full flex-col items-center gap-0.5 text-center text-[0.6875rem] text-[var(--color-text-secondary)]">
             <p className="text-center">
               Нет аккаунта?{" "}
               <Link href="/zayavka" className="font-medium text-[var(--color-accent-gold)] hover:opacity-90 hover:underline transition-colors">
@@ -192,7 +192,7 @@ export default function LoginPage() {
 
           <Link
             href="/"
-            className="mt-0 block text-center text-[10px] text-[var(--color-muted)] hover:text-[var(--color-text)] transition-colors"
+            className="mt-1 block text-center text-sm text-[var(--color-muted)] hover:text-[var(--color-text)] transition-colors"
           >
             ← На главную
           </Link>

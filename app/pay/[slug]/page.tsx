@@ -241,7 +241,7 @@ export default function PayPage() {
 
   return (
     <div className="pay-page pay-page--cards flex min-h-screen w-full flex-col justify-center px-4 py-8" style={wrapperStyle}>
-      <div className="mx-auto w-full max-w-lg">
+      <div className="mx-auto w-full max-w-md">
         {/* Основной блок со скруглёнными краями и отступами — внутри все карточки */}
         <div
           className="pay-page-outer-block relative rounded-2xl border-0 p-4 shadow-[var(--shadow-card)]"

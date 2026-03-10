@@ -11,6 +11,8 @@ import {
   Menu,
   LogOut,
   MessageCircle,
+  ShieldCheck,
+  BadgeCheck,
 } from "lucide-react";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
@@ -19,6 +21,7 @@ const NAV = [
   { label: "Дашборд", href: "/cabinet", icon: LayoutDashboard },
   { label: "Операции", href: "/cabinet/transactions", icon: List },
   { label: "Моя ссылка", href: "/cabinet/link", icon: Link2 },
+  { label: "Верификация", href: "/cabinet/verification", icon: ShieldCheck },
   { label: "Поддержка", href: "/cabinet/support", icon: MessageCircle },
   { label: "Настройки профиля", href: "/cabinet/settings", icon: Settings },
 ] as const;
@@ -30,6 +33,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [user, setUser] = useState<{
     fullName?: string | null;
+    verificationStatus?: string;
     establishmentBrand?: {
       logoUrl: string | null;
       primaryColor: string | null;
@@ -92,7 +96,11 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
           router.replace("/change-password");
           return;
         }
-        if (data) setUser({ fullName: data.fullName, establishmentBrand: data.establishmentBrand ?? null });
+        if (data) setUser({
+          fullName: data.fullName,
+          verificationStatus: data.verificationStatus,
+          establishmentBrand: data.establishmentBrand ?? null,
+        });
       })
       .catch(() => {});
   }, [mounted, router]);
@@ -190,7 +198,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
 
       {/* Левое меню: на мобильном — выезд слева от края (как на лендинге справа), без зазора */}
       <div
-        className={`cabinet-sidebar fixed left-0 top-0 z-40 flex h-full w-[min(calc(100vw-4rem),20rem)] max-w-[20rem] flex-col overflow-hidden border-0 border-r border-white/10 py-6 shadow-2xl backdrop-blur-xl transition-[transform] duration-300 ease-out lg:static lg:left-auto lg:top-auto lg:ml-4 lg:mt-4 lg:mr-0 lg:mb-0 lg:h-auto lg:max-h-none lg:w-[260px] lg:max-w-none lg:translate-x-0 lg:rounded-2xl lg:border ${
+        className={`cabinet-sidebar fixed left-0 top-0 z-40 flex h-full w-[min(calc(100vw-4rem),20rem)] max-w-[20rem] flex-col overflow-hidden border-0 border-r border-white/10 py-6 shadow-2xl backdrop-blur-xl transition-[transform] duration-300 ease-out lg:static lg:left-auto lg:top-auto lg:ml-4 lg:mt-4 lg:mr-0 lg:mb-0 lg:h-auto lg:max-h-[calc(100vh-2rem)] lg:w-[260px] lg:max-w-none lg:translate-x-0 lg:rounded-2xl lg:border lg:self-start ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
         style={sidebarStyle}
@@ -209,7 +217,12 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
               {initials}
             </div>
             <div className="min-w-0 flex-1">
-              <div className="truncate font-semibold text-[var(--color-text)]" style={brandFont ? { color: brandFont } : undefined}>{displayName}</div>
+              <div className="flex items-center gap-1.5">
+                <span className="truncate font-semibold text-[var(--color-text)]" style={brandFont ? { color: brandFont } : undefined}>{displayName}</span>
+                {user?.verificationStatus === "VERIFIED" && (
+                  <BadgeCheck className="h-5 w-5 shrink-0 text-blue-500" aria-label="Аккаунт верифицирован" />
+                )}
+              </div>
               <div className="text-sm text-[var(--color-text)]/80" style={brandFont ? { color: brandFont } : undefined}>Официант</div>
             </div>
           </div>
@@ -251,10 +264,10 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
         </nav>
       </div>
 
-      <main className="min-h-screen min-w-0 flex-1 overflow-x-hidden pl-4 pr-4 lg:pl-0 lg:pr-0 lg:ml-0 flex flex-col">
-        {/* Основной блок — как шторка: отступы от краёв */}
+      <main className="min-h-screen min-w-0 flex-1 overflow-x-hidden pl-4 pr-4 lg:pl-0 lg:pr-0 lg:ml-0 lg:mr-0 flex flex-col">
+        {/* Основной блок — без отступа справа, прижат к правому краю */}
         <div
-          className="cabinet-main-block mt-4 mr-0 mb-4 ml-0 lg:mr-4 lg:ml-4 flex w-full max-w-full flex-col self-start rounded-2xl border border-white/10 backdrop-blur-xl"
+          className="cabinet-main-block mt-4 mr-0 mb-4 ml-0 lg:mr-0 lg:ml-4 flex w-full max-w-full flex-col self-start rounded-2xl border border-white/10 backdrop-blur-xl"
           style={mainBlockStyle}
         >
           <div className="p-6 lg:p-8" id="main-content">

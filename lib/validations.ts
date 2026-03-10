@@ -216,6 +216,20 @@ export const supportMessageSchema = z.object({
     .max(4000, "Сообщение не должно превышать 4000 символов"),
 });
 
+// Верификация: этап 1 — ФИО, дата рождения, серия/номер паспорта, ИНН
+export const verificationStep1Schema = z.object({
+  fullName: z.string().trim().min(1, "Укажите ФИО").max(255),
+  birthDate: z.string().trim().min(1, "Укажите дату рождения").max(20),
+  passportSeries: z.string().trim().min(2, "Серия паспорта: 2–4 цифры").max(4).regex(/^\d{2,4}$/, "Серия: только цифры"),
+  passportNumber: z.string().trim().min(6, "Номер паспорта: 6 цифр").max(6).regex(/^\d{6}$/, "Номер: 6 цифр"),
+  inn: z.string().trim().min(10, "ИНН: 10 или 12 цифр").max(12).regex(/^\d{10}$|^\d{12}$/, "ИНН: только цифры, 10 или 12"),
+});
+
+// Верификация: отправка заявки (согласие на обработку ПД)
+export const verificationSubmitSchema = verificationStep1Schema.extend({
+  consentPersonalData: z.literal(true, { errorMap: () => ({ message: "Необходимо согласие на обработку персональных данных" }) }),
+});
+
 // Смена пароля
 export const changePasswordSchema = z
   .object({

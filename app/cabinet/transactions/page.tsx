@@ -256,7 +256,7 @@ export default function CabinetTransactionsPage() {
         <div className="grid items-stretch gap-8 lg:grid-cols-1">
           <div id="waiter-card" className="cabinet-card rounded-xl border-0 bg-[var(--color-bg-sides)] overflow-hidden shadow-[var(--shadow-subtle)]">
             <div className="border-0 px-6 py-4 text-center">
-              <h3 className="font-[family:var(--font-playfair)] text-xl font-semibold text-[var(--color-text)]">Карта официанта</h3>
+              <h3 className="font-[family:var(--font-playfair)] text-xl font-semibold text-[var(--color-text)] text-center">Карта официанта</h3>
             </div>
             <div className="p-6">
               <div className="overflow-hidden rounded-2xl">

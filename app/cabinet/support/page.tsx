@@ -125,11 +125,11 @@ export default function CabinetSupportPage() {
 
   return (
     <div className="support-chat-header mx-auto max-w-2xl text-center">
-      <h1 className="flex items-center justify-center gap-2 text-2xl font-bold text-[var(--color-text)]">
-        <MessageCircle className="h-7 w-7 text-[var(--color-brand-gold)]" />
+      <h1 className="flex items-center justify-center gap-2 text-2xl font-bold text-[var(--color-text)] text-center">
+        <MessageCircle className="h-7 w-7 shrink-0 text-[var(--color-brand-gold)]" />
         Поддержка FreeTips
       </h1>
-      <p className="mt-2 text-sm text-[var(--color-text)]/90">
+      <p className="mt-2 text-center text-sm text-[var(--color-text)]/90">
         Задайте вопрос или опишите проблему. Ответим в рабочее время.
       </p>
 

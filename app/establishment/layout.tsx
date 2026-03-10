@@ -165,9 +165,9 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
           <button
             type="button"
             onClick={handleLogout}
-            className="mt-2 flex w-full items-center gap-3 rounded-[10px] px-4 py-3.5 font-medium text-white/80 transition-colors hover:bg-[var(--color-dark-gray)]/10 hover:text-white"
+            className="mt-2 flex w-full items-center gap-3 rounded-[10px] px-4 py-3 text-sm font-medium text-white/80 transition-colors hover:bg-[var(--color-dark-gray)]/10 hover:text-white"
           >
-            <LogOut className="h-5 w-5 shrink-0" />
+            <LogOut className="h-4 w-4 shrink-0" />
             <span>Выйти</span>
           </button>
         </nav>

@@ -190,7 +190,7 @@ export default function CabinetDashboardPage() {
           <div className="p-6">
             <div className="flex flex-col items-center">
               <div className="w-full max-w-[320px] flex flex-col items-center">
-                <p className="w-full text-center text-lg font-semibold text-[var(--color-text)] mb-3">
+                <p className="w-full text-center text-lg font-semibold text-white mb-3">
                   {fullName?.trim() || "Официант"}
                 </p>
                 <div className="w-full overflow-hidden">

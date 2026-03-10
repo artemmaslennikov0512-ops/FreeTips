@@ -148,7 +148,7 @@ export default function AdminVerificationRequestsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-4">
+      <div className="flex items-center justify-center gap-4">
         <h1 className="font-[family:var(--font-playfair)] text-xl font-semibold text-[var(--color-text)]">
           Заявки на верификацию
         </h1>
@@ -173,18 +173,18 @@ export default function AdminVerificationRequestsPage() {
           <table className="w-full min-w-[700px] text-left text-sm">
             <thead>
               <tr className="border-b border-white/10 bg-white/5">
-                <th className="px-4 py-3 font-semibold text-[var(--color-text)]">Дата</th>
-                <th className="px-4 py-3 font-semibold text-[var(--color-text)]">Пользователь</th>
-                <th className="px-4 py-3 font-semibold text-[var(--color-text)]">ФИО</th>
-                <th className="px-4 py-3 font-semibold text-[var(--color-text)]">Паспорт / ИНН</th>
-                <th className="px-4 py-3 font-semibold text-[var(--color-text)]">Документы</th>
-                <th className="px-4 py-3 font-semibold text-[var(--color-text)]">Действия</th>
+                <th className="px-4 py-3 font-semibold text-white">Дата</th>
+                <th className="px-4 py-3 font-semibold text-white">Пользователь</th>
+                <th className="px-4 py-3 font-semibold text-white">ФИО</th>
+                <th className="px-4 py-3 font-semibold text-white">Паспорт / ИНН</th>
+                <th className="px-4 py-3 font-semibold text-white">Документы</th>
+                <th className="px-4 py-3 font-semibold text-white">Действия</th>
               </tr>
             </thead>
             <tbody>
               {list.map((r) => (
                 <tr key={r.id} className="border-b border-white/5 hover:bg-white/5">
-                  <td className="px-4 py-3 text-[var(--color-text)]/80">
+                  <td className="px-4 py-3 text-white">
                     {new Date(r.createdAt).toLocaleString("ru-RU")}
                   </td>
                   <td className="px-4 py-3">
@@ -195,11 +195,11 @@ export default function AdminVerificationRequestsPage() {
                       {r.login}
                     </Link>
                     {r.email && (
-                      <div className="text-xs text-[var(--color-text)]/60">{r.email}</div>
+                      <div className="text-xs text-white/80">{r.email}</div>
                     )}
                   </td>
-                  <td className="px-4 py-3 text-[var(--color-text)]">{r.fullName}</td>
-                  <td className="px-4 py-3 text-[var(--color-text)]/90">
+                  <td className="px-4 py-3 text-white">{r.fullName}</td>
+                  <td className="px-4 py-3 text-white">
                     {r.passportSeries} {r.passportNumber}, ИНН {r.inn}
                   </td>
                   <td className="px-4 py-3">
@@ -213,7 +213,7 @@ export default function AdminVerificationRequestsPage() {
                             type="button"
                             onClick={() => has && downloadDoc(r.id, type)}
                             disabled={!has || downloading === key}
-                            className="inline-flex items-center gap-1 rounded-lg border border-white/20 bg-white/5 px-2 py-1 text-xs font-medium text-[var(--color-text)]/90 hover:bg-white/10 disabled:opacity-50"
+                            className="inline-flex items-center gap-1 rounded-lg border border-white/20 bg-white/5 px-2 py-1 text-xs font-medium text-white hover:bg-white/10 disabled:opacity-50"
                           >
                             {downloading === key ? (
                               <Loader2 className="h-3 w-3 animate-spin" />
@@ -265,7 +265,7 @@ export default function AdminVerificationRequestsPage() {
           aria-modal="true"
           aria-labelledby="reject-modal-title"
         >
-          <div className="w-full max-w-md rounded-2xl border border-white/10 bg-[var(--color-navy)] p-6 shadow-xl">
+          <div className="reject-modal-content w-full max-w-md rounded-2xl border border-white/10 bg-[var(--color-navy)] p-6 shadow-xl text-center">
             <h2 id="reject-modal-title" className="mb-4 text-lg font-semibold text-white">
               Отклонить заявку ({rejectModal.login})
             </h2>
@@ -276,11 +276,11 @@ export default function AdminVerificationRequestsPage() {
               value={rejectReason}
               onChange={(e) => setRejectReason(e.target.value)}
               placeholder="Например: Нечитаемое фото паспорта. Загрузите чёткое изображение главной страницы."
-              className="mb-4 w-full rounded-xl border border-white/20 bg-white/5 px-4 py-3 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-[var(--color-brand-gold)]"
+              className="reject-modal-textarea mb-4 w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-brand-gold)]"
               rows={4}
             />
             {rejectError && <p className="mb-2 text-sm text-red-400">{rejectError}</p>}
-            <div className="flex justify-end gap-3">
+            <div className="flex justify-center gap-3">
               <button
                 type="button"
                 onClick={() => {

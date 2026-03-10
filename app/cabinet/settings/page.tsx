@@ -227,6 +227,7 @@ export default function CabinetSettingsPage() {
           )}
         </div>
         <div className="p-6">
+        <div className="max-w-xl">
 
         {saveError && <p className="mb-4 text-sm text-[var(--color-accent-red)]" role="alert">{saveError}</p>}
         {saveOk && (
@@ -313,6 +314,7 @@ export default function CabinetSettingsPage() {
           Сохранить
         </button>
         </div>
+        </div>
       </div>
 
       <div id="settings-password" className="cabinet-card rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden">
@@ -320,6 +322,7 @@ export default function CabinetSettingsPage() {
           <h2 className="font-[family:var(--font-playfair)] text-lg font-semibold text-[var(--color-text)]">Сменить пароль</h2>
         </div>
         <div className="p-6">
+        <div className="max-w-xl">
 
         {pwError && <p className="mb-4 text-sm text-[var(--color-accent-red)]" role="alert">{pwError}</p>}
         {pwOk && (
@@ -329,7 +332,7 @@ export default function CabinetSettingsPage() {
           </div>
         )}
 
-        <div className="grid gap-4 sm:max-w-md">
+        <div className="grid gap-4">
           <div>
             <label htmlFor="settings-pwCurrent" className="mb-1 block text-sm font-medium text-[var(--color-text)]">Текущий пароль</label>
             <input
@@ -377,6 +380,7 @@ export default function CabinetSettingsPage() {
           {pwSaving && <Loader2 className="h-4 w-4 animate-spin" />}
           Сменить пароль
         </button>
+        </div>
         </div>
       </div>
     </div>

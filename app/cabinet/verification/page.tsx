@@ -265,12 +265,12 @@ export default function CabinetVerificationPage() {
       </h1>
 
       {data?.verificationStatus === "REJECTED" && data.verificationRejectionReason && (
-        <div className="cabinet-block-inner flex items-start gap-4 rounded-xl border border-red-500/30 bg-red-500/10 p-4">
-          <AlertCircle className="h-6 w-6 shrink-0 text-red-500" />
-          <div>
+        <div className="cabinet-block-inner flex items-start gap-4 rounded-xl border border-red-500/30 bg-red-500/10 p-4 min-h-0 w-full">
+          <AlertCircle className="h-6 w-6 shrink-0 text-red-500 mt-0.5" />
+          <div className="min-w-0 flex-1 space-y-1">
             <p className="font-semibold text-[var(--color-text)]">Заявка отклонена</p>
-            <p className="text-sm text-[var(--color-text)]/90">{data.verificationRejectionReason}</p>
-            <p className="mt-2 text-sm text-[var(--color-text)]/70">Вы можете подать заявку повторно, заполнив форму ниже.</p>
+            <p className="text-sm text-[var(--color-text)]/90 break-words whitespace-pre-wrap">{data.verificationRejectionReason}</p>
+            <p className="pt-1 text-sm text-[var(--color-text)]/70">Вы можете подать заявку повторно, заполнив форму ниже.</p>
           </div>
         </div>
       )}
@@ -286,30 +286,33 @@ export default function CabinetVerificationPage() {
         <div className="p-6">
           {step === 1 && (
             <div className="space-y-4">
+              <p className="text-xs text-white/70">Все поля обязательны для заполнения.</p>
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-white">ФИО</label>
+                <label className="mb-1.5 block text-sm font-medium text-white">ФИО <span className="text-red-400">*</span></label>
                 <input
                   type="text"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   className={cabinetInputClassName(!!fieldErrors.fullName)}
                   placeholder="Иванов Иван Иванович"
+                  required
                 />
                 {fieldErrors.fullName && <p className="mt-1 text-sm text-red-500">{fieldErrors.fullName}</p>}
               </div>
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-white">Дата рождения</label>
+                <label className="mb-1.5 block text-sm font-medium text-white">Дата рождения <span className="text-red-400">*</span></label>
                 <input
                   type="date"
                   value={birthDate}
                   onChange={(e) => setBirthDate(e.target.value)}
                   className={cabinetInputClassName(!!fieldErrors.birthDate)}
+                  required
                 />
                 {fieldErrors.birthDate && <p className="mt-1 text-sm text-red-500">{fieldErrors.birthDate}</p>}
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="mb-1.5 block text-sm font-medium text-white">Серия паспорта</label>
+                  <label className="mb-1.5 block text-sm font-medium text-white">Серия паспорта <span className="text-red-400">*</span></label>
                   <input
                     type="text"
                     inputMode="numeric"
@@ -318,11 +321,12 @@ export default function CabinetVerificationPage() {
                     onChange={(e) => setPassportSeries(e.target.value.replace(/\D/g, ""))}
                     className={cabinetInputClassName(!!fieldErrors.passportSeries)}
                     placeholder="1234"
+                    required
                   />
                   {fieldErrors.passportSeries && <p className="mt-1 text-sm text-red-500">{fieldErrors.passportSeries}</p>}
                 </div>
                 <div>
-                  <label className="mb-1.5 block text-sm font-medium text-white">Номер паспорта</label>
+                  <label className="mb-1.5 block text-sm font-medium text-white">Номер паспорта <span className="text-red-400">*</span></label>
                   <input
                     type="text"
                     inputMode="numeric"
@@ -331,12 +335,13 @@ export default function CabinetVerificationPage() {
                     onChange={(e) => setPassportNumber(e.target.value.replace(/\D/g, ""))}
                     className={cabinetInputClassName(!!fieldErrors.passportNumber)}
                     placeholder="567890"
+                    required
                   />
                   {fieldErrors.passportNumber && <p className="mt-1 text-sm text-red-500">{fieldErrors.passportNumber}</p>}
                 </div>
               </div>
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-white">ИНН</label>
+                <label className="mb-1.5 block text-sm font-medium text-white">ИНН <span className="text-red-400">*</span></label>
                 <input
                   type="text"
                   inputMode="numeric"
@@ -345,6 +350,7 @@ export default function CabinetVerificationPage() {
                   onChange={(e) => setInn(e.target.value.replace(/\D/g, ""))}
                   className={cabinetInputClassName(!!fieldErrors.inn)}
                   placeholder="10 или 12 цифр"
+                  required
                 />
                 {fieldErrors.inn && <p className="mt-1 text-sm text-red-500">{fieldErrors.inn}</p>}
               </div>
@@ -408,7 +414,7 @@ export default function CabinetVerificationPage() {
                     className="mt-1 h-4 w-4 rounded border-[var(--color-dark-gray)]/40 text-[var(--color-brand-gold)] focus:ring-[var(--color-brand-gold)]"
                   />
                   <span className="text-sm text-white">
-                    Я соглашаюсь на сбор и обработку персональных данных в соответствии с{" "}
+                    <span className="text-red-400">*</span> Я соглашаюсь на сбор и обработку персональных данных в соответствии с{" "}
                     <Link href="/politika" className="text-[var(--color-brand-gold)] hover:underline">
                       Политикой обработки персональных данных
                     </Link>{" "}
@@ -428,6 +434,9 @@ export default function CabinetVerificationPage() {
               {submitOk && (
                 <p className="text-sm font-medium text-green-600">Заявка отправлена на рассмотрение.</p>
               )}
+              <p className="text-xs text-white/70">
+                Для отправки заявки необходимо загрузить все три документа и принять соглашение выше.
+              </p>
               <div className="flex gap-3">
                 <button
                   type="button"
@@ -439,7 +448,13 @@ export default function CabinetVerificationPage() {
                 <button
                   type="button"
                   onClick={handleSubmit}
-                  disabled={saving || !data?.currentRequest?.hasPassportMain || !data?.currentRequest?.hasPassportSpread || !data?.currentRequest?.hasSelfie}
+                  disabled={
+                    saving ||
+                    !consent ||
+                    !data?.currentRequest?.hasPassportMain ||
+                    !data?.currentRequest?.hasPassportSpread ||
+                    !data?.currentRequest?.hasSelfie
+                  }
                   className="rounded-[10px] bg-[var(--color-brand-gold)] px-5 py-2.5 text-[14px] font-semibold text-[#0a192f] hover:opacity-90 disabled:opacity-50"
                 >
                   {saving ? "Отправка…" : "Отправить заявку"}

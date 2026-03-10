@@ -127,8 +127,8 @@ export function Header() {
       <header className="site-header site-header-landing sticky top-0 z-30 mt-4 w-full max-w-none rounded-none bg-transparent">
         <div className="mx-auto flex h-16 w-full items-center justify-between gap-2 px-4 sm:px-6 lg:px-8">
           <Link href="/" className="flex shrink-0 items-center gap-2 rounded-lg border-0 px-1.5 py-1.5 hover:bg-[var(--color-light-gray)] transition-all sm:gap-2.5 sm:px-2 sm:py-2" aria-label="На главную">
-            <span className="site-header-logo-icon flex h-8 w-8 items-center justify-center rounded-md bg-[var(--color-brand-gold)] text-sm sm:h-9 sm:w-9 lg:h-10 lg:w-10 lg:text-base logo-ft-abbr text-[#0a192f]"><span>F</span><span>T</span></span>
-            <span className="site-header-logo-text font-[family:var(--font-playfair)] text-base font-bold sm:text-lg lg:text-xl text-[var(--color-navy)]"><span className="site-header-logo-free">Free</span><span className="text-[var(--color-brand-gold)]">Tips</span></span>
+            <span className="site-header-logo-icon flex h-7 w-7 items-center justify-center rounded-md bg-[var(--color-brand-gold)] text-xs sm:h-8 sm:w-8 lg:h-9 lg:w-9 lg:text-sm logo-ft-abbr text-[#0a192f]"><span>F</span><span>T</span></span>
+            <span className="site-header-logo-text font-[family:var(--font-playfair)] text-sm font-bold sm:text-base lg:text-lg text-[var(--color-navy)]"><span className="site-header-logo-free">Free</span><span className="text-[var(--color-brand-gold)]">Tips</span></span>
           </Link>
           <nav className="hidden lg:flex shrink-0 items-center justify-center gap-1.5 xl:gap-2 2xl:gap-3" aria-label="Навигация">
             <Link href="/#features" className="whitespace-nowrap rounded-xl border-0 bg-[var(--color-white)]/95 backdrop-blur-sm shadow-[var(--shadow-subtle)] px-2.5 py-2 font-medium text-[14px] text-[var(--color-navy)] transition-all hover:shadow-[var(--shadow-soft)] hover:-translate-y-0.5 xl:px-3 xl:py-2.5 2xl:px-4">Преимущества</Link>
@@ -228,8 +228,8 @@ export function Header() {
           className="flex items-center gap-2"
           aria-label="На главную"
         >
-          <span className="site-header-logo-icon flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--color-brand-gold)] text-base logo-ft-abbr text-[#0a192f]"><span>F</span><span>T</span></span>
-          <span className="site-header-logo-text font-[family:var(--font-playfair)] text-xl font-bold text-[var(--color-navy)]"><span className="site-header-logo-free">Free</span><span className="text-[var(--color-brand-gold)]">Tips</span></span>
+          <span className="site-header-logo-icon flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--color-brand-gold)] text-sm logo-ft-abbr text-[#0a192f]"><span>F</span><span>T</span></span>
+          <span className="site-header-logo-text font-[family:var(--font-playfair)] text-lg font-bold text-[var(--color-navy)]"><span className="site-header-logo-free">Free</span><span className="text-[var(--color-brand-gold)]">Tips</span></span>
         </Link>
 
         <div className="hidden md:flex items-center gap-3">

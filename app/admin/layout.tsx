@@ -187,7 +187,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         }`}
       >
         <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
-          <div className="cabinet-sidebar-profile cabinet-block-inner mx-4 mb-4 rounded-xl border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-4 py-3">
+          <div className="cabinet-sidebar-profile cabinet-block-inner mx-4 mb-4 rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-4 py-3">
             <div className="flex items-center gap-3">
               <div className="cabinet-sidebar-avatar flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--color-brand-gold)] font-semibold text-[#0a192f] text-sm">
                 {(user.login || "A").charAt(0).toUpperCase()}
@@ -217,9 +217,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <button
               type="button"
               onClick={handleLogout}
-              className="mb-1 mt-4 flex w-full items-center gap-3 rounded-[10px] border border-transparent px-4 py-3.5 font-medium text-[var(--color-text)]/80 transition-colors hover:bg-[var(--color-dark-gray)]/10 hover:text-[var(--color-text)]"
+              className="mb-1 mt-4 flex w-full items-center gap-3 rounded-[10px] border border-transparent px-4 py-3 text-sm font-medium text-[var(--color-text)]/80 transition-colors hover:bg-[var(--color-dark-gray)]/10 hover:text-[var(--color-text)]"
             >
-              <LogOut className="h-5 w-5 shrink-0" />
+              <LogOut className="h-4 w-4 shrink-0" />
               <span>Выйти</span>
             </button>
           </nav>

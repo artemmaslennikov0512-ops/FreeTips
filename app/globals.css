@@ -91,11 +91,11 @@
   --section-dark-heading: #171717;
 }
 
-/* Светлая тема: основной фон ЛК и админки — тёмно-синий */
+/* Светлая тема: основной фон страницы ЛК и админки — светло-серый */
 html:not([data-theme="dark"]) body.cabinet-page,
 html:not([data-theme="dark"]) body.admin-page,
 html:not([data-theme="dark"]) .cabinet-premium {
-  background: #1a2337;
+  background: #e5e7eb;
 }
 
 /* Светлая тема: сайдбар — тёмно-синее стекло, светлый текст */
@@ -109,6 +109,11 @@ html:not([data-theme="dark"]) .cabinet-premium .cabinet-sidebar:not(.admin-sideb
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-sidebar:not(.admin-sidebar) a,
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-sidebar:not(.admin-sidebar) button {
   color: inherit;
+}
+
+/* Блок профиля в сайдбаре: тоньше обводка, как у карточек в блоке */
+.cabinet-premium .cabinet-sidebar-profile {
+  border-width: 0.5px;
 }
 
 /* Светлая тема: блок пользователя в сайдбаре — как «Быстрые действия», белый текст */
@@ -155,15 +160,19 @@ html:not([data-theme="dark"]) .admin-panel .admin-sidebar .cabinet-nav-active {
 /* Фон блока пользователя в сайдбаре админки — как в карточках (полупрозрачный, светлая обводка) */
 html:not([data-theme="dark"]) .admin-panel .admin-sidebar .cabinet-sidebar-profile {
   background: rgba(255, 255, 255, 0.15) !important;
-  border: 1px solid rgba(197, 165, 114, 0.5) !important;
+  border-width: 0.5px !important;
+  border-style: solid !important;
+  border-color: rgba(197, 165, 114, 0.5) !important;
   color: #fff !important;
 }
 
-/* Светлая тема: блок профиля в сайдбаре — белый фон, обводка как у активного подсвечивающего блока; аватар — золотой фон, тёмные инициалы */
+/* Светлая тема: блок профиля в сайдбаре — белый фон, обводка тоньше; аватар — золотой фон, тёмные инициалы */
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-sidebar-profile {
   background: #ffffff !important;
-  border: 1px solid rgba(197, 165, 114, 0.55) !important;
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.15);
+  border-width: 0.5px !important;
+  border-style: solid !important;
+  border-color: rgba(197, 165, 114, 0.55) !important;
+  box-shadow: 0 0 0 0.5px rgba(255, 255, 255, 0.15);
 }
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-sidebar-avatar {
   background: var(--color-brand-gold) !important;
@@ -205,6 +214,7 @@ html:not([data-theme="dark"]) .cabinet-premium .cabinet-sidebar-avatar {
 }
 [data-theme="dark"] .cabinet-premium .cabinet-sidebar .cabinet-sidebar-profile {
   background: rgba(0, 0, 0, 0.25) !important;
+  border-width: 0.5px !important;
   border-color: rgba(255, 255, 255, 0.15) !important;
   color: #fafafa !important;
 }
@@ -219,16 +229,43 @@ html:not([data-theme="dark"]) .cabinet-premium .cabinet-sidebar-avatar {
   background-color: transparent;
 }
 
-[data-theme="dark"] .cabinet-premium .premium-card-front {
-  background: #161616 !important;
+/* Светлая тема: карта баланса — белая, скругление, тень «парения» */
+html:not([data-theme="dark"]) .cabinet-premium .premium-card-front {
+  background: #ffffff !important;
   background-image: none !important;
-  border: 1px solid rgba(192, 192, 192, 0.4);
-  box-shadow: 0 0 0 1px rgba(192, 192, 192, 0.08);
+  border-radius: 10px !important;
+  box-shadow: inset 0 0 0 1px rgba(10, 25, 47, 0.08) !important;
+}
+html:not([data-theme="dark"]) .cabinet-premium .premium-card-inner {
+  border-radius: 10px !important;
+  box-shadow: 0 25px 50px -12px rgba(10, 25, 47, 0.18), 0 12px 24px -8px rgba(10, 25, 47, 0.1) !important;
+}
+html:not([data-theme="dark"]) .cabinet-premium .premium-card-brand {
+  color: #374151 !important;
+  text-shadow: none !important;
+}
+html:not([data-theme="dark"]) .cabinet-premium .premium-card-face.premium-card-front p {
+  color: #0a192f !important;
+}
+html:not([data-theme="dark"]) .cabinet-premium .premium-card-shine {
+  opacity: 0.15;
+}
+html:not([data-theme="dark"]) .cabinet-premium .premium-glass {
+  background: linear-gradient(180deg, rgba(10, 25, 47, 0.02) 0%, transparent 50%);
+}
+
+/* Тёмная тема: карта баланса — золотистый градиент, скругление, тень «парения» */
+[data-theme="dark"] .cabinet-premium .premium-card-front {
+  background: radial-gradient(ellipse 120% 120% at 50% 50%, #d4b896 0%, var(--color-brand-gold) 40%, #b8985c 100%) !important;
+  background-image: radial-gradient(ellipse 120% 120% at 50% 50%, #d4b896 0%, var(--color-brand-gold) 40%, #b8985c 100%) !important;
+  border: none !important;
+  border-radius: 10px !important;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.25), inset -20px -20px 40px rgba(0,0,0,0.08) !important;
 }
 
 [data-theme="dark"] .cabinet-premium .premium-card-brand {
-  color: #fff !important;
-  text-shadow: none !important;
+  color: #4a4a4a !important;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.4) !important;
 }
 
 [data-theme="dark"] .cabinet-premium .premium-animated-pattern,
@@ -237,11 +274,12 @@ html:not([data-theme="dark"]) .cabinet-premium .cabinet-sidebar-avatar {
 }
 
 [data-theme="dark"] .cabinet-premium .premium-glass {
-  background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, transparent 50%);
+  background: linear-gradient(180deg, rgba(255,255,255,0.12) 0%, transparent 50%, rgba(0,0,0,0.05) 100%) !important;
 }
 
 [data-theme="dark"] .cabinet-premium .premium-card-inner {
-  box-shadow: none;
+  border-radius: 10px !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4), 0 12px 24px -8px rgba(0, 0, 0, 0.25) !important;
 }
 
 [data-theme="dark"] .cabinet-premium .cabinet-overlay {
@@ -375,6 +413,21 @@ html:not([data-theme="dark"]) .admin-panel .admin-users-token-btn {
 }
 html:not([data-theme="dark"]) .admin-panel .admin-users-token-btn:hover:not(:disabled) {
   background: rgba(255, 255, 255, 0.35) !important;
+}
+
+/* Модалка «Отклонить заявку»: в светлой теме текст ввода всегда белый, чтобы набираемый текст был виден */
+html:not([data-theme="dark"]) .reject-modal-content .reject-modal-textarea,
+.reject-modal-content .reject-modal-textarea {
+  color: #fff !important;
+}
+.reject-modal-content .reject-modal-textarea::placeholder {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+/* Тёмная тема: модалка «Отклонить заявку» — тёмный фон блока (в тёмной теме --color-navy светлый) */
+[data-theme="dark"] .reject-modal-content {
+  background: #0a192f !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
 }
 
 /* Светлая тема: блок «Оставить чаевые» (/pay) — тот же стиль */
@@ -1220,11 +1273,20 @@ html:not([data-theme="dark"]) .cabinet-premium #operations-history.cabinet-card 
   color: rgba(255, 255, 255, 0.6) !important;
 }
 
-/* Чат поддержки: заголовок, описание и кнопка «Обновить» — белый текст */
+/* Чат поддержки: заголовок и описание по центру, белый текст */
+.cabinet-premium .support-chat-header {
+  text-align: center;
+}
 .cabinet-premium .support-chat-header h1,
 .cabinet-premium .support-chat-header p,
 .cabinet-premium .support-chat-header button {
   color: #fff !important;
+}
+.cabinet-premium .support-chat-header h1 {
+  justify-content: center;
+}
+.cabinet-premium .support-chat-header p {
+  text-align: center;
 }
 .cabinet-premium .support-chat-header button:disabled {
   color: rgba(255, 255, 255, 0.5) !important;

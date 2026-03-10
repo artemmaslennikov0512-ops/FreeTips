@@ -257,10 +257,10 @@ export default function PayPage() {
             {branding?.logoUrl ? (
               <img src={branding.logoUrl} alt="" className="h-10 w-auto max-w-[120px] object-contain" />
             ) : (
-              <span className="pay-page-logo-ft logo-ft-abbr flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--color-brand-gold)] text-base text-[#0a192f]">FT</span>
+              <span className="pay-page-logo-ft logo-ft-abbr flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--color-brand-gold)] text-sm text-[#0a192f]">FT</span>
             )}
             <span
-              className="font-[family:var(--font-playfair)] text-xl font-bold pay-page-logo-text"
+              className="font-[family:var(--font-playfair)] text-lg font-bold pay-page-logo-text"
               style={{ color: fontClr ?? "var(--color-text)" }}
             >
               <span className="pay-page-logo-free" style={{ color: fontClr ? "inherit" : undefined, opacity: fontClr ? undefined : 0.95 }}>Free</span>

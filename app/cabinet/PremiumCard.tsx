@@ -20,14 +20,14 @@ const CARD_STYLES = `
   aspect-ratio: 320 / 192;
   max-height: 192px;
   position: relative;
-  border-radius: 0;
+  border-radius: 10px;
   overflow: hidden;
-  box-shadow: 0 8px 24px color-mix(in srgb, var(--color-navy) 25%, transparent);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.2), 0 12px 24px -8px rgba(0, 0, 0, 0.12);
 }
 .premium-card-face {
   position: absolute;
   inset: 0;
-  border-radius: 0;
+  border-radius: 10px;
   overflow: hidden;
 }
 .premium-card-front {
@@ -37,7 +37,7 @@ const CARD_STYLES = `
 .premium-card-shine {
   position: absolute;
   inset: 0;
-  border-radius: 0;
+  border-radius: 10px;
   background: linear-gradient(135deg, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0.08) 40%, transparent 60%);
   pointer-events: none;
   z-index: 1;
@@ -53,7 +53,7 @@ const CARD_STYLES = `
   position: absolute;
   inset: 0;
   background: linear-gradient(180deg, rgba(255,255,255,0.12) 0%, transparent 50%, rgba(0,0,0,0.05) 100%);
-  border-radius: 0;
+  border-radius: 10px;
   z-index: 1;
 }
 .premium-logo-icon {
@@ -130,9 +130,9 @@ export function PremiumCard({ fullName, balanceKop, compact }: Props) {
               <div className="absolute left-[12px] top-[10px] z-[3]">
                 <div className="premium-badge">VIRTUAL</div>
               </div>
-              <div className="absolute bottom-[28px] right-[12px] z-[3] text-right">
-                <p className="text-[10px] text-white/60">{showBalance ? "БАЛАНС" : "ВЛАДЕЛЕЦ"}</p>
-                <p className={`text-[14px] text-white font-semibold ${showBalance ? "text-right" : "truncate max-w-[160px]"}`}>
+              <div className="absolute bottom-[28px] right-[12px] z-[3] text-right space-y-0.5">
+                <p className="text-[8px] leading-tight text-white/60 m-0">{showBalance ? "БАЛАНС" : "ВЛАДЕЛЕЦ"}</p>
+                <p className={`text-[13px] font-medium text-white/90 m-0 leading-tight ${showBalance ? "text-right" : "truncate max-w-[160px]"}`}>
                   {showBalance ? formatMoney(BigInt(balanceKop)) : holderName}
                 </p>
               </div>

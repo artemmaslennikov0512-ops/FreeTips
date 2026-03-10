@@ -209,7 +209,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
           </div>
         )}
         <div
-          className={`cabinet-sidebar-profile cabinet-block-inner mx-4 rounded-xl border border-[var(--color-brand-gold)]/20 px-4 py-3 ${!sidebarBg ? "bg-[var(--color-dark-gray)]/10" : ""}`}
+          className={`cabinet-sidebar-profile cabinet-block-inner mx-4 rounded-[10px] border border-[var(--color-brand-gold)]/20 px-4 py-3 ${!sidebarBg ? "bg-[var(--color-dark-gray)]/10" : ""}`}
           style={Object.keys(profileBlockStyle).length ? profileBlockStyle : undefined}
         >
           <div className="flex items-center gap-3">
@@ -255,19 +255,19 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
           <button
             type="button"
             onClick={handleLogout}
-            className="mt-4 flex w-full items-center gap-3 rounded-[10px] px-4 py-3.5 font-medium text-[var(--color-text)]/80 transition-colors hover:bg-[var(--color-dark-gray)]/10 hover:text-[var(--color-text)]"
+            className="mt-4 flex w-full items-center gap-3 rounded-[10px] px-4 py-3 text-sm font-medium text-[var(--color-text)]/80 transition-colors hover:bg-[var(--color-dark-gray)]/10 hover:text-[var(--color-text)]"
             style={brandFont ? { color: `${brandFont}cc` } : undefined}
           >
-            <LogOut className="h-5 w-5 shrink-0" />
+            <LogOut className="h-4 w-4 shrink-0" />
             <span>Выйти</span>
           </button>
         </nav>
       </div>
 
       <main className="min-h-screen min-w-0 flex-1 overflow-x-hidden pl-4 pr-4 lg:pl-0 lg:pr-0 lg:ml-0 lg:mr-0 flex flex-col">
-        {/* Основной блок — без отступа справа, прижат к правому краю */}
+        {/* Основной блок — с отступом от левого и правого краёв */}
         <div
-          className="cabinet-main-block mt-4 mr-0 mb-4 ml-0 lg:mr-0 lg:ml-4 flex w-full max-w-full flex-col self-start rounded-2xl border border-white/10 backdrop-blur-xl"
+          className="cabinet-main-block mt-4 mr-0 mb-4 ml-0 lg:mr-4 lg:ml-4 flex w-full max-w-full flex-col self-start rounded-2xl border border-white/10 backdrop-blur-xl"
           style={mainBlockStyle}
         >
           <div className="p-6 lg:p-8" id="main-content">

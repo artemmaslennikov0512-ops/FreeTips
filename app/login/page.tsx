@@ -176,26 +176,25 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <div className="mt-3 flex w-full flex-col items-center gap-0.5 text-center text-[0.6875rem] text-[var(--color-text-secondary)]">
-            <p className="text-center">
+          <div className="auth-page-footer-links mt-2 flex w-full flex-col items-center gap-0 text-center text-[0.6875rem] leading-tight text-[var(--color-text-secondary)]">
+            <div className="m-0 text-center">
               Нет аккаунта?{" "}
               <Link href="/zayavka" className="font-medium text-[var(--color-accent-gold)] hover:opacity-90 hover:underline transition-colors">
                 Оставить заявку
               </Link>
-            </p>
-            <p className="text-center">
+            </div>
+            <div className="m-0 text-center">
               <Link href="/login/establishment" className="font-medium text-[var(--color-accent-gold)] hover:opacity-90 hover:underline transition-colors">
                 Вход для управляющего заведением →
               </Link>
-            </p>
+            </div>
+            <Link
+              href="/"
+              className="m-0 block text-center text-sm text-[var(--color-muted)] hover:text-[var(--color-text)] transition-colors"
+            >
+              ← На главную
+            </Link>
           </div>
-
-          <Link
-            href="/"
-            className="mt-1 block text-center text-sm text-[var(--color-muted)] hover:text-[var(--color-text)] transition-colors"
-          >
-            ← На главную
-          </Link>
         </div>
       </div>
     </AuthPageShell>

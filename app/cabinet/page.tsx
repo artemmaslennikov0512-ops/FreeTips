@@ -318,7 +318,7 @@ export default function CabinetDashboardPage() {
         </div>
 
         <div id="quick-actions" className="cabinet-card rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden">
-          <div className="border-0 px-6 py-4">
+          <div className="border-0 px-6 py-4 text-center">
             <h3 className="font-[family:var(--font-playfair)] text-lg font-semibold text-[var(--color-text)]">
               Быстрые действия
             </h3>

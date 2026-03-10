@@ -60,7 +60,7 @@ const CARD_STYLES = `
   width: 24px;
   height: 24px;
   background: linear-gradient(135deg, #fff, #ccc);
-  border-radius: 0;
+  border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -75,7 +75,7 @@ const CARD_STYLES = `
   background: linear-gradient(90deg, #fff, #ccc);
   color: #000;
   padding: 2px 6px;
-  border-radius: 0;
+  border-radius: 6px;
   font-size: 0.5rem;
   font-weight: bold;
 }
@@ -130,8 +130,7 @@ export function PremiumCard({ fullName, balanceKop, compact }: Props) {
               <div className="absolute left-[12px] top-[10px] z-[3]">
                 <div className="premium-badge">VIRTUAL</div>
               </div>
-              <div className="absolute bottom-[28px] right-[12px] z-[3] text-right space-y-0.5">
-                <p className="text-[8px] leading-tight text-white/60 m-0">{showBalance ? "БАЛАНС" : "ВЛАДЕЛЕЦ"}</p>
+              <div className="premium-card-balance-block absolute bottom-[28px] right-[12px] z-[3] flex items-center justify-end">
                 <p className={`text-[13px] font-medium text-white/90 m-0 leading-tight ${showBalance ? "text-right" : "truncate max-w-[160px]"}`}>
                   {showBalance ? formatMoney(BigInt(balanceKop)) : holderName}
                 </p>

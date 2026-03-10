@@ -478,7 +478,7 @@ export default function ZayavkaPage() {
                   <button
                     type="button"
                     onClick={handleBack}
-                    className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-[var(--color-muted)]/40 bg-white/10 px-4 py-3 text-[14px] font-semibold text-[var(--color-text)] hover:bg-white/20 transition-colors"
+                    className="zayavka-btn-back flex flex-1 items-center justify-center gap-2 rounded-xl border-0 bg-white px-4 py-3 text-[14px] font-semibold text-[#0a192f] shadow-[var(--shadow-card)] hover:opacity-90 transition-opacity"
                   >
                     <ArrowLeft className="h-5 w-5" /> Назад
                   </button>

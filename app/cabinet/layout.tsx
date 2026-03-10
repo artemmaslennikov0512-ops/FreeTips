@@ -198,7 +198,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
 
       {/* Левое меню: на мобильном — выезд слева от края (как на лендинге справа), без зазора */}
       <div
-        className={`cabinet-sidebar fixed left-0 top-0 z-40 flex h-full w-[min(calc(100vw-4rem),20rem)] max-w-[20rem] flex-col overflow-hidden border-0 border-r border-white/10 py-6 shadow-2xl backdrop-blur-xl transition-[transform] duration-300 ease-out lg:static lg:left-auto lg:top-auto lg:ml-4 lg:mt-4 lg:mr-0 lg:mb-0 lg:h-auto lg:max-h-[calc(100vh-2rem)] lg:w-[260px] lg:max-w-none lg:translate-x-0 lg:rounded-2xl lg:border lg:self-start ${
+        className={`cabinet-sidebar fixed left-0 top-0 z-40 flex h-full w-[min(calc(100vw-4rem),20rem)] max-w-[20rem] flex-col overflow-hidden border-0 border-r border-white/10 py-6 shadow-2xl backdrop-blur-xl transition-[transform] duration-300 ease-out lg:static lg:left-auto lg:top-auto lg:ml-4 lg:mt-4 lg:mr-0 lg:mb-0 lg:h-auto lg:max-h-[calc(100vh-2rem)] lg:w-[260px] lg:max-w-none lg:translate-x-0 lg:rounded-[10px] lg:border lg:self-start ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
         style={sidebarStyle}
@@ -264,10 +264,10 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
         </nav>
       </div>
 
-      <main className="min-h-screen min-w-0 flex-1 overflow-x-hidden pl-4 pr-4 lg:pl-0 lg:pr-0 lg:ml-0 lg:mr-0 flex flex-col">
-        {/* Основной блок — с отступом от левого и правого краёв */}
+      <main className="min-h-screen min-w-0 flex-1 overflow-x-hidden pl-4 pr-4 lg:pl-0 lg:pr-4 lg:ml-0 lg:mr-0 flex flex-col">
+        {/* Основной блок — с отступом от левого и правого краёв, справа не заходит под скроллбар */}
         <div
-          className="cabinet-main-block mt-4 mr-0 mb-4 ml-0 lg:mr-4 lg:ml-4 flex w-full max-w-full flex-col self-start rounded-2xl border border-white/10 backdrop-blur-xl"
+          className="cabinet-main-block mt-4 mr-0 mb-4 ml-0 lg:mr-0 lg:ml-4 flex w-full max-w-full flex-col self-start rounded-[10px] border border-white/10 backdrop-blur-xl"
           style={mainBlockStyle}
         >
           <div className="p-6 lg:p-8" id="main-content">

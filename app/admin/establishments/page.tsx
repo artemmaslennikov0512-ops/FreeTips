@@ -273,64 +273,75 @@ export default function AdminEstablishmentsPage() {
         </form>
       )}
 
-      <div className="overflow-x-auto rounded-2xl border border-white/10 bg-[#0a192f]">
-        <table className="w-full text-left">
+      {/* Мобильная версия: карточки */}
+      <div className="space-y-4 lg:hidden">
+        {list.length === 0 ? (
+          <div className="rounded-xl border border-white/10 bg-[#0a192f] p-6 text-center text-white/60">Нет заведений. Создайте первое.</div>
+        ) : (
+          list.map((est) => (
+            <div key={est.id} className="rounded-xl border border-white/10 bg-[#0a192f] p-4">
+              <p className="font-medium text-white">{est.name}</p>
+              <p className="mt-1 font-mono text-sm text-white/80">{est.uniqueSlug}</p>
+              <p className="mt-2 text-sm text-white/80">Сотрудников: {est.employeesCount}{est.maxEmployeesCount != null ? ` / ${est.maxEmployeesCount}` : ""} · Управляющих: {est.adminsCount}</p>
+              <div className="mt-4 flex flex-wrap gap-2 border-t border-white/10 pt-3">
+                {linkByEstId[est.id] ? (
+                  <>
+                    <button type="button" onClick={() => copyLink(linkByEstId[est.id])} className="inline-flex items-center gap-1 rounded-lg bg-white/10 px-3 py-2 text-xs text-white hover:bg-white/20">
+                      <Copy className="h-3 w-3" /> Копировать
+                    </button>
+                    <button type="button" onClick={() => getOrRegenerateToken(est.id)} disabled={loadingTokenId === est.id} className="inline-flex items-center gap-1 rounded-lg bg-amber-500/20 px-3 py-2 text-xs text-amber-200 hover:bg-amber-500/30 disabled:opacity-50">
+                      <RefreshCw className={`h-3 w-3 ${loadingTokenId === est.id ? "animate-spin" : ""}`} /> Сменить токен
+                    </button>
+                  </>
+                ) : (
+                  <button type="button" onClick={() => getOrRegenerateToken(est.id)} disabled={loadingTokenId === est.id} className="inline-flex items-center gap-1 rounded-lg bg-[var(--color-brand-gold)]/80 px-3 py-2 text-xs text-[#0a192f] hover:bg-[var(--color-brand-gold)] disabled:opacity-50">
+                    {loadingTokenId === est.id ? "…" : "Получить ссылку"}
+                  </button>
+                )}
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* Десктоп: таблица */}
+      <div className="admin-establishments-table max-lg:hidden overflow-x-auto rounded-xl border border-white/10 bg-[#0a192f]">
+        <table className="w-full min-w-[700px] text-left">
           <thead>
             <tr className="border-b border-white/10">
-              <th className="p-3 font-medium text-white">Название</th>
-              <th className="p-3 font-medium text-white">Slug</th>
-              <th className="p-3 font-medium text-white">Лимит сотрудников</th>
-              <th className="p-3 font-medium text-white">Сотрудников</th>
-              <th className="p-3 font-medium text-white">Управляющих</th>
-              <th className="p-3 font-medium text-white">Ссылка для управляющего</th>
+              <th className="whitespace-nowrap p-3 font-medium text-white">Название</th>
+              <th className="whitespace-nowrap p-3 font-medium text-white">Slug</th>
+              <th className="whitespace-nowrap p-3 font-medium text-white">Лимит сотрудников</th>
+              <th className="whitespace-nowrap p-3 font-medium text-white">Сотрудников</th>
+              <th className="whitespace-nowrap p-3 font-medium text-white">Управляющих</th>
+              <th className="whitespace-nowrap p-3 font-medium text-white">Ссылка для управляющего</th>
             </tr>
           </thead>
           <tbody>
             {list.length === 0 ? (
               <tr>
-                <td colSpan={6} className="p-6 text-center text-white/60">
-                  Нет заведений. Создайте первое.
-                </td>
+                <td colSpan={6} className="p-6 text-center text-white/60">Нет заведений. Создайте первое.</td>
               </tr>
             ) : (
               list.map((est) => (
                 <tr key={est.id} className="border-b border-white/5">
-                  <td className="p-3 text-white">{est.name}</td>
-                  <td className="p-3 text-white/80 font-mono text-sm">{est.uniqueSlug}</td>
-                  <td className="p-3 text-white/80">
-                    {est.maxEmployeesCount == null ? "—" : est.maxEmployeesCount}
-                  </td>
-                  <td className="p-3 text-white/80">{est.employeesCount}</td>
-                  <td className="p-3 text-white/80">{est.adminsCount}</td>
+                  <td className="whitespace-nowrap p-3 text-white">{est.name}</td>
+                  <td className="whitespace-nowrap p-3 font-mono text-sm text-white/80">{est.uniqueSlug}</td>
+                  <td className="whitespace-nowrap p-3 text-white/80">{est.maxEmployeesCount == null ? "—" : est.maxEmployeesCount}</td>
+                  <td className="whitespace-nowrap p-3 text-white/80">{est.employeesCount}</td>
+                  <td className="whitespace-nowrap p-3 text-white/80">{est.adminsCount}</td>
                   <td className="p-3">
                     {linkByEstId[est.id] ? (
                       <div className="flex flex-wrap items-center gap-2">
-                        <button
-                          type="button"
-                          onClick={() => copyLink(linkByEstId[est.id])}
-                          className="inline-flex items-center gap-1 rounded-lg bg-white/10 px-2 py-1.5 text-xs text-white hover:bg-white/20"
-                        >
+                        <button type="button" onClick={() => copyLink(linkByEstId[est.id])} className="inline-flex items-center gap-1 rounded-lg bg-white/10 px-2 py-1.5 text-xs text-white hover:bg-white/20">
                           <Copy className="h-3 w-3" /> Копировать
                         </button>
-                        <button
-                          type="button"
-                          onClick={() => getOrRegenerateToken(est.id)}
-                          disabled={loadingTokenId === est.id}
-                          className="inline-flex items-center gap-1 rounded-lg bg-amber-500/20 px-2 py-1.5 text-xs text-amber-200 hover:bg-amber-500/30 disabled:opacity-50"
-                        >
-                          <RefreshCw
-                            className={`h-3 w-3 ${loadingTokenId === est.id ? "animate-spin" : ""}`}
-                          />{" "}
-                          Сменить токен
+                        <button type="button" onClick={() => getOrRegenerateToken(est.id)} disabled={loadingTokenId === est.id} className="inline-flex items-center gap-1 rounded-lg bg-amber-500/20 px-2 py-1.5 text-xs text-amber-200 hover:bg-amber-500/30 disabled:opacity-50">
+                          <RefreshCw className={`h-3 w-3 ${loadingTokenId === est.id ? "animate-spin" : ""}`} /> Сменить токен
                         </button>
                       </div>
                     ) : (
-                      <button
-                        type="button"
-                        onClick={() => getOrRegenerateToken(est.id)}
-                        disabled={loadingTokenId === est.id}
-                        className="inline-flex items-center gap-1 rounded-lg bg-[var(--color-brand-gold)]/80 px-2 py-1.5 text-xs text-[#0a192f] hover:bg-[var(--color-brand-gold)] disabled:opacity-50"
-                      >
+                      <button type="button" onClick={() => getOrRegenerateToken(est.id)} disabled={loadingTokenId === est.id} className="inline-flex items-center gap-1 rounded-lg bg-[var(--color-brand-gold)]/80 px-2 py-1.5 text-xs text-[#0a192f] hover:bg-[var(--color-brand-gold)] disabled:opacity-50">
                         {loadingTokenId === est.id ? "…" : "Получить ссылку"}
                       </button>
                     )}

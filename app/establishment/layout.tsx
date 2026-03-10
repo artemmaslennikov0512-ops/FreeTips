@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
-import { LayoutDashboard, LogOut, Users, PieChart, BarChart3, Palette } from "lucide-react";
+import { LayoutDashboard, LogOut, Users, PieChart, BarChart3, Palette, Menu } from "lucide-react";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 
@@ -29,6 +29,7 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [retryTrigger, setRetryTrigger] = useState(0);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => setMounted(true), []);
 
@@ -129,10 +130,25 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
 
   const isActive = (href: string) => pathname === href || (href !== "/establishment" && pathname.startsWith(href));
   const navIcons = [LayoutDashboard, Users, PieChart, BarChart3, Palette] as const;
+  const closeSidebar = () => setSidebarOpen(false);
 
   return (
     <div className="establishment-panel cabinet-premium flex min-h-screen w-full min-w-0 max-w-full overflow-x-hidden bg-[var(--color-bg)] font-[family:var(--font-inter)] text-white pt-4">
-      <aside className="cabinet-sidebar fixed left-4 top-4 z-40 flex h-auto max-h-[calc(100vh-2rem)] w-[260px] shrink-0 flex-col overflow-hidden rounded-2xl border border-white/10 bg-white/[0.06] py-6 shadow-sm backdrop-blur-xl lg:static lg:ml-4 lg:mt-4 lg:max-h-none lg:self-start">
+      {/* Шторка на мобильном */}
+      <div
+        className={`cabinet-overlay fixed inset-0 z-30 bg-[rgba(15,23,42,0.65)] backdrop-blur-xl transition-opacity duration-300 lg:hidden ${
+          sidebarOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+        }`}
+        onClick={closeSidebar}
+        aria-hidden
+      />
+
+      {/* Сайдбар: на мобильном — выезжает слева, на lg — статичный */}
+      <aside
+        className={`cabinet-sidebar fixed left-0 top-0 z-40 flex h-full w-[min(calc(100vw-4rem),20rem)] max-w-[20rem] flex-col overflow-hidden border-0 border-r border-white/10 py-6 shadow-2xl backdrop-blur-xl transition-[transform] duration-300 ease-out lg:static lg:left-auto lg:top-auto lg:ml-4 lg:mt-4 lg:mr-0 lg:mb-0 lg:h-auto lg:max-h-[calc(100vh-2rem)] lg:w-[260px] lg:max-w-none lg:translate-x-0 lg:rounded-2xl lg:border bg-white/[0.06] ${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
         <div className="px-4 mb-6">
           <span className="font-[family:var(--font-playfair)] font-bold text-white">
             Кабинет заведения
@@ -145,6 +161,7 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
               <Link
                 key={href}
                 href={href}
+                onClick={closeSidebar}
                 className={`flex items-center gap-3 rounded-[10px] px-4 py-3.5 font-medium transition-colors ${
                   isActive(href)
                     ? "cabinet-nav-active border border-[#0a192f]/35 bg-[#0a192f]/12 text-[#0a192f] font-semibold"
@@ -152,12 +169,13 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
                 }`}
               >
                 <Icon className="h-5 w-5 shrink-0" />
-                <span>{label}</span>
+                <span className="min-w-0 break-words">{label}</span>
               </Link>
             );
           })}
           <Link
             href="/cabinet"
+            onClick={closeSidebar}
             className="mt-2 flex items-center gap-3 rounded-[10px] px-4 py-3.5 font-medium text-white/80 transition-colors hover:bg-[var(--color-dark-gray)]/10 hover:text-white"
           >
             Личный кабинет
@@ -172,9 +190,20 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
           </button>
         </nav>
       </aside>
+
       <main className="min-w-0 flex-1 overflow-x-hidden pl-4 pr-4 lg:pl-0 lg:pr-0 lg:ml-0 flex flex-col">
         <div className="cabinet-main-block mt-4 mr-0 mb-4 ml-0 lg:mr-4 lg:ml-4 flex flex-col rounded-2xl border border-white/10 bg-white/[0.06] backdrop-blur-xl">
-          <div className="p-6 lg:p-8">
+          <div className="p-6 lg:p-8" id="main-content">
+            <div className="mb-4 lg:hidden">
+              <button
+                type="button"
+                onClick={() => setSidebarOpen(true)}
+                className="flex h-14 w-14 min-w-14 items-center justify-center rounded-xl border border-white/20 bg-white/10 text-[var(--color-brand-gold)] hover:bg-[var(--color-brand-gold)]/20 hover:border-[var(--color-brand-gold)]/40 active:scale-95"
+                aria-label="Меню"
+              >
+                <Menu className="h-7 w-7" strokeWidth={2} />
+              </button>
+            </div>
             {children}
           </div>
         </div>

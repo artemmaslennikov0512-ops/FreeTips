@@ -101,7 +101,7 @@ export default function AdminUsersPage() {
       EMPLOYEE: "Официант",
     };
     return (
-      <span className={`rounded-full px-3 py-1 text-xs font-medium ${styles[role as keyof typeof styles] || styles.RECIPIENT}`}>
+      <span className={`inline-block whitespace-nowrap rounded-full px-3 py-1 text-xs font-medium ${styles[role as keyof typeof styles] || styles.RECIPIENT}`}>
         {labels[role as keyof typeof labels] || role}
       </span>
     );
@@ -369,40 +369,67 @@ export default function AdminUsersPage() {
         )}
       </div>
 
-      <div className="admin-users-table cabinet-section-header overflow-x-auto rounded-xl border-0">
-        <table className="w-full">
+      {/* Мобильная версия: карточки вместо таблицы */}
+      <div className="cabinet-section-header space-y-3 rounded-xl border-0 p-4 lg:hidden">
+        {sortedUsers.length === 0 ? (
+          <p className="py-8 text-center text-sm text-white/90">Пользователей не найдено</p>
+        ) : (
+          sortedUsers.map((user) => (
+            <div
+              key={user.id}
+              className="flex flex-col gap-3 rounded-xl border border-white/10 bg-[var(--color-dark-gray)]/20 p-4"
+            >
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <Link
+                  href={`/admin/users/${user.id}`}
+                  className="min-w-0 flex-1 rounded-xl border border-white/25 bg-[var(--color-dark-gray)]/50 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-[var(--color-dark-gray)]/70 hover:border-white/40 break-all"
+                >
+                  {user.login}
+                </Link>
+                <span className="shrink-0 text-xs font-mono text-white/70">#{user.uniqueId}</span>
+              </div>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
+                <span className="text-white/60">Email</span>
+                <span className="min-w-0 truncate text-white/90" title={user.email || undefined}>{user.email || "—"}</span>
+                <span className="text-white/60">Роль</span>
+                <span>{getRoleBadge(user.role)}</span>
+                <span className="text-white/60">Баланс</span>
+                <span className="text-white">{formatMoneyCompact(user.stats.balanceKop)}</span>
+                <span className="text-white/60">Получено</span>
+                <span className="text-white">{formatMoneyCompact(user.stats.totalReceivedKop)}</span>
+                <span className="text-white/60">Регистрация</span>
+                <span className="text-white/80">{formatDate(user.createdAt)}</span>
+              </div>
+              <div className="flex justify-end border-t border-white/10 pt-3">
+                <button
+                  type="button"
+                  onClick={() => handleToggleBlocked(user)}
+                  disabled={updatingId === user.id}
+                  className={`whitespace-nowrap rounded-lg border border-white/25 px-3 py-2 text-xs font-semibold text-white transition-colors bg-[var(--color-dark-gray)]/50 hover:bg-[var(--color-dark-gray)]/70 disabled:opacity-60 ${updatingId === user.id ? "opacity-60" : ""}`}
+                >
+                  {user.isBlocked ? "Разблокировать" : "Ограничить"}
+                </button>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* Десктоп: таблица с горизонтальным скроллом */}
+      <div className="admin-users-table cabinet-section-header overflow-x-auto rounded-xl border-0 max-lg:hidden">
+        <table className="w-full min-w-[900px]">
           <thead className="border-0 bg-[var(--color-brand-gold)]">
             <tr>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">
-                ID
-              </th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">
-                Логин
-              </th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">
-                Email
-              </th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">
-                Роль
-              </th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">
-                Баланс
-              </th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">
-                Получено
-              </th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">
-                Транзакции
-              </th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">
-                В ожидании вывода
-              </th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">
-                Дата регистрации
-              </th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">
-                Доступ
-              </th>
+              <th className="whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">ID</th>
+              <th className="whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">Логин</th>
+              <th className="whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">Email</th>
+              <th className="whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">Роль</th>
+              <th className="whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">Баланс</th>
+              <th className="whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">Получено</th>
+              <th className="whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">Транзакции</th>
+              <th className="whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">В ожидании вывода</th>
+              <th className="whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">Дата регистрации</th>
+              <th className="min-w-[7rem] whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">Доступ</th>
             </tr>
           </thead>
           <tbody>
@@ -415,10 +442,8 @@ export default function AdminUsersPage() {
             ) : (
               sortedUsers.map((user) => (
                 <tr key={user.id} className="border-0 hover:bg-[var(--color-brand-gold)]/15 transition-colors">
-                  <td className="px-4 py-3 text-sm font-mono text-white/90">
-                    #{user.uniqueId}
-                  </td>
-                  <td className="px-4 py-3">
+                  <td className="whitespace-nowrap px-4 py-3 text-sm font-mono text-white/90">#{user.uniqueId}</td>
+                  <td className="min-w-[120px] whitespace-nowrap px-4 py-3">
                     <Link
                       href={`/admin/users/${user.id}`}
                       className="inline-block rounded-xl border border-white/25 bg-[var(--color-dark-gray)]/50 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[var(--color-dark-gray)]/70 hover:border-white/40 focus:outline-none focus:ring-2 focus:ring-white/30"
@@ -426,31 +451,19 @@ export default function AdminUsersPage() {
                       {user.login}
                     </Link>
                   </td>
-                  <td className="px-4 py-3 text-sm text-white/90">
-                    {user.email || "—"}
-                  </td>
-                  <td className="px-4 py-3">{getRoleBadge(user.role)}</td>
-                  <td className="px-4 py-3 text-sm text-white">
-                    {formatMoneyCompact(user.stats.balanceKop)}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-white">
-                    {formatMoneyCompact(user.stats.totalReceivedKop)}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-white/90">
-                    {user.stats.transactionsCount.toLocaleString("ru-RU")}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-white/90">
-                    {user.stats.payoutsPendingCount.toLocaleString("ru-RU")}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-white/80">
-                    {formatDate(user.createdAt)}
-                  </td>
-                  <td className="px-4 py-3">
+                  <td className="min-w-[140px] max-w-[180px] truncate px-4 py-3 text-sm text-white/90" title={user.email || undefined}>{user.email || "—"}</td>
+                  <td className="whitespace-nowrap px-4 py-3">{getRoleBadge(user.role)}</td>
+                  <td className="whitespace-nowrap px-4 py-3 text-sm text-white">{formatMoneyCompact(user.stats.balanceKop)}</td>
+                  <td className="whitespace-nowrap px-4 py-3 text-sm text-white">{formatMoneyCompact(user.stats.totalReceivedKop)}</td>
+                  <td className="whitespace-nowrap px-4 py-3 text-sm text-white/90">{user.stats.transactionsCount.toLocaleString("ru-RU")}</td>
+                  <td className="whitespace-nowrap px-4 py-3 text-sm text-white/90">{user.stats.payoutsPendingCount.toLocaleString("ru-RU")}</td>
+                  <td className="whitespace-nowrap px-4 py-3 text-sm text-white/80">{formatDate(user.createdAt)}</td>
+                  <td className="min-w-[7rem] whitespace-nowrap px-4 py-3">
                     <button
                       type="button"
                       onClick={() => handleToggleBlocked(user)}
                       disabled={updatingId === user.id}
-                      className={`rounded-lg border border-white/25 px-3 py-1.5 text-xs font-semibold text-white transition-colors bg-[var(--color-dark-gray)]/50 hover:bg-[var(--color-dark-gray)]/70 disabled:opacity-60 ${updatingId === user.id ? "opacity-60" : ""}`}
+                      className={`rounded-lg border border-white/25 px-3 py-1.5 text-xs font-semibold text-white transition-colors bg-[var(--color-dark-gray)]/50 hover:bg-[var(--color-dark-gray)]/70 disabled:opacity-60 whitespace-nowrap ${updatingId === user.id ? "opacity-60" : ""}`}
                     >
                       {user.isBlocked ? "Разблокировать" : "Ограничить"}
                     </button>

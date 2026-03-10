@@ -152,7 +152,7 @@ export default function AdminSupportThreadPage() {
   }
 
   return (
-    <div className="admin-support-thread mx-auto max-w-2xl">
+    <div className="admin-support-thread w-full">
       <Link
         href="/admin/support"
         className="mb-4 inline-flex items-center gap-2 text-sm text-white/90 hover:text-white"

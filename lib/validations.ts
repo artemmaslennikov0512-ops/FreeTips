@@ -70,7 +70,7 @@ export const slugSchema = z
   .max(50, "Slug не должен превышать 50 символов")
   .regex(/^[a-z0-9_-]+$/, "Slug может содержать только латиницу, цифры, дефисы и подчёркивания");
 
-// Регистрация
+// Регистрация (включая обязательное согласие с офертой и политикой ПДн)
 export const registerSchema = z
   .object({
     login: loginSchema,
@@ -92,6 +92,9 @@ export const registerSchema = z
       },
       emailSchema.optional(),
     ),
+    acceptOfferAndPrivacy: z.literal(true, {
+      errorMap: () => ({ message: "Необходимо принять условия Пользовательского соглашения и Политики обработки персональных данных" }),
+    }),
   })
   .refine((d) => d.password === d.passwordConfirm, {
     message: "Пароли не совпадают",
@@ -156,6 +159,11 @@ export const createPayoutSchema = z.object({
   pan: panSchema.optional(),
 });
 
+// Обязательное согласие с офертой и политиками при подаче заявки
+const consentOfferAndPolicySchema = z.literal(true, {
+  errorMap: () => ({ message: "Необходимо принять условия оферты, политики ПДн и политики безопасности платежей" }),
+});
+
 // Заявка на подключение (оставить заявку): заведение или отдельный получатель чаевых
 export const createRegistrationRequestSchema = z.discriminatedUnion("requestType", [
   z.object({
@@ -166,6 +174,7 @@ export const createRegistrationRequestSchema = z.discriminatedUnion("requestType
     phone: phoneRegistrationSchema,
     email: emailSchema,
     employeeCount: z.coerce.number().int().min(1, "Укажите количество сотрудников").max(10000),
+    consentOfferAndPolicy: consentOfferAndPolicySchema,
   }),
   z.object({
     requestType: z.literal("individual"),
@@ -177,6 +186,7 @@ export const createRegistrationRequestSchema = z.discriminatedUnion("requestType
     establishment: z.string().trim().max(255).optional().default(""),
     adminFullName: z.string().trim().min(1, "Укажите ФИО администратора для подтверждения").max(255),
     adminContactPhone: phoneRegistrationSchema,
+    consentOfferAndPolicy: consentOfferAndPolicySchema,
   }),
 ]);
 

@@ -169,93 +169,122 @@ export default function AdminVerificationRequestsPage() {
           Нет заявок на рассмотрении
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-white/10">
-          <table className="w-full min-w-[700px] text-left text-sm">
-            <thead>
-              <tr className="border-b border-white/10 bg-white/5">
-                <th className="px-4 py-3 font-semibold text-white">Дата</th>
-                <th className="px-4 py-3 font-semibold text-white">Пользователь</th>
-                <th className="px-4 py-3 font-semibold text-white">ФИО</th>
-                <th className="px-4 py-3 font-semibold text-white">Паспорт / ИНН</th>
-                <th className="px-4 py-3 font-semibold text-white">Документы</th>
-                <th className="px-4 py-3 font-semibold text-white">Действия</th>
-              </tr>
-            </thead>
-            <tbody>
-              {list.map((r) => (
-                <tr key={r.id} className="border-b border-white/5 hover:bg-white/5">
-                  <td className="px-4 py-3 text-white">
-                    {new Date(r.createdAt).toLocaleString("ru-RU")}
-                  </td>
-                  <td className="px-4 py-3">
-                    <Link
-                      href={`/admin/users/${r.userId}`}
-                      className="text-[var(--color-brand-gold)] hover:underline"
-                    >
-                      {r.login}
-                    </Link>
-                    {r.email && (
-                      <div className="text-xs text-white/80">{r.email}</div>
-                    )}
-                  </td>
-                  <td className="px-4 py-3 text-white">{r.fullName}</td>
-                  <td className="px-4 py-3 text-white">
-                    {r.passportSeries} {r.passportNumber}, ИНН {r.inn}
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex flex-wrap gap-2">
-                      {(["passport_main", "passport_spread", "selfie"] as const).map((type) => {
-                        const has = type === "passport_main" ? r.hasPassportMain : type === "passport_spread" ? r.hasPassportSpread : r.hasSelfie;
-                        const key = `${r.id}-${type}`;
-                        return (
-                          <button
-                            key={type}
-                            type="button"
-                            onClick={() => has && downloadDoc(r.id, type)}
-                            disabled={!has || downloading === key}
-                            className="inline-flex items-center gap-1 rounded-lg border border-white/20 bg-white/5 px-2 py-1 text-xs font-medium text-white hover:bg-white/10 disabled:opacity-50"
-                          >
-                            {downloading === key ? (
-                              <Loader2 className="h-3 w-3 animate-spin" />
-                            ) : (
-                              <Download className="h-3 w-3" />
-                            )}
-                            {DOC_LABELS[type]}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-2">
+        <>
+          {/* Мобильная версия: карточки */}
+          <div className="space-y-4 lg:hidden">
+            {list.map((r) => (
+              <div key={r.id} className="rounded-xl border border-white/10 bg-white/5 p-4">
+                <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                  <span className="text-xs text-white/70">{new Date(r.createdAt).toLocaleString("ru-RU")}</span>
+                  <Link href={`/admin/users/${r.userId}`} className="text-sm font-medium text-[var(--color-brand-gold)] hover:underline">
+                    {r.login}
+                  </Link>
+                </div>
+                <p className="text-sm text-white">{r.fullName}</p>
+                <p className="mt-1 text-xs text-white/80">{r.passportSeries} {r.passportNumber}, ИНН {r.inn}</p>
+                {r.email && <p className="mt-1 truncate text-xs text-white/70">{r.email}</p>}
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {(["passport_main", "passport_spread", "selfie"] as const).map((type) => {
+                    const has = type === "passport_main" ? r.hasPassportMain : type === "passport_spread" ? r.hasPassportSpread : r.hasSelfie;
+                    const key = `${r.id}-${type}`;
+                    return (
                       <button
+                        key={type}
                         type="button"
-                        onClick={() => handleApprove(r.id)}
-                        disabled={approvingId === r.id}
-                        className="inline-flex items-center gap-1 rounded-lg bg-green-600/20 px-3 py-1.5 text-sm font-medium text-green-400 hover:bg-green-600/30 disabled:opacity-50"
+                        onClick={() => has && downloadDoc(r.id, type)}
+                        disabled={!has || downloading === key}
+                        className="inline-flex items-center gap-1 rounded-lg border border-white/20 bg-white/5 px-2 py-1 text-xs font-medium text-white hover:bg-white/10 disabled:opacity-50"
                       >
-                        {approvingId === r.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
-                        Подтвердить
+                        {downloading === key ? <Loader2 className="h-3 w-3 animate-spin" /> : <Download className="h-3 w-3" />}
+                        {DOC_LABELS[type]}
                       </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setRejectModal({ id: r.id, login: r.login });
-                          setRejectReason("");
-                          setRejectError(null);
-                        }}
-                        className="inline-flex items-center gap-1 rounded-lg bg-red-600/20 px-3 py-1.5 text-sm font-medium text-red-400 hover:bg-red-600/30"
-                      >
-                        <X className="h-4 w-4" />
-                        Отклонить
-                      </button>
-                    </div>
-                  </td>
+                    );
+                  })}
+                </div>
+                <div className="mt-4 flex flex-wrap gap-2 border-t border-white/10 pt-3">
+                  <button
+                    type="button"
+                    onClick={() => handleApprove(r.id)}
+                    disabled={approvingId === r.id}
+                    className="inline-flex items-center gap-1 rounded-lg bg-green-600/20 px-3 py-2 text-sm font-medium text-green-400 hover:bg-green-600/30 disabled:opacity-50"
+                  >
+                    {approvingId === r.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+                    Подтвердить
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setRejectModal({ id: r.id, login: r.login }); setRejectReason(""); setRejectError(null); }}
+                    className="inline-flex items-center gap-1 rounded-lg bg-red-600/20 px-3 py-2 text-sm font-medium text-red-400 hover:bg-red-600/30"
+                  >
+                    <X className="h-4 w-4" />
+                    Отклонить
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Десктоп: таблица */}
+          <div className="max-lg:hidden overflow-x-auto rounded-xl border border-white/10">
+            <table className="w-full min-w-[700px] text-left text-sm">
+              <thead>
+                <tr className="border-b border-white/10 bg-white/5">
+                  <th className="whitespace-nowrap px-4 py-3 font-semibold text-white">Дата</th>
+                  <th className="whitespace-nowrap px-4 py-3 font-semibold text-white">Пользователь</th>
+                  <th className="whitespace-nowrap px-4 py-3 font-semibold text-white">ФИО</th>
+                  <th className="whitespace-nowrap px-4 py-3 font-semibold text-white">Паспорт / ИНН</th>
+                  <th className="whitespace-nowrap px-4 py-3 font-semibold text-white">Документы</th>
+                  <th className="whitespace-nowrap px-4 py-3 font-semibold text-white">Действия</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {list.map((r) => (
+                  <tr key={r.id} className="border-b border-white/5 hover:bg-white/5">
+                    <td className="whitespace-nowrap px-4 py-3 text-white">{new Date(r.createdAt).toLocaleString("ru-RU")}</td>
+                    <td className="px-4 py-3">
+                      <Link href={`/admin/users/${r.userId}`} className="text-[var(--color-brand-gold)] hover:underline">{r.login}</Link>
+                      {r.email && <div className="text-xs text-white/80">{r.email}</div>}
+                    </td>
+                    <td className="whitespace-nowrap px-4 py-3 text-white">{r.fullName}</td>
+                    <td className="whitespace-nowrap px-4 py-3 text-white">{r.passportSeries} {r.passportNumber}, ИНН {r.inn}</td>
+                    <td className="px-4 py-3">
+                      <div className="flex flex-wrap gap-2">
+                        {(["passport_main", "passport_spread", "selfie"] as const).map((type) => {
+                          const has = type === "passport_main" ? r.hasPassportMain : type === "passport_spread" ? r.hasPassportSpread : r.hasSelfie;
+                          const key = `${r.id}-${type}`;
+                          return (
+                            <button
+                              key={type}
+                              type="button"
+                              onClick={() => has && downloadDoc(r.id, type)}
+                              disabled={!has || downloading === key}
+                              className="inline-flex items-center gap-1 rounded-lg border border-white/20 bg-white/5 px-2 py-1 text-xs font-medium text-white hover:bg-white/10 disabled:opacity-50"
+                            >
+                              {downloading === key ? <Loader2 className="h-3 w-3 animate-spin" /> : <Download className="h-3 w-3" />}
+                              {DOC_LABELS[type]}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-2">
+                        <button type="button" onClick={() => handleApprove(r.id)} disabled={approvingId === r.id} className="inline-flex items-center gap-1 rounded-lg bg-green-600/20 px-3 py-1.5 text-sm font-medium text-green-400 hover:bg-green-600/30 disabled:opacity-50">
+                          {approvingId === r.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+                          Подтвердить
+                        </button>
+                        <button type="button" onClick={() => { setRejectModal({ id: r.id, login: r.login }); setRejectReason(""); setRejectError(null); }} className="inline-flex items-center gap-1 rounded-lg bg-red-600/20 px-3 py-1.5 text-sm font-medium text-red-400 hover:bg-red-600/30">
+                          <X className="h-4 w-4" />
+                          Отклонить
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
 
       {rejectModal && (
@@ -265,11 +294,11 @@ export default function AdminVerificationRequestsPage() {
           aria-modal="true"
           aria-labelledby="reject-modal-title"
         >
-          <div className="reject-modal-content w-full max-w-md rounded-2xl border border-white/10 bg-[var(--color-navy)] p-6 shadow-xl text-center">
-            <h2 id="reject-modal-title" className="mb-4 text-lg font-semibold text-white">
+          <div className="reject-modal-content flex w-full max-w-md flex-col items-center rounded-2xl border border-white/10 bg-[var(--color-navy)] p-6 shadow-xl text-center">
+            <h2 id="reject-modal-title" className="mb-4 w-full text-center text-lg font-semibold text-white">
               Отклонить заявку ({rejectModal.login})
             </h2>
-            <p className="mb-2 text-sm text-white/80">
+            <p className="mb-4 w-full text-center text-sm text-white/80">
               Укажите причину отказа. Клиент увидит этот текст в личном кабинете.
             </p>
             <textarea
@@ -279,8 +308,8 @@ export default function AdminVerificationRequestsPage() {
               className="reject-modal-textarea mb-4 w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-brand-gold)]"
               rows={4}
             />
-            {rejectError && <p className="mb-2 text-sm text-red-400">{rejectError}</p>}
-            <div className="flex justify-center gap-3">
+            {rejectError && <p className="reject-modal-error-msg mb-2 w-full text-center text-sm text-red-400">{rejectError}</p>}
+            <div className="reject-modal-actions flex justify-center gap-3">
               <button
                 type="button"
                 onClick={() => {

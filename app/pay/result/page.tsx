@@ -40,8 +40,10 @@ export default async function PayResultPage({
               <XCircle className="h-9 w-9 text-[var(--color-accent-red)]" />
             </div>
             <div className="mt-8 flex flex-col items-center text-center">
-              <h1 className="text-xl font-semibold text-[var(--color-text)]">Оплата не прошла</h1>
-              <p className="mt-3 text-sm text-[var(--color-text-secondary)]">
+              <h1 className="font-[family:var(--font-playfair)] text-2xl font-semibold text-[#0a192f]">
+                Оплата не прошла
+              </h1>
+              <p className="mt-3 text-center text-sm text-[#2d3748]">
                 Платёж был отклонён или отменён. Вы можете попробовать снова на странице получателя.
               </p>
             </div>

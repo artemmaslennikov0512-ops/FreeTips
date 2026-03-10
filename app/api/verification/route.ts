@@ -164,12 +164,6 @@ export async function POST(request: NextRequest) {
     },
     select: { id: true },
   });
-  await db.user.update({
-    where: { id: userId },
-    data: {
-      verificationStatus: VerificationStatus.PENDING,
-      verificationRejectionReason: null,
-    },
-  });
+  // Не переводим пользователя в PENDING здесь — только после явной отправки заявки (POST с consent).
   return NextResponse.json({ requestId: req.id });
 }

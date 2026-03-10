@@ -25,6 +25,7 @@ const initialFormData = {
   employeeCount: "",
   adminFullName: "",
   adminContactPhone: "",
+  consentOfferAndPolicy: false,
 };
 
 /** Валидация только полей шага 1 (личные данные) */
@@ -111,6 +112,7 @@ export default function ZayavkaPage() {
           phone: formData.phone ? `+7${formData.phone}` : "",
           email: formData.email.trim(),
           employeeCount: formData.employeeCount === "" ? 0 : Number(formData.employeeCount),
+          consentOfferAndPolicy: formData.consentOfferAndPolicy as true,
         }
       : {
           requestType: "individual" as const,
@@ -122,6 +124,7 @@ export default function ZayavkaPage() {
           establishment: formData.establishment.trim() || undefined,
           adminFullName: formData.adminFullName.trim(),
           adminContactPhone: formData.adminContactPhone ? `+7${formData.adminContactPhone}` : "",
+          consentOfferAndPolicy: formData.consentOfferAndPolicy as true,
         };
 
     const parsed = createRegistrationRequestSchema.safeParse(payload);
@@ -229,13 +232,13 @@ export default function ZayavkaPage() {
                     <label htmlFor="zayavka-requestType" className="mb-1.5 block text-center text-sm font-medium text-[var(--color-text)]">
                       Подключается
                     </label>
-                    <div className="relative">
+                    <div className="zayavka-select-wrap relative rounded-xl border border-[var(--color-brand-gold)]/25 bg-[var(--color-light-gray)] focus-within:border-[var(--color-brand-gold)]/50 focus-within:ring-2 focus-within:ring-[var(--color-brand-gold)]/30 focus-within:ring-offset-2 focus-within:ring-offset-[var(--color-bg)]">
                       <Building2 className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--color-muted)] pointer-events-none z-10" />
                       <select
                         id="zayavka-requestType"
                         value={formData.requestType}
                         onChange={handleRequestTypeChange}
-                        className={`${inputBase} appearance-none cursor-pointer pl-10 pr-10`}
+                        className="zayavka-select w-full rounded-xl border-0 bg-transparent py-2.5 pl-10 pr-10 text-[var(--color-text)] appearance-none cursor-pointer focus:outline-none font-[family:var(--font-inter)] text-base"
                         aria-describedby="zayavka-requestType-desc"
                       >
                         <option value="establishment">Заведение</option>
@@ -474,6 +477,35 @@ export default function ZayavkaPage() {
                   </>
                 )}
 
+                <div className="rounded-xl border border-white/10 bg-[var(--color-muted)]/5 p-3">
+                  <label className="flex cursor-pointer items-start gap-3">
+                    <input
+                      type="checkbox"
+                      checked={formData.consentOfferAndPolicy}
+                      onChange={(e) => setFormData({ ...formData, consentOfferAndPolicy: e.target.checked })}
+                      className="mt-1 h-4 w-4 shrink-0 rounded border-[var(--color-muted)] text-[var(--color-brand-gold)] focus:ring-[var(--color-brand-gold)]/50"
+                    />
+                    <span className="text-sm text-[var(--color-text-secondary)]">
+                      Я принимаю условия{" "}
+                      <Link href="/politika" className="text-[var(--color-accent-gold)] hover:opacity-90 hover:underline" target="_blank" rel="noopener noreferrer">
+                        Политики обработки персональных данных
+                      </Link>
+                      ,{" "}
+                      <Link href="/oferta" className="text-[var(--color-accent-gold)] hover:opacity-90 hover:underline" target="_blank" rel="noopener noreferrer">
+                        Пользовательского соглашения (оферты)
+                      </Link>
+                      {" "}и{" "}
+                      <Link href="/politika-bezopasnosti" className="text-[var(--color-accent-gold)] hover:opacity-90 hover:underline" target="_blank" rel="noopener noreferrer">
+                        Политики безопасности платежей
+                      </Link>
+                      . Отправка заявки возможна только при согласии.
+                    </span>
+                  </label>
+                  {fieldErrors.consentOfferAndPolicy && (
+                    <p className="mt-1 text-sm text-[var(--color-accent-red)]" role="alert">{fieldErrors.consentOfferAndPolicy}</p>
+                  )}
+                </div>
+
                 <div className="flex gap-3">
                   <button
                     type="button"
@@ -490,21 +522,6 @@ export default function ZayavkaPage() {
                     {loading ? "Отправка..." : "Оставить заявку"}
                   </button>
                 </div>
-                <p className="zayavka-hint mt-3 text-center text-[var(--color-muted)]">
-                  Нажимая «Оставить заявку», вы соглашаетесь с{" "}
-                  <Link href="/politika" className="text-[var(--color-accent-gold)] hover:opacity-90 hover:underline">
-                    условиями обработки персональных данных
-                  </Link>
-                  ,{" "}
-                  <Link href="/oferta" className="text-[var(--color-accent-gold)] hover:opacity-90 hover:underline">
-                    пользовательским соглашением
-                  </Link>
-                  {" "}и{" "}
-                  <Link href="/politika-bezopasnosti" className="text-[var(--color-accent-gold)] hover:opacity-90 hover:underline">
-                    политикой безопасности платежей
-                  </Link>
-                  .
-                </p>
               </>
             )}
           </form>

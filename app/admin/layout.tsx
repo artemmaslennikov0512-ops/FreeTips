@@ -211,7 +211,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 }`}
               >
                 <Icon className="h-5 w-5 shrink-0" />
-                <span>{label}</span>
+                <span className="min-w-0 break-words">{label}</span>
               </Link>
             ))}
             <button

@@ -277,161 +277,151 @@ export default function AdminDashboardPage() {
           return visibleRequests.length === 0 ? (
             <p className="text-white/90">Заявок пока нет.</p>
           ) : (
-          <div className="admin-dashboard-table cabinet-section-header overflow-hidden rounded-2xl border-0">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm text-white">
-                <thead>
-                  <tr className="border-0 bg-white/10">
-                    <th className="w-8 p-3 text-white/80"></th>
-                    <th className="p-3 font-medium text-white">Тип</th>
-                    <th className="p-3 font-medium text-white">ФИО</th>
-                    <th className="p-3 font-medium text-white">Почта</th>
-                    <th className="p-3 font-medium text-white">Дата заявки</th>
-                    <th className="p-3 font-medium text-white">Статус</th>
-                    <th className="p-3 font-medium text-white">Действие</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {visibleRequests.map((r) => {
-                    const isExpanded = expandedId === r.id;
-                    const isApproving = approvingId === r.id;
-                    const linkForRow = getLinkForRequest(r.id);
-                    return (
-                      <Fragment key={r.id}>
-                        <tr
-                          className="border-0 hover:bg-white/10 transition-colors"
-                        >
-                          <td className="p-2">
-                            <button
-                              type="button"
-                              onClick={() => setExpandedId(isExpanded ? null : r.id)}
-                              className="rounded p-1 text-white/80 hover:bg-white/15 hover:text-white"
-                              aria-label={isExpanded ? "Свернуть" : "Развернуть"}
-                            >
-                              {isExpanded ? <ChevronDown className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
-                            </button>
-                          </td>
-                          <td className="p-3 text-white/90">
-                            <span className="text-xs">
-                              {r.requestType === "establishment" ? "Заведение" : "Получатель"}
-                            </span>
-                          </td>
-                          <td className="p-3 text-white/90">{r.fullName}</td>
-                          <td className="p-3 text-white/90">{r.email}</td>
-                          <td className="p-3 text-white/80">
-                            {new Date(r.createdAt).toLocaleDateString("ru-RU", {
-                              day: "2-digit",
-                              month: "2-digit",
-                              year: "numeric",
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })}
-                          </td>
-                          <td className="p-3">
-                            <span
-                              className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                                r.status === "PENDING"
-                                  ? "bg-[var(--color-light-gray)] text-[var(--color-text)]"
-                                  : r.status === "APPROVED"
-                                    ? "bg-[var(--color-light-gray)] text-[var(--color-text)]"
-                                    : "bg-[var(--color-light-gray)] text-[var(--color-text-secondary)]"
-                              }`}
-                            >
-                              {r.status === "PENDING" ? "Ожидает" : r.status === "APPROVED" ? "Принята" : r.status}
-                            </span>
-                          </td>
-                          <td className="p-3">
-                            {r.status === "PENDING" && !r.hasToken && (
-                              <button
-                                type="button"
-                                disabled={isApproving}
-                                onClick={() => handleApprove(r.id)}
-                                className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--color-brand-gold)] px-3 py-1.5 text-sm font-medium text-[#0a192f] hover:opacity-90 disabled:opacity-50"
-                              >
-                                <ClipboardCheck className="h-4 w-4" />
-                                {isApproving ? "Создание ссылки..." : "Принять подключение"}
+          <>
+            {/* Мобильная версия: карточки */}
+            <div className="space-y-4 lg:hidden">
+              {visibleRequests.map((r) => {
+                const linkForRow = getLinkForRequest(r.id);
+                const isApproving = approvingId === r.id;
+                return (
+                  <div key={r.id} className="admin-dashboard-table cabinet-section-header rounded-2xl border-0 p-4">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <span className="text-xs text-white/70">{r.requestType === "establishment" ? "Заведение" : "Получатель"}</span>
+                      <span className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${r.status === "PENDING" ? "bg-white/20 text-white" : r.status === "APPROVED" ? "bg-white/20 text-white" : "bg-white/10 text-white/80"}`}>
+                        {r.status === "PENDING" ? "Ожидает" : r.status === "APPROVED" ? "Принята" : r.status}
+                      </span>
+                    </div>
+                    <p className="mt-2 font-medium text-white">{r.fullName}</p>
+                    <p className="truncate text-sm text-white/80">{r.email}</p>
+                    <p className="mt-1 text-xs text-white/60">
+                      {new Date(r.createdAt).toLocaleDateString("ru-RU", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                    </p>
+                    <div className="mt-4 flex flex-wrap gap-2 border-t border-white/10 pt-3">
+                      {r.status === "PENDING" && !r.hasToken && (
+                        <button type="button" disabled={isApproving} onClick={() => handleApprove(r.id)} className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--color-brand-gold)] px-3 py-2 text-sm font-medium text-[#0a192f] hover:opacity-90 disabled:opacity-50">
+                          <ClipboardCheck className="h-4 w-4" />
+                          {isApproving ? "Создание ссылки..." : "Принять подключение"}
+                        </button>
+                      )}
+                      {linkForRow && (
+                        <>
+                          <button type="button" onClick={() => copyLink(linkForRow)} className="inline-flex items-center gap-1 rounded-lg bg-white/10 px-3 py-2 text-xs text-white hover:bg-white/20" title="Копировать">
+                            <Copy className="h-4 w-4" /> Копировать
+                          </button>
+                          <button type="button" disabled={sendingTokenId === r.id} onClick={() => handleSendToken(r.id)} className="inline-flex items-center gap-1 rounded-lg border border-[var(--color-brand-gold)] bg-transparent px-3 py-2 text-xs font-medium text-[var(--color-brand-gold)] hover:bg-[var(--color-brand-gold)]/10 disabled:opacity-50">
+                            <Send className="h-3.5 w-3.5" />{sendingTokenId === r.id ? "Отправка…" : "Выслать токен"}
+                          </button>
+                        </>
+                      )}
+                      {r.status === "APPROVED" && r.hasToken && !linkForRow && (
+                        <button type="button" disabled={sendingTokenId === r.id} onClick={() => handleSendToken(r.id)} className="inline-flex items-center gap-1 rounded-lg border border-[var(--color-brand-gold)] bg-transparent px-3 py-2 text-xs font-medium text-[var(--color-brand-gold)] hover:bg-[var(--color-brand-gold)]/10 disabled:opacity-50">
+                          <Send className="h-3.5 w-3.5" />{sendingTokenId === r.id ? "Отправка…" : "Выслать токен"}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Десктоп: таблица */}
+            <div className="admin-dashboard-table cabinet-section-header max-lg:hidden overflow-hidden rounded-2xl border-0">
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[720px] text-left text-sm text-white">
+                  <thead>
+                    <tr className="border-0 bg-white/10">
+                      <th className="w-8 whitespace-nowrap p-3 text-white/80"></th>
+                      <th className="whitespace-nowrap p-3 font-medium text-white">Тип</th>
+                      <th className="whitespace-nowrap p-3 font-medium text-white">ФИО</th>
+                      <th className="whitespace-nowrap p-3 font-medium text-white">Почта</th>
+                      <th className="whitespace-nowrap p-3 font-medium text-white">Дата заявки</th>
+                      <th className="whitespace-nowrap p-3 font-medium text-white">Статус</th>
+                      <th className="whitespace-nowrap p-3 font-medium text-white">Действие</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {visibleRequests.map((r) => {
+                      const isExpanded = expandedId === r.id;
+                      const isApproving = approvingId === r.id;
+                      const linkForRow = getLinkForRequest(r.id);
+                      return (
+                        <Fragment key={r.id}>
+                          <tr className="border-0 hover:bg-white/10 transition-colors">
+                            <td className="p-2">
+                              <button type="button" onClick={() => setExpandedId(isExpanded ? null : r.id)} className="rounded p-1 text-white/80 hover:bg-white/15 hover:text-white" aria-label={isExpanded ? "Свернуть" : "Развернуть"}>
+                                {isExpanded ? <ChevronDown className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
                               </button>
-                            )}
-                            {linkForRow && (
-                              <div className="flex flex-col gap-1">
-                                <div className="flex flex-wrap items-center gap-2">
-                                  <input
-                                    type="text"
-                                    readOnly
-                                    value={linkForRow}
-                                    className="max-w-[280px] rounded border-0 bg-[var(--color-light-gray)] px-2 py-1 text-xs text-[var(--color-text)]"
-                                  />
-                                  <button
-                                    type="button"
-                                    onClick={() => copyLink(linkForRow)}
-                                    className="rounded p-1.5 text-white/80 hover:bg-white/15 hover:text-white"
-                                    title="Копировать"
-                                  >
-                                    <Copy className="h-4 w-4" />
-                                  </button>
-                                  <button
-                                    type="button"
-                                    disabled={sendingTokenId === r.id}
-                                    onClick={() => handleSendToken(r.id)}
-                                    className="inline-flex items-center gap-1 rounded-lg border border-[var(--color-brand-gold)] bg-transparent px-2.5 py-1 text-xs font-medium text-[var(--color-brand-gold)] hover:bg-[var(--color-brand-gold)]/10 disabled:opacity-50"
-                                    title={`Выслать ссылку на ${r.email}`}
-                                  >
-                                    <Send className="h-3.5 w-3.5" />
-                                    {sendingTokenId === r.id ? "Отправка…" : "Выслать токен"}
-                                  </button>
-                                </div>
-                                <span className="text-xs text-white/80">Одноразовая ссылка — только одна регистрация</span>
-                              </div>
-                            )}
-                            {r.status === "APPROVED" && r.hasToken && !linkForRow && (
-                              <div className="flex flex-wrap items-center gap-2">
-                                <span className="text-xs text-white/80">Ссылка выдана</span>
-                                <button
-                                  type="button"
-                                  disabled={sendingTokenId === r.id}
-                                  onClick={() => handleSendToken(r.id)}
-                                  className="inline-flex items-center gap-1 rounded-lg border border-[var(--color-brand-gold)] bg-transparent px-2.5 py-1 text-xs font-medium text-[var(--color-brand-gold)] hover:bg-[var(--color-brand-gold)]/10 disabled:opacity-50"
-                                  title={`Выслать ссылку на ${r.email}`}
-                                >
-                                  <Send className="h-3.5 w-3.5" />
-                                  {sendingTokenId === r.id ? "Отправка…" : "Выслать токен"}
+                            </td>
+                            <td className="whitespace-nowrap p-3 text-white/90">{r.requestType === "establishment" ? "Заведение" : "Получатель"}</td>
+                            <td className="whitespace-nowrap p-3 text-white/90">{r.fullName}</td>
+                            <td className="whitespace-nowrap p-3 text-white/90">{r.email}</td>
+                            <td className="whitespace-nowrap p-3 text-white/80">{new Date(r.createdAt).toLocaleDateString("ru-RU", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}</td>
+                            <td className="p-3">
+                              <span className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${r.status === "PENDING" ? "bg-[var(--color-light-gray)] text-[var(--color-text)]" : r.status === "APPROVED" ? "bg-[var(--color-light-gray)] text-[var(--color-text)]" : "bg-[var(--color-light-gray)] text-[var(--color-text-secondary)]"}`}>
+                                {r.status === "PENDING" ? "Ожидает" : r.status === "APPROVED" ? "Принята" : r.status}
+                              </span>
+                            </td>
+                            <td className="p-3">
+                              {r.status === "PENDING" && !r.hasToken && (
+                                <button type="button" disabled={isApproving} onClick={() => handleApprove(r.id)} className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--color-brand-gold)] px-3 py-1.5 text-sm font-medium text-[#0a192f] hover:opacity-90 disabled:opacity-50">
+                                  <ClipboardCheck className="h-4 w-4" />{isApproving ? "Создание ссылки..." : "Принять подключение"}
                                 </button>
-                              </div>
-                            )}
-                          </td>
-                        </tr>
-                        {isExpanded && (
-                          <tr className="border-0 bg-white/10">
-                            <td colSpan={7} className="p-4">
-                              {r.requestType === "establishment" ? (
-                                <div className="grid gap-2 text-white/90 sm:grid-cols-2">
-                                  <p><span className="text-white/70">Компания:</span> {r.companyName ?? "—"}</p>
-                                  <p><span className="text-white/70">Роль в компании:</span> {r.companyRole ?? "—"}</p>
-                                  <p><span className="text-white/70">Сотрудников:</span> {r.employeeCount ?? "—"}</p>
-                                  <p><span className="text-white/70">Телефон:</span> {r.phone}</p>
-                                  <p><span className="text-white/70">ФИО:</span> {r.fullName}</p>
-                                  <p><span className="text-white/70">Почта:</span> {r.email}</p>
+                              )}
+                              {linkForRow && (
+                                <div className="flex flex-col gap-1">
+                                  <div className="flex flex-wrap items-center gap-2">
+                                    <input type="text" readOnly value={linkForRow} className="max-w-[280px] rounded border-0 bg-[var(--color-light-gray)] px-2 py-1 text-xs text-[var(--color-text)]" />
+                                    <button type="button" onClick={() => copyLink(linkForRow)} className="rounded p-1.5 text-white/80 hover:bg-white/15 hover:text-white" title="Копировать"><Copy className="h-4 w-4" /></button>
+                                    <button type="button" disabled={sendingTokenId === r.id} onClick={() => handleSendToken(r.id)} className="inline-flex items-center gap-1 rounded-lg border border-[var(--color-brand-gold)] bg-transparent px-2.5 py-1 text-xs font-medium text-[var(--color-brand-gold)] hover:bg-[var(--color-brand-gold)]/10 disabled:opacity-50" title={`Выслать ссылку на ${r.email}`}>
+                                      <Send className="h-3.5 w-3.5" />{sendingTokenId === r.id ? "Отправка…" : "Выслать токен"}
+                                    </button>
+                                  </div>
+                                  <span className="text-xs text-white/80">Одноразовая ссылка — только одна регистрация</span>
                                 </div>
-                              ) : (
-                                <div className="grid gap-2 text-white/90 sm:grid-cols-2">
-                                  <p><span className="text-white/70">Дата рождения:</span> {r.dateOfBirth}</p>
-                                  <p><span className="text-white/70">Заведение:</span> {r.establishment || "—"}</p>
-                                  <p><span className="text-white/70">Телефон:</span> {r.phone}</p>
-                                  <p><span className="text-white/70">Вид деятельности:</span> {r.activityType}</p>
-                                  <p><span className="text-white/70">ФИО администратора:</span> {r.adminFullName ?? "—"}</p>
-                                  <p><span className="text-white/70">Телефон администратора:</span> {r.adminContactPhone ?? "—"}</p>
+                              )}
+                              {r.status === "APPROVED" && r.hasToken && !linkForRow && (
+                                <div className="flex flex-wrap items-center gap-2">
+                                  <span className="text-xs text-white/80">Ссылка выдана</span>
+                                  <button type="button" disabled={sendingTokenId === r.id} onClick={() => handleSendToken(r.id)} className="inline-flex items-center gap-1 rounded-lg border border-[var(--color-brand-gold)] bg-transparent px-2.5 py-1 text-xs font-medium text-[var(--color-brand-gold)] hover:bg-[var(--color-brand-gold)]/10 disabled:opacity-50" title={`Выслать ссылку на ${r.email}`}>
+                                    <Send className="h-3.5 w-3.5" />{sendingTokenId === r.id ? "Отправка…" : "Выслать токен"}
+                                  </button>
                                 </div>
                               )}
                             </td>
                           </tr>
-                        )}
-                      </Fragment>
-                    );
-                  })}
-                </tbody>
-              </table>
+                          {isExpanded && (
+                            <tr className="border-0 bg-white/10">
+                              <td colSpan={7} className="p-4">
+                                {r.requestType === "establishment" ? (
+                                  <div className="grid gap-2 text-white/90 sm:grid-cols-2">
+                                    <p><span className="text-white/70">Компания:</span> {r.companyName ?? "—"}</p>
+                                    <p><span className="text-white/70">Роль в компании:</span> {r.companyRole ?? "—"}</p>
+                                    <p><span className="text-white/70">Сотрудников:</span> {r.employeeCount ?? "—"}</p>
+                                    <p><span className="text-white/70">Телефон:</span> {r.phone}</p>
+                                    <p><span className="text-white/70">ФИО:</span> {r.fullName}</p>
+                                    <p><span className="text-white/70">Почта:</span> {r.email}</p>
+                                  </div>
+                                ) : (
+                                  <div className="grid gap-2 text-white/90 sm:grid-cols-2">
+                                    <p><span className="text-white/70">Дата рождения:</span> {r.dateOfBirth}</p>
+                                    <p><span className="text-white/70">Заведение:</span> {r.establishment || "—"}</p>
+                                    <p><span className="text-white/70">Телефон:</span> {r.phone}</p>
+                                    <p><span className="text-white/70">Вид деятельности:</span> {r.activityType}</p>
+                                    <p><span className="text-white/70">ФИО администратора:</span> {r.adminFullName ?? "—"}</p>
+                                    <p><span className="text-white/70">Телефон администратора:</span> {r.adminContactPhone ?? "—"}</p>
+                                  </div>
+                                )}
+                              </td>
+                            </tr>
+                          )}
+                        </Fragment>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
+          </>
           );
         })()}
       </section>

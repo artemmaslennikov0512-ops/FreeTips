@@ -22,6 +22,7 @@ function RegisterForm() {
     passwordConfirm: "",
     registrationToken: "",
     email: "",
+    acceptOfferAndPrivacy: false,
   });
   const [emailCode, setEmailCode] = useState("");
   const [emailVerified, setEmailVerified] = useState(false);
@@ -145,6 +146,10 @@ function RegisterForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    if (!formData.acceptOfferAndPrivacy) {
+      setError("Для регистрации необходимо принять условия Пользовательского соглашения и Политики обработки персональных данных.");
+      return;
+    }
     if (formData.email.trim()) {
       if (!emailVerified) {
         setError("Подтвердите почту перед регистрацией: нажмите «Подтвердить почту», введите 6 цифр из письма и проверьте код.");
@@ -157,7 +162,7 @@ function RegisterForm() {
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json", ...getCsrfHeader() },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ ...formData, acceptOfferAndPrivacy: true }),
         credentials: "include",
       });
 
@@ -360,6 +365,28 @@ function RegisterForm() {
                   className={AUTH_INPUT_CLASS}
                 />
               </div>
+            </div>
+
+            <div className="rounded-xl border border-white/10 bg-[var(--color-muted)]/5 p-3">
+              <label className="flex cursor-pointer items-start gap-3">
+                <input
+                  type="checkbox"
+                  checked={formData.acceptOfferAndPrivacy}
+                  onChange={(e) => setFormData({ ...formData, acceptOfferAndPrivacy: e.target.checked })}
+                  className="mt-1 h-4 w-4 rounded border-[var(--color-muted)] text-[var(--color-brand-gold)] focus:ring-[var(--color-brand-gold)]/50"
+                />
+                <span className="text-sm text-[var(--color-text-secondary)]">
+                  Я принимаю условия{" "}
+                  <Link href="/oferta" className="text-[var(--color-accent-gold)] hover:opacity-90 hover:underline" target="_blank" rel="noopener noreferrer">
+                    Пользовательского соглашения (оферты)
+                  </Link>
+                  {" "}и{" "}
+                  <Link href="/politika" className="text-[var(--color-accent-gold)] hover:opacity-90 hover:underline" target="_blank" rel="noopener noreferrer">
+                    Политики обработки персональных данных
+                  </Link>
+                  . Регистрация возможна только при согласии с указанными документами.
+                </span>
+              </label>
             </div>
 
             <button

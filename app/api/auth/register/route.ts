@@ -44,6 +44,7 @@ export async function POST(request: NextRequest) {
       passwordConfirm: string;
       registrationToken: string;
       email?: string;
+      acceptOfferAndPrivacy: true;
     };
     const validated = registerSchema.parse(parsed.data) as RegisterPayload;
 

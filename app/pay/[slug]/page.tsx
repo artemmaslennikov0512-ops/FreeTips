@@ -244,7 +244,7 @@ export default function PayPage() {
       <div className="mx-auto w-full max-w-md">
         {/* Основной блок со скруглёнными краями и отступами — внутри все карточки */}
         <div
-          className="pay-page-outer-block relative rounded-2xl border-0 p-4 shadow-[var(--shadow-card)]"
+          className="pay-page-outer-block relative rounded-2xl border-0 px-4 pt-5 pb-5 shadow-[var(--shadow-card)]"
         style={Object.keys(cardStyle).length ? cardStyle : undefined}
       >
         <div className="absolute right-4 top-4">
@@ -252,7 +252,7 @@ export default function PayPage() {
         </div>
 
         {/* Логотип */}
-        <div className="pay-page-logo-wrap flex justify-center mb-3">
+        <div className="pay-page-logo-wrap flex justify-center">
           <div className="flex items-center gap-2">
             {branding?.logoUrl ? (
               <img src={branding.logoUrl} alt="" className="h-10 w-auto max-w-[120px] object-contain" />

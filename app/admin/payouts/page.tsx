@@ -191,107 +191,95 @@ export default function AdminPayoutsPage() {
         </select>
       </div>
 
-      <div className="cabinet-section-header overflow-x-auto rounded-xl border-0">
-        <table className="w-full">
+      {/* Мобильная версия: карточки */}
+      <div className="space-y-4 lg:hidden">
+        {payouts.length === 0 ? (
+          <div className="cabinet-section-header rounded-xl border-0 px-6 py-8 text-center text-white/90">Заявок не найдено</div>
+        ) : (
+          payouts.map((payout) => (
+            <div key={payout.id} className="cabinet-section-header rounded-xl border-0 p-4">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <span className="text-xs text-white/70">{payout.id.slice(0, 8)}…</span>
+                <span>{getStatusBadge(payout.status)}</span>
+              </div>
+              <p className="mt-2 font-medium text-white">{payout.userLogin}</p>
+              {payout.userEmail && <p className="truncate text-xs text-white/80">{payout.userEmail}</p>}
+              <p className="mt-1 text-sm font-medium text-white">{formatMoneyCompact(payout.amountKop)}</p>
+              <p className="text-sm text-white/80">{formatDate(payout.createdAt)}</p>
+              <div className="mt-4 flex flex-wrap gap-2 border-t border-white/10 pt-3">
+                {(payout.status === "CREATED" || payout.status === "PROCESSING") && (
+                  <>
+                    <button type="button" onClick={() => handleOpenSendPaygineModal(payout.id)} disabled={sendingPaygine === payout.id} className="inline-flex items-center gap-1 rounded-lg bg-[var(--color-brand-gold)] px-3 py-2 text-xs font-medium text-[#0a192f] hover:opacity-90 disabled:opacity-50">
+                      <Send className="h-3 w-3" />{sendingPaygine === payout.id ? "Отправка…" : "В Paygine"}
+                    </button>
+                    <button type="button" onClick={() => handleStatusChange(payout.id, "REJECTED")} disabled={updating === payout.id} className="inline-flex items-center gap-1 rounded-lg bg-[var(--color-dark-gray)] px-3 py-2 text-xs font-medium text-white hover:opacity-90 disabled:opacity-50">
+                      <XCircle className="h-3 w-3" />Отклонить
+                    </button>
+                    <button type="button" onClick={() => { if (window.confirm("Отметить выполненной без отправки в Paygine?")) void handleStatusChange(payout.id, "COMPLETED"); }} disabled={updating === payout.id} className="inline-flex items-center gap-1 rounded-lg border border-white/20 px-3 py-2 text-xs font-medium text-white/90 hover:bg-white/10 disabled:opacity-50">
+                      <CheckCircle2 className="h-3 w-3" />Вручную
+                    </button>
+                  </>
+                )}
+                {payout.status === "COMPLETED" && !payout.externalId && (
+                  <button type="button" onClick={() => handleOpenSendPaygineModal(payout.id)} disabled={sendingPaygine === payout.id} className="inline-flex items-center gap-1 rounded-lg bg-[var(--color-brand-gold)] px-3 py-2 text-xs font-medium text-[#0a192f] hover:opacity-90 disabled:opacity-50">
+                    <Send className="h-3 w-3" />{sendingPaygine === payout.id ? "Отправка…" : "В Paygine"}
+                  </button>
+                )}
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* Десктоп: таблица */}
+      <div className="cabinet-section-header max-lg:hidden overflow-x-auto rounded-xl border-0">
+        <table className="w-full min-w-[800px]">
           <thead className="border-0 bg-[var(--color-brand-gold)]">
             <tr>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">
-                ID
-              </th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">
-                Пользователь
-              </th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">
-                Сумма
-              </th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">
-                Статус
-              </th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">
-                Дата
-              </th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">
-                Действия
-              </th>
+              <th className="whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">ID</th>
+              <th className="whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">Пользователь</th>
+              <th className="whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">Сумма</th>
+              <th className="whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">Статус</th>
+              <th className="whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">Дата</th>
+              <th className="whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">Действия</th>
             </tr>
           </thead>
           <tbody>
             {payouts.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-4 py-8 text-center text-white/90">
-                  Заявок не найдено
-                </td>
+                <td colSpan={6} className="px-4 py-8 text-center text-white/90">Заявок не найдено</td>
               </tr>
             ) : (
               payouts.map((payout) => (
                 <tr key={payout.id} className="border-0 hover:bg-[var(--color-brand-gold)]/15 transition-colors">
-                  <td className="px-4 py-3 text-sm text-white/90">
-                    {payout.id.slice(0, 8)}...
-                  </td>
+                  <td className="whitespace-nowrap px-4 py-3 text-sm text-white/90">{payout.id.slice(0, 8)}...</td>
                   <td className="px-4 py-3 text-sm">
                     <div>
                       <div className="font-medium text-white">{payout.userLogin}</div>
-                      {payout.userEmail && (
-                        <div className="text-xs text-white/80">{payout.userEmail}</div>
-                      )}
+                      {payout.userEmail && <div className="text-xs text-white/80">{payout.userEmail}</div>}
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-sm font-medium text-white">
-                    {formatMoneyCompact(payout.amountKop)}
-                  </td>
-                  <td className="px-4 py-3">{getStatusBadge(payout.status)}</td>
-                  <td className="px-4 py-3 text-sm text-white/90">
-                    {formatDate(payout.createdAt)}
-                  </td>
+                  <td className="whitespace-nowrap px-4 py-3 text-sm font-medium text-white">{formatMoneyCompact(payout.amountKop)}</td>
+                  <td className="whitespace-nowrap px-4 py-3">{getStatusBadge(payout.status)}</td>
+                  <td className="whitespace-nowrap px-4 py-3 text-sm text-white/90">{formatDate(payout.createdAt)}</td>
                   <td className="px-4 py-3">
                     <div className="flex flex-wrap gap-2">
                       {(payout.status === "CREATED" || payout.status === "PROCESSING") && (
                         <>
-                          <button
-                            type="button"
-                            onClick={() => handleOpenSendPaygineModal(payout.id)}
-                            disabled={sendingPaygine === payout.id}
-                            className="flex items-center gap-1 rounded-lg bg-[var(--color-brand-gold)] px-3 py-1.5 text-xs font-medium text-[#0a192f] transition-colors hover:opacity-90 disabled:opacity-50"
-                            title="Отправить вывод в Paygine на карту (SDPayOut). Только после успешной отправки заявка станет «Выполнена»."
-                          >
-                            <Send className="h-3 w-3" />
-                            {sendingPaygine === payout.id ? "Отправка…" : "В Paygine"}
+                          <button type="button" onClick={() => handleOpenSendPaygineModal(payout.id)} disabled={sendingPaygine === payout.id} className="flex items-center gap-1 rounded-lg bg-[var(--color-brand-gold)] px-3 py-1.5 text-xs font-medium text-[#0a192f] transition-colors hover:opacity-90 disabled:opacity-50" title="Отправить вывод в Paygine на карту (SDPayOut).">
+                            <Send className="h-3 w-3" />{sendingPaygine === payout.id ? "Отправка…" : "В Paygine"}
                           </button>
-                          <button
-                            type="button"
-                            onClick={() => handleStatusChange(payout.id, "REJECTED")}
-                            disabled={updating === payout.id}
-                            className="flex items-center gap-1 rounded-lg bg-[var(--color-dark-gray)] px-3 py-1.5 text-xs font-medium text-[var(--color-white)] transition-colors hover:opacity-90 disabled:opacity-50"
-                          >
-                            <XCircle className="h-3 w-3" />
-                            Отклонить
+                          <button type="button" onClick={() => handleStatusChange(payout.id, "REJECTED")} disabled={updating === payout.id} className="flex items-center gap-1 rounded-lg bg-[var(--color-dark-gray)] px-3 py-1.5 text-xs font-medium text-[var(--color-white)] transition-colors hover:opacity-90 disabled:opacity-50">
+                            <XCircle className="h-3 w-3" />Отклонить
                           </button>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              if (window.confirm("Отметить выполненной без отправки в Paygine? Использовать только если выплата проведена другим способом (наличные и т.п.). В Paygine заказа не будет.")) {
-                                void handleStatusChange(payout.id, "COMPLETED");
-                              }
-                            }}
-                            disabled={updating === payout.id}
-                            className="flex items-center gap-1 rounded-lg border border-[var(--color-border)] px-3 py-1.5 text-xs font-medium text-[var(--color-text-secondary)] transition-colors hover:opacity-90 disabled:opacity-50"
-                            title="Только для ручной выплаты вне Paygine"
-                          >
-                            <CheckCircle2 className="h-3 w-3" />
-                            Вручную
+                          <button type="button" onClick={() => { if (window.confirm("Отметить выполненной без отправки в Paygine? Использовать только если выплата проведена другим способом (наличные и т.п.). В Paygine заказа не будет.")) void handleStatusChange(payout.id, "COMPLETED"); }} disabled={updating === payout.id} className="flex items-center gap-1 rounded-lg border border-[var(--color-border)] px-3 py-1.5 text-xs font-medium text-[var(--color-text-secondary)] transition-colors hover:opacity-90 disabled:opacity-50" title="Только для ручной выплаты вне Paygine">
+                            <CheckCircle2 className="h-3 w-3" />Вручную
                           </button>
                         </>
                       )}
                       {payout.status === "COMPLETED" && !payout.externalId && (
-                        <button
-                          type="button"
-                          onClick={() => handleOpenSendPaygineModal(payout.id)}
-                          disabled={sendingPaygine === payout.id}
-                          className="flex items-center gap-1 rounded-lg bg-[var(--color-brand-gold)] px-3 py-1.5 text-xs font-medium text-[#0a192f] transition-colors hover:opacity-90 disabled:opacity-50"
-                          title="Заявка была отмечена «Вручную» — в Paygine вывода нет. Отправить сейчас (SDPayOut)."
-                        >
-                          <Send className="h-3 w-3" />
-                          {sendingPaygine === payout.id ? "Отправка…" : "В Paygine"}
+                        <button type="button" onClick={() => handleOpenSendPaygineModal(payout.id)} disabled={sendingPaygine === payout.id} className="flex items-center gap-1 rounded-lg bg-[var(--color-brand-gold)] px-3 py-1.5 text-xs font-medium text-[#0a192f] transition-colors hover:opacity-90 disabled:opacity-50" title="Заявка отмечена «Вручную» — отправить в Paygine сейчас (SDPayOut).">
+                          <Send className="h-3 w-3" />{sendingPaygine === payout.id ? "Отправка…" : "В Paygine"}
                         </button>
                       )}
                     </div>

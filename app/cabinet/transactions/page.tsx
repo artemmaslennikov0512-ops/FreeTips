@@ -355,24 +355,71 @@ export default function CabinetTransactionsPage() {
           <div className="px-6 py-12 text-center text-[var(--color-text)]/90">Операций пока нет</div>
         ) : (
           <>
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[320px] border-collapse text-left text-sm text-[var(--color-text)]">
+            {/* Мобильная версия: карточки по одной операции */}
+            <div className="space-y-4 px-4 pb-4 md:hidden">
+              {byDay.days.map((dayKey) => (
+                <div key={dayKey} className="space-y-3">
+                  <div className="text-center">
+                    <span className="inline-block rounded-lg bg-[var(--color-brand-gold)] px-4 py-1.5 text-sm font-semibold text-[#0a192f]">
+                      {formatDayLabel(dayKey)}
+                    </span>
+                  </div>
+                  {(byDay.map.get(dayKey) ?? []).map((op) => (
+                    <div
+                      key={`${op.type}-${op.id}`}
+                      className="rounded-xl border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/5 p-4 text-sm text-[var(--color-text)]"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0 flex-1 space-y-2">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="font-semibold text-[var(--color-text)]">
+                              {op.type === "tip" ? "Пополнение" : "Списание"}
+                            </span>
+                            <span className="text-[var(--color-text)]/90">
+                              {formatDate(op.createdAt, { includeYear: true })}
+                            </span>
+                          </div>
+                          <div className="flex flex-wrap gap-x-4 gap-y-1 text-[var(--color-text)]/90">
+                            <span>Сумма: <strong className="text-[var(--color-text)]">{formatMoney(BigInt(op.amountKop))}</strong></span>
+                            {op.feeKop > 0 && (
+                              <span>Комиссия: {formatMoney(BigInt(op.feeKop))}</span>
+                            )}
+                            <span>Итого: <strong className="text-[var(--color-text)]">{formatMoney(BigInt(op.amountKop + op.feeKop))}</strong></span>
+                          </div>
+                          {op.type === "payout" && op.status === "REJECTED" && op.rejectionReason && (
+                            <p className="text-xs text-[var(--color-text)]/80" title={op.rejectionReason}>
+                              {op.rejectionReason}
+                            </p>
+                          )}
+                        </div>
+                        <div className="shrink-0">
+                          <StatusIcon op={op} />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+
+            {/* Десктоп: таблица */}
+            <div className="hidden overflow-x-auto md:block">
+              <table className="w-full min-w-[640px] border-collapse text-left text-sm text-[var(--color-text)]">
                 <thead className="bg-[var(--color-dark-gray)]/10">
                   <tr className="border-b border-[var(--color-brand-gold)]/20">
-                    <th className="px-5 py-4 font-semibold text-[var(--color-text)]">Дата</th>
-                    <th className="px-5 py-4 font-semibold text-[var(--color-text)]">Тип</th>
-                    <th className="px-5 py-4 font-semibold text-[var(--color-text)]">Офик / страница</th>
-                    <th className="px-5 py-4 font-semibold text-[var(--color-text)]">Сумма</th>
-                    <th className="px-5 py-4 font-semibold text-[var(--color-text)]">Комиссия</th>
-                    <th className="px-5 py-4 font-semibold text-[var(--color-text)]">Итоговая сумма</th>
-                    <th className="px-5 py-4 font-semibold text-[var(--color-text)]">Статус</th>
+                    <th className="whitespace-nowrap px-5 py-4 font-semibold text-[var(--color-text)]">Дата</th>
+                    <th className="whitespace-nowrap px-5 py-4 font-semibold text-[var(--color-text)]">Тип</th>
+                    <th className="whitespace-nowrap px-5 py-4 font-semibold text-[var(--color-text)]">Сумма</th>
+                    <th className="whitespace-nowrap px-5 py-4 font-semibold text-[var(--color-text)]">Комиссия</th>
+                    <th className="whitespace-nowrap px-5 py-4 font-semibold text-[var(--color-text)]">Итоговая сумма</th>
+                    <th className="whitespace-nowrap px-5 py-4 font-semibold text-[var(--color-text)]">Статус</th>
                   </tr>
                 </thead>
                 <tbody>
                   {byDay.days.map((dayKey) => (
                     <Fragment key={dayKey}>
                       <tr className="border-b border-[var(--color-brand-gold)]/20">
-                        <td colSpan={7} className="px-5 py-3 text-center">
+                        <td colSpan={6} className="px-5 py-3 text-center">
                           <span className="inline-block rounded-lg bg-[var(--color-brand-gold)] px-4 py-1.5 text-sm font-semibold text-[#0a192f]">
                             {formatDayLabel(dayKey)}
                           </span>
@@ -383,37 +430,19 @@ export default function CabinetTransactionsPage() {
                           key={`${op.type}-${op.id}`}
                           className="border-b border-[var(--color-brand-gold)]/20 transition-colors hover:bg-[var(--color-dark-gray)]/8"
                         >
-                          <td className="px-5 py-4 text-[var(--color-text)]/90">
+                          <td className="whitespace-nowrap px-5 py-4 text-[var(--color-text)]/90">
                             {formatDate(op.createdAt, { includeYear: true })}
                           </td>
-                          <td className="px-5 py-4 text-[var(--color-text)]">
+                          <td className="whitespace-nowrap px-5 py-4 text-[var(--color-text)]">
                             {op.type === "tip" ? "Пополнение" : "Списание"}
                           </td>
-                          <td className="px-5 py-4 text-[var(--color-text)]/90">
-                            {op.type === "tip" && (op.paymentPageUrl ?? op.linkSlug) ? (
-                              op.paymentPageUrl ? (
-                                <a
-                                  href={op.paymentPageUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="text-[var(--color-brand-gold)] hover:underline"
-                                >
-                                  {op.linkSlug ?? op.paymentPageUrl}
-                                </a>
-                              ) : (
-                                op.linkSlug
-                              )
-                            ) : (
-                              "—"
-                            )}
-                          </td>
-                          <td className="px-5 py-4 font-semibold text-[var(--color-text)]">
+                          <td className="whitespace-nowrap px-5 py-4 font-semibold text-[var(--color-text)]">
                             {formatMoney(BigInt(op.amountKop))}
                           </td>
-                          <td className="px-5 py-4 text-[var(--color-text)]/90">
+                          <td className="whitespace-nowrap px-5 py-4 text-[var(--color-text)]/90">
                             {op.feeKop ? formatMoney(BigInt(op.feeKop)) : "—"}
                           </td>
-                          <td className="px-5 py-4 font-medium text-[var(--color-text)]">
+                          <td className="whitespace-nowrap px-5 py-4 font-medium text-[var(--color-text)]">
                             {formatMoney(BigInt(op.amountKop + op.feeKop))}
                           </td>
                           <td className="px-5 py-4">

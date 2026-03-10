@@ -896,51 +896,66 @@ export default function AdminUserDetailsPage() {
         <div className="border-0 px-5 py-4">
           <h2 className="text-center text-base font-semibold text-white">История пополнений</h2>
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-white">
-            <thead className="border-0 bg-white/10">
-              <tr>
-                <th className="px-4 py-3 text-left text-sm font-semibold text-white">ID</th>
-                <th className="px-4 py-3 text-left text-sm font-semibold text-white">Сумма</th>
-                <th className="px-4 py-3 text-left text-sm font-semibold text-white">Статус</th>
-                <th className="px-4 py-3 text-left text-sm font-semibold text-white">Офик / страница</th>
-                <th className="px-4 py-3 text-left text-sm font-semibold text-white">Дата</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.transactions.length === 0 ? (
-                <tr>
-                  <td colSpan={5} className="px-4 py-8 text-center text-white/90">
-                    Записей не найдено
-                  </td>
-                </tr>
-              ) : (
-                data.transactions.map((tx) => (
-                  <tr key={tx.id} className="border-0 hover:bg-[var(--color-brand-gold)]/15 transition-colors">
-                    <td className="px-4 py-3 text-sm text-white/90">{tx.id.slice(0, 8)}...</td>
-                    <td className="px-4 py-3 text-sm text-white/90">{formatMoneyCompact(tx.amountKop)}</td>
-                    <td className="px-4 py-3 text-sm text-white/90">{statusLabels[tx.status]}</td>
-                    <td className="px-4 py-3 text-sm text-white/90">
-                      {tx.paymentPageUrl ? (
-                        <a
-                          href={tx.paymentPageUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-[var(--color-brand-gold)] hover:underline"
-                        >
-                          {tx.linkSlug ?? tx.paymentPageUrl}
-                        </a>
-                      ) : (
-                        tx.linkSlug ?? "—"
-                      )}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-white/90">{formatDate(tx.createdAt)}</td>
+        {data.transactions.length === 0 ? (
+          <div className="px-4 py-8 text-center text-white/90">Записей не найдено</div>
+        ) : (
+          <>
+            {/* Мобильная версия: карточки */}
+            <div className="space-y-3 px-4 pb-4 lg:hidden">
+              {data.transactions.map((tx) => (
+                <div key={tx.id} className="rounded-xl border border-white/10 bg-white/5 p-4">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <span className="font-medium text-white">{formatMoneyCompact(tx.amountKop)}</span>
+                    <span className="text-sm text-white/80">{statusLabels[tx.status]}</span>
+                  </div>
+                  <p className="mt-1 text-sm text-white/70">{formatDate(tx.createdAt)}</p>
+                  <p className="mt-1 truncate text-sm text-white/80">
+                    {tx.paymentPageUrl ? (
+                      <a href={tx.paymentPageUrl} target="_blank" rel="noopener noreferrer" className="text-[var(--color-brand-gold)] hover:underline">
+                        {tx.linkSlug ?? "Страница"}
+                      </a>
+                    ) : (
+                      tx.linkSlug ?? "—"
+                    )}
+                  </p>
+                </div>
+              ))}
+            </div>
+            {/* Десктоп: таблица */}
+            <div className="hidden overflow-x-auto lg:block">
+              <table className="w-full min-w-[560px] text-white">
+                <thead className="border-0 bg-white/10">
+                  <tr>
+                    <th className="whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-white">ID</th>
+                    <th className="whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-white">Сумма</th>
+                    <th className="whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-white">Статус</th>
+                    <th className="whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-white">Офик / страница</th>
+                    <th className="whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-white">Дата</th>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+                </thead>
+                <tbody>
+                  {data.transactions.map((tx) => (
+                    <tr key={tx.id} className="border-0 hover:bg-[var(--color-brand-gold)]/15 transition-colors">
+                      <td className="whitespace-nowrap px-4 py-3 text-sm text-white/90">{tx.id.slice(0, 8)}...</td>
+                      <td className="whitespace-nowrap px-4 py-3 text-sm text-white/90">{formatMoneyCompact(tx.amountKop)}</td>
+                      <td className="whitespace-nowrap px-4 py-3 text-sm text-white/90">{statusLabels[tx.status]}</td>
+                      <td className="px-4 py-3 text-sm text-white/90">
+                        {tx.paymentPageUrl ? (
+                          <a href={tx.paymentPageUrl} target="_blank" rel="noopener noreferrer" className="text-[var(--color-brand-gold)] hover:underline">
+                            {tx.linkSlug ?? tx.paymentPageUrl}
+                          </a>
+                        ) : (
+                          tx.linkSlug ?? "—"
+                        )}
+                      </td>
+                      <td className="whitespace-nowrap px-4 py-3 text-sm text-white/90">{formatDate(tx.createdAt)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

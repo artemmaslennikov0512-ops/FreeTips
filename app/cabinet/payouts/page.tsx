@@ -103,76 +103,88 @@ export default function CabinetPayoutsPage() {
         {payouts.length === 0 ? (
           <div className="px-6 py-12 text-center text-[var(--color-text-secondary)]">Заявок пока нет</div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[400px] text-left text-sm">
-              <thead className="border-0 bg-[var(--color-dark-gray)]/10">
-                <tr>
-                  <th className="px-5 py-4 font-semibold text-[var(--color-text)]">Дата</th>
-                  <th className="px-5 py-4 font-semibold text-[var(--color-text)]">Сумма</th>
-                  <th className="px-5 py-4 font-semibold text-[var(--color-text)]">Реквизиты</th>
-                  <th className="px-5 py-4 font-semibold text-[var(--color-text)]">Статус</th>
-                  <th className="px-5 py-4 font-semibold text-[var(--color-text)]">Чек</th>
-                </tr>
-              </thead>
-              <tbody>
-                {payouts.map((p) => (
-                  <tr
-                    key={p.id}
-                    className="border-0 transition-colors last:border-0 hover:bg-[var(--color-dark-gray)]/8"
-                  >
-                    <td className="px-5 py-4 text-[var(--color-text-secondary)]">
-                      {formatDate(p.createdAt, { includeYear: true })}
-                    </td>
-                    <td className="px-5 py-4 font-semibold text-[var(--color-text)]">
-                      {formatMoney(BigInt(p.amountKop))}
-                    </td>
-                    <td
-                      className="max-w-[200px] truncate px-5 py-4 text-[var(--color-text-secondary)]"
-                      title={p.details}
+          <>
+            {/* Мобильная версия: карточки */}
+            <div className="space-y-4 md:hidden px-4 pb-4">
+              {payouts.map((p) => (
+                <div key={p.id} className="rounded-xl border border-[var(--color-dark-gray)]/20 bg-[var(--color-dark-gray)]/5 p-4">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <span className="text-sm font-semibold text-[var(--color-text)]">{formatMoney(BigInt(p.amountKop))}</span>
+                    <span
+                      className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
+                        p.status === "COMPLETED" ? "bg-[var(--color-dark-gray)]/10 text-[var(--color-text)]"
+                          : p.status === "REJECTED" ? "bg-[var(--color-muted)]/15 text-[var(--color-text-secondary)]"
+                          : p.status === "PROCESSING" ? "bg-[var(--color-dark-gray)]/10 text-[var(--color-text-secondary)]"
+                          : "bg-[var(--color-dark-gray)]/10 text-[var(--color-text)]"
+                      }`}
                     >
-                      {truncateDetails(p.details)}
-                    </td>
-                    <td className="px-5 py-4">
-                      <span
-                        className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
-                          p.status === "COMPLETED"
-                            ? "bg-[var(--color-dark-gray)]/10 text-[var(--color-text)]"
-                            : p.status === "REJECTED"
-                              ? "bg-[var(--color-muted)]/15 text-[var(--color-text-secondary)]"
-                              : p.status === "PROCESSING"
-                                ? "bg-[var(--color-dark-gray)]/10 text-[var(--color-text-secondary)]"
-                                : "bg-[var(--color-dark-gray)]/10 text-[var(--color-text)]"
-                        }`}
+                      {PAYOUT_STATUS_LABEL[p.status] ?? p.status}
+                    </span>
+                  </div>
+                  <p className="mt-2 text-sm text-[var(--color-text-secondary)]">{formatDate(p.createdAt, { includeYear: true })}</p>
+                  <p className="mt-1 truncate text-sm text-[var(--color-text-secondary)]" title={p.details}>{truncateDetails(p.details, 50)}</p>
+                  <div className="mt-3 border-t border-[var(--color-dark-gray)]/10 pt-3">
+                    {p.status === "COMPLETED" ? (
+                      <button
+                        type="button"
+                        onClick={() => handleDownloadReceipt(p.id)}
+                        disabled={downloadingId === p.id}
+                        className="inline-flex items-center gap-1.5 rounded-xl border-0 px-3 py-2 text-xs font-semibold text-[var(--color-text)] transition-all hover:bg-[var(--color-dark-gray)]/10 disabled:opacity-50"
                       >
-                        {PAYOUT_STATUS_LABEL[p.status] ?? p.status}
+                        <FileDown className="h-4 w-4" />
+                        {downloadingId === p.id ? "…" : "Скачать чек PDF"}
+                      </button>
+                    ) : (
+                      <span className="inline-flex items-center gap-1.5 rounded-xl bg-[var(--color-dark-gray)]/6 px-3 py-2 text-xs text-[var(--color-muted)]" title="Доступно после выполнения вывода">
+                        <FileDown className="h-4 w-4" />
+                        Чек (после выполнения)
                       </span>
-                    </td>
-                    <td className="px-5 py-4">
-                      {p.status === "COMPLETED" ? (
-                        <button
-                          type="button"
-                          onClick={() => handleDownloadReceipt(p.id)}
-                          disabled={downloadingId === p.id}
-                          className="inline-flex items-center gap-1.5 rounded-xl border-0 px-3 py-2 text-xs font-semibold text-[var(--color-text)] transition-all hover:bg-[var(--color-dark-gray)]/10 disabled:opacity-50"
-                        >
-                          <FileDown className="h-4 w-4" />
-                          {downloadingId === p.id ? "…" : "PDF"}
-                        </button>
-                      ) : (
-                        <span
-                          className="inline-flex items-center gap-1.5 rounded-xl border-0 bg-[var(--color-dark-gray)]/6 px-3 py-2 text-xs text-[var(--color-muted)]"
-                          title="Доступно после выполнения вывода"
-                        >
-                          <FileDown className="h-4 w-4" />
-                          PDF
-                        </span>
-                      )}
-                    </td>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Десктоп: таблица */}
+            <div className="hidden overflow-x-auto md:block">
+              <table className="w-full min-w-[400px] text-left text-sm">
+                <thead className="border-0 bg-[var(--color-dark-gray)]/10">
+                  <tr>
+                    <th className="whitespace-nowrap px-5 py-4 font-semibold text-[var(--color-text)]">Дата</th>
+                    <th className="whitespace-nowrap px-5 py-4 font-semibold text-[var(--color-text)]">Сумма</th>
+                    <th className="whitespace-nowrap px-5 py-4 font-semibold text-[var(--color-text)]">Реквизиты</th>
+                    <th className="whitespace-nowrap px-5 py-4 font-semibold text-[var(--color-text)]">Статус</th>
+                    <th className="whitespace-nowrap px-5 py-4 font-semibold text-[var(--color-text)]">Чек</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {payouts.map((p) => (
+                    <tr key={p.id} className="border-0 transition-colors last:border-0 hover:bg-[var(--color-dark-gray)]/8">
+                      <td className="whitespace-nowrap px-5 py-4 text-[var(--color-text-secondary)]">{formatDate(p.createdAt, { includeYear: true })}</td>
+                      <td className="whitespace-nowrap px-5 py-4 font-semibold text-[var(--color-text)]">{formatMoney(BigInt(p.amountKop))}</td>
+                      <td className="max-w-[200px] truncate px-5 py-4 text-[var(--color-text-secondary)]" title={p.details}>{truncateDetails(p.details)}</td>
+                      <td className="px-5 py-4">
+                        <span className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${p.status === "COMPLETED" ? "bg-[var(--color-dark-gray)]/10 text-[var(--color-text)]" : p.status === "REJECTED" ? "bg-[var(--color-muted)]/15 text-[var(--color-text-secondary)]" : p.status === "PROCESSING" ? "bg-[var(--color-dark-gray)]/10 text-[var(--color-text-secondary)]" : "bg-[var(--color-dark-gray)]/10 text-[var(--color-text)]"}`}>
+                          {PAYOUT_STATUS_LABEL[p.status] ?? p.status}
+                        </span>
+                      </td>
+                      <td className="px-5 py-4">
+                        {p.status === "COMPLETED" ? (
+                          <button type="button" onClick={() => handleDownloadReceipt(p.id)} disabled={downloadingId === p.id} className="inline-flex items-center gap-1.5 rounded-xl border-0 px-3 py-2 text-xs font-semibold text-[var(--color-text)] transition-all hover:bg-[var(--color-dark-gray)]/10 disabled:opacity-50">
+                            <FileDown className="h-4 w-4" />{downloadingId === p.id ? "…" : "PDF"}
+                          </button>
+                        ) : (
+                          <span className="inline-flex items-center gap-1.5 rounded-xl border-0 bg-[var(--color-dark-gray)]/6 px-3 py-2 text-xs text-[var(--color-muted)]" title="Доступно после выполнения вывода">
+                            <FileDown className="h-4 w-4" />PDF
+                          </span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </div>
     </div>

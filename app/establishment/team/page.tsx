@@ -291,109 +291,110 @@ export default function EstablishmentTeamPage() {
         </div>
       )}
 
-      <div className="cabinet-card overflow-hidden rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)]">
+      {/* Мобильная версия: карточки */}
+      <div className="space-y-4 lg:hidden">
+        {employees.length === 0 ? (
+          <div className="cabinet-card rounded-[10px] border-0 bg-[var(--color-bg-sides)] p-6 text-center text-white/90 shadow-[var(--shadow-subtle)]">Нет сотрудников.</div>
+        ) : (
+          employees.map((emp) => (
+            <div key={emp.id} className={`cabinet-card rounded-[10px] border-0 bg-[var(--color-bg-sides)] p-4 shadow-[var(--shadow-subtle)] ${!emp.isActive ? "opacity-70" : ""}`}>
+              <p className="font-medium text-white">{emp.name}</p>
+              <p className="text-sm text-white/90">{emp.position || "—"}</p>
+              <p className="mt-1 text-sm text-white/80">Коэфф. {emp.coefficient} · Рейтинг: {emp.reviewsCount > 0 ? `${emp.avgRating ?? "—"} (${emp.reviewsCount})` : "—"}</p>
+              <p className="mt-1 text-xs text-white/70">{emp.isActive ? "Активен" : "Неактивен"} · {emp.hasUser ? "Привязан к аккаунту" : "Не привязан"}</p>
+              <div className="mt-4 flex flex-wrap gap-2 border-t border-[var(--color-dark-gray)]/20 pt-3">
+                <button type="button" onClick={() => toggleActive(emp)} disabled={togglingId === emp.id} className="rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-xs text-white hover:bg-[var(--color-dark-gray)]/20 disabled:opacity-50">
+                  {togglingId === emp.id ? "…" : emp.isActive ? "Деактивировать" : "Активировать"}
+                </button>
+                {emp.hasUser && <span className="py-2 text-sm text-white/80">Уже зарегистрирован</span>}
+                {!emp.hasUser && linkByEmpId[emp.id] && (
+                  <>
+                    <button type="button" onClick={() => copyLink(linkByEmpId[emp.id])} className="inline-flex items-center gap-1 rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-xs text-white hover:bg-[var(--color-dark-gray)]/20">
+                      <Copy className="h-3 w-3" /> Копировать
+                    </button>
+                    <button type="button" onClick={() => getOrRegenerateToken(emp.id)} disabled={loadingTokenId === emp.id} className="inline-flex items-center gap-1 rounded-lg bg-[var(--color-brand-gold)]/20 px-3 py-2 text-xs text-white hover:bg-[var(--color-brand-gold)]/30 disabled:opacity-50">
+                      <RefreshCw className={`h-3 w-3 ${loadingTokenId === emp.id ? "animate-spin" : ""}`} /> Сменить токен
+                    </button>
+                  </>
+                )}
+                {!emp.hasUser && !linkByEmpId[emp.id] && (
+                  <>
+                    <button type="button" onClick={() => getOrRegenerateToken(emp.id)} disabled={loadingTokenId === emp.id} className="inline-flex items-center gap-1 rounded-lg bg-[var(--color-brand-gold)] px-3 py-2 text-xs text-[#0a192f] hover:opacity-90 disabled:opacity-50">
+                      {loadingTokenId === emp.id ? "…" : "Выдать ссылку"}
+                    </button>
+                    <button type="button" onClick={() => inviteByEmail(emp.id)} disabled={invitingId === emp.id} className="inline-flex items-center gap-1 rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-xs text-white hover:bg-[var(--color-dark-gray)]/20 disabled:opacity-50" title="Пригласить по email">
+                      <Mail className="h-3 w-3" />{invitingId === emp.id ? "…" : "Email"}
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* Десктоп: таблица */}
+      <div className="cabinet-card max-lg:hidden overflow-hidden rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)]">
         <div className="overflow-x-auto">
-          <table className="w-full text-left">
+          <table className="w-full min-w-[720px] text-left">
             <thead>
               <tr className="border-b border-[var(--color-dark-gray)]/20">
-                <th className="p-3 font-medium text-white">Имя</th>
-                <th className="p-3 font-medium text-white">Должность</th>
-                <th className="p-3 font-medium text-white">Коэфф.</th>
-                <th className="p-3 font-medium text-white">Рейтинг</th>
-                <th className="p-3 font-medium text-white">Статус</th>
-                <th className="p-3 font-medium text-white">Привязан к аккаунту</th>
-                <th className="p-3 font-medium text-white">Ссылка для регистрации</th>
+                <th className="whitespace-nowrap p-3 font-medium text-white">Имя</th>
+                <th className="whitespace-nowrap p-3 font-medium text-white">Должность</th>
+                <th className="whitespace-nowrap p-3 font-medium text-white">Коэфф.</th>
+                <th className="whitespace-nowrap p-3 font-medium text-white">Рейтинг</th>
+                <th className="whitespace-nowrap p-3 font-medium text-white">Статус</th>
+                <th className="whitespace-nowrap p-3 font-medium text-white">Привязан к аккаунту</th>
+                <th className="whitespace-nowrap p-3 font-medium text-white">Ссылка для регистрации</th>
               </tr>
             </thead>
             <tbody>
               {employees.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="p-6 text-center text-white/90">
-                    Нет сотрудников.
-                  </td>
+                  <td colSpan={7} className="p-6 text-center text-white/90">Нет сотрудников.</td>
                 </tr>
               ) : (
                 employees.map((emp) => (
-                  <tr
-                    key={emp.id}
-                    className={`border-b border-[var(--color-dark-gray)]/10 ${!emp.isActive ? "opacity-70" : ""}`}
-                  >
-                    <td className="p-3 text-white">{emp.name}</td>
-                    <td className="p-3 text-white/90">{emp.position || "—"}</td>
-                    <td className="p-3 text-white/90">{emp.coefficient}</td>
-                    <td className="p-3 text-white/90">
-                      {emp.reviewsCount > 0
-                        ? `${emp.avgRating ?? "—"} (${emp.reviewsCount})`
-                        : "—"}
-                    </td>
+                  <tr key={emp.id} className={`border-b border-[var(--color-dark-gray)]/10 ${!emp.isActive ? "opacity-70" : ""}`}>
+                    <td className="whitespace-nowrap p-3 text-white">{emp.name}</td>
+                    <td className="whitespace-nowrap p-3 text-white/90">{emp.position || "—"}</td>
+                    <td className="whitespace-nowrap p-3 text-white/90">{emp.coefficient}</td>
+                    <td className="whitespace-nowrap p-3 text-white/90">{emp.reviewsCount > 0 ? `${emp.avgRating ?? "—"} (${emp.reviewsCount})` : "—"}</td>
                     <td className="p-3">
-                      <span className={`text-xs ${emp.isActive ? "text-[var(--color-accent-emerald)]" : "text-white/80"}`}>
-                        {emp.isActive ? "Активен" : "Неактивен"}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => toggleActive(emp)}
-                        disabled={togglingId === emp.id}
-                        className="ml-2 rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-2 py-1 text-xs text-white hover:bg-[var(--color-dark-gray)]/20 disabled:opacity-50"
-                      >
+                      <span className={`text-xs ${emp.isActive ? "text-[var(--color-accent-emerald)]" : "text-white/80"}`}>{emp.isActive ? "Активен" : "Неактивен"}</span>
+                      <button type="button" onClick={() => toggleActive(emp)} disabled={togglingId === emp.id} className="ml-2 rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-2 py-1 text-xs text-white hover:bg-[var(--color-dark-gray)]/20 disabled:opacity-50">
                         {togglingId === emp.id ? "…" : emp.isActive ? "Деактивировать" : "Активировать"}
                       </button>
                     </td>
-                    <td className="p-3 text-white/90">
-                      {emp.hasUser ? "Да" : "Нет"}
-                    </td>
+                    <td className="whitespace-nowrap p-3 text-white/90">{emp.hasUser ? "Да" : "Нет"}</td>
                     <td className="p-3">
                       {emp.hasUser ? (
-                        <span className="text-white/90 text-sm">Уже зарегистрирован</span>
+                        <span className="text-sm text-white/90">Уже зарегистрирован</span>
                       ) : linkByEmpId[emp.id] ? (
                         <div className="flex flex-wrap items-center gap-2">
-                          <button
-                            type="button"
-                            onClick={() => copyLink(linkByEmpId[emp.id])}
-                            className="inline-flex items-center gap-1 rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-2 py-1.5 text-xs text-white hover:bg-[var(--color-dark-gray)]/20"
-                          >
+                          <button type="button" onClick={() => copyLink(linkByEmpId[emp.id])} className="inline-flex items-center gap-1 rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-2 py-1.5 text-xs text-white hover:bg-[var(--color-dark-gray)]/20">
                             <Copy className="h-3 w-3" /> Копировать
                           </button>
-                          <button
-                            type="button"
-                            onClick={() => getOrRegenerateToken(emp.id)}
-                            disabled={loadingTokenId === emp.id}
-                            className="inline-flex items-center gap-1 rounded-lg bg-[var(--color-brand-gold)]/20 px-2 py-1.5 text-xs text-white hover:bg-[var(--color-brand-gold)]/30 disabled:opacity-50"
-                          >
-                            <RefreshCw
-                              className={`h-3 w-3 ${loadingTokenId === emp.id ? "animate-spin" : ""}`}
-                            />{" "}
-                            Сменить токен
+                          <button type="button" onClick={() => getOrRegenerateToken(emp.id)} disabled={loadingTokenId === emp.id} className="inline-flex items-center gap-1 rounded-lg bg-[var(--color-brand-gold)]/20 px-2 py-1.5 text-xs text-white hover:bg-[var(--color-brand-gold)]/30 disabled:opacity-50">
+                            <RefreshCw className={`h-3 w-3 ${loadingTokenId === emp.id ? "animate-spin" : ""}`} /> Сменить токен
                           </button>
                         </div>
                       ) : (
                         <div className="flex flex-wrap items-center gap-1">
-                          <button
-                            type="button"
-                            onClick={() => getOrRegenerateToken(emp.id)}
-                            disabled={loadingTokenId === emp.id}
-                            className="inline-flex items-center gap-1 rounded-lg bg-[var(--color-brand-gold)] px-2 py-1.5 text-xs text-[#0a192f] hover:opacity-90 disabled:opacity-50"
-                          >
+                          <button type="button" onClick={() => getOrRegenerateToken(emp.id)} disabled={loadingTokenId === emp.id} className="inline-flex items-center gap-1 rounded-lg bg-[var(--color-brand-gold)] px-2 py-1.5 text-xs text-[#0a192f] hover:opacity-90 disabled:opacity-50">
                             {loadingTokenId === emp.id ? "…" : "Выдать ссылку"}
                           </button>
-                          <button
-                            type="button"
-                            onClick={() => inviteByEmail(emp.id)}
-                            disabled={invitingId === emp.id}
-                            className="inline-flex items-center gap-1 rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-2 py-1.5 text-xs text-white hover:bg-[var(--color-dark-gray)]/20 disabled:opacity-50"
-                              title="Пригласить по email"
-                          >
-                            <Mail className="h-3 w-3" />
-                            {invitingId === emp.id ? "…" : "Email"}
+                          <button type="button" onClick={() => inviteByEmail(emp.id)} disabled={invitingId === emp.id} className="inline-flex items-center gap-1 rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-2 py-1.5 text-xs text-white hover:bg-[var(--color-dark-gray)]/20 disabled:opacity-50" title="Пригласить по email">
+                            <Mail className="h-3 w-3" />{invitingId === emp.id ? "…" : "Email"}
                           </button>
                         </div>
                       )}
                     </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

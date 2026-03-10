@@ -16,6 +16,10 @@ type Operation = {
   feeKop: number;
   status: string;
   rejectionReason?: string | null;
+  /** URL страницы приёма чаевых (офика). Только для type "tip". */
+  paymentPageUrl?: string;
+  /** Уникальный идентификатор офика (slug). Только для type "tip". */
+  linkSlug?: string;
   createdAt: string;
 };
 
@@ -357,6 +361,7 @@ export default function CabinetTransactionsPage() {
                   <tr className="border-b border-[var(--color-brand-gold)]/20">
                     <th className="px-5 py-4 font-semibold text-[var(--color-text)]">Дата</th>
                     <th className="px-5 py-4 font-semibold text-[var(--color-text)]">Тип</th>
+                    <th className="px-5 py-4 font-semibold text-[var(--color-text)]">Офик / страница</th>
                     <th className="px-5 py-4 font-semibold text-[var(--color-text)]">Сумма</th>
                     <th className="px-5 py-4 font-semibold text-[var(--color-text)]">Комиссия</th>
                     <th className="px-5 py-4 font-semibold text-[var(--color-text)]">Итоговая сумма</th>
@@ -367,7 +372,7 @@ export default function CabinetTransactionsPage() {
                   {byDay.days.map((dayKey) => (
                     <Fragment key={dayKey}>
                       <tr className="border-b border-[var(--color-brand-gold)]/20">
-                        <td colSpan={6} className="px-5 py-3 text-center">
+                        <td colSpan={7} className="px-5 py-3 text-center">
                           <span className="inline-block rounded-lg bg-[var(--color-brand-gold)] px-4 py-1.5 text-sm font-semibold text-[#0a192f]">
                             {formatDayLabel(dayKey)}
                           </span>
@@ -383,6 +388,24 @@ export default function CabinetTransactionsPage() {
                           </td>
                           <td className="px-5 py-4 text-[var(--color-text)]">
                             {op.type === "tip" ? "Пополнение" : "Списание"}
+                          </td>
+                          <td className="px-5 py-4 text-[var(--color-text)]/90">
+                            {op.type === "tip" && (op.paymentPageUrl ?? op.linkSlug) ? (
+                              op.paymentPageUrl ? (
+                                <a
+                                  href={op.paymentPageUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-[var(--color-brand-gold)] hover:underline"
+                                >
+                                  {op.linkSlug ?? op.paymentPageUrl}
+                                </a>
+                              ) : (
+                                op.linkSlug
+                              )
+                            ) : (
+                              "—"
+                            )}
                           </td>
                           <td className="px-5 py-4 font-semibold text-[var(--color-text)]">
                             {formatMoney(BigInt(op.amountKop))}

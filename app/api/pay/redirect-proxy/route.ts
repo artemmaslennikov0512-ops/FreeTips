@@ -51,10 +51,17 @@ export async function POST(request: NextRequest) {
 
   const tx = await db.transaction.findUnique({
     where: { id: verifiedTid },
-    select: { id: true, status: true, externalId: true, amountKop: true, paygineOrderSdRef: true },
+    select: {
+      id: true,
+      status: true,
+      externalId: true,
+      amountKop: true,
+      paygineOrderSdRef: true,
+      link: { select: { slug: true } },
+    },
   });
 
-  if (!tx || tx.status !== "PENDING" || !tx.externalId || !tx.paygineOrderSdRef?.trim()) {
+  if (!tx || tx.status !== "PENDING" || !tx.externalId || !tx.paygineOrderSdRef?.trim() || !tx.link?.slug) {
     return new NextResponse("Платёж не найден или уже обработан. Создайте платёж заново.", { status: 400 });
   }
 
@@ -63,12 +70,13 @@ export async function POST(request: NextRequest) {
     return new NextResponse("Неверные данные платежа.", { status: 400 });
   }
 
+  const paymentPageUrl = `${baseUrl}/pay/${tx.link.slug}`;
   const formParams = buildSDPayInFormParams(config, {
     orderId,
     amountKop: Number(tx.amountKop),
     sdRef: tx.paygineOrderSdRef.trim(),
-    url: `${baseUrl}/pay/result?tid=${tx.id}&outcome=success`,
-    failurl: `${baseUrl}/pay/result?tid=${tx.id}&outcome=fail`,
+    url: `${paymentPageUrl}?tid=${tx.id}&outcome=success`,
+    failurl: `${paymentPageUrl}?tid=${tx.id}&outcome=fail`,
   });
 
   const paygineUrl = getSDPayInEndpoint();

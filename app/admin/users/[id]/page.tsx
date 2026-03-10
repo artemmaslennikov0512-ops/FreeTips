@@ -13,6 +13,8 @@ interface Transaction {
   amountKop: number;
   status: "PENDING" | "SUCCESS" | "FAILED" | "CANCELLED";
   createdAt: string;
+  linkSlug: string | null;
+  paymentPageUrl: string | null;
 }
 
 interface UserDetailsResponse {
@@ -901,13 +903,14 @@ export default function AdminUserDetailsPage() {
                 <th className="px-4 py-3 text-left text-sm font-semibold text-white">ID</th>
                 <th className="px-4 py-3 text-left text-sm font-semibold text-white">Сумма</th>
                 <th className="px-4 py-3 text-left text-sm font-semibold text-white">Статус</th>
+                <th className="px-4 py-3 text-left text-sm font-semibold text-white">Офик / страница</th>
                 <th className="px-4 py-3 text-left text-sm font-semibold text-white">Дата</th>
               </tr>
             </thead>
             <tbody>
               {data.transactions.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="px-4 py-8 text-center text-white/90">
+                  <td colSpan={5} className="px-4 py-8 text-center text-white/90">
                     Записей не найдено
                   </td>
                 </tr>
@@ -917,6 +920,20 @@ export default function AdminUserDetailsPage() {
                     <td className="px-4 py-3 text-sm text-white/90">{tx.id.slice(0, 8)}...</td>
                     <td className="px-4 py-3 text-sm text-white/90">{formatMoneyCompact(tx.amountKop)}</td>
                     <td className="px-4 py-3 text-sm text-white/90">{statusLabels[tx.status]}</td>
+                    <td className="px-4 py-3 text-sm text-white/90">
+                      {tx.paymentPageUrl ? (
+                        <a
+                          href={tx.paymentPageUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[var(--color-brand-gold)] hover:underline"
+                        >
+                          {tx.linkSlug ?? tx.paymentPageUrl}
+                        </a>
+                      ) : (
+                        tx.linkSlug ?? "—"
+                      )}
+                    </td>
                     <td className="px-4 py-3 text-sm text-white/90">{formatDate(tx.createdAt)}</td>
                   </tr>
                 ))

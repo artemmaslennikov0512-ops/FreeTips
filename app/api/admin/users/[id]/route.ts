@@ -112,12 +112,22 @@ function serializeUser(user: {
   };
 }
 
-function serializeTransaction(tx: { id: string; amountKop: bigint; status: string; createdAt: Date }) {
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ?? "";
+
+function serializeTransaction(tx: {
+  id: string;
+  amountKop: bigint;
+  status: string;
+  createdAt: Date;
+  link: { slug: string } | null;
+}) {
   return {
     id: tx.id,
     amountKop: Number(tx.amountKop),
     status: tx.status,
     createdAt: tx.createdAt.toISOString(),
+    linkSlug: tx.link?.slug ?? null,
+    paymentPageUrl: tx.link?.slug && APP_URL ? `${APP_URL}/pay/${tx.link.slug}` : null,
   };
 }
 
@@ -141,6 +151,13 @@ function getTransactions(id: string, params: ListParams) {
     orderBy: { createdAt: "desc" },
     take: params.limit,
     skip: params.offset,
+    select: {
+      id: true,
+      amountKop: true,
+      status: true,
+      createdAt: true,
+      link: { select: { slug: true } },
+    },
   });
 }
 

@@ -75,6 +75,16 @@ export class PayginePaymentGateway implements PaymentGateway {
       return { success: false, error: "Сумма слишком мала" };
     }
 
+    const tipLink = await db.tipLink.findUnique({
+      where: { id: linkId },
+      select: { slug: true },
+    });
+    if (!tipLink) {
+      return { success: false, error: "Ссылка для чаевых не найдена" };
+    }
+    const linkSlug = tipLink.slug;
+    const paymentPagePath = `/pay/${linkSlug}`;
+
     const existing = await db.transaction.findUnique({
       where: { idempotencyKey },
       select: { id: true, status: true, externalId: true },
@@ -114,8 +124,8 @@ export class PayginePaymentGateway implements PaymentGateway {
       select: { id: true },
     });
 
-    const successUrl = `${baseUrl}/pay/result?tid=${tx.id}&outcome=success`;
-    const failUrl = `${baseUrl}/pay/result?tid=${tx.id}&outcome=fail`;
+    const successUrl = `${baseUrl}${paymentPagePath}?tid=${tx.id}&outcome=success`;
+    const failUrl = `${baseUrl}${paymentPagePath}?tid=${tx.id}&outcome=fail`;
     const notifyUrl = `${baseUrl}/api/payment/webhook`;
     const orderSdRef = createOrderSdRef(tx.id);
 
@@ -125,7 +135,7 @@ export class PayginePaymentGateway implements PaymentGateway {
         amount,
         currency: CURRENCY_RUB,
         reference: idempotencyKey,
-        description: "Чаевые",
+        description: linkSlug,
         fee: feeKop > 0 ? feeKop : undefined,
         url: successUrl,
         failurl: failUrl,

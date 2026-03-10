@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { CheckCircle2, XCircle, Loader2, User, Smartphone, CreditCard } from "lucide-react";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
@@ -18,6 +18,7 @@ function toKopecks(rub: number): number {
 
 export default function PayPage() {
   const params = useParams();
+  const searchParams = useSearchParams();
   const slug = typeof params.slug === "string" ? params.slug : "";
 
   const [loading, setLoading] = useState(true);
@@ -47,6 +48,15 @@ export default function PayPage() {
       QRCode.toDataURL(url, { width: 128, margin: 1 }).then(setQrDataUrl).catch(() => {});
     }
   }, [slug]);
+
+  useEffect(() => {
+    const tid = searchParams.get("tid");
+    const outcome = searchParams.get("outcome");
+    if (tid && (outcome === "success" || outcome === "fail")) {
+      setResult(outcome);
+      return;
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     if (!slug) return;
@@ -179,7 +189,7 @@ export default function PayPage() {
             </h1>
             <p className="mt-1 text-center text-lg font-medium text-[#0a192f]">Чаевые зачислены.</p>
             <p className="mt-3 text-center text-sm text-[#2d3748]">
-              {recipientName} получил вашу благодарность.
+              {(recipientName ?? "Получатель")} получил вашу благодарность.
             </p>
           </div>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">

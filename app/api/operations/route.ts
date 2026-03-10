@@ -9,6 +9,7 @@ import { requireAuthOrApiKey } from "@/lib/auth-or-api-key";
 import { db } from "@/lib/db";
 import { parseLimitOffset } from "@/lib/api/helpers";
 import { feeKopForPayout } from "@/lib/payment/paygine-fee";
+import { getBaseUrlFromRequest } from "@/lib/get-base-url";
 
 export type OperationItem = {
   id: string;
@@ -18,6 +19,10 @@ export type OperationItem = {
   status: string;
   /** Причина отклонения (только для выводов со статусом REJECTED). */
   rejectionReason?: string | null;
+  /** URL страницы приёма чаевых (офика), по которой видно, кому идёт чай. Только для type "tip". */
+  paymentPageUrl?: string;
+  /** Уникальный идентификатор офика (slug ссылки), совпадает с order description в Paygine. Только для type "tip". */
+  linkSlug?: string;
   createdAt: string;
 };
 
@@ -28,11 +33,19 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const { limit, offset } = parseLimitOffset(searchParams);
 
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") || getBaseUrlFromRequest(request) || "";
   const takeEach = offset + limit;
   const [transactions, payouts, totalTx, totalPayout] = await Promise.all([
     db.transaction.findMany({
       where: { recipientId: auth.userId, status: "SUCCESS" },
-      select: { id: true, amountKop: true, feeKop: true, status: true, createdAt: true },
+      select: {
+        id: true,
+        amountKop: true,
+        feeKop: true,
+        status: true,
+        createdAt: true,
+        link: { select: { slug: true } },
+      },
       orderBy: { createdAt: "desc" },
       take: takeEach,
       skip: 0,
@@ -54,6 +67,10 @@ export async function GET(request: NextRequest) {
     amountKop: Number(t.amountKop),
     feeKop: Number(t.feeKop ?? 0),
     status: t.status,
+    ...(t.link && {
+      linkSlug: t.link.slug,
+      paymentPageUrl: baseUrl ? `${baseUrl}/pay/${t.link.slug}` : undefined,
+    }),
     createdAt: t.createdAt.toISOString(),
   }));
 

@@ -26,6 +26,7 @@ export default function PayPage() {
   const [savingFor, setSavingFor] = useState<string | null>(null);
   const [branding, setBranding] = useState<{
     logoUrl?: string;
+    logoOpacityPercent?: number | null;
     primaryColor?: string;
     secondaryColor?: string;
     mainBackgroundColor?: string;

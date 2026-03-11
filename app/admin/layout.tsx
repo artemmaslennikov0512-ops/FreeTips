@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import {
@@ -13,6 +13,7 @@ import {
   MessageCircle,
   Building2,
   FileCheck,
+  ChevronDown,
 } from "lucide-react";
 import { getAccessToken, fetchWithAuth, clearAccessToken } from "@/lib/auth-client";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
@@ -140,7 +141,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     return pathname?.startsWith(href) ?? false;
   };
 
-  const closeSidebar = () => setSidebarOpen(false);
+  const closeSidebar = useCallback(() => setSidebarOpen(false), []);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
 
   if (!mounted || loading) {
     return <LoadingSpinner message="Загрузка…" className="min-h-[60vh]" />;
@@ -171,18 +173,18 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <div className="admin-panel cabinet-premium flex min-h-screen w-full min-w-0 max-w-full bg-[var(--color-bg)] font-[family:var(--font-inter)] text-[var(--color-text)] pt-4">
-      {/* Шторка — как в ЛК официанта */}
+      {/* Шторка — закрывает выпадающее меню при клике вне (мобильный) */}
       <div
-        className={`admin-overlay cabinet-overlay fixed inset-0 z-30 rounded-xl border border-white/[0.12] bg-[rgba(15,23,42,0.65)] backdrop-blur-xl lg:hidden ml-4 mr-4 mt-4 mb-4 ${sidebarOpen ? "block" : "hidden"}`}
+        className={`admin-overlay cabinet-overlay fixed inset-0 z-30 rounded-xl border border-white/[0.12] bg-[rgba(15,23,42,0.65)] backdrop-blur-xl lg:hidden ml-4 mr-4 mt-4 mb-4 transition-opacity duration-300 ${
+          sidebarOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+        }`}
         onClick={closeSidebar}
         aria-hidden
       />
 
-      {/* Боковая панель — такой же стиль, как в ЛК официанта: отступы, скругление, стекло, обводка */}
+      {/* Боковая панель — только на десктопе (lg+); на мобильном навигация в выпадающем списке под кнопкой */}
       <aside
-        className={`admin-sidebar cabinet-sidebar fixed left-4 top-4 z-40 flex h-auto max-h-[calc(100vh-2rem)] w-[260px] shrink-0 flex-col overflow-hidden rounded-[10px] border border-white/10 bg-[var(--color-navy)] py-6 shadow-sm backdrop-blur-xl transition-transform duration-300 lg:static lg:left-auto lg:top-auto lg:ml-4 lg:mt-4 lg:mr-0 lg:mb-0 lg:max-h-none lg:self-start lg:translate-x-0 ${
-          sidebarOpen ? "translate-x-0 flex" : "-translate-x-full hidden lg:flex"
-        }`}
+        className="admin-sidebar cabinet-sidebar hidden lg:flex fixed left-4 top-4 z-40 h-auto max-h-[calc(100vh-2rem)] w-[260px] shrink-0 flex-col overflow-hidden rounded-[10px] border border-white/10 bg-[var(--color-navy)] py-6 shadow-sm backdrop-blur-xl lg:static lg:left-auto lg:top-auto lg:ml-4 lg:mt-4 lg:mr-0 lg:mb-0 lg:max-h-none lg:self-start lg:translate-x-0"
       >
         <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
           <div className="cabinet-sidebar-profile cabinet-block-inner mx-4 mb-4 rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-4 py-3">
@@ -196,46 +198,104 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               </div>
             </div>
           </div>
-          <nav className="flex-1 overflow-y-auto px-4 py-2">
-            {NAV.map(({ label, href, icon: Icon }) => (
-              <Link
-                key={href}
-                href={href}
-                onClick={closeSidebar}
-                className={`mb-1 flex items-center gap-3 rounded-[10px] px-4 py-3.5 font-medium transition-colors ${
-                  isActive(href)
-                    ? "cabinet-nav-active border border-[#0a192f]/35 bg-[#0a192f]/12 text-[#0a192f] font-semibold"
-                    : "border border-transparent text-[var(--color-text)]/80 hover:bg-[var(--color-dark-gray)]/10 hover:text-[var(--color-text)]"
-                }`}
-              >
-                <Icon className="h-5 w-5 shrink-0" />
-                <span className="min-w-0 break-words">{label}</span>
-              </Link>
-            ))}
+          <div className="cabinet-nav-block flex-1 overflow-y-auto px-4 py-2">
+            <p className="cabinet-nav-label mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-white/50">
+              Навигация
+            </p>
+            <nav className="flex flex-col gap-0.5 rounded-xl border border-[var(--color-brand-gold)]/15 bg-white/5 p-1.5 shadow-[var(--shadow-subtle)]" aria-label="Навигация админ-панели">
+              {NAV.map(({ label, href, icon: Icon }) => (
+                <Link
+                  key={href}
+                  href={href}
+                  onClick={closeSidebar}
+                  className={`flex items-center gap-3 rounded-lg px-3 py-3 font-medium transition-colors ${
+                    isActive(href)
+                      ? "cabinet-nav-active border border-[#0a192f]/25 bg-[#0a192f]/10 text-[#0a192f] font-semibold"
+                      : "border border-transparent text-white/80 hover:bg-[var(--color-dark-gray)]/10 hover:text-white"
+                  }`}
+                >
+                  <Icon className="h-5 w-5 shrink-0" />
+                  <span className="min-w-0 break-words">{label}</span>
+                </Link>
+              ))}
+            </nav>
             <button
               type="button"
               onClick={handleLogout}
-              className="mb-1 mt-4 flex w-full items-center gap-3 rounded-[10px] border border-transparent px-4 py-3 text-sm font-medium text-[var(--color-text)]/80 transition-colors hover:bg-[var(--color-dark-gray)]/10 hover:text-[var(--color-text)]"
+              className="mt-4 flex w-full items-center gap-3 rounded-[10px] border border-transparent px-4 py-3 text-sm font-medium text-white/80 transition-colors hover:bg-[var(--color-dark-gray)]/10 hover:text-white"
             >
               <LogOut className="h-4 w-4 shrink-0" />
               <span>Выйти</span>
             </button>
-          </nav>
+          </div>
         </div>
       </aside>
 
       <main className="min-h-screen min-w-0 flex-1 overflow-x-hidden pl-4 pr-4 lg:pl-0 lg:pr-0 lg:ml-0 flex flex-col">
         <div className="admin-main-block cabinet-main-block mt-4 mr-0 mb-4 ml-0 lg:mr-4 lg:ml-4 flex min-h-[calc(100vh-2rem)] flex-1 flex-col rounded-[10px] border border-white/10 bg-white/[0.06] backdrop-blur-xl">
           <div className="p-4 sm:p-6 lg:p-8 min-w-0 max-w-full flex-1 overflow-x-hidden flex flex-col" id="main-content">
-            <div className="mb-4 flex justify-start lg:hidden">
+            <div className="mb-4 flex justify-start lg:hidden relative">
               <button
+                ref={menuButtonRef}
                 type="button"
-                onClick={() => setSidebarOpen(true)}
-                className="flex h-14 w-14 min-w-14 items-center justify-center rounded-xl border border-white/20 bg-white/10 text-[var(--color-brand-gold)] hover:bg-[var(--color-brand-gold)]/20 hover:border-[var(--color-brand-gold)]/40 active:scale-95"
+                onClick={() => setSidebarOpen((o) => !o)}
+                className="cabinet-menu-btn flex h-14 w-14 min-w-14 items-center justify-center gap-1.5 rounded-xl border border-white/20 bg-white/10 text-[var(--color-brand-gold)] hover:bg-[var(--color-brand-gold)]/20 hover:border-[var(--color-brand-gold)]/40 active:scale-95 transition-all"
                 aria-label="Меню"
+                aria-expanded={sidebarOpen}
+                aria-haspopup="true"
+                aria-controls="admin-nav-dropdown"
               >
                 <Menu className="h-7 w-7" strokeWidth={2} />
+                <ChevronDown className={`h-5 w-5 transition-transform duration-200 ${sidebarOpen ? "rotate-180" : ""}`} aria-hidden />
               </button>
+              <div
+                id="admin-nav-dropdown"
+                role="menu"
+                className={`cabinet-nav-dropdown admin-nav-dropdown absolute left-0 top-full z-50 mt-2 w-[min(100vw-2rem,320px)] origin-top rounded-xl border border-[var(--color-brand-gold)]/20 bg-[var(--color-navy)] shadow-[var(--shadow-card)] backdrop-blur-xl transition-[opacity,transform] duration-200 ${
+                  sidebarOpen ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"
+                }`}
+                aria-hidden={!sidebarOpen}
+              >
+                <div className="cabinet-nav-dropdown-inner overflow-hidden rounded-xl p-3 text-white">
+                  <div className="cabinet-sidebar-profile cabinet-block-inner mb-3 rounded-lg border border-[var(--color-brand-gold)]/20 bg-white/10 px-3 py-2.5">
+                    <div className="flex items-center gap-2.5">
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--color-brand-gold)] font-semibold text-[#0a192f] text-sm">
+                        {(user.login || "A").charAt(0).toUpperCase()}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="truncate font-semibold text-white text-sm">{user.login}</div>
+                        <div className="text-xs text-white/80">Админ</div>
+                      </div>
+                    </div>
+                  </div>
+                  <p className="cabinet-nav-label mb-1.5 px-2 text-[10px] font-semibold uppercase tracking-wider text-white/50">Навигация</p>
+                  <nav className="flex flex-col gap-0.5 rounded-lg border border-[var(--color-brand-gold)]/15 bg-white/5 p-1" role="none">
+                    {NAV.map(({ label, href, icon: Icon }) => (
+                      <Link
+                        key={href}
+                        href={href}
+                        onClick={closeSidebar}
+                        role="menuitem"
+                        className={`flex items-center gap-2.5 rounded-md px-2.5 py-2.5 text-sm font-medium transition-colors ${
+                          isActive(href) ? "cabinet-nav-active bg-white/15 text-white font-semibold" : "text-white/85 hover:bg-white/10 hover:text-white"
+                        }`}
+                      >
+                        <Icon className="h-4 w-4 shrink-0" />
+                        <span>{label}</span>
+                      </Link>
+                    ))}
+                  </nav>
+                  <button
+                    type="button"
+                    onClick={() => { closeSidebar(); handleLogout(); }}
+                    className="mt-3 flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2.5 text-sm font-medium text-white/80 hover:bg-white/10 hover:text-white"
+                    role="menuitem"
+                  >
+                    <LogOut className="h-4 w-4 shrink-0" />
+                    <span>Выйти</span>
+                  </button>
+                </div>
+              </div>
             </div>
             {children}
           </div>

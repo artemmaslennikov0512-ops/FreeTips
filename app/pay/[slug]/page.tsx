@@ -316,6 +316,15 @@ export default function PayPage() {
           </div>
         </div>
 
+        {/* Отдельный блок: подписи тем (официант | QR | сумма) в одну строку по центру, у каждой темы свой шрифт */}
+        <div className="pay-page-topics pay-page-card card" style={Object.keys(cardStyle).length ? cardStyle : undefined}>
+          <div className="pay-page-topics-row">
+            <span className="pay-page-topic pay-page-topic--officiant" style={{ color: fontClr ?? undefined }}>Официант</span>
+            <span className="pay-page-topic pay-page-topic--qr" style={{ color: fontClr ?? undefined }}>QR-код</span>
+            <span className="pay-page-topic pay-page-topic--sum" style={{ color: fontClr ?? undefined }}>Сумма</span>
+          </div>
+        </div>
+
         {/* Карточка: сумма чаевых */}
         <div className="pay-page-card card" style={Object.keys(cardStyle).length ? cardStyle : undefined}>
           <div className="pay-page-amounts">

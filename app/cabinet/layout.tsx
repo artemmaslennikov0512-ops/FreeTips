@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import {
@@ -14,6 +14,7 @@ import {
   ShieldCheck,
   BadgeCheck,
   Building2,
+  ChevronDown,
 } from "lucide-react";
 import { getAccessToken, fetchWithAuth, clearAccessToken } from "@/lib/auth-client";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
@@ -158,6 +159,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
     href === "/cabinet" ? pathname === "/cabinet" : pathname.startsWith(href);
 
   const closeSidebar = useCallback(() => setSidebarOpen(false), []);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
 
   if (!mounted) {
     return <LoadingSpinner message="Загрузка…" className="min-h-[60vh]" />;
@@ -201,7 +203,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
       data-brand-active={hasBrand ? "true" : undefined}
       style={Object.keys(brandStyle).length ? brandStyle : undefined}
     >
-      {/* Мобильная шторка — как на лендинге: на весь экран, без зазоров, показ через opacity */}
+      {/* Мобильная шторка — закрывает выпадающее меню при клике вне */}
       <div
         className={`cabinet-overlay fixed inset-0 z-30 bg-[rgba(15,23,42,0.65)] backdrop-blur-xl transition-opacity duration-300 lg:hidden ${
           sidebarOpen ? "opacity-100" : "opacity-0 pointer-events-none"
@@ -210,11 +212,9 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
         aria-hidden
       />
 
-      {/* Левое меню: на мобильном — выезд слева от края (как на лендинге справа), без зазора */}
+      {/* Левое меню: только на десктопе (lg+); на мобильном навигация в выпадающем списке под кнопкой */}
       <div
-        className={`cabinet-sidebar fixed left-0 top-0 z-40 flex h-full w-[min(calc(100vw-4rem),20rem)] max-w-[20rem] flex-col overflow-hidden border-0 border-r border-white/10 py-6 shadow-2xl backdrop-blur-xl transition-[transform] duration-300 ease-out lg:static lg:left-auto lg:top-auto lg:ml-0 lg:mt-2 lg:mr-0 lg:mb-0 lg:h-auto lg:max-h-[calc(100vh-2rem)] lg:w-[260px] lg:max-w-none lg:translate-x-0 lg:rounded-[10px] lg:border lg:self-start ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
+        className={`cabinet-sidebar hidden lg:flex fixed left-0 top-0 z-40 h-full w-[min(calc(100vw-4rem),20rem)] max-w-[20rem] flex-col overflow-hidden border-0 border-r border-white/10 py-6 shadow-2xl backdrop-blur-xl transition-[transform] duration-300 ease-out lg:static lg:left-auto lg:top-auto lg:ml-0 lg:mt-2 lg:mr-0 lg:mb-0 lg:h-auto lg:max-h-[calc(100vh-2rem)] lg:w-[260px] lg:max-w-none lg:translate-x-0 lg:rounded-[10px] lg:border lg:self-start`}
         style={sidebarStyle}
       >
         {user?.establishmentBrand?.logoUrl && (
@@ -254,42 +254,47 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
             </div>
           </div>
         </div>
-        <nav className="mt-8 flex flex-col gap-1 px-4">
-          {NAV.map(({ label, href, icon: Icon }) => (
-            <Link
-              key={href}
-              href={href}
-              onClick={closeSidebar}
-              className={`flex items-center gap-3 rounded-[10px] px-4 py-3.5 font-medium transition-colors ${
-                isActive(href)
-                  ? "cabinet-nav-active border border-[#0a192f]/35 bg-[#0a192f]/12 text-[#0a192f] font-semibold"
-                  : "border border-transparent text-[var(--color-text)]/80 hover:bg-[var(--color-dark-gray)]/10 hover:text-[var(--color-text)]"
-              }`}
-              style={!isActive(href) && brandFont ? { color: `${brandFont}cc` } : undefined}
-            >
-              <Icon className="h-5 w-5 shrink-0" />
-              <span>{label}</span>
-              {href === "/cabinet/support" && supportUnreadCount > 0 && (
-                <span
-                  className="ml-auto flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[var(--color-accent-red)] px-1.5 text-xs font-semibold text-white"
-                  aria-label={`Непрочитанных: ${supportUnreadCount}`}
-                >
-                  {supportUnreadCount > 99 ? "99+" : supportUnreadCount}
-                </span>
-              )}
-            </Link>
-          ))}
-          {user?.role === "ESTABLISHMENT_ADMIN" && (
-            <Link
-              href="/establishment"
-              onClick={closeSidebar}
-              className="mt-2 flex items-center gap-3 rounded-[10px] px-4 py-3.5 font-medium text-[var(--color-text)]/80 transition-colors hover:bg-[var(--color-dark-gray)]/10 hover:text-[var(--color-text)]"
-              style={brandFont ? { color: `${brandFont}cc` } : undefined}
-            >
-              <Building2 className="h-5 w-5 shrink-0" />
-              <span>Кабинет заведения</span>
-            </Link>
-          )}
+        <div className="cabinet-nav-block mt-6 px-4">
+          <p className="cabinet-nav-label mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-[var(--color-text)]/50">
+            Навигация
+          </p>
+          <nav className="flex flex-col gap-0.5 rounded-xl border border-[var(--color-brand-gold)]/15 bg-[var(--color-dark-gray)]/5 p-1.5 shadow-[var(--shadow-subtle)]" aria-label="Навигация по кабинету">
+            {NAV.map(({ label, href, icon: Icon }) => (
+              <Link
+                key={href}
+                href={href}
+                onClick={closeSidebar}
+                className={`flex items-center gap-3 rounded-lg px-3 py-3 font-medium transition-colors ${
+                  isActive(href)
+                    ? "cabinet-nav-active border border-[#0a192f]/25 bg-[#0a192f]/10 text-[#0a192f] font-semibold"
+                    : "border border-transparent text-[var(--color-text)]/80 hover:bg-[var(--color-dark-gray)]/10 hover:text-[var(--color-text)]"
+                }`}
+                style={!isActive(href) && brandFont ? { color: `${brandFont}cc` } : undefined}
+              >
+                <Icon className="h-5 w-5 shrink-0" />
+                <span>{label}</span>
+                {href === "/cabinet/support" && supportUnreadCount > 0 && (
+                  <span
+                    className="ml-auto flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[var(--color-accent-red)] px-1.5 text-xs font-semibold text-white"
+                    aria-label={`Непрочитанных: ${supportUnreadCount}`}
+                  >
+                    {supportUnreadCount > 99 ? "99+" : supportUnreadCount}
+                  </span>
+                )}
+              </Link>
+            ))}
+            {user?.role === "ESTABLISHMENT_ADMIN" && (
+              <Link
+                href="/establishment"
+                onClick={closeSidebar}
+                className="flex items-center gap-3 rounded-lg border border-transparent px-3 py-3 font-medium text-[var(--color-text)]/80 transition-colors hover:bg-[var(--color-dark-gray)]/10 hover:text-[var(--color-text)]"
+                style={brandFont ? { color: `${brandFont}cc` } : undefined}
+              >
+                <Building2 className="h-5 w-5 shrink-0" />
+                <span>Кабинет заведения</span>
+              </Link>
+            )}
+          </nav>
           <button
             type="button"
             onClick={handleLogout}
@@ -299,7 +304,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
             <LogOut className="h-4 w-4 shrink-0" />
             <span>Выйти</span>
           </button>
-        </nav>
+        </div>
       </div>
 
       <main className="min-h-screen min-w-0 flex-1 overflow-x-hidden px-0 pt-2 pb-4 md:px-4 lg:pl-0 lg:pr-4 lg:ml-0 lg:mr-0 flex flex-col">
@@ -309,15 +314,86 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
           style={mainBlockStyle}
         >
           <div className="p-4 md:p-6 lg:p-8" id="main-content">
-            <div className="mb-4 lg:hidden">
+            <div className="mb-4 lg:hidden relative">
               <button
+                ref={menuButtonRef}
                 type="button"
-                onClick={() => setSidebarOpen(true)}
-                className="flex h-14 w-14 min-w-14 items-center justify-center rounded-xl border border-white/20 bg-white/10 text-[var(--color-brand-gold)] hover:bg-[var(--color-brand-gold)]/20 hover:border-[var(--color-brand-gold)]/40 active:scale-95"
-                aria-label="Меню"
+                onClick={() => setSidebarOpen((o) => !o)}
+                className="cabinet-menu-btn flex h-14 w-14 min-w-14 items-center justify-center gap-1.5 rounded-xl border border-white/20 bg-white/10 text-[var(--color-brand-gold)] hover:bg-[var(--color-brand-gold)]/20 hover:border-[var(--color-brand-gold)]/40 active:scale-95 transition-all aria-label="Меню"
+                aria-expanded={sidebarOpen}
+                aria-haspopup="true"
+                aria-controls="cabinet-nav-dropdown"
               >
                 <Menu className="h-7 w-7" strokeWidth={2} />
+                <ChevronDown className={`h-5 w-5 transition-transform duration-200 ${sidebarOpen ? "rotate-180" : ""}`} aria-hidden />
               </button>
+              <div
+                id="cabinet-nav-dropdown"
+                role="menu"
+                className={`cabinet-nav-dropdown absolute left-0 top-full z-50 mt-2 w-[min(100vw-2rem,320px)] origin-top rounded-xl border border-[var(--color-brand-gold)]/20 bg-[var(--color-bg-sides)] shadow-[var(--shadow-card)] backdrop-blur-xl transition-[opacity,transform] duration-200 ${
+                  sidebarOpen ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"
+                }`}
+                style={sidebarStyle}
+                aria-hidden={!sidebarOpen}
+              >
+                <div className="cabinet-nav-dropdown-inner overflow-hidden rounded-xl p-3">
+                  <div className={`cabinet-sidebar-profile cabinet-block-inner mb-3 rounded-lg border border-[var(--color-brand-gold)]/20 px-3 py-2.5 ${!sidebarBg ? "bg-[var(--color-dark-gray)]/10" : ""}`} style={Object.keys(profileBlockStyle).length ? profileBlockStyle : undefined}>
+                    <div className="flex items-center gap-2.5">
+                      {user?.employeePhotoUrl ? (
+                        <img src={user.employeePhotoUrl} alt="" className="h-9 w-9 shrink-0 rounded-full object-cover bg-[var(--color-brand-gold)]" />
+                      ) : (
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--color-brand-gold)] font-semibold text-[#0a192f] text-xs">{initials}</div>
+                      )}
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-1">
+                          <span className="truncate font-semibold text-[var(--color-text)] text-sm" style={brandFont ? { color: brandFont } : undefined}>{displayName}</span>
+                          {user?.verificationStatus === "VERIFIED" && <BadgeCheck className="h-4 w-4 shrink-0 text-blue-500" aria-label="Верифицирован" />}
+                        </div>
+                        <div className="text-xs text-[var(--color-text)]/80" style={brandFont ? { color: brandFont } : undefined}>Официант</div>
+                      </div>
+                    </div>
+                  </div>
+                  <p className="cabinet-nav-label mb-1.5 px-2 text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text)]/50">Навигация</p>
+                  <nav className="flex flex-col gap-0.5 rounded-lg border border-[var(--color-brand-gold)]/15 bg-[var(--color-dark-gray)]/5 p-1" role="none">
+                    {NAV.map(({ label, href, icon: Icon }) => (
+                      <Link
+                        key={href}
+                        href={href}
+                        onClick={closeSidebar}
+                        role="menuitem"
+                        className={`flex items-center gap-2.5 rounded-md px-2.5 py-2.5 text-sm font-medium transition-colors ${
+                          isActive(href) ? "cabinet-nav-active bg-[#0a192f]/10 text-[#0a192f] font-semibold" : "text-[var(--color-text)]/85 hover:bg-[var(--color-dark-gray)]/10 hover:text-[var(--color-text)]"
+                        }`}
+                        style={!isActive(href) && brandFont ? { color: `${brandFont}cc` } : undefined}
+                      >
+                        <Icon className="h-4 w-4 shrink-0" />
+                        <span>{label}</span>
+                        {href === "/cabinet/support" && supportUnreadCount > 0 && (
+                          <span className="ml-auto flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[var(--color-accent-red)] px-1.5 text-xs font-semibold text-white">
+                            {supportUnreadCount > 99 ? "99+" : supportUnreadCount}
+                          </span>
+                        )}
+                      </Link>
+                    ))}
+                    {user?.role === "ESTABLISHMENT_ADMIN" && (
+                      <Link href="/establishment" onClick={closeSidebar} role="menuitem" className="flex items-center gap-2.5 rounded-md px-2.5 py-2.5 text-sm font-medium text-[var(--color-text)]/85 hover:bg-[var(--color-dark-gray)]/10" style={brandFont ? { color: `${brandFont}cc` } : undefined}>
+                        <Building2 className="h-4 w-4 shrink-0" />
+                        <span>Кабинет заведения</span>
+                      </Link>
+                    )}
+                  </nav>
+                  <button
+                    type="button"
+                    onClick={() => { closeSidebar(); handleLogout(); }}
+                    className="mt-3 flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2.5 text-sm font-medium text-[var(--color-text)]/80 hover:bg-[var(--color-dark-gray)]/10 hover:text-[var(--color-text)]"
+                    style={brandFont ? { color: `${brandFont}cc` } : undefined}
+                    role="menuitem"
+                  >
+                    <LogOut className="h-4 w-4 shrink-0" />
+                    <span>Выйти</span>
+                  </button>
+                </div>
+              </div>
             </div>
             {children}
           </div>

@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { User, Loader2, CheckCircle2 } from "lucide-react";
+import { User, Loader2, CheckCircle2, Camera, ImageIcon } from "lucide-react";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { getAccessToken, authHeaders, clearAccessToken } from "@/lib/auth-client";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
@@ -19,6 +19,7 @@ type Profile = {
   birthDate?: string | null;
   establishment?: string | null;
   role: string;
+  employeePhotoUrl?: string | null;
   stats: import("../shared").Stats;
 };
 
@@ -47,6 +48,10 @@ export default function CabinetSettingsPage() {
   const [pwError, setPwError] = useState<string | null>(null);
   const [pwFieldErrors, setPwFieldErrors] = useState<Record<string, string>>({});
   const [pwOk, setPwOk] = useState(false);
+
+  const [photoUploading, setPhotoUploading] = useState(false);
+  const [photoError, setPhotoError] = useState<string | null>(null);
+  const photoInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const token = getAccessToken();
@@ -202,6 +207,38 @@ export default function CabinetSettingsPage() {
     }
   };
 
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !getAccessToken()) return;
+    setPhotoError(null);
+    setPhotoUploading(true);
+    try {
+      const formData = new FormData();
+      formData.set("file", file);
+      formData.set("type", "avatar");
+      const res = await fetch("/api/profile/employee-photo", {
+        method: "POST",
+        headers: authHeaders(),
+        body: formData,
+      });
+      const data = (await res.json()) as { ok?: boolean; error?: string };
+      if (!res.ok) {
+        setPhotoError(data?.error ?? "Ошибка загрузки");
+        return;
+      }
+      const profileRes = await fetch("/api/profile", { headers: authHeaders() });
+      if (profileRes.ok) {
+        const updated = (await profileRes.json()) as Profile;
+        setUser(updated);
+      }
+    } catch {
+      setPhotoError("Ошибка соединения");
+    } finally {
+      setPhotoUploading(false);
+      e.target.value = "";
+    }
+  };
+
   const combinedFullNameForCompare = [editLastName.trim(), editFirstName.trim(), editPatronymic.trim()].filter(Boolean).join(" ");
   const hasProfileChanges =
     editLogin.trim() !== (user?.login ?? "") ||
@@ -230,6 +267,57 @@ export default function CabinetSettingsPage() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-8">
+      {user?.role === "EMPLOYEE" && (
+        <div id="settings-photo" className="cabinet-card rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden">
+          <div className="flex items-center gap-3 border-0 px-6 py-4">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--color-accent-gold)]/20 text-[var(--color-accent-gold)]">
+              <Camera className="h-6 w-6" />
+            </div>
+            <h2 className="font-[family:var(--font-playfair)] text-lg font-semibold text-[var(--color-text)]">Фото профиля</h2>
+          </div>
+          <div className="p-6">
+            <p className="text-sm text-[var(--color-text)]/80 mb-4">
+              Фото отображается на странице оплаты чаевых и в сайдбаре. Рекомендуется не менее 200×200 px. Форматы: JPEG, PNG, WebP, до 5 МБ.
+            </p>
+            <div className="flex flex-wrap items-center gap-4">
+              {user.employeePhotoUrl ? (
+                <img
+                  src={user.employeePhotoUrl}
+                  alt=""
+                  className="h-24 w-24 rounded-full object-cover border-2 border-[var(--color-brand-gold)]/30"
+                />
+              ) : (
+                <div className="h-24 w-24 rounded-full bg-[var(--color-dark-gray)]/50 flex items-center justify-center border-2 border-dashed border-white/20">
+                  <ImageIcon className="h-10 w-10 text-white/40" />
+                </div>
+              )}
+              <div className="flex flex-col gap-2">
+                <input
+                  ref={photoInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/jpg"
+                  onChange={handlePhotoUpload}
+                  className="hidden"
+                  aria-label="Выберите фото"
+                />
+                <button
+                  type="button"
+                  onClick={() => photoInputRef.current?.click()}
+                  disabled={photoUploading}
+                  className="inline-flex items-center gap-2 rounded-xl bg-[var(--color-brand-gold)] px-4 py-2.5 text-[14px] font-semibold text-[#0a192f] hover:opacity-90 disabled:opacity-50"
+                >
+                  {photoUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ImageIcon className="h-4 w-4" />}
+                  {photoUploading ? "Загрузка…" : "Загрузить фото"}
+                </button>
+                {photoError && (
+                  <p className="text-sm text-[var(--color-accent-red)]" role="alert">{photoError}</p>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div id="settings-profile" className="cabinet-card rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden">
         <div className="flex items-center justify-between border-0 px-6 py-4">
           <div className="flex items-center gap-3">

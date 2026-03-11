@@ -13,7 +13,7 @@ function buildFooterColumns(): { title: string; links: { href: string; label: st
     { title: "Сервис", links: [{ href: "/#features", label: "Преимущества" }, { href: "/#process", label: "Как работает" }, { href: "/oferta", label: "Тарифы" }, { href: "/politika-bezopasnosti", label: "Безопасность" }] },
     docsColumn,
     { title: "Компания", links: [{ href: "/#about", label: "О нас" }, { href: "/kontakty", label: "Контакты" }] },
-    { title: "Помощь", links: [{ href: "/kontakty", label: "Поддержка" }] },
+    { title: "Помощь", links: [{ href: "/kontakty", label: "Поддержка" }, { href: "/zayavka", label: "Оставить заявку" }] },
   ];
 }
 
@@ -59,7 +59,7 @@ export function FooterPremium() {
             </div>
           </div>
         )}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-16 gap-y-12 mb-16 items-start">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-x-16 gap-y-12 mb-16 items-start">
           <div className="flex flex-col gap-4 text-left">
             <Link href="/" className="flex items-center gap-2 group w-fit">
               <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--color-navy)] text-[var(--color-white)] font-bold text-lg">FT</span>

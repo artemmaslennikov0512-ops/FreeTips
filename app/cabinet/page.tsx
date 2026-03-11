@@ -42,6 +42,7 @@ export default function CabinetDashboardPage() {
   const [savingFor, setSavingFor] = useState<string | null>(null);
   const [savingForEdit, setSavingForEdit] = useState("");
   const [savingForSaving, setSavingForSaving] = useState(false);
+  const [savingForEditing, setSavingForEditing] = useState(false);
 
   const fetchProfileAndData = useCallback(async () => {
     const token = localStorage.getItem("accessToken");
@@ -161,6 +162,7 @@ export default function CabinetDashboardPage() {
       });
       if (res.ok) {
         setSavingFor(value);
+        setSavingForEditing(false);
       }
     } finally {
       setSavingForSaving(false);
@@ -353,28 +355,46 @@ export default function CabinetDashboardPage() {
             </h3>
           </div>
           <div className="p-6">
-            {/* 1. Goal card — same size/style as "Your link for tea" */}
+            {/* 1. Goal card — saved goal text + "Изменить" or input + "Сохранить" */}
             <div className="cabinet-block-inner mb-6 rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 p-4">
               <div className="mb-2 text-sm font-semibold text-[var(--color-text)]">Цель, на которую коплю</div>
-              <div className="cabinet-input-window mb-3 w-full rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-bg-sides)] px-3 py-2 text-[14px] text-[var(--color-text)] placeholder:text-[var(--color-text)]/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-brand-gold)]/50">
-                <input
-                  type="text"
-                  value={savingForEdit}
-                  onChange={(e) => setSavingForEdit(e.target.value)}
-                  placeholder="Например: новый ноутбук, отпуск…"
-                  maxLength={500}
-                  className="w-full min-w-0 bg-transparent"
-                  aria-label="Цель (на что коплю)"
-                />
-              </div>
-              <button
-                type="button"
-                onClick={saveSavingFor}
-                disabled={savingForSaving || (savingForEdit.trim() || null) === (savingFor ?? null)}
-                className="rounded-[10px] bg-[var(--color-brand-gold)] px-4 py-2 text-[14px] font-semibold text-[#0a192f] transition-all hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {savingForSaving ? "Сохранение…" : "Сохранить"}
-              </button>
+              {savingFor && !savingForEditing ? (
+                <>
+                  <p className="mb-3 text-[14px] text-[var(--color-text)]">{savingFor}</p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSavingForEditing(true);
+                      setSavingForEdit(savingFor);
+                    }}
+                    className="rounded-[10px] border border-[var(--color-brand-gold)]/40 bg-transparent px-4 py-2 text-[14px] font-semibold text-[var(--color-text)] transition-all hover:bg-[var(--color-brand-gold)]/15"
+                  >
+                    Изменить
+                  </button>
+                </>
+              ) : (
+                <>
+                  <div className="cabinet-input-window mb-3 w-full rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-bg-sides)] px-3 py-2 text-[14px] text-[var(--color-text)] placeholder:text-[var(--color-text)]/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-brand-gold)]/50">
+                    <input
+                      type="text"
+                      value={savingForEdit}
+                      onChange={(e) => setSavingForEdit(e.target.value)}
+                      placeholder="Например: новый ноутбук, отпуск…"
+                      maxLength={500}
+                      className="w-full min-w-0 bg-transparent"
+                      aria-label="Цель (на что коплю)"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={saveSavingFor}
+                    disabled={savingForSaving || (savingForEdit.trim() || null) === (savingFor ?? null)}
+                    className="rounded-[10px] bg-[var(--color-brand-gold)] px-4 py-2 text-[14px] font-semibold text-[#0a192f] transition-all hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {savingForSaving ? "Сохранение…" : "Сохранить"}
+                  </button>
+                </>
+              )}
             </div>
 
             {/* 2. Four quick action cards */}

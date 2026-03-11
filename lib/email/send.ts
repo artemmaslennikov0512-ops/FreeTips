@@ -16,6 +16,19 @@ export interface SendEmailOptions {
 
 export type SendEmailResult = { ok: true } | { ok: false; error: string };
 
+/** Проверка: задана ли хотя бы одна конфигурация почты (для диагностики без раскрытия секретов). */
+export function isMailConfigured(): boolean {
+  return getMailProvider() !== "none";
+}
+
+function getMailProvider(): "smtp" | "resend" | "none" {
+  const smtpHost = process.env.SMTP_HOST?.trim();
+  if (smtpHost) return "smtp";
+  const resendKey = process.env.RESEND_API_KEY?.trim();
+  if (resendKey) return "resend";
+  return "none";
+}
+
 /** Отправить письмо. Возвращает { ok: true } или { ok: false, error }. Если почта не настроена — { ok: false, error: "..." }. */
 export async function sendEmail(options: SendEmailOptions): Promise<SendEmailResult> {
   const { to, subject, html } = options;
@@ -31,7 +44,11 @@ export async function sendEmail(options: SendEmailOptions): Promise<SendEmailRes
     return sendViaResend({ to, subject, html, text: options.text, from: options.from ?? process.env.RESEND_FROM ?? "FreeTips <onboarding@resend.dev>" });
   }
 
-  return { ok: false, error: "Почта не настроена: задайте SMTP_* или RESEND_API_KEY" };
+  return {
+    ok: false,
+    error:
+      "Почта не настроена: задайте SMTP_HOST (и SMTP_USER, SMTP_PASS) или RESEND_API_KEY в .env. Без пробелов в начале строки. После изменения .env перезапустите сервер.",
+  };
 }
 
 async function sendViaSmtp(options: SendEmailOptions): Promise<SendEmailResult> {

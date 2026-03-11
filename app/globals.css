@@ -135,6 +135,58 @@ html:not([data-theme="dark"]) .cabinet-premium .cabinet-sidebar:not(.admin-sideb
   color: #fafafa !important;
 }
 
+/* Выпадающий список навигации (мобильный) — продолжение кнопки «Меню» */
+.cabinet-premium .cabinet-nav-dropdown {
+  box-shadow: var(--shadow-card), 0 0 0 1px rgba(197, 165, 114, 0.12);
+}
+.cabinet-premium .cabinet-nav-dropdown::before {
+  content: "";
+  position: absolute;
+  top: -6px;
+  left: 20px;
+  width: 12px;
+  height: 12px;
+  background: var(--color-bg-sides);
+  border-left: 1px solid rgba(197, 165, 114, 0.2);
+  border-top: 1px solid rgba(197, 165, 114, 0.2);
+  transform: rotate(45deg);
+  border-radius: 1px;
+}
+html:not([data-theme="dark"]) .cabinet-premium .cabinet-nav-dropdown::before {
+  background: #0a192f;
+  border-color: rgba(197, 165, 114, 0.25);
+}
+[data-theme="dark"] .cabinet-premium .cabinet-nav-dropdown::before {
+  display: none;
+}
+.cabinet-premium .cabinet-menu-btn[aria-expanded="true"] {
+  border-color: rgba(197, 165, 114, 0.45);
+  background: rgba(197, 165, 114, 0.12);
+}
+/* Светлая тема: выпадающий список в том же стиле, что и сайдбар */
+html:not([data-theme="dark"]) .cabinet-premium .cabinet-nav-dropdown {
+  background: linear-gradient(135deg, #0a192f 0%, color-mix(in srgb, #0a192f 85%, white) 50%, #0a192f 100%) !important;
+  color: rgba(255, 255, 255, 0.92);
+  border-color: rgba(197, 165, 114, 0.3) !important;
+}
+html:not([data-theme="dark"]) .cabinet-premium .cabinet-nav-dropdown a,
+html:not([data-theme="dark"]) .cabinet-premium .cabinet-nav-dropdown button {
+  color: inherit;
+}
+html:not([data-theme="dark"]) .cabinet-premium .cabinet-nav-dropdown .cabinet-nav-label {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+html:not([data-theme="dark"]) .cabinet-premium .cabinet-nav-dropdown .cabinet-nav-active {
+  border-color: rgba(255, 255, 255, 0.35) !important;
+  background: rgba(255, 255, 255, 0.18) !important;
+  color: #ffffff !important;
+}
+
+/* Блок навигации в сайдбаре — подпись «Навигация» */
+.cabinet-premium .cabinet-nav-block .cabinet-nav-label {
+  font-family: var(--font-inter), system-ui, sans-serif;
+}
+
 /* Светлая тема: сайдбар админки — градиент как у ЛК, разделы видны (светлый текст), шрифт, подсветка активного */
 html:not([data-theme="dark"]) .admin-panel .admin-sidebar {
   background: linear-gradient(135deg, #0a192f 0%, color-mix(in srgb, #0a192f 85%, white) 50%, #0a192f 100%) !important;
@@ -775,6 +827,7 @@ html:not([data-theme="dark"]) .pay-page .pay-page-card.card {
 html:not([data-theme="dark"]) .pay-page .pay-page-card.card .pay-page-recipient-name,
 html:not([data-theme="dark"]) .pay-page .pay-page-card.card .pay-page-section-title,
 html:not([data-theme="dark"]) .pay-page .pay-page-card.card .pay-page-label,
+html:not([data-theme="dark"]) .pay-page .pay-page-card.card .pay-page-topic,
 html:not([data-theme="dark"]) .pay-page .pay-page-card.card .info-block,
 html:not([data-theme="dark"]) .pay-page .pay-page-card.card .info-row,
 html:not([data-theme="dark"]) .pay-page .pay-page-card.card .info-row span {
@@ -1133,6 +1186,46 @@ html:not([data-theme="dark"]) .pay-page .pay-page-submit:hover:not(:disabled) {
   opacity: 0.5;
   cursor: not-allowed;
   transform: none;
+}
+
+/* Блок подписей тем: официант | QR | сумма — одна строка по центру, у каждой темы свой шрифт */
+.pay-page .pay-page-topics {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 18px;
+}
+.pay-page .pay-page-topics-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: nowrap;
+  width: 100%;
+}
+.pay-page .pay-page-topic {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--pay-page-text-muted);
+}
+.pay-page .pay-page-topic--officiant {
+  font-family: var(--font-playfair), serif;
+}
+.pay-page .pay-page-topic--qr {
+  font-family: var(--font-inter), system-ui, sans-serif;
+}
+.pay-page .pay-page-topic--sum {
+  font-family: var(--font-syne), system-ui, sans-serif;
+}
+@media (min-width: 640px) {
+  .pay-page .pay-page-topics-row {
+    gap: 1.5rem;
+  }
+  .pay-page .pay-page-topic {
+    font-size: 0.875rem;
+  }
 }
 
 /* Информационный блок — компактный */

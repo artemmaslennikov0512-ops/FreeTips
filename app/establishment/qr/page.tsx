@@ -133,20 +133,20 @@ export default function EstablishmentQrPage() {
         Ссылки для оплаты и карточки для печати. Вид карточки настраивается в разделе «Бренд».
       </p>
 
-      <div className="cabinet-card rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden">
-        <div className="border-b border-white/10 px-4 py-3">
+      <div className="cabinet-card rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden flex flex-col items-center text-center">
+        <div className="border-b border-white/10 px-4 py-3 w-full">
           <span className="text-sm font-medium text-white/90">Ссылка и QR для чаевых</span>
         </div>
-        <div className="p-6 space-y-4">
+        <div className="p-6 space-y-4 w-full max-w-lg flex flex-col items-center">
           {examplePayLink ? (
             <>
-              <div>
+              <div className="flex flex-col items-center w-full">
                 <label className="block text-xs text-white/70 mb-1">Пример ссылки (один из сотрудников)</label>
                 <a
                   href={examplePayLink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block truncate text-sm text-[var(--color-brand-gold)] hover:underline"
+                  className="block truncate max-w-full text-sm text-[var(--color-brand-gold)] hover:underline text-center"
                 >
                   {examplePayLink}
                 </a>
@@ -164,9 +164,9 @@ export default function EstablishmentQrPage() {
             </p>
           )}
 
-          <div className="border-t border-white/10 pt-4">
+          <div className="border-t border-white/10 pt-4 w-full flex flex-col items-center">
             <p className="text-xs text-white/70 mb-3">Скачать PDF со всеми карточками для печати (лого, имя, QR по каждому сотруднику).</p>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2 justify-center">
               <button
                 type="button"
                 onClick={downloadPdf}
@@ -187,7 +187,7 @@ export default function EstablishmentQrPage() {
               </button>
             </div>
             {activeCount === 0 && (
-              <p className="mt-2 text-sm text-amber-200">
+              <p className="mt-2 text-sm text-amber-200 text-center">
                 Нет активных сотрудников — PDF пока недоступен.
               </p>
             )}

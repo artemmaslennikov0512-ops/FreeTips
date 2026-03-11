@@ -316,6 +316,7 @@ model Establishment {
   address           String?  @db.Text
   phone             String?  @db.VarChar(50)
   logoUrl           String?  @db.VarChar(512)
+  logoOpacityPercent Int?    // прозрачность лого 0–100, null = 100
   uniqueSlug        String   @unique @db.VarChar(50) // для URL и QR (например momo-pizza)
   maxEmployeesCount Int?     // лимит сотрудников (null = без лимита); задаёт суперадмин
   tipPoolUserId     String?  @unique @db.VarChar(64) // пользователь-пул для приёма чаевых по QR сотрудников
@@ -332,6 +333,7 @@ model Establishment {
   borderOpacityPercent Int?  // прозрачность обводки 0–100, null = 100
   printCardWidthMm  Int?     // ширина карточки для печати (мм), null = 67
   printCardHeightMm Int?     // высота карточки для печати (мм), null = 49
+  printCardFooterColor String? @db.VarChar(20) // цвет подписи «Отсканируйте для чаевых» (hex), null = fontColor
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 

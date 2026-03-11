@@ -40,6 +40,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
     employeePhotoUrl?: string | null;
     establishmentBrand?: {
       logoUrl: string | null;
+      logoOpacityPercent: number | null;
       primaryColor: string | null;
       secondaryColor: string | null;
       mainBackgroundColor: string | null;
@@ -218,7 +219,12 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
       >
         {user?.establishmentBrand?.logoUrl && (
           <div className="mx-4 mb-3 flex justify-center">
-            <img src={user.establishmentBrand.logoUrl} alt="" className="h-8 w-auto max-w-[140px] object-contain opacity-95" />
+            <img
+              src={user.establishmentBrand.logoUrl}
+              alt=""
+              className="h-8 w-auto max-w-[140px] object-contain"
+              style={{ opacity: user.establishmentBrand.logoOpacityPercent != null ? user.establishmentBrand.logoOpacityPercent / 100 : 0.95 }}
+            />
           </div>
         )}
         <div

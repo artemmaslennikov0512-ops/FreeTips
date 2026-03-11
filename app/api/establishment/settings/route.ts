@@ -36,6 +36,8 @@ const updateSettingsSchema = z.object({
   borderOpacityPercent: z.number().int().min(0).max(100).optional().nullable(),
   printCardWidthMm: z.number().int().min(20).max(200).optional().nullable(),
   printCardHeightMm: z.number().int().min(20).max(200).optional().nullable(),
+  printCardFooterColor: hexOptional,
+  logoOpacityPercent: z.number().int().min(0).max(100).optional().nullable(),
 });
 
 export async function GET(request: NextRequest) {
@@ -59,6 +61,8 @@ export async function GET(request: NextRequest) {
       borderOpacityPercent: true,
       printCardWidthMm: true,
       printCardHeightMm: true,
+      printCardFooterColor: true,
+      logoOpacityPercent: true,
     },
   });
   if (!est) {
@@ -66,6 +70,7 @@ export async function GET(request: NextRequest) {
   }
   return NextResponse.json({
     logoUrl: est.logoUrl ?? null,
+    logoOpacityPercent: est.logoOpacityPercent ?? null,
     primaryColor: est.primaryColor ?? null,
     secondaryColor: est.secondaryColor ?? null,
     mainBackgroundColor: est.mainBackgroundColor ?? null,
@@ -79,6 +84,8 @@ export async function GET(request: NextRequest) {
     borderOpacityPercent: est.borderOpacityPercent ?? null,
     printCardWidthMm: est.printCardWidthMm ?? null,
     printCardHeightMm: est.printCardHeightMm ?? null,
+    printCardFooterColor: est.printCardFooterColor ?? null,
+    logoOpacityPercent: est.logoOpacityPercent ?? null,
   });
 }
 
@@ -113,6 +120,8 @@ export async function PATCH(request: NextRequest) {
         borderOpacityPercent: null,
         printCardWidthMm: null,
         printCardHeightMm: null,
+        printCardFooterColor: null,
+        logoOpacityPercent: null,
       },
     });
     const updated = await db.establishment.findUnique({
@@ -132,6 +141,8 @@ export async function PATCH(request: NextRequest) {
         borderOpacityPercent: true,
         printCardWidthMm: true,
         printCardHeightMm: true,
+        printCardFooterColor: true,
+        logoOpacityPercent: true,
       },
     });
     return NextResponse.json({
@@ -149,6 +160,8 @@ export async function PATCH(request: NextRequest) {
       borderOpacityPercent: updated?.borderOpacityPercent ?? null,
       printCardWidthMm: updated?.printCardWidthMm ?? null,
       printCardHeightMm: updated?.printCardHeightMm ?? null,
+      printCardFooterColor: updated?.printCardFooterColor ?? null,
+      logoOpacityPercent: updated?.logoOpacityPercent ?? null,
     });
   }
 
@@ -165,10 +178,13 @@ export async function PATCH(request: NextRequest) {
     borderColor?: string | null;
     borderWidthPx?: number | null;
     borderOpacityPercent?: number | null;
-    printCardWidthMm?: number | null;
-    printCardHeightMm?: number | null;
+  printCardWidthMm?: number | null;
+  printCardHeightMm?: number | null;
+  printCardFooterColor?: string | null;
+  logoOpacityPercent?: number | null;
   } = {};
   if (parseResult.data.logoUrl !== undefined) data.logoUrl = parseResult.data.logoUrl;
+  if (parseResult.data.logoOpacityPercent !== undefined) data.logoOpacityPercent = parseResult.data.logoOpacityPercent;
   if (parseResult.data.primaryColor !== undefined) data.primaryColor = parseResult.data.primaryColor;
   if (parseResult.data.secondaryColor !== undefined) data.secondaryColor = parseResult.data.secondaryColor;
   if (parseResult.data.mainBackgroundColor !== undefined) data.mainBackgroundColor = parseResult.data.mainBackgroundColor;
@@ -182,6 +198,7 @@ export async function PATCH(request: NextRequest) {
   if (parseResult.data.borderOpacityPercent !== undefined) data.borderOpacityPercent = parseResult.data.borderOpacityPercent;
   if (parseResult.data.printCardWidthMm !== undefined) data.printCardWidthMm = parseResult.data.printCardWidthMm;
   if (parseResult.data.printCardHeightMm !== undefined) data.printCardHeightMm = parseResult.data.printCardHeightMm;
+  if (parseResult.data.printCardFooterColor !== undefined) data.printCardFooterColor = parseResult.data.printCardFooterColor;
 
   await db.establishment.update({
     where: { id: auth.establishmentId },
@@ -205,6 +222,8 @@ export async function PATCH(request: NextRequest) {
       borderOpacityPercent: true,
       printCardWidthMm: true,
       printCardHeightMm: true,
+      printCardFooterColor: true,
+      logoOpacityPercent: true,
     },
   });
   return NextResponse.json({
@@ -222,5 +241,7 @@ export async function PATCH(request: NextRequest) {
     borderOpacityPercent: updated?.borderOpacityPercent ?? null,
     printCardWidthMm: updated?.printCardWidthMm ?? null,
     printCardHeightMm: updated?.printCardHeightMm ?? null,
+    printCardFooterColor: updated?.printCardFooterColor ?? null,
+    logoOpacityPercent: updated?.logoOpacityPercent ?? null,
   });
 }

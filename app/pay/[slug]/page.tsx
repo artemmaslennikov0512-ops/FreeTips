@@ -80,6 +80,7 @@ export default function PayPage() {
           recipientPhotoUrl?: string;
           branding?: {
             logoUrl?: string;
+            logoOpacityPercent?: number | null;
             primaryColor?: string;
             secondaryColor?: string;
             mainBackgroundColor?: string;
@@ -257,22 +258,27 @@ export default function PayPage() {
           <ThemeToggle />
         </div>
 
-        {/* Логотип */}
+        {/* Логотип: только лого заведения или только FreeTips (без дублирования) */}
         <div className="pay-page-logo-wrap flex justify-center">
-          <div className="flex items-center gap-2">
-            {branding?.logoUrl ? (
-              <img src={branding.logoUrl} alt="" className="h-10 w-auto max-w-[120px] object-contain" />
-            ) : (
+          {branding?.logoUrl ? (
+            <img
+              src={branding.logoUrl}
+              alt=""
+              className="h-10 w-auto max-w-[120px] object-contain"
+              style={{ opacity: branding?.logoOpacityPercent != null ? branding.logoOpacityPercent / 100 : 1 }}
+            />
+          ) : (
+            <div className="flex items-center gap-2">
               <span className="pay-page-logo-ft logo-ft-abbr flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--color-brand-gold)] text-sm text-[#0a192f]">FT</span>
-            )}
-            <span
-              className="font-[family:var(--font-playfair)] text-lg font-bold pay-page-logo-text"
-              style={{ color: fontClr ?? "var(--color-text)" }}
-            >
-              <span className="pay-page-logo-free" style={{ color: fontClr ? "inherit" : undefined, opacity: fontClr ? undefined : 0.95 }}>Free</span>
-              <span className="text-[var(--color-brand-gold)]">Tips</span>
-            </span>
-          </div>
+              <span
+                className="font-[family:var(--font-playfair)] text-lg font-bold pay-page-logo-text"
+                style={{ color: fontClr ?? "var(--color-text)" }}
+              >
+                <span className="pay-page-logo-free" style={{ color: fontClr ? "inherit" : undefined, opacity: fontClr ? undefined : 0.95 }}>Free</span>
+                <span className="text-[var(--color-brand-gold)]">Tips</span>
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Карточка: получатель — обводка до QR, отступ от QR как слева от блока */}

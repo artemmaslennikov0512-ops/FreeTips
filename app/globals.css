@@ -442,6 +442,17 @@ html:not([data-theme="dark"]) .admin-panel .admin-main-block.cabinet-main-block 
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.08);
 }
 
+/* ЛК официанта: при включённом бренде заведения текст в основном блоке использует цвет бренда (fontColor) */
+[data-brand-active="true"] .cabinet-premium .cabinet-main-block #main-content,
+[data-brand-active="true"] .cabinet-premium .cabinet-main-block #main-content .text-white {
+  color: var(--color-text);
+}
+[data-brand-active="true"] .cabinet-premium .cabinet-main-block #main-content .text-white\/90,
+[data-brand-active="true"] .cabinet-premium .cabinet-main-block #main-content .text-white\/80,
+[data-brand-active="true"] .cabinet-premium .cabinet-main-block #main-content .text-white\/70 {
+  color: var(--color-text-secondary);
+}
+
 /* Светлая тема: блоки на основном блоке — тот же фон и рамка, что у блока чата поддержки */
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-card,
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-section-header {

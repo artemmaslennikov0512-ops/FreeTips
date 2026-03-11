@@ -87,6 +87,7 @@ export async function GET(request: NextRequest) {
         borderColor: true,
         printCardWidthMm: true,
         printCardHeightMm: true,
+        printCardFooterColor: true,
       },
     }),
   ]);
@@ -110,10 +111,14 @@ export async function GET(request: NextRequest) {
   const blocksBgRgb = establishment?.blocksBackgroundColor
     ? hexToRgb(establishment.blocksBackgroundColor)
     : BLOCKS_BG_DARK;
+  const footerRgb = establishment?.printCardFooterColor
+    ? hexToRgb(establishment.printCardFooterColor)
+    : fontRgb;
 
   const cardBg = cardBgRgb ? rgb(cardBgRgb.r, cardBgRgb.g, cardBgRgb.b) : rgb(DEFAULT_NAVY.r, DEFAULT_NAVY.g, DEFAULT_NAVY.b);
-  const borderColor = borderRgb ? rgb(borderRgb.r, borderRgb.g, borderRgb.b) : rgb(DEFAULT_GOLD.r, DEFAULT_GOLD.g, DEFAULT_GOLD.b);
+  const borderColorPdf = borderRgb ? rgb(borderRgb.r, borderRgb.g, borderRgb.b) : rgb(DEFAULT_GOLD.r, DEFAULT_GOLD.g, DEFAULT_GOLD.b);
   const fontColor = fontRgb ? rgb(fontRgb.r, fontRgb.g, fontRgb.b) : rgb(1, 1, 1);
+  const footerColor = footerRgb ? rgb(footerRgb.r, footerRgb.g, footerRgb.b) : fontColor;
   const blocksBg = blocksBgRgb ? rgb(blocksBgRgb.r, blocksBgRgb.g, blocksBgRgb.b) : rgb(BLOCKS_BG_DARK.r, BLOCKS_BG_DARK.g, BLOCKS_BG_DARK.b);
 
   let logoPng: Uint8Array | null = null;
@@ -177,7 +182,7 @@ export async function GET(request: NextRequest) {
       width: CARD_WIDTH,
       height: CARD_HEIGHT,
       color: cardBg,
-      borderColor,
+      borderColor: borderColorPdf,
       borderWidth: 1.2 * Math.min(scaleX, scaleY),
     });
 
@@ -206,7 +211,13 @@ export async function GET(request: NextRequest) {
     }
 
     const blockGap = 6 * scaleY;
-    const blockH = 72 * scaleY;
+    const footerReserve = 12 * scaleY;
+    const topSectionH = 50 * scaleY;
+    const qrSize = 48 * Math.min(scaleX, scaleY);
+    const blockH = Math.min(
+      headerY - blockGap - (cardY + footerReserve),
+      Math.max(72 * scaleY, topSectionH + qrSize + 4 * scaleY),
+    );
     const blockY = headerY - blockGap - blockH;
     page.drawRectangle({
       x: innerLeft,
@@ -214,26 +225,16 @@ export async function GET(request: NextRequest) {
       width: innerWidth,
       height: blockH,
       color: blocksBg,
-      borderColor,
+      borderColor: borderColorPdf,
       borderWidth: 0.5 * Math.min(scaleX, scaleY),
     });
-
-    const payUrl = `${payBase}/${emp.qrCodeIdentifier}`;
-    const dataUrl = await QRCode.toDataURL(payUrl, { width: 140, margin: 1 });
-    const base64 = dataUrl.replace(/^data:image\/png;base64,/, "");
-    const pngBytes = Uint8Array.from(Buffer.from(base64, "base64"));
-    const qrImage = await doc.embedPng(pngBytes);
-    const qrSize = 48 * Math.min(scaleX, scaleY);
-    const qrPad = 6 * scaleX;
-    const qrX = innerLeft + innerWidth - qrSize - qrPad;
-    const qrY = blockY + (blockH - qrSize) / 2;
-    page.drawImage(qrImage, { x: qrX, y: qrY, width: qrSize, height: qrSize });
 
     const textX = innerLeft + 6 * scaleX;
     const nameSize = 11 * Math.min(scaleX, scaleY);
     const posSize = 9 * Math.min(scaleX, scaleY);
-    const nameY = blockY + blockH - 14 * scaleY;
-    let photoDrawnWidth = 0;
+    const photoSize = 28 * Math.min(scaleX, scaleY);
+    let nameY = blockY + blockH - 14 * scaleY;
+    let photoDrawn = false;
     if (emp.printCardPhotoUrl?.trim()) {
       const storagePath = join(process.cwd(), "storage", emp.printCardPhotoUrl);
       if (existsSync(storagePath)) {
@@ -248,25 +249,28 @@ export async function GET(request: NextRequest) {
                 ? await doc.embedJpg(bytes)
                 : null;
           if (embed) {
-            const photoSize = 36 * Math.min(scaleX, scaleY);
-            const photoX = textX;
-            const photoY = blockY + (blockH - photoSize) / 2;
+            const photoX = innerLeft + (innerWidth - photoSize) / 2;
+            const photoY = blockY + blockH - photoSize - 4 * scaleY;
             page.drawImage(embed, {
               x: photoX,
               y: photoY,
               width: photoSize,
               height: photoSize,
             });
-            photoDrawnWidth = photoSize + 6 * scaleX;
+            photoDrawn = true;
+            nameY = photoY - 4 * scaleY - 14 * scaleY;
           }
         } catch {
           // skip photo on embed error
         }
       }
     }
-    const nameTextX = textX + photoDrawnWidth;
+    if (!photoDrawn) {
+      nameY = blockY + blockH - 14 * scaleY;
+    }
+    const posY = nameY - 14 * scaleY;
     page.drawText(emp.name.slice(0, 24), {
-      x: nameTextX,
+      x: textX,
       y: nameY,
       size: nameSize,
       font: fontBold,
@@ -274,13 +278,22 @@ export async function GET(request: NextRequest) {
     });
     if (emp.position) {
       page.drawText(emp.position.slice(0, 26), {
-        x: nameTextX,
-        y: nameY - 14 * scaleY,
+        x: textX,
+        y: posY,
         size: posSize,
         font,
         color: fontColor,
       });
     }
+
+    const payUrl = `${payBase}/${emp.qrCodeIdentifier}`;
+    const dataUrl = await QRCode.toDataURL(payUrl, { width: 140, margin: 1 });
+    const base64 = dataUrl.replace(/^data:image\/png;base64,/, "");
+    const pngBytes = Uint8Array.from(Buffer.from(base64, "base64"));
+    const qrImage = await doc.embedPng(pngBytes);
+    const qrX = innerLeft + (innerWidth - qrSize) / 2;
+    const qrY = blockY + (blockH - qrSize) / 2;
+    page.drawImage(qrImage, { x: qrX, y: qrY, width: qrSize, height: qrSize });
 
     const footerSize = 7 * Math.min(scaleX, scaleY);
     page.drawText("Отсканируйте для чаевых", {
@@ -288,7 +301,7 @@ export async function GET(request: NextRequest) {
       y: blockY - 8 * scaleY,
       size: footerSize,
       font,
-      color: fontColor,
+      color: footerColor,
     });
 
     cardIndex++;

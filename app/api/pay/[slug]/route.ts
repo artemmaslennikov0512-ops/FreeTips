@@ -46,6 +46,7 @@ export async function GET(request: NextRequest, { params }: Params) {
           establishment: {
             select: {
               logoUrl: true,
+              logoOpacityPercent: true,
               primaryColor: true,
               secondaryColor: true,
               mainBackgroundColor: true,
@@ -83,6 +84,7 @@ export async function GET(request: NextRequest, { params }: Params) {
     tipLink.employee?.establishment
       ? {
           logoUrl: tipLink.employee.establishment.logoUrl ?? undefined,
+          logoOpacityPercent: tipLink.employee.establishment.logoOpacityPercent ?? undefined,
           primaryColor: tipLink.employee.establishment.primaryColor ?? undefined,
           secondaryColor: tipLink.employee.establishment.secondaryColor ?? undefined,
           mainBackgroundColor: tipLink.employee.establishment.mainBackgroundColor ?? undefined,

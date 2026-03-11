@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Palette, ChevronDown, Printer, Smartphone, LayoutDashboard } from "lucide-react";
+import { useEffect, useState, useCallback } from "react";
+import { Palette, ChevronDown, Printer, Smartphone, LayoutDashboard, FileDown, ImageIcon, X } from "lucide-react";
 import { authHeaders } from "@/lib/auth-client";
+import { getBaseUrl } from "@/lib/get-base-url";
 
 type BrandGroup = "print" | "pay" | "cabinet";
 
@@ -27,6 +28,8 @@ interface BrandSettings {
   borderOpacityPercent: number | null;
   printCardWidthMm: number | null;
   printCardHeightMm: number | null;
+  printCardFooterColor: string | null;
+  logoOpacityPercent: number | null;
 }
 
 const DEFAULT_HEX = { primary: "#c9a227", secondary: "#0a192f", mainBg: "#0a192f", blocksBg: "#1e293b", font: "#fafafa", border: "rgba(197,165,114,0.5)" };
@@ -50,6 +53,15 @@ export default function EstablishmentBrandPage() {
   const [secondaryOpacityPercent, setSecondaryOpacityPercent] = useState(100);
   const [printCardWidthMm, setPrintCardWidthMm] = useState(67);
   const [printCardHeightMm, setPrintCardHeightMm] = useState(49);
+  const [printCardFooterColor, setPrintCardFooterColor] = useState("");
+  const [logoOpacityPercent, setLogoOpacityPercent] = useState(100);
+  const [printPreviewQrUrl, setPrintPreviewQrUrl] = useState<string | null>(null);
+  const [examplePaySlug, setExamplePaySlug] = useState<string | null>(null);
+  const [examplePayQrUrl, setExamplePayQrUrl] = useState<string | null>(null);
+  const [printActiveCount, setPrintActiveCount] = useState(0);
+  const [pdfDownloading, setPdfDownloading] = useState(false);
+  const [pdfPreviewUrl, setPdfPreviewUrl] = useState<string | null>(null);
+  const [pdfPreviewLoading, setPdfPreviewLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [activeGroup, setActiveGroup] = useState<BrandGroup>("pay");
 
@@ -82,6 +94,8 @@ export default function EstablishmentBrandPage() {
           setSecondaryOpacityPercent(data.secondaryOpacityPercent ?? 100);
           setPrintCardWidthMm(data.printCardWidthMm ?? 67);
           setPrintCardHeightMm(data.printCardHeightMm ?? 49);
+          setPrintCardFooterColor(data.printCardFooterColor ?? "");
+          setLogoOpacityPercent(data.logoOpacityPercent ?? 100);
         }
       } finally {
         setLoading(false);
@@ -113,6 +127,8 @@ export default function EstablishmentBrandPage() {
           borderOpacityPercent: borderOpacityPercent,
           printCardWidthMm: printCardWidthMm,
           printCardHeightMm: printCardHeightMm,
+          printCardFooterColor: printCardFooterColor.trim() || null,
+          logoOpacityPercent: logoOpacityPercent === 100 ? null : logoOpacityPercent,
         }),
       });
       const data = await res.json().catch(() => ({}));
@@ -136,6 +152,8 @@ export default function EstablishmentBrandPage() {
       setSecondaryOpacityPercent(data.secondaryOpacityPercent ?? 100);
       setPrintCardWidthMm(data.printCardWidthMm ?? 67);
       setPrintCardHeightMm(data.printCardHeightMm ?? 49);
+      setPrintCardFooterColor(data.printCardFooterColor ?? "");
+      setLogoOpacityPercent(data.logoOpacityPercent ?? 100);
       setMessage("Сохранено. Настройки применяются в личном кабинете и на странице оплаты чаевых. QR настраивается в разделе «QR и печать».");
     } catch {
       setMessage("Ошибка соединения");
@@ -175,6 +193,8 @@ export default function EstablishmentBrandPage() {
       setSecondaryOpacityPercent(data.secondaryOpacityPercent ?? 100);
       setPrintCardWidthMm(data.printCardWidthMm ?? 67);
       setPrintCardHeightMm(data.printCardHeightMm ?? 49);
+      setPrintCardFooterColor(data.printCardFooterColor ?? "");
+      setLogoOpacityPercent(data.logoOpacityPercent ?? 100);
       setMessage("Настройки сброшены к исходным.");
     } catch {
       setMessage("Ошибка соединения");
@@ -186,6 +206,92 @@ export default function EstablishmentBrandPage() {
   if (loading) {
     return <div className="text-white/90">Загрузка…</div>;
   }
+
+  useEffect(() => {
+    if (activeGroup !== "print" || typeof window === "undefined") return;
+    import("qrcode")
+      .then((m) => m.default.toDataURL("https://example.com/pay/demo", { width: 120, margin: 1 }))
+      .then(setPrintPreviewQrUrl)
+      .catch(() => {});
+  }, [activeGroup]);
+
+  useEffect(() => {
+    if (activeGroup !== "print") return;
+    fetch("/api/establishment/employees", { headers: authHeaders() })
+      .then((r) => r.ok ? r.json() : null)
+      .then((data) => {
+        const employees = data?.employees ?? [];
+        const active = employees.filter((e: { isActive: boolean }) => e.isActive);
+        setPrintActiveCount(active.length);
+        const first = active[0];
+        if (first?.qrCodeIdentifier) setExamplePaySlug(first.qrCodeIdentifier);
+      })
+      .catch(() => {});
+  }, [activeGroup]);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || !examplePaySlug) return;
+    const url = `${getBaseUrl()}/pay/${examplePaySlug}`;
+    import("qrcode")
+      .then((m) => m.default.toDataURL(url, { width: 160, margin: 1 }))
+      .then(setExamplePayQrUrl)
+      .catch(() => {});
+  }, [examplePaySlug]);
+
+  const downloadPdf = useCallback(async () => {
+    setPdfDownloading(true);
+    try {
+      const res = await fetch("/api/establishment/employees/pdf", { headers: authHeaders() });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        alert(data?.error ?? "Ошибка загрузки PDF");
+        setPdfDownloading(false);
+        return;
+      }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "qr-cards.pdf";
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      alert("Ошибка загрузки");
+    } finally {
+      setPdfDownloading(false);
+    }
+  }, []);
+
+  const openPdfPreview = useCallback(async () => {
+    setPdfPreviewLoading(true);
+    setPdfPreviewUrl(null);
+    try {
+      const res = await fetch("/api/establishment/employees/pdf", { headers: authHeaders() });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        alert(data?.error ?? "Ошибка загрузки");
+        setPdfPreviewLoading(false);
+        return;
+      }
+      const blob = await res.blob();
+      setPdfPreviewUrl(URL.createObjectURL(blob));
+    } catch {
+      alert("Ошибка загрузки");
+    } finally {
+      setPdfPreviewLoading(false);
+    }
+  }, []);
+
+  const closePdfPreview = useCallback(() => {
+    if (pdfPreviewUrl) {
+      URL.revokeObjectURL(pdfPreviewUrl);
+      setPdfPreviewUrl(null);
+    }
+  }, [pdfPreviewUrl]);
+
+  useEffect(() => {
+    return () => { if (pdfPreviewUrl) URL.revokeObjectURL(pdfPreviewUrl); };
+  }, [pdfPreviewUrl]);
 
   const hexToRgba = (hex: string | undefined, percent: number) => {
     if (!hex || !/^#[0-9A-Fa-f]{6}$/i.test(hex)) return undefined;
@@ -261,6 +367,19 @@ export default function EstablishmentBrandPage() {
                 placeholder="https://..."
                 className="cabinet-input-window w-full rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-white placeholder:text-white/50 focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-gold)]/40"
               />
+              {logoUrl.trim() ? (
+                <div className="mt-2">
+                  <label className="block text-xs text-white/70 mb-1">Прозрачность логотипа: {logoOpacityPercent}%</label>
+                  <input
+                    type="range"
+                    min={0}
+                    max={100}
+                    value={logoOpacityPercent}
+                    onChange={(e) => setLogoOpacityPercent(Number(e.target.value))}
+                    className="w-full h-2 rounded-lg appearance-none bg-white/20 accent-[var(--color-brand-gold)]"
+                  />
+                </div>
+              ) : null}
             </div>
             <div>
               <label className="block text-sm text-white/90 mb-1">Основной цвет (hex){isPrintOnly ? " — рамка, акцент на карточке" : " — кнопки, акценты, рамки"}</label>
@@ -414,20 +533,41 @@ export default function EstablishmentBrandPage() {
               </div>
             </div>
             {isPrintOnly && (
-              <div className="rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/5 p-3 space-y-3">
-                <p className="text-sm font-medium text-white/90">Размер карточки для печати (мм)</p>
-                <p className="text-xs text-white/70">Ширина и высота одной карточки в PDF. Контент масштабируется под выбранный размер.</p>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs text-white/70 mb-1">Ширина, мм</label>
-                    <input type="number" min={20} max={200} value={printCardWidthMm} onChange={(e) => setPrintCardWidthMm(clampMm(Number(e.target.value)))} className="cabinet-input-window w-full rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-white focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-gold)]/40" />
-                  </div>
-                  <div>
-                    <label className="block text-xs text-white/70 mb-1">Высота, мм</label>
-                    <input type="number" min={20} max={200} value={printCardHeightMm} onChange={(e) => setPrintCardHeightMm(clampMm(Number(e.target.value)))} className="cabinet-input-window w-full rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-white focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-gold)]/40" />
+              <>
+                <div>
+                  <label className="block text-sm text-white/90 mb-1">Цвет подписи под QR (hex)</label>
+                  <p className="text-xs text-white/70 mb-1">«Отсканируйте для чаевых». Если не задан — используется цвет текста.</p>
+                  <div className="flex gap-2 items-center">
+                    <input
+                      type="color"
+                      value={printCardFooterColor.match(/^#[0-9A-Fa-f]{6}$/) ? printCardFooterColor : "#b8c5d6"}
+                      onChange={(e) => setPrintCardFooterColor(e.target.value)}
+                      className="h-10 w-14 rounded border border-[var(--color-brand-gold)]/20 cursor-pointer"
+                    />
+                    <input
+                      type="text"
+                      value={printCardFooterColor}
+                      onChange={(e) => setPrintCardFooterColor(e.target.value)}
+                      placeholder="#b8c5d6 или пусто"
+                      className="cabinet-input-window flex-1 rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-white placeholder:text-white/50 focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-gold)]/40"
+                    />
                   </div>
                 </div>
-              </div>
+                <div className="rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/5 p-3 space-y-3">
+                  <p className="text-sm font-medium text-white/90">Размер карточки для печати (мм)</p>
+                  <p className="text-xs text-white/70">Ширина и высота одной карточки в PDF. Контент масштабируется под выбранный размер.</p>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs text-white/70 mb-1">Ширина, мм</label>
+                      <input type="number" min={20} max={200} value={printCardWidthMm} onChange={(e) => setPrintCardWidthMm(clampMm(Number(e.target.value)))} className="cabinet-input-window w-full rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-white focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-gold)]/40" />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-white/70 mb-1">Высота, мм</label>
+                      <input type="number" min={20} max={200} value={printCardHeightMm} onChange={(e) => setPrintCardHeightMm(clampMm(Number(e.target.value)))} className="cabinet-input-window w-full rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-white focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-gold)]/40" />
+                    </div>
+                  </div>
+                </div>
+              </>
             )}
             <div className="flex flex-wrap gap-3">
               <button
@@ -464,7 +604,7 @@ export default function EstablishmentBrandPage() {
               backgroundColor: mainBgRgba ?? (hex(mainBackgroundColor) || undefined),
             }}
           >
-            {/* Превью: карточка для печати — размер по настройкам (мм → px для экрана), контент тянется */}
+            {/* Превью: карточка для печати — лого → фото → имя → должность → QR по центру → подпись */}
             {activeGroup === "print" && (
               <div className="w-full flex flex-col items-center">
                 <p className="text-xs text-white/60 mb-2">Так будет выглядеть одна карточка в PDF ({printCardWidthMm}×{printCardHeightMm} мм)</p>
@@ -480,31 +620,92 @@ export default function EstablishmentBrandPage() {
                     backgroundColor: mainBgRgba ?? hexOr(mainBackgroundColor, "#0a192f"),
                   }}
                 >
-                  {/* Верх: лого или название */}
-                  <div className="flex items-center justify-center shrink-0 py-2 px-2 min-h-[36px]" style={{ borderBottom: `1px solid ${borderRgba}` }}>
+                  {/* Верх: лого или название (фиксированно) */}
+                  <div className="flex items-center justify-center shrink-0 py-1.5 px-2 min-h-[28px]" style={{ borderBottom: `1px solid ${borderRgba}` }}>
                     {logoUrl.trim() ? (
-                      <img src={logoUrl.trim()} alt="" className="h-6 w-auto max-w-[140px] object-contain" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
+                      <img src={logoUrl.trim()} alt="" className="h-5 w-auto max-w-[120px] object-contain" style={{ opacity: logoOpacityPercent != null ? logoOpacityPercent / 100 : 1 }} onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
                     ) : (
-                      <span className="font-[family:var(--font-playfair)] text-sm font-bold truncate max-w-full" style={{ color: hexOr(fontColor, "#fafafa") }}>
+                      <span className="font-[family:var(--font-playfair)] text-xs font-bold truncate max-w-full" style={{ color: hexOr(fontColor, "#fafafa") }}>
                         Free<span style={{ color: hexOr(primaryColor, "var(--color-brand-gold)") }}>Tips</span>
                       </span>
                     )}
                   </div>
-                  {/* Блок: имя слева, QR справа (как в PDF) */}
+                  {/* Блок: фон карточки; сверху фото + имя + должность, по центру QR, снизу подпись */}
                   <div
-                    className="flex-1 flex items-center justify-between gap-2 px-3 py-2 mt-2 mx-2 rounded"
+                    className="flex-1 flex flex-col min-h-0 rounded-b px-2 py-1.5"
                     style={{
                       backgroundColor: blocksBgRgba ?? hexOr(blocksBackgroundColor, "rgba(0.06,0.12,0.22,1)"),
-                      border: `1px solid ${borderRgba}`,
+                      borderLeft: `1px solid ${borderRgba}`,
+                      borderRight: `1px solid ${borderRgba}`,
+                      borderBottom: `1px solid ${borderRgba}`,
                     }}
                   >
-                    <div className="min-w-0">
-                      <p className="font-semibold text-sm truncate" style={{ color: hexOr(fontColor, "#fafafa") }}>Имя официанта</p>
-                      <p className="text-xs opacity-90" style={{ color: hexOr(fontColor, "#e2e8f0") }}>Должность</p>
+                    {/* Фото (плейсхолдер в превью) */}
+                    <div className="flex justify-center shrink-0 mt-0.5">
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center text-[10px] shrink-0" style={{ backgroundColor: (hex(primaryColor) || "var(--color-brand-gold)") + "30", color: hexOr(fontColor, "#fafafa") }}>👤</div>
                     </div>
-                    <div className="flex-shrink-0 w-12 h-12 rounded flex items-center justify-center bg-white/10 text-[10px] text-white/70" aria-hidden>QR</div>
+                    <p className="font-semibold text-[10px] truncate text-center mt-0.5" style={{ color: hexOr(fontColor, "#fafafa") }}>Имя официанта</p>
+                    <p className="text-[9px] opacity-90 text-center truncate" style={{ color: hexOr(fontColor, "#e2e8f0") }}>Должность</p>
+                    {/* QR по центру блока */}
+                    <div className="flex-1 flex items-center justify-center min-h-0 py-1">
+                      {printPreviewQrUrl ? (
+                        <img src={printPreviewQrUrl} alt="" className="max-w-full max-h-full w-14 h-14 object-contain rounded bg-white" />
+                      ) : (
+                        <div className="w-14 h-14 rounded bg-white/20 flex items-center justify-center text-[10px] text-white/70">QR</div>
+                      )}
+                    </div>
                   </div>
-                  <p className="text-[10px] px-3 py-1.5 text-center" style={{ color: hexOr(fontColor, "rgba(250,250,250,0.8)") }}>Отсканируйте для чаевых</p>
+                  <p className="text-[9px] px-2 py-1 text-center shrink-0" style={{ color: hexOr(printCardFooterColor || undefined, hexOr(fontColor, "rgba(250,250,250,0.85)")) }}>Отсканируйте для чаевых</p>
+                </div>
+
+                {/* Ссылка, QR и PDF */}
+                <div className="w-full mt-4 space-y-3 border-t border-white/10 pt-4">
+                  {examplePaySlug ? (
+                    <>
+                      <div>
+                        <p className="text-xs text-white/70 mb-1">Пример ссылки для оплаты</p>
+                        <a
+                          href={`${getBaseUrl()}/pay/${examplePaySlug}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="block truncate text-sm text-[var(--color-brand-gold)] hover:underline"
+                        >
+                          {getBaseUrl()}/pay/{examplePaySlug}
+                        </a>
+                      </div>
+                      {examplePayQrUrl && (
+                        <div className="flex flex-col items-center gap-1">
+                          <p className="text-xs text-white/70">QR-код ссылки</p>
+                          <img src={examplePayQrUrl} alt="" className="w-32 h-32 rounded-lg bg-white p-1" />
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <p className="text-xs text-white/60">Добавьте сотрудников в «Команда» — появится пример ссылки и QR.</p>
+                  )}
+                  <div className="flex flex-wrap gap-2 justify-center">
+                    <button
+                      type="button"
+                      onClick={downloadPdf}
+                      disabled={pdfDownloading || printActiveCount === 0}
+                      className="inline-flex items-center gap-2 rounded-[10px] bg-[var(--color-brand-gold)] px-4 py-2 font-medium text-[#0a192f] hover:opacity-90 disabled:opacity-50"
+                    >
+                      <FileDown className={`h-5 w-5 ${pdfDownloading ? "animate-pulse" : ""}`} />
+                      {pdfDownloading ? "Скачивание…" : "Скачать PDF"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={openPdfPreview}
+                      disabled={printActiveCount === 0 || pdfPreviewLoading}
+                      className="inline-flex items-center gap-2 rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-4 py-2 font-medium text-white hover:bg-[var(--color-dark-gray)]/20 disabled:opacity-50"
+                    >
+                      <ImageIcon className={`h-5 w-5 ${pdfPreviewLoading ? "animate-pulse" : ""}`} />
+                      {pdfPreviewLoading ? "Загрузка…" : "Предпросмотр PDF"}
+                    </button>
+                  </div>
+                  {printActiveCount === 0 && (
+                    <p className="text-xs text-amber-200 text-center">Нет активных сотрудников — PDF недоступен.</p>
+                  )}
                 </div>
               </div>
             )}
@@ -515,19 +716,25 @@ export default function EstablishmentBrandPage() {
                 <p className="text-xs text-white/60 mb-2">Так видит страницу клиент после перехода по QR</p>
                 <div className="rounded-2xl overflow-hidden border-0 shadow-lg transition-colors" style={{ backgroundColor: secondaryRgba ?? hexOr(secondaryColor, blocksBgRgba ?? "#1e293b"), borderWidth: borderWidth ? `${borderWidth}px` : 0, borderStyle: "solid", borderColor: borderRgba }}>
                   <div className="px-4 pt-4 pb-4 space-y-3">
-                    {/* Логотип */}
+                    {/* Логотип: только лого или только FreeTips */}
                     <div className="flex justify-center">
-                      <div className="flex items-center gap-2">
-                        {logoUrl.trim() ? (
-                          <img src={logoUrl.trim()} alt="" className="h-9 w-auto max-w-[110px] object-contain" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
-                        ) : (
+                      {logoUrl.trim() ? (
+                        <img
+                          src={logoUrl.trim()}
+                          alt=""
+                          className="h-9 w-auto max-w-[110px] object-contain"
+                          style={{ opacity: logoOpacityPercent != null ? logoOpacityPercent / 100 : 1 }}
+                          onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                        />
+                      ) : (
+                        <div className="flex items-center gap-2">
                           <span className="flex h-8 w-8 items-center justify-center rounded-lg text-sm font-bold text-[#0a192f]" style={{ backgroundColor: hexOr(primaryColor, "var(--color-brand-gold)") }}>FT</span>
-                        )}
-                        <span className="font-[family:var(--font-playfair)] text-base font-bold" style={{ color: hexOr(fontColor, "#fafafa") }}>
-                          <span className="opacity-90">Free</span>
-                          <span style={{ color: hexOr(primaryColor, "var(--color-brand-gold)") }}>Tips</span>
-                        </span>
-                      </div>
+                          <span className="font-[family:var(--font-playfair)] text-base font-bold" style={{ color: hexOr(fontColor, "#fafafa") }}>
+                            <span className="opacity-90">Free</span>
+                            <span style={{ color: hexOr(primaryColor, "var(--color-brand-gold)") }}>Tips</span>
+                          </span>
+                        </div>
+                      )}
                     </div>
                     {/* Карточка получателя: имя + QR */}
                     <div className="rounded-xl p-3 flex items-center justify-between gap-3" style={{ borderWidth: `${Math.min(2, borderWidth)}px`, borderStyle: "solid", borderColor: borderRgba, backgroundColor: blocksBgRgba ?? "rgba(255,255,255,0.06)" }}>
@@ -588,6 +795,22 @@ export default function EstablishmentBrandPage() {
           </div>
         </div>
       </div>
+
+      {pdfPreviewUrl && (
+        <div className="fixed inset-0 z-50 flex flex-col bg-[#0a192f]/95">
+          <div className="flex shrink-0 items-center justify-between border-b border-[var(--color-brand-gold)]/20 bg-[var(--color-charcoal)] px-4 py-3">
+            <span className="font-medium text-white">Предпросмотр PDF</span>
+            <button
+              type="button"
+              onClick={closePdfPreview}
+              className="flex items-center gap-2 rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-4 py-2 font-medium text-white hover:bg-[var(--color-dark-gray)]/20"
+            >
+              <X className="h-5 w-5" /> Закрыть
+            </button>
+          </div>
+          <iframe src={pdfPreviewUrl} title="Предпросмотр PDF" className="min-h-0 flex-1 w-full border-0" />
+        </div>
+      )}
     </div>
   );
 }

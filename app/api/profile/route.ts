@@ -46,6 +46,7 @@ export async function GET(request: NextRequest) {
               select: {
                 name: true,
                 logoUrl: true,
+                logoOpacityPercent: true,
                 primaryColor: true,
                 secondaryColor: true,
                 mainBackgroundColor: true,
@@ -165,6 +166,7 @@ export async function GET(request: NextRequest) {
         profile.establishmentRelation != null
           ? {
               logoUrl: profile.establishmentRelation.logoUrl != null ? String(profile.establishmentRelation.logoUrl) : null,
+              logoOpacityPercent: profile.establishmentRelation.logoOpacityPercent ?? null,
               primaryColor: profile.establishmentRelation.primaryColor != null ? String(profile.establishmentRelation.primaryColor) : null,
               secondaryColor: profile.establishmentRelation.secondaryColor != null ? String(profile.establishmentRelation.secondaryColor) : null,
               mainBackgroundColor: profile.establishmentRelation.mainBackgroundColor != null ? String(profile.establishmentRelation.mainBackgroundColor) : null,

@@ -8,7 +8,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireRole } from "@/lib/middleware/auth";
 import { z } from "zod";
-import { parseJsonWithLimit, MAX_BODY_SIZE_AUTH } from "@/lib/api/helpers";
+import { parseJsonWithLimit, MAX_BODY_SIZE_AUTH, jsonError } from "@/lib/api/helpers";
 import { sendPayoutToPaygine } from "@/lib/payment/send-payout-to-paygine";
 import { logSecurity } from "@/lib/logger";
 
@@ -27,12 +27,12 @@ export async function POST(
 
   const bodyResult = await parseJsonWithLimit(request, MAX_BODY_SIZE_AUTH);
   if (!bodyResult.ok || bodyResult.data == null) {
-    return NextResponse.json({ error: "Укажите номер карты в теле запроса: { \"pan\": \"...\" }" }, { status: 400 });
+    return jsonError(400, "Укажите номер карты в теле запроса: { \"pan\": \"...\" }");
   }
   const parsed = bodySchema.safeParse(bodyResult.data);
   if (!parsed.success) {
     const msg = parsed.error.issues[0]?.message ?? "Неверное тело запроса";
-    return NextResponse.json({ error: msg }, { status: 400 });
+    return jsonError(400, msg);
   }
 
   const result = await sendPayoutToPaygine(payoutId, {

@@ -15,7 +15,8 @@ import {
   BadgeCheck,
   Building2,
 } from "lucide-react";
-import { getCsrfHeader, getAccessToken, fetchWithAuth, clearAccessToken } from "@/lib/auth-client";
+import { getAccessToken, fetchWithAuth, clearAccessToken } from "@/lib/auth-client";
+import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 
 const NAV = [

@@ -9,7 +9,7 @@ import { requireRole } from "@/lib/middleware/auth";
 import { db } from "@/lib/db";
 import { getBalance } from "@/lib/balance";
 import { z } from "zod";
-import { parseJsonWithLimit, MAX_BODY_SIZE_AUTH } from "@/lib/api/helpers";
+import { parseJsonWithLimit, MAX_BODY_SIZE_AUTH, jsonError } from "@/lib/api/helpers";
 
 const updateUserSchema = z.object({
   isBlocked: z.boolean().optional(),
@@ -67,9 +67,7 @@ function parseListParams(request: NextRequest): ListParams | NextResponse {
   const statusParam = searchParams.get("status");
   if (!statusParam) return { limit, offset, status: "SUCCESS" };
   const parsed = statusSchema.safeParse(statusParam);
-  if (!parsed.success) {
-    return NextResponse.json({ error: "Некорректный статус" }, { status: 400 });
-  }
+  if (!parsed.success) return jsonError(400, "Некорректный статус");
   return { limit, offset, status: parsed.data };
 }
 
@@ -190,9 +188,7 @@ async function handleGet(
   if (parsed instanceof NextResponse) return parsed;
   const { id } = await params;
   const data = await fetchUserDetails(id, parsed);
-  if (!data.user || data.user.role === "SUPERADMIN") {
-    return NextResponse.json({ error: "Пользователь не найден" }, { status: 404 });
-  }
+  if (!data.user || data.user.role === "SUPERADMIN") return jsonError(404, "Пользователь не найден");
   return NextResponse.json({
     user: serializeUser(data.user),
     stats: buildStats(data.balanceData, data.txCount, data.payoutsPendingCount),
@@ -211,45 +207,21 @@ async function handlePatch(
   const bodyResult = await parseJsonWithLimit(request, MAX_BODY_SIZE_AUTH);
   if (!bodyResult.ok) return bodyResult.response;
   const parsed = updateUserSchema.safeParse(bodyResult.data);
-  if (!parsed.success) {
-    return NextResponse.json(
-      { error: "Неверные данные", issues: parsed.error.issues },
-      { status: 400 },
-    );
-  }
+  if (!parsed.success) return jsonError(400, "Неверные данные", parsed.error.issues);
   const existing = await db.user.findUnique({ where: { id }, select: { id: true } });
-  if (!existing) {
-    return NextResponse.json({ error: "Пользователь не найден" }, { status: 404 });
-  }
-  if (id === actorId && parsed.data.isBlocked === true) {
-    return NextResponse.json(
-      { error: "Нельзя заблокировать самого себя" },
-      { status: 400 },
-    );
-  }
-  const data: {
-    isBlocked?: boolean;
-    payoutDailyLimitCount?: number | null;
-    payoutDailyLimitKop?: bigint | null;
-    payoutMonthlyLimitCount?: number | null;
-    payoutMonthlyLimitKop?: bigint | null;
-    autoConfirmPayouts?: boolean;
-    autoConfirmPayoutThresholdKop?: bigint | null;
-  } = {};
-  if (parsed.data.isBlocked !== undefined) data.isBlocked = parsed.data.isBlocked;
-  if (parsed.data.payoutDailyLimitCount !== undefined) data.payoutDailyLimitCount = parsed.data.payoutDailyLimitCount;
-  if (parsed.data.payoutDailyLimitKop !== undefined) {
-    data.payoutDailyLimitKop = parsed.data.payoutDailyLimitKop != null ? BigInt(parsed.data.payoutDailyLimitKop) : null;
-  }
-  if (parsed.data.payoutMonthlyLimitCount !== undefined) data.payoutMonthlyLimitCount = parsed.data.payoutMonthlyLimitCount;
-  if (parsed.data.payoutMonthlyLimitKop !== undefined) {
-    data.payoutMonthlyLimitKop = parsed.data.payoutMonthlyLimitKop != null ? BigInt(parsed.data.payoutMonthlyLimitKop) : null;
-  }
-  if (parsed.data.autoConfirmPayouts !== undefined) data.autoConfirmPayouts = parsed.data.autoConfirmPayouts;
-  if (parsed.data.autoConfirmPayoutThresholdKop !== undefined) {
-    data.autoConfirmPayoutThresholdKop =
-      parsed.data.autoConfirmPayoutThresholdKop != null ? BigInt(parsed.data.autoConfirmPayoutThresholdKop) : null;
-  }
+  if (!existing) return jsonError(404, "Пользователь не найден");
+  if (id === actorId && parsed.data.isBlocked === true) return jsonError(400, "Нельзя заблокировать самого себя");
+  const p = parsed.data;
+  const toBigInt = (v: number | null) => (v != null ? BigInt(v) : null);
+  const data = {
+    ...(p.isBlocked !== undefined && { isBlocked: p.isBlocked }),
+    ...(p.payoutDailyLimitCount !== undefined && { payoutDailyLimitCount: p.payoutDailyLimitCount }),
+    ...(p.payoutDailyLimitKop !== undefined && { payoutDailyLimitKop: toBigInt(p.payoutDailyLimitKop) }),
+    ...(p.payoutMonthlyLimitCount !== undefined && { payoutMonthlyLimitCount: p.payoutMonthlyLimitCount }),
+    ...(p.payoutMonthlyLimitKop !== undefined && { payoutMonthlyLimitKop: toBigInt(p.payoutMonthlyLimitKop) }),
+    ...(p.autoConfirmPayouts !== undefined && { autoConfirmPayouts: p.autoConfirmPayouts }),
+    ...(p.autoConfirmPayoutThresholdKop !== undefined && { autoConfirmPayoutThresholdKop: toBigInt(p.autoConfirmPayoutThresholdKop) }),
+  };
   const updated = await db.user.update({
     where: { id },
     data,

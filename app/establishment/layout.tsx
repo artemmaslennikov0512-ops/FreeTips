@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { LayoutDashboard, LogOut, Users, PieChart, BarChart3, Palette, Menu, QrCode } from "lucide-react";
-import { getCsrfHeader, getAccessToken, fetchWithAuth, clearAccessToken } from "@/lib/auth-client";
+import { getAccessToken, fetchWithAuth, clearAccessToken } from "@/lib/auth-client";
+import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 
 interface Profile {

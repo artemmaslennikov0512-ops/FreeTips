@@ -412,6 +412,7 @@ export default function EstablishmentBrandPage() {
             >
               Оплатить 100 ₽
             </button>
+            </div>
           </div>
           <p className="text-xs text-center opacity-70" style={{ color: fontColor && /^#[0-9A-Fa-f]{6}$/i.test(fontColor) ? fontColor : undefined }}>
             {""}

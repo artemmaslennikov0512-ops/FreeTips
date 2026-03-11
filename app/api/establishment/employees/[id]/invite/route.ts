@@ -33,15 +33,8 @@ export async function POST(request: NextRequest, { params }: Params) {
     where: { id: employeeId, establishmentId: auth.establishmentId },
     select: { id: true, name: true, userId: true },
   });
-  if (!employee) {
-    return NextResponse.json({ error: "Сотрудник не найден" }, { status: 404 });
-  }
-  if (employee.userId) {
-    return NextResponse.json(
-      { error: "Сотрудник уже зарегистрирован." },
-      { status: 400 },
-    );
-  }
+  if (!employee) return jsonError(404, "Сотрудник не найден");
+  if (employee.userId) return jsonError(400, "Сотрудник уже зарегистрирован.");
 
   const parsed = await parseJsonWithLimit(request, MAX_BODY_SIZE_AUTH);
   if (!parsed.ok) return parsed.response;
@@ -85,10 +78,7 @@ export async function POST(request: NextRequest, { params }: Params) {
   });
 
   if (!sendResult.ok) {
-    return NextResponse.json(
-      { error: sendResult.error || "Отправка писем не настроена. Настройте SMTP или RESEND_API_KEY." },
-      { status: 502 },
-    );
+    return jsonError(502, sendResult.error || "Отправка писем не настроена. Настройте SMTP или RESEND_API_KEY.");
   }
 
   return NextResponse.json(

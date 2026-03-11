@@ -9,7 +9,7 @@ import { requireAuthOrApiKey } from "@/lib/auth-or-api-key";
 import { db } from "@/lib/db";
 import { createPayoutSchema } from "@/lib/validations";
 import { getBalance } from "@/lib/balance";
-import { parseJsonWithLimit, MAX_BODY_SIZE_AUTH } from "@/lib/api/helpers";
+import { parseJsonWithLimit, MAX_BODY_SIZE_AUTH, jsonError } from "@/lib/api/helpers";
 import { getUtcDayStart, getUtcMonthStart, getEffectivePayoutLimits, getEffectiveMonthlyPayoutLimits } from "@/lib/payout-limits";
 import { sendPayoutToPaygine, isPayginePayoutAutoSendEnabled } from "@/lib/payment/send-payout-to-paygine";
 import { feeKopForPayout } from "@/lib/payment/paygine-fee";
@@ -62,10 +62,7 @@ export async function POST(request: NextRequest) {
       ip,
       userId: auth.userId,
     });
-    return NextResponse.json(
-      { error: "Неверные данные", issues: parsed.error.issues },
-      { status: 400 },
-    );
+    return jsonError(400, "Неверные данные", parsed.error.issues);
   }
 
   const { amountKop, details, recipientName, pan } = parsed.data;
@@ -76,11 +73,9 @@ export async function POST(request: NextRequest) {
 
   const { balanceKop } = await getBalance(auth.userId);
   if (totalDebitKop > balanceKop) {
+    const hint = payoutFeeKop > 0 ? `С учётом комиссии вывода ${(payoutFeeKop / 100).toFixed(2)} ₽ нужно ${Number(totalDebitKop) / 100} ₽` : undefined;
     return NextResponse.json(
-      {
-        error: "Недостаточно средств на балансе",
-        hint: payoutFeeKop > 0 ? `С учётом комиссии вывода ${(payoutFeeKop / 100).toFixed(2)} ₽ нужно ${Number(totalDebitKop) / 100} ₽` : undefined,
-      },
+      { error: "Недостаточно средств на балансе", ...(hint !== undefined && { hint }) },
       { status: 400 },
     );
   }
@@ -96,17 +91,11 @@ export async function POST(request: NextRequest) {
     paygineConfigured &&
     (!pan || pan.replace(/\s/g, "").trim().length < 8)
   ) {
-    return NextResponse.json(
-      { error: "Для автовывода в Paygine укажите номер карты (pan)" },
-      { status: 400 },
-    );
+    return jsonError(400, "Для автовывода в Paygine укажите номер карты (pan)");
   }
   if (user?.autoConfirmPayoutThresholdKop != null && amountBigInt > user.autoConfirmPayoutThresholdKop) {
     const maxRub = Number(user.autoConfirmPayoutThresholdKop) / 100;
-    return NextResponse.json(
-      { error: `Максимальная сумма одной операции вывода: ${maxRub.toLocaleString("ru-RU")} ₽` },
-      { status: 400 },
-    );
+    return jsonError(400, `Максимальная сумма одной операции вывода: ${maxRub.toLocaleString("ru-RU")} ₽`);
   }
 
   const dayStart = getUtcDayStart();
@@ -147,10 +136,7 @@ export async function POST(request: NextRequest) {
       amountKop: Number(amountBigInt),
       limit: limits.count,
     });
-    return NextResponse.json(
-      { error: `Превышен лимит: не более ${limits.count} заявок в сутки` },
-      { status: 400 },
-    );
+    return jsonError(400, `Превышен лимит: не более ${limits.count} заявок в сутки`);
   }
   const todaySumKop = todaySum._sum.amountKop ?? BigInt(0);
   if (todaySumKop + amountBigInt > limits.kop) {
@@ -164,10 +150,7 @@ export async function POST(request: NextRequest) {
       limitKop: Number(limits.kop),
     });
     const limitRub = Number(limits.kop) / 100;
-    return NextResponse.json(
-      { error: `Превышен лимит: не более ${limitRub.toLocaleString("ru-RU")} ₽ вывода в сутки` },
-      { status: 400 },
-    );
+    return jsonError(400, `Превышен лимит: не более ${limitRub.toLocaleString("ru-RU")} ₽ вывода в сутки`);
   }
 
   if (monthlyLimits.count != null && monthCount >= monthlyLimits.count) {
@@ -180,10 +163,7 @@ export async function POST(request: NextRequest) {
       amountKop: Number(amountBigInt),
       limit: monthlyLimits.count,
     });
-    return NextResponse.json(
-      { error: `Превышен лимит: не более ${monthlyLimits.count} заявок в месяц` },
-      { status: 400 },
-    );
+    return jsonError(400, `Превышен лимит: не более ${monthlyLimits.count} заявок в месяц`);
   }
   const monthSumKop = monthSum._sum?.amountKop ?? BigInt(0);
   if (monthlyLimits.kop != null && monthSumKop + amountBigInt > monthlyLimits.kop) {
@@ -197,10 +177,7 @@ export async function POST(request: NextRequest) {
       limitKop: Number(monthlyLimits.kop),
     });
     const limitRub = Number(monthlyLimits.kop) / 100;
-    return NextResponse.json(
-      { error: `Превышен лимит: не более ${limitRub.toLocaleString("ru-RU")} ₽ вывода в месяц` },
-      { status: 400 },
-    );
+    return jsonError(400, `Превышен лимит: не более ${limitRub.toLocaleString("ru-RU")} ₽ вывода в месяц`);
   }
 
   const payout = await db.payoutRequest.create({

@@ -68,8 +68,10 @@ export default function EstablishmentBrandPage() {
   const clampPercent = (v: number) => Math.min(100, Math.max(0, v));
   const clampMm = (v: number) => Math.min(200, Math.max(20, v));
   const hexRe = /^#[0-9A-Fa-f]{6}$/i;
-  const hex = (s: string | undefined) => (s && hexRe.test(s) ? s : "");
+  const hex = (s: string | undefined) => (s && hexRe.test(String(s)) ? String(s) : "");
   const hexOr = (s: string | undefined, fallback: string) => hex(s) || fallback;
+  /** Безопасно: вернуть строку, если это валидный hex, иначе fallback (для value полей). */
+  const safeHexValue = (s: unknown, fallback: string) => (typeof s === "string" && hexRe.test(s) ? s : fallback);
 
   useEffect(() => {
     const load = async () => {
@@ -80,22 +82,22 @@ export default function EstablishmentBrandPage() {
         if (res.ok) {
           const data = await res.json();
           setSettings(data);
-          setLogoUrl(data.logoUrl ?? "");
-          setPrimaryColor(data.primaryColor ?? "");
-          setSecondaryColor(data.secondaryColor ?? "");
-          setMainBackgroundColor(data.mainBackgroundColor ?? "");
-          setBlocksBackgroundColor(data.blocksBackgroundColor ?? "");
-          setFontColor(data.fontColor ?? "");
-          setBorderColor(data.borderColor ?? "");
-          setBorderWidthPx(data.borderWidthPx ?? 2);
-          setBorderOpacityPercent(data.borderOpacityPercent ?? 100);
-          setMainBackgroundOpacityPercent(data.mainBackgroundOpacityPercent ?? 100);
-          setBlocksBackgroundOpacityPercent(data.blocksBackgroundOpacityPercent ?? 100);
-          setSecondaryOpacityPercent(data.secondaryOpacityPercent ?? 100);
-          setPrintCardWidthMm(data.printCardWidthMm ?? 67);
-          setPrintCardHeightMm(data.printCardHeightMm ?? 49);
-          setPrintCardFooterColor(data.printCardFooterColor ?? "");
-          setLogoOpacityPercent(data.logoOpacityPercent ?? 100);
+          setLogoUrl(String(data.logoUrl ?? ""));
+          setPrimaryColor(String(data.primaryColor ?? ""));
+          setSecondaryColor(String(data.secondaryColor ?? ""));
+          setMainBackgroundColor(String(data.mainBackgroundColor ?? ""));
+          setBlocksBackgroundColor(String(data.blocksBackgroundColor ?? ""));
+          setFontColor(String(data.fontColor ?? ""));
+          setBorderColor(String(data.borderColor ?? ""));
+          setBorderWidthPx(Number(data.borderWidthPx) || 2);
+          setBorderOpacityPercent(Number(data.borderOpacityPercent) ?? 100);
+          setMainBackgroundOpacityPercent(Number(data.mainBackgroundOpacityPercent) ?? 100);
+          setBlocksBackgroundOpacityPercent(Number(data.blocksBackgroundOpacityPercent) ?? 100);
+          setSecondaryOpacityPercent(Number(data.secondaryOpacityPercent) ?? 100);
+          setPrintCardWidthMm(Number(data.printCardWidthMm) || 67);
+          setPrintCardHeightMm(Number(data.printCardHeightMm) || 49);
+          setPrintCardFooterColor(String(data.printCardFooterColor ?? ""));
+          setLogoOpacityPercent(Number(data.logoOpacityPercent) ?? 100);
         }
       } finally {
         setLoading(false);
@@ -138,22 +140,22 @@ export default function EstablishmentBrandPage() {
         return;
       }
       setSettings(data);
-      setLogoUrl(data.logoUrl ?? "");
-      setPrimaryColor(data.primaryColor ?? "");
-      setSecondaryColor(data.secondaryColor ?? "");
-      setMainBackgroundColor(data.mainBackgroundColor ?? "");
-      setBlocksBackgroundColor(data.blocksBackgroundColor ?? "");
-      setFontColor(data.fontColor ?? "");
-      setBorderColor(data.borderColor ?? "");
-      setBorderWidthPx(data.borderWidthPx ?? 2);
-      setBorderOpacityPercent(data.borderOpacityPercent ?? 100);
-      setMainBackgroundOpacityPercent(data.mainBackgroundOpacityPercent ?? 100);
-      setBlocksBackgroundOpacityPercent(data.blocksBackgroundOpacityPercent ?? 100);
-      setSecondaryOpacityPercent(data.secondaryOpacityPercent ?? 100);
-      setPrintCardWidthMm(data.printCardWidthMm ?? 67);
-      setPrintCardHeightMm(data.printCardHeightMm ?? 49);
-      setPrintCardFooterColor(data.printCardFooterColor ?? "");
-      setLogoOpacityPercent(data.logoOpacityPercent ?? 100);
+      setLogoUrl(String(data.logoUrl ?? ""));
+      setPrimaryColor(String(data.primaryColor ?? ""));
+      setSecondaryColor(String(data.secondaryColor ?? ""));
+      setMainBackgroundColor(String(data.mainBackgroundColor ?? ""));
+      setBlocksBackgroundColor(String(data.blocksBackgroundColor ?? ""));
+      setFontColor(String(data.fontColor ?? ""));
+      setBorderColor(String(data.borderColor ?? ""));
+      setBorderWidthPx(Number(data.borderWidthPx) ?? 2);
+      setBorderOpacityPercent(Number(data.borderOpacityPercent) ?? 100);
+      setMainBackgroundOpacityPercent(Number(data.mainBackgroundOpacityPercent) ?? 100);
+      setBlocksBackgroundOpacityPercent(Number(data.blocksBackgroundOpacityPercent) ?? 100);
+      setSecondaryOpacityPercent(Number(data.secondaryOpacityPercent) ?? 100);
+      setPrintCardWidthMm(Number(data.printCardWidthMm) ?? 67);
+      setPrintCardHeightMm(Number(data.printCardHeightMm) ?? 49);
+      setPrintCardFooterColor(String(data.printCardFooterColor ?? ""));
+      setLogoOpacityPercent(Number(data.logoOpacityPercent) ?? 100);
       setMessage("Сохранено. Настройки применяются в личном кабинете и на странице оплаты чаевых. QR настраивается в разделе «QR и печать».");
     } catch {
       setMessage("Ошибка соединения");
@@ -179,22 +181,22 @@ export default function EstablishmentBrandPage() {
         return;
       }
       setSettings(data);
-      setLogoUrl(data.logoUrl ?? "");
-      setPrimaryColor(data.primaryColor ?? "");
-      setSecondaryColor(data.secondaryColor ?? "");
-      setMainBackgroundColor(data.mainBackgroundColor ?? "");
-      setBlocksBackgroundColor(data.blocksBackgroundColor ?? "");
-      setFontColor(data.fontColor ?? "");
-      setBorderColor(data.borderColor ?? "");
-      setBorderWidthPx(data.borderWidthPx ?? 2);
-      setBorderOpacityPercent(data.borderOpacityPercent ?? 100);
-      setMainBackgroundOpacityPercent(data.mainBackgroundOpacityPercent ?? 100);
-      setBlocksBackgroundOpacityPercent(data.blocksBackgroundOpacityPercent ?? 100);
-      setSecondaryOpacityPercent(data.secondaryOpacityPercent ?? 100);
-      setPrintCardWidthMm(data.printCardWidthMm ?? 67);
-      setPrintCardHeightMm(data.printCardHeightMm ?? 49);
-      setPrintCardFooterColor(data.printCardFooterColor ?? "");
-      setLogoOpacityPercent(data.logoOpacityPercent ?? 100);
+      setLogoUrl(String(data.logoUrl ?? ""));
+      setPrimaryColor(String(data.primaryColor ?? ""));
+      setSecondaryColor(String(data.secondaryColor ?? ""));
+      setMainBackgroundColor(String(data.mainBackgroundColor ?? ""));
+      setBlocksBackgroundColor(String(data.blocksBackgroundColor ?? ""));
+      setFontColor(String(data.fontColor ?? ""));
+      setBorderColor(String(data.borderColor ?? ""));
+      setBorderWidthPx(Number(data.borderWidthPx) ?? 2);
+      setBorderOpacityPercent(Number(data.borderOpacityPercent) ?? 100);
+      setMainBackgroundOpacityPercent(Number(data.mainBackgroundOpacityPercent) ?? 100);
+      setBlocksBackgroundOpacityPercent(Number(data.blocksBackgroundOpacityPercent) ?? 100);
+      setSecondaryOpacityPercent(Number(data.secondaryOpacityPercent) ?? 100);
+      setPrintCardWidthMm(Number(data.printCardWidthMm) ?? 67);
+      setPrintCardHeightMm(Number(data.printCardHeightMm) ?? 49);
+      setPrintCardFooterColor(String(data.printCardFooterColor ?? ""));
+      setLogoOpacityPercent(Number(data.logoOpacityPercent) ?? 100);
       setMessage("Настройки сброшены к исходным.");
     } catch {
       setMessage("Ошибка соединения");
@@ -302,6 +304,9 @@ export default function EstablishmentBrandPage() {
   };
   const borderHex = hexOr(borderColor, hexOr(primaryColor, "#c5a572"));
   const borderRgba = (() => {
+    if (typeof borderHex !== "string" || borderHex.length < 7 || !hexRe.test(borderHex)) {
+      return "rgba(197,165,114,0.5)";
+    }
     const r = parseInt(borderHex.slice(1, 3), 16);
     const g = parseInt(borderHex.slice(3, 5), 16);
     const b = parseInt(borderHex.slice(5, 7), 16);
@@ -386,7 +391,7 @@ export default function EstablishmentBrandPage() {
               <div className="flex gap-2 items-center">
                 <input
                   type="color"
-                  value={primaryColor.match(/^#[0-9A-Fa-f]{6}$/) ? primaryColor : DEFAULT_HEX.primary}
+                  value={safeHexValue(primaryColor, DEFAULT_HEX.primary)}
                   onChange={(e) => setPrimaryColor(e.target.value)}
                   className="h-10 w-14 rounded border border-[var(--color-brand-gold)]/20 cursor-pointer"
                 />
@@ -406,7 +411,7 @@ export default function EstablishmentBrandPage() {
               <div className="flex gap-2 items-center">
                 <input
                   type="color"
-                  value={secondaryColor.match(/^#[0-9A-Fa-f]{6}$/) ? secondaryColor : DEFAULT_HEX.secondary}
+                  value={safeHexValue(secondaryColor, DEFAULT_HEX.secondary)}
                   onChange={(e) => setSecondaryColor(e.target.value)}
                   className="h-10 w-14 rounded border border-[var(--color-brand-gold)]/20 cursor-pointer"
                 />
@@ -431,7 +436,7 @@ export default function EstablishmentBrandPage() {
               <div className="flex gap-2 items-center">
                 <input
                   type="color"
-                  value={mainBackgroundColor.match(/^#[0-9A-Fa-f]{6}$/) ? mainBackgroundColor : DEFAULT_HEX.mainBg}
+                  value={safeHexValue(mainBackgroundColor, DEFAULT_HEX.mainBg)}
                   onChange={(e) => setMainBackgroundColor(e.target.value)}
                   className="h-10 w-14 rounded border border-[var(--color-brand-gold)]/20 cursor-pointer"
                 />
@@ -456,7 +461,7 @@ export default function EstablishmentBrandPage() {
               <div className="flex gap-2 items-center">
                 <input
                   type="color"
-                  value={blocksBackgroundColor.match(/^#[0-9A-Fa-f]{6}$/) ? blocksBackgroundColor : DEFAULT_HEX.blocksBg}
+                  value={safeHexValue(blocksBackgroundColor, DEFAULT_HEX.blocksBg)}
                   onChange={(e) => setBlocksBackgroundColor(e.target.value)}
                   className="h-10 w-14 rounded border border-[var(--color-brand-gold)]/20 cursor-pointer"
                 />
@@ -481,7 +486,7 @@ export default function EstablishmentBrandPage() {
               <div className="flex gap-2 items-center">
                 <input
                   type="color"
-                  value={fontColor.match(/^#[0-9A-Fa-f]{6}$/) ? fontColor : DEFAULT_HEX.font}
+                  value={safeHexValue(fontColor, DEFAULT_HEX.font)}
                   onChange={(e) => setFontColor(e.target.value)}
                   className="h-10 w-14 rounded border border-[var(--color-brand-gold)]/20 cursor-pointer"
                 />
@@ -501,7 +506,7 @@ export default function EstablishmentBrandPage() {
               <div className="flex gap-2 items-center">
                 <input
                   type="color"
-                  value={borderColor.match(/^#[0-9A-Fa-f]{6}$/) ? borderColor : "#c5a372"}
+                  value={safeHexValue(borderColor, "#c5a372")}
                   onChange={(e) => setBorderColor(e.target.value)}
                   className="h-10 w-14 rounded border border-[var(--color-brand-gold)]/20 cursor-pointer"
                 />
@@ -540,7 +545,7 @@ export default function EstablishmentBrandPage() {
                   <div className="flex gap-2 items-center">
                     <input
                       type="color"
-                      value={printCardFooterColor.match(/^#[0-9A-Fa-f]{6}$/) ? printCardFooterColor : "#b8c5d6"}
+                      value={safeHexValue(printCardFooterColor, "#b8c5d6")}
                       onChange={(e) => setPrintCardFooterColor(e.target.value)}
                       className="h-10 w-14 rounded border border-[var(--color-brand-gold)]/20 cursor-pointer"
                     />

@@ -7,7 +7,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireEstablishmentAdmin } from "@/lib/middleware/auth";
 import { db } from "@/lib/db";
 import { getBaseUrlFromRequest } from "@/lib/get-base-url";
-import { PDFDocument, rgb, RGB, StandardFonts } from "pdf-lib";
+import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 import QRCode from "qrcode";
 
 const CARD_WIDTH = 190;
@@ -34,7 +34,7 @@ function getOrigin(request: NextRequest): string {
   }
 }
 
-function hexToRgb(hex: string): RGB | null {
+function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
   const m = hex.match(/^#?([0-9A-Fa-f]{6})$/);
   if (!m) return null;
   const n = parseInt(m[1], 16);

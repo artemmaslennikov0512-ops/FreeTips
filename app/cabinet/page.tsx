@@ -209,7 +209,7 @@ export default function CabinetDashboardPage() {
                         <ShieldCheck className="h-5 w-5" aria-hidden />
                       </div>
                     </div>
-                    <p className="text-sm text-white/90">Ваша личность подтверждена.</p>
+                    <p className="w-full text-center text-sm text-white">Ваша личность подтверждена.</p>
                   </div>
                 ) : verificationStatus === "PENDING" ? (
                   <div className="flex items-center justify-center gap-3 text-center">

@@ -229,6 +229,45 @@ html:not([data-theme="dark"]) .cabinet-premium .cabinet-sidebar-avatar {
   background-color: transparent;
 }
 
+/* Настройки бренда заведения: в обеих темах одни и те же переменные применяются ко всем элементам */
+.cabinet-premium[data-brand-active] .cabinet-card {
+  background: var(--color-bg-sides) !important;
+  border-color: var(--cabinet-border-color, rgba(255, 255, 255, 0.2)) !important;
+}
+.cabinet-premium[data-brand-active] .cabinet-block-inner,
+.cabinet-premium[data-brand-active] .cabinet-limits-block {
+  border-color: var(--cabinet-border-color, rgba(255, 255, 255, 0.12)) !important;
+  background: var(--color-bg-sides, rgba(255, 255, 255, 0.06)) !important;
+}
+.cabinet-premium[data-brand-active] .cabinet-card .cabinet-input-window,
+.cabinet-premium[data-brand-active] .cabinet-block-inner .cabinet-input-window {
+  background: var(--color-bg-sides) !important;
+  border-color: var(--cabinet-border-color, rgba(197, 165, 114, 0.2)) !important;
+  color: var(--color-text) !important;
+}
+
+/* Светлая тема: при бренде текст сайдбара и блоков — из настроек (цвет шрифта) */
+html:not([data-theme="dark"]) .cabinet-premium[data-brand-active] .cabinet-sidebar,
+html:not([data-theme="dark"]) .cabinet-premium[data-brand-active] .cabinet-sidebar a,
+html:not([data-theme="dark"]) .cabinet-premium[data-brand-active] .cabinet-sidebar button,
+html:not([data-theme="dark"]) .cabinet-premium[data-brand-active] .cabinet-sidebar .cabinet-sidebar-profile {
+  color: var(--color-text) !important;
+}
+html:not([data-theme="dark"]) .cabinet-premium[data-brand-active] .cabinet-sidebar .cabinet-nav-active {
+  color: var(--color-text) !important;
+}
+
+/* Тёмная тема: при бренде не перебивать переменные — текст и фон из настроек */
+[data-theme="dark"] .cabinet-premium[data-brand-active] .cabinet-sidebar,
+[data-theme="dark"] .cabinet-premium[data-brand-active] .cabinet-sidebar a,
+[data-theme="dark"] .cabinet-premium[data-brand-active] .cabinet-sidebar button,
+[data-theme="dark"] .cabinet-premium[data-brand-active] .cabinet-sidebar .cabinet-sidebar-profile {
+  color: var(--color-text) !important;
+}
+[data-theme="dark"] .cabinet-premium[data-brand-active] .cabinet-sidebar .cabinet-nav-active {
+  color: var(--color-text) !important;
+}
+
 /* Светлая тема: карта баланса — белая, скругление, тень «парения» */
 html:not([data-theme="dark"]) .cabinet-premium .premium-card-front {
   background: #ffffff !important;
@@ -1275,35 +1314,6 @@ html:not([data-theme="dark"]) .cabinet-premium #operations-history.cabinet-card 
   color: rgba(255, 255, 255, 0.9) !important;
 }
 
-/* Мобильная версия ЛК (официант): светлый фон основного блока и чёрный текст */
-@media (max-width: 767px) {
-  html:not([data-theme="dark"]) .cabinet-premium .cabinet-main-block:not(.admin-main-block) {
-    background: #f5f5f5 !important;
-    border-color: rgba(0, 0, 0, 0.08) !important;
-  }
-  html:not([data-theme="dark"]) .cabinet-premium .cabinet-main-block:not(.admin-main-block) #main-content,
-  html:not([data-theme="dark"]) .cabinet-premium .cabinet-main-block:not(.admin-main-block) #main-content h1,
-  html:not([data-theme="dark"]) .cabinet-premium .cabinet-main-block:not(.admin-main-block) #main-content h2,
-  html:not([data-theme="dark"]) .cabinet-premium .cabinet-main-block:not(.admin-main-block) #main-content h3,
-  html:not([data-theme="dark"]) .cabinet-premium .cabinet-main-block:not(.admin-main-block) #main-content h4,
-  html:not([data-theme="dark"]) .cabinet-premium .cabinet-main-block:not(.admin-main-block) #main-content p,
-  html:not([data-theme="dark"]) .cabinet-premium .cabinet-main-block:not(.admin-main-block) #main-content span,
-  html:not([data-theme="dark"]) .cabinet-premium .cabinet-main-block:not(.admin-main-block) .cabinet-card,
-  html:not([data-theme="dark"]) .cabinet-premium .cabinet-main-block:not(.admin-main-block) .cabinet-card h3,
-  html:not([data-theme="dark"]) .cabinet-premium .cabinet-main-block:not(.admin-main-block) #operations-history.cabinet-card h3,
-  html:not([data-theme="dark"]) .cabinet-premium .cabinet-main-block:not(.admin-main-block) #operations-history.cabinet-card .border-t .text-sm,
-  html:not([data-theme="dark"]) .cabinet-premium .cabinet-main-block:not(.admin-main-block) #operations-history.cabinet-card .border-t span.text-sm {
-    color: #0a192f !important;
-  }
-  html:not([data-theme="dark"]) .cabinet-premium .cabinet-main-block:not(.admin-main-block) #operations-history.cabinet-card * {
-    color: #0a192f !important;
-  }
-  html:not([data-theme="dark"]) .cabinet-premium .cabinet-main-block:not(.admin-main-block) .cabinet-card {
-    background: #ffffff !important;
-    border-color: rgba(0, 0, 0, 0.08) !important;
-  }
-}
-
 /* Текст в полях ввода ЛК и админки — чёрный на светлом фоне */
 .cabinet-premium input,
 .cabinet-premium textarea {
@@ -1435,6 +1445,26 @@ html:not([data-theme="dark"]) .cabinet-premium .cabinet-limits-block .font-mediu
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-verification-status,
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-verification-status p {
   color: #0a192f !important;
+}
+
+/* Мобильная версия: блок верификации — во всю ширину, белый текст по центру, фон затемнён */
+@media (max-width: 768px) {
+  .cabinet-premium .cabinet-verification-status {
+    width: 100% !important;
+    max-width: 100% !important;
+    text-align: center !important;
+    background: rgba(10, 25, 47, 0.85) !important;
+    border-color: rgba(197, 165, 114, 0.5) !important;
+  }
+  .cabinet-premium .cabinet-verification-status,
+  .cabinet-premium .cabinet-verification-status p,
+  html:not([data-theme="dark"]) .cabinet-premium .cabinet-verification-status,
+  html:not([data-theme="dark"]) .cabinet-premium .cabinet-verification-status p {
+    color: #fff !important;
+  }
+  .cabinet-premium .cabinet-verification-status .flex {
+    justify-content: center !important;
+  }
 }
 
 /* Тёмная тема: шторка ЛК (официант и админ) — тёмное стекло */

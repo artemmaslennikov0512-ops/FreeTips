@@ -2325,6 +2325,130 @@ p {
   }
 }
 
+/* Hero: градиентный заголовок с анимацией перелива */
+.hero-title-gradient {
+  background: linear-gradient(90deg, #3b82f6 0%, #6366f1 25%, #8b5cf6 50%, #6366f1 75%, #3b82f6 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+.hero-premium-section h1.hero-title-gradient {
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .hero-title-gradient {
+    animation: hero-shimmer 6s ease-in-out infinite;
+  }
+}
+@keyframes hero-shimmer {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* Правая колонка hero: анимированный градиентный фон */
+.hero-brand-card {
+  position: relative;
+  transition: box-shadow 0.4s ease, background 0.4s ease;
+}
+.hero-brand-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.03) 0%, rgba(139, 92, 246, 0.05) 50%, rgba(99, 102, 241, 0.03) 100%);
+  background-size: 200% 200%;
+  pointer-events: none;
+  z-index: 0;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .hero-brand-card::before {
+    animation: hero-brand-bg 8s ease-in-out infinite;
+  }
+}
+@keyframes hero-brand-bg {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+.hero-brand-card:hover {
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+.hero-brand-card:hover::before {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.06) 0%, rgba(139, 92, 246, 0.08) 50%, rgba(99, 102, 241, 0.06) 100%);
+}
+
+/* Иконки в пунктах правой колонки — hover */
+.hero-brand-item .hero-brand-icon {
+  transition: transform 0.3s ease, color 0.3s ease;
+}
+.hero-brand-item:hover .hero-brand-icon {
+  transform: scale(1.1);
+  color: #8b5cf6 !important;
+}
+
+/* Превью-карточки: тень и разделители */
+.hero-preview-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-preview-card:hover { transform: none; }
+}
+.hero-preview-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  border-color: rgba(255, 255, 255, 0.25) !important;
+}
+.hero-preview-gallery {
+  display: flex;
+  align-items: stretch;
+  gap: 0.5rem;
+}
+.hero-preview-gallery .hero-preview-card {
+  flex: 1;
+  min-width: 0;
+  position: relative;
+}
+.hero-preview-gallery .hero-preview-card:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  right: -0.25rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.35);
+}
+
+/* Кнопка «Настроить дизайн»: градиент и пульсация при hover */
+.hero-btn-design {
+  background: linear-gradient(135deg, rgba(197, 165, 114, 0.25) 0%, rgba(197, 165, 114, 0.12) 100%) !important;
+  transition: box-shadow 0.3s ease, transform 0.3s ease, background 0.3s ease !important;
+}
+.hero-btn-design:hover {
+  box-shadow: 0 0 20px rgba(197, 165, 114, 0.4), 0 4px 16px rgba(0, 0, 0, 0.2) !important;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .hero-btn-design:hover {
+    animation: hero-btn-glow 1.5s ease-in-out infinite;
+  }
+}
+@keyframes hero-btn-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(197, 165, 114, 0.4), 0 4px 16px rgba(0, 0, 0, 0.2); }
+  50% { box-shadow: 0 0 28px rgba(197, 165, 114, 0.55), 0 4px 20px rgba(0, 0, 0, 0.25); }
+}
+
+/* Основная кнопка hero: лёгкий градиент и тень при hover */
+.hero-btn-primary {
+  background: linear-gradient(135deg, #c5a572 0%, #b8955f 100%) !important;
+  transition: box-shadow 0.3s ease, transform 0.3s ease !important;
+}
+.hero-btn-primary:hover {
+  box-shadow: 0 6px 24px rgba(197, 165, 114, 0.45) !important;
+}
+
 .section-dark h1,
 .section-dark h2,
 .section-dark h3,

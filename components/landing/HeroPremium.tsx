@@ -42,9 +42,9 @@ const BRAND_FEATURES = [
 ] as const;
 
 const PREVIEW_ITEMS = [
-  { label: "Карточка", icon: "fa-solid fa-id-card" },
-  { label: "Оплата", icon: "fa-solid fa-wallet" },
-  { label: "Кабинет", icon: "fa-solid fa-gauge-high" },
+  { label: "Карточка", icon: "fa-solid fa-qrcode" },
+  { label: "Оплата", icon: "fa-solid fa-mobile-screen" },
+  { label: "Кабинет", icon: "fa-solid fa-user" },
 ] as const;
 
 export function HeroPremium() {
@@ -64,7 +64,7 @@ export function HeroPremium() {
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto] lg:items-start gap-10 lg:gap-12 xl:gap-16">
           {/* Левая колонка: заголовок, подзаголовок, кнопки, метрики */}
           <div className="max-w-[640px] relative z-[2] flex flex-col">
-            <h1 className="hero-premium-title font-[family:var(--font-inter)] text-4xl sm:text-5xl lg:text-6xl font-bold text-[var(--color-on-navy)] leading-[1.15] mb-4">
+            <h1 className="hero-premium-title hero-title-gradient font-[family:var(--font-inter)] text-4xl sm:text-5xl lg:text-6xl font-bold leading-[1.15] mb-4">
               Чаевые, которые работают на ваш бренд
             </h1>
             <p className="hero-premium-lead text-lg text-[var(--color-on-dark-muted)] mb-6 max-w-[560px] leading-relaxed">
@@ -73,7 +73,7 @@ export function HeroPremium() {
             <div className="flex flex-wrap gap-3 sm:gap-4 mb-0">
               <Link
                 href="/zayavka"
-                className="hero-btn-primary inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-[var(--color-accent-gold)] text-[var(--color-navy)] font-bold text-[15px] transition-all duration-300 shadow-[var(--shadow-button)] hover:shadow-[var(--shadow-button-hover)] hover:-translate-y-0.5 hover:opacity-95 hover:scale-[1.02]"
+                className="hero-btn-primary inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-[var(--color-navy)] font-bold text-[15px] shadow-[var(--shadow-button)] hover:-translate-y-0.5 hover:opacity-95 hover:scale-[1.02]"
               >
                 Подключить заведение
               </Link>
@@ -101,9 +101,9 @@ export function HeroPremium() {
           </div>
 
           {/* Правая колонка: бренд, фичи, превью, кнопка */}
-          <div className="mt-4 lg:mt-0 lg:shrink-0 lg:w-[340px] xl:w-[360px] relative z-[2] rounded-2xl border border-white/15 bg-gradient-to-b from-white/[0.08] to-white/[0.03] backdrop-blur-md shadow-[0_8px_32px_rgba(0,0,0,0.2)] overflow-hidden">
-            <div className="h-1 w-full bg-gradient-to-r from-[var(--color-accent-gold)]/80 via-[var(--color-accent-gold)] to-[var(--color-accent-gold)]/60" aria-hidden />
-            <div className="px-5 py-5 sm:px-6 sm:py-6">
+          <div className="hero-brand-card mt-4 lg:mt-0 lg:shrink-0 lg:w-[340px] xl:w-[360px] relative z-[2] rounded-2xl border border-white/15 bg-gradient-to-b from-white/[0.08] to-white/[0.03] backdrop-blur-md shadow-[0_8px_32px_rgba(0,0,0,0.2)] overflow-hidden">
+            <div className="h-1 w-full bg-gradient-to-r from-[var(--color-accent-gold)]/80 via-[var(--color-accent-gold)] to-[var(--color-accent-gold)]/60 relative z-10" aria-hidden />
+            <div className="px-5 py-5 sm:px-6 sm:py-6 relative z-10">
               <h2 className="font-[family:var(--font-inter)] text-xl sm:text-2xl font-bold text-[var(--color-on-navy)] leading-tight mb-2">
                 Всё под вашим брендом
               </h2>
@@ -113,7 +113,7 @@ export function HeroPremium() {
                     key={label}
                     className="hero-brand-item flex items-start gap-3 rounded-xl bg-white/[0.06] border border-white/10 px-3 py-2.5 transition-all duration-300 hover:bg-white/[0.09] hover:border-white/20"
                   >
-                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[var(--color-accent-gold)]/20 text-[var(--color-accent-gold)] mt-0.5">
+                    <span className="hero-brand-icon flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[var(--color-accent-gold)]/20 text-[var(--color-accent-gold)] mt-0.5">
                       <i className={`${icon} text-sm`} aria-hidden />
                     </span>
                     <span className="flex flex-col min-w-0">
@@ -125,11 +125,11 @@ export function HeroPremium() {
               </ul>
               <div className="mb-5">
                 <span className="text-xs font-semibold text-[var(--color-on-dark-muted)] uppercase tracking-wider">Превью</span>
-                <div className="mt-3 flex gap-3">
+                <div className="hero-preview-gallery mt-3">
                   {PREVIEW_ITEMS.map(({ label, icon }) => (
                     <div
                       key={label}
-                      className="hero-preview-item flex-1 min-w-0 flex flex-col items-center justify-center rounded-xl border border-white/15 bg-white/[0.05] aspect-square p-2 transition-transform duration-300 hover:scale-105 hover:shadow-lg hover:border-white/20"
+                      className="hero-preview-card flex flex-col items-center justify-center rounded-xl border border-white/15 bg-white/[0.05] aspect-square p-2"
                     >
                       <i className={`${icon} text-2xl text-[var(--color-accent-gold)]/80 mb-1`} aria-hidden />
                       <span className="text-[11px] sm:text-xs font-medium text-[var(--color-on-dark-muted)] text-center leading-tight">
@@ -141,7 +141,7 @@ export function HeroPremium() {
               </div>
               <Link
                 href="/establishment/brand"
-                className="hero-btn-design block w-full text-center py-3 rounded-xl border-2 border-[var(--color-accent-gold)]/60 text-[var(--color-on-navy)] font-semibold text-[14px] bg-[var(--color-accent-gold)]/15 backdrop-blur-sm transition-all duration-300 hover:bg-[var(--color-accent-gold)]/25 hover:border-[var(--color-accent-gold)] hover:shadow-[var(--shadow-button)] hover:scale-[1.02]"
+                className="hero-btn-design block w-full text-center py-3 rounded-xl border-2 border-[var(--color-accent-gold)]/60 text-[var(--color-on-navy)] font-semibold text-[14px] backdrop-blur-sm hover:bg-[var(--color-accent-gold)]/25 hover:border-[var(--color-accent-gold)] hover:scale-[1.02]"
               >
                 Настроить дизайн бесплатно
               </Link>

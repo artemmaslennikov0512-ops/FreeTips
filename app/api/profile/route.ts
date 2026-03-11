@@ -199,8 +199,18 @@ export async function GET(request: NextRequest) {
     };
     return NextResponse.json(body);
   } catch (err) {
-    logError("profile.get.error", err, { requestId: getRequestId(request) });
-    return internalError("Не удалось загрузить профиль");
+    const requestId = getRequestId(request);
+    logError("profile.get.error", err, { requestId });
+    const devMessage = err instanceof Error ? err.message : String(err);
+    // Для отладки: заголовок X-Debug-Profile-Error: 1 — вернуть реальную ошибку в ответе
+    const wantDebug = request.headers.get("x-debug-profile-error") === "1";
+    if (wantDebug) {
+      return NextResponse.json(
+        { error: "Не удалось загрузить профиль", debug: devMessage },
+        { status: 500 },
+      );
+    }
+    return internalError("Не удалось загрузить профиль", devMessage);
   }
 }
 

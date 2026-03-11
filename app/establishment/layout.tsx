@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
-import { LayoutDashboard, LogOut, Users, PieChart, BarChart3, Palette, Menu } from "lucide-react";
+import { LayoutDashboard, LogOut, Users, PieChart, BarChart3, Palette, Menu, QrCode } from "lucide-react";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 
@@ -16,6 +16,7 @@ interface Profile {
 const NAV = [
   { label: "Дашборд", href: "/establishment" },
   { label: "Команда", href: "/establishment/team" },
+  { label: "QR и печать", href: "/establishment/qr" },
   { label: "Распределение", href: "/establishment/payout-rules" },
   { label: "Аналитика", href: "/establishment/analytics" },
   { label: "Бренд", href: "/establishment/brand" },
@@ -129,7 +130,7 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
   }
 
   const isActive = (href: string) => pathname === href || (href !== "/establishment" && pathname.startsWith(href));
-  const navIcons = [LayoutDashboard, Users, PieChart, BarChart3, Palette] as const;
+  const navIcons = [LayoutDashboard, Users, QrCode, PieChart, BarChart3, Palette] as const;
   const closeSidebar = () => setSidebarOpen(false);
 
   return (

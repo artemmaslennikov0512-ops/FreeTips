@@ -59,6 +59,7 @@ export async function GET(request: NextRequest) {
             autoConfirmPayoutThresholdKop: true,
             verificationStatus: true,
             verificationRejectionReason: true,
+            savingFor: true,
           },
         }),
         db.transaction.aggregate({
@@ -190,6 +191,7 @@ export async function GET(request: NextRequest) {
           : 10_000_000, // 100 000 ₽ по умолчанию
       verificationStatus: String(profile.verificationStatus),
       verificationRejectionReason: profile.verificationRejectionReason != null ? String(profile.verificationRejectionReason) : null,
+      savingFor: profile.savingFor != null ? String(profile.savingFor) : null,
     };
     return NextResponse.json(body);
   } catch (err) {
@@ -213,10 +215,10 @@ export async function PATCH(request: NextRequest) {
   }
 
   const data = parsed.data;
-  const allowedKeys = ["login", "email", "fullName", "birthDate", "establishment"] as const;
+  const allowedKeys = ["login", "email", "fullName", "birthDate", "establishment", "savingFor"] as const;
   const update = Object.fromEntries(
     allowedKeys.filter((k) => data[k] !== undefined).map((k) => [k, data[k]])
-  ) as { login?: string; email?: string | null; fullName?: string | null; birthDate?: string | null; establishment?: string | null };
+  ) as { login?: string; email?: string | null; fullName?: string | null; birthDate?: string | null; establishment?: string | null; savingFor?: string | null };
   if (Object.keys(update).length === 0) {
     return jsonError(400, "Нечего обновлять");
   }
@@ -250,7 +252,7 @@ export async function PATCH(request: NextRequest) {
   const profile = await db.user.update({
     where: { id: auth.userId },
     data: update,
-    select: { id: true, uniqueId: true, login: true, email: true, role: true, fullName: true, birthDate: true, establishment: true },
+    select: { id: true, uniqueId: true, login: true, email: true, role: true, fullName: true, birthDate: true, establishment: true, savingFor: true },
   });
 
   return NextResponse.json(profile);

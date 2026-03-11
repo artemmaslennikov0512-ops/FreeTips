@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Users, Plus, Copy, RefreshCw, FileDown, Mail } from "lucide-react";
+import { Plus, Copy, RefreshCw, FileDown, Mail, Pencil } from "lucide-react";
 import { authHeaders } from "@/lib/auth-client";
 
 interface EstablishmentInfo {
@@ -40,6 +40,12 @@ export default function EstablishmentTeamPage() {
   const [togglingId, setTogglingId] = useState<string | null>(null);
   const [downloadingPdf, setDownloadingPdf] = useState(false);
   const [invitingId, setInvitingId] = useState<string | null>(null);
+  const [editEmployee, setEditEmployee] = useState<EmployeeRow | null>(null);
+  const [editName, setEditName] = useState("");
+  const [editPosition, setEditPosition] = useState("");
+  const [editCoefficient, setEditCoefficient] = useState(1);
+  const [editError, setEditError] = useState<string | null>(null);
+  const [savingEdit, setSavingEdit] = useState(false);
 
   const fetchData = async () => {
     setLoading(true);
@@ -192,6 +198,44 @@ export default function EstablishmentTeamPage() {
     }
   };
 
+  const openEdit = (emp: EmployeeRow) => {
+    setEditEmployee(emp);
+    setEditName(emp.name);
+    setEditPosition(emp.position || "");
+    setEditCoefficient(emp.coefficient);
+    setEditError(null);
+  };
+
+  const handleSaveEdit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editEmployee) return;
+    setEditError(null);
+    setSavingEdit(true);
+    try {
+      const res = await fetch(`/api/establishment/employees/${editEmployee.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", ...authHeaders() },
+        body: JSON.stringify({
+          name: editName.trim(),
+          position: editPosition.trim() || null,
+          coefficient: Number(editCoefficient),
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setEditError(data?.error ?? "Ошибка сохранения");
+        setSavingEdit(false);
+        return;
+      }
+      setEditEmployee(null);
+      fetchData();
+    } catch {
+      setEditError("Ошибка соединения");
+    } finally {
+      setSavingEdit(false);
+    }
+  };
+
   const canAdd =
     info &&
     (info.maxEmployeesCount == null || info.employeesCount < info.maxEmployeesCount);
@@ -291,6 +335,64 @@ export default function EstablishmentTeamPage() {
         </div>
       )}
 
+      {editEmployee && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0a192f]/80 backdrop-blur-sm">
+          <div className="cabinet-card w-full max-w-md rounded-[10px] border border-[var(--color-brand-gold)]/30 bg-[var(--color-charcoal)] shadow-[var(--shadow-card)] overflow-hidden">
+            <form onSubmit={handleSaveEdit} className="p-6 space-y-4">
+              <h2 className="text-lg font-medium text-white">Редактировать сотрудника</h2>
+              {editError && <p className="text-sm text-[var(--color-accent-red)]">{editError}</p>}
+              <div>
+                <label className="block text-sm text-white/90 mb-1">Имя *</label>
+                <input
+                  type="text"
+                  required
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                  className="cabinet-input-window w-full rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-white placeholder:text-white/50 focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-gold)]/40"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-white/90 mb-1">Должность</label>
+                <input
+                  type="text"
+                  value={editPosition}
+                  onChange={(e) => setEditPosition(e.target.value)}
+                  className="cabinet-input-window w-full rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-white placeholder:text-white/50 focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-gold)]/40"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-white/90 mb-1">Коэффициент</label>
+                <input
+                  type="number"
+                  min={0.01}
+                  max={100}
+                  step={0.01}
+                  value={editCoefficient}
+                  onChange={(e) => setEditCoefficient(parseFloat(e.target.value) || 1)}
+                  className="cabinet-input-window w-full rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-white placeholder:text-white/50 focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-gold)]/40"
+                />
+              </div>
+              <div className="flex gap-2 pt-2">
+                <button
+                  type="submit"
+                  disabled={savingEdit}
+                  className="rounded-[10px] bg-[var(--color-brand-gold)] px-4 py-2 font-medium text-[#0a192f] hover:opacity-90 disabled:opacity-50"
+                >
+                  {savingEdit ? "Сохранение…" : "Сохранить"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setEditEmployee(null); setEditError(null); }}
+                  className="rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-4 py-2 font-medium text-white hover:bg-[var(--color-dark-gray)]/20"
+                >
+                  Отмена
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* Мобильная версия: карточки */}
       <div className="space-y-4 lg:hidden">
         {employees.length === 0 ? (
@@ -303,6 +405,9 @@ export default function EstablishmentTeamPage() {
               <p className="mt-1 text-sm text-white/80">Коэфф. {emp.coefficient} · Рейтинг: {emp.reviewsCount > 0 ? `${emp.avgRating ?? "—"} (${emp.reviewsCount})` : "—"}</p>
               <p className="mt-1 text-xs text-white/70">{emp.isActive ? "Активен" : "Неактивен"} · {emp.hasUser ? "Привязан к аккаунту" : "Не привязан"}</p>
               <div className="mt-4 flex flex-wrap gap-2 border-t border-[var(--color-dark-gray)]/20 pt-3">
+                <button type="button" onClick={() => openEdit(emp)} className="inline-flex items-center gap-1 rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-xs text-white hover:bg-[var(--color-dark-gray)]/20">
+                  <Pencil className="h-3 w-3" /> Редактировать
+                </button>
                 <button type="button" onClick={() => toggleActive(emp)} disabled={togglingId === emp.id} className="rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-xs text-white hover:bg-[var(--color-dark-gray)]/20 disabled:opacity-50">
                   {togglingId === emp.id ? "…" : emp.isActive ? "Деактивировать" : "Активировать"}
                 </button>
@@ -346,12 +451,13 @@ export default function EstablishmentTeamPage() {
                 <th className="whitespace-nowrap p-3 font-medium text-white">Статус</th>
                 <th className="whitespace-nowrap p-3 font-medium text-white">Привязан к аккаунту</th>
                 <th className="whitespace-nowrap p-3 font-medium text-white">Ссылка для регистрации</th>
+                <th className="whitespace-nowrap p-3 font-medium text-white">Действия</th>
               </tr>
             </thead>
             <tbody>
               {employees.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="p-6 text-center text-white/90">Нет сотрудников.</td>
+                  <td colSpan={8} className="p-6 text-center text-white/90">Нет сотрудников.</td>
                 </tr>
               ) : (
                 employees.map((emp) => (
@@ -389,6 +495,11 @@ export default function EstablishmentTeamPage() {
                           </button>
                         </div>
                       )}
+                    </td>
+                    <td className="p-3">
+                      <button type="button" onClick={() => openEdit(emp)} className="inline-flex items-center gap-1 rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-2 py-1.5 text-xs text-white hover:bg-[var(--color-dark-gray)]/20">
+                        <Pencil className="h-3 w-3" /> Редактировать
+                      </button>
                     </td>
                   </tr>
                 ))

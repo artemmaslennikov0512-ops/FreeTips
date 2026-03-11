@@ -54,7 +54,7 @@ export async function GET(request: NextRequest, { params }: Params) {
           },
         },
       },
-      user: { select: { login: true, fullName: true } },
+      user: { select: { login: true, fullName: true, savingFor: true } },
     },
   });
 
@@ -87,7 +87,12 @@ export async function GET(request: NextRequest, { params }: Params) {
           borderColor: tipLink.employee.establishment.borderColor ?? undefined,
         }
       : undefined;
-  return NextResponse.json({ recipientName, ...(branding && { branding }) });
+  const savingFor = tipLink.user.savingFor?.trim() || undefined;
+  return NextResponse.json({
+    recipientName,
+    ...(branding && { branding }),
+    ...(savingFor && { savingFor }),
+  });
 }
 
 export async function POST(request: NextRequest, { params }: Params) {

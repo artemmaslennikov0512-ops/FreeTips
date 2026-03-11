@@ -70,6 +70,7 @@ model User {
   paygineSdRef       String?   @db.VarChar(128) // кубышка официанта (присваивается при регистрации, в Paygine создаётся при первом зачислении)
   verificationStatus VerificationStatus @default(NONE)
   verificationRejectionReason String?   @db.VarChar(1000) // причина отказа (видна клиенту)
+  savingFor         String?   @db.VarChar(500) // на что копит официант — показывается на странице оплаты
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
 

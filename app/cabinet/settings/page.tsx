@@ -18,6 +18,7 @@ type Profile = {
   fullName?: string | null;
   birthDate?: string | null;
   establishment?: string | null;
+  savingFor?: string | null;
   role: string;
   stats: import("../shared").Stats;
 };
@@ -35,6 +36,7 @@ export default function CabinetSettingsPage() {
   const [editPatronymic, setEditPatronymic] = useState("");
   const [editBirthDate, setEditBirthDate] = useState("");
   const [editEstablishment, setEditEstablishment] = useState("");
+  const [editSavingFor, setEditSavingFor] = useState("");
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [saveOk, setSaveOk] = useState(false);
@@ -85,6 +87,7 @@ export default function CabinetSettingsPage() {
         setEditPatronymic(parts[2] ?? "");
         setEditBirthDate(data.birthDate ?? "");
         setEditEstablishment(data.establishment ?? "");
+        setEditSavingFor(data.savingFor ?? "");
       } catch {
         setError("Ошибка соединения");
       } finally {
@@ -107,6 +110,7 @@ export default function CabinetSettingsPage() {
     if (combinedFullName !== (user.fullName ?? "").trim()) payload.fullName = combinedFullName || "";
     if (editBirthDate.trim() !== (user.birthDate ?? "")) payload.birthDate = editBirthDate.trim() || "";
     if (editEstablishment.trim() !== (user.establishment ?? "")) payload.establishment = editEstablishment.trim() || "";
+    if (editSavingFor.trim() !== (user.savingFor ?? "")) payload.savingFor = editSavingFor.trim() || "";
 
     const parsed = patchProfileSchema.safeParse(payload);
     if (!parsed.success) {
@@ -208,7 +212,8 @@ export default function CabinetSettingsPage() {
     editEmail.trim() !== (user?.email ?? "") ||
     combinedFullNameForCompare !== (user?.fullName ?? "").trim() ||
     editBirthDate.trim() !== (user?.birthDate ?? "") ||
-    editEstablishment.trim() !== (user?.establishment ?? "");
+    editEstablishment.trim() !== (user?.establishment ?? "") ||
+    editSavingFor.trim() !== (user?.savingFor ?? "");
 
   if (loading) {
     return <LoadingSpinner message="Загрузка профиля…" />;
@@ -345,6 +350,20 @@ export default function CabinetSettingsPage() {
                 className={cabinetInputClassName(!!profileFieldErrors.establishment)}
               />
               {profileFieldErrors.establishment && <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{profileFieldErrors.establishment}</p>}
+            </div>
+            <div className="sm:col-span-2">
+              <label htmlFor="settings-savingFor" className="mb-1 block text-sm font-medium text-[var(--color-text)]">На что коплю (показывается гостям на странице оплаты)</label>
+              <input
+                id="settings-savingFor"
+                type="text"
+                value={editSavingFor}
+                onChange={(e) => setEditSavingFor(e.target.value)}
+                placeholder="Например: на новый велосипед, на отпуск"
+                maxLength={500}
+                className={cabinetInputClassName(!!profileFieldErrors.savingFor)}
+              />
+              {profileFieldErrors.savingFor && <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{profileFieldErrors.savingFor}</p>}
+              <p className="mt-1 text-xs text-[var(--color-text-secondary)]">Необязательно. Текст будет виден гостям при оплате чаевых.</p>
             </div>
           </div>
         </div>

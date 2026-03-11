@@ -23,6 +23,7 @@ export default function PayPage() {
 
   const [loading, setLoading] = useState(true);
   const [recipientName, setRecipientName] = useState<string | null>(null);
+  const [savingFor, setSavingFor] = useState<string | null>(null);
   const [branding, setBranding] = useState<{
     logoUrl?: string;
     primaryColor?: string;
@@ -74,6 +75,7 @@ export default function PayPage() {
         }
         const data = (await res.json()) as {
           recipientName: string;
+          savingFor?: string;
           branding?: {
             logoUrl?: string;
             primaryColor?: string;
@@ -85,6 +87,7 @@ export default function PayPage() {
           };
         };
         setRecipientName(data.recipientName);
+        setSavingFor(data.savingFor ?? null);
         setBranding(data.branding ?? null);
       } catch {
         setError("Ошибка соединения");
@@ -281,6 +284,11 @@ export default function PayPage() {
                   {recipientName}
                 </p>
               </div>
+              {savingFor && (
+                <p className="pay-page-saving-for mt-2 text-sm opacity-90" style={{ color: fontClr ?? undefined }}>
+                  Коплю на: {savingFor}
+                </p>
+              )}
             </div>
             {qrDataUrl && (
               <div className="pay-page-recipient-qr shrink-0 flex items-center">

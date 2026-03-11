@@ -55,6 +55,9 @@ export default function EstablishmentBrandPage() {
 
   const clampPercent = (v: number) => Math.min(100, Math.max(0, v));
   const clampMm = (v: number) => Math.min(200, Math.max(20, v));
+  const hexRe = /^#[0-9A-Fa-f]{6}$/i;
+  const hex = (s: string | undefined) => (s && hexRe.test(s) ? s : "");
+  const hexOr = (s: string | undefined, fallback: string) => hex(s) || fallback;
 
   useEffect(() => {
     const load = async () => {
@@ -191,7 +194,7 @@ export default function EstablishmentBrandPage() {
     const b = parseInt(hex.slice(5, 7), 16);
     return `rgba(${r},${g},${b},${percent / 100})`;
   };
-  const borderHex = borderColor && /^#[0-9A-Fa-f]{6}$/i.test(borderColor) ? borderColor : primaryColor && /^#[0-9A-Fa-f]{6}$/i.test(primaryColor) ? primaryColor : "#c5a572";
+  const borderHex = hexOr(borderColor, hexOr(primaryColor, "#c5a572"));
   const borderRgba = (() => {
     const r = parseInt(borderHex.slice(1, 3), 16);
     const g = parseInt(borderHex.slice(3, 5), 16);
@@ -458,7 +461,7 @@ export default function EstablishmentBrandPage() {
           <div
             className="p-6 flex flex-col items-center gap-4 rounded-b-[10px] max-h-[70vh] overflow-y-auto"
             style={{
-              backgroundColor: mainBgRgba ?? (mainBackgroundColor && /^#[0-9A-Fa-f]{6}$/i.test(mainBackgroundColor) ? mainBackgroundColor : undefined),
+              backgroundColor: mainBgRgba ?? (hex(mainBackgroundColor) || undefined),
             }}
           >
             {/* Превью: карточка для печати — размер по настройкам (мм → px для экрана), контент тянется */}
@@ -474,7 +477,7 @@ export default function EstablishmentBrandPage() {
                     minHeight: 90,
                     border: `${Math.min(2, borderWidth)}px solid ${borderRgba}`,
                     borderRadius: 4,
-                    backgroundColor: mainBgRgba ?? (mainBackgroundColor && /^#[0-9A-Fa-f]{6}$/i.test(mainBackgroundColor) ? mainBackgroundColor : "#0a192f"),
+                    backgroundColor: mainBgRgba ?? hexOr(mainBackgroundColor, "#0a192f"),
                   }}
                 >
                   {/* Верх: лого или название */}
@@ -482,8 +485,8 @@ export default function EstablishmentBrandPage() {
                     {logoUrl.trim() ? (
                       <img src={logoUrl.trim()} alt="" className="h-6 w-auto max-w-[140px] object-contain" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
                     ) : (
-                      <span className="font-[family:var(--font-playfair)] text-sm font-bold truncate max-w-full" style={{ color: fontColor && /^#[0-9A-Fa-f]{6}$/i.test(fontColor) ? fontColor : "#fafafa" }}>
-                        Free<span style={{ color: primaryColor && /^#[0-9A-Fa-f]{6}$/i.test(primaryColor) ? primaryColor : "var(--color-brand-gold)" }}>Tips</span>
+                      <span className="font-[family:var(--font-playfair)] text-sm font-bold truncate max-w-full" style={{ color: hexOr(fontColor, "#fafafa") }}>
+                        Free<span style={{ color: hexOr(primaryColor, "var(--color-brand-gold)") }}>Tips</span>
                       </span>
                     )}
                   </div>
@@ -491,17 +494,17 @@ export default function EstablishmentBrandPage() {
                   <div
                     className="flex-1 flex items-center justify-between gap-2 px-3 py-2 mt-2 mx-2 rounded"
                     style={{
-                      backgroundColor: blocksBgRgba ?? (blocksBackgroundColor && /^#[0-9A-Fa-f]{6}$/i.test(blocksBackgroundColor) ? blocksBackgroundColor : "rgba(0.06,0.12,0.22,1)"),
+                      backgroundColor: blocksBgRgba ?? hexOr(blocksBackgroundColor, "rgba(0.06,0.12,0.22,1)"),
                       border: `1px solid ${borderRgba}`,
                     }}
                   >
                     <div className="min-w-0">
-                      <p className="font-semibold text-sm truncate" style={{ color: fontColor && /^#[0-9A-Fa-f]{6}$/i.test(fontColor) ? fontColor : "#fafafa" }}>Имя официанта</p>
-                      <p className="text-xs opacity-90" style={{ color: fontColor && /^#[0-9A-Fa-f]{6}$/i.test(fontColor) ? fontColor : "#e2e8f0" }}>Должность</p>
+                      <p className="font-semibold text-sm truncate" style={{ color: hexOr(fontColor, "#fafafa") }}>Имя официанта</p>
+                      <p className="text-xs opacity-90" style={{ color: hexOr(fontColor, "#e2e8f0") }}>Должность</p>
                     </div>
                     <div className="flex-shrink-0 w-12 h-12 rounded flex items-center justify-center bg-white/10 text-[10px] text-white/70" aria-hidden>QR</div>
                   </div>
-                  <p className="text-[10px] px-3 py-1.5 text-center" style={{ color: fontColor && /^#[0-9A-Fa-f]{6}$/i.test(fontColor) ? fontColor : "rgba(250,250,250,0.8)" }}>Отсканируйте для чаевых</p>
+                  <p className="text-[10px] px-3 py-1.5 text-center" style={{ color: hexOr(fontColor, "rgba(250,250,250,0.8)") }}>Отсканируйте для чаевых</p>
                 </div>
               </div>
             )}
@@ -510,7 +513,7 @@ export default function EstablishmentBrandPage() {
             {activeGroup === "pay" && (
               <div className="w-full max-w-[380px] mx-auto">
                 <p className="text-xs text-white/60 mb-2">Так видит страницу клиент после перехода по QR</p>
-                <div className="rounded-2xl overflow-hidden border-0 shadow-lg transition-colors" style={{ backgroundColor: secondaryRgba ?? (secondaryColor && /^#[0-9A-Fa-f]{6}$/i.test(secondaryColor) ? secondaryColor : blocksBgRgba ?? "#1e293b"), borderWidth: borderWidth ? `${borderWidth}px` : 0, borderStyle: "solid", borderColor: borderRgba }}>
+                <div className="rounded-2xl overflow-hidden border-0 shadow-lg transition-colors" style={{ backgroundColor: secondaryRgba ?? hexOr(secondaryColor, blocksBgRgba ?? "#1e293b"), borderWidth: borderWidth ? `${borderWidth}px` : 0, borderStyle: "solid", borderColor: borderRgba }}>
                   <div className="px-4 pt-4 pb-4 space-y-3">
                     {/* Логотип */}
                     <div className="flex justify-center">
@@ -518,21 +521,21 @@ export default function EstablishmentBrandPage() {
                         {logoUrl.trim() ? (
                           <img src={logoUrl.trim()} alt="" className="h-9 w-auto max-w-[110px] object-contain" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
                         ) : (
-                          <span className="flex h-8 w-8 items-center justify-center rounded-lg text-sm font-bold text-[#0a192f]" style={{ backgroundColor: primaryColor && /^#[0-9A-Fa-f]{6}$/i.test(primaryColor) ? primaryColor : "var(--color-brand-gold)" }}>FT</span>
+                          <span className="flex h-8 w-8 items-center justify-center rounded-lg text-sm font-bold text-[#0a192f]" style={{ backgroundColor: hexOr(primaryColor, "var(--color-brand-gold)") }}>FT</span>
                         )}
-                        <span className="font-[family:var(--font-playfair)] text-base font-bold" style={{ color: fontColor && /^#[0-9A-Fa-f]{6}$/i.test(fontColor) ? fontColor : "#fafafa" }}>
+                        <span className="font-[family:var(--font-playfair)] text-base font-bold" style={{ color: hexOr(fontColor, "#fafafa") }}>
                           <span className="opacity-90">Free</span>
-                          <span style={{ color: primaryColor && /^#[0-9A-Fa-f]{6}$/i.test(primaryColor) ? primaryColor : "var(--color-brand-gold)" }}>Tips</span>
+                          <span style={{ color: hexOr(primaryColor, "var(--color-brand-gold)") }}>Tips</span>
                         </span>
                       </div>
                     </div>
                     {/* Карточка получателя: имя + QR */}
                     <div className="rounded-xl p-3 flex items-center justify-between gap-3" style={{ borderWidth: `${Math.min(2, borderWidth)}px`, borderStyle: "solid", borderColor: borderRgba, backgroundColor: blocksBgRgba ?? "rgba(255,255,255,0.06)" }}>
                       <div className="min-w-0 flex items-center gap-2">
-                        <div className="h-9 w-9 rounded-full shrink-0 flex items-center justify-center text-sm" style={{ backgroundColor: (primaryColor && /^#[0-9A-Fa-f]{6}$/i.test(primaryColor) ? primaryColor : "var(--color-brand-gold)") + "26", color: primaryColor && /^#[0-9A-Fa-f]{6}$/i.test(primaryColor) ? primaryColor : "var(--color-brand-gold)" }}>👤</div>
+                        <div className="h-9 w-9 rounded-full shrink-0 flex items-center justify-center text-sm" style={{ backgroundColor: (hex(primaryColor) || "var(--color-brand-gold)") + "26", color: hexOr(primaryColor, "var(--color-brand-gold)") }}>👤</div>
                         <div>
-                          <p className="font-medium text-sm truncate" style={{ color: fontColor && /^#[0-9A-Fa-f]{6}$/i.test(fontColor) ? fontColor : "#fafafa" }}>Имя официанта</p>
-                          <p className="text-xs opacity-80" style={{ color: fontColor && /^#[0-9A-Fa-f]{6}$/i.test(fontColor) ? fontColor : "#e2e8f0" }}>Коплю на: цель</p>
+                          <p className="font-medium text-sm truncate" style={{ color: hexOr(fontColor, "#fafafa") }}>Имя официанта</p>
+                          <p className="text-xs opacity-80" style={{ color: hexOr(fontColor, "#e2e8f0") }}>Коплю на: цель</p>
                         </div>
                       </div>
                       <div className="w-14 h-14 rounded-lg flex items-center justify-center shrink-0 bg-black/20 text-[10px] text-white/70">QR</div>
@@ -541,25 +544,25 @@ export default function EstablishmentBrandPage() {
                     <div className="rounded-xl p-3" style={{ borderWidth: `${Math.min(2, borderWidth)}px`, borderStyle: "solid", borderColor: borderRgba, backgroundColor: blocksBgRgba ?? "rgba(255,255,255,0.06)" }}>
                       <div className="grid grid-cols-4 gap-1.5 mb-2">
                         {[50, 100, 200, 500].map((r, i) => (
-                          <div key={r} className="rounded-lg py-2 text-center text-xs font-medium" style={{ backgroundColor: i === 1 ? (primaryColor && /^#[0-9A-Fa-f]{6}$/i.test(primaryColor) ? `${primaryColor}33` : "rgba(201,162,39,0.2)" : "rgba(255,255,255,0.08)", color: fontColor && /^#[0-9A-Fa-f]{6}$/i.test(fontColor) ? fontColor : "#fafafa" }}>{r} ₽</div>
+                          <div key={r} className="rounded-lg py-2 text-center text-xs font-medium" style={{ backgroundColor: i === 1 ? (hex(primaryColor) ? `${hex(primaryColor)}33` : "rgba(201,162,39,0.2)") : "rgba(255,255,255,0.08)", color: hexOr(fontColor, "#fafafa") }}>{r} ₽</div>
                         ))}
                       </div>
-                      <p className="text-[10px] mb-1.5 opacity-80" style={{ color: fontColor && /^#[0-9A-Fa-f]{6}$/i.test(fontColor) ? fontColor : "#94a3b8" }}>Выберите сумму или введите свою</p>
-                      <div className="rounded-lg h-8 px-2 bg-white/5 border border-white/10" style={{ color: fontColor && /^#[0-9A-Fa-f]{6}$/i.test(fontColor) ? fontColor : "#f1f5f9" }} />
+                      <p className="text-[10px] mb-1.5 opacity-80" style={{ color: hexOr(fontColor, "#94a3b8") }}>Выберите сумму или введите свою</p>
+                      <div className="rounded-lg h-8 px-2 bg-white/5 border border-white/10" style={{ color: hexOr(fontColor, "#f1f5f9") }} />
                     </div>
                     {/* Отзыв */}
                     <div className="rounded-xl p-2.5" style={{ borderWidth: `${Math.min(2, borderWidth)}px`, borderStyle: "solid", borderColor: borderRgba, backgroundColor: blocksBgRgba ?? "rgba(255,255,255,0.06)" }}>
-                      <p className="text-[10px] font-medium mb-1" style={{ color: fontColor && /^#[0-9A-Fa-f]{6}$/i.test(fontColor) ? fontColor : "#cbd5e1" }}>Отзыв (необязательно)</p>
+                      <p className="text-[10px] font-medium mb-1" style={{ color: hexOr(fontColor, "#cbd5e1") }}>Отзыв (необязательно)</p>
                       <div className="rounded h-12 bg-white/5 border border-white/10" />
                     </div>
                     {/* Кнопка оплаты */}
-                    <button type="button" disabled className="w-full rounded-xl py-2.5 text-sm font-semibold text-[#0a192f]" style={{ backgroundColor: primaryColor && /^#[0-9A-Fa-f]{6}$/i.test(primaryColor) ? primaryColor : "var(--color-brand-gold)" }}>
+                    <button type="button" disabled className="w-full rounded-xl py-2.5 text-sm font-semibold text-[#0a192f]" style={{ backgroundColor: hexOr(primaryColor, "var(--color-brand-gold)") }}>
                       Оплатить 100 ₽
                     </button>
                     {/* Подсказки */}
                     <div className="flex flex-col gap-1 pt-1">
-                      <p className="text-[10px] opacity-70 flex items-center gap-1.5" style={{ color: fontColor && /^#[0-9A-Fa-f]{6}$/i.test(fontColor) ? fontColor : "#94a3b8" }}><span>📱</span> Покажите QR — гость отсканирует эту страницу</p>
-                      <p className="text-[10px] opacity-70 flex items-center gap-1.5" style={{ color: fontColor && /^#[0-9A-Fa-f]{6}$/i.test(fontColor) ? fontColor : "#94a3b8" }}><span>💳</span> Оплата картой. Регистрация не нужна.</p>
+                      <p className="text-[10px] opacity-70 flex items-center gap-1.5" style={{ color: hexOr(fontColor, "#94a3b8") }}><span>📱</span> Покажите QR — гость отсканирует эту страницу</p>
+                      <p className="text-[10px] opacity-70 flex items-center gap-1.5" style={{ color: hexOr(fontColor, "#94a3b8") }}><span>💳</span> Оплата картой. Регистрация не нужна.</p>
                     </div>
                   </div>
                 </div>
@@ -568,9 +571,9 @@ export default function EstablishmentBrandPage() {
 
             {/* Превью: личный кабинет официанта */}
             {activeGroup === "cabinet" && (
-              <div className="w-full max-w-sm flex rounded-[10px] overflow-hidden border border-white/10" style={{ backgroundColor: mainBgRgba ?? (mainBackgroundColor && /^#[0-9A-Fa-f]{6}$/i.test(mainBackgroundColor) ? mainBackgroundColor : "#0f172a") }}>
+              <div className="w-full max-w-sm flex rounded-[10px] overflow-hidden border border-white/10" style={{ backgroundColor: mainBgRgba ?? hexOr(mainBackgroundColor, "#0f172a") }}>
                 <div className="w-14 shrink-0 py-3 px-2 border-r border-white/10" style={{ backgroundColor: "rgba(255,255,255,0.06)" }}>
-                  <div className="h-2 w-2 rounded-full mb-2 mx-1" style={{ backgroundColor: primaryColor && /^#[0-9A-Fa-f]{6}$/i.test(primaryColor) ? primaryColor : "var(--color-brand-gold)" }} />
+                  <div className="h-2 w-2 rounded-full mb-2 mx-1" style={{ backgroundColor: hexOr(primaryColor, "var(--color-brand-gold)") }} />
                   <div className="h-2 w-2 rounded-full mb-2 mx-1 bg-white/20" />
                   <div className="h-2 w-2 rounded-full mx-1 bg-white/20" />
                 </div>

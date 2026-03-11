@@ -205,10 +205,6 @@ export default function EstablishmentBrandPage() {
     }
   };
 
-  if (loading) {
-    return <div className="text-white/90">Загрузка…</div>;
-  }
-
   useEffect(() => {
     if (activeGroup !== "print" || typeof window === "undefined") return;
     import("qrcode")
@@ -294,6 +290,10 @@ export default function EstablishmentBrandPage() {
   useEffect(() => {
     return () => { if (pdfPreviewUrl) URL.revokeObjectURL(pdfPreviewUrl); };
   }, [pdfPreviewUrl]);
+
+  if (loading) {
+    return <div className="text-white/90">Загрузка…</div>;
+  }
 
   const hexToRgba = (hex: string | undefined, percent: number) => {
     if (!hex || !/^#[0-9A-Fa-f]{6}$/i.test(hex)) return undefined;

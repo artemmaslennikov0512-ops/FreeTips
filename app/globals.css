@@ -1293,9 +1293,10 @@ html:not([data-theme="dark"]) .cabinet-premium #waiter-card.cabinet-card .waiter
 html:not([data-theme="dark"]) .cabinet-premium #waiter-card.cabinet-card .waiter-card-summary * {
   color: #fff !important;
 }
-/* Текст баланса на белой карте (страница операций) — тёмный, чтобы был виден (переопределяет правило выше) */
+/* Текст баланса на белой карте (страница операций) — чёрный, чтобы был виден (переопределяет правило .p-6 p) */
 html:not([data-theme="dark"]) .cabinet-premium #waiter-card.cabinet-card .premium-card-balance-block,
 html:not([data-theme="dark"]) .cabinet-premium #waiter-card.cabinet-card .premium-card-balance-block p,
+html:not([data-theme="dark"]) .cabinet-premium #waiter-card.cabinet-card .p-6 p.premium-card-balance-text,
 html:not([data-theme="dark"]) .cabinet-premium #waiter-card.cabinet-card .premium-card-balance-text {
   color: #0a192f !important;
   opacity: 1 !important;
@@ -1312,6 +1313,18 @@ html:not([data-theme="dark"]) .cabinet-premium #operations-history.cabinet-card 
 }
 html:not([data-theme="dark"]) .cabinet-premium #operations-history.cabinet-card table td {
   color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Светлая тема + мобильная версия: карточки операций и пагинация — белый текст */
+@media (max-width: 767px) {
+  html:not([data-theme="dark"]) .cabinet-premium #operations-history.cabinet-card .md\:hidden,
+  html:not([data-theme="dark"]) .cabinet-premium #operations-history.cabinet-card .md\:hidden * {
+    color: #fff !important;
+  }
+  /* Заголовки дат на золотом фоне оставляем тёмными для контраста */
+  html:not([data-theme="dark"]) .cabinet-premium #operations-history.cabinet-card .md\:hidden .rounded-lg.bg-\[var\(--color-brand-gold\)\] {
+    color: #0a192f !important;
+  }
 }
 
 /* Текст в полях ввода ЛК и админки — чёрный на светлом фоне */
@@ -1441,10 +1454,10 @@ html:not([data-theme="dark"]) .cabinet-premium .cabinet-limits-block .font-mediu
   color: rgba(255, 255, 255, 0.9) !important;
 }
 
-/* Светлая тема: текст в блоке статуса верификации — тёмный, чтобы был читаем */
+/* Светлая тема: текст в блоке статуса верификации — белый на тёмном фоне блока */
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-verification-status,
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-verification-status p {
-  color: #0a192f !important;
+  color: #fff !important;
 }
 
 /* Мобильная версия: блок верификации — во всю ширину, белый текст по центру, фон затемнён */

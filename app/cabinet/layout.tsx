@@ -192,7 +192,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
 
   return (
     <div
-      className="cabinet-premium flex min-h-screen w-full max-w-full overflow-x-hidden bg-[var(--color-bg)] font-[family:var(--font-inter)] text-[var(--color-text)] pt-4"
+      className="cabinet-premium flex min-h-screen w-full max-w-full overflow-x-hidden bg-[var(--color-bg)] font-[family:var(--font-inter)] text-[var(--color-text)] pt-2"
       data-brand-active={hasBrand ? "true" : undefined}
       style={Object.keys(brandStyle).length ? brandStyle : undefined}
     >
@@ -207,7 +207,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
 
       {/* Левое меню: на мобильном — выезд слева от края (как на лендинге справа), без зазора */}
       <div
-        className={`cabinet-sidebar fixed left-0 top-0 z-40 flex h-full w-[min(calc(100vw-4rem),20rem)] max-w-[20rem] flex-col overflow-hidden border-0 border-r border-white/10 py-6 shadow-2xl backdrop-blur-xl transition-[transform] duration-300 ease-out lg:static lg:left-auto lg:top-auto lg:ml-0 lg:mt-4 lg:mr-0 lg:mb-0 lg:h-auto lg:max-h-[calc(100vh-2rem)] lg:w-[260px] lg:max-w-none lg:translate-x-0 lg:rounded-[10px] lg:border lg:self-start ${
+        className={`cabinet-sidebar fixed left-0 top-0 z-40 flex h-full w-[min(calc(100vw-4rem),20rem)] max-w-[20rem] flex-col overflow-hidden border-0 border-r border-white/10 py-6 shadow-2xl backdrop-blur-xl transition-[transform] duration-300 ease-out lg:static lg:left-auto lg:top-auto lg:ml-0 lg:mt-2 lg:mr-0 lg:mb-0 lg:h-auto lg:max-h-[calc(100vh-2rem)] lg:w-[260px] lg:max-w-none lg:translate-x-0 lg:rounded-[10px] lg:border lg:self-start ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
         style={sidebarStyle}
@@ -273,10 +273,10 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
         </nav>
       </div>
 
-      <main className="min-h-screen min-w-0 flex-1 overflow-x-hidden px-0 pt-2 pb-4 md:pt-4 md:px-4 lg:pl-0 lg:pr-4 lg:ml-0 lg:mr-0 flex flex-col">
-        {/* Основной блок — на мобильном на всю ширину с минимальными отступами, на десктопе с отступом слева */}
+      <main className="min-h-screen min-w-0 flex-1 overflow-x-hidden px-0 pt-2 pb-4 md:px-4 lg:pl-0 lg:pr-4 lg:ml-0 lg:mr-0 flex flex-col">
+        {/* Основной блок — выровнен по сайдбару по верхнему краю */}
         <div
-          className="cabinet-main-block mt-0 md:mt-4 mr-0 mb-0 md:mb-4 ml-0 lg:mr-0 lg:ml-4 flex w-full max-w-full flex-col self-start rounded-lg md:rounded-[10px] border border-white/10 backdrop-blur-xl"
+          className="cabinet-main-block mt-0 mr-0 mb-0 md:mb-4 ml-0 lg:mr-0 lg:ml-4 flex w-full max-w-full flex-col self-start rounded-lg md:rounded-[10px] border border-white/10 backdrop-blur-xl"
           style={mainBlockStyle}
         >
           <div className="p-4 md:p-6 lg:p-8" id="main-content">

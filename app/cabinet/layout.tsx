@@ -236,10 +236,10 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
               <img
                 src={user.employeePhotoUrl}
                 alt=""
-                className="cabinet-sidebar-avatar h-10 w-10 shrink-0 rounded-full object-cover bg-[var(--color-brand-gold)]"
+                className="cabinet-sidebar-avatar h-14 w-14 shrink-0 rounded-full object-cover bg-[var(--color-brand-gold)]"
               />
             ) : (
-              <div className="cabinet-sidebar-avatar flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--color-brand-gold)] font-semibold text-[#0a192f] text-sm">
+              <div className="cabinet-sidebar-avatar flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[var(--color-brand-gold)] font-semibold text-[#0a192f] text-base">
                 {initials}
               </div>
             )}

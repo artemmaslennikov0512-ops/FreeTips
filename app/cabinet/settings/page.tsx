@@ -272,54 +272,65 @@ export default function CabinetSettingsPage() {
   return (
     <div className="mx-auto max-w-2xl space-y-8">
       {canUploadPhoto && (
-        <div id="settings-photo" className="cabinet-card rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden">
+        <div id="settings-photo" className="cabinet-card cabinet-settings-photo-block rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden text-white">
           <div className="flex items-center gap-3 border-0 px-6 py-4">
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--color-accent-gold)]/20 text-[var(--color-accent-gold)]">
               <Camera className="h-6 w-6" />
             </div>
-            <h2 className="font-[family:var(--font-playfair)] text-lg font-semibold text-[var(--color-text)]">Фото профиля</h2>
+            <h2 className="font-[family:var(--font-playfair)] text-lg font-semibold text-white">Фото профиля</h2>
           </div>
           <div className="p-6">
-            <p className="text-sm text-[var(--color-text)]/80 mb-2">
+            <p className="text-sm text-white/90 mb-2">
               Загрузите фото — на странице оплаты чаевых гости увидят его рядом с вашим именем вместо иконки человека. Также отображается в сайдбаре ЛК. Доступно и получателям без заведения, и сотрудникам заведения.
             </p>
-            <p className="text-sm text-[var(--color-text)]/70 mb-4">
+            <p className="text-sm text-white/75 mb-4">
               Рекомендуется не менее 200×200 px. Форматы: JPEG, PNG, WebP, до 5 МБ.
             </p>
-            <div className="flex flex-wrap items-center gap-4">
-              {user.employeePhotoUrl ? (
-                <img
-                  src={user.employeePhotoUrl}
-                  alt=""
-                  className="h-24 w-24 rounded-full object-cover border-2 border-[var(--color-brand-gold)]/30"
-                />
-              ) : (
-                <div className="h-24 w-24 rounded-full bg-[var(--color-dark-gray)]/50 flex items-center justify-center border-2 border-dashed border-white/20">
-                  <ImageIcon className="h-10 w-10 text-white/40" />
-                </div>
-              )}
-              <div className="flex flex-col gap-2">
-                <input
-                  ref={photoInputRef}
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp,image/jpg"
-                  onChange={handlePhotoUpload}
-                  className="hidden"
-                  aria-label="Выберите фото"
-                />
-                <button
-                  type="button"
-                  onClick={() => photoInputRef.current?.click()}
-                  disabled={photoUploading}
-                  className="inline-flex items-center gap-2 rounded-xl bg-[var(--color-brand-gold)] px-4 py-2.5 text-[14px] font-semibold text-[#0a192f] hover:opacity-90 disabled:opacity-50"
-                >
-                  {photoUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ImageIcon className="h-4 w-4" />}
-                  {photoUploading ? "Загрузка…" : "Загрузить фото"}
-                </button>
-                {photoError && (
-                  <p className="text-sm text-[var(--color-accent-red)]" role="alert">{photoError}</p>
+            <div className="flex flex-col items-center">
+              <div className="flex items-center justify-center gap-4">
+                {user.employeePhotoUrl ? (
+                  <img
+                    src={user.employeePhotoUrl}
+                    alt=""
+                    className="settings-photo-avatar h-24 w-24 shrink-0 rounded-full object-cover border-2 border-[var(--color-brand-gold)]/30"
+                  />
+                ) : (
+                  <div className="settings-photo-avatar h-24 w-24 shrink-0 rounded-full bg-[var(--color-dark-gray)]/50 flex items-center justify-center border-2 border-dashed border-white/20">
+                    <ImageIcon className="h-10 w-10 text-white/40" />
+                  </div>
                 )}
+                <div className="flex flex-col items-start gap-2">
+                  <input
+                    ref={photoInputRef}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,image/jpg"
+                    onChange={handlePhotoUpload}
+                    className="hidden"
+                    aria-label="Выберите фото"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => photoInputRef.current?.click()}
+                    disabled={photoUploading}
+                    className="inline-flex items-center gap-2 rounded-xl bg-[var(--color-brand-gold)] px-4 py-2.5 text-[14px] font-semibold text-[#0a192f] hover:opacity-90 disabled:opacity-50"
+                  >
+                    {photoUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ImageIcon className="h-4 w-4" />}
+                    {photoUploading ? "Загрузка…" : "Загрузить фото"}
+                  </button>
+                  {user.employeePhotoUrl && (
+                    <button
+                      type="button"
+                      onClick={() => window.location.reload()}
+                      className="inline-flex items-center gap-2 rounded-xl border border-white/30 bg-white/10 px-4 py-2.5 text-[14px] font-semibold text-white hover:bg-white/20 transition-colors"
+                    >
+                      Сохранить и обновить
+                    </button>
+                  )}
+                </div>
               </div>
+              {photoError && (
+                <p className="mt-3 text-sm text-[var(--color-accent-red)]" role="alert">{photoError}</p>
+              )}
             </div>
           </div>
         </div>

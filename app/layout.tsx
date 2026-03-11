@@ -82,6 +82,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="ru" className={`${inter.className} ${inter.variable} ${syne.variable} ${playfair.variable}`} suppressHydrationWarning>
       <head>
         <link rel="sitemap" type="application/xml" href={`${baseUrl}/sitemap.xml`} title="Sitemap" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossOrigin="anonymous" referrerPolicy="no-referrer" />
       </head>
       <body className="min-h-screen w-full max-w-full overflow-x-hidden flex flex-col font-sans antialiased bg-[var(--color-bg)] text-[var(--color-text)]">
         <script

@@ -291,11 +291,11 @@ export default function PayPage() {
                   <img
                     src={recipientPhotoUrl}
                     alt=""
-                    className="h-10 w-10 shrink-0 rounded-full object-cover bg-[var(--pay-page-accent)]/15"
+                    className="pay-page-recipient-avatar h-14 w-14 shrink-0 rounded-full object-cover bg-[var(--pay-page-accent)]/15"
                   />
                 ) : (
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--pay-page-accent)]/15 text-[var(--pay-page-accent)]">
-                    <User className="h-5 w-5" />
+                  <div className="pay-page-recipient-avatar flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[var(--pay-page-accent)]/15 text-[var(--pay-page-accent)]">
+                    <User className="h-6 w-6" />
                   </div>
                 )}
                 <p className="pay-page-recipient-name min-w-0 truncate flex items-center" style={{ color: fontClr ?? undefined }}>
@@ -311,15 +311,11 @@ export default function PayPage() {
           </div>
         </div>
 
-        {/* Блок подписей: цель (на что копит) | QR | сумма — только здесь выводится цель */}
-        <div className="pay-page-topics pay-page-card card" style={Object.keys(cardStyle).length ? cardStyle : undefined}>
-          <div className="pay-page-topics-row">
-            <span className="pay-page-topic pay-page-topic--officiant min-w-0 truncate" style={{ color: fontClr ?? undefined }} title={savingFor?.trim() ? `Коплю на: ${savingFor}` : undefined}>
-              {savingFor?.trim() ? `Коплю на: ${savingFor}` : "Коплю на большое счастье"}
-            </span>
-            <span className="pay-page-topic pay-page-topic--qr" style={{ color: fontClr ?? undefined }}>QR-код</span>
-            <span className="pay-page-topic pay-page-topic--sum" style={{ color: fontClr ?? undefined }}>Сумма</span>
-          </div>
+        {/* Блок только с целью: на что копит официант */}
+        <div className="pay-page-saving-goal pay-page-card card" style={Object.keys(cardStyle).length ? cardStyle : undefined}>
+          <p className="pay-page-saving-goal-text" style={{ color: fontClr ?? undefined }} title={savingFor?.trim() ? `Коплю на: ${savingFor}` : undefined}>
+            {savingFor?.trim() ? `Коплю на: ${savingFor}` : "Коплю на большое счастье"}
+          </p>
         </div>
 
         {/* Карточка: сумма чаевых */}

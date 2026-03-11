@@ -357,7 +357,7 @@ export default function CabinetDashboardPage() {
           <div className="p-6">
             {/* 1. Goal card — saved goal text + "Изменить" or input + "Сохранить" */}
             <div className="cabinet-block-inner mb-6 rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 p-4">
-              <div className="mb-2 text-sm font-semibold text-[var(--color-text)]">Цель, на которую коплю</div>
+              <div className="mb-2 text-sm font-semibold text-[var(--color-text)]">Укажите цель, на которую собираете: 🎯</div>
               {savingFor && !savingForEditing ? (
                 <>
                   <p className="mb-3 text-[14px] text-[var(--color-text)]">{savingFor}</p>
@@ -367,7 +367,7 @@ export default function CabinetDashboardPage() {
                       setSavingForEditing(true);
                       setSavingForEdit(savingFor);
                     }}
-                    className="rounded-[10px] border border-[var(--color-brand-gold)]/40 bg-transparent px-4 py-2 text-[14px] font-semibold text-[var(--color-text)] transition-all hover:bg-[var(--color-brand-gold)]/15"
+                    className="rounded-[10px] border border-[var(--color-brand-gold)]/40 bg-transparent px-4 py-2 text-[14px] font-semibold text-[var(--color-brand-gold)] transition-all hover:bg-[var(--color-brand-gold)]/15"
                   >
                     Изменить
                   </button>

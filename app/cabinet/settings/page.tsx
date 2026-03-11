@@ -265,9 +265,13 @@ export default function CabinetSettingsPage() {
     );
   }
 
+  const isEmployee = user?.role?.toUpperCase() === "EMPLOYEE";
+  const isRecipient = user?.role?.toUpperCase() === "RECIPIENT";
+  const canUploadPhoto = isEmployee || isRecipient;
+
   return (
     <div className="mx-auto max-w-2xl space-y-8">
-      {user?.role === "EMPLOYEE" && (
+      {canUploadPhoto && (
         <div id="settings-photo" className="cabinet-card rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden">
           <div className="flex items-center gap-3 border-0 px-6 py-4">
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--color-accent-gold)]/20 text-[var(--color-accent-gold)]">
@@ -276,8 +280,11 @@ export default function CabinetSettingsPage() {
             <h2 className="font-[family:var(--font-playfair)] text-lg font-semibold text-[var(--color-text)]">Фото профиля</h2>
           </div>
           <div className="p-6">
-            <p className="text-sm text-[var(--color-text)]/80 mb-4">
-              Фото отображается на странице оплаты чаевых и в сайдбаре. Рекомендуется не менее 200×200 px. Форматы: JPEG, PNG, WebP, до 5 МБ.
+            <p className="text-sm text-[var(--color-text)]/80 mb-2">
+              Загрузите фото — на странице оплаты чаевых гости увидят его рядом с вашим именем вместо иконки человека. Также отображается в сайдбаре ЛК. Доступно и получателям без заведения, и сотрудникам заведения.
+            </p>
+            <p className="text-sm text-[var(--color-text)]/70 mb-4">
+              Рекомендуется не менее 200×200 px. Форматы: JPEG, PNG, WebP, до 5 МБ.
             </p>
             <div className="flex flex-wrap items-center gap-4">
               {user.employeePhotoUrl ? (

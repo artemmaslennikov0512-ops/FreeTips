@@ -302,11 +302,6 @@ export default function PayPage() {
                   {recipientName}
                 </p>
               </div>
-              {savingFor && (
-                <p className="pay-page-saving-for mt-2 text-sm opacity-90" style={{ color: fontClr ?? undefined }}>
-                  Коплю на: {savingFor}
-                </p>
-              )}
             </div>
             {qrDataUrl && (
               <div className="pay-page-recipient-qr shrink-0 flex items-center">
@@ -316,10 +311,12 @@ export default function PayPage() {
           </div>
         </div>
 
-        {/* Отдельный блок: подписи тем (официант | QR | сумма) в одну строку по центру, у каждой темы свой шрифт */}
+        {/* Блок подписей: цель (на что копит) | QR | сумма — только здесь выводится цель */}
         <div className="pay-page-topics pay-page-card card" style={Object.keys(cardStyle).length ? cardStyle : undefined}>
           <div className="pay-page-topics-row">
-            <span className="pay-page-topic pay-page-topic--officiant" style={{ color: fontClr ?? undefined }}>Официант</span>
+            <span className="pay-page-topic pay-page-topic--officiant min-w-0 truncate" style={{ color: fontClr ?? undefined }} title={savingFor?.trim() ? `Коплю на: ${savingFor}` : undefined}>
+              {savingFor?.trim() ? `Коплю на: ${savingFor}` : "Коплю на большое счастье"}
+            </span>
             <span className="pay-page-topic pay-page-topic--qr" style={{ color: fontClr ?? undefined }}>QR-код</span>
             <span className="pay-page-topic pay-page-topic--sum" style={{ color: fontClr ?? undefined }}>Сумма</span>
           </div>

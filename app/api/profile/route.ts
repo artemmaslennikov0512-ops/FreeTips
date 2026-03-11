@@ -67,6 +67,7 @@ export async function GET(request: NextRequest) {
             verificationStatus: true,
             verificationRejectionReason: true,
             savingFor: true,
+            profilePhotoUrl: true,
           },
         }),
         db.transaction.aggregate({
@@ -209,11 +210,13 @@ export async function GET(request: NextRequest) {
       verificationStatus: String(profile.verificationStatus),
       verificationRejectionReason: profile.verificationRejectionReason != null ? String(profile.verificationRejectionReason) : null,
       savingFor: profile.savingFor != null ? String(profile.savingFor) : null,
-      /** Фото официанта для ЛК (страница оплаты и сайдбар). Рекомендуется ≥200×200 px. */
+      /** Фото для ЛК (страница оплаты и сайдбар): EMPLOYEE — из Employee, RECIPIENT — из User.profilePhotoUrl. */
       employeePhotoUrl:
         employee?.photoUrl && employee?.id
           ? `${getBaseUrlFromRequest(request).replace(/\/$/, "")}/api/establishment/employees/photo/${employee.id}?type=avatar`
-          : null,
+          : profile.profilePhotoUrl && profile.role === "RECIPIENT"
+            ? `${getBaseUrlFromRequest(request).replace(/\/$/, "")}/api/profile/photo/${profile.id}`
+            : null,
     };
     return NextResponse.json(body);
   } catch (err) {

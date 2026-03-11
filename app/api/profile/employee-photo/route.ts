@@ -1,9 +1,8 @@
 /**
- * POST /api/profile/employee-photo — загрузка своего фото официантом (ЛК).
- * FormData: file (обязательно), type = "avatar" | "print".
+ * POST /api/profile/employee-photo — загрузка своего фото (ЛК).
+ * FormData: file (обязательно), type = "avatar" | "print" (print только для EMPLOYEE).
+ * Доступно: EMPLOYEE (официант заведения) и RECIPIENT (получатель без заведения).
  * avatar — для страницы оплаты и ЛК (рекомендуется ≥200×200 px).
- * print — для карточки печати (рекомендуется ≥150×150 px).
- * Требует: авторизация, роль EMPLOYEE (привязка к сотруднику заведения).
  */
 
 import { NextRequest, NextResponse } from "next/server";
@@ -45,7 +44,7 @@ export async function POST(request: NextRequest) {
     const [user, employee] = await Promise.all([
       db.user.findUnique({
         where: { id: userId },
-        select: { role: true },
+        select: { role: true, profilePhotoUrl: true },
       }),
       db.employee.findFirst({
         where: { userId },
@@ -53,14 +52,14 @@ export async function POST(request: NextRequest) {
       }),
     ]);
 
-    if (!user || user.role !== "EMPLOYEE" || !employee) {
+    const isEmployee = user?.role === "EMPLOYEE" && employee;
+    const isRecipient = user?.role === "RECIPIENT";
+    if (!user || (!isEmployee && !isRecipient)) {
       return NextResponse.json(
-        { error: "Загрузка фото доступна только сотрудникам заведения" },
+        { error: "Загрузка фото доступна получателям чаевых и сотрудникам заведения" },
         { status: 403 },
       );
     }
-
-    const employeeId = employee.id;
 
     let formData: FormData;
     try {
@@ -74,7 +73,13 @@ export async function POST(request: NextRequest) {
 
     if (!type || !ALLOWED_TYPES.includes(type as (typeof ALLOWED_TYPES)[0])) {
       return NextResponse.json(
-        { error: 'Укажите type: "avatar" (профиль и страница оплаты) или "print" (карточка для печати)' },
+        { error: 'Укажите type: "avatar" (профиль и страница оплаты) или "print" (карточка для печати, только для сотрудников)' },
+        { status: 400 },
+      );
+    }
+    if (isRecipient && type !== "avatar") {
+      return NextResponse.json(
+        { error: 'Для получателя без заведения доступен только type: "avatar"' },
         { status: 400 },
       );
     }
@@ -93,7 +98,17 @@ export async function POST(request: NextRequest) {
     }
 
     const storageRoot = join(process.cwd(), "storage");
-    const relDir = join("establishments", employee.establishmentId, "employees", employeeId);
+    let relDir: string;
+    let oldPath: string | null = null;
+
+    if (isRecipient) {
+      relDir = join("recipients", userId);
+      oldPath = user.profilePhotoUrl;
+    } else {
+      relDir = join("establishments", employee!.establishmentId, "employees", employee!.id);
+      oldPath = type === "avatar" ? employee!.photoUrl : employee!.printCardPhotoUrl;
+    }
+
     const storageDir = join(storageRoot, relDir);
     if (!existsSync(storageRoot)) mkdirSync(storageRoot, { recursive: true });
     if (!existsSync(storageDir)) mkdirSync(storageDir, { recursive: true });
@@ -102,7 +117,6 @@ export async function POST(request: NextRequest) {
     const fileName = type === "avatar" ? `avatar.${ext}` : `print.${ext}`;
     const filePath = join(storageDir, fileName);
 
-    const oldPath = type === "avatar" ? employee.photoUrl : employee.printCardPhotoUrl;
     if (oldPath) {
       const oldFull = join(storageRoot, oldPath);
       if (existsSync(oldFull)) {
@@ -118,7 +132,7 @@ export async function POST(request: NextRequest) {
       const buf = Buffer.from(await file.arrayBuffer());
       writeFileSync(filePath, buf);
     } catch (err) {
-      logError("profile.employee-photo.upload.write.error", err, { employeeId, type });
+      logError("profile.employee-photo.upload.write.error", err, { userId, type });
       return NextResponse.json(
         { error: "Не удалось сохранить файл. Проверьте права на каталог storage." },
         { status: 500 },
@@ -126,10 +140,17 @@ export async function POST(request: NextRequest) {
     }
 
     const relativePath = join(relDir, fileName).replace(/\\/g, "/");
-    await db.employee.update({
-      where: { id: employeeId },
-      data: type === "avatar" ? { photoUrl: relativePath } : { printCardPhotoUrl: relativePath },
-    });
+    if (isRecipient) {
+      await db.user.update({
+        where: { id: userId },
+        data: { profilePhotoUrl: relativePath },
+      });
+    } else {
+      await db.employee.update({
+        where: { id: employee!.id },
+        data: type === "avatar" ? { photoUrl: relativePath } : { printCardPhotoUrl: relativePath },
+      });
+    }
 
     return NextResponse.json({ ok: true, path: relativePath });
   } catch (err) {

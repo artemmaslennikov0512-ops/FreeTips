@@ -59,7 +59,7 @@ export async function GET(request: NextRequest, { params }: Params) {
           },
         },
       },
-      user: { select: { login: true, fullName: true, savingFor: true } },
+      user: { select: { id: true, login: true, fullName: true, savingFor: true, profilePhotoUrl: true } },
     },
   });
 
@@ -100,7 +100,9 @@ export async function GET(request: NextRequest, { params }: Params) {
   const recipientPhotoUrl =
     tipLink.employee?.photoUrl && tipLink.employee?.id
       ? `${baseUrl.replace(/\/$/, "")}/api/establishment/employees/photo/${tipLink.employee.id}?type=avatar`
-      : undefined;
+      : tipLink.user.profilePhotoUrl
+        ? `${baseUrl.replace(/\/$/, "")}/api/profile/photo/${tipLink.user.id}`
+        : undefined;
   return NextResponse.json({
     recipientName,
     ...(branding && { branding }),

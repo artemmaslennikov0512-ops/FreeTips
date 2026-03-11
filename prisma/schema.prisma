@@ -71,6 +71,7 @@ model User {
   verificationStatus VerificationStatus @default(NONE)
   verificationRejectionReason String?   @db.VarChar(1000) // причина отказа (видна клиенту)
   savingFor         String?   @db.VarChar(500) // на что копит официант — показывается на странице оплаты
+  profilePhotoUrl   String?   @db.VarChar(512) // фото получателя (RECIPIENT): страница оплаты и ЛК (путь в storage)
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
 

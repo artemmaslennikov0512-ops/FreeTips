@@ -29,6 +29,8 @@ const updateSettingsSchema = z.object({
   blocksBackgroundColor: hexOptional,
   fontColor: hexOptional,
   borderColor: hexOptional,
+  borderWidthPx: z.number().int().min(0).max(8).optional().nullable(),
+  borderOpacityPercent: z.number().int().min(0).max(100).optional().nullable(),
 });
 
 export async function GET(request: NextRequest) {
@@ -45,6 +47,8 @@ export async function GET(request: NextRequest) {
       blocksBackgroundColor: true,
       fontColor: true,
       borderColor: true,
+      borderWidthPx: true,
+      borderOpacityPercent: true,
     },
   });
   if (!est) {
@@ -58,6 +62,8 @@ export async function GET(request: NextRequest) {
     blocksBackgroundColor: est.blocksBackgroundColor ?? null,
     fontColor: est.fontColor ?? null,
     borderColor: est.borderColor ?? null,
+    borderWidthPx: est.borderWidthPx ?? null,
+    borderOpacityPercent: est.borderOpacityPercent ?? null,
   });
 }
 
@@ -85,6 +91,8 @@ export async function PATCH(request: NextRequest) {
         blocksBackgroundColor: null,
         fontColor: null,
         borderColor: null,
+        borderWidthPx: null,
+        borderOpacityPercent: null,
       },
     });
     const updated = await db.establishment.findUnique({
@@ -97,6 +105,8 @@ export async function PATCH(request: NextRequest) {
         blocksBackgroundColor: true,
         fontColor: true,
         borderColor: true,
+        borderWidthPx: true,
+        borderOpacityPercent: true,
       },
     });
     return NextResponse.json({
@@ -107,6 +117,8 @@ export async function PATCH(request: NextRequest) {
       blocksBackgroundColor: updated?.blocksBackgroundColor ?? null,
       fontColor: updated?.fontColor ?? null,
       borderColor: updated?.borderColor ?? null,
+      borderWidthPx: updated?.borderWidthPx ?? null,
+      borderOpacityPercent: updated?.borderOpacityPercent ?? null,
     });
   }
 
@@ -118,6 +130,8 @@ export async function PATCH(request: NextRequest) {
     blocksBackgroundColor?: string | null;
     fontColor?: string | null;
     borderColor?: string | null;
+    borderWidthPx?: number | null;
+    borderOpacityPercent?: number | null;
   } = {};
   if (parseResult.data.logoUrl !== undefined) data.logoUrl = parseResult.data.logoUrl;
   if (parseResult.data.primaryColor !== undefined) data.primaryColor = parseResult.data.primaryColor;
@@ -126,6 +140,8 @@ export async function PATCH(request: NextRequest) {
   if (parseResult.data.blocksBackgroundColor !== undefined) data.blocksBackgroundColor = parseResult.data.blocksBackgroundColor;
   if (parseResult.data.fontColor !== undefined) data.fontColor = parseResult.data.fontColor;
   if (parseResult.data.borderColor !== undefined) data.borderColor = parseResult.data.borderColor;
+  if (parseResult.data.borderWidthPx !== undefined) data.borderWidthPx = parseResult.data.borderWidthPx;
+  if (parseResult.data.borderOpacityPercent !== undefined) data.borderOpacityPercent = parseResult.data.borderOpacityPercent;
 
   await db.establishment.update({
     where: { id: auth.establishmentId },
@@ -142,6 +158,8 @@ export async function PATCH(request: NextRequest) {
       blocksBackgroundColor: true,
       fontColor: true,
       borderColor: true,
+      borderWidthPx: true,
+      borderOpacityPercent: true,
     },
   });
   return NextResponse.json({
@@ -152,5 +170,7 @@ export async function PATCH(request: NextRequest) {
     blocksBackgroundColor: updated?.blocksBackgroundColor ?? null,
     fontColor: updated?.fontColor ?? null,
     borderColor: updated?.borderColor ?? null,
+    borderWidthPx: updated?.borderWidthPx ?? null,
+    borderOpacityPercent: updated?.borderOpacityPercent ?? null,
   });
 }

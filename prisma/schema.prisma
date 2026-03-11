@@ -325,6 +325,8 @@ model Establishment {
   blocksBackgroundColor String?  @db.VarChar(20) // фон блоков/карточек (hex)
   fontColor         String?  @db.VarChar(20) // цвет основного текста (hex)
   borderColor       String?  @db.VarChar(20) // цвет обводки/рамок (hex)
+  borderWidthPx     Int?     // толщина обводки (px), null = 2
+  borderOpacityPercent Int?  // прозрачность обводки 0–100, null = 100
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 

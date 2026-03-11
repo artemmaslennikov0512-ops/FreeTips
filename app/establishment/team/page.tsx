@@ -438,42 +438,42 @@ export default function EstablishmentTeamPage() {
         )}
       </div>
 
-      {/* Десктоп: таблица */}
-      <div className="cabinet-card max-lg:hidden overflow-hidden rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)]">
+      {/* Десктоп: таблица — белые границы в светлой теме, выравнивание по колонкам, overflow для узких экранов */}
+      <div className="establishment-team-table cabinet-card max-lg:hidden overflow-hidden rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)]">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[720px] text-left">
+          <table className="establishment-team-table-grid w-full min-w-[720px] border-collapse">
             <thead>
-              <tr className="border-b border-[var(--color-dark-gray)]/20">
-                <th className="whitespace-nowrap p-3 font-medium text-white">Имя</th>
-                <th className="whitespace-nowrap p-3 font-medium text-white">Должность</th>
-                <th className="whitespace-nowrap p-3 font-medium text-white">Коэфф.</th>
-                <th className="whitespace-nowrap p-3 font-medium text-white">Рейтинг</th>
-                <th className="whitespace-nowrap p-3 font-medium text-white">Статус</th>
-                <th className="whitespace-nowrap p-3 font-medium text-white">Привязан к аккаунту</th>
-                <th className="whitespace-nowrap p-3 font-medium text-white">Ссылка для регистрации</th>
-                <th className="whitespace-nowrap p-3 font-medium text-white">Действия</th>
+              <tr className="establishment-team-table-row-head">
+                <th className="establishment-team-table-cell establishment-team-table-cell-name whitespace-nowrap p-3 font-medium text-white text-left">Имя</th>
+                <th className="establishment-team-table-cell establishment-team-table-cell-position whitespace-nowrap p-3 font-medium text-white text-left">Должность</th>
+                <th className="establishment-team-table-cell establishment-team-table-cell-coef whitespace-nowrap p-3 font-medium text-white text-right">Коэфф.</th>
+                <th className="establishment-team-table-cell establishment-team-table-cell-rating whitespace-nowrap p-3 font-medium text-white text-right">Рейтинг</th>
+                <th className="establishment-team-table-cell establishment-team-table-cell-status whitespace-nowrap p-3 font-medium text-white text-left">Статус</th>
+                <th className="establishment-team-table-cell establishment-team-table-cell-linked whitespace-nowrap p-3 font-medium text-white text-center">Привязан к аккаунту</th>
+                <th className="establishment-team-table-cell establishment-team-table-cell-link whitespace-nowrap p-3 font-medium text-white text-left">Ссылка для регистрации</th>
+                <th className="establishment-team-table-cell establishment-team-table-cell-actions whitespace-nowrap p-3 font-medium text-white text-left">Действия</th>
               </tr>
             </thead>
             <tbody>
               {employees.length === 0 ? (
-                <tr>
+                <tr className="establishment-team-table-row">
                   <td colSpan={8} className="p-6 text-center text-white/90">Нет сотрудников.</td>
                 </tr>
               ) : (
                 employees.map((emp) => (
-                  <tr key={emp.id} className={`border-b border-[var(--color-dark-gray)]/10 ${!emp.isActive ? "opacity-70" : ""}`}>
-                    <td className="whitespace-nowrap p-3 text-white">{emp.name}</td>
-                    <td className="whitespace-nowrap p-3 text-white/90">{emp.position || "—"}</td>
-                    <td className="whitespace-nowrap p-3 text-white/90">{emp.coefficient}</td>
-                    <td className="whitespace-nowrap p-3 text-white/90">{emp.reviewsCount > 0 ? `${emp.avgRating ?? "—"} (${emp.reviewsCount})` : "—"}</td>
-                    <td className="p-3">
+                  <tr key={emp.id} className={`establishment-team-table-row ${!emp.isActive ? "opacity-70" : ""}`}>
+                    <td className="establishment-team-table-cell establishment-team-table-cell-name whitespace-nowrap p-3 text-white text-left">{emp.name}</td>
+                    <td className="establishment-team-table-cell establishment-team-table-cell-position whitespace-nowrap p-3 text-white/90 text-left">{emp.position || "—"}</td>
+                    <td className="establishment-team-table-cell establishment-team-table-cell-coef whitespace-nowrap p-3 text-white/90 text-right">{emp.coefficient}</td>
+                    <td className="establishment-team-table-cell establishment-team-table-cell-rating whitespace-nowrap p-3 text-white/90 text-right">{emp.reviewsCount > 0 ? `${emp.avgRating ?? "—"} (${emp.reviewsCount})` : "—"}</td>
+                    <td className="establishment-team-table-cell establishment-team-table-cell-status p-3 text-left">
                       <span className={`text-xs ${emp.isActive ? "text-[var(--color-accent-emerald)]" : "text-white/80"}`}>{emp.isActive ? "Активен" : "Неактивен"}</span>
                       <button type="button" onClick={() => toggleActive(emp)} disabled={togglingId === emp.id} className="ml-2 rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-2 py-1 text-xs text-white hover:bg-[var(--color-dark-gray)]/20 disabled:opacity-50">
                         {togglingId === emp.id ? "…" : emp.isActive ? "Деактивировать" : "Активировать"}
                       </button>
                     </td>
-                    <td className="whitespace-nowrap p-3 text-white/90">{emp.hasUser ? "Да" : "Нет"}</td>
-                    <td className="p-3">
+                    <td className="establishment-team-table-cell establishment-team-table-cell-linked whitespace-nowrap p-3 text-white/90 text-center">{emp.hasUser ? "Да" : "Нет"}</td>
+                    <td className="establishment-team-table-cell establishment-team-table-cell-link p-3 text-left">
                       {emp.hasUser ? (
                         <span className="text-sm text-white/90">Уже зарегистрирован</span>
                       ) : linkByEmpId[emp.id] ? (
@@ -496,7 +496,7 @@ export default function EstablishmentTeamPage() {
                         </div>
                       )}
                     </td>
-                    <td className="p-3">
+                    <td className="establishment-team-table-cell establishment-team-table-cell-actions p-3 text-left">
                       <button type="button" onClick={() => openEdit(emp)} className="inline-flex items-center gap-1 rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-2 py-1.5 text-xs text-white hover:bg-[var(--color-dark-gray)]/20">
                         <Pencil className="h-3 w-3" /> Редактировать
                       </button>

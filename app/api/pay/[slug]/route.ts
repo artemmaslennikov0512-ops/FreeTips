@@ -50,6 +50,8 @@ export async function GET(request: NextRequest, { params }: Params) {
               blocksBackgroundColor: true,
               fontColor: true,
               borderColor: true,
+              borderWidthPx: true,
+              borderOpacityPercent: true,
             },
           },
         },
@@ -85,6 +87,8 @@ export async function GET(request: NextRequest, { params }: Params) {
           blocksBackgroundColor: tipLink.employee.establishment.blocksBackgroundColor ?? undefined,
           fontColor: tipLink.employee.establishment.fontColor ?? undefined,
           borderColor: tipLink.employee.establishment.borderColor ?? undefined,
+          borderWidthPx: tipLink.employee.establishment.borderWidthPx ?? undefined,
+          borderOpacityPercent: tipLink.employee.establishment.borderOpacityPercent ?? undefined,
         }
       : undefined;
   const savingFor = tipLink.user.savingFor?.trim() || undefined;

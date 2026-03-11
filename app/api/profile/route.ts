@@ -51,6 +51,8 @@ export async function GET(request: NextRequest) {
                 blocksBackgroundColor: true,
                 fontColor: true,
                 borderColor: true,
+                borderWidthPx: true,
+                borderOpacityPercent: true,
               },
             },
             apiKey: true,
@@ -161,6 +163,8 @@ export async function GET(request: NextRequest) {
               blocksBackgroundColor: profile.establishmentRelation.blocksBackgroundColor != null ? String(profile.establishmentRelation.blocksBackgroundColor) : null,
               fontColor: profile.establishmentRelation.fontColor != null ? String(profile.establishmentRelation.fontColor) : null,
               borderColor: profile.establishmentRelation.borderColor != null ? String(profile.establishmentRelation.borderColor) : null,
+              borderWidthPx: profile.establishmentRelation.borderWidthPx ?? null,
+              borderOpacityPercent: profile.establishmentRelation.borderOpacityPercent ?? null,
             }
           : null,
       hasApiKey: !!(profile.apiKey ?? profile.apiKeyHash),

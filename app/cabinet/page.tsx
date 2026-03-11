@@ -39,6 +39,9 @@ export default function CabinetDashboardPage() {
   const [tipLink, setTipLink] = useState<string | null>(null);
   const [linkCopied, setLinkCopied] = useState(false);
   const [verificationStatus, setVerificationStatus] = useState<string | null>(null);
+  const [savingFor, setSavingFor] = useState<string | null>(null);
+  const [savingForEdit, setSavingForEdit] = useState("");
+  const [savingForSaving, setSavingForSaving] = useState(false);
 
   const fetchProfileAndData = useCallback(async () => {
     const token = localStorage.getItem("accessToken");
@@ -67,6 +70,7 @@ export default function CabinetDashboardPage() {
         hasApiKey?: boolean;
         fullName?: string | null;
         uniqueId?: string | null;
+        savingFor?: string | null;
         payoutLimits?: { dailyLimitCount: number; dailyLimitKop: number; monthlyLimitCount?: number; monthlyLimitKop?: number };
         payoutUsageToday?: { count: number; sumKop: number };
         payoutUsageMonth?: { count: number; sumKop: number };
@@ -77,6 +81,7 @@ export default function CabinetDashboardPage() {
       setApiKey(null);
       setFullName(profile.fullName ?? null);
       setUniqueId(profile.uniqueId ?? null);
+      setSavingFor(profile.savingFor ?? null);
       setPayoutLimits(profile.payoutLimits ?? null);
       setPayoutUsageToday(profile.payoutUsageToday ?? null);
       setPayoutUsageMonth(profile.payoutUsageMonth ?? null);
@@ -103,6 +108,10 @@ export default function CabinetDashboardPage() {
     }
     fetchProfileAndData();
   }, [router, fetchProfileAndData]);
+
+  useEffect(() => {
+    setSavingForEdit(savingFor ?? "");
+  }, [savingFor]);
 
   // Обновление баланса при возврате на вкладку (после зачислений/списаний)
   useEffect(() => {
@@ -137,6 +146,26 @@ export default function CabinetDashboardPage() {
       /* ignore */
     }
   }, [tipLink]);
+
+  const saveSavingFor = useCallback(async () => {
+    const token = localStorage.getItem("accessToken");
+    if (!token) return;
+    const value = savingForEdit.trim() || null;
+    if (value === (savingFor ?? null)) return;
+    setSavingForSaving(true);
+    try {
+      const res = await fetch("/api/profile", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ savingFor: value ?? "" }),
+      });
+      if (res.ok) {
+        setSavingFor(value);
+      }
+    } finally {
+      setSavingForSaving(false);
+    }
+  }, [savingForEdit, savingFor]);
 
   const copyApiKey = useCallback(() => {
     if (!apiKey) return;
@@ -324,8 +353,50 @@ export default function CabinetDashboardPage() {
             </h3>
           </div>
           <div className="p-6">
+            {/* 1. Goal card — same size/style as "Your link for tea" */}
+            <div className="cabinet-block-inner mb-6 rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 p-4">
+              <div className="mb-2 text-sm font-semibold text-[var(--color-text)]">Цель, на которую коплю</div>
+              <div className="cabinet-input-window mb-3 w-full rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-bg-sides)] px-3 py-2 text-[14px] text-[var(--color-text)] placeholder:text-[var(--color-text)]/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-brand-gold)]/50">
+                <input
+                  type="text"
+                  value={savingForEdit}
+                  onChange={(e) => setSavingForEdit(e.target.value)}
+                  placeholder="Например: новый ноутбук, отпуск…"
+                  maxLength={500}
+                  className="w-full min-w-0 bg-transparent"
+                  aria-label="Цель (на что коплю)"
+                />
+              </div>
+              <button
+                type="button"
+                onClick={saveSavingFor}
+                disabled={savingForSaving || (savingForEdit.trim() || null) === (savingFor ?? null)}
+                className="rounded-[10px] bg-[var(--color-brand-gold)] px-4 py-2 text-[14px] font-semibold text-[#0a192f] transition-all hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {savingForSaving ? "Сохранение…" : "Сохранить"}
+              </button>
+            </div>
+
+            {/* 2. Four quick action cards */}
+            <div className="mb-6 grid grid-cols-2 gap-4">
+              {QUICK_ACTIONS.map(({ href, icon: Icon, title, desc }) => (
+                <Link
+                  key={href}
+                  href={href}
+                  className="cabinet-block-inner flex flex-col items-center rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 p-6 transition-all hover:bg-[var(--color-accent-gold)]/15 hover:-translate-y-1 shadow-[var(--shadow-subtle)]"
+                >
+                  <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-[var(--color-brand-gold)] text-[#0a192f]">
+                    <Icon className="h-5 w-5" />
+                  </div>
+                  <div className="font-semibold text-[var(--color-text)] text-center">{title}</div>
+                  <div className="mt-1 text-center text-sm text-[var(--color-text)]/90">{desc}</div>
+                </Link>
+              ))}
+            </div>
+
+            {/* 3. Your link for tea — at the bottom */}
             {tipLink && (
-              <div className="cabinet-block-inner mb-6 rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 p-4">
+              <div className="cabinet-block-inner rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 p-4">
                 <div className="mb-2 text-sm font-semibold text-[var(--color-text)]">Ваша ссылка для чаевых</div>
                 <div className="cabinet-input-window mb-3 break-all rounded-lg bg-[var(--color-bg-sides)] px-3 py-2 font-mono text-xs text-[var(--color-text)]/90">
                   {tipLink}
@@ -351,21 +422,6 @@ export default function CabinetDashboardPage() {
                 </div>
               </div>
             )}
-            <div className="grid grid-cols-2 gap-4">
-              {QUICK_ACTIONS.map(({ href, icon: Icon, title, desc }) => (
-                <Link
-                  key={href}
-                  href={href}
-                  className="cabinet-block-inner flex flex-col items-center rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 p-6 transition-all hover:bg-[var(--color-accent-gold)]/15 hover:-translate-y-1 shadow-[var(--shadow-subtle)]"
-                >
-                  <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-[var(--color-brand-gold)] text-[#0a192f]">
-                    <Icon className="h-5 w-5" />
-                  </div>
-                  <div className="font-semibold text-[var(--color-text)] text-center">{title}</div>
-                  <div className="mt-1 text-center text-sm text-[var(--color-text)]/90">{desc}</div>
-                </Link>
-              ))}
-            </div>
           </div>
         </div>
       </div>

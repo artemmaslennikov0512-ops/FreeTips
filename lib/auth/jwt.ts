@@ -16,9 +16,9 @@ function getJWTRefreshSecretKey(): Uint8Array {
   return new TextEncoder().encode(getJwtRefreshSecret());
 }
 
-// Время жизни токенов
-const ACCESS_TOKEN_EXPIRES_IN = "15m"; // 15 минут
-const REFRESH_TOKEN_EXPIRES_IN = "7d"; // 7 дней
+// Время жизни токенов (access 24h — без постоянного выброса из кабинета; refresh продлевает сессию до 7 дней)
+const ACCESS_TOKEN_EXPIRES_IN = "24h";
+const REFRESH_TOKEN_EXPIRES_IN = "7d";
 
 export interface TokenPayload extends JWTPayload {
   userId: string;

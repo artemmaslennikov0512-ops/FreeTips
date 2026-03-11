@@ -14,7 +14,7 @@ import {
   Building2,
   FileCheck,
 } from "lucide-react";
-import { getCsrfHeader } from "@/lib/security/csrf-client";
+import { getCsrfHeader, getAccessToken, fetchWithAuth, clearAccessToken } from "@/lib/auth-client";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 
 interface User {
@@ -70,19 +70,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     if (!mounted || typeof window === "undefined") return;
 
     const checkAuth = async () => {
-      const token = localStorage.getItem("accessToken");
-      if (!token) {
+      if (!getAccessToken()) {
         router.replace("/login");
         return;
       }
 
       try {
-        const res = await fetch("/api/profile", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await fetchWithAuth("/api/profile");
 
         if (res.status === 401 || res.status === 403) {
-          localStorage.removeItem("accessToken");
+          clearAccessToken();
           router.replace("/login");
           return;
         }
@@ -132,7 +129,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         credentials: "include",
       });
     } finally {
-      localStorage.removeItem("accessToken");
+      clearAccessToken();
       router.replace("/");
     }
   };

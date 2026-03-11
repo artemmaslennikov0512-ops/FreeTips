@@ -12,6 +12,8 @@ interface BrandSettings {
   blocksBackgroundColor: string | null;
   fontColor: string | null;
   borderColor: string | null;
+  borderWidthPx: number | null;
+  borderOpacityPercent: number | null;
 }
 
 const DEFAULT_HEX = { primary: "#c9a227", secondary: "#0a192f", mainBg: "#0a192f", blocksBg: "#1e293b", font: "#fafafa", border: "rgba(197,165,114,0.5)" };
@@ -28,6 +30,8 @@ export default function EstablishmentBrandPage() {
   const [blocksBackgroundColor, setBlocksBackgroundColor] = useState("");
   const [fontColor, setFontColor] = useState("");
   const [borderColor, setBorderColor] = useState("");
+  const [borderWidthPx, setBorderWidthPx] = useState(2);
+  const [borderOpacityPercent, setBorderOpacityPercent] = useState(100);
   const [message, setMessage] = useState<string | null>(null);
 
   useEffect(() => {
@@ -46,6 +50,8 @@ export default function EstablishmentBrandPage() {
           setBlocksBackgroundColor(data.blocksBackgroundColor ?? "");
           setFontColor(data.fontColor ?? "");
           setBorderColor(data.borderColor ?? "");
+          setBorderWidthPx(data.borderWidthPx ?? 2);
+          setBorderOpacityPercent(data.borderOpacityPercent ?? 100);
         }
       } finally {
         setLoading(false);
@@ -70,6 +76,8 @@ export default function EstablishmentBrandPage() {
           blocksBackgroundColor: blocksBackgroundColor.trim() || null,
           fontColor: fontColor.trim() || null,
           borderColor: borderColor.trim() || null,
+          borderWidthPx: borderWidthPx,
+          borderOpacityPercent: borderOpacityPercent,
         }),
       });
       const data = await res.json().catch(() => ({}));
@@ -86,7 +94,9 @@ export default function EstablishmentBrandPage() {
       setBlocksBackgroundColor(data.blocksBackgroundColor ?? "");
       setFontColor(data.fontColor ?? "");
       setBorderColor(data.borderColor ?? "");
-      setMessage("Сохранено. Настройки применятся на странице оплаты по QR и в кабинете официанта.");
+      setBorderWidthPx(data.borderWidthPx ?? 2);
+      setBorderOpacityPercent(data.borderOpacityPercent ?? 100);
+      setMessage("Сохранено. Настройки применяются в личном кабинете и на странице оплаты чаевых. QR настраивается в разделе «QR и печать».");
     } catch {
       setMessage("Ошибка соединения");
     } finally {
@@ -118,6 +128,8 @@ export default function EstablishmentBrandPage() {
       setBlocksBackgroundColor(data.blocksBackgroundColor ?? "");
       setFontColor(data.fontColor ?? "");
       setBorderColor(data.borderColor ?? "");
+      setBorderWidthPx(data.borderWidthPx ?? 2);
+      setBorderOpacityPercent(data.borderOpacityPercent ?? 100);
       setMessage("Настройки сброшены к исходным.");
     } catch {
       setMessage("Ошибка соединения");
@@ -130,36 +142,218 @@ export default function EstablishmentBrandPage() {
     return <div className="text-white/90">Загрузка…</div>;
   }
 
+  const borderHex = borderColor && /^#[0-9A-Fa-f]{6}$/i.test(borderColor) ? borderColor : primaryColor && /^#[0-9A-Fa-f]{6}$/i.test(primaryColor) ? primaryColor : "#c5a572";
+  const borderAlpha = (borderOpacityPercent / 100);
+  const borderRgba = (() => {
+    const r = parseInt(borderHex.slice(1, 3), 16);
+    const g = parseInt(borderHex.slice(3, 5), 16);
+    const b = parseInt(borderHex.slice(5, 7), 16);
+    return `rgba(${r},${g},${b},${borderAlpha})`;
+  })();
+  const borderWidth = Math.min(8, Math.max(0, borderWidthPx));
+
   return (
-    <div className="mx-auto max-w-2xl space-y-6">
+    <div className="mx-auto max-w-6xl space-y-6">
       <div>
         <h1 className="font-[family:var(--font-playfair)] text-xl font-semibold text-white flex items-center justify-center gap-2 w-full">
           <Palette className="h-5 w-5" />
           Бренд заведения
         </h1>
         <p className="text-white/90 text-sm mt-1 text-center">
-          Логотип и цвета отображаются на странице оплаты чаевых и в кабинете официанта. Меняйте поля — превью обновится сразу.
+          Настройки применяются только к личному кабинету и странице оплаты чаевых. Меняйте поля — превью обновится сразу. QR-коды настраиваются в разделе «QR и печать».
         </p>
       </div>
 
-      {/* Превью в реальном времени: основной фон, доп. цвет = фон блока, фон блоков, цвет текста */}
-      <div className="cabinet-card rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden">
-        <div className="border-b border-white/10 px-4 py-3 text-center">
-          <span className="text-sm font-medium text-white/90">Превью: как увидят гости и официанты</span>
+      {/* Две колонки: слева — настройки, справа — превью */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+        {/* Левая колонка: форма настроек */}
+        <div className="cabinet-card rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden order-2 lg:order-1">
+          <form onSubmit={handleSubmit} className="p-6 space-y-4">
+            {message && (
+              <p className={`text-sm ${message.startsWith("Сохранено") ? "text-[var(--color-accent-emerald)]" : "text-[var(--color-accent-red)]"}`}>
+                {message}
+              </p>
+            )}
+            <div>
+              <label className="block text-sm text-white/90 mb-1">URL логотипа</label>
+              <input
+                type="url"
+                value={logoUrl}
+                onChange={(e) => setLogoUrl(e.target.value)}
+                placeholder="https://..."
+                className="cabinet-input-window w-full rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-white placeholder:text-white/50 focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-gold)]/40"
+              />
+            </div>
+            <div>
+              <label className="block text-sm text-white/90 mb-1">Основной цвет (hex) — кнопки, акценты, рамки</label>
+              <div className="flex gap-2 items-center">
+                <input
+                  type="color"
+                  value={primaryColor.match(/^#[0-9A-Fa-f]{6}$/) ? primaryColor : DEFAULT_HEX.primary}
+                  onChange={(e) => setPrimaryColor(e.target.value)}
+                  className="h-10 w-14 rounded border border-[var(--color-brand-gold)]/20 cursor-pointer"
+                />
+                <input
+                  type="text"
+                  value={primaryColor}
+                  onChange={(e) => setPrimaryColor(e.target.value)}
+                  placeholder={DEFAULT_HEX.primary}
+                  className="cabinet-input-window flex-1 rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-white placeholder:text-white/50 focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-gold)]/40"
+                />
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm text-white/90 mb-1">Доп. цвет (hex) — фон карточки оплаты, сайдбар</label>
+              <div className="flex gap-2 items-center">
+                <input
+                  type="color"
+                  value={secondaryColor.match(/^#[0-9A-Fa-f]{6}$/) ? secondaryColor : DEFAULT_HEX.secondary}
+                  onChange={(e) => setSecondaryColor(e.target.value)}
+                  className="h-10 w-14 rounded border border-[var(--color-brand-gold)]/20 cursor-pointer"
+                />
+                <input
+                  type="text"
+                  value={secondaryColor}
+                  onChange={(e) => setSecondaryColor(e.target.value)}
+                  placeholder={DEFAULT_HEX.secondary}
+                  className="cabinet-input-window flex-1 rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-white placeholder:text-white/50 focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-gold)]/40"
+                />
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm text-white/90 mb-1">Фон основной (hex) — фон страницы</label>
+              <div className="flex gap-2 items-center">
+                <input
+                  type="color"
+                  value={mainBackgroundColor.match(/^#[0-9A-Fa-f]{6}$/) ? mainBackgroundColor : DEFAULT_HEX.mainBg}
+                  onChange={(e) => setMainBackgroundColor(e.target.value)}
+                  className="h-10 w-14 rounded border border-[var(--color-brand-gold)]/20 cursor-pointer"
+                />
+                <input
+                  type="text"
+                  value={mainBackgroundColor}
+                  onChange={(e) => setMainBackgroundColor(e.target.value)}
+                  placeholder={DEFAULT_HEX.mainBg}
+                  className="cabinet-input-window flex-1 rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-white placeholder:text-white/50 focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-gold)]/40"
+                />
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm text-white/90 mb-1">Фон блоков (hex) — карточки, поля</label>
+              <div className="flex gap-2 items-center">
+                <input
+                  type="color"
+                  value={blocksBackgroundColor.match(/^#[0-9A-Fa-f]{6}$/) ? blocksBackgroundColor : DEFAULT_HEX.blocksBg}
+                  onChange={(e) => setBlocksBackgroundColor(e.target.value)}
+                  className="h-10 w-14 rounded border border-[var(--color-brand-gold)]/20 cursor-pointer"
+                />
+                <input
+                  type="text"
+                  value={blocksBackgroundColor}
+                  onChange={(e) => setBlocksBackgroundColor(e.target.value)}
+                  placeholder={DEFAULT_HEX.blocksBg}
+                  className="cabinet-input-window flex-1 rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-white placeholder:text-white/50 focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-gold)]/40"
+                />
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm text-white/90 mb-1">Цвет шрифта (hex)</label>
+              <div className="flex gap-2 items-center">
+                <input
+                  type="color"
+                  value={fontColor.match(/^#[0-9A-Fa-f]{6}$/) ? fontColor : DEFAULT_HEX.font}
+                  onChange={(e) => setFontColor(e.target.value)}
+                  className="h-10 w-14 rounded border border-[var(--color-brand-gold)]/20 cursor-pointer"
+                />
+                <input
+                  type="text"
+                  value={fontColor}
+                  onChange={(e) => setFontColor(e.target.value)}
+                  placeholder={DEFAULT_HEX.font}
+                  className="cabinet-input-window flex-1 rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-white placeholder:text-white/50 focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-gold)]/40"
+                />
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm text-white/90 mb-1">Цвет обводки (hex) — рамки карточек и полей</label>
+              <div className="flex gap-2 items-center">
+                <input
+                  type="color"
+                  value={borderColor.match(/^#[0-9A-Fa-f]{6}$/) ? borderColor : "#c5a372"}
+                  onChange={(e) => setBorderColor(e.target.value)}
+                  className="h-10 w-14 rounded border border-[var(--color-brand-gold)]/20 cursor-pointer"
+                />
+                <input
+                  type="text"
+                  value={borderColor}
+                  onChange={(e) => setBorderColor(e.target.value)}
+                  placeholder="#c5a372"
+                  className="cabinet-input-window flex-1 rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-white placeholder:text-white/50 focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-gold)]/40"
+                />
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm text-white/90 mb-1">Толщина обводки (px)</label>
+              <input
+                type="number"
+                min={0}
+                max={8}
+                value={borderWidthPx}
+                onChange={(e) => setBorderWidthPx(Number(e.target.value) || 0)}
+                className="cabinet-input-window w-full rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-white focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-gold)]/40"
+              />
+            </div>
+            <div>
+              <label className="block text-sm text-white/90 mb-1">Прозрачность обводки: {borderOpacityPercent}%</label>
+              <input
+                type="range"
+                min={0}
+                max={100}
+                value={borderOpacityPercent}
+                onChange={(e) => setBorderOpacityPercent(Number(e.target.value))}
+                className="w-full h-2 rounded-lg appearance-none bg-white/20 accent-[var(--color-brand-gold)]"
+              />
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <button
+                type="submit"
+                disabled={saving}
+                className="rounded-[10px] bg-[var(--color-brand-gold)] px-4 py-2 font-medium text-[#0a192f] hover:opacity-90 disabled:opacity-50"
+              >
+                {saving ? "Сохранение…" : "Сохранить"}
+              </button>
+              <button
+                type="button"
+                onClick={handleResetToDefaults}
+                disabled={resetting || saving}
+                className="rounded-[10px] border border-white/30 bg-white/5 px-4 py-2 font-medium text-white/90 hover:bg-white/10 disabled:opacity-50"
+              >
+                {resetting ? "Сброс…" : "Вернуть к исходным настройкам"}
+              </button>
+            </div>
+          </form>
         </div>
-        <div
-          className="p-6 flex flex-col items-center gap-4 rounded-b-[10px]"
-          style={{
-            backgroundColor: mainBackgroundColor && /^#[0-9A-Fa-f]{6}$/i.test(mainBackgroundColor) ? mainBackgroundColor : undefined,
-          }}
-        >
+
+        {/* Правая колонка: превью */}
+        <div className="cabinet-card rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden order-1 lg:order-2 lg:sticky lg:top-4">
+          <div className="border-b border-white/10 px-4 py-3 text-center">
+            <span className="text-sm font-medium text-white/90">Превью: личный кабинет и страница оплаты</span>
+          </div>
           <div
-            className="w-full max-w-sm rounded-xl border-2 p-4 transition-colors"
+            className="p-6 flex flex-col items-center gap-4 rounded-b-[10px]"
             style={{
-              borderColor: borderColor && /^#[0-9A-Fa-f]{6}$/i.test(borderColor) ? borderColor : primaryColor && /^#[0-9A-Fa-f]{6}$/i.test(primaryColor) ? `${primaryColor}99` : undefined,
-              backgroundColor: secondaryColor && /^#[0-9A-Fa-f]{6}$/i.test(secondaryColor) ? secondaryColor : blocksBackgroundColor && /^#[0-9A-Fa-f]{6}$/i.test(blocksBackgroundColor) ? blocksBackgroundColor : undefined,
+              backgroundColor: mainBackgroundColor && /^#[0-9A-Fa-f]{6}$/i.test(mainBackgroundColor) ? mainBackgroundColor : undefined,
             }}
           >
+            <div
+              className="w-full max-w-sm rounded-xl p-4 transition-colors"
+              style={{
+                borderWidth: `${borderWidth}px`,
+                borderStyle: "solid",
+                borderColor: borderRgba,
+                backgroundColor: secondaryColor && /^#[0-9A-Fa-f]{6}$/i.test(secondaryColor) ? secondaryColor : blocksBackgroundColor && /^#[0-9A-Fa-f]{6}$/i.test(blocksBackgroundColor) ? blocksBackgroundColor : undefined,
+              }}
+            >
             <div className="flex items-center justify-center gap-2 mb-3 min-h-[32px]">
               {logoUrl.trim() && (
                 <img
@@ -182,9 +376,11 @@ export default function EstablishmentBrandPage() {
               </span>
             </div>
             <div
-              className="rounded-lg border py-2 px-3 text-center text-sm"
+              className="rounded-lg py-2 px-3 text-center text-sm"
               style={{
-                borderColor: borderColor && /^#[0-9A-Fa-f]{6}$/i.test(borderColor) ? borderColor : primaryColor && /^#[0-9A-Fa-f]{6}$/i.test(primaryColor) ? `${primaryColor}66` : undefined,
+                borderWidth: `${Math.min(4, borderWidth)}px`,
+                borderStyle: "solid",
+                borderColor: borderRgba,
                 backgroundColor: blocksBackgroundColor && /^#[0-9A-Fa-f]{6}$/i.test(blocksBackgroundColor) ? blocksBackgroundColor : "rgba(255,255,255,0.05)",
                 color: fontColor && /^#[0-9A-Fa-f]{6}$/i.test(fontColor) ? fontColor : "rgba(255,255,255,0.9)",
               }}
@@ -221,151 +417,6 @@ export default function EstablishmentBrandPage() {
             {""}
           </p>
         </div>
-      </div>
-
-      <div className="cabinet-card rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden">
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          {message && (
-            <p className={`text-sm ${message.startsWith("Сохранено") ? "text-[var(--color-accent-emerald)]" : "text-[var(--color-accent-red)]"}`}>
-              {message}
-            </p>
-          )}
-          <div>
-            <label className="block text-sm text-white/90 mb-1">URL логотипа</label>
-            <input
-              type="url"
-              value={logoUrl}
-              onChange={(e) => setLogoUrl(e.target.value)}
-              placeholder="https://..."
-              className="cabinet-input-window w-full rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-white placeholder:text-white/50 focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-gold)]/40"
-            />
-          </div>
-          <div>
-            <label className="block text-sm text-white/90 mb-1">Основной цвет (hex) — кнопки, акценты, рамки</label>
-            <div className="flex gap-2 items-center">
-              <input
-                type="color"
-                value={primaryColor.match(/^#[0-9A-Fa-f]{6}$/) ? primaryColor : DEFAULT_HEX.primary}
-                onChange={(e) => setPrimaryColor(e.target.value)}
-                className="h-10 w-14 rounded border border-[var(--color-brand-gold)]/20 cursor-pointer"
-              />
-              <input
-                type="text"
-                value={primaryColor}
-                onChange={(e) => setPrimaryColor(e.target.value)}
-                placeholder={DEFAULT_HEX.primary}
-                className="cabinet-input-window flex-1 rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-white placeholder:text-white/50 focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-gold)]/40"
-              />
-            </div>
-          </div>
-          <div>
-            <label className="block text-sm text-white/90 mb-1">Доп. цвет (hex) — фон карточки оплаты, сайдбар</label>
-            <div className="flex gap-2 items-center">
-              <input
-                type="color"
-                value={secondaryColor.match(/^#[0-9A-Fa-f]{6}$/) ? secondaryColor : DEFAULT_HEX.secondary}
-                onChange={(e) => setSecondaryColor(e.target.value)}
-                className="h-10 w-14 rounded border border-[var(--color-brand-gold)]/20 cursor-pointer"
-              />
-              <input
-                type="text"
-                value={secondaryColor}
-                onChange={(e) => setSecondaryColor(e.target.value)}
-                placeholder={DEFAULT_HEX.secondary}
-                className="cabinet-input-window flex-1 rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-white placeholder:text-white/50 focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-gold)]/40"
-              />
-            </div>
-          </div>
-          <div>
-            <label className="block text-sm text-white/90 mb-1">Фон основной (hex) — фон страницы</label>
-            <div className="flex gap-2 items-center">
-              <input
-                type="color"
-                value={mainBackgroundColor.match(/^#[0-9A-Fa-f]{6}$/) ? mainBackgroundColor : DEFAULT_HEX.mainBg}
-                onChange={(e) => setMainBackgroundColor(e.target.value)}
-                className="h-10 w-14 rounded border border-[var(--color-brand-gold)]/20 cursor-pointer"
-              />
-              <input
-                type="text"
-                value={mainBackgroundColor}
-                onChange={(e) => setMainBackgroundColor(e.target.value)}
-                placeholder={DEFAULT_HEX.mainBg}
-                className="cabinet-input-window flex-1 rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-white placeholder:text-white/50 focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-gold)]/40"
-              />
-            </div>
-          </div>
-          <div>
-            <label className="block text-sm text-white/90 mb-1">Фон блоков (hex) — карточки, поля</label>
-            <div className="flex gap-2 items-center">
-              <input
-                type="color"
-                value={blocksBackgroundColor.match(/^#[0-9A-Fa-f]{6}$/) ? blocksBackgroundColor : DEFAULT_HEX.blocksBg}
-                onChange={(e) => setBlocksBackgroundColor(e.target.value)}
-                className="h-10 w-14 rounded border border-[var(--color-brand-gold)]/20 cursor-pointer"
-              />
-              <input
-                type="text"
-                value={blocksBackgroundColor}
-                onChange={(e) => setBlocksBackgroundColor(e.target.value)}
-                placeholder={DEFAULT_HEX.blocksBg}
-                className="cabinet-input-window flex-1 rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-white placeholder:text-white/50 focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-gold)]/40"
-              />
-            </div>
-          </div>
-          <div>
-            <label className="block text-sm text-white/90 mb-1">Цвет шрифта (hex)</label>
-            <div className="flex gap-2 items-center">
-              <input
-                type="color"
-                value={fontColor.match(/^#[0-9A-Fa-f]{6}$/) ? fontColor : DEFAULT_HEX.font}
-                onChange={(e) => setFontColor(e.target.value)}
-                className="h-10 w-14 rounded border border-[var(--color-brand-gold)]/20 cursor-pointer"
-              />
-              <input
-                type="text"
-                value={fontColor}
-                onChange={(e) => setFontColor(e.target.value)}
-                placeholder={DEFAULT_HEX.font}
-                className="cabinet-input-window flex-1 rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-white placeholder:text-white/50 focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-gold)]/40"
-              />
-            </div>
-          </div>
-          <div>
-            <label className="block text-sm text-white/90 mb-1">Цвет обводки (hex) — рамки карточек и полей</label>
-            <div className="flex gap-2 items-center">
-              <input
-                type="color"
-                value={borderColor.match(/^#[0-9A-Fa-f]{6}$/) ? borderColor : "#c5a372"}
-                onChange={(e) => setBorderColor(e.target.value)}
-                className="h-10 w-14 rounded border border-[var(--color-brand-gold)]/20 cursor-pointer"
-              />
-              <input
-                type="text"
-                value={borderColor}
-                onChange={(e) => setBorderColor(e.target.value)}
-                placeholder="#c5a372"
-                className="cabinet-input-window flex-1 rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-white placeholder:text-white/50 focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-gold)]/40"
-              />
-            </div>
-          </div>
-          <div className="flex flex-wrap gap-3">
-            <button
-              type="submit"
-              disabled={saving}
-              className="rounded-[10px] bg-[var(--color-brand-gold)] px-4 py-2 font-medium text-[#0a192f] hover:opacity-90 disabled:opacity-50"
-            >
-              {saving ? "Сохранение…" : "Сохранить"}
-            </button>
-            <button
-              type="button"
-              onClick={handleResetToDefaults}
-              disabled={resetting || saving}
-              className="rounded-[10px] border border-white/30 bg-white/5 px-4 py-2 font-medium text-white/90 hover:bg-white/10 disabled:opacity-50"
-            >
-              {resetting ? "Сброс…" : "Вернуть к исходным настройкам"}
-            </button>
-          </div>
-        </form>
       </div>
     </div>
   );

@@ -15,7 +15,7 @@ import {
   BadgeCheck,
   Building2,
 } from "lucide-react";
-import { getCsrfHeader } from "@/lib/security/csrf-client";
+import { getCsrfHeader, getAccessToken, fetchWithAuth, clearAccessToken } from "@/lib/auth-client";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 
 const NAV = [
@@ -75,15 +75,14 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
 
   useEffect(() => {
     if (!mounted || typeof window === "undefined") return;
-    const token = localStorage.getItem("accessToken");
-    if (!token) {
+    if (!getAccessToken()) {
       router.replace("/login");
       return;
     }
-    fetch("/api/profile", { headers: { Authorization: `Bearer ${token}` } })
+    fetchWithAuth("/api/profile")
       .then((res) => {
         if (res.status === 401 || res.status === 403) {
-          localStorage.removeItem("accessToken");
+          clearAccessToken();
           router.replace("/login");
           return null;
         }
@@ -109,9 +108,8 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
   }, [mounted, router]);
 
   const fetchSupportUnread = useCallback(() => {
-    const token = localStorage.getItem("accessToken");
-    if (!token) return;
-    fetch("/api/support/unread-count", { headers: { Authorization: `Bearer ${token}` } })
+    if (!getAccessToken()) return;
+    fetchWithAuth("/api/support/unread-count")
       .then((res) => (res.ok ? res.json() : null))
       .then((data: { count?: number } | null) => {
         if (data && typeof data.count === "number") setSupportUnreadCount(data.count);
@@ -130,7 +128,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
 
   useEffect(() => {
     const onFocus = () => {
-      if (document.visibilityState === "visible" && localStorage.getItem("accessToken")) {
+      if (document.visibilityState === "visible" && getAccessToken()) {
         fetchSupportUnread();
       }
     };
@@ -147,7 +145,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
         credentials: "include",
       });
     } finally {
-      localStorage.removeItem("accessToken");
+      clearAccessToken();
       router.replace("/");
     }
   }, [router]);

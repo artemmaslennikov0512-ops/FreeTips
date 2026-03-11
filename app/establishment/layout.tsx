@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { LayoutDashboard, LogOut, Users, PieChart, BarChart3, Palette, Menu, QrCode } from "lucide-react";
-import { getCsrfHeader } from "@/lib/security/csrf-client";
+import { getCsrfHeader, getAccessToken, fetchWithAuth, clearAccessToken } from "@/lib/auth-client";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 
 interface Profile {
@@ -43,19 +43,16 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
     if (!mounted || typeof window === "undefined") return;
 
     const checkAuth = async () => {
-      const token = localStorage.getItem("accessToken");
-      if (!token) {
+      if (!getAccessToken()) {
         router.replace("/login");
         return;
       }
 
       try {
-        const res = await fetch("/api/profile", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await fetchWithAuth("/api/profile");
 
         if (res.status === 401 || res.status === 403) {
-          localStorage.removeItem("accessToken");
+          clearAccessToken();
           router.replace("/login");
           return;
         }
@@ -97,7 +94,7 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
         credentials: "include",
       });
     } finally {
-      localStorage.removeItem("accessToken");
+      clearAccessToken();
       router.replace("/");
     }
   };
@@ -144,9 +141,9 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
         aria-hidden
       />
 
-      {/* Сайдбар: по высоте контента, не тянется до низа; на мобильном — выезжает слева */}
+      {/* Сайдбар: не тянется до низа (адаптация по контенту), по верху в одну линию с основным блоком */}
       <aside
-        className={`cabinet-sidebar fixed left-0 top-0 z-40 flex h-auto max-h-[100vh] w-[min(calc(100vw-4rem),20rem)] max-w-[20rem] flex-col overflow-y-auto overflow-x-hidden rounded-r-[10px] border-0 border-r border-white/10 py-6 shadow-2xl backdrop-blur-xl transition-[transform] duration-300 ease-out lg:static lg:left-auto lg:top-auto lg:ml-4 lg:mt-4 lg:mr-0 lg:mb-0 lg:max-h-none lg:w-[260px] lg:max-w-none lg:translate-x-0 lg:rounded-[10px] lg:border bg-white/[0.06] ${
+        className={`cabinet-sidebar fixed left-0 top-0 z-40 flex max-h-[100vh] w-[min(calc(100vw-4rem),20rem)] max-w-[20rem] flex-col overflow-y-auto overflow-x-hidden rounded-r-[10px] border-0 border-r border-white/10 py-6 shadow-2xl backdrop-blur-xl transition-[transform] duration-300 ease-out lg:static lg:left-auto lg:top-auto lg:ml-4 lg:mt-0 lg:mr-0 lg:mb-0 lg:max-h-none lg:w-[260px] lg:max-w-none lg:translate-x-0 lg:rounded-[10px] lg:border lg:self-start bg-white/[0.06] ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -193,7 +190,7 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
       </aside>
 
       <main className="min-h-0 min-w-0 flex-1 overflow-x-hidden pl-4 pr-4 lg:pl-0 lg:pr-0 lg:ml-0 flex flex-col">
-        <div className="cabinet-main-block mt-4 mr-0 mb-4 ml-0 lg:mr-4 lg:ml-4 flex min-h-0 flex-1 flex-col rounded-[10px] border border-white/10 bg-white/[0.06] backdrop-blur-xl">
+        <div className="cabinet-main-block mt-4 mr-0 mb-4 ml-0 lg:mt-0 lg:mr-4 lg:ml-4 flex min-h-0 flex-1 flex-col rounded-[10px] border border-white/10 bg-white/[0.06] backdrop-blur-xl">
           <div className="p-6 lg:p-8" id="main-content">
             <div className="mb-4 lg:hidden">
               <button

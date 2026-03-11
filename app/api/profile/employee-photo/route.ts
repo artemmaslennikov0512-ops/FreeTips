@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
   try {
     const auth = await requireAuth(request);
     if (auth.response) return auth.response;
-    const userId = auth.userId;
+    const userId = auth.user.userId;
 
     const [user, employee] = await Promise.all([
       db.user.findUnique({

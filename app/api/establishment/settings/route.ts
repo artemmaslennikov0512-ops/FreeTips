@@ -85,7 +85,6 @@ export async function GET(request: NextRequest) {
     printCardWidthMm: est.printCardWidthMm ?? null,
     printCardHeightMm: est.printCardHeightMm ?? null,
     printCardFooterColor: est.printCardFooterColor ?? null,
-    logoOpacityPercent: est.logoOpacityPercent ?? null,
   });
 }
 

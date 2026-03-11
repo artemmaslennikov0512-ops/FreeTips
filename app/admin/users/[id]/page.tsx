@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, UserRound, Wallet, TrendingUp, Send, ListChecks, Clock, Sliders, Copy, Key, RotateCw, Lock, Unlock } from "lucide-react";
+import { ArrowLeft, UserRound, Wallet, TrendingUp, Send, ListChecks, Clock, Sliders, Copy, Key, RotateCw, Lock, Unlock, ShieldCheck } from "lucide-react";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { formatDate, formatMoneyCompact } from "@/lib/utils";
 import { PremiumCard } from "@/app/cabinet/PremiumCard";
@@ -35,6 +35,8 @@ interface UserDetailsResponse {
     fullName: string | null;
     birthDate: string | null;
     establishment: string | null;
+    verificationStatus?: string;
+    verificationRejectionReason?: string | null;
   };
   stats: {
     balanceKop: number;
@@ -89,6 +91,8 @@ export default function AdminUserDetailsPage() {
   const [displayApiKey, setDisplayApiKey] = useState<string | null>(null);
   const [blockLoading, setBlockLoading] = useState(false);
   const [blockError, setBlockError] = useState<string | null>(null);
+  const [verifyLoading, setVerifyLoading] = useState(false);
+  const [verifyError, setVerifyError] = useState<string | null>(null);
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
@@ -491,6 +495,42 @@ export default function AdminUserDetailsPage() {
     }
   };
 
+  const handleManualVerify = async () => {
+    if (!userId) return;
+    const token = localStorage.getItem("accessToken");
+    if (!token) return;
+    setVerifyLoading(true);
+    setVerifyError(null);
+    try {
+      const res = await fetch(`/api/admin/users/${userId}/verify`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+          ...getCsrfHeader(),
+        },
+      });
+      const respData = await res.json();
+      if (!res.ok) {
+        setVerifyError((respData as { error?: string }).error ?? "Ошибка");
+        setVerifyLoading(false);
+        return;
+      }
+      setData((prev) =>
+        prev
+          ? {
+              ...prev,
+              user: { ...prev.user, verificationStatus: "VERIFIED", verificationRejectionReason: null },
+            }
+          : null,
+      );
+    } catch {
+      setVerifyError("Ошибка соединения");
+    } finally {
+      setVerifyLoading(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
@@ -529,24 +569,44 @@ export default function AdminUserDetailsPage() {
           </div>
         </div>
         {blockError && <p className="text-sm text-white/90">{blockError}</p>}
-        <button
-          type="button"
-          onClick={handleBlockToggle}
-          disabled={blockLoading}
-          className="inline-flex items-center gap-2 rounded-xl bg-[var(--color-brand-gold)] px-4 py-2.5 text-sm font-medium text-[#0a192f] hover:opacity-90 disabled:opacity-50"
-        >
-          {data.user.isBlocked ? (
-            <>
-              <Unlock className="h-4 w-4" />
-              {blockLoading ? "Загрузка..." : "Разблокировать пользователя"}
-            </>
-          ) : (
-            <>
-              <Lock className="h-4 w-4" />
-              {blockLoading ? "Загрузка..." : "Заблокировать пользователя"}
-            </>
+        {verifyError && <p className="text-sm text-white/90">{verifyError}</p>}
+        <div className="flex flex-wrap items-center gap-3">
+          <button
+            type="button"
+            onClick={handleBlockToggle}
+            disabled={blockLoading}
+            className="inline-flex items-center gap-2 rounded-xl bg-[var(--color-brand-gold)] px-4 py-2.5 text-sm font-medium text-[#0a192f] hover:opacity-90 disabled:opacity-50"
+          >
+            {data.user.isBlocked ? (
+              <>
+                <Unlock className="h-4 w-4" />
+                {blockLoading ? "Загрузка..." : "Разблокировать пользователя"}
+              </>
+            ) : (
+              <>
+                <Lock className="h-4 w-4" />
+                {blockLoading ? "Загрузка..." : "Заблокировать пользователя"}
+              </>
+            )}
+          </button>
+          {data.user.verificationStatus !== "VERIFIED" && (
+            <button
+              type="button"
+              onClick={handleManualVerify}
+              disabled={verifyLoading}
+              className="inline-flex items-center gap-2 rounded-xl border border-[var(--color-brand-gold)] bg-transparent px-4 py-2.5 text-sm font-medium text-[var(--color-brand-gold)] hover:bg-[var(--color-brand-gold)]/10 disabled:opacity-50"
+            >
+              <ShieldCheck className="h-4 w-4" />
+              {verifyLoading ? "Сохранение..." : "Подтвердить верификацию"}
+            </button>
           )}
-        </button>
+          {data.user.verificationStatus === "VERIFIED" && (
+            <span className="inline-flex items-center gap-2 rounded-xl border border-green-500/50 bg-green-500/10 px-4 py-2.5 text-sm font-medium text-green-400">
+              <ShieldCheck className="h-4 w-4" />
+              Верифицирован
+            </span>
+          )}
+        </div>
       </div>
 
       <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -633,6 +693,18 @@ export default function AdminUserDetailsPage() {
             <div className="flex justify-between gap-4">
               <dt className="text-white">Статус</dt>
               <dd className="text-white/90">{data.user.isBlocked ? "Заблокирован" : "Активен"}</dd>
+            </div>
+            <div className="flex justify-between gap-4">
+              <dt className="text-white">Верификация</dt>
+              <dd className="text-white/90">
+                {data.user.verificationStatus === "VERIFIED"
+                  ? "Верифицирован"
+                  : data.user.verificationStatus === "PENDING"
+                    ? "На рассмотрении"
+                    : data.user.verificationStatus === "REJECTED"
+                      ? `Отклонён${data.user.verificationRejectionReason ? `: ${data.user.verificationRejectionReason}` : ""}`
+                      : "Не верифицирован"}
+              </dd>
             </div>
             <div className="flex justify-between gap-4">
               <dt className="text-white">Дата регистрации</dt>

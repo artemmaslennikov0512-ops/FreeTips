@@ -85,6 +85,7 @@ export default function CabinetTransactionsPage() {
   const [sdPageError, setSdPageError] = useState<string | null>(null);
   const [sdPageNewTabHint, setSdPageNewTabHint] = useState(false);
   const [maxPayoutPerRequestKop, setMaxPayoutPerRequestKop] = useState<number>(10_000_000);
+  const [verificationStatus, setVerificationStatus] = useState<string | null>(null);
 
   const totalPages = Math.max(1, Math.ceil(list.length / PER_PAGE));
   const paginatedList = useMemo(
@@ -129,11 +130,12 @@ export default function CabinetTransactionsPage() {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (profileRes.ok) {
-        const profile = (await profileRes.json()) as { stats?: Stats; maxPayoutPerRequestKop?: number };
+        const profile = (await profileRes.json()) as { stats?: Stats; maxPayoutPerRequestKop?: number; verificationStatus?: string };
         setStats(profile.stats ?? null);
         if (typeof profile.maxPayoutPerRequestKop === "number" && profile.maxPayoutPerRequestKop > 0) {
           setMaxPayoutPerRequestKop(profile.maxPayoutPerRequestKop);
         }
+        setVerificationStatus(profile.verificationStatus ?? null);
       }
     } catch {
       setError("Ошибка соединения");
@@ -285,16 +287,23 @@ export default function CabinetTransactionsPage() {
                     type="button"
                     onClick={handleSDPayOutPage}
                     disabled={
+                      verificationStatus !== "VERIFIED" ||
                       sdPageLoading ||
                       !sdPageAmount ||
                       parseFloat(sdPageAmount) < 100 ||
                       Math.round(parseFloat(sdPageAmount) * 100) > maxPayoutPerRequestKop
                     }
                     className="cabinet-btn-gold w-auto rounded-xl bg-[var(--color-brand-gold)] px-6 py-3 text-[14px] font-semibold text-[#0a192f] transition-all hover:opacity-90 disabled:opacity-50 disabled:pointer-events-none"
+                    title={verificationStatus !== "VERIFIED" ? "Вывод доступен после прохождения верификации" : undefined}
                   >
                     {sdPageLoading ? "Переход…" : "Вывести средства"}
                   </button>
                 </div>
+                {verificationStatus !== "VERIFIED" && (
+                  <p className="text-center text-sm text-amber-600" role="status">
+                    Вывод доступен после прохождения верификации в разделе профиля.
+                  </p>
+                )}
                 {sdPageAmount && parseFloat(sdPageAmount) > 0 && Math.round(parseFloat(sdPageAmount) * 100) > maxPayoutPerRequestKop && (
                   <p className="text-center text-sm font-medium text-red-600" role="alert">
                     Сумма превышает лимит (макс. {(maxPayoutPerRequestKop / 100).toLocaleString("ru-RU")} ₽)
@@ -350,6 +359,15 @@ export default function CabinetTransactionsPage() {
           <h3 className="font-[family:var(--font-playfair)] text-xl font-semibold text-[var(--color-text)]">
             История операций
           </h3>
+          {verificationStatus !== "VERIFIED" && (
+            <p className="mt-3 rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-[var(--color-text)]">
+              Вывод средств недоступен: верификация не пройдена. Пройдите верификацию в разделе{" "}
+              <a href="/cabinet/verification" className="font-medium text-[var(--color-brand-gold)] underline underline-offset-2 hover:no-underline">
+                Верификация
+              </a>
+              .
+            </p>
+          )}
         </div>
         {list.length === 0 ? (
           <div className="px-6 py-12 text-center text-[var(--color-text)]/90">Операций пока нет</div>

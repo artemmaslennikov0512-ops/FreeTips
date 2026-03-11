@@ -44,6 +44,8 @@ const USER_SELECT = {
   fullName: true,
   birthDate: true,
   establishment: true,
+  verificationStatus: true,
+  verificationRejectionReason: true,
 };
 
 type ListParams = {
@@ -89,6 +91,8 @@ function serializeUser(user: {
   fullName: string | null;
   birthDate: string | null;
   establishment: string | null;
+  verificationStatus: string;
+  verificationRejectionReason: string | null;
 }) {
   return {
     id: user.id,
@@ -107,6 +111,8 @@ function serializeUser(user: {
     fullName: user.fullName,
     birthDate: user.birthDate,
     establishment: user.establishment,
+    verificationStatus: user.verificationStatus,
+    verificationRejectionReason: user.verificationRejectionReason,
   };
 }
 

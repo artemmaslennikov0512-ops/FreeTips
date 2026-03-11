@@ -30,7 +30,9 @@ export default function CabinetSettingsPage() {
 
   const [editLogin, setEditLogin] = useState("");
   const [editEmail, setEditEmail] = useState("");
-  const [editFullName, setEditFullName] = useState("");
+  const [editLastName, setEditLastName] = useState("");
+  const [editFirstName, setEditFirstName] = useState("");
+  const [editPatronymic, setEditPatronymic] = useState("");
   const [editBirthDate, setEditBirthDate] = useState("");
   const [editEstablishment, setEditEstablishment] = useState("");
   const [saving, setSaving] = useState(false);
@@ -77,7 +79,10 @@ export default function CabinetSettingsPage() {
         setUser(data);
         setEditLogin(data.login);
         setEditEmail(data.email ?? "");
-        setEditFullName(data.fullName ?? "");
+        const parts = (data.fullName ?? "").trim().split(/\s+/).filter(Boolean);
+        setEditLastName(parts[0] ?? "");
+        setEditFirstName(parts[1] ?? "");
+        setEditPatronymic(parts[2] ?? "");
         setEditBirthDate(data.birthDate ?? "");
         setEditEstablishment(data.establishment ?? "");
       } catch {
@@ -95,10 +100,11 @@ export default function CabinetSettingsPage() {
     setSaveError(null);
     setSaveOk(false);
 
+    const combinedFullName = [editLastName.trim(), editFirstName.trim(), editPatronymic.trim()].filter(Boolean).join(" ");
     const payload: Record<string, unknown> = {};
     if (editLogin.trim() !== user.login) payload.login = editLogin.trim();
     if (editEmail.trim() !== (user.email ?? "")) payload.email = editEmail.trim() || "";
-    if (editFullName.trim() !== (user.fullName ?? "")) payload.fullName = editFullName.trim() || "";
+    if (combinedFullName !== (user.fullName ?? "").trim()) payload.fullName = combinedFullName || "";
     if (editBirthDate.trim() !== (user.birthDate ?? "")) payload.birthDate = editBirthDate.trim() || "";
     if (editEstablishment.trim() !== (user.establishment ?? "")) payload.establishment = editEstablishment.trim() || "";
 
@@ -196,10 +202,11 @@ export default function CabinetSettingsPage() {
     }
   };
 
+  const combinedFullNameForCompare = [editLastName.trim(), editFirstName.trim(), editPatronymic.trim()].filter(Boolean).join(" ");
   const hasProfileChanges =
     editLogin.trim() !== (user?.login ?? "") ||
     editEmail.trim() !== (user?.email ?? "") ||
-    editFullName.trim() !== (user?.fullName ?? "") ||
+    combinedFullNameForCompare !== (user?.fullName ?? "").trim() ||
     editBirthDate.trim() !== (user?.birthDate ?? "") ||
     editEstablishment.trim() !== (user?.establishment ?? "");
 
@@ -282,17 +289,39 @@ export default function CabinetSettingsPage() {
         <div className="mt-6">
           <h3 className="text-sm font-semibold text-[var(--color-text)]">Анкета</h3>
           <div className="mt-3 grid gap-4 sm:grid-cols-2">
-            <div className="sm:col-span-2">
-              <label htmlFor="settings-fullName" className="mb-1 block text-sm font-medium text-[var(--color-text)]">ФИО</label>
+            <div>
+              <label htmlFor="settings-lastName" className="mb-1 block text-sm font-medium text-[var(--color-text)]">Фамилия</label>
               <input
-                id="settings-fullName"
+                id="settings-lastName"
                 type="text"
-                value={editFullName}
-                onChange={(e) => setEditFullName(e.target.value)}
-                placeholder="Иванов Иван Иванович"
+                value={editLastName}
+                onChange={(e) => setEditLastName(e.target.value)}
+                placeholder="Иванов"
                 className={cabinetInputClassName(!!profileFieldErrors.fullName)}
               />
               {profileFieldErrors.fullName && <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{profileFieldErrors.fullName}</p>}
+            </div>
+            <div>
+              <label htmlFor="settings-firstName" className="mb-1 block text-sm font-medium text-[var(--color-text)]">Имя</label>
+              <input
+                id="settings-firstName"
+                type="text"
+                value={editFirstName}
+                onChange={(e) => setEditFirstName(e.target.value)}
+                placeholder="Иван"
+                className={cabinetInputClassName(false)}
+              />
+            </div>
+            <div className="sm:col-span-2">
+              <label htmlFor="settings-patronymic" className="mb-1 block text-sm font-medium text-[var(--color-text)]">Отчество</label>
+              <input
+                id="settings-patronymic"
+                type="text"
+                value={editPatronymic}
+                onChange={(e) => setEditPatronymic(e.target.value)}
+                placeholder="Иванович"
+                className={cabinetInputClassName(false)}
+              />
             </div>
             <div>
               <label htmlFor="settings-birthDate" className="mb-1 block text-sm font-medium text-[var(--color-text)]">Дата рождения</label>

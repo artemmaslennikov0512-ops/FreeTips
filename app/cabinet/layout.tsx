@@ -264,13 +264,13 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
         </nav>
       </div>
 
-      <main className="min-h-screen min-w-0 flex-1 overflow-x-hidden pl-4 pr-4 lg:pl-0 lg:pr-4 lg:ml-0 lg:mr-0 flex flex-col">
-        {/* Основной блок — с отступом от левого и правого краёв, справа не заходит под скроллбар */}
+      <main className="min-h-screen min-w-0 flex-1 overflow-x-hidden px-2 pt-2 pb-4 md:pt-4 md:px-4 lg:pl-0 lg:pr-4 lg:ml-0 lg:mr-0 flex flex-col">
+        {/* Основной блок — на мобильном на всю ширину с минимальными отступами, на десктопе с отступом слева */}
         <div
-          className="cabinet-main-block mt-4 mr-0 mb-4 ml-0 lg:mr-0 lg:ml-4 flex w-full max-w-full flex-col self-start rounded-[10px] border border-white/10 backdrop-blur-xl"
+          className="cabinet-main-block mt-0 md:mt-4 mr-0 mb-0 md:mb-4 ml-0 lg:mr-0 lg:ml-4 flex w-full max-w-full flex-col self-start rounded-lg md:rounded-[10px] border border-white/10 backdrop-blur-xl"
           style={mainBlockStyle}
         >
-          <div className="p-6 lg:p-8" id="main-content">
+          <div className="p-4 md:p-6 lg:p-8" id="main-content">
             <div className="mb-4 lg:hidden">
               <button
                 type="button"

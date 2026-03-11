@@ -346,7 +346,7 @@ export default function CabinetTransactionsPage() {
       )}
 
       <div id="operations-history" className="cabinet-card overflow-hidden rounded-xl border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)]">
-        <div className="border-0 px-6 py-5">
+        <div className="border-0 px-4 py-4 md:px-6 md:py-5">
           <h3 className="font-[family:var(--font-playfair)] text-xl font-semibold text-[var(--color-text)]">
             История операций
           </h3>
@@ -401,6 +401,38 @@ export default function CabinetTransactionsPage() {
                 </div>
               ))}
             </div>
+
+            {/* Мобильная версия: пагинация под списком операций */}
+            {totalPages > 1 && (
+              <div className="flex flex-wrap items-center justify-between gap-4 border-t border-[var(--color-brand-gold)]/20 px-4 py-4 md:hidden">
+                <p className="text-sm text-[var(--color-text)]/90">
+                  Показано {(currentPage - 1) * PER_PAGE + 1}–{Math.min(currentPage * PER_PAGE, list.length)} из {list.length}
+                </p>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                    disabled={currentPage <= 1}
+                    className="inline-flex h-9 min-w-[36px] items-center justify-center rounded-lg border border-[var(--color-brand-gold)]/20 bg-transparent px-2 text-sm font-medium text-[var(--color-text)] transition-colors hover:bg-[var(--color-dark-gray)]/10 disabled:opacity-40 disabled:pointer-events-none"
+                    aria-label="Предыдущая страница"
+                  >
+                    <ChevronLeft className="h-5 w-5" />
+                  </button>
+                  <span className="text-sm text-[var(--color-text)]/90">
+                    {currentPage} из {totalPages}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                    disabled={currentPage >= totalPages}
+                    className="inline-flex h-9 min-w-[36px] items-center justify-center rounded-lg border border-[var(--color-brand-gold)]/20 bg-transparent px-2 text-sm font-medium text-[var(--color-text)] transition-colors hover:bg-[var(--color-dark-gray)]/10 disabled:opacity-40 disabled:pointer-events-none"
+                    aria-label="Следующая страница"
+                  >
+                    <ChevronRight className="h-5 w-5" />
+                  </button>
+                </div>
+              </div>
+            )}
 
             {/* Десктоп: таблица */}
             <div className="hidden overflow-x-auto md:block">

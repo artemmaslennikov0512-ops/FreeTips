@@ -78,6 +78,7 @@ certbot --nginx -d free-tips.ru
 server {
     listen 80;
     server_name free-tips.ru www.free-tips.ru;
+    client_max_body_size 10M;
     location / {
         proxy_pass http://127.0.0.1:3000;
         proxy_http_version 1.1;

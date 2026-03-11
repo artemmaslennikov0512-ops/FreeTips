@@ -200,16 +200,16 @@ export default function CabinetDashboardPage() {
             </div>
 
             {verificationStatus && (
-              <div className="cabinet-limits-block cabinet-verification-status mt-6 rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 p-5">
+              <div className="cabinet-limits-block cabinet-verification-status mt-6 w-full min-w-0 max-w-full rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 p-5">
                 {verificationStatus === "VERIFIED" ? (
-                  <div className="flex items-center justify-center gap-3 text-center">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-green-600/20 text-green-500">
-                      <ShieldCheck className="h-5 w-5" />
+                  <div className="flex w-full min-w-0 max-w-full flex-col items-center gap-2 text-center">
+                    <div className="flex flex-wrap items-center justify-center gap-2">
+                      <span className="font-semibold leading-none text-white">Аккаунт верифицирован!</span>
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-green-600/20 text-green-500">
+                        <ShieldCheck className="h-5 w-5" aria-hidden />
+                      </div>
                     </div>
-                    <div>
-                      <p className="font-semibold text-[var(--color-text)]">Аккаунт верифицирован!</p>
-                      <p className="text-sm text-[var(--color-text)]/80">Ваша личность подтверждена.</p>
-                    </div>
+                    <p className="text-sm text-white/90">Ваша личность подтверждена.</p>
                   </div>
                 ) : verificationStatus === "PENDING" ? (
                   <div className="flex items-center justify-center gap-3 text-center">

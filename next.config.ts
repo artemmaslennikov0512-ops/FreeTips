@@ -5,6 +5,10 @@ const PAYGINE_ORIGINS = "https://test.paygine.com https://pay.paygine.com";
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  experimental: {
+    // Лимит тела запроса для загрузки файлов (верификация — до 10 МБ)
+    proxyClientMaxBodySize: "10mb",
+  },
   async redirects() {
     return [{ source: "/favicon.ico", destination: "/icon-32x32", permanent: false }];
   },

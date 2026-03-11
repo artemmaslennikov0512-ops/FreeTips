@@ -221,14 +221,16 @@ export default function CabinetVerificationPage() {
         <h1 className="font-[family:var(--font-playfair)] text-xl font-semibold text-[var(--color-text)] text-center">
           Верификация
         </h1>
-        <div className="mx-auto flex w-fit max-w-xl flex-col items-center rounded-xl border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 p-6 text-center">
-          <div className="flex items-center justify-center gap-3">
-            <span className="font-semibold leading-none text-white">Аккаунт верифицирован</span>
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-green-600/20 text-green-500">
-              <ShieldCheck className="h-5 w-5" aria-hidden />
+        <div className="mx-auto w-full min-w-0 max-w-full rounded-xl border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 p-6 text-center sm:max-w-xl">
+          <div className="flex flex-col items-center gap-2">
+            <div className="flex flex-wrap items-center justify-center gap-2">
+              <span className="font-semibold leading-none text-white">Аккаунт верифицирован</span>
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-green-600/20 text-green-500">
+                <ShieldCheck className="h-5 w-5" aria-hidden />
+              </div>
             </div>
+            <p className="text-sm text-white/90">Ваша личность подтверждена. Вы можете пользоваться всеми услугами сервиса.</p>
           </div>
-          <p className="mt-3 text-sm text-white/90">Ваша личность подтверждена. Вы можете пользоваться всеми услугами сервиса.</p>
         </div>
       </div>
     );
@@ -283,9 +285,9 @@ export default function CabinetVerificationPage() {
             </span>
           </div>
         </div>
-        <div className="p-6">
+        <div className="min-w-0 p-6">
           {step === 1 && (
-            <div className="space-y-4">
+            <div className="min-w-0 space-y-4">
               <p className="text-xs text-white/70">Все поля обязательны для заполнения.</p>
               <div>
                 <label className="mb-1.5 block text-sm font-medium text-white">ФИО <span className="text-red-400">*</span></label>
@@ -299,13 +301,13 @@ export default function CabinetVerificationPage() {
                 />
                 {fieldErrors.fullName && <p className="mt-1 text-sm text-red-500">{fieldErrors.fullName}</p>}
               </div>
-              <div>
+              <div className="min-w-0">
                 <label className="mb-1.5 block text-sm font-medium text-white">Дата рождения <span className="text-red-400">*</span></label>
                 <input
                   type="date"
                   value={birthDate}
                   onChange={(e) => setBirthDate(e.target.value)}
-                  className={cabinetInputClassName(!!fieldErrors.birthDate)}
+                  className={`${cabinetInputClassName(!!fieldErrors.birthDate)} min-w-0 max-w-full`}
                   required
                 />
                 {fieldErrors.birthDate && <p className="mt-1 text-sm text-red-500">{fieldErrors.birthDate}</p>}

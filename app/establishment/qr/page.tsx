@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { FileDown, QrCode, ImageIcon } from "lucide-react";
+import { useEffect, useState, useCallback } from "react";
+import { FileDown, QrCode, ImageIcon, X } from "lucide-react";
 import { authHeaders } from "@/lib/auth-client";
 
 export default function EstablishmentQrPage() {
@@ -10,6 +10,8 @@ export default function EstablishmentQrPage() {
   const [info, setInfo] = useState<{ name: string; employeesCount: number } | null>(null);
   const [activeCount, setActiveCount] = useState<number>(0);
   const [downloading, setDownloading] = useState(false);
+  const [pdfPreviewUrl, setPdfPreviewUrl] = useState<string | null>(null);
+  const [previewLoading, setPreviewLoading] = useState(false);
 
   useEffect(() => {
     const load = async () => {
@@ -60,28 +62,39 @@ export default function EstablishmentQrPage() {
     }
   };
 
-  const openPreview = async () => {
-    const w = window.open("", "_blank");
-    if (!w) {
-      alert("Разрешите всплывающие окна для предпросмотра");
-      return;
-    }
+  const openPreview = useCallback(async () => {
+    setPreviewLoading(true);
+    setPdfPreviewUrl(null);
     try {
       const res = await fetch("/api/establishment/employees/pdf", { headers: authHeaders() });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        w.close();
         alert(data?.error ?? "Ошибка загрузки");
+        setPreviewLoading(false);
         return;
       }
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
-      w.location.href = url;
+      setPdfPreviewUrl(url);
     } catch {
-      w.close();
       alert("Ошибка загрузки");
+    } finally {
+      setPreviewLoading(false);
     }
-  };
+  }, []);
+
+  const closePreview = useCallback(() => {
+    if (pdfPreviewUrl) {
+      URL.revokeObjectURL(pdfPreviewUrl);
+      setPdfPreviewUrl(null);
+    }
+  }, [pdfPreviewUrl]);
+
+  useEffect(() => {
+    return () => {
+      if (pdfPreviewUrl) URL.revokeObjectURL(pdfPreviewUrl);
+    };
+  }, [pdfPreviewUrl]);
 
   if (loading) {
     return <div className="text-white/90">Загрузка…</div>;
@@ -131,13 +144,33 @@ export default function EstablishmentQrPage() {
           <button
             type="button"
             onClick={openPreview}
-            disabled={activeCount === 0}
+            disabled={activeCount === 0 || previewLoading}
             className="inline-flex items-center gap-2 rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-4 py-2.5 font-medium text-white hover:bg-[var(--color-dark-gray)]/20 disabled:opacity-50"
           >
-            <ImageIcon className="h-5 w-5" />
-            Предпросмотр
+            <ImageIcon className={`h-5 w-5 ${previewLoading ? "animate-pulse" : ""}`} />
+            {previewLoading ? "Загрузка…" : "Предпросмотр"}
           </button>
         </div>
+
+        {pdfPreviewUrl && (
+          <div className="fixed inset-0 z-50 flex flex-col bg-[#0a192f]/95">
+            <div className="flex shrink-0 items-center justify-between border-b border-[var(--color-brand-gold)]/20 bg-[var(--color-charcoal)] px-4 py-3">
+              <span className="font-medium text-white">Предпросмотр PDF</span>
+              <button
+                type="button"
+                onClick={closePreview}
+                className="flex items-center gap-2 rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-4 py-2 font-medium text-white hover:bg-[var(--color-dark-gray)]/20"
+              >
+                <X className="h-5 w-5" /> Закрыть
+              </button>
+            </div>
+            <iframe
+              src={pdfPreviewUrl}
+              title="Предпросмотр карточек"
+              className="min-h-0 flex-1 w-full border-0"
+            />
+          </div>
+        )}
 
         {activeCount === 0 && (
           <p className="mt-4 text-sm text-amber-200">

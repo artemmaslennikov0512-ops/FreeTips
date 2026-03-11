@@ -137,14 +137,14 @@ export default function EstablishmentBrandPage() {
           <Palette className="h-5 w-5" />
           Бренд заведения
         </h1>
-        <p className="text-white/90 text-sm mt-1">
+        <p className="text-white/90 text-sm mt-1 text-center">
           Логотип и цвета отображаются на странице оплаты чаевых и в кабинете официанта. Меняйте поля — превью обновится сразу.
         </p>
       </div>
 
       {/* Превью в реальном времени: основной фон, доп. цвет = фон блока, фон блоков, цвет текста */}
       <div className="cabinet-card rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden">
-        <div className="border-b border-white/10 px-4 py-3">
+        <div className="border-b border-white/10 px-4 py-3 text-center">
           <span className="text-sm font-medium text-white/90">Превью: как увидят гости и официанты</span>
         </div>
         <div
@@ -218,7 +218,7 @@ export default function EstablishmentBrandPage() {
             </button>
           </div>
           <p className="text-xs text-center opacity-70" style={{ color: fontColor && /^#[0-9A-Fa-f]{6}$/i.test(fontColor) ? fontColor : undefined }}>
-            Основной фон · Доп. цвет = фон карточки · Фон блоков · Цвет текста · Обводка
+            {""}
           </p>
         </div>
       </div>

@@ -1606,6 +1606,21 @@ html:not([data-theme="dark"]) .admin-panel select:focus {
   box-shadow: 0 0 0 2px rgba(197, 165, 114, 0.4);
 }
 
+/* Модалка «Редактировать сотрудника» — всегда тёмная (и в светлой теме кабинета заведения) */
+.establishment-edit-modal {
+  background-color: #1e2a3a !important;
+}
+.establishment-edit-modal h2,
+.establishment-edit-modal label,
+.establishment-edit-modal .cabinet-input-window,
+.establishment-edit-modal .cabinet-input-window::placeholder {
+  color: rgba(255, 255, 255, 0.95) !important;
+}
+.establishment-edit-modal .cabinet-input-window {
+  background: rgba(45, 55, 72, 0.6) !important;
+  border-color: rgba(197, 165, 114, 0.35) !important;
+}
+
 /* Поле поиска в админке «Пользователи» — белый текст ввода */
 .admin-panel .admin-users-search-input {
   color: #ffffff !important;

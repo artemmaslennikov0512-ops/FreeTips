@@ -336,8 +336,8 @@ export default function EstablishmentTeamPage() {
       )}
 
       {editEmployee && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0a192f]/80 backdrop-blur-sm">
-          <div className="cabinet-card w-full max-w-md rounded-[10px] border border-[var(--color-brand-gold)]/30 bg-[var(--color-charcoal)] shadow-[var(--shadow-card)] overflow-hidden">
+        <div className="fixed inset-0 z-50 grid place-items-center p-4 bg-black/70 backdrop-blur-sm">
+          <div className="establishment-edit-modal w-full max-w-md rounded-[10px] border border-[var(--color-brand-gold)]/30 bg-[#1e2a3a] shadow-[var(--shadow-card)] overflow-hidden">
             <form onSubmit={handleSaveEdit} className="p-6 space-y-4">
               <h2 className="text-lg font-medium text-white">Редактировать сотрудника</h2>
               {editError && <p className="text-sm text-[var(--color-accent-red)]">{editError}</p>}

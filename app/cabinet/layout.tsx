@@ -13,6 +13,7 @@ import {
   MessageCircle,
   ShieldCheck,
   BadgeCheck,
+  Building2,
 } from "lucide-react";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
@@ -32,6 +33,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
   const [mounted, setMounted] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [user, setUser] = useState<{
+    role?: string;
     fullName?: string | null;
     verificationStatus?: string;
     establishmentBrand?: {
@@ -97,6 +99,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
           return;
         }
         if (data) setUser({
+          role: data.role,
           fullName: data.fullName,
           verificationStatus: data.verificationStatus,
           establishmentBrand: data.establishmentBrand ?? null,
@@ -261,6 +264,17 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
               )}
             </Link>
           ))}
+          {user?.role === "ESTABLISHMENT_ADMIN" && (
+            <Link
+              href="/establishment"
+              onClick={closeSidebar}
+              className="mt-2 flex items-center gap-3 rounded-[10px] px-4 py-3.5 font-medium text-[var(--color-text)]/80 transition-colors hover:bg-[var(--color-dark-gray)]/10 hover:text-[var(--color-text)]"
+              style={brandFont ? { color: `${brandFont}cc` } : undefined}
+            >
+              <Building2 className="h-5 w-5 shrink-0" />
+              <span>Кабинет заведения</span>
+            </Link>
+          )}
           <button
             type="button"
             onClick={handleLogout}
@@ -274,9 +288,9 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
       </div>
 
       <main className="min-h-screen min-w-0 flex-1 overflow-x-hidden px-0 pt-2 pb-4 md:px-4 lg:pl-0 lg:pr-4 lg:ml-0 lg:mr-0 flex flex-col">
-        {/* Основной блок — выровнен по сайдбару по верхнему краю */}
+        {/* Основной блок — тянется до низа страницы с отступом */}
         <div
-          className="cabinet-main-block mt-0 mr-0 mb-0 md:mb-4 ml-0 lg:mr-0 lg:ml-4 flex w-full max-w-full flex-col self-start rounded-lg md:rounded-[10px] border border-white/10 backdrop-blur-xl"
+          className="cabinet-main-block mt-0 mr-0 mb-4 ml-0 lg:mr-4 lg:ml-4 flex min-h-0 flex-1 w-full max-w-full flex-col rounded-lg md:rounded-[10px] border border-white/10 backdrop-blur-xl"
           style={mainBlockStyle}
         >
           <div className="p-4 md:p-6 lg:p-8" id="main-content">

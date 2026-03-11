@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { PieChart, Plus, Pencil, Trash2 } from "lucide-react";
 import { authHeaders } from "@/lib/auth-client";
+import { CustomDropdown } from "@/components/CustomDropdown";
 
 interface PayoutRule {
   id: string;
@@ -151,17 +152,17 @@ export default function PayoutRulesPage() {
             )}
             {!editingId && (
               <div>
-                <label className="block text-sm text-white/90 mb-1">Тип</label>
-                <select
+                <CustomDropdown
+                  id="payout-rules-type"
+                  variant="establishment"
+                  label="Тип"
                   value={formType}
-                  onChange={(e) =>
-                    setFormType(e.target.value as "establishment_share" | "charity")
-                  }
-                  className="cabinet-input-window w-full rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-white focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-gold)]/40"
-                >
-                  <option value="establishment_share">Доля заведения</option>
-                  <option value="charity">В фонд / благотворительность</option>
-                </select>
+                  onChange={(v) => setFormType(v as "establishment_share" | "charity")}
+                  options={[
+                    { value: "establishment_share", label: "Доля заведения" },
+                    { value: "charity", label: "В фонд / благотворительность" },
+                  ]}
+                />
               </div>
             )}
             <div>

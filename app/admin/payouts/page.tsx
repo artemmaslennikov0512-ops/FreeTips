@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Send, CheckCircle2, XCircle } from "lucide-react";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
+import { CustomDropdown } from "@/components/CustomDropdown";
 import { formatDate, formatMoneyCompact } from "@/lib/utils";
 
 interface Payout {
@@ -177,18 +178,21 @@ export default function AdminPayoutsPage() {
 
   return (
     <div className="min-w-0 max-w-full">
-      <div className="mb-6">
-        <select
+      <div className="mb-6 w-full max-w-xs">
+        <CustomDropdown
+          id="admin-payouts-status"
+          variant="admin"
           value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          className="cabinet-section-header rounded-xl border-0 px-4 py-2 text-sm text-white focus:outline-none"
-        >
-          <option value="">Все статусы</option>
-          <option value="CREATED">Создана</option>
-          <option value="PROCESSING">В обработке</option>
-          <option value="COMPLETED">Выполнена</option>
-          <option value="REJECTED">Отклонена</option>
-        </select>
+          onChange={setStatusFilter}
+          placeholder="Все статусы"
+          options={[
+            { value: "", label: "Все статусы" },
+            { value: "CREATED", label: "Создана" },
+            { value: "PROCESSING", label: "В обработке" },
+            { value: "COMPLETED", label: "Выполнена" },
+            { value: "REJECTED", label: "Отклонена" },
+          ]}
+        />
       </div>
 
       {/* Мобильная версия: карточки */}

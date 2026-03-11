@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { User, Calendar, Building2, Phone, Briefcase, Mail, Users, ArrowRight, ArrowLeft } from "lucide-react";
+import { User, Calendar, Building2, Phone, Briefcase, Mail, Users, ArrowRight, ArrowLeft, ChevronDown } from "lucide-react";
 import { site } from "@/config/site";
 import { AuthPageShell } from "@/components/AuthPageShell";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
@@ -51,6 +51,27 @@ export default function ZayavkaPage() {
   const [success, setSuccess] = useState(false);
   const [formData, setFormData] = useState(initialFormData);
   const [step, setStep] = useState<1 | 2>(1);
+  const [requestTypeDropdownOpen, setRequestTypeDropdownOpen] = useState(false);
+  const requestTypeDropdownRef = useRef<HTMLDivElement>(null);
+
+  const closeRequestTypeDropdown = useCallback(() => setRequestTypeDropdownOpen(false), []);
+  useEffect(() => {
+    if (!requestTypeDropdownOpen) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (requestTypeDropdownRef.current && !requestTypeDropdownRef.current.contains(e.target as Node)) {
+        closeRequestTypeDropdown();
+      }
+    };
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeRequestTypeDropdown();
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleEscape);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, [requestTypeDropdownOpen, closeRequestTypeDropdown]);
 
   /** Форматирование национальной части: 10 цифр → (XXX) XXX-XX-XX */
   const formatPhoneNational = (digits: string): string => {
@@ -69,13 +90,6 @@ export default function ZayavkaPage() {
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>, field: "phone" | "adminContactPhone") => {
     const digits = normalizePhoneDigits(e.target.value);
     setFormData((prev) => ({ ...prev, [field]: digits }));
-  };
-
-  const handleRequestTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const v = e.target.value as RequestType;
-    setFormData((prev) => ({ ...prev, requestType: v }));
-    setFieldErrors({});
-    setStep(1);
   };
 
   const isEstablishment = formData.requestType === "establishment";
@@ -229,22 +243,58 @@ export default function ZayavkaPage() {
                     Тип подключения
                   </h2>
                   <div>
-                    <label htmlFor="zayavka-requestType" className="mb-1.5 block text-center text-sm font-medium text-[var(--color-text)]">
+                    <label id="zayavka-requestType-label" className="mb-1.5 block text-center text-sm font-medium text-[var(--color-text)]">
                       Подключается
                     </label>
-                    <div className="zayavka-select-wrap relative rounded-xl border border-[var(--color-brand-gold)]/25 bg-[var(--color-light-gray)] focus-within:border-[var(--color-brand-gold)]/50 focus-within:ring-2 focus-within:ring-[var(--color-brand-gold)]/30 focus-within:ring-offset-2 focus-within:ring-offset-[var(--color-bg)]">
-                      <Building2 className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--color-muted)] pointer-events-none z-10" />
-                      <select
+                    <div ref={requestTypeDropdownRef} className="zayavka-select-wrap zayavka-custom-dropdown relative rounded-xl border border-[var(--color-brand-gold)]/25 bg-[var(--color-light-gray)] focus-within:border-[var(--color-brand-gold)]/50 focus-within:ring-2 focus-within:ring-[var(--color-brand-gold)]/30 focus-within:ring-offset-2 focus-within:ring-offset-[var(--color-bg)]">
+                      <button
+                        type="button"
                         id="zayavka-requestType"
-                        value={formData.requestType}
-                        onChange={handleRequestTypeChange}
-                        className="zayavka-select w-full rounded-xl border-0 bg-transparent py-2.5 pl-10 pr-10 text-[var(--color-text)] appearance-none cursor-pointer focus:outline-none font-[family:var(--font-inter)] text-base"
+                        onClick={() => setRequestTypeDropdownOpen((o) => !o)}
+                        className="zayavka-select zayavka-custom-dropdown-trigger flex w-full items-center gap-2 rounded-xl border-0 bg-transparent py-2.5 pl-10 pr-10 text-left text-[var(--color-text)] cursor-pointer focus:outline-none font-[family:var(--font-inter)] text-base"
+                        aria-haspopup="listbox"
+                        aria-expanded={requestTypeDropdownOpen}
+                        aria-labelledby="zayavka-requestType-label"
                         aria-describedby="zayavka-requestType-desc"
+                        aria-activedescendant={requestTypeDropdownOpen ? `zayavka-requestType-option-${formData.requestType}` : undefined}
                       >
-                        <option value="establishment">Заведение</option>
-                        <option value="individual">Получатель чаевых</option>
-                      </select>
-                      <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-[var(--color-muted)]" aria-hidden="true">▼</span>
+                        <Building2 className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--color-muted)] pointer-events-none shrink-0" aria-hidden />
+                        <span className="flex-1 min-w-0">
+                          {formData.requestType === "establishment" ? "Заведение" : "Получатель чаевых"}
+                        </span>
+                        <ChevronDown className={`absolute right-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--color-muted)] shrink-0 transition-transform duration-200 pointer-events-none ${requestTypeDropdownOpen ? "rotate-180" : ""}`} aria-hidden />
+                      </button>
+                      <div
+                        role="listbox"
+                        aria-labelledby="zayavka-requestType-label"
+                        id="zayavka-requestType-listbox"
+                        className={`zayavka-custom-dropdown-panel absolute left-0 right-0 top-full z-20 mt-1 overflow-hidden rounded-xl border border-[var(--color-brand-gold)]/20 bg-[var(--color-bg-sides)] shadow-[var(--shadow-card)] transition-[opacity,transform] duration-200 ${
+                          requestTypeDropdownOpen ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1 pointer-events-none invisible"
+                        }`}
+                      >
+                        {(["establishment", "individual"] as const).map((value) => (
+                          <button
+                            key={value}
+                            type="button"
+                            role="option"
+                            id={`zayavka-requestType-option-${value}`}
+                            aria-selected={formData.requestType === value}
+                            onClick={() => {
+                              setFormData((prev) => ({ ...prev, requestType: value }));
+                              setFieldErrors({});
+                              setStep(1);
+                              setRequestTypeDropdownOpen(false);
+                            }}
+                            className={`zayavka-custom-dropdown-option w-full flex items-center gap-2 px-4 py-3 text-left text-sm font-medium transition-colors ${
+                              formData.requestType === value
+                                ? "bg-[var(--color-navy)] text-white"
+                                : "text-[var(--color-text)] hover:bg-[var(--color-light-gray)]"
+                            }`}
+                          >
+                            {value === "establishment" ? "Заведение" : "Получатель чаевых"}
+                          </button>
+                        ))}
+                      </div>
                     </div>
                     <p id="zayavka-requestType-desc" className="zayavka-hint mt-1 text-center text-[var(--color-muted)]">
                       {isEstablishment ? "Данные компании и контактного лица" : "Официант, курьер и т.д. — с контактом администратора для подтверждения"}

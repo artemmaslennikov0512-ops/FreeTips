@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { Palette, ChevronDown, Printer, Smartphone, LayoutDashboard, FileDown, ImageIcon, X } from "lucide-react";
+import { Palette, Printer, Smartphone, LayoutDashboard, FileDown, ImageIcon, X } from "lucide-react";
 import { authHeaders } from "@/lib/auth-client";
+import { CustomDropdown } from "@/components/CustomDropdown";
 import { getBaseUrl } from "@/lib/get-base-url";
 
 type BrandGroup = "print" | "pay" | "cabinet";
@@ -333,21 +334,14 @@ export default function EstablishmentBrandPage() {
 
       {/* Выбор группы: выпадающий список */}
       <div className="cabinet-card rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] p-4">
-        <label className="block text-sm font-medium text-white/90 mb-2">Режим настройки</label>
-        <div className="relative">
-          <select
-            value={activeGroup}
-            onChange={(e) => setActiveGroup(e.target.value as BrandGroup)}
-            className="cabinet-input-window w-full appearance-none rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 pl-4 pr-10 py-3 text-white focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-gold)]/40 cursor-pointer"
-          >
-            {BRAND_GROUPS.map((g) => (
-              <option key={g.value} value={g.value} className="bg-[#1e293b] text-white">
-                {g.label}
-              </option>
-            ))}
-          </select>
-          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-white/60 pointer-events-none" />
-        </div>
+        <CustomDropdown
+          id="establishment-brand-group"
+          variant="establishment"
+          label="Режим настройки"
+          value={activeGroup}
+          onChange={(v) => setActiveGroup(v as BrandGroup)}
+          options={BRAND_GROUPS.map((g) => ({ value: g.value, label: g.label }))}
+        />
         <p className="mt-2 text-xs text-white/70">
           {BRAND_GROUPS.find((g) => g.value === activeGroup)?.description}
         </p>

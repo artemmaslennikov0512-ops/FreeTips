@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { BarChart3, Download } from "lucide-react";
 import { authHeaders } from "@/lib/auth-client";
+import { CustomDropdown } from "@/components/CustomDropdown";
 
 interface Stats {
   totalTipsKop: number;
@@ -82,14 +83,18 @@ export default function AnalyticsPage() {
           Аналитика
         </h1>
         <div className="flex items-center gap-2">
-          <select
-            value={period}
-            onChange={(e) => setPeriod(e.target.value as "7d" | "30d")}
-            className="cabinet-input-window rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-white focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-gold)]/40"
-          >
-            <option value="7d">За 7 дней</option>
-            <option value="30d">За 30 дней</option>
-          </select>
+          <div className="min-w-[8rem]">
+            <CustomDropdown
+              id="analytics-period"
+              variant="establishment"
+              value={period}
+              onChange={(v) => setPeriod(v as "7d" | "30d")}
+              options={[
+                { value: "7d", label: "За 7 дней" },
+                { value: "30d", label: "За 30 дней" },
+              ]}
+            />
+          </div>
           <button
             type="button"
             onClick={exportCsv}

@@ -1933,6 +1933,25 @@ html:not([data-theme="dark"]) .zayavka-page .zayavka-card a:not(.auth-btn-primar
 .layout-zayavka .zayavka-select-wrap {
   transition: border-color 0.2s, box-shadow 0.2s;
 }
+.layout-zayavka .zayavka-custom-dropdown-trigger:focus-visible {
+  outline: none;
+}
+.layout-zayavka .zayavka-custom-dropdown-panel {
+  max-height: 12rem;
+  box-shadow: var(--shadow-card), 0 0 0 1px rgba(10, 25, 47, 0.06);
+}
+.layout-zayavka .zayavka-custom-dropdown-option {
+  font-family: var(--font-inter), system-ui, sans-serif;
+}
+.layout-zayavka .zayavka-custom-dropdown-option:first-child {
+  border-radius: 10px 10px 0 0;
+}
+.layout-zayavka .zayavka-custom-dropdown-option:last-child {
+  border-radius: 0 0 10px 10px;
+}
+.layout-zayavka .zayavka-custom-dropdown-option:only-child {
+  border-radius: 10px;
+}
 [data-theme="dark"] .layout-zayavka .zayavka-select-wrap {
   background: rgba(255, 255, 255, 0.08) !important;
   border-color: rgba(197, 165, 114, 0.35) !important;
@@ -1940,19 +1959,119 @@ html:not([data-theme="dark"]) .zayavka-page .zayavka-card a:not(.auth-btn-primar
 [data-theme="dark"] .layout-zayavka .zayavka-select {
   color: #fafafa !important;
 }
-/* Опции выпадающего списка — тот же шрифт и фон, что и у поля (единый вид) */
-.layout-zayavka select option {
-  font-family: var(--font-inter), system-ui, sans-serif;
-  font-size: 1rem;
-  padding: 0.5rem;
+[data-theme="dark"] .layout-zayavka .zayavka-custom-dropdown-panel {
+  background: var(--color-bg-sides) !important;
+  border-color: rgba(197, 165, 114, 0.25) !important;
+  box-shadow: var(--shadow-card), 0 0 0 1px rgba(255, 255, 255, 0.06);
 }
-html:not([data-theme="dark"]) .layout-zayavka select option {
-  background: #f8f9fa;
-  color: #0a192f;
+[data-theme="dark"] .layout-zayavka .zayavka-custom-dropdown-option {
+  color: var(--color-text);
 }
-[data-theme="dark"] .layout-zayavka select option {
-  background: #262626;
-  color: #fafafa;
+[data-theme="dark"] .layout-zayavka .zayavka-custom-dropdown-option[aria-selected="true"] {
+  background: var(--color-brand-gold) !important;
+  color: #0a192f !important;
+}
+[data-theme="dark"] .layout-zayavka .zayavka-custom-dropdown-option:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* Общий компонент CustomDropdown (админка, кабинет заведения) */
+.custom-dropdown-panel {
+  max-height: 14rem;
+  box-shadow: var(--shadow-card), 0 0 0 1px rgba(10, 25, 47, 0.06);
+}
+.custom-dropdown-panel-admin {
+  border-radius: 0.75rem;
+}
+.custom-dropdown-panel button[role="option"]:first-child {
+  border-radius: 10px 10px 0 0;
+}
+.custom-dropdown-panel button[role="option"]:last-child {
+  border-radius: 0 0 10px 10px;
+}
+.custom-dropdown-panel button[role="option"]:only-child {
+  border-radius: 10px;
+}
+.admin-panel .custom-dropdown-admin .custom-dropdown-panel-admin {
+  border-color: rgba(255, 255, 255, 0.12);
+}
+.establishment-panel .custom-dropdown-establishment .custom-dropdown-panel-establishment,
+.cabinet-card .custom-dropdown-establishment .custom-dropdown-panel-establishment {
+  border-color: rgba(197, 165, 114, 0.25);
+}
+
+/* CustomDropdown: тёмная тема — единый вид для админки, заведения и default */
+[data-theme="dark"] .custom-dropdown-admin .custom-dropdown-panel-admin {
+  background: var(--color-bg-sides) !important;
+  border-color: rgba(255, 255, 255, 0.12);
+}
+[data-theme="dark"] .custom-dropdown-admin button[role="option"] {
+  color: var(--color-text);
+}
+[data-theme="dark"] .custom-dropdown-admin button[role="option"]:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+[data-theme="dark"] .custom-dropdown-admin button[role="option"][aria-selected="true"] {
+  background: var(--color-brand-gold) !important;
+  color: #0a192f !important;
+}
+[data-theme="dark"] .custom-dropdown-admin .custom-dropdown-trigger-admin {
+  color: var(--color-text) !important;
+  background: var(--color-bg-sides) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+[data-theme="dark"] .custom-dropdown-admin label {
+  color: var(--color-text) !important;
+}
+
+[data-theme="dark"] .custom-dropdown-establishment {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border-color: rgba(197, 165, 114, 0.3);
+}
+[data-theme="dark"] .custom-dropdown-establishment .custom-dropdown-panel-establishment {
+  background: var(--color-bg-sides) !important;
+  border-color: rgba(255, 255, 255, 0.12);
+}
+[data-theme="dark"] .custom-dropdown-establishment button[role="option"] {
+  color: var(--color-text);
+}
+[data-theme="dark"] .custom-dropdown-establishment button[role="option"]:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+[data-theme="dark"] .custom-dropdown-establishment button[role="option"][aria-selected="true"] {
+  background: var(--color-brand-gold) !important;
+  color: #0a192f !important;
+}
+[data-theme="dark"] .custom-dropdown-establishment button[type="button"]:first-of-type {
+  color: var(--color-text);
+}
+[data-theme="dark"] .custom-dropdown-establishment label {
+  color: var(--color-text) !important;
+}
+
+[data-theme="dark"] .custom-dropdown-default {
+  background: var(--color-bg-sides) !important;
+  border-color: rgba(197, 165, 114, 0.35);
+}
+[data-theme="dark"] .custom-dropdown-default .custom-dropdown-panel-default {
+  background: var(--color-bg-sides) !important;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+[data-theme="dark"] .custom-dropdown-default button[role="option"] {
+  color: var(--color-text);
+}
+[data-theme="dark"] .custom-dropdown-default button[role="option"]:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+[data-theme="dark"] .custom-dropdown-default button[role="option"][aria-selected="true"] {
+  background: var(--color-brand-gold) !important;
+  color: #0a192f !important;
+}
+[data-theme="dark"] .custom-dropdown-default button[type="button"]:first-of-type {
+  color: var(--color-text);
+}
+[data-theme="dark"] .custom-dropdown-default label {
+  color: var(--color-text) !important;
 }
 
 /* Подсказки под полями заявки — мелкий шрифт, перебивает глобальный p */

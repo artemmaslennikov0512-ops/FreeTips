@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Search, Copy, Filter, ArrowUpDown, Lock, Check } from "lucide-react";
 import Link from "next/link";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
+import { CustomDropdown } from "@/components/CustomDropdown";
 import { getBaseUrl } from "@/lib/get-base-url";
 import { formatDate, formatMoneyCompact } from "@/lib/utils";
 
@@ -317,39 +318,54 @@ export default function AdminUsersPage() {
           <Filter className="h-4 w-4" />
           <span>Фильтры:</span>
         </div>
-        <select
-          value={roleFilter}
-          onChange={(e) => setRoleFilter(e.target.value)}
-          className="rounded-lg cabinet-section-header border-0 px-3 py-2 text-sm text-white focus:outline-none"
-        >
-          <option value="">Все роли</option>
-          <option value="RECIPIENT">Получатель</option>
-          <option value="ADMIN">Админ</option>
-          <option value="ESTABLISHMENT_ADMIN">Управляющий заведения</option>
-          <option value="EMPLOYEE">Официант</option>
-        </select>
-        <select
-          value={blockedFilter}
-          onChange={(e) => setBlockedFilter(e.target.value)}
-          className="rounded-lg cabinet-section-header border-0 px-3 py-2 text-sm text-white focus:outline-none"
-        >
-          <option value="">Все статусы</option>
-          <option value="false">Активные</option>
-          <option value="true">Заблокированные</option>
-        </select>
+        <div className="min-w-[10rem]">
+          <CustomDropdown
+            id="admin-users-role"
+            variant="admin"
+            value={roleFilter}
+            onChange={setRoleFilter}
+            placeholder="Все роли"
+            options={[
+              { value: "", label: "Все роли" },
+              { value: "RECIPIENT", label: "Получатель" },
+              { value: "ADMIN", label: "Админ" },
+              { value: "ESTABLISHMENT_ADMIN", label: "Управляющий заведения" },
+              { value: "EMPLOYEE", label: "Официант" },
+            ]}
+          />
+        </div>
+        <div className="min-w-[10rem]">
+          <CustomDropdown
+            id="admin-users-blocked"
+            variant="admin"
+            value={blockedFilter}
+            onChange={setBlockedFilter}
+            placeholder="Все статусы"
+            options={[
+              { value: "", label: "Все статусы" },
+              { value: "false", label: "Активные" },
+              { value: "true", label: "Заблокированные" },
+            ]}
+          />
+        </div>
         <div className="flex items-center gap-2">
           <ArrowUpDown className="h-4 w-4 text-white/80" />
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-            className="rounded-lg cabinet-section-header border-0 px-3 py-2 text-sm text-white focus:outline-none"
-          >
-            <option value="createdAt">По дате</option>
-            <option value="login">По логину</option>
-            <option value="balance">По балансу</option>
-            <option value="received">По получено</option>
-            <option value="transactions">По транзакциям</option>
-          </select>
+          <div className="min-w-[10rem]">
+            <CustomDropdown
+              id="admin-users-sort"
+              variant="admin"
+              value={sortBy}
+              onChange={setSortBy}
+              placeholder="По дате"
+              options={[
+                { value: "createdAt", label: "По дате" },
+                { value: "login", label: "По логину" },
+                { value: "balance", label: "По балансу" },
+                { value: "received", label: "По получено" },
+                { value: "transactions", label: "По транзакциям" },
+              ]}
+            />
+          </div>
           <button
             type="button"
             onClick={() => setSortOrder((o) => (o === "desc" ? "asc" : "desc"))}

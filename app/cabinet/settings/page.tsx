@@ -120,10 +120,21 @@ export default function CabinetSettingsPage() {
         body: JSON.stringify(parsed.data),
       });
 
-      const j = (await res.json()) as { error?: string; issues?: unknown } | Profile;
+      const j = (await res.json()) as { error?: string; details?: Array<{ path?: (string | number)[]; message?: string }> } | Profile;
 
       if (!res.ok) {
-        setSaveError((j as { error?: string }).error ?? "Ошибка сохранения");
+        const err = j as { error?: string; details?: Array<{ path?: (string | number)[]; message?: string }> };
+        const msg = err?.error ?? err?.details?.[0]?.message ?? "Ошибка сохранения";
+        setSaveError(msg);
+        if (Array.isArray(err?.details)) {
+          const fieldErrors: Record<string, string> = {};
+          for (const d of err.details) {
+            const path = d.path as (string | number)[] | undefined;
+            const key = path?.[0];
+            if (typeof key === "string" && d.message) fieldErrors[key] = d.message;
+          }
+          if (Object.keys(fieldErrors).length > 0) setProfileFieldErrors((prev) => ({ ...prev, ...fieldErrors }));
+        }
         return;
       }
 
@@ -211,7 +222,7 @@ export default function CabinetSettingsPage() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="mx-auto max-w-2xl space-y-8">
       <div id="settings-profile" className="cabinet-card rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden">
         <div className="flex items-center justify-between border-0 px-6 py-4">
           <div className="flex items-center gap-3">
@@ -229,10 +240,15 @@ export default function CabinetSettingsPage() {
         <div className="p-6">
         <div className="max-w-xl">
 
-        {saveError && <p className="mb-4 text-sm text-[var(--color-accent-red)]" role="alert">{saveError}</p>}
+        {saveError && (
+          <div className="mb-4 rounded-lg border border-red-500/40 bg-red-500/10 px-4 py-3" role="alert">
+            <p className="text-sm font-medium text-white">{saveError}</p>
+            <p className="mt-1 text-xs text-white/80">Заполните все обязательные поля или исправьте формат (дата — ГГГГ-ММ-ДД).</p>
+          </div>
+        )}
         {saveOk && (
-          <div className="mb-4 flex items-center gap-2 text-sm text-[var(--color-text)]">
-            <CheckCircle2 className="h-5 w-5 shrink-0" />
+          <div className="mb-4 flex items-center gap-2 text-sm text-white">
+            <CheckCircle2 className="h-5 w-5 shrink-0 text-green-400" />
             <span>Сохранено</span>
           </div>
         )}
@@ -324,10 +340,14 @@ export default function CabinetSettingsPage() {
         <div className="p-6">
         <div className="max-w-xl">
 
-        {pwError && <p className="mb-4 text-sm text-[var(--color-accent-red)]" role="alert">{pwError}</p>}
+        {pwError && (
+          <div className="mb-4 rounded-lg border border-red-500/40 bg-red-500/10 px-4 py-3" role="alert">
+            <p className="text-sm font-medium text-white">{pwError}</p>
+          </div>
+        )}
         {pwOk && (
-          <div className="mb-4 flex items-center gap-2 text-sm text-[var(--color-text)]">
-            <CheckCircle2 className="h-5 w-5 shrink-0" />
+          <div className="mb-4 flex items-center gap-2 text-sm text-white">
+            <CheckCircle2 className="h-5 w-5 shrink-0 text-green-400" />
             <span>Пароль изменён</span>
           </div>
         )}

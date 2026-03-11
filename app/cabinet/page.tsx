@@ -200,9 +200,9 @@ export default function CabinetDashboardPage() {
             </div>
 
             {verificationStatus && (
-              <div className="cabinet-limits-block mt-6 rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 p-5">
+              <div className="cabinet-limits-block cabinet-verification-status mt-6 rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 p-5">
                 {verificationStatus === "VERIFIED" ? (
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center justify-center gap-3 text-center">
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-green-600/20 text-green-500">
                       <ShieldCheck className="h-5 w-5" />
                     </div>
@@ -212,13 +212,13 @@ export default function CabinetDashboardPage() {
                     </div>
                   </div>
                 ) : verificationStatus === "PENDING" ? (
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center justify-center gap-3 text-center">
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-500/20 text-amber-500">
                       <ShieldAlert className="h-5 w-5" />
                     </div>
                     <div>
-                      <p className="font-semibold text-[var(--color-text)]">Заявка на рассмотрении</p>
-                      <p className="text-sm text-[var(--color-text)]/80">Ожидайте результата проверки документов.</p>
+                      <p className="font-semibold text-white">Заявка на рассмотрении</p>
+                      <p className="text-sm text-white/90">Ожидайте результата проверки документов.</p>
                     </div>
                   </div>
                 ) : (

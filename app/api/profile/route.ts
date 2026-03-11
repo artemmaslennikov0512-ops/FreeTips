@@ -207,7 +207,9 @@ export async function PATCH(request: NextRequest) {
 
   const parsed = patchProfileSchema.safeParse(parsedBody.data);
   if (!parsed.success) {
-    return jsonError(400, "Неверные данные", parsed.error.issues);
+    const firstIssue = parsed.error.issues[0];
+    const message = firstIssue?.message ?? "Неверные данные";
+    return jsonError(400, message, parsed.error.issues);
   }
 
   const data = parsed.data;

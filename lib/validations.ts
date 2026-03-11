@@ -205,7 +205,12 @@ export const patchProfileSchema = z.object({
   birthDate: z
     .string()
     .optional()
-    .transform((v) => (v == null || (typeof v === "string" && v.trim() === "") ? null : (v ?? "").trim()))
+    .transform((v) => {
+      if (v == null || (typeof v === "string" && v.trim() === "")) return null;
+      const s = (v ?? "").trim();
+      const dateOnly = s.includes("T") ? s.split("T")[0] ?? s : s;
+      return dateOnly;
+    })
     .refine(
       (v) => v === null || /^\d{4}-\d{2}-\d{2}$/.test(v),
       "Дата рождения должна быть в формате YYYY-MM-DD",

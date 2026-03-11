@@ -247,7 +247,8 @@ html:not([data-theme="dark"]) .cabinet-premium .premium-card-brand {
 /* Светлая тема: текст баланса на белой карте — тёмный, хорошо виден */
 html:not([data-theme="dark"]) .cabinet-premium .premium-card-face.premium-card-front p,
 html:not([data-theme="dark"]) .cabinet-premium .premium-card-balance-block,
-html:not([data-theme="dark"]) .cabinet-premium .premium-card-balance-block p {
+html:not([data-theme="dark"]) .cabinet-premium .premium-card-balance-block p,
+html:not([data-theme="dark"]) .cabinet-premium .premium-card-balance-text {
   color: #0a192f !important;
   opacity: 1 !important;
 }
@@ -270,6 +271,10 @@ html:not([data-theme="dark"]) .cabinet-premium .premium-glass {
 [data-theme="dark"] .cabinet-premium .premium-card-brand {
   color: #4a4a4a !important;
   text-shadow: 0 1px 0 rgba(255,255,255,0.4) !important;
+}
+
+[data-theme="dark"] .cabinet-premium .premium-card-balance-text {
+  color: rgba(255, 255, 255, 0.95) !important;
 }
 
 [data-theme="dark"] .cabinet-premium .premium-animated-pattern,
@@ -1394,6 +1399,12 @@ html:not([data-theme="dark"]) .cabinet-premium .cabinet-limits-block .cabinet-li
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-limits-block h4,
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-limits-block .font-medium {
   color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Светлая тема: текст в блоке статуса верификации — тёмный, чтобы был читаем */
+html:not([data-theme="dark"]) .cabinet-premium .cabinet-verification-status,
+html:not([data-theme="dark"]) .cabinet-premium .cabinet-verification-status p {
+  color: #0a192f !important;
 }
 
 /* Тёмная тема: шторка ЛК (официант и админ) — тёмное стекло */

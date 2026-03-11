@@ -292,7 +292,6 @@ export default function PayPage() {
 
         {/* Карточка: сумма чаевых */}
         <div className="pay-page-card card" style={Object.keys(cardStyle).length ? cardStyle : undefined}>
-          <p className="pay-page-section-title">Сумма чаевых</p>
           <div className="pay-page-amounts">
             {PRESETS.map((r) => {
               const numCustom = customAmount.trim() ? Number(customAmount.replace(",", ".")) : null;
@@ -363,19 +362,17 @@ export default function PayPage() {
           )}
         </button>
 
-        {/* Информационный блок */}
-        <div className="pay-page-card card pay-page-info-card" style={Object.keys(cardStyle).length ? cardStyle : undefined}>
-          <div className="info-block">
-            {qrDataUrl && (
-              <div className="info-row">
-                <Smartphone className="info-block-icon size-5 shrink-0" aria-hidden />
-                <span>Покажите QR — гость отсканирует эту страницу</span>
-              </div>
-            )}
+        {/* Пояснения: QR и оплата картой — без внешней карточки */}
+        <div className="info-block">
+          {qrDataUrl && (
             <div className="info-row">
-              <CreditCard className="info-block-icon size-5 shrink-0" aria-hidden />
-              <span>Оплата банковской картой. Регистрация не нужна.</span>
+              <Smartphone className="info-block-icon size-5 shrink-0" aria-hidden />
+              <span>Покажите QR — гость отсканирует эту страницу</span>
             </div>
+          )}
+          <div className="info-row">
+            <CreditCard className="info-block-icon size-5 shrink-0" aria-hidden />
+            <span>Оплата банковской картой. Регистрация не нужна.</span>
           </div>
         </div>
       </div>

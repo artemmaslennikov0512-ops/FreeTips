@@ -4,11 +4,20 @@ import { Mail, MessageCircle } from "lucide-react";
 
 const FOOTER_LINK_CLASS = "text-[var(--color-on-dark-muted)] hover:text-[var(--color-accent-gold)] transition-colors";
 
-const FOOTER_COLUMNS: { title: string; links: { href: string; label: string }[] }[] = [
-  { title: "Сервис", links: [{ href: "/#features", label: "Преимущества" }, { href: "/#process", label: "Как работает" }, { href: "/oferta", label: "Тарифы" }, { href: "/politika-bezopasnosti", label: "Безопасность" }] },
-  { title: "Компания", links: [{ href: "/#about", label: "О нас" }, { href: "/kontakty", label: "Контакты" }] },
-  { title: "Помощь", links: [{ href: "/kontakty", label: "Поддержка" }, { href: "/politika", label: "Документация" }] },
-];
+function buildFooterColumns(): { title: string; links: { href: string; label: string }[] }[] {
+  const docsColumn = {
+    title: "Документы",
+    links: site.footer.docs.map((d) => ({ href: d.href, label: d.label })),
+  };
+  return [
+    { title: "Сервис", links: [{ href: "/#features", label: "Преимущества" }, { href: "/#process", label: "Как работает" }, { href: "/oferta", label: "Тарифы" }, { href: "/politika-bezopasnosti", label: "Безопасность" }] },
+    docsColumn,
+    { title: "Компания", links: [{ href: "/#about", label: "О нас" }, { href: "/kontakty", label: "Контакты" }] },
+    { title: "Помощь", links: [{ href: "/kontakty", label: "Поддержка" }] },
+  ];
+}
+
+const FOOTER_COLUMNS = buildFooterColumns();
 
 function telegramUsername(url: string): string {
   const match = url.match(/t\.me\/([^/?]+)/);

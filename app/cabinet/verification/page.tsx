@@ -223,12 +223,12 @@ export default function CabinetVerificationPage() {
         </h1>
         <div className="mx-auto flex w-fit max-w-xl flex-col items-center rounded-xl border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 p-6 text-center">
           <div className="flex items-center justify-center gap-3">
-            <p className="font-semibold text-[var(--color-text)]">Аккаунт верифицирован</p>
+            <span className="font-semibold leading-none text-white">Аккаунт верифицирован</span>
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-green-600/20 text-green-500">
-              <ShieldCheck className="h-5 w-5" />
+              <ShieldCheck className="h-5 w-5" aria-hidden />
             </div>
           </div>
-          <p className="mt-3 text-sm text-[var(--color-text)]/80">Ваша личность подтверждена. Вы можете пользоваться всеми услугами сервиса.</p>
+          <p className="mt-3 text-sm text-white/90">Ваша личность подтверждена. Вы можете пользоваться всеми услугами сервиса.</p>
         </div>
       </div>
     );
@@ -249,8 +249,8 @@ export default function CabinetVerificationPage() {
         </h1>
         <div className="mx-auto flex w-fit max-w-xl flex-col items-center rounded-xl border border-amber-500/30 bg-amber-500/10 p-6 text-center">
           <div className="flex items-center justify-center gap-3">
-            <p className="font-semibold text-[var(--color-text)]">Заявка на рассмотрении</p>
-            <Clock className="h-6 w-6 shrink-0 text-amber-500" />
+            <span className="font-semibold leading-none text-[var(--color-text)]">Заявка на рассмотрении</span>
+            <Clock className="h-5 w-5 shrink-0 text-amber-500" aria-hidden />
           </div>
           <p className="mt-3 text-sm text-[var(--color-text)]/80">Мы проверяем ваши документы. Ожидайте уведомления.</p>
         </div>
@@ -267,8 +267,8 @@ export default function CabinetVerificationPage() {
       {data?.verificationStatus === "REJECTED" && data.verificationRejectionReason && (
         <div className="mx-auto flex w-fit max-w-xl flex-col items-center rounded-xl border border-red-500/30 bg-red-500/10 p-6 text-center">
           <div className="flex items-center justify-center gap-3">
-            <p className="font-semibold text-[var(--color-text)]">Заявка отклонена</p>
-            <AlertCircle className="h-6 w-6 shrink-0 text-red-500" />
+            <span className="font-semibold leading-none text-[var(--color-text)]">Заявка отклонена</span>
+            <AlertCircle className="h-5 w-5 shrink-0 text-red-500" aria-hidden />
           </div>
           <p className="mt-3 text-sm text-[var(--color-text)]/90 break-words whitespace-pre-wrap">{data.verificationRejectionReason}</p>
           <p className="mt-2 text-sm text-[var(--color-text)]/70">Вы можете подать заявку повторно, заполнив форму ниже.</p>

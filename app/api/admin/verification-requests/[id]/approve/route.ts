@@ -19,7 +19,7 @@ export async function POST(
 
   const verificationRequest = await db.verificationRequest.findUnique({
     where: { id },
-    select: { id: true, userId: true, status: true },
+    select: { id: true, userId: true, status: true, fullName: true, birthDate: true },
   });
 
   if (!verificationRequest) {
@@ -27,6 +27,17 @@ export async function POST(
   }
   if (verificationRequest.status !== "PENDING") {
     return NextResponse.json({ error: "Заявка уже рассмотрена" }, { status: 400 });
+  }
+
+  const userUpdate: { verificationStatus: VerificationStatus; verificationRejectionReason: null; fullName?: string; birthDate?: string | null } = {
+    verificationStatus: VerificationStatus.VERIFIED,
+    verificationRejectionReason: null,
+  };
+  if (verificationRequest.fullName?.trim()) {
+    userUpdate.fullName = verificationRequest.fullName.trim();
+  }
+  if (verificationRequest.birthDate?.trim()) {
+    userUpdate.birthDate = verificationRequest.birthDate.trim();
   }
 
   await db.$transaction([
@@ -41,10 +52,7 @@ export async function POST(
     }),
     db.user.update({
       where: { id: verificationRequest.userId },
-      data: {
-        verificationStatus: VerificationStatus.VERIFIED,
-        verificationRejectionReason: null,
-      },
+      data: userUpdate,
     }),
   ]);
 

@@ -132,7 +132,7 @@ export function PremiumCard({ fullName, balanceKop, compact }: Props) {
                     FreeTips
                   </span>
                 </div>
-                <p className={`text-[13px] font-medium text-white/90 m-0 leading-none shrink-0 ${showBalance ? "text-right" : "truncate max-w-[160px]"}`}>
+                <p className={`premium-card-balance-text text-[13px] font-medium m-0 leading-none shrink-0 ${showBalance ? "text-right" : "truncate max-w-[160px]"}`}>
                   {showBalance ? formatMoney(BigInt(balanceKop)) : holderName}
                 </p>
               </div>

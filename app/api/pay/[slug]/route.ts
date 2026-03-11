@@ -62,8 +62,19 @@ export async function GET(request: NextRequest, { params }: Params) {
     return NextResponse.json({ error: "Ссылка не найдена" }, { status: 404 });
   }
 
-  const nameFromProfile = tipLink.user.fullName?.trim() || tipLink.employee?.name?.trim() || tipLink.user.login || "";
-  const recipientName = nameFromProfile ? `Официант, ${nameFromProfile}` : "Официант";
+  const fullName = tipLink.user.fullName?.trim() || "";
+  const employeeName = tipLink.employee?.name?.trim() || "";
+  const login = tipLink.user.login || "";
+  // ФИО в формате «Фамилия Имя Отчество» — на странице оплаты показываем только имя (второе слово)
+  const firstNameFromFullName =
+    fullName && fullName.length > 0
+      ? (() => {
+          const parts = fullName.split(/\s+/).filter(Boolean);
+          return parts.length >= 2 ? parts[1]! : parts[0] ?? fullName;
+        })()
+      : "";
+  const displayName = firstNameFromFullName || employeeName || login || "";
+  const recipientName = displayName ? `Официант, ${displayName}` : "Официант";
   const branding =
     tipLink.employee?.establishment
       ? {

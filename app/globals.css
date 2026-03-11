@@ -182,9 +182,16 @@ html:not([data-theme="dark"]) .cabinet-premium .cabinet-nav-dropdown .cabinet-na
   color: #ffffff !important;
 }
 
-/* Блок навигации в сайдбаре — подпись «Навигация» */
+/* Блок навигации в сайдбаре — подпись «Навигация», скругление как у сайдбара */
 .cabinet-premium .cabinet-nav-block .cabinet-nav-label {
   font-family: var(--font-inter), system-ui, sans-serif;
+}
+/* Светлая тема: подпись «Навигация» в сайдбаре — белая (на тёмно-синем фоне иначе не видна) */
+html:not([data-theme="dark"]) .cabinet-premium .cabinet-sidebar:not(.admin-sidebar) .cabinet-nav-label {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+html:not([data-theme="dark"]) .admin-panel .admin-sidebar .cabinet-nav-label {
+  color: rgba(255, 255, 255, 0.85) !important;
 }
 
 /* Светлая тема: сайдбар админки — градиент как у ЛК, разделы видны (светлый текст), шрифт, подсветка активного */

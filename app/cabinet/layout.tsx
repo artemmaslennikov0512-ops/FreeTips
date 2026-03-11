@@ -255,10 +255,10 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
           </div>
         </div>
         <div className="cabinet-nav-block mt-6 px-4">
-          <p className="cabinet-nav-label mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-[var(--color-text)]/50">
+          <p className="cabinet-nav-label mb-2 px-3 text-center text-xs font-semibold uppercase tracking-wider text-[var(--color-text)]/50">
             Навигация
           </p>
-          <nav className="flex flex-col gap-0.5 rounded-xl border border-[var(--color-brand-gold)]/15 bg-[var(--color-dark-gray)]/5 p-1.5 shadow-[var(--shadow-subtle)]" aria-label="Навигация по кабинету">
+          <nav className="flex flex-col gap-0.5 rounded-[10px] border border-[var(--color-brand-gold)]/15 bg-[var(--color-dark-gray)]/5 p-1.5 shadow-[var(--shadow-subtle)]" aria-label="Навигация по кабинету">
             {NAV.map(({ label, href, icon: Icon }) => (
               <Link
                 key={href}
@@ -354,7 +354,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
                       </div>
                     </div>
                   </div>
-                  <p className="cabinet-nav-label mb-1.5 px-2 text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text)]/50">Навигация</p>
+                  <p className="cabinet-nav-label mb-1.5 px-2 text-center text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text)]/50">Навигация</p>
                   <nav className="flex flex-col gap-0.5 rounded-lg border border-[var(--color-brand-gold)]/15 bg-[var(--color-dark-gray)]/5 p-1" role="none">
                     {NAV.map(({ label, href, icon: Icon }) => (
                       <Link

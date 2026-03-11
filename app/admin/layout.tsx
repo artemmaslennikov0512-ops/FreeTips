@@ -199,10 +199,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </div>
           </div>
           <div className="cabinet-nav-block flex-1 overflow-y-auto px-4 py-2">
-            <p className="cabinet-nav-label mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-white/50">
+            <p className="cabinet-nav-label mb-2 px-3 text-center text-xs font-semibold uppercase tracking-wider text-white/50">
               Навигация
             </p>
-            <nav className="flex flex-col gap-0.5 rounded-xl border border-[var(--color-brand-gold)]/15 bg-white/5 p-1.5 shadow-[var(--shadow-subtle)]" aria-label="Навигация админ-панели">
+            <nav className="flex flex-col gap-0.5 rounded-[10px] border border-[var(--color-brand-gold)]/15 bg-white/5 p-1.5 shadow-[var(--shadow-subtle)]" aria-label="Навигация админ-панели">
               {NAV.map(({ label, href, icon: Icon }) => (
                 <Link
                   key={href}
@@ -268,7 +268,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                       </div>
                     </div>
                   </div>
-                  <p className="cabinet-nav-label mb-1.5 px-2 text-[10px] font-semibold uppercase tracking-wider text-white/50">Навигация</p>
+                  <p className="cabinet-nav-label mb-1.5 px-2 text-center text-[10px] font-semibold uppercase tracking-wider text-white/50">Навигация</p>
                   <nav className="flex flex-col gap-0.5 rounded-lg border border-[var(--color-brand-gold)]/15 bg-white/5 p-1" role="none">
                     {NAV.map(({ label, href, icon: Icon }) => (
                       <Link

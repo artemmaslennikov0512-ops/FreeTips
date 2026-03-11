@@ -15,6 +15,7 @@ import { getEffectivePayoutLimits, getEffectiveMonthlyPayoutLimits, getUtcDaySta
 import { sdGetBalance } from "@/lib/payment/paygine/client";
 import { logError, logInfo } from "@/lib/logger";
 import { getRequestId } from "@/lib/security/request";
+import { getBaseUrlFromRequest } from "@/lib/get-base-url";
 
 export async function GET(request: NextRequest) {
   try {
@@ -26,7 +27,7 @@ export async function GET(request: NextRequest) {
     const dayStart = getUtcDayStart();
     const monthStart = getUtcMonthStart();
 
-    const [profile, txSum, payoutsCompletedSum, txCount, payoutsPendingCount, limits, monthlyLimits, todayPayouts, monthPayouts] =
+    const [profile, txSum, payoutsCompletedSum, txCount, payoutsPendingCount, limits, monthlyLimits, todayPayouts, monthPayouts, employee] =
       await Promise.all([
         db.user.findUnique({
           where: { id },
@@ -48,7 +49,10 @@ export async function GET(request: NextRequest) {
                 primaryColor: true,
                 secondaryColor: true,
                 mainBackgroundColor: true,
+                mainBackgroundOpacityPercent: true,
                 blocksBackgroundColor: true,
+                blocksBackgroundOpacityPercent: true,
+                secondaryOpacityPercent: true,
                 fontColor: true,
                 borderColor: true,
                 borderWidthPx: true,
@@ -95,6 +99,10 @@ export async function GET(request: NextRequest) {
           },
           _count: true,
           _sum: { amountKop: true },
+        }),
+        db.employee.findFirst({
+          where: { userId: id },
+          select: { id: true, photoUrl: true },
         }),
       ]);
 
@@ -160,7 +168,10 @@ export async function GET(request: NextRequest) {
               primaryColor: profile.establishmentRelation.primaryColor != null ? String(profile.establishmentRelation.primaryColor) : null,
               secondaryColor: profile.establishmentRelation.secondaryColor != null ? String(profile.establishmentRelation.secondaryColor) : null,
               mainBackgroundColor: profile.establishmentRelation.mainBackgroundColor != null ? String(profile.establishmentRelation.mainBackgroundColor) : null,
+              mainBackgroundOpacityPercent: profile.establishmentRelation.mainBackgroundOpacityPercent ?? null,
               blocksBackgroundColor: profile.establishmentRelation.blocksBackgroundColor != null ? String(profile.establishmentRelation.blocksBackgroundColor) : null,
+              blocksBackgroundOpacityPercent: profile.establishmentRelation.blocksBackgroundOpacityPercent ?? null,
+              secondaryOpacityPercent: profile.establishmentRelation.secondaryOpacityPercent ?? null,
               fontColor: profile.establishmentRelation.fontColor != null ? String(profile.establishmentRelation.fontColor) : null,
               borderColor: profile.establishmentRelation.borderColor != null ? String(profile.establishmentRelation.borderColor) : null,
               borderWidthPx: profile.establishmentRelation.borderWidthPx ?? null,
@@ -196,6 +207,11 @@ export async function GET(request: NextRequest) {
       verificationStatus: String(profile.verificationStatus),
       verificationRejectionReason: profile.verificationRejectionReason != null ? String(profile.verificationRejectionReason) : null,
       savingFor: profile.savingFor != null ? String(profile.savingFor) : null,
+      /** Фото официанта для ЛК (страница оплаты и сайдбар). Рекомендуется ≥200×200 px. */
+      employeePhotoUrl:
+        employee?.photoUrl && employee?.id
+          ? `${getBaseUrlFromRequest(request).replace(/\/$/, "")}/api/establishment/employees/photo/${employee.id}?type=avatar`
+          : null,
     };
     return NextResponse.json(body);
   } catch (err) {

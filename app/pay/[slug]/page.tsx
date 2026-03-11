@@ -33,6 +33,7 @@ export default function PayPage() {
     fontColor?: string;
     borderColor?: string;
   } | null>(null);
+  const [recipientPhotoUrl, setRecipientPhotoUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const [amount, setAmount] = useState<number>(100);
@@ -76,6 +77,7 @@ export default function PayPage() {
         const data = (await res.json()) as {
           recipientName: string;
           savingFor?: string;
+          recipientPhotoUrl?: string;
           branding?: {
             logoUrl?: string;
             primaryColor?: string;
@@ -88,6 +90,7 @@ export default function PayPage() {
         };
         setRecipientName(data.recipientName);
         setSavingFor(data.savingFor ?? null);
+        setRecipientPhotoUrl(data.recipientPhotoUrl ?? null);
         setBranding(data.branding ?? null);
       } catch {
         setError("Ошибка соединения");
@@ -277,9 +280,17 @@ export default function PayPage() {
           <div className="pay-page-recipient pay-page-recipient--with-qr">
             <div className="pay-page-recipient-bordered">
               <div className="pay-page-recipient-profile">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--pay-page-accent)]/15 text-[var(--pay-page-accent)]">
-                  <User className="h-5 w-5" />
-                </div>
+                {recipientPhotoUrl ? (
+                  <img
+                    src={recipientPhotoUrl}
+                    alt=""
+                    className="h-10 w-10 shrink-0 rounded-full object-cover bg-[var(--pay-page-accent)]/15"
+                  />
+                ) : (
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--pay-page-accent)]/15 text-[var(--pay-page-accent)]">
+                    <User className="h-5 w-5" />
+                  </div>
+                )}
                 <p className="pay-page-recipient-name min-w-0 truncate flex items-center" style={{ color: fontClr ?? undefined }}>
                   {recipientName}
                 </p>

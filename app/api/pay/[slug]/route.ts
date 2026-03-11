@@ -40,7 +40,9 @@ export async function GET(request: NextRequest, { params }: Params) {
       employeeId: true,
       employee: {
         select: {
+          id: true,
           name: true,
+          photoUrl: true,
           establishment: {
             select: {
               logoUrl: true,
@@ -92,10 +94,16 @@ export async function GET(request: NextRequest, { params }: Params) {
         }
       : undefined;
   const savingFor = tipLink.user.savingFor?.trim() || undefined;
+  const baseUrl = getBaseUrlFromRequest(request);
+  const recipientPhotoUrl =
+    tipLink.employee?.photoUrl && tipLink.employee?.id
+      ? `${baseUrl.replace(/\/$/, "")}/api/establishment/employees/photo/${tipLink.employee.id}?type=avatar`
+      : undefined;
   return NextResponse.json({
     recipientName,
     ...(branding && { branding }),
     ...(savingFor && { savingFor }),
+    ...(recipientPhotoUrl && { recipientPhotoUrl }),
   });
 }
 

@@ -322,11 +322,16 @@ model Establishment {
   primaryColor      String?  @db.VarChar(20) // hex для White Label (например #c9a227)
   secondaryColor    String?  @db.VarChar(20) // доп. цвет: фон, акценты
   mainBackgroundColor   String?  @db.VarChar(20) // фон основной страницы (hex)
+  mainBackgroundOpacityPercent Int?  // прозрачность фона основной страницы 0–100, null = 100
   blocksBackgroundColor String?  @db.VarChar(20) // фон блоков/карточек (hex)
+  blocksBackgroundOpacityPercent Int?  // прозрачность фона блоков 0–100, null = 100
+  secondaryOpacityPercent Int?  // прозрачность доп. цвета (фон карточки, сайдбар) 0–100, null = 100
   fontColor         String?  @db.VarChar(20) // цвет основного текста (hex)
   borderColor       String?  @db.VarChar(20) // цвет обводки/рамок (hex)
   borderWidthPx     Int?     // толщина обводки (px), null = 2
   borderOpacityPercent Int?  // прозрачность обводки 0–100, null = 100
+  printCardWidthMm  Int?     // ширина карточки для печати (мм), null = 67
+  printCardHeightMm Int?     // высота карточки для печати (мм), null = 49
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
@@ -350,6 +355,8 @@ model Employee {
   isActive         Boolean  @default(true)
   qrCodeIdentifier String   @unique @db.VarChar(50) // slug для страницы оплаты (QR)
   userId           String?  @unique @db.VarChar(64) // привязка к User после регистрации/инвайта
+  photoUrl         String?  @db.VarChar(512) // путь к фото: страница оплаты и ЛК (рекомендуется ≥200×200 px)
+  printCardPhotoUrl String? @db.VarChar(512) // путь к фото для печатной карточки QR (отдельное, рекомендуется ≥150×150 px)
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 

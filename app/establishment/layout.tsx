@@ -144,11 +144,11 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
 
       {/* Сайдбар: не тянется до низа (адаптация по контенту), по верху в одну линию с основным блоком */}
       <aside
-        className={`cabinet-sidebar fixed left-0 top-0 z-40 flex max-h-[100vh] w-[min(calc(100vw-4rem),20rem)] max-w-[20rem] flex-col overflow-y-auto overflow-x-hidden rounded-r-[10px] border-0 border-r border-white/10 py-6 shadow-2xl backdrop-blur-xl transition-[transform] duration-300 ease-out lg:static lg:left-auto lg:top-auto lg:ml-4 lg:mt-0 lg:mr-0 lg:mb-0 lg:max-h-none lg:w-[260px] lg:max-w-none lg:translate-x-0 lg:rounded-[10px] lg:border lg:self-start bg-white/[0.06] ${
+        className={`cabinet-sidebar fixed left-0 top-0 z-40 flex max-h-[100vh] w-[min(calc(100vw-4rem),20rem)] max-w-[20rem] flex-col overflow-y-auto overflow-x-hidden rounded-r-[10px] border-0 border-r border-white/10 py-6 shadow-2xl backdrop-blur-xl transition-[transform] duration-300 ease-out lg:static lg:left-auto lg:top-auto lg:ml-0 lg:mt-0 lg:mr-0 lg:mb-0 lg:max-h-none lg:w-[260px] lg:max-w-none lg:translate-x-0 lg:rounded-l-none lg:rounded-r-[10px] lg:border lg:self-start bg-white/[0.06] ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <div className="px-4 mb-6 shrink-0">
+        <div className="pl-4 pr-4 mb-6 shrink-0">
           <span className="font-[family:var(--font-playfair)] font-bold text-white">
             Кабинет заведения
           </span>
@@ -191,7 +191,7 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
       </aside>
 
       <main className="min-h-0 min-w-0 flex-1 overflow-x-hidden pl-4 pr-4 lg:pl-0 lg:pr-0 lg:ml-0 flex flex-col">
-        <div className="cabinet-main-block mt-4 mr-0 mb-4 ml-0 lg:mt-0 lg:mr-4 lg:ml-4 flex min-h-0 flex-1 flex-col rounded-[10px] border border-white/10 bg-white/[0.06] backdrop-blur-xl">
+        <div className="cabinet-main-block mt-4 mr-0 mb-4 ml-0 lg:mt-0 lg:mr-0 lg:ml-4 flex min-h-0 flex-1 flex-col rounded-l-[10px] border border-white/10 bg-white/[0.06] backdrop-blur-xl lg:rounded-r-none">
           <div className="p-6 lg:p-8" id="main-content">
             <div className="mb-4 lg:hidden">
               <button

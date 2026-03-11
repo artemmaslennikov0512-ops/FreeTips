@@ -4,14 +4,17 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
+import { join } from "path";
+import { readFileSync, existsSync } from "fs";
 import { requireEstablishmentAdmin } from "@/lib/middleware/auth";
 import { db } from "@/lib/db";
 import { getBaseUrlFromRequest } from "@/lib/get-base-url";
 import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 import QRCode from "qrcode";
 
-const CARD_WIDTH = 190;
-const CARD_HEIGHT = 138;
+const REF_CARD_WIDTH_PT = 190;
+const REF_CARD_HEIGHT_PT = 138;
+const MM_TO_PT = 2.834645669;
 const COLS = 2;
 const ROWS = 5;
 const MARGIN = 36;
@@ -69,7 +72,7 @@ export async function GET(request: NextRequest) {
     db.employee.findMany({
       where: { establishmentId: auth.establishmentId, isActive: true },
       orderBy: { name: "asc" },
-      select: { id: true, name: true, position: true, qrCodeIdentifier: true },
+      select: { id: true, name: true, position: true, qrCodeIdentifier: true, printCardPhotoUrl: true },
     }),
     db.establishment.findUnique({
       where: { id: auth.establishmentId },
@@ -82,6 +85,8 @@ export async function GET(request: NextRequest) {
         blocksBackgroundColor: true,
         fontColor: true,
         borderColor: true,
+        printCardWidthMm: true,
+        printCardHeightMm: true,
       },
     }),
   ]);
@@ -137,6 +142,13 @@ export async function GET(request: NextRequest) {
     }
   }
 
+  const cardWidthMm = establishment?.printCardWidthMm ?? 67;
+  const cardHeightMm = establishment?.printCardHeightMm ?? 49;
+  const CARD_WIDTH = cardWidthMm * MM_TO_PT;
+  const CARD_HEIGHT = cardHeightMm * MM_TO_PT;
+  const scaleX = CARD_WIDTH / REF_CARD_WIDTH_PT;
+  const scaleY = CARD_HEIGHT / REF_CARD_HEIGHT_PT;
+
   let cardIndex = 0;
   let page = doc.addPage([PAGE_WIDTH, PAGE_HEIGHT]);
   const cardFullWidth = CARD_WIDTH + CARD_GAP_X;
@@ -152,7 +164,13 @@ export async function GET(request: NextRequest) {
     const x = MARGIN + col * cardFullWidth;
     const cardY = PAGE_HEIGHT - MARGIN - (row + 1) * cardFullHeight + CARD_GAP_Y;
 
-    // Внешняя карточка — фон как на странице оплаты (бренд заведения)
+    const pad = 8 * Math.min(scaleX, scaleY);
+    const innerLeft = x + pad;
+    const innerWidth = CARD_WIDTH - pad * 2;
+
+    const headerH = 22 * scaleY;
+    const headerY = cardY + CARD_HEIGHT - pad - headerH;
+
     page.drawRectangle({
       x,
       y: cardY,
@@ -160,21 +178,14 @@ export async function GET(request: NextRequest) {
       height: CARD_HEIGHT,
       color: cardBg,
       borderColor,
-      borderWidth: 1.2,
+      borderWidth: 1.2 * Math.min(scaleX, scaleY),
     });
 
-    const pad = 8;
-    const innerLeft = x + pad;
-    const innerBottom = cardY + pad;
-    const innerWidth = CARD_WIDTH - pad * 2;
-    const innerHeight = CARD_HEIGHT - pad * 2;
-
-    // Верхняя полоса: логотип или название заведения
-    const headerH = 22;
-    const headerY = cardY + CARD_HEIGHT - pad - headerH;
     if (logoImage) {
-      const logoW = Math.min(logoImage.width, innerWidth - 4);
-      const logoH = Math.min(headerH - 4, (logoImage.height / logoImage.width) * logoW);
+      const logoMaxW = innerWidth - 4 * scaleX;
+      const logoMaxH = headerH - 4 * scaleY;
+      const logoW = Math.min(logoImage.width, logoMaxW);
+      const logoH = Math.min(logoMaxH, (logoImage.height / logoImage.width) * logoW);
       const logoX = x + (CARD_WIDTH - logoW) / 2;
       page.drawImage(logoImage, {
         x: logoX,
@@ -184,19 +195,19 @@ export async function GET(request: NextRequest) {
       });
     } else {
       const title = (establishment?.name ?? "FreeTips").slice(0, 28);
+      const titleSize = 9 * Math.min(scaleX, scaleY);
       page.drawText(title, {
         x: innerLeft,
-        y: headerY + 4,
-        size: 9,
+        y: headerY + 4 * scaleY,
+        size: titleSize,
         font: fontBold,
         color: fontColor,
       });
     }
 
-    // Внутренний блок (как карточка получателя на странице оплаты): имя + QR
-    const blockTop = headerY - 6;
-    const blockH = 72;
-    const blockY = blockTop - blockH;
+    const blockGap = 6 * scaleY;
+    const blockH = 72 * scaleY;
+    const blockY = headerY - blockGap - blockH;
     page.drawRectangle({
       x: innerLeft,
       y: blockY,
@@ -204,7 +215,7 @@ export async function GET(request: NextRequest) {
       height: blockH,
       color: blocksBg,
       borderColor,
-      borderWidth: 0.5,
+      borderWidth: 0.5 * Math.min(scaleX, scaleY),
     });
 
     const payUrl = `${payBase}/${emp.qrCodeIdentifier}`;
@@ -212,35 +223,70 @@ export async function GET(request: NextRequest) {
     const base64 = dataUrl.replace(/^data:image\/png;base64,/, "");
     const pngBytes = Uint8Array.from(Buffer.from(base64, "base64"));
     const qrImage = await doc.embedPng(pngBytes);
-    const qrSize = 48;
-    const qrX = innerLeft + innerWidth - qrSize - 6;
+    const qrSize = 48 * Math.min(scaleX, scaleY);
+    const qrPad = 6 * scaleX;
+    const qrX = innerLeft + innerWidth - qrSize - qrPad;
     const qrY = blockY + (blockH - qrSize) / 2;
     page.drawImage(qrImage, { x: qrX, y: qrY, width: qrSize, height: qrSize });
 
-    const textX = innerLeft + 6;
-    const nameY = blockY + blockH - 14;
+    const textX = innerLeft + 6 * scaleX;
+    const nameSize = 11 * Math.min(scaleX, scaleY);
+    const posSize = 9 * Math.min(scaleX, scaleY);
+    const nameY = blockY + blockH - 14 * scaleY;
+    let photoDrawnWidth = 0;
+    if (emp.printCardPhotoUrl?.trim()) {
+      const storagePath = join(process.cwd(), "storage", emp.printCardPhotoUrl);
+      if (existsSync(storagePath)) {
+        try {
+          const imgBuf = readFileSync(storagePath);
+          const bytes = new Uint8Array(imgBuf);
+          const ext = (emp.printCardPhotoUrl.split(".").pop() ?? "").toLowerCase();
+          const embed =
+            ext === "png"
+              ? await doc.embedPng(bytes)
+              : ext === "jpg" || ext === "jpeg"
+                ? await doc.embedJpg(bytes)
+                : null;
+          if (embed) {
+            const photoSize = 36 * Math.min(scaleX, scaleY);
+            const photoX = textX;
+            const photoY = blockY + (blockH - photoSize) / 2;
+            page.drawImage(embed, {
+              x: photoX,
+              y: photoY,
+              width: photoSize,
+              height: photoSize,
+            });
+            photoDrawnWidth = photoSize + 6 * scaleX;
+          }
+        } catch {
+          // skip photo on embed error
+        }
+      }
+    }
+    const nameTextX = textX + photoDrawnWidth;
     page.drawText(emp.name.slice(0, 24), {
-      x: textX,
+      x: nameTextX,
       y: nameY,
-      size: 11,
+      size: nameSize,
       font: fontBold,
       color: fontColor,
     });
     if (emp.position) {
       page.drawText(emp.position.slice(0, 26), {
-        x: textX,
-        y: nameY - 14,
-        size: 9,
+        x: nameTextX,
+        y: nameY - 14 * scaleY,
+        size: posSize,
         font,
         color: fontColor,
       });
     }
 
-    // Подпись под блоком
+    const footerSize = 7 * Math.min(scaleX, scaleY);
     page.drawText("Отсканируйте для чаевых", {
       x: innerLeft,
-      y: blockY - 8,
-      size: 7,
+      y: blockY - 8 * scaleY,
+      size: footerSize,
       font,
       color: fontColor,
     });

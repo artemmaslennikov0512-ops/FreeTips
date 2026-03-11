@@ -37,6 +37,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
     role?: string;
     fullName?: string | null;
     verificationStatus?: string;
+    employeePhotoUrl?: string | null;
     establishmentBrand?: {
       logoUrl: string | null;
       primaryColor: string | null;
@@ -102,6 +103,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
           role: data.role,
           fullName: data.fullName,
           verificationStatus: data.verificationStatus,
+          employeePhotoUrl: data.employeePhotoUrl ?? null,
           establishmentBrand: data.establishmentBrand ?? null,
         });
       })
@@ -224,9 +226,17 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
           style={Object.keys(profileBlockStyle).length ? profileBlockStyle : undefined}
         >
           <div className="flex items-center gap-3">
-            <div className="cabinet-sidebar-avatar flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--color-brand-gold)] font-semibold text-[#0a192f] text-sm">
-              {initials}
-            </div>
+            {user?.employeePhotoUrl ? (
+              <img
+                src={user.employeePhotoUrl}
+                alt=""
+                className="cabinet-sidebar-avatar h-10 w-10 shrink-0 rounded-full object-cover bg-[var(--color-brand-gold)]"
+              />
+            ) : (
+              <div className="cabinet-sidebar-avatar flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--color-brand-gold)] font-semibold text-[#0a192f] text-sm">
+                {initials}
+              </div>
+            )}
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-1.5">
                 <span className="truncate font-semibold text-[var(--color-text)]" style={brandFont ? { color: brandFont } : undefined}>{displayName}</span>

@@ -7,6 +7,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireEstablishmentAdmin } from "@/lib/middleware/auth";
 import { db } from "@/lib/db";
+import { getBaseUrlFromRequest } from "@/lib/get-base-url";
 import { hashPassword } from "@/lib/auth/password";
 import { generateSlug } from "@/lib/generate-slug";
 import { parseJsonWithLimit, MAX_BODY_SIZE_AUTH, jsonError } from "@/lib/api/helpers";
@@ -35,6 +36,7 @@ export async function GET(request: NextRequest) {
   const auth = await requireEstablishmentAdmin(request);
   if (auth.response) return auth.response;
 
+  const baseUrl = getBaseUrlFromRequest(request);
   const employees = await db.employee.findMany({
     where: { establishmentId: auth.establishmentId },
     orderBy: { createdAt: "desc" },
@@ -46,6 +48,8 @@ export async function GET(request: NextRequest) {
       isActive: true,
       qrCodeIdentifier: true,
       userId: true,
+      photoUrl: true,
+      printCardPhotoUrl: true,
       createdAt: true,
     },
   });
@@ -68,6 +72,7 @@ export async function GET(request: NextRequest) {
     ]),
   );
 
+  const prefix = `${baseUrl.replace(/\/$/, "")}/api/establishment/employees/photo`;
   return NextResponse.json({
     employees: employees.map((e) => {
       const rating = reviewAgg[e.id];
@@ -79,6 +84,8 @@ export async function GET(request: NextRequest) {
         isActive: e.isActive,
         qrCodeIdentifier: e.qrCodeIdentifier,
         hasUser: !!e.userId,
+        photoUrl: e.photoUrl ? `${prefix}/${e.id}?type=avatar` : null,
+        printCardPhotoUrl: e.printCardPhotoUrl ? `${prefix}/${e.id}?type=print` : null,
         createdAt: e.createdAt.toISOString(),
         avgRating: rating?.avgRating ?? null,
         reviewsCount: rating?.reviewsCount ?? 0,

@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Plus, Copy, RefreshCw, FileDown, Mail, Pencil } from "lucide-react";
+import { useEffect, useState, useRef } from "react";
+import { Plus, Copy, RefreshCw, FileDown, Mail, Pencil, Upload, ImageIcon } from "lucide-react";
 import { authHeaders } from "@/lib/auth-client";
 
 interface EstablishmentInfo {
@@ -20,6 +20,8 @@ interface EmployeeRow {
   isActive: boolean;
   qrCodeIdentifier: string;
   hasUser: boolean;
+  photoUrl: string | null;
+  printCardPhotoUrl: string | null;
   createdAt: string;
   avgRating: number | null;
   reviewsCount: number;
@@ -46,8 +48,11 @@ export default function EstablishmentTeamPage() {
   const [editCoefficient, setEditCoefficient] = useState(1);
   const [editError, setEditError] = useState<string | null>(null);
   const [savingEdit, setSavingEdit] = useState(false);
+  const [uploadingPhotoId, setUploadingPhotoId] = useState<string | null>(null);
+  const avatarInputRef = useRef<HTMLInputElement>(null);
+  const printInputRef = useRef<HTMLInputElement>(null);
 
-  const fetchData = async () => {
+  const fetchData = async (): Promise<EmployeeRow[]> => {
     setLoading(true);
     setError(null);
     try {
@@ -58,14 +63,17 @@ export default function EstablishmentTeamPage() {
       if (!infoRes.ok || !empRes.ok) {
         setError("Ошибка загрузки");
         setLoading(false);
-        return;
+        return [];
       }
       const infoData = await infoRes.json();
       const empData = await empRes.json();
+      const list = empData.employees ?? [];
       setInfo(infoData);
-      setEmployees(empData.employees ?? []);
+      setEmployees(list);
+      return list;
     } catch {
       setError("Ошибка соединения");
+      return [];
     } finally {
       setLoading(false);
     }
@@ -236,6 +244,36 @@ export default function EstablishmentTeamPage() {
     }
   };
 
+  const uploadPhoto = async (empId: string, type: "avatar" | "print", file: File) => {
+    setUploadingPhotoId(empId);
+    try {
+      const form = new FormData();
+      form.set("type", type);
+      form.set("file", file);
+      const res = await fetch(`/api/establishment/employees/${empId}/photo`, {
+        method: "POST",
+        headers: authHeaders(),
+        body: form,
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        alert(data?.error ?? "Ошибка загрузки фото");
+        return;
+      }
+      const list = await fetchData();
+      if (editEmployee && editEmployee.id === empId) {
+        const updated = list.find((e) => e.id === empId);
+        if (updated) setEditEmployee(updated);
+      }
+      if (type === "avatar" && avatarInputRef.current) avatarInputRef.current.value = "";
+      if (type === "print" && printInputRef.current) printInputRef.current.value = "";
+    } catch {
+      alert("Ошибка соединения");
+    } finally {
+      setUploadingPhotoId(null);
+    }
+  };
+
   const canAdd =
     info &&
     (info.maxEmployeesCount == null || info.employeesCount < info.maxEmployeesCount);
@@ -372,6 +410,56 @@ export default function EstablishmentTeamPage() {
                   className="cabinet-input-window w-full rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-white placeholder:text-white/50 focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-gold)]/40"
                 />
               </div>
+              <div className="border-t border-white/10 pt-4 space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-white/90 mb-1">Фото для страницы оплаты и ЛК</label>
+                  <p className="text-xs text-white/70 mb-2">Показывается на странице оплаты и в сайдбаре официанта. Рекомендуемое разрешение: не менее 200×200 px. Форматы: JPEG, PNG, WebP.</p>
+                  <div className="flex items-center gap-3 flex-wrap">
+                    {editEmployee.photoUrl && (
+                      <img src={editEmployee.photoUrl} alt="" className="h-12 w-12 rounded-full object-cover border border-[var(--color-brand-gold)]/20" />
+                    )}
+                    <label className="inline-flex items-center gap-2 rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-sm text-white cursor-pointer hover:bg-[var(--color-dark-gray)]/20">
+                      <Upload className="h-4 w-4" />
+                      {uploadingPhotoId === editEmployee.id ? "Загрузка…" : "Выбрать файл"}
+                      <input
+                        ref={avatarInputRef}
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp,image/jpg"
+                        className="sr-only"
+                        onChange={(e) => {
+                          const f = e.target.files?.[0];
+                          if (f) uploadPhoto(editEmployee.id, "avatar", f);
+                        }}
+                        disabled={uploadingPhotoId === editEmployee.id}
+                      />
+                    </label>
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-white/90 mb-1">Фото для печатной карточки QR</label>
+                  <p className="text-xs text-white/70 mb-2">Только для карточки при печати PDF. Рекомендуемое разрешение: не менее 150×150 px. Форматы: JPEG, PNG (WebP в PDF не выводится).</p>
+                  <div className="flex items-center gap-3 flex-wrap">
+                    {editEmployee.printCardPhotoUrl && (
+                      <img src={editEmployee.printCardPhotoUrl} alt="" className="h-12 w-12 rounded-full object-cover border border-[var(--color-brand-gold)]/20" />
+                    )}
+                    <label className="inline-flex items-center gap-2 rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-sm text-white cursor-pointer hover:bg-[var(--color-dark-gray)]/20">
+                      <ImageIcon className="h-4 w-4" />
+                      {uploadingPhotoId === editEmployee.id ? "Загрузка…" : "Выбрать файл"}
+                      <input
+                        ref={printInputRef}
+                        type="file"
+                        accept="image/jpeg,image/png,image/jpg"
+                        className="sr-only"
+                        onChange={(e) => {
+                          const f = e.target.files?.[0];
+                          if (f) uploadPhoto(editEmployee.id, "print", f);
+                        }}
+                        disabled={uploadingPhotoId === editEmployee.id}
+                      />
+                    </label>
+                  </div>
+                </div>
+              </div>
               <div className="flex gap-2 pt-2">
                 <button
                   type="submit"
@@ -444,14 +532,14 @@ export default function EstablishmentTeamPage() {
           <table className="establishment-team-table-grid w-full min-w-[720px] border-collapse">
             <thead>
               <tr className="establishment-team-table-row-head">
-                <th className="establishment-team-table-cell establishment-team-table-cell-name whitespace-nowrap p-3 font-medium text-white text-left">Имя</th>
-                <th className="establishment-team-table-cell establishment-team-table-cell-position whitespace-nowrap p-3 font-medium text-white text-left">Должность</th>
-                <th className="establishment-team-table-cell establishment-team-table-cell-coef whitespace-nowrap p-3 font-medium text-white text-right">Коэфф.</th>
-                <th className="establishment-team-table-cell establishment-team-table-cell-rating whitespace-nowrap p-3 font-medium text-white text-right">Рейтинг</th>
-                <th className="establishment-team-table-cell establishment-team-table-cell-status whitespace-nowrap p-3 font-medium text-white text-left">Статус</th>
+                <th className="establishment-team-table-cell establishment-team-table-cell-name whitespace-nowrap p-3 font-medium text-white text-center">Имя</th>
+                <th className="establishment-team-table-cell establishment-team-table-cell-position whitespace-nowrap p-3 font-medium text-white text-center">Должность</th>
+                <th className="establishment-team-table-cell establishment-team-table-cell-coef whitespace-nowrap p-3 font-medium text-white text-center">Коэфф.</th>
+                <th className="establishment-team-table-cell establishment-team-table-cell-rating whitespace-nowrap p-3 font-medium text-white text-center">Рейтинг</th>
+                <th className="establishment-team-table-cell establishment-team-table-cell-status whitespace-nowrap p-3 font-medium text-white text-center">Статус</th>
                 <th className="establishment-team-table-cell establishment-team-table-cell-linked whitespace-nowrap p-3 font-medium text-white text-center">Привязан к аккаунту</th>
-                <th className="establishment-team-table-cell establishment-team-table-cell-link whitespace-nowrap p-3 font-medium text-white text-left">Ссылка для регистрации</th>
-                <th className="establishment-team-table-cell establishment-team-table-cell-actions whitespace-nowrap p-3 font-medium text-white text-left">Действия</th>
+                <th className="establishment-team-table-cell establishment-team-table-cell-link whitespace-nowrap p-3 font-medium text-white text-center">Ссылка для регистрации</th>
+                <th className="establishment-team-table-cell establishment-team-table-cell-actions whitespace-nowrap p-3 font-medium text-white text-center">Действия</th>
               </tr>
             </thead>
             <tbody>
@@ -462,22 +550,24 @@ export default function EstablishmentTeamPage() {
               ) : (
                 employees.map((emp) => (
                   <tr key={emp.id} className={`establishment-team-table-row ${!emp.isActive ? "opacity-70" : ""}`}>
-                    <td className="establishment-team-table-cell establishment-team-table-cell-name whitespace-nowrap p-3 text-white text-left">{emp.name}</td>
-                    <td className="establishment-team-table-cell establishment-team-table-cell-position whitespace-nowrap p-3 text-white/90 text-left">{emp.position || "—"}</td>
-                    <td className="establishment-team-table-cell establishment-team-table-cell-coef whitespace-nowrap p-3 text-white/90 text-right">{emp.coefficient}</td>
-                    <td className="establishment-team-table-cell establishment-team-table-cell-rating whitespace-nowrap p-3 text-white/90 text-right">{emp.reviewsCount > 0 ? `${emp.avgRating ?? "—"} (${emp.reviewsCount})` : "—"}</td>
-                    <td className="establishment-team-table-cell establishment-team-table-cell-status p-3 text-left">
-                      <span className={`text-xs ${emp.isActive ? "text-[var(--color-accent-emerald)]" : "text-white/80"}`}>{emp.isActive ? "Активен" : "Неактивен"}</span>
-                      <button type="button" onClick={() => toggleActive(emp)} disabled={togglingId === emp.id} className="ml-2 rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-2 py-1 text-xs text-white hover:bg-[var(--color-dark-gray)]/20 disabled:opacity-50">
-                        {togglingId === emp.id ? "…" : emp.isActive ? "Деактивировать" : "Активировать"}
-                      </button>
+                    <td className="establishment-team-table-cell establishment-team-table-cell-name whitespace-nowrap p-3 text-white text-center">{emp.name}</td>
+                    <td className="establishment-team-table-cell establishment-team-table-cell-position whitespace-nowrap p-3 text-white/90 text-center">{emp.position || "—"}</td>
+                    <td className="establishment-team-table-cell establishment-team-table-cell-coef whitespace-nowrap p-3 text-white/90 text-center">{emp.coefficient}</td>
+                    <td className="establishment-team-table-cell establishment-team-table-cell-rating whitespace-nowrap p-3 text-white/90 text-center">{emp.reviewsCount > 0 ? `${emp.avgRating ?? "—"} (${emp.reviewsCount})` : "—"}</td>
+                    <td className="establishment-team-table-cell establishment-team-table-cell-status p-3 text-center">
+                      <div className="flex flex-wrap items-center justify-center gap-2">
+                        <span className={`text-xs ${emp.isActive ? "text-[var(--color-accent-emerald)]" : "text-white/80"}`}>{emp.isActive ? "Активен" : "Неактивен"}</span>
+                        <button type="button" onClick={() => toggleActive(emp)} disabled={togglingId === emp.id} className="rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-2 py-1 text-xs text-white hover:bg-[var(--color-dark-gray)]/20 disabled:opacity-50">
+                          {togglingId === emp.id ? "…" : emp.isActive ? "Деактивировать" : "Активировать"}
+                        </button>
+                      </div>
                     </td>
                     <td className="establishment-team-table-cell establishment-team-table-cell-linked whitespace-nowrap p-3 text-white/90 text-center">{emp.hasUser ? "Да" : "Нет"}</td>
-                    <td className="establishment-team-table-cell establishment-team-table-cell-link p-3 text-left">
+                    <td className="establishment-team-table-cell establishment-team-table-cell-link p-3 text-center">
                       {emp.hasUser ? (
                         <span className="text-sm text-white/90">Уже зарегистрирован</span>
                       ) : linkByEmpId[emp.id] ? (
-                        <div className="flex flex-wrap items-center gap-2">
+                        <div className="flex flex-wrap items-center justify-center gap-2">
                           <button type="button" onClick={() => copyLink(linkByEmpId[emp.id])} className="inline-flex items-center gap-1 rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-2 py-1.5 text-xs text-white hover:bg-[var(--color-dark-gray)]/20">
                             <Copy className="h-3 w-3" /> Копировать
                           </button>
@@ -486,7 +576,7 @@ export default function EstablishmentTeamPage() {
                           </button>
                         </div>
                       ) : (
-                        <div className="flex flex-wrap items-center gap-1">
+                        <div className="flex flex-wrap items-center justify-center gap-1">
                           <button type="button" onClick={() => getOrRegenerateToken(emp.id)} disabled={loadingTokenId === emp.id} className="inline-flex items-center gap-1 rounded-lg bg-[var(--color-brand-gold)] px-2 py-1.5 text-xs text-[#0a192f] hover:opacity-90 disabled:opacity-50">
                             {loadingTokenId === emp.id ? "…" : "Выдать ссылку"}
                           </button>
@@ -496,10 +586,12 @@ export default function EstablishmentTeamPage() {
                         </div>
                       )}
                     </td>
-                    <td className="establishment-team-table-cell establishment-team-table-cell-actions p-3 text-left">
-                      <button type="button" onClick={() => openEdit(emp)} className="inline-flex items-center gap-1 rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-2 py-1.5 text-xs text-white hover:bg-[var(--color-dark-gray)]/20">
-                        <Pencil className="h-3 w-3" /> Редактировать
-                      </button>
+                    <td className="establishment-team-table-cell establishment-team-table-cell-actions p-3 text-center">
+                      <div className="flex justify-center">
+                        <button type="button" onClick={() => openEdit(emp)} className="inline-flex items-center gap-1 rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-2 py-1.5 text-xs text-white hover:bg-[var(--color-dark-gray)]/20">
+                          <Pencil className="h-3 w-3" /> Редактировать
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))

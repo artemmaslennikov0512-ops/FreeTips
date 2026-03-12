@@ -118,6 +118,10 @@ async function runOnePayment(
   const payUrl = `${BASE_URL}/pay/${slug}`;
   await page.goto(payUrl, { waitUntil: "domcontentloaded", timeout: PAGE_WAIT_MS });
 
+  // Убираем баннер «Уведомление об использовании cookies», чтобы он не перехватывал клики
+  await page.evaluate(() => localStorage.setItem("cookieConsentAccepted", "1"));
+  await page.reload({ waitUntil: "domcontentloaded" });
+
   const payBtn = page.getByRole("button", { name: /Оплатить/i });
   await payBtn.waitFor({ state: "visible", timeout: 8000 });
   await payBtn.click();

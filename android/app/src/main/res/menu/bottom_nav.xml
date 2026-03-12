@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/nav_home" android:icon="@android:drawable/ic_menu_agenda" android:title="Главная" />
-    <item android:id="@+id/nav_payouts" android:icon="@android:drawable/ic_menu_upload" android:title="Выводы" />
-    <item android:id="@+id/nav_transactions" android:icon="@android:drawable/ic_menu_recent_history" android:title="Операции" />
-    <item android:id="@+id/nav_links" android:icon="@android:drawable/ic_menu_share" android:title="Ссылки" />
-    <item android:id="@+id/nav_profile" android:icon="@android:drawable/ic_menu_preferences" android:title="Профиль" />
+    <item android:id="@+id/nav_home" android:icon="@drawable/ic_nav_home" android:title="Главная" />
+    <item android:id="@+id/nav_transactions" android:icon="@drawable/ic_nav_transactions" android:title="Операции" />
+    <item android:id="@+id/nav_links" android:icon="@drawable/ic_nav_qr" android:title="QR" />
+    <item android:id="@+id/nav_profile" android:icon="@drawable/ic_nav_profile" android:title="Профиль" />
 </menu>

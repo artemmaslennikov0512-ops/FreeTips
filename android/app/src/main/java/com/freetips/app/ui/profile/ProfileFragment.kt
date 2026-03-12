@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.freetips.app.ApiKeyEntryActivity
 import com.freetips.app.R
@@ -32,18 +31,6 @@ class ProfileFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val prefs = SecurePrefs(requireContext())
-        binding.inputBaseUrl.setText(prefs.baseUrl ?: com.freetips.app.BuildConfig.BASE_URL)
-        binding.btnSaveUrl.setOnClickListener {
-            val raw = binding.inputBaseUrl.text?.toString()?.trim()
-            val normalized = when {
-                raw.isNullOrBlank() || !raw.startsWith("http") -> null
-                raw.endsWith("/") -> raw.dropLast(1)
-                else -> raw
-            }
-            prefs.baseUrl = normalized
-            Toast.makeText(requireContext(), getString(R.string.profile_address_saved), Toast.LENGTH_SHORT).show()
-        }
         binding.swipeRefresh.setColorSchemeResources(R.color.primary)
         binding.swipeRefresh.setOnRefreshListener { loadProfile() }
         loadProfile()

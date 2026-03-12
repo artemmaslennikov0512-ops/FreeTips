@@ -8,7 +8,6 @@ import androidx.security.crypto.MasterKey
 
 private const val PREFS_NAME = "freetips_secure"
 private const val KEY_API_KEY = "api_key"
-private const val KEY_BASE_URL = "base_url"
 private const val KEY_HAS_SUCCESSFUL_LOGIN = "has_successful_login"
 
 class SecurePrefs(context: Context) {
@@ -34,49 +33,16 @@ class SecurePrefs(context: Context) {
             prefs.edit().putString(KEY_API_KEY, value?.takeIf { it.isNotBlank() }).apply()
         }
 
-    /** Saved server URL. If null or blank, effectiveBaseUrl uses BuildConfig.BASE_URL. */
-    var baseUrl: String?
-        get() {
-            val raw = prefs.getString(KEY_BASE_URL, null)?.trim()?.takeIf { it.isNotBlank() } ?: return null
-            if (looksLikeApiKey(raw)) {
-                prefs.edit().putString(KEY_BASE_URL, null).apply()
-                return null
-            }
-            return raw
-        }
-        set(value) {
-            val v = value?.trim()?.takeIf { it.isNotBlank() }
-            if (v != null && looksLikeApiKey(v)) return
-            prefs.edit().putString(KEY_BASE_URL, v).apply()
-        }
-
-    /** URL for API requests: saved baseUrl or BuildConfig default. Always has http(s) scheme and no trailing slash. */
+    /** URL for API requests. Always BuildConfig.BASE_URL (normalized). Not stored or visible in app. */
     val effectiveBaseUrl: String
         get() {
-            val saved = baseUrl?.trim()?.takeIf { it.isNotBlank() }
-            val raw = when {
-                saved == null -> BuildConfig.BASE_URL
-                looksLikeApiKey(saved) -> BuildConfig.BASE_URL
-                else -> saved
+            val raw = BuildConfig.BASE_URL.trim().removeSuffix("/")
+            return when {
+                raw.startsWith("http://") || raw.startsWith("https://") -> raw
+                raw.isNotBlank() -> "https://$raw"
+                else -> "https://free-tips.ru"
             }
-            val withoutSlash = raw.removeSuffix("/").trim()
-            val withScheme = when {
-                withoutSlash.startsWith("http://") || withoutSlash.startsWith("https://") -> withoutSlash
-                else -> "https://$withoutSlash"
-            }
-            return withScheme
         }
-
-    private fun looksLikeApiKey(s: String): Boolean {
-        val clean = s.removePrefix("http://").removePrefix("https://").trim()
-        if (clean.isEmpty()) return true
-        if (clean.contains(".")) return false
-        if (clean.length in 32..128 && clean.all { it.isLetterOrDigit() || it == '-' || it == '_' })
-            return true
-        return false
-    }
-
-    fun looksLikeApiKeyPublic(s: String): Boolean = looksLikeApiKey(s)
 
     /** True only after at least one successful login in this install. Used to allow auto-login on next launch. */
     var hasSuccessfulLoginOnce: Boolean

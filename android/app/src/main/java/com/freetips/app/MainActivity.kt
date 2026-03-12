@@ -99,7 +99,7 @@ class MainActivity : AppCompatActivity(), NotificationsBottomSheet.BadgeUpdater 
         }
         ImageViewCompat.setImageTintList(
             binding.btnNotifications,
-            ColorStateList.valueOf(ContextCompat.getColor(this, R.color.primary))
+            ColorStateList.valueOf(ContextCompat.getColor(this, R.color.logo_ft_dark_blue))
         )
     }
 

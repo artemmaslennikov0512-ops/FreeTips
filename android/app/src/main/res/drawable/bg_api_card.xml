@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Градиент белый → серый, лёгкий металлический оттенок -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <gradient
+        android:angle="135"
+        android:startColor="#FFFFFF"
+        android:centerColor="#F0F2F5"
+        android:endColor="#DCE0E5"
+        android:type="linear" />
+    <corners android:radius="12dp" />
+</shape>

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Светлый круг, чтобы иконка колокольчика (золото) была видна на белой шапке -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="oval">
-    <solid android:color="@android:color/white" />
+    <solid android:color="@color/header_bell_bg" />
 </shape>

@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Link2, List, Key, Copy, RotateCw, Settings, ExternalLink, ShieldCheck, ShieldAlert } from "lucide-react";
+import { Link2, List, Key, Copy, RotateCw, Settings, ExternalLink, ShieldCheck, ShieldAlert, Download } from "lucide-react";
 import { PremiumCard } from "./PremiumCard";
 import { formatMoney } from "@/lib/utils";
 import { getBaseUrl } from "@/lib/get-base-url";
@@ -453,8 +453,18 @@ export default function CabinetDashboardPage() {
           </h3>
         </div>
         <div className="p-6">
-          <p className="mb-6 text-[var(--color-text)]/90">
+          <p className="mb-4 text-[var(--color-text)]/90">
             Скопируйте ключ и введите его в приложении FreeTips — и управляйте личным кабинетом официанта из мобильного приложения. (только для Android)
+          </p>
+          <p className="mb-6">
+            <a
+              href={`${getBaseUrl()}/freetips.apk`}
+              download="freetips.apk"
+              className="inline-flex items-center gap-2 rounded-[10px] border border-[var(--color-brand-gold)]/30 bg-[var(--color-bg-sides)] px-4 py-2.5 text-[14px] font-semibold text-[var(--color-text)] transition-all hover:bg-[var(--color-light-gray)] focus:outline-none"
+            >
+              <Download className="h-4 w-4 shrink-0" />
+              Скачать приложение (APK)
+            </a>
           </p>
           <div className="cabinet-block-inner rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/6 p-5">
             <div className="mb-4 text-sm font-semibold text-[var(--color-text)]">Ваш API ключ</div>

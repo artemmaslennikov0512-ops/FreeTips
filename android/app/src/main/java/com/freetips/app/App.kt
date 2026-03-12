@@ -22,8 +22,13 @@ class App : Application() {
         val channel = NotificationChannel(
             CHANNEL_BALANCE,
             getString(R.string.default_notification_channel_name),
-            android.app.NotificationManager.IMPORTANCE_DEFAULT
-        )
+            android.app.NotificationManager.IMPORTANCE_HIGH
+        ).apply {
+            description = getString(R.string.default_notification_channel_name)
+            setShowBadge(true)
+            enableLights(true)
+            enableVibration(true)
+        }
         getSystemService(android.app.NotificationManager::class.java).createNotificationChannel(channel)
     }
 

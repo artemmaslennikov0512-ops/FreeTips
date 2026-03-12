@@ -1,8 +1,12 @@
 package com.freetips.app
 
 import android.content.Intent
+import android.net.Uri
+import android.graphics.LinearGradient
+import android.graphics.Shader
 import android.os.Bundle
 import android.view.View
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.freetips.app.BuildConfig
@@ -25,15 +29,7 @@ class ApiKeyEntryActivity : AppCompatActivity() {
             setContentView(binding.root)
             prefs = SecurePrefs(this)
 
-            binding.inputBaseUrl.hint = "https://ваш-сайт.ru"
-            val urlToShow = if (prefs.hasSuccessfulLoginOnce) {
-                val savedUrl = prefs.baseUrl
-                if (!savedUrl.isNullOrBlank() && !prefs.looksLikeApiKeyPublic(savedUrl)) savedUrl
-                else BuildConfig.BASE_URL.ifBlank { "https://" }
-            } else {
-                BuildConfig.BASE_URL.ifBlank { "https://" }
-            }
-            binding.inputBaseUrl.setText(urlToShow)
+            applyGradientWhenLaidOut(binding.titleHeading)
 
             val savedKey = prefs.apiKey
             if (prefs.hasSuccessfulLoginOnce && !savedKey.isNullOrBlank()) {
@@ -48,20 +44,16 @@ class ApiKeyEntryActivity : AppCompatActivity() {
                     return@setOnClickListener
                 }
                 binding.errorText.visibility = View.GONE
-                validateAndGo(getEffectiveBaseUrl(), key)
+                validateAndGo(key)
             }
 
-            binding.btnReset.setOnClickListener {
-                prefs.clear()
-                binding.inputBaseUrl.setText(BuildConfig.BASE_URL.ifBlank { "https://" })
-                binding.inputApiKey.text?.clear()
-                binding.errorText.visibility = View.GONE
-                binding.progress.visibility = View.GONE
-                binding.btnLogin.isEnabled = true
+            binding.linkDownloadApp.setOnClickListener {
+                val url = "${BuildConfig.BASE_URL.trimEnd('/')}/freetips.apk"
+                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
             }
 
             if (prefs.hasSuccessfulLoginOnce && !savedKey.isNullOrBlank()) {
-                validateAndGo(getEffectiveBaseUrl(), savedKey)
+                validateAndGo(savedKey)
             }
         } catch (t: Throwable) {
             android.util.Log.e("ApiKeyEntry", "onCreate", t)
@@ -76,29 +68,35 @@ class ApiKeyEntryActivity : AppCompatActivity() {
         }
     }
 
-    /** Нормализует URL для запросов: trim, без завершающего слэша (закон Постеля). */
-    private fun normalizeBaseUrl(raw: String): String {
-        val trimmed = raw.trim()
-        return if (trimmed.endsWith("/")) trimmed.dropLast(1) else trimmed
+    private fun applyGradientWhenLaidOut(label: TextView) {
+        label.viewTreeObserver.addOnGlobalLayoutListener(object : android.view.ViewTreeObserver.OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                label.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                val text = label.text?.toString() ?: return
+                if (text.isEmpty()) return
+                val textWidth = label.paint.measureText(text)
+                if (textWidth <= 0f) return
+                val colorWhite = 0xFFFFFFFF.toInt()
+                val colorGold = 0xFFC5A572.toInt()
+                val colors = intArrayOf(colorWhite, colorGold)
+                val positions = floatArrayOf(0f, 0.35f)
+                label.paint.shader = LinearGradient(0f, 0f, textWidth, 0f, colors, positions, Shader.TileMode.CLAMP)
+                label.invalidate()
+            }
+        })
     }
 
-    private fun getEffectiveBaseUrl(): String {
-        val raw = binding.inputBaseUrl.text?.toString()?.trim() ?: ""
-        val url = if (raw.startsWith("http")) raw else BuildConfig.BASE_URL
-        return normalizeBaseUrl(url)
-    }
-
-    private fun validateAndGo(baseUrl: String, apiKey: String) {
+    private fun validateAndGo(apiKey: String) {
         binding.progress.visibility = View.VISIBLE
         binding.btnLogin.isEnabled = false
 
-        ApiClient(apiKey, baseUrl).validateApiKey().enqueue(object : Callback {
+        ApiClient(apiKey, BuildConfig.BASE_URL).validateApiKey().enqueue(object : Callback {
             override fun onFailure(call: okhttp3.Call, e: IOException) {
                 runOnUiThread {
                     binding.progress.visibility = View.GONE
                     binding.btnLogin.isEnabled = true
                     binding.errorText.visibility = View.VISIBLE
-                    binding.errorText.text = "Нет связи с сервером. Проверьте интернет и адрес сервера."
+                    binding.errorText.text = "Нет связи с сервером. Проверьте интернет."
                 }
             }
 
@@ -113,7 +111,6 @@ class ApiKeyEntryActivity : AppCompatActivity() {
                         binding.btnLogin.isEnabled = true
                         if (success) {
                             try {
-                                prefs.baseUrl = baseUrl
                                 prefs.apiKey = apiKey
                                 prefs.hasSuccessfulLoginOnce = true
                             } catch (e: Throwable) {

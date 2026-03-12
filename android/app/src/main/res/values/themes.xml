@@ -24,24 +24,27 @@
         <item name="colorOnSurface">@color/on_surface</item>
         <item name="colorOnSurfaceVariant">@color/on_surface_variant</item>
         <item name="colorError">@color/error</item>
+        <item name="android:textColorPrimary">@color/on_surface</item>
+        <item name="android:textColorSecondary">@color/on_surface_variant</item>
+        <item name="android:windowContentOverlay">@null</item>
         <item name="android:statusBarColor">?attr/freetips_statusBarColor</item>
         <item name="android:navigationBarColor">?attr/freetips_navigationBarColor</item>
-        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightStatusBar">true</item>
         <item name="android:windowBackground">@color/background</item>
-        <item name="android:windowLightNavigationBar">false</item>
+        <item name="android:windowLightNavigationBar">true</item>
         <item name="materialButtonStyle">@style/Widget.FreeTips.Button</item>
-        <!-- Поэлементные атрибуты (можно менять только нужный блок) -->
-        <item name="freetips_headerBarBackground">@color/surface</item>
-        <item name="freetips_headerBarTextColor">@color/on_surface</item>
-        <item name="freetips_headerBarIconColor">@color/on_surface</item>
+        <!-- Поэлементные атрибуты: шапка и низ белые, иконки/подписи — золото и тёмно-синий -->
+        <item name="freetips_headerBarBackground">@color/surface_light</item>
+        <item name="freetips_headerBarTextColor">@color/logo_ft_dark_blue</item>
+        <item name="freetips_headerBarIconColor">@color/primary</item>
         <item name="freetips_screenBackground">@color/background</item>
-        <item name="freetips_bottomNavBackground">@color/surface</item>
+        <item name="freetips_bottomNavBackground">@color/surface_light</item>
         <item name="freetips_bottomNavIconColor">@color/bottom_nav_color</item>
         <item name="freetips_cardBackground">@color/surface</item>
         <item name="freetips_cardTextColor">@color/on_surface</item>
         <item name="freetips_cardTextColorVariant">@color/on_surface_variant</item>
-        <item name="freetips_statusBarColor">@color/background</item>
-        <item name="freetips_navigationBarColor">@color/surface</item>
+        <item name="freetips_statusBarColor">@color/surface_light</item>
+        <item name="freetips_navigationBarColor">@color/surface_light</item>
         <!-- Положение и отступы (можно менять без смены цветов темы) -->
         <item name="freetips_headerBarPaddingStart">@dimen/header_content_inset</item>
         <item name="freetips_headerBarPaddingEnd">@dimen/header_content_inset</item>

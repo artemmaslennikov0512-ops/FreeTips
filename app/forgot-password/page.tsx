@@ -56,17 +56,17 @@ export default function ForgotPasswordPage() {
 
   return (
     <AuthPageShell>
-      <div className="mx-auto flex min-h-[80vh] max-w-md flex-col justify-center px-4 py-16">
+      <div className="forgot-password-page mx-auto flex min-h-[80vh] max-w-md flex-col justify-center px-4 py-16">
         <div className={`${AUTH_CARD_CLASS} text-center`}>
           {/* Иконка, заголовок и описание — по центру */}
-          <div className="mx-auto max-w-full">
+          <div className="forgot-password-header mx-auto max-w-full">
             <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[var(--color-accent-gold)]/20 text-[var(--color-accent-gold)] ring-2 ring-[var(--color-accent-gold)]/40">
               <KeyRound className="h-6 w-6" />
             </div>
-            <h1 className="text-sm font-semibold leading-tight text-[var(--color-text)]">
+            <h1 className="forgot-password-title">
               Восстановление пароля
             </h1>
-            <p className="mt-3 text-xs text-[var(--color-text-secondary)] max-w-md mx-auto">
+            <p className="forgot-password-desc mt-3 text-[var(--color-text-secondary)] max-w-md mx-auto">
               {success
                 ? "На указанный email отправлена ссылка для сброса пароля. Проверьте почту и папку «Спам»."
                 : "Укажите логин и почту — мы отправим ссылку на сброс пароля. Логин и email должны принадлежать одному аккаунту."}
@@ -97,7 +97,7 @@ export default function ForgotPasswordPage() {
                       className={`${AUTH_INPUT_CLASS} ${fieldErrors.login ? AUTH_ERROR_BORDER : ""}`}
                     />
                   </div>
-                  <p className="mt-1 text-[10px] leading-snug text-[var(--color-text-secondary)]">
+                  <p className="forgot-password-tip mt-1 leading-snug text-[var(--color-text-secondary)]">
                     Логин можно вводить с большой или маленькой буквы.
                   </p>
                   {fieldErrors.login && (
@@ -120,7 +120,7 @@ export default function ForgotPasswordPage() {
                       className={`${AUTH_INPUT_CLASS} ${fieldErrors.email ? AUTH_ERROR_BORDER : ""}`}
                     />
                   </div>
-                  <p className="mt-1 text-[10px] leading-snug text-[var(--color-text-secondary)]">
+                  <p className="forgot-password-tip mt-1 leading-snug text-[var(--color-text-secondary)]">
                     Это правильная почта? Проверьте перед отправкой.
                   </p>
                   {fieldErrors.email && (

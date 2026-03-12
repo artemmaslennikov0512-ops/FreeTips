@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Золотой градиент карты, как на сайте (brand gold #c5a572) -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item>
         <shape android:shape="rectangle">
             <gradient
                 android:angle="135"
-                android:startColor="#0a192f"
-                android:centerColor="#1e2a3a"
-                android:endColor="#0a192f"
+                android:startColor="#9A7B4F"
+                android:centerColor="#C5A572"
+                android:endColor="#D4B896"
                 android:type="linear" />
             <corners android:radius="12dp" />
         </shape>

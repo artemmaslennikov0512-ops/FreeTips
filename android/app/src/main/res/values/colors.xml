@@ -33,6 +33,8 @@
     <color name="on_surface_light">#1C1B1F</color>
     <color name="on_surface_light_variant">#6B7280</color>
     <color name="amount_chip_bg_light">#E5E7EB</color>
+    <!-- Кнопка колокольчика на белой шапке -->
+    <color name="header_bell_bg">#E8E8E8</color>
 
     <!-- Legacy -->
     <color name="ic_launcher_background">#0D1117</color>

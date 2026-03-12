@@ -4,7 +4,12 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.LinearGradient
+import android.graphics.Paint
+import android.graphics.Shader
+import android.widget.TextView
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -82,7 +87,9 @@ class LinksFragment : Fragment() {
                             binding.linksList.text = if (sb.isEmpty()) "Нет ссылок" else sb.toString().trim()
                             firstUrl?.let { url ->
                                 binding.qrCard.visibility = View.VISIBLE
-                                binding.qrImage.setImageBitmap(encodeQrToBitmap(url, 512))
+                                binding.qrImage.setImageBitmap(encodeQrToBitmap(requireContext(), url, 512))
+                                binding.qrLabel.text = "Официант"
+                                applyGradientWhenLaidOut(binding.qrLabel)
                             } ?: run { binding.qrCard.visibility = View.GONE }
                             binding.linksList.setOnLongClickListener {
                                 val firstUrl = sb.toString().trim().lineSequence().firstOrNull { it.startsWith("http") }
@@ -112,18 +119,44 @@ class LinksFragment : Fragment() {
         super.onDestroyView()
     }
 
-    private fun encodeQrToBitmap(content: String, sizePx: Int): Bitmap {
+    private fun encodeQrToBitmap(context: Context, content: String, sizePx: Int): Bitmap {
         val writer = QRCodeWriter()
-        val hints = mapOf(EncodeHintType.MARGIN to 1)
+        val hints = mapOf(EncodeHintType.MARGIN to 2)
         val bitMatrix = writer.encode(content, BarcodeFormat.QR_CODE, sizePx, sizePx, hints)
         val w = bitMatrix.width
         val h = bitMatrix.height
-        val bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.RGB_565)
+
+        val colorBlue = 0xFF0D1B2A.toInt()
+        val colorGold = 0xFFC5A572.toInt()
+        val gradient = LinearGradient(0f, 0f, w.toFloat(), h.toFloat(), colorBlue, colorGold, Shader.TileMode.CLAMP)
+        val gradientBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+        val gradCanvas = Canvas(gradientBitmap)
+        val gradPaint = Paint().apply { shader = gradient }
+        gradCanvas.drawRect(0f, 0f, w.toFloat(), h.toFloat(), gradPaint)
+
+        val bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
         for (x in 0 until w) {
             for (y in 0 until h) {
-                bitmap.setPixel(x, y, if (bitMatrix[x, y]) Color.BLACK else Color.WHITE)
+                bitmap.setPixel(x, y, if (bitMatrix[x, y]) gradientBitmap.getPixel(x, y) else Color.WHITE)
             }
         }
+        gradientBitmap.recycle()
         return bitmap
+    }
+
+    private fun applyGradientWhenLaidOut(label: TextView) {
+        label.viewTreeObserver.addOnGlobalLayoutListener(object : android.view.ViewTreeObserver.OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                label.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                val text = label.text?.toString() ?: return
+                if (text.isEmpty()) return
+                val textWidth = label.paint.measureText(text)
+                if (textWidth <= 0f) return
+                val colorBlue = 0xFF0D1B2A.toInt()
+                val colorGold = 0xFFC5A572.toInt()
+                label.paint.shader = LinearGradient(0f, 0f, textWidth, 0f, colorBlue, colorGold, Shader.TileMode.CLAMP)
+                label.invalidate()
+            }
+        })
     }
 }

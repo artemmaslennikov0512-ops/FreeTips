@@ -2293,6 +2293,30 @@ p {
   text-align: center !important;
 }
 
+/* Страница восстановления пароля: переопределяем глобальные h1/p, чтобы заголовок был по центру и мельче, подсказки 10px */
+.forgot-password-page .forgot-password-title {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  text-align: center !important;
+  line-height: 1.2 !important;
+  margin-bottom: 0 !important;
+  color: var(--color-text) !important;
+}
+.forgot-password-page .forgot-password-header {
+  text-align: center !important;
+}
+.forgot-password-page .forgot-password-desc {
+  font-size: 12px !important;
+  font-weight: 400 !important;
+  text-align: center !important;
+  margin-bottom: 0 !important;
+}
+.forgot-password-page .forgot-password-tip {
+  font-size: 10px !important;
+  font-weight: 400 !important;
+  margin-bottom: 0 !important;
+}
+
 /* Герой-секция лендинга: вернуть исходные размеры заголовка и текста (не трогать глобальной шкалой) */
 .hero-premium-section .hero-premium-title,
 .hero-premium-section h1 {

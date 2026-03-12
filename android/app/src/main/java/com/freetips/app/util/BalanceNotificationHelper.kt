@@ -1,9 +1,12 @@
 package com.freetips.app.util
 
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.freetips.app.App
+import com.freetips.app.MainActivity
 import com.freetips.app.R
 
 /**
@@ -49,12 +52,18 @@ object BalanceNotificationHelper {
     }
 
     private fun showSystemNotification(context: Context, title: String, text: String) {
+        val openApp = Intent(context, MainActivity::class.java).apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP }
+        val pending = PendingIntent.getActivity(context, 0, openApp, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         val builder = NotificationCompat.Builder(context, App.CHANNEL_BALANCE)
-            .setSmallIcon(android.R.drawable.ic_dialog_info)
+            .setSmallIcon(R.drawable.ic_notification_small)
             .setContentTitle(title)
             .setContentText(text)
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setContentIntent(pending)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            .setCategory(NotificationCompat.CATEGORY_MESSAGE)
             .setAutoCancel(true)
+            .setDefaults(NotificationCompat.DEFAULT_ALL)
         try {
             if (NotificationManagerCompat.from(context).areNotificationsEnabled()) {
                 NotificationManagerCompat.from(context).notify(NOTIFICATION_ID_TOPUP, builder.build())

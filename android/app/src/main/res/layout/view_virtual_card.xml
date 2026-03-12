@@ -27,7 +27,7 @@
             android:textSize="10sp"
             android:textStyle="bold"
             android:letterSpacing="0.12"
-            android:textColor="@android:color/white" />
+            android:textColor="@color/on_primary" />
 
         <!-- Чип с аббревиатурой FT и логотип FreeTips, снизу слева -->
         <LinearLayout
@@ -59,7 +59,7 @@
                     android:text="Free"
                     android:textSize="12sp"
                     android:textStyle="bold"
-                    android:textColor="@color/on_surface"
+                    android:textColor="@color/on_primary"
                     android:alpha="0.9" />
                 <TextView
                     android:layout_width="wrap_content"
@@ -67,7 +67,7 @@
                     android:text="Tips"
                     android:textSize="12sp"
                     android:textStyle="bold"
-                    android:textColor="@android:color/white" />
+                    android:textColor="@color/on_primary" />
             </LinearLayout>
         </LinearLayout>
 
@@ -84,7 +84,7 @@
                 android:layout_height="wrap_content"
                 android:text="БАЛАНС"
                 android:textSize="10sp"
-                android:textColor="@color/on_surface"
+                android:textColor="@color/on_primary"
                 android:alpha="0.7" />
             <TextView
                 android:id="@+id/cardBalance"
@@ -93,7 +93,7 @@
                 android:layout_marginTop="2dp"
                 android:textSize="20sp"
                 android:textStyle="bold"
-                android:textColor="@android:color/white"
+                android:textColor="@color/on_primary"
                 tools:text="20 200,00 ₽" />
         </LinearLayout>
     </FrameLayout>

@@ -15,9 +15,9 @@
     <dimen name="card_to_section_margin">32dp</dimen>
     <dimen name="card_inset_margin">12dp</dimen>
 
-    <!-- Карточки -->
+    <!-- Карточки: больше elevation для читаемости на тёмном фоне -->
     <dimen name="card_radius">12dp</dimen>
-    <dimen name="card_elevation">2dp</dimen>
+    <dimen name="card_elevation">4dp</dimen>
     <dimen name="card_padding">16dp</dimen>
     <dimen name="card_padding_large">24dp</dimen>
     <dimen name="content_inset_horizontal">8dp</dimen>

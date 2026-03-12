@@ -15,12 +15,13 @@
         android:background="?attr/freetips_headerBarBackground"
         android:elevation="4dp" />
 
-    <!-- Логотип и колокольчик под шапкой, без фона шапки -->
+    <!-- Логотип и колокольчик: белый фон как у шапки -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
+        android:background="?attr/freetips_headerBarBackground"
         android:paddingStart="?attr/freetips_headerBarPaddingStart"
         android:paddingEnd="?attr/freetips_headerBarPaddingEnd"
         android:paddingTop="?attr/freetips_headerBarPaddingTop"

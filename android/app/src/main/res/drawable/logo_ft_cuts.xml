@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- F и T со срезами: F — срез верхней плашки вправо-вниз, T — срез верхней плашки и нижний срез ножки -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="80dp"
+    android:height="80dp"
+    android:viewportWidth="80"
+    android:viewportHeight="80">
+
+    <!-- F: вертикальная ножка (толще) -->
+    <path
+        android:fillColor="@color/primary"
+        android:pathData="M6,6 L16,6 L16,74 L6,74 Z" />
+    <!-- F: верхняя плашка со срезом (правый конец вниз-вправо) -->
+    <path
+        android:fillColor="@color/primary"
+        android:pathData="M6,6 L38,6 L42,14 L16,14 Z" />
+    <!-- F: средняя плашка -->
+    <path
+        android:fillColor="@color/primary"
+        android:pathData="M6,34 L30,34 L30,42 L6,42 Z" />
+
+    <!-- T: верхняя плашка со срезом справа -->
+    <path
+        android:fillColor="@color/primary"
+        android:pathData="M48,6 L76,6 L80,14 L52,14 Z" />
+    <!-- T: ножка со срезом внизу справа -->
+    <path
+        android:fillColor="@color/primary"
+        android:pathData="M58,14 L70,14 L70,64 L64,70 L58,70 L58,64 Z" />
+</vector>

@@ -34,6 +34,14 @@
                     android:layout_marginEnd="@dimen/card_inset_margin"
                     android:layout_marginTop="@dimen/card_inset_margin" />
 
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnPayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_lg"
+                    android:minHeight="@dimen/touch_target_min"
+                    android:text="Вывод" />
+
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -58,17 +66,6 @@
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/spacing_lg"
-        app:srcCompat="@android:drawable/ic_input_add"
-        app:backgroundTint="@color/primary"
-        app:tint="@color/on_primary"
-        android:contentDescription="Вывести" />
 
     <ProgressBar
         android:id="@+id/progress"

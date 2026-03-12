@@ -40,7 +40,7 @@ class PayoutsFragment : Fragment() {
         binding.swipeRefresh.setColorSchemeResources(R.color.primary)
         binding.swipeRefresh.setOnRefreshListener { loadPayouts() }
         loadPayouts()
-        binding.fab.setOnClickListener { showCreatePayoutDialog() }
+        binding.btnPayout.setOnClickListener { showCreatePayoutDialog() }
     }
 
     private fun loadPayouts() {

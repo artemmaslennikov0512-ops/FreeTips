@@ -6,8 +6,6 @@
 
     <fragment android:id="@+id/nav_home" android:name="com.freetips.app.ui.home.HomeFragment"
         android:label="Главная" />
-    <fragment android:id="@+id/nav_payouts" android:name="com.freetips.app.ui.payouts.PayoutsFragment"
-        android:label="Выводы" />
     <fragment android:id="@+id/nav_transactions" android:name="com.freetips.app.ui.transactions.TransactionsFragment"
         android:label="Операции" />
     <fragment android:id="@+id/nav_links" android:name="com.freetips.app.ui.links.LinksFragment"

@@ -11,7 +11,7 @@
  *
  * Запуск:
  *   npx tsx scripts/load-test-payments-e2e.ts [число_платежей] [параллельных_потоков]
- * По умолчанию: 20 платежей, 1 поток. Параллельных потоков 2–5 — нагрузка на сайт выше.
+ * По умолчанию: 50 платежей, 3 потока (нагрузка). Для быстрой проверки: ... 5 1
  * HEADLESS=0 — показать браузер.
  */
 
@@ -33,10 +33,11 @@ const BASE_URL =
 
 const E2E_SLUG = "test-waiter-e2e";
 const TEST_PASSWORD = "TestPassword123!";
-const PAGE_WAIT_MS = 20_000;
-const CARD_SUBMIT_WAIT_MS = 70_000;
-const RELOCATE_POLL_MS = 90_000; // сколько ждать переливов по БД после последнего платежа
+const PAGE_WAIT_MS = 25_000;
+const CARD_SUBMIT_WAIT_MS = 75_000;
+const RELOCATE_POLL_MS = 120_000; // сколько ждать переливов по БД после последнего платежа
 const RELOCATE_POLL_INTERVAL_MS = 2_000;
+const DELAY_BETWEEN_PAYMENTS_MS = 600; // пауза между оплатами в одном потоке (под нагрузкой меньше)
 
 const CARD_SELECTORS = {
   pan: [
@@ -174,7 +175,7 @@ const DEFAULT_TEST_CVC = "983";
 
 async function main() {
   const countArg = process.argv[2]?.trim();
-  const numPayments = countArg ? Math.max(1, parseInt(countArg, 10) || 20) : 20;
+  const numPayments = countArg ? Math.max(1, parseInt(countArg, 10) || 50) : 50;
 
   const pan = (process.env.PAYGINE_TEST_PAN?.replace(/\s/g, "") ?? DEFAULT_TEST_PAN).trim();
   let expdate = process.env.PAYGINE_TEST_EXPIRY?.trim() ?? DEFAULT_TEST_EXPIRY;
@@ -227,7 +228,7 @@ async function main() {
   }
 
   const concurrentArg = process.argv[3]?.trim();
-  const concurrent = concurrentArg ? Math.max(1, Math.min(10, parseInt(concurrentArg, 10) || 1)) : 1;
+  const concurrent = concurrentArg ? Math.max(1, Math.min(10, parseInt(concurrentArg, 10) || 3)) : 3;
   const paymentsPerWorker = Math.ceil(numPayments / concurrent);
 
   console.log(
@@ -238,6 +239,7 @@ async function main() {
   const startTime = new Date();
 
   const results: { ok: boolean; error?: string }[] = [];
+  let completedCount = 0;
   const runWorker = async (workerIndex: number) => {
     const context = await browser.newContext();
     const page = await context.newPage();
@@ -245,10 +247,14 @@ async function main() {
     for (let i = 0; i < myCount; i++) {
       const r = await runOnePayment(page, slug, pan, expdate, cvc);
       results.push(r);
+      completedCount += 1;
       if (concurrent === 1) {
-        console.log(r.ok ? `   Платёж ${results.length}/${numPayments}: успех` : `   Платёж ${results.length}/${numPayments}: ${r.error ?? "ошибка"}`);
+        console.log(r.ok ? `   Платёж ${completedCount}/${numPayments}: успех` : `   Платёж ${completedCount}/${numPayments}: ${r.error ?? "ошибка"}`);
+      } else if (completedCount % 10 === 0 || completedCount === numPayments) {
+        const okSoFar = results.filter((x) => x.ok).length;
+        console.log(`   Выполнено ${completedCount}/${numPayments}, успешно: ${okSoFar}`);
       }
-      if (i < myCount - 1) await page.waitForTimeout(1200);
+      if (i < myCount - 1) await page.waitForTimeout(DELAY_BETWEEN_PAYMENTS_MS);
     }
     await context.close();
   };

@@ -123,6 +123,7 @@ export function Header() {
             <span className="site-header-logo-text font-[family:var(--font-playfair)] text-sm font-bold sm:text-base lg:text-lg text-[var(--color-navy)]"><span className="site-header-logo-free">Free</span><span className="text-[var(--color-brand-gold)]">Tips</span></span>
           </Link>
           <nav className="hidden lg:flex shrink-0 items-center justify-center gap-1.5 xl:gap-2 2xl:gap-3" aria-label="Навигация">
+            <Link href="/#app" className="whitespace-nowrap rounded-xl border-0 bg-[var(--color-white)]/95 backdrop-blur-sm shadow-[var(--shadow-subtle)] px-2.5 py-2 font-medium text-[14px] text-[var(--color-navy)] transition-all hover:shadow-[var(--shadow-soft)] hover:-translate-y-0.5 xl:px-3 xl:py-2.5 2xl:px-4">Приложение</Link>
             <Link href="/#features" className="whitespace-nowrap rounded-xl border-0 bg-[var(--color-white)]/95 backdrop-blur-sm shadow-[var(--shadow-subtle)] px-2.5 py-2 font-medium text-[14px] text-[var(--color-navy)] transition-all hover:shadow-[var(--shadow-soft)] hover:-translate-y-0.5 xl:px-3 xl:py-2.5 2xl:px-4">Преимущества</Link>
             <Link href="/#process" className="whitespace-nowrap rounded-xl border-0 bg-[var(--color-white)]/95 backdrop-blur-sm shadow-[var(--shadow-subtle)] px-2.5 py-2 font-medium text-[14px] text-[var(--color-navy)] transition-all hover:shadow-[var(--shadow-soft)] hover:-translate-y-0.5 xl:px-3 xl:py-2.5 2xl:px-4">Как работает</Link>
             <Link href="/#business" className="whitespace-nowrap rounded-xl border-0 bg-[var(--color-white)]/95 backdrop-blur-sm shadow-[var(--shadow-subtle)] px-2.5 py-2 font-medium text-[14px] text-[var(--color-navy)] transition-all hover:shadow-[var(--shadow-soft)] hover:-translate-y-0.5 xl:px-3 xl:py-2.5 2xl:px-4">Для бизнеса</Link>
@@ -187,6 +188,7 @@ export function Header() {
               </button>
             </div>
             <nav className="flex flex-col gap-2">
+              <Link href="/#app" onClick={close} className="py-3 text-[14px] font-medium text-white hover:text-[var(--color-brand-gold)]">Приложение</Link>
               <Link href="/#features" onClick={close} className="py-3 text-[14px] font-medium text-white hover:text-[var(--color-brand-gold)]">Преимущества</Link>
               <Link href="/#process" onClick={close} className="py-3 text-[14px] font-medium text-white hover:text-[var(--color-brand-gold)]">Как работает</Link>
               <Link href="/#business" onClick={close} className="py-3 text-[14px] font-medium text-white hover:text-[var(--color-brand-gold)]">Для бизнеса</Link>

@@ -45,6 +45,14 @@ class LinksFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.swipeRefresh.setColorSchemeResources(R.color.primary)
         binding.swipeRefresh.setOnRefreshListener { loadLinks() }
+        binding.btnCopyLink.setOnClickListener {
+            val url = binding.linksList.text?.toString()
+            if (!url.isNullOrBlank() && url.startsWith("http")) {
+                (requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager)
+                    .setPrimaryClip(ClipData.newPlainText("url", url))
+                Toast.makeText(requireContext(), "Ссылка скопирована", Toast.LENGTH_SHORT).show()
+            }
+        }
         loadLinks()
     }
 
@@ -76,30 +84,19 @@ class LinksFragment : Fragment() {
                         try {
                             @Suppress("UNCHECKED_CAST")
                             val links = (Gson().fromJson(body, Map::class.java)["links"] as? List<*>)?.map { it as Map<*, *> } ?: emptyList()
-                            val sb = StringBuilder()
                             var firstUrl: String? = null
                             links.forEach { m ->
                                 val slug = m["slug"]?.toString() ?: ""
                                 val url = "${base.removeSuffix("/")}/pay/$slug"
                                 if (firstUrl == null) firstUrl = url
-                                sb.append("Ссылка для чаевых:\n$url\n\n")
                             }
-                            binding.linksList.text = if (sb.isEmpty()) "Нет ссылок" else sb.toString().trim()
+                            binding.linksList.text = firstUrl ?: "Нет ссылок"
                             firstUrl?.let { url ->
                                 binding.qrCard.visibility = View.VISIBLE
                                 binding.qrImage.setImageBitmap(encodeQrToBitmap(requireContext(), url, 512))
                                 binding.qrLabel.text = "Официант"
                                 applyGradientWhenLaidOut(binding.qrLabel)
                             } ?: run { binding.qrCard.visibility = View.GONE }
-                            binding.linksList.setOnLongClickListener {
-                                val firstUrl = sb.toString().trim().lineSequence().firstOrNull { it.startsWith("http") }
-                                if (firstUrl != null) {
-                                    (requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager)
-                                        .setPrimaryClip(ClipData.newPlainText("url", firstUrl))
-                                    Toast.makeText(requireContext(), "Ссылка скопирована", Toast.LENGTH_SHORT).show()
-                                }
-                                true
-                            }
                         } catch (_: Exception) {
                             binding.linksList.text = "Нет ссылок"
                             binding.qrCard.visibility = View.GONE

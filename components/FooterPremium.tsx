@@ -10,7 +10,7 @@ function buildFooterColumns(): { title: string; links: { href: string; label: st
     links: site.footer.docs.map((d) => ({ href: d.href, label: d.label })),
   };
   return [
-    { title: "Сервис", links: [{ href: "/#features", label: "Преимущества" }, { href: "/#process", label: "Как работает" }, { href: "/oferta", label: "Тарифы" }, { href: "/politika-bezopasnosti", label: "Безопасность" }] },
+    { title: "Сервис", links: [{ href: "/#app", label: "Приложение" }, { href: "/#features", label: "Преимущества" }, { href: "/#process", label: "Как работает" }, { href: "/oferta", label: "Тарифы" }, { href: "/politika-bezopasnosti", label: "Безопасность" }] },
     docsColumn,
     { title: "Компания", links: [{ href: "/#about", label: "О нас" }, { href: "/kontakty", label: "Контакты" }] },
     { title: "Помощь", links: [{ href: "/kontakty", label: "Поддержка" }, { href: "/zayavka", label: "Оставить заявку" }] },

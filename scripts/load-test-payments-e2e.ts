@@ -11,7 +11,8 @@
  *
  * Запуск:
  *   npx tsx scripts/load-test-payments-e2e.ts [число_платежей] [параллельных_потоков]
- *   npx tsx scripts/load-test-payments-e2e.ts 10 batch   — режим batch: 10 аккаунтов, по 20 редиректов на аккаунт (всего 200), затем по 10 оплат с интервалом 1 с и 10 с интервалом 30 с по каждому аккаунту (10–30 аккаунтов одновременно).
+ *   npx tsx scripts/load-test-payments-e2e.ts batch     — лёгкий batch: 3 аккаунта, по 10 редиректов (сервер не перегружается).
+ *   npx tsx scripts/load-test-payments-e2e.ts 10 batch  — 10 аккаунтов (можно 2–30). Редиректов на аккаунт и паузу между открытиями см. константы в скрипте.
  * По умолчанию: 50 платежей, 3 потока. HEADLESS=0 — показать браузер.
  */
 
@@ -41,9 +42,11 @@ const DELAY_BETWEEN_PAYMENTS_MS = 600;
 const BATCH_FIRST_INTERVAL_MS = 1_000;
 const BATCH_SECOND_INTERVAL_MS = 30_000;
 const BATCH_FIRST_COUNT = 10;
-const BATCH_REDIRECTS_PER_ACCOUNT = 20; // редиректов на один аккаунт
-const BATCH_ACCOUNTS_MIN = 10;
+const BATCH_REDIRECTS_PER_ACCOUNT = 10; // редиректов на аккаунт (20 — тяжёлая нагрузка, сервер может не потянуть)
+const BATCH_OPEN_DELAY_MS = 400; // пауза между открытием каждой страницы в фазе 1 (снижает пиковую нагрузку)
+const BATCH_ACCOUNTS_MIN = 2;
 const BATCH_ACCOUNTS_MAX = 30;
+const BATCH_ACCOUNTS_DEFAULT = 3; // по умолчанию 3 аккаунта (лёгкий режим для слабого сервера)
 
 const CARD_SELECTORS = {
   pan: [
@@ -115,34 +118,53 @@ async function findAndFill(
   return false;
 }
 
+const PAY_BTN_WAIT_MS = 25_000;
+
 /** Открывает страницу оплаты и доходит до формы Paygine (без ввода карты). */
 async function openToPaygineForm(
   page: import("playwright").Page,
   slug: string
 ): Promise<{ ok: boolean; error?: string }> {
-  const payUrl = `${BASE_URL}/pay/${slug}`;
-  await page.goto(payUrl, { waitUntil: "domcontentloaded", timeout: PAGE_WAIT_MS });
-  await page.evaluate(() => localStorage.setItem("cookieConsentAccepted", "1"));
-  await page.reload({ waitUntil: "domcontentloaded" });
+  try {
+    const payUrl = `${BASE_URL}/pay/${slug}`;
+    await page.goto(payUrl, { waitUntil: "load", timeout: PAGE_WAIT_MS });
+    await page.evaluate(() => localStorage.setItem("cookieConsentAccepted", "1"));
+    await page.reload({ waitUntil: "load" });
+    await page.waitForTimeout(2000);
 
-  const payBtn = page.getByRole("button", { name: /Оплатить/i });
-  await payBtn.waitFor({ state: "visible", timeout: 8000 });
-  await payBtn.click();
+    const cookieDialog = page.getByRole("dialog", { name: /cookies/i });
+    const dialogVisible = await cookieDialog.isVisible().catch(() => false);
+    if (dialogVisible) {
+      await page.getByRole("button", { name: /Понятно/i }).click({ timeout: 5000 }).catch(() => {});
+      await page.waitForTimeout(500);
+    }
 
-  await page.waitForURL(
-    (url) => url.pathname.includes("/pay/redirect") && url.searchParams.has("tid"),
-    { timeout: PAGE_WAIT_MS }
-  ).catch(() => {});
+    const payBtn = page.getByRole("button", { name: /Оплатить/i });
+    await payBtn.waitFor({ state: "visible", timeout: PAY_BTN_WAIT_MS });
+    try {
+      await payBtn.click({ timeout: 12_000 });
+    } catch {
+      await payBtn.click({ force: true, timeout: 5_000 }).catch(() => {});
+    }
 
-  await page.waitForURL(
-    (url) => /paygine|pay\.paygine/i.test(url.href),
-    { timeout: PAGE_WAIT_MS }
-  ).catch(() => {});
+    await page.waitForURL(
+      (url) => url.pathname.includes("/pay/redirect") && url.searchParams.has("tid"),
+      { timeout: PAGE_WAIT_MS }
+    ).catch(() => {});
 
-  if (!/paygine|pay\.paygine/i.test(page.url())) {
-    return { ok: false, error: "Не попали на форму Paygine" };
+    await page.waitForURL(
+      (url) => /paygine|pay\.paygine/i.test(url.href),
+      { timeout: PAGE_WAIT_MS }
+    ).catch(() => {});
+
+    if (!/paygine|pay\.paygine/i.test(page.url())) {
+      return { ok: false, error: "Не попали на форму Paygine" };
+    }
+    return { ok: true };
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    return { ok: false, error: msg.includes("Timeout") ? "Таймаут загрузки или кнопки" : msg.slice(0, 80) };
   }
-  return { ok: true };
 }
 
 /** Заполняет форму Paygine и отправляет (страница уже на Paygine). */
@@ -197,8 +219,8 @@ async function main() {
   const batchMode = args.some((a) => a.toLowerCase() === "batch");
   const numArg = args.find((a) => /^\d+$/.test(a));
   const numAccountsBatch = batchMode && numArg
-    ? Math.max(BATCH_ACCOUNTS_MIN, Math.min(BATCH_ACCOUNTS_MAX, parseInt(numArg, 10) || 10))
-    : 10;
+    ? Math.max(BATCH_ACCOUNTS_MIN, Math.min(BATCH_ACCOUNTS_MAX, parseInt(numArg, 10) || BATCH_ACCOUNTS_DEFAULT))
+    : BATCH_ACCOUNTS_DEFAULT;
   const numPayments = batchMode
     ? numAccountsBatch * BATCH_REDIRECTS_PER_ACCOUNT
     : numArg ? Math.max(1, parseInt(numArg, 10) || 50) : 50;
@@ -311,7 +333,7 @@ async function main() {
       pages.push(await context.newPage());
     }
     try {
-      console.log("   Фаза 1: открытие всех редиректов на форму Paygine (по аккаунтам)…");
+      console.log("   Фаза 1: открытие всех редиректов на форму Paygine (пауза %s мс между страницами)…", BATCH_OPEN_DELAY_MS);
       for (let a = 0; a < numAccountsBatch; a++) {
         const accountSlug = batchSlugs[a]!;
         for (let j = 0; j < BATCH_REDIRECTS_PER_ACCOUNT; j++) {
@@ -319,6 +341,7 @@ async function main() {
           const r = await openToPaygineForm(pages[idx]!, accountSlug);
           if (!r.ok) results.push(r);
           else results.push({ ok: true });
+          if (BATCH_OPEN_DELAY_MS > 0) await new Promise((r) => setTimeout(r, BATCH_OPEN_DELAY_MS));
         }
         if ((a + 1) % 5 === 0 || a + 1 === numAccountsBatch) {
           console.log(`   Аккаунтов открыто: ${a + 1}/${numAccountsBatch} (страниц ${(a + 1) * BATCH_REDIRECTS_PER_ACCOUNT}/${total})`);

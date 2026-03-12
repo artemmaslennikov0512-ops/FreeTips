@@ -14,14 +14,14 @@ android {
         versionCode = 1
         versionName = "1.0.0"
 
-        // Site URL — all requests go through it (single backend, no duplicate payment integration)
-        buildConfigField("String", "BASE_URL", "\"https://YOUR-DOMAIN.com\"")
+        // URL сервера (тот же, что NEXT_PUBLIC_APP_URL на бэкенде). Менять при смене окружения.
+        buildConfigField("String", "BASE_URL", "\"https://free-tips.ru\"")
     }
 
     buildTypes {
         debug {
             applicationIdSuffix = ".debug"
-            buildConfigField("String", "BASE_URL", "\"https://YOUR-DOMAIN.com\"")
+            buildConfigField("String", "BASE_URL", "\"https://free-tips.ru\"")
         }
         release {
             isMinifyEnabled = false

@@ -57,16 +57,16 @@ export default function ForgotPasswordPage() {
   return (
     <AuthPageShell>
       <div className="mx-auto flex min-h-[80vh] max-w-md flex-col justify-center px-4 py-16">
-        <div className={AUTH_CARD_CLASS}>
-          {/* Центрируем только иконку, заголовок и описание */}
-          <div className="text-center">
+        <div className={`${AUTH_CARD_CLASS} text-center`}>
+          {/* Иконка, заголовок и описание — по центру */}
+          <div className="mx-auto max-w-full">
             <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[var(--color-accent-gold)]/20 text-[var(--color-accent-gold)] ring-2 ring-[var(--color-accent-gold)]/40">
               <KeyRound className="h-6 w-6" />
             </div>
-            <h1 className="text-base font-semibold leading-tight text-[var(--color-text)]">
+            <h1 className="text-sm font-semibold leading-tight text-[var(--color-text)]">
               Восстановление пароля
             </h1>
-            <p className="mt-3 text-sm text-[var(--color-text-secondary)]">
+            <p className="mt-3 text-xs text-[var(--color-text-secondary)] max-w-md mx-auto">
               {success
                 ? "На указанный email отправлена ссылка для сброса пароля. Проверьте почту и папку «Спам»."
                 : "Укажите логин и почту — мы отправим ссылку на сброс пароля. Логин и email должны принадлежать одному аккаунту."}
@@ -74,13 +74,13 @@ export default function ForgotPasswordPage() {
           </div>
 
           {!success && (
-            <>
+            <div className="text-left">
               {error && (
                 <div className="mt-4 rounded-xl border-0 bg-[var(--color-muted)]/10 p-3 text-sm text-[var(--color-accent-red)]" role="alert">
                   {error}
                 </div>
               )}
-              <form onSubmit={handleSubmit} className="mt-6 space-y-4 text-left">
+              <form onSubmit={handleSubmit} className="mt-6 space-y-4">
                 <div>
                   <label htmlFor="login" className="mb-1.5 block text-sm font-medium text-[var(--color-text)]">
                     Логин
@@ -135,29 +135,31 @@ export default function ForgotPasswordPage() {
                   {loading ? "Отправка…" : "Отправить ссылку"}
                 </button>
               </form>
-            </>
+            </div>
           )}
 
           {success && (
-            <Link
-              href="/login"
-              className="auth-btn-primary mt-6 inline-block rounded-xl bg-[var(--color-brand-gold)] px-6 py-2.5 text-[14px] font-semibold text-[#0a192f] hover:opacity-90 transition-all"
-            >
-              Вернуться к входу
-            </Link>
+            <div className="mt-6 flex justify-center">
+              <Link
+                href="/login"
+                className="auth-btn-primary inline-block rounded-xl bg-[var(--color-brand-gold)] px-6 py-2.5 text-[14px] font-semibold text-[#0a192f] hover:opacity-90 transition-all"
+              >
+                Вернуться к входу
+              </Link>
+            </div>
           )}
-          <div className="text-left">
+          <div className="mt-4 flex flex-col items-center gap-1">
             {!success && (
               <Link
                 href="/login"
-                className="mt-4 inline-block text-sm text-[var(--color-muted)] hover:text-[var(--color-text)] transition-colors"
+                className="text-sm text-[var(--color-muted)] hover:text-[var(--color-text)] transition-colors"
               >
                 Вернуться к входу
               </Link>
             )}
             <Link
               href="/"
-              className="mt-3 block text-sm text-[var(--color-muted)] hover:text-[var(--color-text)] transition-colors"
+              className="text-sm text-[var(--color-muted)] hover:text-[var(--color-text)] transition-colors"
             >
               ← На главную
             </Link>

@@ -27,11 +27,15 @@
 
 ### 1. URL сайта
 
-В `app/build.gradle.kts` укажите ваш домен:
+В `app/build.gradle.kts` задаётся **BASE_URL** — адрес вашего сервера (тот же, что `NEXT_PUBLIC_APP_URL` в `.env` на бэкенде). Сейчас указан продакшен: **https://free-tips.ru**.
+
+Если собираете приложение для другого окружения (тест, локальный сервер), замените в `build.gradle.kts` в секциях `defaultConfig` и `buildTypes.debug`:
 
 ```kotlin
 buildConfigField("String", "BASE_URL", "\"https://ваш-домен.ru\"")
 ```
+
+После смены URL пересоберите приложение (Build → Rebuild Project, затем собрать APK).
 
 ### 2. Подпись release-APK
 

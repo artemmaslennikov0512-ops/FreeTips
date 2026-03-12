@@ -78,6 +78,7 @@ export async function POST(request: NextRequest, { params }: Params) {
 
   const sendResult = await sendEmail({ to: req.email, subject, html });
   if (!sendResult.ok) {
+    // Реальная причина (SMTP/Resend) — в логах; в ответе не отдаём детали из соображений безопасности.
     logError("admin.registration_request.send_token.failed", new Error(sendResult.error), { requestId, registrationRequestId: id });
     return NextResponse.json(
       { error: "Не удалось отправить письмо. Проверьте настройки почты на сервере." },

@@ -44,9 +44,19 @@ function normalizeError(error: unknown): LogContext {
   return { name: error.name, message: error.message };
 }
 
+const LOG_FILE = typeof process !== "undefined" ? process.env.LOG_FILE?.trim() : undefined;
+
 function writeLog(level: LogLevel, message: string, context: LogContext): void {
   const payload = { level, message, ...sanitizeContext(context), timestamp: new Date().toISOString() };
-  console.log(JSON.stringify(payload));
+  const line = JSON.stringify(payload) + "\n";
+  console.log(line.trim());
+  if (LOG_FILE) {
+    try {
+      require("fs").appendFileSync(LOG_FILE, line);
+    } catch {
+      // ignore (e.g. permission, disk)
+    }
+  }
 }
 
 export function logInfo(message: string, context: LogContext = {}): void {

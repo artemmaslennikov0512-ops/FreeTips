@@ -1622,6 +1622,94 @@ html:not([data-theme="dark"]) .cabinet-premium .cabinet-verification-status p {
   color: var(--color-brand-gold);
 }
 
+/* ========== Тестовый ЛК: тёмно-золотая тема (как на референсном дизайне) ========== */
+body.cabinet-test-dark-gold {
+  background: #0f1419 !important;
+}
+body.cabinet-test-dark-gold .site-header {
+  background: #1a1f2e !important;
+  border: 1px solid rgba(197, 165, 114, 0.25) !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(197, 165, 114, 0.08) !important;
+  color: rgba(255, 255, 255, 0.95) !important;
+}
+body.cabinet-test-dark-gold .site-header .site-header-logo-text,
+body.cabinet-test-dark-gold .site-header .site-header-logo-free {
+  color: #ffffff !important;
+}
+body.cabinet-test-dark-gold .site-header .site-header-logo-text span:last-child {
+  color: var(--color-brand-gold) !important;
+}
+body.cabinet-test-dark-gold .site-header .site-header-logo-icon {
+  background: var(--color-brand-gold) !important;
+  color: #0a192f !important;
+}
+body.cabinet-test-dark-gold .site-header a:not([class*="bg-"]),
+body.cabinet-test-dark-gold .site-header button:not([class*="bg-"]) {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+body.cabinet-test-dark-gold .site-header .site-header-cta,
+body.cabinet-test-dark-gold .site-header a[href="/login"] {
+  color: #0a192f !important;
+}
+
+.cabinet-test-dark-gold.cabinet-premium {
+  background: #0f1419 !important;
+}
+.cabinet-test-dark-gold .cabinet-sidebar {
+  background: #1a1f2e !important;
+  border-color: rgba(197, 165, 114, 0.2) !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(197, 165, 114, 0.1) !important;
+  color: rgba(255, 255, 255, 0.92) !important;
+}
+.cabinet-test-dark-gold .cabinet-sidebar .cabinet-sidebar-profile {
+  background: rgba(0, 0, 0, 0.25) !important;
+  border-color: rgba(197, 165, 114, 0.3) !important;
+  color: #fafafa !important;
+}
+.cabinet-test-dark-gold .cabinet-sidebar .cabinet-nav-label {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+.cabinet-test-dark-gold .cabinet-main-block {
+  background: #1a1f2e !important;
+  border-color: rgba(197, 165, 114, 0.25) !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(197, 165, 114, 0.1) !important;
+}
+.cabinet-test-dark-gold .cabinet-card {
+  background: #1e2533 !important;
+  border: 1px solid rgba(197, 165, 114, 0.28) !important;
+  box-shadow: 0 0 0 1px rgba(197, 165, 114, 0.08) !important;
+}
+.cabinet-test-dark-gold .cabinet-block-inner,
+.cabinet-test-dark-gold .cabinet-limits-block {
+  background: rgba(0, 0, 0, 0.2) !important;
+  border-color: rgba(197, 165, 114, 0.28) !important;
+  color: rgba(255, 255, 255, 0.92) !important;
+}
+.cabinet-test-dark-gold .cabinet-block-inner .cabinet-limits-label,
+.cabinet-test-dark-gold .cabinet-limits-block .cabinet-limits-label {
+  color: rgba(255, 255, 255, 0.75) !important;
+}
+.cabinet-test-dark-gold .cabinet-input-window {
+  background: rgba(0, 0, 0, 0.25) !important;
+  border: 1px solid rgba(197, 165, 114, 0.25) !important;
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+.cabinet-test-dark-gold .cabinet-card h3,
+.cabinet-test-dark-gold .cabinet-card .font-semibold,
+.cabinet-test-dark-gold .cabinet-block-inner .font-semibold {
+  color: rgba(255, 255, 255, 0.95) !important;
+}
+.cabinet-test-dark-gold .cabinet-card p,
+.cabinet-test-dark-gold .cabinet-block-inner p {
+  color: rgba(255, 255, 255, 0.88) !important;
+}
+.cabinet-test-dark-gold .cabinet-limits-track {
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+.cabinet-test-dark-gold .cabinet-limits-track > div {
+  background: var(--color-brand-gold) !important;
+}
+
 /* ЛК админа — тёмная тема как в ЛК официанта: стекло, обводка */
 [data-theme="dark"] .admin-panel .admin-sidebar {
   background: rgba(255, 255, 255, 0.06) !important;

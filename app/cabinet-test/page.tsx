@@ -36,11 +36,16 @@ const QUICK_ACTIONS = [
   { href: "#", icon: Settings, title: "Настройки профиля", desc: "Редактировать данные и пароль" },
 ] as const;
 
-/** Тестовая страница дизайна ЛК: те же классы и структура, mock-данные, без авторизации. */
+/** Тестовая страница дизайна ЛК: тёмно-золотая тема, те же классы и структура, mock-данные, без авторизации. */
 export default function CabinetTestPage() {
   useEffect(() => {
-    document.body.classList.add("cabinet-page");
-    return () => document.body.classList.remove("cabinet-page");
+    document.body.classList.add("cabinet-page", "cabinet-test-dark-gold");
+    document.documentElement.setAttribute("data-theme", "dark");
+    return () => {
+      document.body.classList.remove("cabinet-page", "cabinet-test-dark-gold");
+      const saved = typeof localStorage !== "undefined" ? localStorage.getItem("theme") : null;
+      document.documentElement.setAttribute("data-theme", saved === "dark" ? "dark" : "light");
+    };
   }, []);
 
   const displayName = "Иван Петров";
@@ -53,14 +58,15 @@ export default function CabinetTestPage() {
 
   return (
     <div
-      className="cabinet-premium flex min-h-screen w-full max-w-full overflow-x-hidden bg-[var(--color-bg)] font-[family:var(--font-inter)] text-[var(--color-text)] pt-2"
+      className="cabinet-premium cabinet-test-dark-gold flex min-h-screen w-full max-w-full overflow-x-hidden bg-[var(--color-bg)] font-[family:var(--font-inter)] text-[var(--color-text)] pt-2"
+      data-cabinet-theme="dark-gold"
     >
-      {/* Баннер: тестовый дизайн */}
-      <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-center gap-3 bg-amber-500/95 px-4 py-2 text-sm font-semibold text-[#0a192f] shadow-md">
-        <span>Тестовый дизайн ЛК — для экспериментов с оформлением</span>
+      {/* Баннер: тестовый дизайн — в стиле тёмно-золотой темы */}
+      <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-center gap-3 border-b border-[var(--color-brand-gold)]/30 bg-[#1a1f2e]/98 px-4 py-2 text-sm font-semibold text-[var(--color-brand-gold)] shadow-lg backdrop-blur-sm">
+        <span>Тестовый дизайн ЛК — тёмно-золотая тема</span>
         <Link
           href="/"
-          className="rounded-lg bg-[#0a192f] px-3 py-1.5 text-xs font-medium text-white hover:opacity-90"
+          className="rounded-lg bg-[var(--color-brand-gold)] px-3 py-1.5 text-xs font-medium text-[#0a192f] hover:opacity-90"
         >
           На главную
         </Link>
@@ -68,8 +74,7 @@ export default function CabinetTestPage() {
 
       {/* Сайдбар — те же классы, что в реальном ЛК */}
       <div
-        className="cabinet-sidebar hidden lg:flex fixed left-0 top-0 z-40 h-full w-[min(calc(100vw-4rem),20rem)] max-w-[20rem] flex-col overflow-hidden border-0 border-r border-white/10 py-6 shadow-2xl backdrop-blur-xl lg:static lg:ml-0 lg:mt-2 lg:mr-0 lg:mb-0 lg:h-auto lg:max-h-[calc(100vh-2rem)] lg:w-[260px] lg:max-w-none lg:rounded-[10px] lg:border lg:self-start"
-        style={{ backgroundColor: "rgba(255,255,255,0.06)" }}
+        className="cabinet-sidebar hidden lg:flex fixed left-0 top-0 z-40 h-full w-[min(calc(100vw-4rem),20rem)] max-w-[20rem] flex-col overflow-hidden border-0 border-r border-[var(--color-brand-gold)]/15 py-6 shadow-2xl backdrop-blur-xl lg:static lg:ml-0 lg:mt-2 lg:mr-0 lg:mb-0 lg:h-auto lg:max-h-[calc(100vh-2rem)] lg:w-[260px] lg:max-w-none lg:rounded-[10px] lg:border lg:self-start"
       >
         <div
           className="cabinet-sidebar-profile cabinet-block-inner mx-4 rounded-[10px] border border-[var(--color-brand-gold)]/20 px-4 py-3 bg-[var(--color-dark-gray)]/10"
@@ -98,7 +103,7 @@ export default function CabinetTestPage() {
                 href={href}
                 className={`flex items-center gap-3 rounded-lg px-3 py-3 font-medium transition-colors ${
                   href === "/cabinet-test"
-                    ? "cabinet-nav-active border border-[#0a192f]/25 bg-[#0a192f]/10 text-[#0a192f] font-semibold"
+                    ? "cabinet-nav-active border border-[var(--color-brand-gold)]/30 bg-[var(--color-brand-gold)]/15 text-[var(--color-brand-gold)] font-semibold"
                     : "border border-transparent text-[var(--color-text)]/80 hover:bg-[var(--color-dark-gray)]/10 hover:text-[var(--color-text)]"
                 }`}
               >
@@ -118,10 +123,7 @@ export default function CabinetTestPage() {
       </div>
 
       <main className="min-h-screen min-w-0 flex-1 overflow-x-hidden px-0 pt-14 pb-4 md:px-4 lg:pl-0 lg:pr-4 lg:pt-14 flex flex-col">
-        <div
-          className="cabinet-main-block mt-0 mr-0 mb-4 ml-0 lg:mr-4 lg:ml-4 flex min-h-0 flex-1 w-full max-w-full flex-col rounded-lg md:rounded-[10px] border border-white/10 backdrop-blur-xl"
-          style={{ backgroundColor: "rgba(255,255,255,0.06)" }}
-        >
+        <div className="cabinet-main-block mt-0 mr-0 mb-4 ml-0 lg:mr-4 lg:ml-4 flex min-h-0 flex-1 w-full max-w-full flex-col rounded-lg md:rounded-[10px] border border-[var(--color-brand-gold)]/20 backdrop-blur-xl">
           <div className="p-4 md:p-6 lg:p-8" id="main-content">
             <div className="space-y-8">
               <div className="grid gap-6 lg:grid-cols-2">

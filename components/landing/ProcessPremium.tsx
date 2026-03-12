@@ -25,7 +25,7 @@ const steps = [
 
 export function ProcessPremium() {
   return (
-    <section id="process" className="section-dark w-full py-12 sm:py-16 lg:py-[100px] bg-[var(--color-navy)] text-[var(--color-on-navy)] relative overflow-hidden">
+    <section id="process" className="section-dark w-full py-12 sm:py-16 lg:py-[100px] bg-[var(--color-charcoal)] text-[var(--color-on-navy)] relative overflow-hidden">
       <div
         className="absolute inset-0 opacity-[0.04] z-[1]"
         style={{

@@ -100,12 +100,12 @@ export function HeroPremium() {
             </div>
           </div>
 
-          {/* Правая колонка: Всё под вашим брендом — центрирование, настройки, превью, ссылка на заявку */}
+          {/* Правая колонка: Настраивайте под свой бренд — центрирование, настройки, превью, ссылка на заявку */}
           <div className="hero-brand-card mt-4 lg:mt-0 lg:shrink-0 lg:w-[340px] xl:w-[360px] relative z-[2] rounded-2xl border border-white/15 bg-gradient-to-b from-white/[0.08] to-white/[0.03] backdrop-blur-md shadow-[0_8px_32px_rgba(0,0,0,0.2)] overflow-hidden">
             <div className="h-1 w-full bg-gradient-to-r from-[var(--color-accent-gold)]/80 via-[var(--color-accent-gold)] to-[var(--color-accent-gold)]/60 relative z-10" aria-hidden />
-            <div className="px-5 py-5 sm:px-6 sm:py-6 relative z-10 text-center flex flex-col items-center">
-              <h2 className="font-[family:var(--font-inter)] text-xl sm:text-2xl font-bold text-[var(--color-on-navy)] leading-tight mb-4">
-                Всё под вашим брендом
+            <div className="px-5 py-5 sm:px-6 sm:py-6 relative z-10 flex flex-col items-center">
+              <h2 className="font-[family:var(--font-inter)] text-xl sm:text-2xl font-bold text-[var(--color-on-navy)] leading-tight mb-4 w-full text-center">
+                Настраивайте под свой бренд
               </h2>
 
               <div className="w-full mb-5">

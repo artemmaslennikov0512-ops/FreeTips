@@ -22,7 +22,7 @@ const cards = [
 
 export function BusinessPremium() {
   return (
-    <section id="business" className="relative overflow-hidden w-full py-12 sm:py-16 lg:py-[100px] bg-[var(--color-charcoal)]">
+    <section id="business" className="relative overflow-hidden w-full py-12 sm:py-16 lg:py-[100px] bg-[var(--color-navy)]">
       <div
         className="absolute inset-0 opacity-[0.04] z-[1]"
         style={{

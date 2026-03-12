@@ -50,7 +50,13 @@ const PREVIEW_ITEMS = [
 export function HeroPremium() {
   return (
     <section className="section-dark hero-premium-section relative overflow-hidden w-full bg-[var(--color-navy)] pt-[100px] pb-[48px] sm:pt-[120px] sm:pb-[60px]">
-      {/* Градиент для глубины — без изменений */}
+      {/* Фон: официант с QR, гость с экраном успеха */}
+      <div
+        className="absolute inset-0 z-[0] bg-cover bg-center bg-no-repeat opacity-[0.25]"
+        style={{ backgroundImage: "url('/images/waiter-qr-guest-success-freetips-ui.png')" }}
+        aria-hidden
+      />
+      {/* Градиент для глубины */}
       <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-navy)] via-transparent to-[var(--color-charcoal)]/30 pointer-events-none z-[1]" aria-hidden />
       <div
         className="absolute inset-0 opacity-[0.04] z-[1]"

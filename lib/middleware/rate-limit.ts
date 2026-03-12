@@ -43,17 +43,23 @@ export const WEBHOOK_RATE_LIMIT = {
   keyPrefix: "webhook",
 } as const;
 
-/** Окно и лимит для POST /api/pay/[slug] по IP (антифрод) */
+/** Окно и лимит для POST /api/pay/[slug] по IP (антифрод). По умолчанию 2000; в проде можно задать PAY_RATE_LIMIT_IP_MAX=60. */
 export const PAY_RATE_LIMIT_IP = {
   windowMs: 15 * 60 * 1000,
-  maxRequests: 60,
+  maxRequests:
+    typeof process !== "undefined" && process.env.PAY_RATE_LIMIT_IP_MAX !== undefined && process.env.PAY_RATE_LIMIT_IP_MAX !== ""
+    ? Math.max(10, parseInt(process.env.PAY_RATE_LIMIT_IP_MAX, 10) || 60)
+    : 2000,
   keyPrefix: "pay-ip",
 } as const;
 
-/** Окно и лимит для POST /api/pay/[slug] по slug (защита от накрутки) */
+/** Окно и лимит для POST /api/pay/[slug] по slug (защита от накрутки). По умолчанию 2000; в проде можно задать PAY_RATE_LIMIT_SLUG_MAX=30. */
 export const PAY_RATE_LIMIT_SLUG = {
   windowMs: 15 * 60 * 1000,
-  maxRequests: 30,
+  maxRequests:
+    typeof process !== "undefined" && process.env.PAY_RATE_LIMIT_SLUG_MAX !== undefined && process.env.PAY_RATE_LIMIT_SLUG_MAX !== ""
+    ? Math.max(10, parseInt(process.env.PAY_RATE_LIMIT_SLUG_MAX, 10) || 30)
+    : 2000,
   keyPrefix: "pay-slug",
 } as const;
 

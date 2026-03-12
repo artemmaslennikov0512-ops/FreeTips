@@ -16,7 +16,10 @@ const JSON_CONTENT_TYPE = "application/json";
 const SECOND_MS = 1000;
 const MINUTE_MS = 60 * SECOND_MS;
 const API_RATE_WINDOW_MS = 15 * MINUTE_MS;
-const API_RATE_LIMIT_MAX = 400;
+const API_RATE_LIMIT_MAX =
+  typeof process !== "undefined" && process.env.API_RATE_LIMIT_MAX
+    ? Math.max(100, parseInt(process.env.API_RATE_LIMIT_MAX, 10) || 400)
+    : 2000;
 const HSTS_MAX_AGE_SECONDS = 15552000;
 const RATE_LIMIT_OPTIONS = {
   windowMs: API_RATE_WINDOW_MS,

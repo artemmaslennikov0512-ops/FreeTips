@@ -11,8 +11,8 @@
  *
  * Запуск:
  *   npx tsx scripts/load-test-payments-e2e.ts [число_платежей] [параллельных_потоков]
- * По умолчанию: 50 платежей, 3 потока (нагрузка). Для быстрой проверки: ... 5 1
- * HEADLESS=0 — показать браузер.
+ *   npx tsx scripts/load-test-payments-e2e.ts 10 batch   — режим batch: 10 аккаунтов, по 20 редиректов на аккаунт (всего 200), затем по 10 оплат с интервалом 1 с и 10 с интервалом 30 с по каждому аккаунту (10–30 аккаунтов одновременно).
+ * По умолчанию: 50 платежей, 3 потока. HEADLESS=0 — показать браузер.
  */
 
 import "dotenv/config";
@@ -35,9 +35,15 @@ const E2E_SLUG = "test-waiter-e2e";
 const TEST_PASSWORD = "TestPassword123!";
 const PAGE_WAIT_MS = 25_000;
 const CARD_SUBMIT_WAIT_MS = 75_000;
-const RELOCATE_POLL_MS = 120_000; // сколько ждать переливов по БД после последнего платежа
+const RELOCATE_POLL_MS = 120_000;
 const RELOCATE_POLL_INTERVAL_MS = 2_000;
-const DELAY_BETWEEN_PAYMENTS_MS = 600; // пауза между оплатами в одном потоке (под нагрузкой меньше)
+const DELAY_BETWEEN_PAYMENTS_MS = 600;
+const BATCH_FIRST_INTERVAL_MS = 1_000;
+const BATCH_SECOND_INTERVAL_MS = 30_000;
+const BATCH_FIRST_COUNT = 10;
+const BATCH_REDIRECTS_PER_ACCOUNT = 20; // редиректов на один аккаунт
+const BATCH_ACCOUNTS_MIN = 10;
+const BATCH_ACCOUNTS_MAX = 30;
 
 const CARD_SELECTORS = {
   pan: [
@@ -109,17 +115,13 @@ async function findAndFill(
   return false;
 }
 
-async function runOnePayment(
+/** Открывает страницу оплаты и доходит до формы Paygine (без ввода карты). */
+async function openToPaygineForm(
   page: import("playwright").Page,
-  slug: string,
-  pan: string,
-  expdate: string,
-  cvc: string
+  slug: string
 ): Promise<{ ok: boolean; error?: string }> {
   const payUrl = `${BASE_URL}/pay/${slug}`;
   await page.goto(payUrl, { waitUntil: "domcontentloaded", timeout: PAGE_WAIT_MS });
-
-  // Убираем баннер «Уведомление об использовании cookies», чтобы он не перехватывал клики
   await page.evaluate(() => localStorage.setItem("cookieConsentAccepted", "1"));
   await page.reload({ waitUntil: "domcontentloaded" });
 
@@ -140,21 +142,27 @@ async function runOnePayment(
   if (!/paygine|pay\.paygine/i.test(page.url())) {
     return { ok: false, error: "Не попали на форму Paygine" };
   }
+  return { ok: true };
+}
 
+/** Заполняет форму Paygine и отправляет (страница уже на Paygine). */
+async function completePaygineForm(
+  page: import("playwright").Page,
+  pan: string,
+  expdate: string,
+  cvc: string
+): Promise<{ ok: boolean; error?: string }> {
   const filledPan = await findAndFill(page, "pan", pan);
   const filledExp = await findAndFill(page, "expdate", expdate);
   const filledCvc = await findAndFill(page, "cvc", cvc);
-
   if (!filledPan || !filledExp || !filledCvc) {
     return { ok: false, error: "Не найдены поля карты на форме Paygine" };
   }
-
   await page.waitForTimeout(500);
   const submitBtn = page.locator('button[type="submit"], input[type="submit"]').first();
   await submitBtn.click().catch(() => {
     page.locator("form").first().evaluate((f: HTMLFormElement) => f.submit());
   });
-
   const success = await page
     .waitForURL(
       (url) =>
@@ -164,8 +172,19 @@ async function runOnePayment(
     )
     .then(() => true)
     .catch(() => false);
-
   return { ok: success };
+}
+
+async function runOnePayment(
+  page: import("playwright").Page,
+  slug: string,
+  pan: string,
+  expdate: string,
+  cvc: string
+): Promise<{ ok: boolean; error?: string }> {
+  const open = await openToPaygineForm(page, slug);
+  if (!open.ok) return open;
+  return completePaygineForm(page, pan, expdate, cvc);
 }
 
 // Тестовые карты Paygine (тестовый стенд). Переопределяются через PAYGINE_TEST_* в scripts/.env.
@@ -174,8 +193,17 @@ const DEFAULT_TEST_EXPIRY = "08/25";
 const DEFAULT_TEST_CVC = "983";
 
 async function main() {
-  const countArg = process.argv[2]?.trim();
-  const numPayments = countArg ? Math.max(1, parseInt(countArg, 10) || 50) : 50;
+  const args = process.argv.slice(2).map((a) => a?.trim()).filter(Boolean);
+  const batchMode = args.some((a) => a.toLowerCase() === "batch");
+  const numArg = args.find((a) => /^\d+$/.test(a));
+  const numAccountsBatch = batchMode && numArg
+    ? Math.max(BATCH_ACCOUNTS_MIN, Math.min(BATCH_ACCOUNTS_MAX, parseInt(numArg, 10) || 10))
+    : 10;
+  const numPayments = batchMode
+    ? numAccountsBatch * BATCH_REDIRECTS_PER_ACCOUNT
+    : numArg ? Math.max(1, parseInt(numArg, 10) || 50) : 50;
+  const concurrentArg = args.find((a, i) => i >= 1 && /^\d+$/.test(a));
+  const concurrent = batchMode ? 1 : (concurrentArg ? Math.max(1, Math.min(10, parseInt(concurrentArg, 10) || 3)) : 3);
 
   const pan = (process.env.PAYGINE_TEST_PAN?.replace(/\s/g, "") ?? DEFAULT_TEST_PAN).trim();
   let expdate = process.env.PAYGINE_TEST_EXPIRY?.trim() ?? DEFAULT_TEST_EXPIRY;
@@ -193,76 +221,174 @@ async function main() {
     expdate = `${expdate.slice(0, 2)}/${expdate.slice(2)}`;
   }
 
-  console.log("1. Подготовка тестового пользователя и ссылки…");
   const passwordHash = await hashPassword(TEST_PASSWORD);
-  const slug = E2E_SLUG;
-
+  let slug: string;
   let linkId: string;
-  const existingLink = await prisma.tipLink.findFirst({
-    where: { slug: E2E_SLUG },
-    select: { id: true },
-  });
+  let linkIds: string[] = [];
+  let batchSlugs: string[] = [];
 
-  if (existingLink) {
-    linkId = existingLink.id;
-    console.log("   Используется существующая ссылка:", E2E_SLUG);
+  if (batchMode) {
+    console.log(`1. Подготовка ${numAccountsBatch} тестовых аккаунтов (по ${BATCH_REDIRECTS_PER_ACCOUNT} редиректов на аккаунт)…`);
+    for (let a = 1; a <= numAccountsBatch; a++) {
+      const accountSlug = `${E2E_SLUG}-${a}`;
+      let tipLink = await prisma.tipLink.findFirst({
+        where: { slug: accountSlug },
+        select: { id: true },
+      });
+      if (!tipLink) {
+        const user = await prisma.user.create({
+          data: {
+            login: `e2e-waiter-${a}-${Date.now()}`,
+            email: `e2e-waiter-${a}@test.local`,
+            passwordHash,
+            role: "RECIPIENT",
+            paygineSdRef: null,
+          },
+        });
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { paygineSdRef: getWaiterPaygineSdRef(user.id) },
+        });
+        tipLink = await prisma.tipLink.create({
+          data: { userId: user.id, slug: accountSlug },
+        });
+      }
+      batchSlugs.push(accountSlug);
+      linkIds.push(tipLink!.id);
+      if (a % 10 === 0 || a === numAccountsBatch) console.log(`   Готово аккаунтов: ${a}/${numAccountsBatch}`);
+    }
+    slug = batchSlugs[0]!;
   } else {
-    const user = await prisma.user.create({
-      data: {
-        login: `e2e-waiter-${Date.now()}`,
-        email: "e2e-waiter@test.local",
-        passwordHash,
-        role: "RECIPIENT",
-        paygineSdRef: null,
-      },
+    console.log("1. Подготовка тестового пользователя и ссылки…");
+    const existingLink = await prisma.tipLink.findFirst({
+      where: { slug: E2E_SLUG },
+      select: { id: true },
     });
-    await prisma.user.update({
-      where: { id: user.id },
-      data: { paygineSdRef: getWaiterPaygineSdRef(user.id) },
-    });
-    const tipLink = await prisma.tipLink.create({
-      data: { userId: user.id, slug: E2E_SLUG },
-    });
-    linkId = tipLink.id;
-    console.log("   Создан пользователь и ссылка:", E2E_SLUG);
+    if (existingLink) {
+      linkId = existingLink.id;
+      linkIds = [existingLink.id];
+      slug = E2E_SLUG;
+      console.log("   Используется существующая ссылка:", E2E_SLUG);
+    } else {
+      const user = await prisma.user.create({
+        data: {
+          login: `e2e-waiter-${Date.now()}`,
+          email: "e2e-waiter@test.local",
+          passwordHash,
+          role: "RECIPIENT",
+          paygineSdRef: null,
+        },
+      });
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { paygineSdRef: getWaiterPaygineSdRef(user.id) },
+      });
+      const tipLink = await prisma.tipLink.create({
+        data: { userId: user.id, slug: E2E_SLUG },
+      });
+      linkId = tipLink.id;
+      linkIds = [tipLink.id];
+      slug = E2E_SLUG;
+      console.log("   Создан пользователь и ссылка:", E2E_SLUG);
+    }
   }
 
-  const concurrentArg = process.argv[3]?.trim();
-  const concurrent = concurrentArg ? Math.max(1, Math.min(10, parseInt(concurrentArg, 10) || 3)) : 3;
-  const paymentsPerWorker = Math.ceil(numPayments / concurrent);
-
-  console.log(
-    `2. E2E под нагрузкой: ${numPayments} оплат, ${concurrent} поток(ов) (страница → Paygine → карта → вебхук → перелив)…`
-  );
   const headless = process.env.HEADLESS?.trim() !== "0" && process.env.HEADLESS?.trim() !== "false";
   const browser = await chromium.launch({ headless });
   const startTime = new Date();
-
   const results: { ok: boolean; error?: string }[] = [];
-  let completedCount = 0;
-  const runWorker = async (workerIndex: number) => {
-    const context = await browser.newContext();
-    const page = await context.newPage();
-    const myCount = workerIndex === concurrent - 1 ? numPayments - (concurrent - 1) * paymentsPerWorker : paymentsPerWorker;
-    for (let i = 0; i < myCount; i++) {
-      const r = await runOnePayment(page, slug, pan, expdate, cvc);
-      results.push(r);
-      completedCount += 1;
-      if (concurrent === 1) {
-        console.log(r.ok ? `   Платёж ${completedCount}/${numPayments}: успех` : `   Платёж ${completedCount}/${numPayments}: ${r.error ?? "ошибка"}`);
-      } else if (completedCount % 10 === 0 || completedCount === numPayments) {
-        const okSoFar = results.filter((x) => x.ok).length;
-        console.log(`   Выполнено ${completedCount}/${numPayments}, успешно: ${okSoFar}`);
-      }
-      if (i < myCount - 1) await page.waitForTimeout(DELAY_BETWEEN_PAYMENTS_MS);
-    }
-    await context.close();
-  };
 
-  try {
-    await Promise.all(Array.from({ length: concurrent }, (_, i) => runWorker(i)));
-  } finally {
-    await browser.close();
+  if (batchMode) {
+    const total = numAccountsBatch * BATCH_REDIRECTS_PER_ACCOUNT;
+    const firstCount = BATCH_FIRST_COUNT;
+    const secondCount = BATCH_REDIRECTS_PER_ACCOUNT - BATCH_FIRST_COUNT;
+    console.log(
+      `2. Режим batch: ${numAccountsBatch} аккаунтов, по ${BATCH_REDIRECTS_PER_ACCOUNT} редиректов (всего ${total}). Открыть все, затем по каждому аккаунту: ${firstCount} оплат с интервалом 1 с, ${secondCount} с интервалом 30 с…`
+    );
+    const context = await browser.newContext();
+    const pages: import("playwright").Page[] = [];
+    for (let i = 0; i < total; i++) {
+      pages.push(await context.newPage());
+    }
+    try {
+      console.log("   Фаза 1: открытие всех редиректов на форму Paygine (по аккаунтам)…");
+      for (let a = 0; a < numAccountsBatch; a++) {
+        const accountSlug = batchSlugs[a]!;
+        for (let j = 0; j < BATCH_REDIRECTS_PER_ACCOUNT; j++) {
+          const idx = a * BATCH_REDIRECTS_PER_ACCOUNT + j;
+          const r = await openToPaygineForm(pages[idx]!, accountSlug);
+          if (!r.ok) results.push(r);
+          else results.push({ ok: true });
+        }
+        if ((a + 1) % 5 === 0 || a + 1 === numAccountsBatch) {
+          console.log(`   Аккаунтов открыто: ${a + 1}/${numAccountsBatch} (страниц ${(a + 1) * BATCH_REDIRECTS_PER_ACCOUNT}/${total})`);
+        }
+      }
+      const openedOk = results.filter((r) => r.ok).length;
+      if (openedOk < total) {
+        console.log(`   На форму Paygine вышли ${openedOk}/${total}.`);
+      }
+      results.length = 0;
+
+      console.log(`   Фаза 2: по каждому аккаунту первые ${firstCount} оплат с интервалом 1 с (параллельно по аккаунтам)…`);
+      await Promise.all(
+        Array.from({ length: numAccountsBatch }, async (_, a) => {
+          for (let j = 0; j < firstCount; j++) {
+            const idx = a * BATCH_REDIRECTS_PER_ACCOUNT + j;
+            const r = await completePaygineForm(pages[idx]!, pan, expdate, cvc);
+            results.push(r);
+            if (j < firstCount - 1) await pages[idx]!.waitForTimeout(BATCH_FIRST_INTERVAL_MS);
+          }
+        })
+      );
+
+      console.log(`   Фаза 3: по каждому аккаунту остальные ${secondCount} оплат с интервалом 30 с…`);
+      await Promise.all(
+        Array.from({ length: numAccountsBatch }, async (_, a) => {
+          for (let j = firstCount; j < BATCH_REDIRECTS_PER_ACCOUNT; j++) {
+            const idx = a * BATCH_REDIRECTS_PER_ACCOUNT + j;
+            const r = await completePaygineForm(pages[idx]!, pan, expdate, cvc);
+            results.push(r);
+            if (j < BATCH_REDIRECTS_PER_ACCOUNT - 1) await pages[idx]!.waitForTimeout(BATCH_SECOND_INTERVAL_MS);
+          }
+        })
+      );
+
+      for (const p of pages) await p.close().catch(() => {});
+    } finally {
+      await context.close();
+      await browser.close();
+    }
+  } else {
+    const paymentsPerWorker = Math.ceil(numPayments / concurrent);
+    console.log(
+      `2. E2E под нагрузкой: ${numPayments} оплат, ${concurrent} поток(ов) (страница → Paygine → карта → вебхук → перелив)…`
+    );
+    let completedCount = 0;
+    const runWorker = async (workerIndex: number) => {
+      const context = await browser.newContext();
+      const page = await context.newPage();
+      const myCount = workerIndex === concurrent - 1 ? numPayments - (concurrent - 1) * paymentsPerWorker : paymentsPerWorker;
+      for (let i = 0; i < myCount; i++) {
+        const r = await runOnePayment(page, slug, pan, expdate, cvc);
+        results.push(r);
+        completedCount += 1;
+        if (concurrent === 1) {
+          console.log(r.ok ? `   Платёж ${completedCount}/${numPayments}: успех` : `   Платёж ${completedCount}/${numPayments}: ${r.error ?? "ошибка"}`);
+        } else if (completedCount % 10 === 0 || completedCount === numPayments) {
+          const okSoFar = results.filter((x) => x.ok).length;
+          console.log(`   Выполнено ${completedCount}/${numPayments}, успешно: ${okSoFar}`);
+        }
+        if (i < myCount - 1) await page.waitForTimeout(DELAY_BETWEEN_PAYMENTS_MS);
+      }
+      await context.close();
+    };
+
+    try {
+      await Promise.all(Array.from({ length: concurrent }, (_, i) => runWorker(i)));
+    } finally {
+      await browser.close();
+    }
   }
 
   const okCount = results.filter((r) => r.ok).length;
@@ -271,7 +397,7 @@ async function main() {
 
   async function getTxStats(since: Date) {
     const list = await prisma.transaction.findMany({
-      where: { linkId, createdAt: { gte: since } },
+      where: { linkId: { in: linkIds }, createdAt: { gte: since } },
       select: { id: true, status: true },
     });
     const byStatus = { SUCCESS: 0, PENDING: 0, FAILED: 0, other: 0 };
@@ -284,7 +410,7 @@ async function main() {
     return { total: list.length, ...byStatus };
   }
 
-  console.log("4. Проверка перелива по БД (транзакции по ссылке за сессию)…");
+  console.log("4. Проверка перелива по БД (транзакции по ссылкам за сессию)…");
   let stats = await getTxStats(startTime);
   const deadline = Date.now() + RELOCATE_POLL_MS;
   while (stats.PENDING > 0 && Date.now() < deadline) {

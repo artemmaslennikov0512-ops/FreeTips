@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { KeyRound, Mail, User, UserCircle } from "lucide-react";
+import { KeyRound, Mail, User } from "lucide-react";
 import { AuthPageShell } from "@/components/AuthPageShell";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { AUTH_CARD_CLASS, AUTH_INPUT_CLASS, AUTH_ERROR_BORDER, AUTH_BTN_PRIMARY } from "@/lib/auth-form-classes";
@@ -10,7 +10,6 @@ import { forgotPasswordRequestSchema } from "@/lib/validations";
 import { getFieldErrors } from "@/lib/form-errors";
 
 export default function ForgotPasswordPage() {
-  const [fullName, setFullName] = useState("");
   const [login, setLogin] = useState("");
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
@@ -24,7 +23,6 @@ export default function ForgotPasswordPage() {
     setFieldErrors({});
 
     const parsed = forgotPasswordRequestSchema.safeParse({
-      fullName: fullName.trim(),
       login: login.trim(),
       email: email.trim().toLowerCase(),
     });
@@ -70,8 +68,8 @@ export default function ForgotPasswordPage() {
           </div>
           <p className="mt-3 text-sm text-[var(--color-text-secondary)]">
             {success
-              ? "Если данные совпали с аккаунтом, на email придёт ссылка для сброса пароля. Проверьте почту и папку «Спам»."
-              : "Укажите ФИО, логин и почту как при регистрации — мы отправим ссылку на сброс пароля."}
+              ? "На указанный email отправлена ссылка для сброса пароля. Проверьте почту и папку «Спам»."
+              : "Укажите логин и почту — мы отправим ссылку на сброс пароля. Логин и email должны принадлежать одному аккаунту."}
           </p>
 
           {!success && (
@@ -82,26 +80,6 @@ export default function ForgotPasswordPage() {
                 </div>
               )}
               <form onSubmit={handleSubmit} className="mt-6 space-y-4 text-left">
-                <div>
-                  <label htmlFor="fullName" className="mb-1.5 block text-sm font-medium text-[var(--color-text)]">
-                    ФИО (как при регистрации)
-                  </label>
-                  <div className="relative">
-                    <UserCircle className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--color-muted)]" />
-                    <input
-                      id="fullName"
-                      type="text"
-                      autoComplete="name"
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
-                      placeholder="Иванов Иван Иванович"
-                      className={`${AUTH_INPUT_CLASS} ${fieldErrors.fullName ? AUTH_ERROR_BORDER : ""}`}
-                    />
-                  </div>
-                  {fieldErrors.fullName && (
-                    <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{fieldErrors.fullName}</p>
-                  )}
-                </div>
                 <div>
                   <label htmlFor="login" className="mb-1.5 block text-sm font-medium text-[var(--color-text)]">
                     Логин
@@ -118,6 +96,9 @@ export default function ForgotPasswordPage() {
                       className={`${AUTH_INPUT_CLASS} ${fieldErrors.login ? AUTH_ERROR_BORDER : ""}`}
                     />
                   </div>
+                  <p className="mt-1 text-xs text-[var(--color-text-secondary)]">
+                    Логин можно вводить с большой или маленькой буквы.
+                  </p>
                   {fieldErrors.login && (
                     <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{fieldErrors.login}</p>
                   )}
@@ -138,6 +119,9 @@ export default function ForgotPasswordPage() {
                       className={`${AUTH_INPUT_CLASS} ${fieldErrors.email ? AUTH_ERROR_BORDER : ""}`}
                     />
                   </div>
+                  <p className="mt-1 text-xs text-[var(--color-text-secondary)]">
+                    Это правильная почта? Проверьте перед отправкой.
+                  </p>
                   {fieldErrors.email && (
                     <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{fieldErrors.email}</p>
                   )}

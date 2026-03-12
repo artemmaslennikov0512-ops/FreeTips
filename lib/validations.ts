@@ -109,11 +109,10 @@ export const loginRequestSchema = z.object({
   password: z.string().min(1, "Пароль обязателен").max(PASSWORD_MAX_LENGTH, "Пароль слишком длинный"),
 });
 
-// Запрос сброса пароля: логин, email и ФИО (как при регистрации) для проверки
+// Запрос сброса пароля: только логин и email (логин без учёта регистра)
 export const forgotPasswordRequestSchema = z.object({
   login: z.string().trim().min(1, "Укажите логин").max(50, "Слишком длинный логин"),
   email: z.string().trim().min(1, "Укажите email").max(255, "Слишком длинный email").email("Неверный формат email"),
-  fullName: z.string().trim().min(1, "Укажите ФИО, как при регистрации").max(255, "Слишком длинное значение"),
 });
 
 // Создание ссылки

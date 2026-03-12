@@ -1,8 +1,7 @@
 /**
  * POST /api/auth/forgot-password
- * Запрос сброса пароля: проверяются логин, email и ФИО (как при регистрации).
- * Создаёт токен и отправляет письмо только при совпадении всех данных.
- * Всегда возвращает успех (не раскрываем наличие аккаунта).
+ * Запрос сброса пароля: логин (без учёта регистра) и email должны принадлежать одному аккаунту.
+ * При неверном логине или email возвращается ошибка; ссылка отправляется только при совпадении.
  */
 
 import { NextRequest, NextResponse } from "next/server";
@@ -21,11 +20,6 @@ import {
 import { getBaseUrlFromRequest } from "@/lib/get-base-url";
 import { sendEmail } from "@/lib/email/send";
 import { templatePasswordReset } from "@/lib/email/templates";
-
-function normalizeFullName(s: string | null | undefined): string {
-  if (!s || typeof s !== "string") return "";
-  return s.trim().toLowerCase().replace(/\s+/g, " ");
-}
 
 export async function POST(request: NextRequest) {
   const requestId = getRequestId(request);
@@ -50,43 +44,50 @@ export async function POST(request: NextRequest) {
       return jsonError(400, "Заполните все поля", validated.error.issues, { hideDetailsInProduction: true });
     }
 
-    const { login, email, fullName } = validated.data;
+    const { login, email } = validated.data;
+    const emailNorm = email.trim().toLowerCase();
     const user = await db.user.findFirst({
-      where: { login: { equals: login, mode: "insensitive" } },
-      select: { id: true, email: true, fullName: true },
+      where: { login: { equals: login.trim(), mode: "insensitive" } },
+      select: { id: true, email: true },
     });
 
-    const emailMatch = user?.email && user.email.toLowerCase() === email.trim().toLowerCase();
-    const storedFullName = normalizeFullName(user?.fullName);
-    const fullNameMatch = storedFullName === "" || storedFullName === normalizeFullName(fullName);
+    const emailMatch = user?.email && user.email.toLowerCase() === emailNorm;
+    if (!user || !user.email || !emailMatch) {
+      return NextResponse.json(
+        { error: "Неверный логин или email. Проверьте данные и попробуйте снова." },
+        { status: 400 },
+      );
+    }
 
-    if (user?.email && emailMatch && fullNameMatch) {
-      logSecurity("auth.forgot_password.request", { requestId, ip, userId: user.id });
+    logSecurity("auth.forgot_password.request", { requestId, ip, userId: user.id });
 
-      const token = generatePasswordResetToken();
-      const tokenHash = hashPasswordResetToken(token);
-      const expiresAt = getPasswordResetTokenExpiresAt();
+    const token = generatePasswordResetToken();
+    const tokenHash = hashPasswordResetToken(token);
+    const expiresAt = getPasswordResetTokenExpiresAt();
 
-      await db.$transaction(async (tx) => {
-        await tx.passwordResetToken.deleteMany({ where: { userId: user.id } });
-        await tx.passwordResetToken.create({
-          data: { userId: user.id, tokenHash, expiresAt },
-        });
+    await db.$transaction(async (tx) => {
+      await tx.passwordResetToken.deleteMany({ where: { userId: user.id } });
+      await tx.passwordResetToken.create({
+        data: { userId: user.id, tokenHash, expiresAt },
       });
+    });
 
-      const baseUrl = getBaseUrlFromRequest(request);
-      const resetLink = `${baseUrl}/reset-password?token=${encodeURIComponent(token)}`;
-      const { subject, html } = templatePasswordReset({ resetLink });
+    const baseUrl = getBaseUrlFromRequest(request);
+    const resetLink = `${baseUrl}/reset-password?token=${encodeURIComponent(token)}`;
+    const { subject, html } = templatePasswordReset({ resetLink });
 
-      const sendResult = await sendEmail({ to: user.email, subject, html });
-      if (!sendResult.ok) {
-        logError("auth.forgot_password.send_failed", new Error(sendResult.error), { requestId, userId: user.id });
-      }
+    const sendResult = await sendEmail({ to: user.email, subject, html });
+    if (!sendResult.ok) {
+      logError("auth.forgot_password.send_failed", new Error(sendResult.error), { requestId, userId: user.id });
+      return NextResponse.json(
+        { error: "Не удалось отправить письмо. Попробуйте позже или обратитесь в поддержку." },
+        { status: 503 },
+      );
     }
 
     return NextResponse.json({
       success: true,
-      message: "Если аккаунт с указанными данными найден, на email придёт ссылка для сброса пароля.",
+      message: "На указанный email отправлена ссылка для сброса пароля.",
     });
   } catch (error) {
     logError("auth.forgot_password.error", error, { requestId, ip });

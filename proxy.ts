@@ -94,9 +94,9 @@ function buildCsp(isDev: boolean): string {
   return [
     "default-src 'self'",
     "img-src 'self' data: https:",
-    "font-src 'self' data:",
+    "font-src 'self' data: https://cdnjs.cloudflare.com",
     `script-src 'self' 'unsafe-inline'${evalToken}`,
-    "style-src 'self' 'unsafe-inline'",
+    "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com",
     `connect-src 'self' https:${devConnect}`,
     "base-uri 'self'",
     "frame-ancestors 'none'",

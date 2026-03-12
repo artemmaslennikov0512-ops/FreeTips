@@ -34,13 +34,15 @@ export function AppPremium() {
       />
       <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8 xl:max-w-7xl 2xl:max-w-screen-2xl relative z-10">
         <div className="max-w-[700px] mx-auto mb-10 sm:mb-14 flex flex-col items-center text-center">
-          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center mb-6 bg-[rgba(197,165,114,0.2)] text-[var(--color-accent-gold)] shadow-[0_4px_12px_rgba(0,0,0,0.15)]">
-            <Smartphone className="w-7 h-7 sm:w-8 sm:h-8" />
+          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 mb-4 w-full">
+            <h2 className="font-[family:var(--font-playfair)] text-2xl sm:text-3xl lg:text-4xl font-semibold text-white">
+              Своё приложение FreeTips
+            </h2>
+            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center shrink-0 bg-[rgba(197,165,114,0.2)] text-[var(--color-accent-gold)] shadow-[0_4px_12px_rgba(0,0,0,0.15)]">
+              <Smartphone className="w-6 h-6 sm:w-7 sm:h-7" />
+            </div>
           </div>
-          <h2 className="font-[family:var(--font-playfair)] text-2xl sm:text-3xl lg:text-4xl font-semibold text-white mb-4 w-full">
-            Своё приложение FreeTips
-          </h2>
-          <p className="text-lg text-[var(--color-on-dark-muted)] w-full">
+          <p className="text-lg text-white/90 w-full text-center">
             Вход по API-ключу из личного кабинета, QR для приёма чаевых и история поступлений — всё в одном приложении.
           </p>
         </div>
@@ -63,7 +65,7 @@ export function AppPremium() {
             {benefits.map(({ icon: Icon, title, desc }) => (
               <li
                 key={title}
-                className="landing-card-hover flex gap-4 sm:gap-6 p-5 sm:p-6 rounded-xl bg-[var(--process-card-bg)] border border-[var(--process-card-border)] hover:border-[var(--process-card-hover-border)] transition-all duration-300"
+                className="landing-card-hover flex flex-col items-center text-center gap-4 p-5 sm:p-6 rounded-xl bg-[var(--process-card-bg)] border border-[var(--process-card-border)] hover:border-[var(--process-card-hover-border)] transition-all duration-300"
               >
                 <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center shrink-0 bg-[rgba(255,255,255,0.08)] text-[var(--color-accent-gold)]">
                   <Icon className="w-6 h-6 sm:w-7 sm:h-7" strokeWidth={1.5} />
@@ -72,7 +74,7 @@ export function AppPremium() {
                   <h3 className="font-[family:var(--font-playfair)] text-lg sm:text-xl font-semibold text-white mb-2">
                     {title}
                   </h3>
-                  <p className="text-[var(--color-on-dark-muted)] leading-relaxed text-sm sm:text-base">
+                  <p className="text-white/90 leading-relaxed text-sm sm:text-base">
                     {desc}
                   </p>
                 </div>

@@ -630,6 +630,10 @@ html:not([data-theme="dark"]) .card-block {
   background: #0a192f !important;
   color: #ffffff !important;
 }
+[data-theme="dark"] .pay-success-always-light .pay-success-card button {
+  color: #0a192f !important;
+  border-color: rgba(10, 25, 47, 0.35) !important;
+}
 
 /* Кнопка «Оплатить» на странице чаевых — всегда золотая (светлая и тёмная тема) */
 .pay-btn-gold {
@@ -1897,6 +1901,15 @@ html:not([data-theme="dark"]) .zayavka-page .zayavka-card label,
 html:not([data-theme="dark"]) .zayavka-page .zayavka-card span:not([class*="bg-"]) {
   color: inherit !important;
 }
+/* Поля ввода в карточке заявки: тёмный текст на светлом фоне (дата рождения и др.), иначе на мобильных наследуют белый цвет карточки */
+html:not([data-theme="dark"]) .zayavka-page .zayavka-card input,
+html:not([data-theme="dark"]) .zayavka-page .zayavka-card textarea {
+  color: #0a192f !important;
+}
+html:not([data-theme="dark"]) .zayavka-page .zayavka-card input::placeholder,
+html:not([data-theme="dark"]) .zayavka-page .zayavka-card textarea::placeholder {
+  color: #64748b !important;
+}
 html:not([data-theme="dark"]) .zayavka-page .zayavka-card a:not(.auth-btn-primary):not([class*="bg-"]) {
   color: var(--color-brand-gold) !important;
 }
@@ -2078,8 +2091,8 @@ html:not([data-theme="dark"]) .zayavka-page .zayavka-card a:not(.auth-btn-primar
   line-height: 1.4;
   margin-top: 0.5rem !important; /* отступ от поля ввода */
 }
-/* Префикс +7 в поле телефона — контраст на светлом фоне поля (карточка заявки может задавать белый текст) */
-html:not([data-theme="dark"]) .zayavka-phone-field .zayavka-phone-prefix {
+/* Префикс +7 в поле телефона — контраст на светлом фоне поля (карточка заявки задаёт белый текст, это правило перебивает .zayavka-card span) */
+html:not([data-theme="dark"]) .zayavka-page .zayavka-card .zayavka-phone-field .zayavka-phone-prefix {
   color: #0a192f !important;
 }
 [data-theme="dark"] .zayavka-phone-field .zayavka-phone-prefix {

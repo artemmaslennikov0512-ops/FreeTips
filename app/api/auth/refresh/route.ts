@@ -9,19 +9,14 @@ import { verifyRefreshToken, generateAccessToken, generateRefreshToken, setRefre
 import { checkRateLimitByIP, getClientIP, AUTH_RATE_LIMIT } from "@/lib/middleware/rate-limit";
 import { logError, logSecurity } from "@/lib/logger";
 import { getRequestId } from "@/lib/security/request";
-import { internalError } from "@/lib/api/helpers";
+import { internalError, rateLimit429Response } from "@/lib/api/helpers";
 
 export async function POST(request: NextRequest) {
   const requestId = getRequestId(request);
   const ip = getClientIP(request);
   try {
     const rateLimit = await checkRateLimitByIP(ip, AUTH_RATE_LIMIT);
-    if (!rateLimit.allowed) {
-      return NextResponse.json(
-        { error: "Слишком много запросов. Попробуйте позже." },
-        { status: 429 },
-      );
-    }
+    if (!rateLimit.allowed) return rateLimit429Response(rateLimit);
 
     // Получаем refresh token из cookie
     const refreshToken = await getRefreshTokenCookie();

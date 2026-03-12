@@ -4,6 +4,8 @@ import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Build
 import android.os.Bundle
+import android.view.View
+import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -55,6 +57,23 @@ class MainActivity : AppCompatActivity(), NotificationsBottomSheet.BadgeUpdater 
             }
             val navController = navHost.navController
             binding.bottomNav.setupWithNavController(navController)
+            navController.addOnDestinationChangedListener { _, destination, _ ->
+                val isHome = (destination.id == R.id.nav_home)
+                binding.headerContainer.visibility = if (isHome) View.VISIBLE else View.GONE
+                // На главной — только значок уведомлений на синем фоне, без шапки и логотипа
+                binding.headerBar.visibility = if (isHome) View.GONE else View.VISIBLE
+                binding.headerLogo.root.visibility = if (isHome) View.GONE else View.VISIBLE
+                if (isHome) {
+                    binding.headerContentRow.setBackgroundResource(android.R.color.transparent)
+                    binding.bellBadgeAnchor.setBackgroundResource(android.R.color.transparent)
+                    binding.btnNotifications.setColorFilter(ContextCompat.getColor(this@MainActivity, R.color.primary))
+                    (binding.headerContentRow.layoutParams as? ViewGroup.MarginLayoutParams)?.topMargin =
+                        resources.getDimensionPixelSize(R.dimen.header_bell_area_top_margin)
+                } else {
+                    binding.btnNotifications.clearColorFilter()
+                    (binding.headerContentRow.layoutParams as? ViewGroup.MarginLayoutParams)?.topMargin = 0
+                }
+            }
 
             notificationBadge = BadgeDrawable.create(this).apply {
                 maxCharacterCount = 3

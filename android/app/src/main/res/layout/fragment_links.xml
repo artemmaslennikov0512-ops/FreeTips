@@ -7,72 +7,64 @@
     android:layout_height="match_parent"
     android:background="@color/background">
 
-    <ScrollView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingStart="@dimen/screen_padding"
-        android:paddingEnd="@dimen/screen_padding"
-        android:paddingTop="@dimen/content_top_padding"
-        android:paddingBottom="@dimen/content_bottom_padding">
+        android:orientation="vertical">
+
+        <!-- Золотая полоса у верхней части страницы с отступом от верха -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/page_strip_height"
+            android:layout_marginTop="96dp"
+            android:layout_marginBottom="@dimen/spacing_md"
+            android:layout_marginStart="48dp"
+            android:layout_marginEnd="48dp"
+            android:background="@drawable/bg_page_strip" />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:fillViewport="true"
+            android:paddingStart="@dimen/screen_padding"
+            android:paddingEnd="@dimen/screen_padding"
+            android:paddingTop="@dimen/spacing_sm"
+            android:paddingBottom="@dimen/content_bottom_padding">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center_vertical">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:minHeight="24dp" />
 
         <TextView
+            android:id="@+id/qrTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="Ссылка для приема чаевых"
-            android:textAppearance="@style/TextAppearance.FreeTips.SectionTitle" />
+            android:paddingBottom="@dimen/spacing_sm"
+            android:text="QR-код"
+            android:textAppearance="@style/TextAppearance.FreeTips.SectionTitle"
+            android:visibility="gone" />
 
-        <com.google.android.material.card.MaterialCardView
+        <View
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/spacing_md"
-            style="@style/Widget.FreeTips.Card"
-            android:padding="@dimen/card_padding">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:gravity="center_horizontal"
-                android:paddingTop="@dimen/spacing_md"
-                android:paddingBottom="@dimen/spacing_md">
-
-                <TextView
-                    android:id="@+id/linksList"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:paddingStart="@dimen/card_padding"
-                    android:paddingEnd="@dimen/card_padding"
-                    android:textSize="14sp"
-                    android:lineSpacingMultiplier="1.25"
-                    android:textColor="@color/primary"
-                    android:breakStrategy="balanced"
-                    android:hyphenationFrequency="none"
-                    tools:text="https://free-tips.ru/pay/6c8mi5cuz1" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnCopyLink"
-                    style="@style/Widget.MaterialComponents.Button.TextButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/spacing_sm"
-                    android:text="Скопировать"
-                    android:textColor="@color/primary" />
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:minHeight="24dp" />
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/qrCard"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="@dimen/spacing_lg"
             style="@style/Widget.FreeTips.Card"
             app:cardBackgroundColor="@color/surface_light"
             app:cardElevation="4dp"
@@ -87,30 +79,132 @@
 
                 <FrameLayout
                     android:layout_width="248dp"
-                    android:layout_height="248dp"
-                    android:background="@drawable/bg_qr_block"
-                    android:padding="16dp">
+                    android:layout_height="248dp">
 
-                    <ImageView
-                        android:id="@+id/qrImage"
+                    <!-- Белый квадрат с QR -->
+                    <FrameLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:contentDescription="@null"
-                        android:scaleType="fitCenter" />
-                </FrameLayout>
+                        android:background="@drawable/bg_qr_block"
+                        android:padding="16dp">
 
-                <TextView
-                    android:id="@+id/qrLabel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/spacing_md"
-                    android:gravity="center"
-                    android:textColor="@color/logo_ft_dark_blue"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    tools:text="Официант" />
+                        <ImageView
+                            android:id="@+id/qrImage"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:contentDescription="@null"
+                            android:scaleType="fitCenter" />
+                    </FrameLayout>
+
+                    <!-- Уголки поверх белого фона -->
+                    <ImageView
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:layout_gravity="top|start"
+                        android:layout_margin="@dimen/qr_corner_offset"
+                        android:src="@drawable/qr_corner_tl"
+                        android:contentDescription="@null" />
+                    <ImageView
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:layout_gravity="top|end"
+                        android:layout_margin="@dimen/qr_corner_offset"
+                        android:src="@drawable/qr_corner_tr"
+                        android:contentDescription="@null" />
+                    <ImageView
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:layout_gravity="bottom|start"
+                        android:layout_margin="@dimen/qr_corner_offset"
+                        android:src="@drawable/qr_corner_bl"
+                        android:contentDescription="@null" />
+                    <ImageView
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:layout_gravity="bottom|end"
+                        android:layout_margin="@dimen/qr_corner_offset"
+                        android:src="@drawable/qr_corner_br"
+                        android:contentDescription="@null" />
+
+                    <TextView
+                        android:id="@+id/qrFreeTipsLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom|center_horizontal"
+                        android:layout_marginBottom="0dp"
+                        android:text="FreeTips"
+                        android:textColor="@color/logo_ft_dark_blue"
+                        android:textSize="22sp"
+                        android:textStyle="bold" />
+                </FrameLayout>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:minHeight="24dp" />
+
+        <!-- Блок ссылки: по центру между QR и нижней полосой -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_link_card_white"
+            android:orientation="vertical"
+            android:padding="@dimen/spacing_sm">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:paddingTop="@dimen/spacing_sm"
+                android:paddingBottom="@dimen/spacing_sm">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_link_row"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="12dp"
+                    android:paddingTop="10dp"
+                    android:paddingEnd="12dp"
+                    android:paddingBottom="10dp">
+
+                    <TextView
+                        android:id="@+id/linksList"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:breakStrategy="balanced"
+                        android:gravity="center"
+                        android:hyphenationFrequency="none"
+                        android:lineSpacingMultiplier="1.25"
+                        android:paddingEnd="@dimen/spacing_sm"
+                        android:textColor="@color/primary"
+                        android:textSize="14sp"
+                        tools:text="https://free-tips.ru/pay/6c8mi5cuz1" />
+
+                    <ImageButton
+                        android:id="@+id/btnCopyLink"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="@string/copy_link"
+                        android:padding="8dp"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/ic_copy_24" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:minHeight="24dp" />
 
         <ProgressBar
             android:id="@+id/progress"
@@ -130,4 +224,15 @@
             android:textSize="14sp" />
     </LinearLayout>
     </ScrollView>
+
+        <!-- Золотая полоса у самого низа, над панелью меню, с отступом -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/page_strip_height"
+            android:layout_marginTop="@dimen/spacing_md"
+            android:layout_marginBottom="64dp"
+            android:layout_marginStart="48dp"
+            android:layout_marginEnd="48dp"
+            android:background="@drawable/bg_page_strip" />
+    </LinearLayout>
 </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

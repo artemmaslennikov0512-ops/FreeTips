@@ -9,6 +9,7 @@ import androidx.security.crypto.MasterKey
 private const val PREFS_NAME = "freetips_secure"
 private const val KEY_API_KEY = "api_key"
 private const val KEY_HAS_SUCCESSFUL_LOGIN = "has_successful_login"
+private const val KEY_LOGIN_429_BLOCKED_UNTIL = "login_429_blocked_until"
 
 class SecurePrefs(context: Context) {
 
@@ -49,6 +50,13 @@ class SecurePrefs(context: Context) {
         get() = prefs.getBoolean(KEY_HAS_SUCCESSFUL_LOGIN, false)
         set(value) {
             prefs.edit().putBoolean(KEY_HAS_SUCCESSFUL_LOGIN, value).apply()
+        }
+
+    /** После 429 не вызывать валидацию до этого времени (currentTimeMillis). Сбрасывается при успешном входе. */
+    var login429BlockedUntil: Long
+        get() = prefs.getLong(KEY_LOGIN_429_BLOCKED_UNTIL, 0L)
+        set(value) {
+            prefs.edit().putLong(KEY_LOGIN_429_BLOCKED_UNTIL, value).apply()
         }
 
     fun clear() {

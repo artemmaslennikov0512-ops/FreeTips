@@ -9,11 +9,11 @@ import android.graphics.Color
 import android.graphics.LinearGradient
 import android.graphics.Paint
 import android.graphics.Shader
-import android.widget.TextView
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.freetips.app.R
@@ -71,6 +71,7 @@ class LinksFragment : Fragment() {
                     binding.progress.visibility = View.GONE
                     binding.swipeRefresh.isRefreshing = false
                     binding.qrCard.visibility = View.GONE
+                    binding.qrTitle.visibility = View.GONE
                     binding.errorText.visibility = View.VISIBLE
                     binding.errorText.text = "Ошибка загрузки"
                 }
@@ -92,16 +93,21 @@ class LinksFragment : Fragment() {
                             }
                             binding.linksList.text = firstUrl ?: "Нет ссылок"
                             firstUrl?.let { url ->
+                                binding.qrTitle.visibility = View.VISIBLE
                                 binding.qrCard.visibility = View.VISIBLE
                                 binding.qrImage.setImageBitmap(encodeQrToBitmap(requireContext(), url, 512))
-                                binding.qrLabel.text = "Официант"
-                                applyGradientWhenLaidOut(binding.qrLabel)
-                            } ?: run { binding.qrCard.visibility = View.GONE }
+                                applyGradientToFreeTipsLabel(binding.qrFreeTipsLabel)
+                            } ?: run {
+                                binding.qrTitle.visibility = View.GONE
+                                binding.qrCard.visibility = View.GONE
+                            }
                         } catch (_: Exception) {
                             binding.linksList.text = "Нет ссылок"
+                            binding.qrTitle.visibility = View.GONE
                             binding.qrCard.visibility = View.GONE
                         }
                     } else {
+                        binding.qrTitle.visibility = View.GONE
                         binding.qrCard.visibility = View.GONE
                         binding.errorText.visibility = View.VISIBLE
                         binding.errorText.text = "Ошибка ${response.code}"
@@ -141,7 +147,7 @@ class LinksFragment : Fragment() {
         return bitmap
     }
 
-    private fun applyGradientWhenLaidOut(label: TextView) {
+    private fun applyGradientToFreeTipsLabel(label: TextView) {
         label.viewTreeObserver.addOnGlobalLayoutListener(object : android.view.ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
                 label.viewTreeObserver.removeOnGlobalLayoutListener(this)
@@ -149,9 +155,9 @@ class LinksFragment : Fragment() {
                 if (text.isEmpty()) return
                 val textWidth = label.paint.measureText(text)
                 if (textWidth <= 0f) return
-                val colorBlue = 0xFF0D1B2A.toInt()
-                val colorGold = 0xFFC5A572.toInt()
-                label.paint.shader = LinearGradient(0f, 0f, textWidth, 0f, colorBlue, colorGold, Shader.TileMode.CLAMP)
+                val colorStart = 0xFF0D1B2A.toInt()
+                val colorEnd = 0xFFC5A572.toInt()
+                label.paint.shader = LinearGradient(0f, 0f, textWidth, 0f, colorStart, colorEnd, Shader.TileMode.CLAMP)
                 label.invalidate()
             }
         })

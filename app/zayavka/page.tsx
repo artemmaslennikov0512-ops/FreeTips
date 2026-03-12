@@ -341,7 +341,7 @@ export default function ZayavkaPage() {
                   <div>
                     <label htmlFor="zayavka-phone" className="mb-1.5 block text-center text-sm font-medium text-[var(--color-text)]">Номер телефона</label>
                     <div className="zayavka-phone-field relative flex rounded-xl border-0 bg-[var(--color-light-gray)] overflow-hidden focus-within:ring-2 focus-within:ring-[var(--color-accent-gold)]/40 focus-within:ring-offset-2 focus-within:ring-offset-[var(--color-bg)]">
-                      <span className="flex items-center gap-1 pl-3 text-[var(--color-text)]" aria-hidden="true">
+                      <span className="flex shrink-0 items-center gap-1 pl-3 text-[var(--color-text)]" aria-hidden="true">
                         <Phone className="zayavka-phone-prefix h-5 w-5 text-[var(--color-muted)]" />
                         <span className="zayavka-phone-prefix font-medium text-[var(--color-text)]">+7</span>
                       </span>
@@ -505,7 +505,7 @@ export default function ZayavkaPage() {
                       <div>
                         <label htmlFor="zayavka-adminContactPhone" className="mb-1.5 block text-center text-sm font-medium text-[var(--color-text)]">Телефон администратора</label>
                         <div className="zayavka-phone-field relative flex rounded-xl border-0 bg-[var(--color-light-gray)] overflow-hidden focus-within:ring-2 focus-within:ring-[var(--color-accent-gold)]/40 focus-within:ring-offset-2 focus-within:ring-offset-[var(--color-bg)]">
-                          <span className="flex items-center gap-1 pl-3 text-[var(--color-text)]" aria-hidden="true">
+                          <span className="flex shrink-0 items-center gap-1 pl-3 text-[var(--color-text)]" aria-hidden="true">
                             <Phone className="zayavka-phone-prefix h-5 w-5 text-[var(--color-muted)]" />
                             <span className="zayavka-phone-prefix font-medium text-[var(--color-text)]">+7</span>
                           </span>

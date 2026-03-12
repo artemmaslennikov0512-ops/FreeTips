@@ -1,129 +1,171 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/swipeRefresh"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background">
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingStart="@dimen/screen_padding"
-        android:paddingEnd="@dimen/screen_padding"
-        android:paddingTop="@dimen/content_top_padding"
-        android:paddingBottom="@dimen/content_bottom_padding">
-
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:gravity="center_horizontal">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <!-- Заголовок «Профиль» над блоком -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Профиль"
-            android:textSize="@dimen/text_subtitle"
-            android:textStyle="bold"
-            android:textColor="@color/on_surface" />
-
-        <com.google.android.material.card.MaterialCardView
+        <!-- Золотая полоса у верхней части страницы -->
+        <View
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/spacing_sm"
-            style="@style/Widget.FreeTips.Card"
-            android:padding="@dimen/card_padding_large">
+            android:layout_height="@dimen/page_strip_height"
+            android:layout_marginTop="96dp"
+            android:layout_marginBottom="@dimen/spacing_md"
+            android:layout_marginStart="48dp"
+            android:layout_marginEnd="48dp"
+            android:background="@drawable/bg_page_strip" />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:fillViewport="true"
+            android:paddingStart="@dimen/screen_padding"
+            android:paddingEnd="@dimen/screen_padding"
+            android:paddingTop="@dimen/spacing_sm"
+            android:paddingBottom="@dimen/content_bottom_padding">
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:orientation="vertical"
-                android:paddingStart="@dimen/content_inset_horizontal"
-                android:paddingEnd="@dimen/content_inset_horizontal">
+                android:gravity="center_vertical">
 
-                <!-- Строка: Логин (по середине строки) -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:minHeight="44dp"
-                    android:paddingVertical="@dimen/spacing_md">
-                    <TextView
-                        android:id="@+id/loginText"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:textSize="@dimen/text_body"
-                        android:textColor="@color/on_surface"
-                        tools:text="Логин: user" />
-                </LinearLayout>
                 <View
                     android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/outline"
-                    android:alpha="0.25" />
-                <!-- Строка: почта без подписи -->
-                <LinearLayout
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:minHeight="24dp" />
+
+                <!-- Заголовок «Профиль» крупнее, по центру между полосой и блоком -->
+                <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:minHeight="44dp"
-                    android:paddingVertical="@dimen/spacing_md">
-                    <TextView
-                        android:id="@+id/emailText"
+                    android:gravity="center"
+                    android:text="Профиль"
+                    android:textSize="@dimen/text_title_large"
+                    android:textStyle="bold"
+                    android:textColor="@color/primary"
+                    android:layout_marginTop="@dimen/spacing_lg"
+                    android:layout_marginBottom="@dimen/spacing_lg" />
+
+                <!-- Блок профиля: белый фон, золотой текст -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardBackgroundColor="@android:color/white"
+                    app:cardCornerRadius="@dimen/card_radius"
+                    android:padding="@dimen/card_padding_large">
+
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:textSize="@dimen/text_body"
-                        android:textColor="@color/on_surface_variant"
-                        tools:text="email@example.com" />
-                </LinearLayout>
+                        android:orientation="vertical"
+                        android:paddingStart="@dimen/content_inset_horizontal"
+                        android:paddingEnd="@dimen/content_inset_horizontal">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:minHeight="44dp"
+                            android:paddingVertical="@dimen/spacing_md">
+                            <TextView
+                                android:id="@+id/loginText"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_vertical"
+                                android:textSize="@dimen/text_body"
+                                android:textColor="@color/primary"
+                                tools:text="Логин: user" />
+                        </LinearLayout>
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="@color/primary"
+                            android:alpha="0.5" />
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:minHeight="44dp"
+                            android:paddingVertical="@dimen/spacing_md">
+                            <TextView
+                                android:id="@+id/emailText"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_vertical"
+                                android:textSize="@dimen/text_body"
+                                android:textColor="@color/primary"
+                                tools:text="email@example.com" />
+                        </LinearLayout>
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="@color/primary"
+                            android:alpha="0.5" />
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:minHeight="44dp"
+                            android:paddingVertical="@dimen/spacing_md">
+                            <TextView
+                                android:id="@+id/fullNameText"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_vertical"
+                                android:textSize="@dimen/text_body"
+                                android:textColor="@color/primary"
+                                tools:text="Иван Иванов" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnLogout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="@dimen/touch_target_min"
+                    android:layout_marginTop="@dimen/spacing_xl"
+                    android:text="Выйти (очистить API-ключ)"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+
+                <TextView
+                    android:id="@+id/errorText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_md"
+                    android:visibility="gone"
+                    android:textColor="@color/error"
+                    android:textSize="@dimen/text_body" />
+
                 <View
                     android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/outline"
-                    android:alpha="0.25" />
-                <!-- Строка: ФИО без подписи -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:minHeight="44dp"
-                    android:paddingVertical="@dimen/spacing_md">
-                    <TextView
-                        android:id="@+id/fullNameText"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:textSize="@dimen/text_body"
-                        android:textColor="@color/on_surface_variant"
-                        tools:text="Иван Иванов" />
-                </LinearLayout>
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:minHeight="24dp" />
             </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
+        </ScrollView>
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnLogout"
+        <!-- Золотая полоса у самого низа, над панелью меню -->
+        <View
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="@dimen/touch_target_min"
-            android:layout_marginTop="@dimen/spacing_xl"
-            android:text="Выйти (очистить API-ключ)"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
-
-        <TextView
-            android:id="@+id/errorText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="@dimen/page_strip_height"
             android:layout_marginTop="@dimen/spacing_md"
-            android:visibility="gone"
-            android:textColor="@color/error"
-            android:textSize="@dimen/text_body" />
+            android:layout_marginBottom="64dp"
+            android:layout_marginStart="48dp"
+            android:layout_marginEnd="48dp"
+            android:background="@drawable/bg_page_strip" />
     </LinearLayout>
-    </ScrollView>
 </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

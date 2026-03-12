@@ -18,7 +18,7 @@ import {
   PAY_RATE_LIMIT_IP,
   PAY_RATE_LIMIT_SLUG,
 } from "@/lib/middleware/rate-limit";
-import { parseJsonWithLimit, MAX_BODY_SIZE_DEFAULT, jsonError, internalError } from "@/lib/api/helpers";
+import { parseJsonWithLimit, MAX_BODY_SIZE_DEFAULT, jsonError, internalError, rateLimit429Response } from "@/lib/api/helpers";
 import { verifyCsrfFromRequest } from "@/lib/security/csrf";
 import { site } from "@/config/site";
 
@@ -126,13 +126,13 @@ export async function POST(request: NextRequest, { params }: Params) {
   const rateLimitIp = await checkRateLimitByIP(ip, PAY_RATE_LIMIT_IP);
   if (!rateLimitIp.allowed) {
     logSecurity("pay.init.rate_limit_ip", { requestId, ip, slug });
-    return NextResponse.json({ error: "Слишком много запросов. Попробуйте позже." }, { status: 429 });
+    return rateLimit429Response(rateLimitIp);
   }
 
   const rateLimitSlug = await checkRateLimitByKey(slug, PAY_RATE_LIMIT_SLUG);
   if (!rateLimitSlug.allowed) {
     logSecurity("pay.init.rate_limit_slug", { requestId, ip, slug });
-    return NextResponse.json({ error: "Слишком много запросов на эту ссылку. Попробуйте позже." }, { status: 429 });
+    return rateLimit429Response(rateLimitSlug, "Слишком много запросов на эту ссылку. Попробуйте позже.");
   }
 
   if (!verifyCsrfFromRequest(request)) {

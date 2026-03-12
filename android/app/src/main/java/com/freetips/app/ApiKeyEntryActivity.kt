@@ -5,6 +5,7 @@ import android.net.Uri
 import android.graphics.LinearGradient
 import android.graphics.Shader
 import android.os.Bundle
+import android.os.SystemClock
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
@@ -21,6 +22,10 @@ class ApiKeyEntryActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityApiKeyEntryBinding
     private lateinit var prefs: SecurePrefs
+
+    /** После 429 не отправляем запрос снова до истечения кулдауна (мс). */
+    private var validationBlockedUntil = 0L
+    private val cooldownMs = 60_000L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,7 +58,13 @@ class ApiKeyEntryActivity : AppCompatActivity() {
             }
 
             if (prefs.hasSuccessfulLoginOnce && !savedKey.isNullOrBlank()) {
-                validateAndGo(savedKey)
+                val blockedUntil = prefs.login429BlockedUntil
+                if (blockedUntil > 0 && System.currentTimeMillis() < blockedUntil) {
+                    binding.errorText.visibility = View.VISIBLE
+                    binding.errorText.text = getString(R.string.login_error_too_many_requests)
+                } else {
+                    validateAndGo(savedKey)
+                }
             }
         } catch (t: Throwable) {
             android.util.Log.e("ApiKeyEntry", "onCreate", t)
@@ -87,6 +98,15 @@ class ApiKeyEntryActivity : AppCompatActivity() {
     }
 
     private fun validateAndGo(apiKey: String) {
+        val nowRealtime = SystemClock.elapsedRealtime()
+        val nowWall = System.currentTimeMillis()
+        val blockedUntilWall = prefs.login429BlockedUntil
+        if (nowRealtime < validationBlockedUntil || (blockedUntilWall > 0 && nowWall < blockedUntilWall)) {
+            binding.errorText.visibility = View.VISIBLE
+            binding.errorText.text = getString(R.string.login_error_too_many_requests)
+            return
+        }
+        binding.errorText.visibility = View.GONE
         binding.progress.visibility = View.VISIBLE
         binding.btnLogin.isEnabled = false
 
@@ -113,6 +133,7 @@ class ApiKeyEntryActivity : AppCompatActivity() {
                             try {
                                 prefs.apiKey = apiKey
                                 prefs.hasSuccessfulLoginOnce = true
+                                prefs.login429BlockedUntil = 0L
                             } catch (e: Throwable) {
                                 binding.errorText.visibility = View.VISIBLE
                                 binding.errorText.text = "Ошибка сохранения: ${e.message}"
@@ -125,10 +146,16 @@ class ApiKeyEntryActivity : AppCompatActivity() {
                             }
                         } else {
                             binding.errorText.visibility = View.VISIBLE
-                            binding.errorText.text = when (code) {
-                                401 -> "Неверный API-ключ"
-                                403 -> "Доступ ограничен"
-                                else -> "Ошибка входа ($code)"
+                            if (code == 429) {
+                                validationBlockedUntil = SystemClock.elapsedRealtime() + cooldownMs
+                                prefs.login429BlockedUntil = System.currentTimeMillis() + cooldownMs
+                                binding.errorText.text = getString(R.string.login_error_too_many_requests)
+                            } else {
+                                binding.errorText.text = when (code) {
+                                    401 -> "Неверный API-ключ"
+                                    403 -> "Доступ ограничен"
+                                    else -> "Ошибка входа ($code)"
+                                }
                             }
                         }
                     } catch (e: Throwable) {

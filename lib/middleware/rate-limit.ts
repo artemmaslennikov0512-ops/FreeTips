@@ -22,10 +22,10 @@ const genericStore = new Map<string, RateLimitEntry>();
 const DEFAULT_WINDOW_MS = 15 * 60 * 1000;
 const DEFAULT_MAX_REQUESTS = 100;
 
-/** Окно и лимит для auth (login/register) */
+/** Окно и лимит для auth (login, регистрация, верификация кода, сброс пароля и т.д.) — по IP */
 export const AUTH_RATE_LIMIT = {
   windowMs: 15 * 60 * 1000,
-  maxRequests: 20,
+  maxRequests: 40,
   keyPrefix: "auth",
 } as const;
 

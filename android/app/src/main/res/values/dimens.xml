@@ -9,6 +9,7 @@
     <dimen name="screen_padding">20dp</dimen>
     <dimen name="header_content_inset">16dp</dimen>
     <dimen name="screen_top_inset">40dp</dimen>
+    <dimen name="header_bell_area_top_margin">48dp</dimen>
     <dimen name="content_top_padding">56dp</dimen>
     <dimen name="content_bottom_padding">56dp</dimen>
     <dimen name="section_title_to_content">12dp</dimen>
@@ -21,6 +22,10 @@
     <dimen name="card_padding">16dp</dimen>
     <dimen name="card_padding_large">24dp</dimen>
     <dimen name="content_inset_horizontal">8dp</dimen>
+    <dimen name="qr_corner_offset">12dp</dimen>
+    <dimen name="qr_card_margin_top">72dp</dimen>
+    <dimen name="page_strip_height">4dp</dimen>
+    <dimen name="page_strip_margin_vertical">16dp</dimen>
     <dimen name="statistics_block_width">280dp</dimen>
 
     <!-- Закон Фиттса: минимальный размер цели касания (Material 48dp) -->

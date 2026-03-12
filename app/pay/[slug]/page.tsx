@@ -210,7 +210,7 @@ export default function PayPage() {
                 setCustomAmount("");
                 setComment("");
               }}
-              className="rounded-xl border border-[var(--color-brand-gold)]/40 bg-transparent px-5 py-2.5 text-sm font-medium text-[var(--color-text)] hover:bg-[var(--color-brand-gold)]/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-gold)]/30"
+              className="rounded-xl border border-[#0a192f]/35 bg-transparent px-5 py-2.5 text-sm font-medium text-[#0a192f] hover:bg-[#0a192f]/8 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a192f]/25"
             >
               Отправить ещё
             </button>

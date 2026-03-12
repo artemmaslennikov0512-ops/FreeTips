@@ -5,6 +5,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { getNodeEnv } from "@/lib/config";
+import type { RateLimitResult } from "@/lib/middleware/rate-limit";
 
 /** Максимальный размер тела запроса для auth/регистрации (512 KB) */
 export const MAX_BODY_SIZE_AUTH = 512 * 1024;
@@ -113,6 +114,21 @@ export function parseLimitOffset(
   );
   const offset = Math.max(0, parseInt(offsetRaw, 10) || 0);
   return { limit, offset };
+}
+
+/**
+ * Ответ 429 при превышении rate limit с заголовком Retry-After (секунды до сброса).
+ * Клиент может показать «Попробуйте через N мин» или таймер.
+ */
+export function rateLimit429Response(
+  rateLimit: RateLimitResult,
+  message: string = "Слишком много запросов. Попробуйте позже.",
+): NextResponse<ApiErrorBody> {
+  const retryAfterSec = Math.max(0, Math.ceil((rateLimit.resetAt - Date.now()) / 1000));
+  return NextResponse.json(
+    { error: message },
+    { status: 429, headers: { "Retry-After": String(retryAfterSec) } },
+  );
 }
 
 /**

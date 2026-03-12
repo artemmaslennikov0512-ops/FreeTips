@@ -7,25 +7,32 @@
     android:orientation="vertical"
     android:background="?attr/freetips_screenBackground">
 
-    <!-- Шапка: только полоса -->
-    <View
-        android:id="@+id/header_bar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/freetips_headerBarMinHeight"
-        android:background="?attr/freetips_headerBarBackground"
-        android:elevation="4dp" />
-
-    <!-- Логотип и колокольчик: белый фон как у шапки -->
+    <!-- Шапка (скрывается в разделе QR) -->
     <LinearLayout
+        android:id="@+id/header_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:background="?attr/freetips_headerBarBackground"
-        android:paddingStart="?attr/freetips_headerBarPaddingStart"
-        android:paddingEnd="?attr/freetips_headerBarPaddingEnd"
-        android:paddingTop="?attr/freetips_headerBarPaddingTop"
-        android:paddingBottom="?attr/freetips_headerBarPaddingBottom">
+        android:orientation="vertical">
+
+        <View
+            android:id="@+id/header_bar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/freetips_headerBarMinHeight"
+            android:background="?attr/freetips_headerBarBackground"
+            android:elevation="4dp" />
+
+        <!-- Логотип и колокольчик; на главной фон строки и круга под колокольчиком делаем прозрачным (синий фон экрана) -->
+        <LinearLayout
+            android:id="@+id/header_content_row"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="?attr/freetips_headerBarBackground"
+            android:paddingStart="?attr/freetips_headerBarPaddingStart"
+            android:paddingEnd="?attr/freetips_headerBarPaddingEnd"
+            android:paddingTop="?attr/freetips_headerBarPaddingTop"
+            android:paddingBottom="?attr/freetips_headerBarPaddingBottom">
 
         <include
             android:id="@+id/header_logo"
@@ -62,6 +69,7 @@
                 android:focusable="false"
                 android:visibility="visible" />
         </FrameLayout>
+    </LinearLayout>
     </LinearLayout>
 
     <androidx.fragment.app.FragmentContainerView

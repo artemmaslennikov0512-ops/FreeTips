@@ -17,7 +17,7 @@ import { getWaiterPaygineSdRef } from "@/lib/payment/paygine-sd-ref";
 import { getSystemDefaultLimitsForNewUser } from "@/lib/system-default-limits";
 import { logError, logSecurity } from "@/lib/logger";
 import { getRequestId } from "@/lib/security/request";
-import { parseJsonWithLimit, MAX_BODY_SIZE_AUTH, jsonError, internalError } from "@/lib/api/helpers";
+import { parseJsonWithLimit, MAX_BODY_SIZE_AUTH, jsonError, internalError, rateLimit429Response } from "@/lib/api/helpers";
 import { verifyCsrfFromRequest } from "@/lib/security/csrf";
 import { consumeEmailVerified } from "@/lib/email-verification-store";
 
@@ -26,12 +26,7 @@ export async function POST(request: NextRequest) {
   const ip = getClientIP(request);
   try {
     const rateLimit = await checkRateLimitByIP(ip, AUTH_RATE_LIMIT);
-    if (!rateLimit.allowed) {
-      return NextResponse.json(
-        { error: "Слишком много запросов. Попробуйте позже." },
-        { status: 429 },
-      );
-    }
+    if (!rateLimit.allowed) return rateLimit429Response(rateLimit);
     if (!verifyCsrfFromRequest(request)) {
       return NextResponse.json({ error: "Некорректный CSRF токен" }, { status: 403 });
     }

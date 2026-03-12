@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Только обводка, прозрачная заливка -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <stroke
+        android:width="3dp"
+        android:color="@color/logo_ft_dark_blue" />
+    <solid android:color="#00000000" />
+    <corners android:radius="@dimen/card_radius" />
+</shape>

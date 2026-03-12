@@ -115,7 +115,7 @@
                                 android:id="@+id/inputApiKey"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:inputType="textPassword"
+                                android:inputType="text"
                                 android:minLines="2"
                                 android:textColor="@android:color/black"
                                 android:textColorHint="#666666"

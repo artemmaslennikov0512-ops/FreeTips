@@ -163,16 +163,21 @@ async function runOnePayment(
   return { ok: success };
 }
 
+// Тестовые карты Paygine (тестовый стенд). Переопределяются через PAYGINE_TEST_* в scripts/.env.
+const DEFAULT_TEST_PAN = "2200019999000007";
+const DEFAULT_TEST_EXPIRY = "08/25";
+const DEFAULT_TEST_CVC = "983";
+
 async function main() {
   const countArg = process.argv[2]?.trim();
   const numPayments = countArg ? Math.max(1, parseInt(countArg, 10) || 20) : 20;
 
-  const pan = process.env.PAYGINE_TEST_PAN?.replace(/\s/g, "") ?? "";
-  let expdate = process.env.PAYGINE_TEST_EXPIRY?.trim() ?? "08/25";
-  const cvc = process.env.PAYGINE_TEST_CVC?.trim() ?? "";
+  const pan = (process.env.PAYGINE_TEST_PAN?.replace(/\s/g, "") ?? DEFAULT_TEST_PAN).trim();
+  let expdate = process.env.PAYGINE_TEST_EXPIRY?.trim() ?? DEFAULT_TEST_EXPIRY;
+  const cvc = (process.env.PAYGINE_TEST_CVC?.trim() ?? DEFAULT_TEST_CVC).trim();
 
   if (!pan || pan.length < 8) {
-    console.error("Задайте PAYGINE_TEST_PAN в scripts/.env (тестовая карта).");
+    console.error("Задайте PAYGINE_TEST_PAN в scripts/.env или используйте тестовую карту по умолчанию.");
     process.exit(1);
   }
   if (!cvc) {

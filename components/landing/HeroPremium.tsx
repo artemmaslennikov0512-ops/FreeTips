@@ -65,10 +65,10 @@ export function HeroPremium() {
           {/* Левая колонка: заголовок, подзаголовок, кнопки, метрики */}
           <div className="max-w-[640px] relative z-[2] flex flex-col">
             <h1 className="hero-premium-title hero-title-gradient font-[family:var(--font-inter)] text-4xl sm:text-5xl lg:text-6xl font-bold leading-[1.15] mb-4">
-              Чаевые, которые работают на ваш бренд
+              Мгновенные чаевые с FreeTips
             </h1>
             <p className="hero-premium-lead text-lg text-[var(--color-on-dark-muted)] mb-6 max-w-[560px] leading-relaxed">
-              Безопасный и уважительный способ получать достойное вознаграждение. Технологии, которым доверяют ведущие заведения. Современный сервис.
+              Гость платит так, как привык — телефоном или картой. Мгновенно, без регистраций и приложений.
             </p>
             <div className="flex flex-wrap gap-3 sm:gap-4 mb-0">
               <Link
@@ -100,32 +100,37 @@ export function HeroPremium() {
             </div>
           </div>
 
-          {/* Правая колонка: бренд, фичи, превью, кнопка */}
+          {/* Правая колонка: Всё под вашим брендом — центрирование, настройки, превью, ссылка на заявку */}
           <div className="hero-brand-card mt-4 lg:mt-0 lg:shrink-0 lg:w-[340px] xl:w-[360px] relative z-[2] rounded-2xl border border-white/15 bg-gradient-to-b from-white/[0.08] to-white/[0.03] backdrop-blur-md shadow-[0_8px_32px_rgba(0,0,0,0.2)] overflow-hidden">
             <div className="h-1 w-full bg-gradient-to-r from-[var(--color-accent-gold)]/80 via-[var(--color-accent-gold)] to-[var(--color-accent-gold)]/60 relative z-10" aria-hidden />
-            <div className="px-5 py-5 sm:px-6 sm:py-6 relative z-10">
-              <h2 className="font-[family:var(--font-inter)] text-xl sm:text-2xl font-bold text-[var(--color-on-navy)] leading-tight mb-2">
+            <div className="px-5 py-5 sm:px-6 sm:py-6 relative z-10 text-center flex flex-col items-center">
+              <h2 className="font-[family:var(--font-inter)] text-xl sm:text-2xl font-bold text-[var(--color-on-navy)] leading-tight mb-4">
                 Всё под вашим брендом
               </h2>
-              <ul className="space-y-3 mb-5">
-                {BRAND_FEATURES.map(({ icon, label, desc }) => (
-                  <li
-                    key={label}
-                    className="hero-brand-item flex items-start gap-3 rounded-xl bg-white/[0.06] border border-white/10 px-3 py-2.5 transition-all duration-300 hover:bg-white/[0.09] hover:border-white/20"
-                  >
-                    <span className="hero-brand-icon flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[var(--color-accent-gold)]/20 text-[var(--color-accent-gold)] mt-0.5">
-                      <i className={`${icon} text-sm`} aria-hidden />
-                    </span>
-                    <span className="flex flex-col min-w-0">
-                      <span className="text-sm font-semibold text-[var(--color-on-navy)]">{label}</span>
-                      <span className="text-xs text-[var(--color-on-dark-muted)] leading-relaxed mt-0.5">{desc}</span>
-                    </span>
-                  </li>
-                ))}
-              </ul>
-              <div className="mb-5">
+
+              <div className="w-full mb-5">
+                <span className="text-xs font-semibold text-[var(--color-on-dark-muted)] uppercase tracking-wider">Настройки</span>
+                <ul className="space-y-3 mt-3 text-left">
+                  {BRAND_FEATURES.map(({ icon, label, desc }) => (
+                    <li
+                      key={label}
+                      className="hero-brand-item flex items-start gap-3 rounded-xl bg-white/[0.06] border border-white/10 px-3 py-2.5 transition-all duration-300 hover:bg-white/[0.09] hover:border-white/20"
+                    >
+                      <span className="hero-brand-icon flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[var(--color-accent-gold)]/20 text-[var(--color-accent-gold)] mt-0.5">
+                        <i className={`${icon} text-sm`} aria-hidden />
+                      </span>
+                      <span className="flex flex-col min-w-0">
+                        <span className="text-sm font-semibold text-[var(--color-on-navy)]">{label}</span>
+                        <span className="text-xs text-[var(--color-on-dark-muted)] leading-relaxed mt-0.5">{desc}</span>
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="w-full mb-5">
                 <span className="text-xs font-semibold text-[var(--color-on-dark-muted)] uppercase tracking-wider">Превью</span>
-                <div className="hero-preview-gallery mt-3">
+                <div className="hero-preview-gallery mt-3 justify-center">
                   {PREVIEW_ITEMS.map(({ label, icon }) => (
                     <div
                       key={label}
@@ -139,11 +144,12 @@ export function HeroPremium() {
                   ))}
                 </div>
               </div>
+
               <Link
-                href="/establishment/brand"
-                className="hero-btn-design block w-full text-center py-3 rounded-xl border-2 border-[var(--color-accent-gold)]/60 text-[var(--color-on-navy)] font-semibold text-[14px] backdrop-blur-sm hover:bg-[var(--color-accent-gold)]/25 hover:border-[var(--color-accent-gold)] hover:scale-[1.02]"
+                href="/zayavka"
+                className="hero-btn-design block w-full text-center py-3 rounded-xl border-2 border-[var(--color-accent-gold)]/60 text-[var(--color-on-navy)] font-semibold text-[14px] backdrop-blur-sm hover:bg-[var(--color-accent-gold)]/25 hover:border-[var(--color-accent-gold)] hover:scale-[1.02] transition-transform"
               >
-                Настроить дизайн бесплатно
+                Оставить заявку
               </Link>
             </div>
           </div>

@@ -456,11 +456,12 @@ export default function CabinetDashboardPage() {
           <p className="mb-4 text-[var(--color-text)]/90">
             Скопируйте ключ и введите его в приложении FreeTips — и управляйте личным кабинетом официанта из мобильного приложения. (только для Android)
           </p>
-          <p className="mb-6">
+          <p className="mb-6 flex flex-wrap items-center gap-3">
+            <span className="text-[var(--color-text)]/90">Приложение для Android:</span>
             <a
               href={`${getBaseUrl()}/freetips.apk`}
               download="freetips.apk"
-              className="inline-flex items-center gap-2 rounded-[10px] border border-[var(--color-brand-gold)]/30 bg-[var(--color-bg-sides)] px-4 py-2.5 text-[14px] font-semibold text-[var(--color-text)] transition-all hover:bg-[var(--color-light-gray)] focus:outline-none"
+              className="inline-flex items-center gap-2 rounded-[10px] bg-[var(--color-brand-gold)] px-5 py-2.5 text-[14px] font-semibold text-[#0a192f] transition-all hover:opacity-90 focus:outline-none"
             >
               <Download className="h-4 w-4 shrink-0" />
               Скачать приложение (APK)

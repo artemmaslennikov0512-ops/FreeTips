@@ -2,9 +2,21 @@
  * Клиент Paygine по документу «Интеграция с ПЦ» (Оглавление1.txt).
  * В приложении: пополнение только картой (Register → SDPayIn). Purchase/PurchaseSBP используются скриптами.
  * Порядок параметров и подпись — Таблицы 1, 2, 44 и Приложение №2.
+ *
+ * Все запросы к API Paygine идут через очередь: по одному в момент. При нескольких вебхуках одновременно
+ * запросы не летят параллельно — снижается риск ошибок и лимитов со стороны ПЦ.
  */
 
 import { buildPaygineSignature } from "./signature";
+
+let paygineQueue: Promise<unknown> = Promise.resolve();
+
+/** Выполняет запрос к Paygine по одному (очередь). */
+function withPaygineSerial<T>(fn: () => Promise<T>): Promise<T> {
+  const work = paygineQueue.then(() => fn());
+  paygineQueue = work.catch(() => undefined);
+  return work;
+}
 
 // Базовый URL для запросов — до /webapi включительно. Тест: https://test.paygine.com/webapi , прод: https://pay.paygine.com/webapi
 const TEST_BASE_URL = "https://test.paygine.com/webapi";
@@ -66,6 +78,7 @@ export async function registerOrder(
   config: PaygineConfig,
   params: RegisterParams
 ): Promise<RegisterResult> {
+  return withPaygineSerial(async () => {
   const { sector, password } = config;
 
   // Подпись строго по документу: sector, amount, currency, password
@@ -120,6 +133,7 @@ export async function registerOrder(
   const errCode = text.match(/<code>([^<]+)<\/code>/)?.[1];
   const errDesc = text.match(/<description>([^<]*)<\/description>/)?.[1];
   return { ok: false, code: errCode ?? undefined, description: (errDesc ?? trimmed).slice(0, 500) };
+  });
 }
 
 /**
@@ -134,6 +148,7 @@ export async function getOrderStatus(
   config: PaygineConfig,
   orderId: number
 ): Promise<OrderStatusResult> {
+  return withPaygineSerial(async () => {
   const { sector, password } = config;
   const signParts = [String(sector), String(orderId)];
   const signature = buildPaygineSignature(signParts, password);
@@ -164,6 +179,7 @@ export async function getOrderStatus(
   const errCode = text.match(/<code>([^<]+)<\/code>/)?.[1];
   const errDesc = text.match(/<description>([^<]*)<\/description>/)?.[1];
   return { ok: false, code: errCode ?? undefined, description: (errDesc ?? text).slice(0, 500) };
+  });
 }
 
 export type PaygineFormParams = Record<string, string>;
@@ -270,6 +286,7 @@ export async function sbpCreditPrecheck(
   config: PaygineConfig,
   params: SBPCreditPrecheckParams
 ): Promise<SBPCreditPrecheckResult> {
+  return withPaygineSerial(async () => {
   const { sector, password } = config;
   const signParts = [
     String(sector),
@@ -306,6 +323,7 @@ export async function sbpCreditPrecheck(
   const errCode = text.match(/<code>([^<]+)<\/code>/)?.[1];
   const errDesc = text.match(/<description>([^<]*)<\/description>/)?.[1];
   return { ok: false, code: errCode ?? undefined, description: (errDesc ?? text).slice(0, 500) };
+  });
 }
 
 /**
@@ -325,6 +343,7 @@ export async function sbpCredit(
   config: PaygineConfig,
   params: SBPCreditParams
 ): Promise<SBPCreditResult> {
+  return withPaygineSerial(async () => {
   const { sector, password } = config;
   const signParts = [String(sector), String(params.orderId), params.precheck_id];
   const signature = buildPaygineSignature(signParts, password);
@@ -355,6 +374,7 @@ export async function sbpCredit(
 
   const operationId = text.match(/<id>(\d+)<\/id>/i)?.[1];
   return { ok: true, operationId };
+  });
 }
 
 // --- Перевод между кубышками (SDRelocateFunds) и вывод на карту (SDPayOut) ---
@@ -379,6 +399,7 @@ export async function sdRelocateFunds(
   config: PaygineConfig,
   params: SDRelocateFundsParams
 ): Promise<SDRelocateFundsResult> {
+  return withPaygineSerial(async () => {
   const { sector, password } = config;
   const signParts = [
     String(sector),
@@ -417,6 +438,7 @@ export async function sdRelocateFunds(
   const code = text.match(/<code>([^<]+)<\/code>/)?.[1];
   const desc = text.match(/<description>([^<]*)<\/description>/)?.[1]?.trim();
   return { ok: false, code, description: (desc ?? text).slice(0, 500) };
+  });
 }
 
 export type SDPayOutParams = {
@@ -447,6 +469,7 @@ export async function sdPayOut(
   config: PaygineConfig,
   params: SDPayOutParams
 ): Promise<SDPayOutResult> {
+  return withPaygineSerial(async () => {
   const { sector, password } = config;
   const pan = params.pan.replace(/\s/g, "");
   const amountStr = String(params.amountKop);
@@ -484,6 +507,7 @@ export async function sdPayOut(
 
   const operationId = text.match(/<id>(\d+)<\/id>/)?.[1] ?? text.match(/<order_id>(\d+)<\/order_id>/)?.[1];
   return { ok: true, operationId };
+  });
 }
 
 /**
@@ -528,6 +552,7 @@ export async function sdGetBalance(
   config: PaygineConfig,
   params: { sdRef: string }
 ): Promise<SDGetBalanceResult> {
+  return withPaygineSerial(async () => {
   const { sector, password } = config;
   const sdRef = params.sdRef.trim();
   const signParts = [String(sector), sdRef];
@@ -580,6 +605,7 @@ export async function sdGetBalance(
     code: codeMatch?.[1]?.trim(),
     description: (descMatch?.[1] ?? text).trim().slice(0, 500) || undefined,
   };
+  });
 }
 
 export type SDPayOutSBPPrecheckParams = {
@@ -600,6 +626,7 @@ export async function sdPayOutSBPPrecheck(
   config: PaygineConfig,
   params: SDPayOutSBPPrecheckParams
 ): Promise<SDPayOutSBPPrecheckResult> {
+  return withPaygineSerial(async () => {
   const { sector, password } = config;
   const signParts = [
     String(sector),
@@ -639,6 +666,7 @@ export async function sdPayOutSBPPrecheck(
   const errCode = text.match(/<code>([^<]+)<\/code>/)?.[1];
   const errDesc = text.match(/<description>([^<]*)<\/description>/)?.[1];
   return { ok: false, code: errCode ?? undefined, description: (errDesc ?? text).slice(0, 500) };
+  });
 }
 
 export type SDPayOutSBPParams = {
@@ -657,6 +685,7 @@ export async function sdPayOutSBP(
   config: PaygineConfig,
   params: SDPayOutSBPParams
 ): Promise<SDPayOutSBPResult> {
+  return withPaygineSerial(async () => {
   const { sector, password } = config;
   const signParts = [String(sector), params.precheck_id];
   const signature = buildPaygineSignature(signParts, password);
@@ -689,4 +718,5 @@ export async function sdPayOutSBP(
 
   const operationId = text.match(/<id>(\d+)<\/id>/i)?.[1];
   return { ok: true, operationId };
+  });
 }

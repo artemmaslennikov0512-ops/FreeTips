@@ -17,6 +17,28 @@ import { logError, logInfo } from "@/lib/logger";
 import { getRequestId } from "@/lib/security/request";
 import { getBaseUrlFromRequest } from "@/lib/get-base-url";
 
+/** Кэш баланса Paygine по userId для снижения числа запросов к ПЦ. TTL из PAYGINE_BALANCE_CACHE_TTL_SEC (по умолчанию 30 сек). */
+const PAYGINE_BALANCE_CACHE_TTL_MS =
+  (Number(process.env.PAYGINE_BALANCE_CACHE_TTL_SEC) || 30) * 1000;
+const paygineBalanceCache = new Map<
+  string,
+  { balanceKop: number; cachedAt: number }
+>();
+
+function getCachedPaygineBalance(userId: string): number | null {
+  const entry = paygineBalanceCache.get(userId);
+  if (!entry) return null;
+  if (Date.now() - entry.cachedAt >= PAYGINE_BALANCE_CACHE_TTL_MS) {
+    paygineBalanceCache.delete(userId);
+    return null;
+  }
+  return entry.balanceKop;
+}
+
+function setCachedPaygineBalance(userId: string, balanceKop: number): void {
+  paygineBalanceCache.set(userId, { balanceKop, cachedAt: Date.now() });
+}
+
 export async function GET(request: NextRequest) {
   try {
     const auth = await requireAuthOrApiKey(request);
@@ -125,14 +147,21 @@ export async function GET(request: NextRequest) {
     const sdRef = profile.paygineSdRef?.trim();
     let paygineBalanceKop: number | null = null;
     if (sdRef && paygineConfig) {
-      try {
-        const paygineBalance = await sdGetBalance(paygineConfig, { sdRef });
-        if (paygineBalance.ok) {
-          paygineBalanceKop = paygineBalance.balanceKop;
-          balanceKopForStats = paygineBalance.balanceKop;
+      const cached = getCachedPaygineBalance(id);
+      if (cached !== null) {
+        paygineBalanceKop = cached;
+        balanceKopForStats = cached;
+      } else {
+        try {
+          const paygineBalance = await sdGetBalance(paygineConfig, { sdRef });
+          if (paygineBalance.ok) {
+            paygineBalanceKop = paygineBalance.balanceKop;
+            balanceKopForStats = paygineBalance.balanceKop;
+            setCachedPaygineBalance(id, paygineBalance.balanceKop);
+          }
+        } catch {
+          // При недоступности Paygine отдаём баланс по БД
         }
-      } catch {
-        // При недоступности Paygine отдаём баланс по БД
       }
     }
     logInfo("profile.balance_source", {
@@ -246,6 +275,12 @@ export async function PATCH(request: NextRequest) {
   if (!parsed.success) {
     const firstIssue = parsed.error.issues[0];
     const message = firstIssue?.message ?? "Неверные данные";
+    logInfo("profile.patch.validation_failed", {
+      userId: auth.userId,
+      message,
+      path: firstIssue?.path,
+      issuesCount: parsed.error.issues.length,
+    });
     return jsonError(400, message, parsed.error.issues);
   }
 
@@ -255,6 +290,7 @@ export async function PATCH(request: NextRequest) {
     allowedKeys.filter((k) => data[k] !== undefined).map((k) => [k, data[k]])
   ) as { login?: string; email?: string | null; fullName?: string | null; birthDate?: string | null; establishment?: string | null; savingFor?: string | null };
   if (Object.keys(update).length === 0) {
+    logInfo("profile.patch.nothing_to_update", { userId: auth.userId });
     return jsonError(400, "Нечего обновлять");
   }
 
@@ -284,11 +320,17 @@ export async function PATCH(request: NextRequest) {
     update.email = emailNormalized;
   }
 
-  const profile = await db.user.update({
-    where: { id: auth.userId },
-    data: update,
-    select: { id: true, uniqueId: true, login: true, email: true, role: true, fullName: true, birthDate: true, establishment: true, savingFor: true },
-  });
-
-  return NextResponse.json(profile);
+  try {
+    const profile = await db.user.update({
+      where: { id: auth.userId },
+      data: update,
+      select: { id: true, uniqueId: true, login: true, email: true, role: true, fullName: true, birthDate: true, establishment: true, savingFor: true },
+    });
+    logInfo("profile.patch.ok", { userId: auth.userId, uniqueId: profile.uniqueId, updatedKeys: Object.keys(update) });
+    return NextResponse.json(profile);
+  } catch (err) {
+    const requestId = getRequestId(request);
+    logError("profile.patch.error", err, { requestId, userId: auth.userId });
+    return jsonError(500, "Не удалось сохранить данные. Попробуйте позже.");
+  }
 }

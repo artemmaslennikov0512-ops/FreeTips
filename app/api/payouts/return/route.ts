@@ -7,7 +7,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireAuthOrApiKey } from "@/lib/auth-or-api-key";
 import { db } from "@/lib/db";
 import { broadcastBalanceUpdated } from "@/lib/ws-broadcast";
-import { requestPaygineBalance } from "@/lib/payment/request-paygine-balance";
 
 export async function GET(request: NextRequest) {
   const auth = await requireAuthOrApiKey(request);
@@ -75,7 +74,6 @@ export async function GET(request: NextRequest) {
   if (newStatus === "COMPLETED") {
     void broadcastBalanceUpdated(recipientUserId);
   }
-  void requestPaygineBalance(recipientUserId);
 
   return NextResponse.json({
     status: newStatus,

@@ -125,18 +125,6 @@ export default function CabinetDashboardPage() {
     return () => document.removeEventListener("visibilitychange", onVisible);
   }, [fetchProfileAndData]);
 
-  // Периодическое обновление баланса, пока вкладка видна (актуализация после зачислений/списаний)
-  const BALANCE_POLL_INTERVAL_MS = 25_000;
-  useEffect(() => {
-    if (!localStorage.getItem("accessToken")) return;
-    const id = setInterval(() => {
-      if (document.visibilityState === "visible") {
-        fetchProfileAndData();
-      }
-    }, BALANCE_POLL_INTERVAL_MS);
-    return () => clearInterval(id);
-  }, [fetchProfileAndData]);
-
   const copyTipLink = useCallback(async () => {
     if (!tipLink) return;
     try {

@@ -1,8 +1,9 @@
 /**
  * POST /api/admin/sync-transaction-statuses
  * Синхронизация статусов пополнений (Transaction) с Paygine (webapi/Order).
- * Для каждой транзакции с externalId и статусом SUCCESS или PENDING запрашивает статус заказа в Paygine;
- * если заказ не COMPLETED — обновляет статус транзакции на FAILED (исправление сбоев).
+ * Для каждой транзакции с externalId и статусом SUCCESS или PENDING запрашивает статус заказа в Paygine:
+ * - PENDING в БД и COMPLETED в Paygine — запускает перелив и ставит SUCCESS (восстановление при потерянном вебхуке);
+ * - заказ не COMPLETED в Paygine — ставит транзакции FAILED.
  * Запускайте периодически (cron) вместе с sync-paygine-status для выводов.
  * Требует: SUPERADMIN
  */
@@ -11,6 +12,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireRole } from "@/lib/middleware/auth";
 import { db } from "@/lib/db";
 import { getOrderStatus } from "@/lib/payment/paygine/client";
+import { runRelocateForTransaction } from "@/lib/payment/paygine-gateway";
 import { TransactionStatus } from "@prisma/client";
 
 export async function POST(request: NextRequest) {
@@ -35,6 +37,7 @@ export async function POST(request: NextRequest) {
   });
 
   let corrected = 0;
+  let recovered = 0;
   const errors: string[] = [];
 
   for (const tx of transactions) {
@@ -50,18 +53,25 @@ export async function POST(request: NextRequest) {
       continue;
     }
 
-    if (result.orderState !== "COMPLETED") {
-      await db.transaction.update({
-        where: { id: tx.id },
-        data: { status: TransactionStatus.FAILED },
-      });
-      corrected++;
+    if (result.orderState === "COMPLETED") {
+      if (tx.status === TransactionStatus.PENDING) {
+        const rel = await runRelocateForTransaction(tx.id);
+        if (rel.ok) recovered++;
+      }
+      continue;
     }
+
+    await db.transaction.update({
+      where: { id: tx.id },
+      data: { status: TransactionStatus.FAILED },
+    });
+    corrected++;
   }
 
   return NextResponse.json({
     total: transactions.length,
     corrected,
+    recovered,
     errors: errors.slice(0, 20),
   });
 }

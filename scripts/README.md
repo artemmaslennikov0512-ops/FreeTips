@@ -45,6 +45,8 @@ npx tsx scripts/sd-topup-card-auto.ts 10000
 ```
 
 В scripts/.env задать тестовую карту: `PAYGINE_TEST_PAN`, `PAYGINE_TEST_EXPIRY`, `PAYGINE_TEST_CVC`.  
+Доступные тестовые карты Paygine (номер, срок 08.25, CVC):  
+`2200019999000007` / 983 · `5406161000000041` / 917 · `4986290000000080` / 721.  
 `HEADLESS=0` — показать браузер при отладке.
 
 ---

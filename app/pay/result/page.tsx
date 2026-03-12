@@ -5,6 +5,7 @@
 
 import Link from "next/link";
 import { CheckCircle2, XCircle } from "lucide-react";
+import { ScrollToTopOnMount } from "@/components/ScrollToTopOnMount";
 
 type SearchParams = { tid?: string; outcome?: string };
 
@@ -17,7 +18,8 @@ export default async function PayResultPage({
   const success = outcome === "success";
 
   return (
-    <div className="pay-success-always-light flex min-h-screen w-full flex-col items-center justify-center px-4 py-8">
+    <div className="pay-success-always-light flex min-h-screen min-h-[100dvh] w-full flex-col items-center justify-center px-4 py-8">
+      <ScrollToTopOnMount />
       <div className="pay-success-card w-full max-w-sm rounded-2xl border border-[var(--color-brand-gold)]/40 bg-white p-8 text-center shadow-[var(--shadow-card)]">
         {success ? (
           <>

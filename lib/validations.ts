@@ -220,7 +220,7 @@ export const patchProfileSchema = z.object({
     .transform((v) => (v == null || (typeof v === "string" && v.trim() === "") ? null : (v ?? "").trim()))
     .refine((v) => v === null || v.length <= 255, "Название заведения слишком длинное"),
   savingFor: z
-    .string()
+    .union([z.string(), z.null()])
     .optional()
     .transform((v) => (v == null || (typeof v === "string" && v.trim() === "") ? null : (v ?? "").trim()))
     .refine((v) => v === null || v.length <= 500, "Не более 500 символов"),

@@ -8,7 +8,6 @@ import { getBalance } from "@/lib/balance";
 import { sdPayOut } from "@/lib/payment/paygine/client";
 import { feeKopForPayout } from "@/lib/payment/paygine-fee";
 import { broadcastBalanceUpdated } from "@/lib/ws-broadcast";
-import { requestPaygineBalance } from "@/lib/payment/request-paygine-balance";
 
 export type SendPayoutToPaygineOptions = {
   /** Номер карты для вывода (SDPayOut). Обязателен. */
@@ -105,7 +104,6 @@ export async function sendPayoutToPaygine(
   });
 
   void broadcastBalanceUpdated(payout.userId);
-  void requestPaygineBalance(payout.userId);
 
   return {
     success: true,

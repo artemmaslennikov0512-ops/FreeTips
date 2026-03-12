@@ -10,7 +10,6 @@ import { db } from "@/lib/db";
 import { z } from "zod";
 import { parseJsonWithLimit, MAX_BODY_SIZE_AUTH } from "@/lib/api/helpers";
 import { broadcastBalanceUpdated } from "@/lib/ws-broadcast";
-import { requestPaygineBalance } from "@/lib/payment/request-paygine-balance";
 
 const updatePayoutSchema = z.object({
   status: z.enum(["PROCESSING", "COMPLETED", "REJECTED"]),
@@ -72,7 +71,6 @@ export async function PATCH(
   if (status === "COMPLETED") {
     void broadcastBalanceUpdated(updated.userId);
   }
-  void requestPaygineBalance(updated.userId);
 
   return NextResponse.json({
     id: updated.id,

@@ -11,7 +11,6 @@ import { getBalance } from "@/lib/balance";
 import { z } from "zod";
 import { parseJsonWithLimit, MAX_BODY_SIZE_AUTH } from "@/lib/api/helpers";
 import { broadcastBalanceUpdated } from "@/lib/ws-broadcast";
-import { requestPaygineBalance } from "@/lib/payment/request-paygine-balance";
 
 const adminPayoutSchema = z.object({
   amountKop: z.number().int().positive("Сумма должна быть положительной"),
@@ -60,7 +59,6 @@ export async function POST(
   });
 
   void broadcastBalanceUpdated(id);
-  void requestPaygineBalance(id);
 
   return NextResponse.json(
     {

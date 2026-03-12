@@ -11,7 +11,6 @@ import { requireRole } from "@/lib/middleware/auth";
 import { db } from "@/lib/db";
 import { getOrderStatus } from "@/lib/payment/paygine/client";
 import { broadcastBalanceUpdated } from "@/lib/ws-broadcast";
-import { requestPaygineBalance } from "@/lib/payment/request-paygine-balance";
 
 export async function POST(request: NextRequest) {
   const auth = await requireRole(["SUPERADMIN"])(request);
@@ -60,7 +59,6 @@ export async function POST(request: NextRequest) {
     } else {
       rejected++;
     }
-    void requestPaygineBalance(p.userId);
   }
 
   return NextResponse.json({

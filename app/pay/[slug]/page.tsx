@@ -61,6 +61,15 @@ export default function PayPage() {
     }
   }, [searchParams]);
 
+  // На мобильном после редиректа с Paygine позиция прокрутки может остаться внизу — прокручиваем к блоку «Спасибо»
+  useEffect(() => {
+    if (result === "success") {
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    }
+  }, [result]);
+
   useEffect(() => {
     if (!slug) return;
 
@@ -186,7 +195,7 @@ export default function PayPage() {
 
   if (result === "success") {
     return (
-      <div className="pay-success-always-light flex min-h-screen w-full flex-col items-center justify-center px-4 py-8">
+      <div className="pay-success-always-light flex min-h-screen min-h-[100dvh] w-full flex-col items-center justify-center px-4 py-8">
         <div className="pay-success-card w-full max-w-sm rounded-2xl border border-[var(--color-brand-gold)]/40 bg-white p-8 text-center shadow-[var(--shadow-card)]">
           <div className="pay-result-icon pay-result-icon-success mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[var(--color-accent-emerald)]/15">
             <CheckCircle2 className="h-9 w-9 text-[var(--color-accent-emerald)]" />

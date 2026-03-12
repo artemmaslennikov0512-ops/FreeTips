@@ -131,7 +131,15 @@ export default function CabinetSettingsPage() {
         body: JSON.stringify(parsed.data),
       });
 
-      const j = (await res.json()) as { error?: string; details?: Array<{ path?: (string | number)[]; message?: string }> } | Profile;
+      type ResBody = { error?: string; details?: Array<{ path?: (string | number)[]; message?: string }> } | Profile;
+      let j: ResBody;
+      try {
+        const text = await res.text();
+        j = text ? (JSON.parse(text) as ResBody) : {};
+      } catch {
+        setSaveError(res.ok ? "Ошибка соединения" : `Ошибка сервера (${res.status}). Попробуйте позже.`);
+        return;
+      }
 
       if (!res.ok) {
         const err = j as { error?: string; details?: Array<{ path?: (string | number)[]; message?: string }> };

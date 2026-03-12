@@ -19,7 +19,6 @@ import {
 import { getAccessToken, fetchWithAuth, clearAccessToken } from "@/lib/auth-client";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
-
 const NAV = [
   { label: "Дашборд", href: "/cabinet", icon: LayoutDashboard },
   { label: "Операции", href: "/cabinet/transactions", icon: List },
@@ -307,14 +306,18 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
         </div>
       </div>
 
-      <main className="min-h-screen min-w-0 flex-1 overflow-x-hidden px-0 pt-2 pb-4 md:px-4 lg:pl-0 lg:pr-4 lg:ml-0 lg:mr-0 flex flex-col">
+      <main
+        className={`min-h-screen min-w-0 flex-1 overflow-x-hidden px-0 pt-2 pb-4 md:px-4 lg:pl-0 lg:pr-4 lg:ml-0 lg:mr-0 flex flex-col transition-[z-index] ${
+          sidebarOpen ? "relative z-40 pointer-events-none lg:pointer-events-auto lg:z-auto" : ""
+        }`}
+      >
         {/* Основной блок — тянется до низа страницы с отступом */}
         <div
           className="cabinet-main-block mt-0 mr-0 mb-4 ml-0 lg:mr-4 lg:ml-4 flex min-h-0 flex-1 w-full max-w-full flex-col rounded-lg md:rounded-[10px] border border-white/10 backdrop-blur-xl"
           style={mainBlockStyle}
         >
           <div className="p-4 md:p-6 lg:p-8" id="main-content">
-            <div className="mb-4 lg:hidden relative">
+            <div className={`mb-4 lg:hidden relative ${sidebarOpen ? "pointer-events-auto" : ""}`}>
               <button
                 ref={menuButtonRef}
                 type="button"

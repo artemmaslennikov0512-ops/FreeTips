@@ -13,7 +13,6 @@ import { db } from "@/lib/db";
 import type { PaymentGateway, CreatePaymentParams, CreatePaymentResult, GetStatusResult } from "./gateway";
 import { TransactionStatus } from "@prisma/client";
 import { broadcastBalanceUpdated } from "@/lib/ws-broadcast";
-import { requestPaygineBalance } from "@/lib/payment/request-paygine-balance";
 import { PayginePaymentGateway } from "./paygine-gateway";
 
 const WEBHOOK_SIGNATURE_PREFIX = "sha256=";
@@ -67,7 +66,6 @@ export class StubPaymentGateway implements PaymentGateway {
     });
 
     void broadcastBalanceUpdated(recipientId);
-    void requestPaygineBalance(recipientId);
 
     return { success: true, transactionId: tx.id };
   }

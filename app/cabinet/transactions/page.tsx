@@ -164,18 +164,6 @@ export default function CabinetTransactionsPage() {
     return () => document.removeEventListener("visibilitychange", onVisible);
   }, [fetchData]);
 
-  // Периодическое обновление баланса и операций, пока вкладка видна (актуализация после зачислений/списаний)
-  const BALANCE_POLL_INTERVAL_MS = 25_000;
-  useEffect(() => {
-    if (!localStorage.getItem("accessToken")) return;
-    const id = setInterval(() => {
-      if (document.visibilityState === "visible") {
-        fetchData();
-      }
-    }, BALANCE_POLL_INTERVAL_MS);
-    return () => clearInterval(id);
-  }, [fetchData]);
-
   const handleSDPayOutPage = async () => {
     const token = localStorage.getItem("accessToken");
     if (!token) return;

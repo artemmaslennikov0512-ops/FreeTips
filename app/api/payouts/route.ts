@@ -15,7 +15,6 @@ import { sendPayoutToPaygine, isPayginePayoutAutoSendEnabled } from "@/lib/payme
 import { feeKopForPayout } from "@/lib/payment/paygine-fee";
 import { logSecurity } from "@/lib/logger";
 import { broadcastBalanceUpdated } from "@/lib/ws-broadcast";
-import { requestPaygineBalance } from "@/lib/payment/request-paygine-balance";
 import { getRequestId } from "@/lib/security/request";
 import { getClientIP } from "@/lib/middleware/rate-limit";
 
@@ -235,7 +234,6 @@ export async function POST(request: NextRequest) {
     });
     finalStatus = "COMPLETED";
     void broadcastBalanceUpdated(auth.userId);
-    void requestPaygineBalance(auth.userId);
   }
 
   return NextResponse.json(

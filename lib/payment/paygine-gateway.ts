@@ -4,6 +4,7 @@
  */
 
 import { db } from "@/lib/db";
+import { getAppUrl } from "@/lib/config";
 import type {
   PaymentGateway,
   CreatePaymentParams,
@@ -12,11 +13,18 @@ import type {
 } from "./gateway";
 import { TransactionStatus } from "@prisma/client";
 import { broadcastBalanceUpdated } from "@/lib/ws-broadcast";
-import { requestPaygineBalance } from "@/lib/payment/request-paygine-balance";
 import { logInfo } from "@/lib/logger";
 import { registerOrder, sdRelocateFunds } from "./paygine/client";
 import { buildPaygineSignature } from "./paygine/signature";
 import { feeKopForIncoming } from "./paygine-fee";
+
+/** Базовый URL для редиректов: канонический из env, иначе из запроса (для dev). Paygine требует абсолютный URL. */
+function getBaseForRedirect(baseUrlFromRequest: string | undefined): string {
+  const fromEnv = getAppUrl().trim().replace(/\/$/, "");
+  if (fromEnv) return fromEnv;
+  const fromReq = baseUrlFromRequest?.trim().replace(/\/$/, "");
+  return fromReq ?? "";
+}
 
 const CURRENCY_RUB = 643;
 
@@ -90,23 +98,24 @@ export class PayginePaymentGateway implements PaymentGateway {
       select: { id: true, status: true, externalId: true },
     });
 
-    if (existing) {
-      if (existing.status === TransactionStatus.SUCCESS) {
-        return { success: true, transactionId: existing.id };
-      }
-      if (existing.status === TransactionStatus.PENDING && existing.externalId) {
-        const redirectUrl = baseUrl ? `${baseUrl}/pay/redirect?tid=${existing.id}` : undefined;
-        return { success: true, transactionId: existing.id, redirectUrl };
-      }
-      return { success: false, error: "Платёж уже создан и не завершён" };
-    }
-
-    if (!baseUrl) {
+    const base = getBaseForRedirect(baseUrl);
+    if (!base) {
       const msg =
         process.env.NODE_ENV === "production"
           ? "Задайте NEXT_PUBLIC_APP_URL в окружении (production)"
           : "Не указан baseUrl для редиректа";
       return { success: false, error: msg };
+    }
+
+    if (existing) {
+      if (existing.status === TransactionStatus.SUCCESS) {
+        return { success: true, transactionId: existing.id };
+      }
+      if (existing.status === TransactionStatus.PENDING && existing.externalId) {
+        const redirectUrl = `${base}/pay/redirect?tid=${existing.id}`;
+        return { success: true, transactionId: existing.id, redirectUrl };
+      }
+      return { success: false, error: "Платёж уже создан и не завершён" };
     }
 
     const feeKop = feeKopForIncoming(amount, "card");
@@ -124,9 +133,10 @@ export class PayginePaymentGateway implements PaymentGateway {
       select: { id: true },
     });
 
-    const successUrl = `${baseUrl}${paymentPagePath}?tid=${tx.id}&outcome=success`;
-    const failUrl = `${baseUrl}${paymentPagePath}?tid=${tx.id}&outcome=fail`;
-    const notifyUrl = `${baseUrl}/api/payment/webhook`;
+    // Абсолютные URL обязательны для редиректа Paygine (в т.ч. с мобильных).
+    const successUrl = `${base}${paymentPagePath}?tid=${tx.id}&outcome=success`;
+    const failUrl = `${base}${paymentPagePath}?tid=${tx.id}&outcome=fail`;
+    const notifyUrl = `${base}/api/payment/webhook`;
     const orderSdRef = createOrderSdRef(tx.id);
 
     const regResult = await registerOrder(
@@ -160,7 +170,7 @@ export class PayginePaymentGateway implements PaymentGateway {
       },
     });
 
-    const redirectUrl = `${baseUrl}/pay/redirect?tid=${tx.id}`;
+    const redirectUrl = `${base}/pay/redirect?tid=${tx.id}`;
     return { success: true, transactionId: tx.id, redirectUrl };
   }
 
@@ -225,7 +235,6 @@ export class PayginePaymentGateway implements PaymentGateway {
           orderState: orderState ?? null,
         });
         void broadcastBalanceUpdated(payout.userId);
-        void requestPaygineBalance(payout.userId);
       }
       return { ok: true };
     }
@@ -280,7 +289,6 @@ export class PayginePaymentGateway implements PaymentGateway {
 
     if (success && setStatusImmediately === TransactionStatus.SUCCESS) {
       void broadcastBalanceUpdated(tx.recipientId);
-      void requestPaygineBalance(tx.recipientId);
     }
 
     if (success && setStatusImmediately === TransactionStatus.PENDING) {
@@ -304,139 +312,139 @@ export class PayginePaymentGateway implements PaymentGateway {
           hint: "Кубышка заказа совпадает с кубышкой официанта — перелив не нужен.",
         });
       } else {
-        // Заявка на перелив: только один вызов вебхука запускает перелив (если в Paygine указаны оба URL — callback приходит дважды)
-        const claimed = await db.transaction.updateMany({
-          where: {
-            id: tx.id,
-            status: TransactionStatus.PENDING,
-            relocateStartedAt: null,
-          },
-          data: { relocateStartedAt: new Date() },
-        });
-        if (claimed.count === 0) {
-          logInfo("payment.webhook.relocate_skipped", {
-            reason: "already_started",
-            transactionId: tx.id,
-            hint: "Перелив уже запущен другим вызовом вебхука (идемпотентность).",
-          });
-        } else {
-        const delayMs = Number(process.env.PAYGINE_RELOCATE_DELAY_MS) || 10_000;
-        const retryDelayMs = Number(process.env.PAYGINE_RELOCATE_RETRY_MS) || 8_000;
-        const isSbp = tx.paymentMethod === "sbp";
-        const companySdRef = process.env.PAYGINE_SD_REF_LEGAL?.trim();
-        const feeKopNum = Number(tx.feeKop ?? 0);
-        const amountKopNum = Number(tx.amountKop);
-        const toWaiterKop = isSbp && companySdRef && feeKopNum > 0 ? amountKopNum - feeKopNum : amountKopNum;
-
-        void (async () => {
-          try {
-          await new Promise((r) => setTimeout(r, delayMs));
-
-          const doRelocate = async (amount: number, toSdRef: string, desc: string) => {
-            const reg = await registerOrder(config, {
-              amount,
-              currency: CURRENCY_RUB,
-              reference: `relocate-${tx.id}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-              description: desc.slice(0, 1000),
-            });
-            if (!reg.ok) return { ok: false, code: reg.code, description: reg.description };
-            let rel = await sdRelocateFunds(config, {
-              orderId: reg.orderId,
-              fromSdRef: orderSdRef,
-              toSdRef,
-            });
-            if (!rel.ok && rel.code === "133") {
-              await new Promise((r) => setTimeout(r, retryDelayMs));
-              rel = await sdRelocateFunds(config, {
-                orderId: reg.orderId,
-                fromSdRef: orderSdRef,
-                toSdRef,
-              });
-            }
-            return rel.ok ? { ok: true } : { ok: false, code: rel.code, description: rel.description };
-          };
-
-          if (isSbp && companySdRef && feeKopNum > 0) {
-            const relFee = await doRelocate(
-              feeKopNum,
-              companySdRef,
-              `Комиссия ЮЛ (чаевые ${tx.id})`
-            );
-            if (relFee.ok) {
-              logInfo("payment.webhook.relocate_ok", {
-                transactionId: tx.id,
-                toSdRef: companySdRef,
-                amountKop: feeKopNum,
-                role: "fee_legal",
-              });
-            } else {
-              logInfo("payment.webhook.relocate_failed", {
-                transactionId: tx.id,
-                code: relFee.code,
-                description: relFee.description,
-                toSdRef: companySdRef,
-                role: "fee_legal",
-              });
-            }
-          }
-
-          if (toWaiterKop < 1) {
-            if (isSbp && companySdRef && feeKopNum > 0 && amountKopNum <= feeKopNum) {
-              logInfo("payment.webhook.relocate_skipped", {
-                transactionId: tx.id,
-                reason: "amount_leq_fee",
-                hint: "Вся сумма ушла в комиссию ЮЛ.",
-              });
-            }
-            await db.transaction.update({
-              where: { id: tx.id },
-              data: { status: TransactionStatus.SUCCESS },
-            });
-            void broadcastBalanceUpdated(tx.recipientId);
-            void requestPaygineBalance(tx.recipientId);
-            return;
-            }
-
-          const relWaiter = await doRelocate(
-            toWaiterKop,
-            waiterSdRef,
-            `Перевод чаевых → ${waiterSdRef}`
-          );
-          if (relWaiter.ok) {
-            logInfo("payment.webhook.relocate_ok", {
-              transactionId: tx.id,
-              toSdRef: waiterSdRef,
-              amountKop: toWaiterKop,
-            });
-            await db.transaction.update({
-              where: { id: tx.id },
-              data: { status: TransactionStatus.SUCCESS },
-            });
-            void broadcastBalanceUpdated(tx.recipientId);
-            void requestPaygineBalance(tx.recipientId);
-          } else {
-            logInfo("payment.webhook.relocate_failed", {
-              transactionId: tx.id,
-              code: relWaiter.code,
-              description: relWaiter.description,
-              hint: "Ручной перелив: npx tsx scripts/utils/relocate-one-transaction.ts " + tx.id,
-            });
-            await db.transaction.update({
-              where: { id: tx.id },
-              data: { status: TransactionStatus.FAILED },
-            });
-          }
-          } catch (err) {
-            logInfo("payment.webhook.relocate_error", {
-              transactionId: tx.id,
-              error: err instanceof Error ? err.message : String(err),
-            });
-          }
-        })();
-        }
+        void runRelocateForTransaction(tx.id);
       }
     }
 
     return { ok: true };
+  }
+}
+
+/**
+ * Выполняет перелив с кубышки заказа на кубышку официанта и ставит SUCCESS.
+ * Вызывается из вебхука и из sync-transaction-statuses (запоздалый вебхук / опрос Paygine).
+ */
+export async function runRelocateForTransaction(txId: string): Promise<{ ok: boolean }> {
+  const config = getConfig();
+  if (!config) return { ok: false };
+
+  const tx = await db.transaction.findUnique({
+    where: { id: txId },
+    select: {
+      id: true,
+      status: true,
+      paygineOrderSdRef: true,
+      recipientId: true,
+      paymentMethod: true,
+      feeKop: true,
+      amountKop: true,
+      relocateStartedAt: true,
+    },
+  });
+  if (!tx || tx.status !== TransactionStatus.PENDING || !tx.paygineOrderSdRef?.trim()) {
+    return { ok: false };
+  }
+
+  const orderSdRef = tx.paygineOrderSdRef.trim();
+  const recipient = await db.user.findUnique({
+    where: { id: tx.recipientId },
+    select: { paygineSdRef: true },
+  });
+  const waiterSdRef = recipient?.paygineSdRef?.trim();
+
+  const isSbp = tx.paymentMethod === "sbp";
+  const companySdRef = process.env.PAYGINE_SD_REF_LEGAL?.trim();
+  const feeKopNum = Number(tx.feeKop ?? 0);
+  const amountKopNum = Number(tx.amountKop);
+  const toWaiterKop = isSbp && companySdRef && feeKopNum > 0 ? amountKopNum - feeKopNum : amountKopNum;
+  const willRelocateToWaiter =
+    !!waiterSdRef &&
+    orderSdRef !== waiterSdRef &&
+    toWaiterKop >= 1;
+
+  if (!willRelocateToWaiter) {
+    if (!waiterSdRef || orderSdRef === waiterSdRef) {
+      await db.transaction.update({ where: { id: txId }, data: { status: TransactionStatus.SUCCESS } });
+      void broadcastBalanceUpdated(tx.recipientId);
+      return { ok: true };
+    }
+    if (toWaiterKop < 1) {
+      await db.transaction.update({ where: { id: txId }, data: { status: TransactionStatus.SUCCESS } });
+      void broadcastBalanceUpdated(tx.recipientId);
+      return { ok: true };
+    }
+  }
+
+  const claimed = await db.transaction.updateMany({
+    where: { id: txId, status: TransactionStatus.PENDING, relocateStartedAt: null },
+    data: { relocateStartedAt: new Date() },
+  });
+  if (claimed.count === 0) return { ok: false };
+
+  const delayMs = Number(process.env.PAYGINE_RELOCATE_DELAY_MS) || 10_000;
+  const retryDelayMs = Number(process.env.PAYGINE_RELOCATE_RETRY_MS) || 8_000;
+
+  try {
+    await new Promise((r) => setTimeout(r, delayMs));
+
+    const doRelocate = async (amount: number, toSdRef: string, desc: string) => {
+      const reg = await registerOrder(config, {
+        amount,
+        currency: CURRENCY_RUB,
+        reference: `relocate-${txId}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        description: desc.slice(0, 1000),
+      });
+      if (!reg.ok) return { ok: false, code: reg.code, description: reg.description };
+      let rel = await sdRelocateFunds(config, {
+        orderId: reg.orderId,
+        fromSdRef: orderSdRef,
+        toSdRef,
+      });
+      if (!rel.ok && rel.code === "133") {
+        await new Promise((r) => setTimeout(r, retryDelayMs));
+        rel = await sdRelocateFunds(config, { orderId: reg.orderId, fromSdRef: orderSdRef, toSdRef });
+      }
+      return rel.ok ? { ok: true } : { ok: false, code: rel.code, description: rel.description };
+    };
+
+    if (isSbp && companySdRef && feeKopNum > 0) {
+      const relFee = await doRelocate(feeKopNum, companySdRef, `Комиссия ЮЛ (чаевые ${txId})`);
+      if (!relFee.ok) {
+        logInfo("payment.webhook.relocate_failed", {
+          transactionId: txId,
+          code: relFee.code,
+          description: relFee.description,
+          toSdRef: companySdRef,
+          role: "fee_legal",
+        });
+      }
+    }
+
+    if (toWaiterKop < 1) {
+      await db.transaction.update({ where: { id: txId }, data: { status: TransactionStatus.SUCCESS } });
+      void broadcastBalanceUpdated(tx.recipientId);
+      return { ok: true };
+    }
+
+    const relWaiter = await doRelocate(toWaiterKop, waiterSdRef!, `Перевод чаевых → ${waiterSdRef}`);
+    if (relWaiter.ok) {
+      await db.transaction.update({ where: { id: txId }, data: { status: TransactionStatus.SUCCESS } });
+      void broadcastBalanceUpdated(tx.recipientId);
+    } else {
+      logInfo("payment.webhook.relocate_failed", {
+        transactionId: txId,
+        code: relWaiter.code,
+        description: relWaiter.description,
+        hint: "Ручной перелив: npx tsx scripts/utils/relocate-one-transaction.ts " + txId,
+      });
+      await db.transaction.update({ where: { id: txId }, data: { status: TransactionStatus.FAILED } });
+    }
+    return { ok: true };
+  } catch (err) {
+    logInfo("payment.webhook.relocate_error", {
+      transactionId: txId,
+      error: err instanceof Error ? err.message : String(err),
+    });
+    return { ok: false };
   }
 }

@@ -2193,13 +2193,13 @@ body {
 }
 
 [data-theme="dark"] body.cabinet-page {
-  background: #000 url(/images/lk-bg-dark-premium.png) center center / cover no-repeat;
+  background: #000 url(/images/dark-gold-bg-v2-vein.png) center center / cover no-repeat;
   background-attachment: fixed;
 }
 
-/* ЛК админа — премиальный тёмный фон на всю страницу */
+/* ЛК админа — премиальный тёмный фон на всю страницу (золотые прожилки) */
 [data-theme="dark"] body.admin-page {
-  background: #000 url(/images/lk-bg-dark-premium.png) center center / cover no-repeat !important;
+  background: #000 url(/images/dark-gold-bg-v2-vein.png) center center / cover no-repeat !important;
   background-attachment: fixed;
   min-height: 100vh;
 }

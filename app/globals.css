@@ -100,18 +100,16 @@ html:not([data-theme="dark"]) .cabinet-premium {
   background: transparent;
 }
 
-/* Светлая тема: сайдбар — матовое стекло, чуть насыщеннее чтобы не бледно */
+/* Светлая тема: сайдбар — однотонный navy с контрастом, как шапка и основной блок */
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-sidebar:not(.admin-sidebar) {
-  background: linear-gradient(135deg, rgba(10, 25, 47, 0.78) 0%, rgba(30, 42, 58, 0.74) 50%, rgba(10, 25, 47, 0.78) 100%);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: none;
+  background: #1e2a3a !important;
+  border: 0.5px solid rgba(197, 165, 114, 0.4) !important;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.08);
   color: rgba(255, 255, 255, 0.92);
 }
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-sidebar:not(.admin-sidebar) a,
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-sidebar:not(.admin-sidebar) button {
-  color: inherit;
+  color: rgba(255, 255, 255, 0.92);
 }
 
 /* Блок профиля в сайдбаре: тоньше обводка, как у карточек в блоке */
@@ -119,15 +117,15 @@ html:not([data-theme="dark"]) .cabinet-premium .cabinet-sidebar:not(.admin-sideb
   border-width: 0.5px;
 }
 
-/* Светлая тема: блок пользователя в сайдбаре — как «Быстрые действия», белый текст */
+/* Светлая тема: блок пользователя в сайдбаре — светлый текст на navy */
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-sidebar-profile {
-  color: #fff !important;
+  color: rgba(255, 255, 255, 0.95) !important;
 }
 
-/* Светлая тема: активный пункт в сайдбаре на тёмно-синем стекле — светлая подсветка */
+/* Светлая тема: активный пункт в сайдбаре — светлая подсветка на navy */
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-sidebar:not(.admin-sidebar) .cabinet-nav-active {
   border-color: rgba(255, 255, 255, 0.35) !important;
-  background: rgba(255, 255, 255, 0.18) !important;
+  background: rgba(255, 255, 255, 0.15) !important;
   color: #ffffff !important;
 }
 
@@ -185,40 +183,46 @@ html:not([data-theme="dark"]) .cabinet-premium .cabinet-nav-dropdown .cabinet-na
   color: #ffffff !important;
 }
 
-/* Блок навигации в сайдбаре — фон как у блока профиля */
+/* Блок навигации в сайдбаре — те же заливка и обводка, что у блока профиля (из .cabinet-sidebar-profile) */
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-sidebar:not(.admin-sidebar) .cabinet-nav-block nav {
-  background: #ffffff !important;
-  border: 0.5px solid rgba(197, 165, 114, 0.55) !important;
-  box-shadow: 0 0 0 0.5px rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-width: 0.5px !important;
+  border-style: solid !important;
+  border-color: rgba(197, 165, 114, 0.45) !important;
+  box-shadow: none;
 }
 html:not([data-theme="dark"]) .admin-panel .admin-sidebar .cabinet-nav-block nav {
   background: rgba(255, 255, 255, 0.15) !important;
-  border: 0.5px solid rgba(197, 165, 114, 0.5) !important;
+  border-width: 0.5px !important;
+  border-style: solid !important;
+  border-color: rgba(197, 165, 114, 0.5) !important;
+  box-shadow: none;
 }
 [data-theme="dark"] .cabinet-premium .cabinet-sidebar .cabinet-nav-block nav,
 [data-theme="dark"] .admin-panel .admin-sidebar .cabinet-nav-block nav {
   background: rgba(0, 0, 0, 0.25) !important;
-  border: 0.5px solid rgba(255, 255, 255, 0.15) !important;
+  border-width: 0.5px !important;
+  border-style: solid !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+  box-shadow: none;
 }
 
 /* Блок навигации в сайдбаре — подпись «Навигация», скругление как у сайдбара */
 .cabinet-premium .cabinet-nav-block .cabinet-nav-label {
   font-family: var(--font-inter), system-ui, sans-serif;
 }
-/* Светлая тема: подпись «Навигация» в сайдбаре — белая (на тёмно-синем фоне иначе не видна) */
+/* Светлая тема: подпись «Навигация» в сайдбаре */
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-sidebar:not(.admin-sidebar) .cabinet-nav-label {
-  color: rgba(255, 255, 255, 0.85) !important;
+  color: rgba(255, 255, 255, 0.8) !important;
 }
 html:not([data-theme="dark"]) .admin-panel .admin-sidebar .cabinet-nav-label {
   color: rgba(255, 255, 255, 0.85) !important;
 }
 
-/* Светлая тема: сайдбар админки — матовое стекло как у ЛК */
+/* Светлая тема: сайдбар админки — однотонный navy с контрастом */
 html:not([data-theme="dark"]) .admin-panel .admin-sidebar {
-  background: linear-gradient(135deg, rgba(10, 25, 47, 0.78) 0%, rgba(30, 42, 58, 0.74) 50%, rgba(10, 25, 47, 0.78) 100%) !important;
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border-color: rgba(197, 165, 114, 0.55) !important;
+  background: #1e2a3a !important;
+  border-color: rgba(197, 165, 114, 0.45) !important;
   color: rgba(255, 255, 255, 0.95);
   font-family: var(--font-inter), system-ui, sans-serif;
 }
@@ -248,11 +252,11 @@ html:not([data-theme="dark"]) .admin-panel .admin-sidebar .cabinet-sidebar-profi
 
 /* Светлая тема: блок профиля в сайдбаре — белый фон, обводка тоньше; аватар — золотой фон, тёмные инициалы */
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-sidebar-profile {
-  background: #ffffff !important;
+  background: rgba(255, 255, 255, 0.1) !important;
   border-width: 0.5px !important;
   border-style: solid !important;
-  border-color: rgba(197, 165, 114, 0.55) !important;
-  box-shadow: 0 0 0 0.5px rgba(255, 255, 255, 0.15);
+  border-color: rgba(197, 165, 114, 0.45) !important;
+  box-shadow: none;
 }
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-sidebar-avatar {
   background: var(--color-brand-gold) !important;
@@ -479,14 +483,13 @@ body.admin-page .admin-panel.cabinet-premium {
 }
 
 /* Светлая тема: шапка — фон как у виртуальной карты (градиент navy) */
+/* Светлая тема: шапка — однотонный navy с контрастом, без градиента */
 html:not([data-theme="dark"]) body.cabinet-page .site-header,
 html:not([data-theme="dark"]) body.admin-page .site-header {
-  background: linear-gradient(135deg, rgba(10, 25, 47, 0.78) 0%, rgba(30, 42, 58, 0.74) 50%, rgba(10, 25, 47, 0.78) 100%);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  background: #1e2a3a !important;
   border: none;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.08);
-  color: rgba(255, 255, 255, 0.92);
+  color: rgba(255, 255, 255, 0.95);
 }
 html:not([data-theme="dark"]) body.cabinet-page .site-header .site-header-logo-text,
 html:not([data-theme="dark"]) body.admin-page .site-header .site-header-logo-text,
@@ -518,12 +521,10 @@ html:not([data-theme="dark"]) body.admin-page .site-header .site-header-logo-ico
   color: inherit;
 }
 
-/* Светлая тема: основной блок ЛК и админки — матовое стекло, чуть насыщеннее */
+/* Светлая тема: основной блок ЛК и админки — однотонный navy с контрастом, без градиента */
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-main-block:not(.admin-main-block),
 html:not([data-theme="dark"]) .admin-panel .admin-main-block.cabinet-main-block {
-  background: linear-gradient(135deg, rgba(10, 25, 47, 0.78) 0%, rgba(30, 42, 58, 0.74) 50%, rgba(10, 25, 47, 0.78) 100%);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  background: #1e2a3a !important;
   border: none;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.08);
 }

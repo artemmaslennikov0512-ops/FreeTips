@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { User, Lock, ArrowRight } from "lucide-react";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { AuthPageShell } from "@/components/AuthPageShell";
@@ -13,6 +13,8 @@ import { LoadingSpinner } from "@/components/LoadingSpinner";
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const resetSuccess = searchParams.get("reset") === "success";
   const [checkingAuth, setCheckingAuth] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -106,6 +108,12 @@ export default function LoginPage() {
               Войдите в личный кабинет для управления чаевыми
             </p>
           </div>
+
+          {resetSuccess && (
+            <div className="mt-4 w-full rounded-xl border border-[var(--color-accent-emerald)]/40 bg-[var(--color-accent-emerald)]/10 p-3 text-sm text-[var(--color-accent-emerald)]" role="status">
+              Пароль успешно изменён. Войдите с новым паролем.
+            </div>
+          )}
 
           {error && (
             <div className="mt-4 w-full rounded-xl border-0 bg-[var(--color-muted)]/10 p-3 text-sm text-[var(--color-accent-red)]" role="alert">

@@ -46,7 +46,7 @@
 | 2.3 | Done | P0 | Вход: POST /api/auth/login (login, password) — access + refresh в httpOnly cookie | app/api/auth/login | 2025-01-24 |
 | 2.4 | Done | P0 | Refresh: POST /api/auth/refresh — обновление пары токенов | app/api/auth/refresh | 2025-01-24 |
 | 2.5 | Done | P0 | Выход: POST /api/auth/logout — инвалидация refresh | app/api/auth/logout | 2025-01-24 |
-| 2.6 | Todo | P1 | Восстановление пароля: запрос кода, сброс по коду | app/api/auth | — |
+| 2.6 | Done | P1 | Восстановление пароля: запрос ссылки (логин+email), сброс по ссылке из письма | app/api/auth, app/forgot-password, app/reset-password | 2026-03-13 |
 | 2.7 | Done | P0 | Middleware: проверка JWT, извлечение user, 401/403 | lib/middleware/auth.ts | 2025-01-24 |
 | 2.8 | Done | P1 | Middleware: rate limiting по IP и по userId | lib/middleware/rate-limit.ts | 2025-01-24 |
 | 2.9 | Done | P1 | POST /api/auth/login: в ответе добавить mustChangePassword: true, если у пользователя mustChangePassword=true | app/api/auth/login | 2025-01-25 |
@@ -112,7 +112,7 @@
 |----|--------|-----------|--------|-------------|-----------|
 | 7.1 | Done | P0 | Страница входа: логин + пароль, «Забыли пароль», ссылка на регистрацию; при уже авторизованном — редирект в /cabinet | app/login | 2025-01-25 |
 | 7.2 | Done | P0 | Страница регистрации: логин, email (опц.), пароль, подтверждение пароля; один шаг, без SMS; при уже авторизованном — редирект в /cabinet | app/register | 2025-01-25 |
-| 7.3 | Todo | P1 | Страница восстановления пароля | frontend/auth | — |
+| 7.3 | Done | P1 | Страница восстановления пароля (/forgot-password, /reset-password?token=…) | app/forgot-password, app/reset-password | 2026-03-13 |
 | 7.4 | Done | P0 | Клиент: accessToken в localStorage, редирект в /cabinet после login/register. TODO: авто-приложение к запросам, refresh по 401 | app/login, app/register, app/cabinet | 2025-01-24 |
 
 ---

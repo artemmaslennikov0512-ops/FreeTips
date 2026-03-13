@@ -334,14 +334,14 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
               <div
                 id="cabinet-nav-dropdown"
                 role="menu"
-                className={`cabinet-nav-dropdown absolute left-0 top-full z-50 mt-2 w-[min(100vw-2rem,320px)] origin-top rounded-xl border border-[var(--color-brand-gold)]/20 bg-[var(--color-bg-sides)] shadow-[var(--shadow-card)] backdrop-blur-xl transition-[opacity,transform] duration-200 ${
+                className={`cabinet-nav-dropdown absolute left-0 top-full z-50 mt-2 w-[min(100vw-2rem,320px)] origin-top rounded-[10px] border border-[var(--color-brand-gold)]/20 shadow-[var(--shadow-card)] backdrop-blur-xl transition-[opacity,transform] duration-200 ${
                   sidebarOpen ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"
                 }`}
                 style={sidebarStyle}
                 aria-hidden={!sidebarOpen}
               >
-                <div className="cabinet-nav-dropdown-inner overflow-hidden rounded-xl p-3">
-                  <div className={`cabinet-sidebar-profile cabinet-block-inner mb-3 rounded-lg border border-[var(--color-brand-gold)]/20 px-3 py-2.5 ${!sidebarBg ? "bg-[var(--color-dark-gray)]/10" : ""}`} style={Object.keys(profileBlockStyle).length ? profileBlockStyle : undefined}>
+                <div className="cabinet-nav-dropdown-inner overflow-hidden rounded-[10px] px-4 py-4">
+                  <div className={`cabinet-sidebar-profile cabinet-block-inner mb-4 rounded-[10px] border border-[var(--color-brand-gold)]/20 px-3 py-2.5 ${!sidebarBg ? "bg-[var(--color-dark-gray)]/10" : ""}`} style={Object.keys(profileBlockStyle).length ? profileBlockStyle : undefined}>
                     <div className="flex items-center gap-2.5">
                       {user?.employeePhotoUrl ? (
                         <img src={user.employeePhotoUrl} alt="" className="h-9 w-9 shrink-0 rounded-full object-cover bg-[var(--color-brand-gold)]" />
@@ -357,20 +357,20 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
                       </div>
                     </div>
                   </div>
-                  <p className="cabinet-nav-label mb-1.5 px-2 text-center text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text)]/50">Навигация</p>
-                  <nav className="flex flex-col gap-0.5 rounded-lg border border-[var(--color-brand-gold)]/15 bg-[var(--color-dark-gray)]/5 p-1" role="none">
+                  <p className="cabinet-nav-label mb-2 px-3 text-center text-xs font-semibold uppercase tracking-wider text-[var(--color-text)]/50">Навигация</p>
+                  <nav className="flex flex-col gap-0.5 rounded-[10px] border border-[var(--color-brand-gold)]/15 bg-[var(--color-dark-gray)]/5 p-1.5 shadow-[var(--shadow-subtle)]" role="none">
                     {NAV.map(({ label, href, icon: Icon }) => (
                       <Link
                         key={href}
                         href={href}
                         onClick={closeSidebar}
                         role="menuitem"
-                        className={`flex items-center gap-2.5 rounded-md px-2.5 py-2.5 text-sm font-medium transition-colors ${
-                          isActive(href) ? "cabinet-nav-active bg-[#0a192f]/10 text-[#0a192f] font-semibold" : "text-[var(--color-text)]/85 hover:bg-[var(--color-dark-gray)]/10 hover:text-[var(--color-text)]"
+                        className={`flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium transition-colors ${
+                          isActive(href) ? "cabinet-nav-active border border-[#0a192f]/25 bg-[#0a192f]/10 text-[#0a192f] font-semibold" : "border border-transparent text-[var(--color-text)]/80 hover:bg-[var(--color-dark-gray)]/10 hover:text-[var(--color-text)]"
                         }`}
                         style={!isActive(href) && brandFont ? { color: `${brandFont}cc` } : undefined}
                       >
-                        <Icon className="h-4 w-4 shrink-0" />
+                        <Icon className="h-5 w-5 shrink-0" />
                         <span>{label}</span>
                         {href === "/cabinet/support" && supportUnreadCount > 0 && (
                           <span className="ml-auto flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[var(--color-accent-red)] px-1.5 text-xs font-semibold text-white">
@@ -380,8 +380,8 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
                       </Link>
                     ))}
                     {user?.role === "ESTABLISHMENT_ADMIN" && (
-                      <Link href="/establishment" onClick={closeSidebar} role="menuitem" className="flex items-center gap-2.5 rounded-md px-2.5 py-2.5 text-sm font-medium text-[var(--color-text)]/85 hover:bg-[var(--color-dark-gray)]/10" style={brandFont ? { color: `${brandFont}cc` } : undefined}>
-                        <Building2 className="h-4 w-4 shrink-0" />
+                      <Link href="/establishment" onClick={closeSidebar} role="menuitem" className="flex items-center gap-3 rounded-lg border border-transparent px-3 py-3 font-medium text-[var(--color-text)]/80 transition-colors hover:bg-[var(--color-dark-gray)]/10 hover:text-[var(--color-text)]" style={brandFont ? { color: `${brandFont}cc` } : undefined}>
+                        <Building2 className="h-5 w-5 shrink-0" />
                         <span>Кабинет заведения</span>
                       </Link>
                     )}
@@ -389,7 +389,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
                   <button
                     type="button"
                     onClick={() => { closeSidebar(); handleLogout(); }}
-                    className="mt-3 flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2.5 text-sm font-medium text-[var(--color-text)]/80 hover:bg-[var(--color-dark-gray)]/10 hover:text-[var(--color-text)]"
+                    className="mt-4 flex w-full items-center gap-3 rounded-[10px] px-4 py-3 text-sm font-medium text-[var(--color-text)]/80 hover:bg-[var(--color-dark-gray)]/10 hover:text-[var(--color-text)]"
                     style={brandFont ? { color: `${brandFont}cc` } : undefined}
                     role="menuitem"
                   >

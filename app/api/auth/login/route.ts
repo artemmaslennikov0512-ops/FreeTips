@@ -12,7 +12,7 @@ import { generateAccessToken, generateRefreshToken, setRefreshTokenCookie } from
 import { checkRateLimitByIP, getClientIP, AUTH_RATE_LIMIT } from "@/lib/middleware/rate-limit";
 import { logError, logSecurity } from "@/lib/logger";
 import { getRequestId } from "@/lib/security/request";
-import { parseJsonWithLimit, MAX_BODY_SIZE_AUTH, jsonError, internalError, rateLimit429Response } from "@/lib/api/helpers";
+import { parseJsonWithLimit, MAX_BODY_SIZE_AUTH, jsonError, internalError, rateLimit429Response, zodErrorResponse } from "@/lib/api/helpers";
 import { verifyCsrfFromRequest } from "@/lib/security/csrf";
 import { z } from "zod";
 
@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
     const rateLimit = await checkRateLimitByIP(ip, AUTH_RATE_LIMIT);
     if (!rateLimit.allowed) return rateLimit429Response(rateLimit);
     if (!verifyCsrfFromRequest(request)) {
-      return NextResponse.json({ error: "Некорректный CSRF токен" }, { status: 403 });
+      return jsonError(403, "Некорректный CSRF токен");
     }
 
     const parsed = await parseJsonWithLimit(request, MAX_BODY_SIZE_AUTH);
@@ -35,27 +35,18 @@ export async function POST(request: NextRequest) {
 
     if (!user) {
       logSecurity("auth.login.failed", { requestId, ip });
-      return NextResponse.json(
-        { error: "Неверный логин или пароль" },
-        { status: 401 },
-      );
+      return jsonError(401, "Неверный логин или пароль");
     }
 
     if (user.isBlocked && user.role !== "ADMIN" && user.role !== "SUPERADMIN") {
       logSecurity("auth.login.blocked", { requestId, ip, userId: user.id });
-      return NextResponse.json(
-        { error: "Доступ к личному кабинету ограничен" },
-        { status: 403 },
-      );
+      return jsonError(403, "Доступ к личному кабинету ограничен");
     }
 
     const isValidPassword = await verifyPassword(validated.password, user.passwordHash);
     if (!isValidPassword) {
       logSecurity("auth.login.failed", { requestId, ip });
-      return NextResponse.json(
-        { error: "Неверный логин или пароль" },
-        { status: 401 },
-      );
+      return jsonError(401, "Неверный логин или пароль");
     }
 
     const tokenPayload = {
@@ -96,14 +87,8 @@ export async function POST(request: NextRequest) {
     );
   } catch (error) {
     if (error instanceof z.ZodError) {
-      const details = error.issues.map((e) => ({
-        path: e.path.join(".") || "(корневой)",
-        message: e.message,
-      }));
-      const message = details[0]?.message ?? "Неверные данные";
-      return jsonError(400, message, details, { hideDetailsInProduction: true });
+      return zodErrorResponse(error);
     }
-
     logError("auth.login.error", error, { requestId, ip });
     return internalError("Ошибка при входе");
   }

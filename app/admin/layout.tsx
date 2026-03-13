@@ -37,20 +37,6 @@ const NAV = [
   { label: "Антифрод", href: "/admin/antifraud", icon: ShieldCheck },
 ] as const;
 
-function getAdminTitle(pathname: string | null): string {
-  if (!pathname) return "Админ-панель";
-  if (pathname === "/admin" || pathname === "/admin/dashboard") return "Дашборд";
-  if (pathname === "/admin/establishments") return "Заведения";
-  if (pathname.startsWith("/admin/payouts")) return "Выводы";
-  if (pathname === "/admin/users") return "Пользователи";
-  if (pathname.match(/^\/admin\/users\/[^/]+$/)) return "Пользователь";
-  if (pathname === "/admin/support") return "Поддержка";
-  if (pathname.startsWith("/admin/support/")) return "Чат с клиентом";
-  if (pathname === "/admin/antifraud") return "Антифрод";
-  if (pathname === "/admin/verification-requests") return "Заявки на верификацию";
-  return "Админ-панель";
-}
-
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();

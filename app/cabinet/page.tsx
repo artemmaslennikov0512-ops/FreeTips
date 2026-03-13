@@ -219,7 +219,7 @@ export default function CabinetDashboardPage() {
             </div>
 
             {verificationStatus && (
-              <div className="cabinet-limits-block cabinet-verification-status mt-6 w-full min-w-0 max-w-full rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 p-5">
+              <div className="cabinet-limits-block cabinet-verification-status mt-6 w-full min-w-0 max-w-full rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 p-5 flex flex-col items-center text-center">
                 {verificationStatus === "VERIFIED" ? (
                   <div className="flex w-full min-w-0 max-w-full flex-col items-center gap-2 text-center">
                     <div className="flex flex-wrap items-center justify-center gap-2">
@@ -396,7 +396,9 @@ export default function CabinetDashboardPage() {
               </div>
               {savingFor && !savingForEditing ? (
                 <div className="flex flex-col items-center text-center">
-                  <p className="mb-3 text-[14px] text-[var(--color-text)]">{savingFor}</p>
+                  <div className="mb-3 w-full max-w-md rounded-lg border border-[var(--color-brand-gold)]/35 bg-[var(--color-bg-sides)] px-4 py-3 text-center">
+                    <p className="text-[14px] font-medium text-[var(--color-text)]">{savingFor}</p>
+                  </div>
                   <button
                     type="button"
                     onClick={() => {
@@ -447,7 +449,7 @@ export default function CabinetDashboardPage() {
             Скопируйте ключ и введите его в приложении FreeTips — и управляйте личным кабинетом официанта из мобильного приложения. (только для Android)
           </p>
           <p className="mb-6 flex flex-wrap items-center gap-3">
-            <span className="text-[var(--color-text)]/90">Приложение для Android:</span>
+            <span className="text-white">Приложение для Android:</span>
             <a
               href={`${getBaseUrl()}/freetips.apk`}
               download="freetips.apk"

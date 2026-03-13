@@ -41,7 +41,6 @@ export default function AdminUsersPage() {
   const [sortBy, setSortBy] = useState("createdAt");
   const [sortOrder, setSortOrder] = useState("desc");
   const [updatingId, setUpdatingId] = useState<string | null>(null);
-  const [tokenExpiresAt, setTokenExpiresAt] = useState<string | null>(null);
   const [tokenLoading, setTokenLoading] = useState(false);
   const [registrationLink, setRegistrationLink] = useState<string | null>(null);
   const [linkCopied, setLinkCopied] = useState(false);
@@ -191,7 +190,6 @@ export default function AdminUsersPage() {
       const data = (await res.json()) as { token: string; link?: string; expiresAt: string; validHours?: number };
       const link = data.link ?? `${getBaseUrl()}/register?token=${encodeURIComponent(data.token)}`;
       setRegistrationLink(link);
-      setTokenExpiresAt(data.expiresAt);
     } catch {
       setError("Ошибка создания токена");
     } finally {

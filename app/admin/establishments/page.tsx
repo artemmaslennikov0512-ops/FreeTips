@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Building2, Plus, Copy, RefreshCw } from "lucide-react";
+import { Plus, Copy, RefreshCw } from "lucide-react";
 import { authHeaders } from "@/lib/auth-client";
 
 interface EstablishmentRow {

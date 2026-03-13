@@ -1,3 +1,5 @@
+import * as fs from "fs";
+
 type LogLevel = "INFO" | "WARN" | "ERROR" | "SECURITY";
 type LogContext = Record<string, unknown>;
 
@@ -52,7 +54,7 @@ function writeLog(level: LogLevel, message: string, context: LogContext): void {
   console.log(line.trim());
   if (LOG_FILE) {
     try {
-      require("fs").appendFileSync(LOG_FILE, line);
+      fs.appendFileSync(LOG_FILE, line);
     } catch {
       // ignore (e.g. permission, disk)
     }

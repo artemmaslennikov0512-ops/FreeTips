@@ -8,7 +8,7 @@ import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 
 const WELCOME_LINES = [
-  "Здравствуйте, Вас приветствует служба поддержки FreeTips!",
+  "Вас приветствует служба поддержки FreeTips!",
   "Задайте свой вопрос, Вам ответит первый освободившийся оператор.",
 ];
 

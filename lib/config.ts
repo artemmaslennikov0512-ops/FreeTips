@@ -18,6 +18,8 @@ const envSchema = z.object({
   PAYGINE_SD_REF: z.string().optional(),
   PAYGINE_SD_REF_LEGAL: z.string().optional(),
   PAYGINE_REQUEST_TIMEOUT_MS: z.string().optional(),
+  PAYGINE_RELOCATE_DELAY_MS: z.string().optional(),
+  PAYGINE_RELOCATE_RETRY_MS: z.string().optional(),
 });
 
 type EnvSchema = z.infer<typeof envSchema>;
@@ -39,6 +41,8 @@ function getEnv(): EnvSchema {
     PAYGINE_SD_REF: process.env.PAYGINE_SD_REF,
     PAYGINE_SD_REF_LEGAL: process.env.PAYGINE_SD_REF_LEGAL,
     PAYGINE_REQUEST_TIMEOUT_MS: process.env.PAYGINE_REQUEST_TIMEOUT_MS,
+    PAYGINE_RELOCATE_DELAY_MS: process.env.PAYGINE_RELOCATE_DELAY_MS,
+    PAYGINE_RELOCATE_RETRY_MS: process.env.PAYGINE_RELOCATE_RETRY_MS,
   });
   if (!result.success) {
     throw new Error(`Invalid env: ${JSON.stringify(result.error.flatten())}`);
@@ -103,6 +107,25 @@ export function getPaygineRequestTimeoutMs(): number {
   const v = getEnv().PAYGINE_REQUEST_TIMEOUT_MS;
   const n = Number(v);
   return Number.isFinite(n) && n > 0 ? n : 30_000;
+}
+
+/** Paygine SD_REF_LEGAL (кубышка ЮЛ для комиссий). */
+export function getPaygineSdRefLegal(): string {
+  return getEnv().PAYGINE_SD_REF_LEGAL?.trim() ?? "";
+}
+
+/** Задержка перед Relocate после оплаты (ms). */
+export function getPaygineRelocateDelayMs(): number {
+  const v = getEnv().PAYGINE_RELOCATE_DELAY_MS;
+  const n = Number(v);
+  return Number.isFinite(n) && n >= 0 ? n : 10_000;
+}
+
+/** Интервал повтора Relocate (ms). */
+export function getPaygineRelocateRetryMs(): number {
+  const v = getEnv().PAYGINE_RELOCATE_RETRY_MS;
+  const n = Number(v);
+  return Number.isFinite(n) && n > 0 ? n : 8_000;
 }
 
 /** Сброс кэша (для тестов). */

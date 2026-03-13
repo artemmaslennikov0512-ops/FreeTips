@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { PieChart, Plus, Pencil, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2 } from "lucide-react";
 import { authHeaders } from "@/lib/auth-client";
 import { CustomDropdown } from "@/components/CustomDropdown";
 

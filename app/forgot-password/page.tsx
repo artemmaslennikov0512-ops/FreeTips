@@ -152,14 +152,14 @@ export default function ForgotPasswordPage() {
             {!success && (
               <Link
                 href="/login"
-                className="text-sm text-[var(--color-muted)] hover:text-[var(--color-text)] transition-colors"
+                className="text-sm text-white hover:opacity-90 transition-colors"
               >
                 Вернуться к входу
               </Link>
             )}
             <Link
               href="/"
-              className="text-sm text-[var(--color-muted)] hover:text-[var(--color-text)] transition-colors"
+              className="text-sm text-[var(--color-brand-gold)] hover:opacity-90 transition-colors"
             >
               ← На главную
             </Link>

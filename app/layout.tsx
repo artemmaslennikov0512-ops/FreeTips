@@ -75,6 +75,11 @@ export const viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
+  // Цвет области статус-бары/даты на мобильных — без этого браузер по умолчанию даёт синий
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#d4d8de" },
+    { media: "(prefers-color-scheme: dark)", color: "#171717" },
+  ],
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

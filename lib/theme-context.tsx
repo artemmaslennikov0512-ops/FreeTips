@@ -65,6 +65,14 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     const effective = authOnly ? "dark" : applyHere ? theme : "light";
     document.documentElement.setAttribute("data-theme", effective);
     if (applyHere && !authOnly) window.localStorage.setItem(STORAGE_KEY, theme);
+
+    // Синхронизация theme-color с темой приложения (область даты/времени на мобильных)
+    const themeColorLight = "#e0dfdc";
+    const themeColorDark = "#171717";
+    const color = effective === "dark" ? themeColorDark : themeColorLight;
+    document.querySelectorAll('meta[name="theme-color"]').forEach((meta) => {
+      meta.setAttribute("content", color);
+    });
   }, [mounted, theme, pathname]);
 
   const setTheme = useCallback((next: Theme) => {

@@ -44,7 +44,6 @@ export async function GET(request: NextRequest) {
     const auth = await requireAuthOrApiKey(request);
     if ("response" in auth) return auth.response;
     const id = auth.userId;
-    const requestId = getRequestId(request);
 
     const dayStart = getUtcDayStart();
     const monthStart = getUtcMonthStart();
@@ -131,7 +130,7 @@ export async function GET(request: NextRequest) {
       ]);
 
     if (!profile) {
-      return NextResponse.json({ error: "Пользователь не найден" }, { status: 404 });
+      return jsonError(404, "Пользователь не найден");
     }
 
     const received = txSum._sum.amountKop ?? BigInt(0);
@@ -302,7 +301,7 @@ export async function PATCH(request: NextRequest) {
       },
     });
     if (taken) {
-      return NextResponse.json({ error: "Логин уже занят" }, { status: 409 });
+      return jsonError(409, "Логин уже занят");
     }
   }
 
@@ -315,7 +314,7 @@ export async function PATCH(request: NextRequest) {
       },
     });
     if (taken) {
-      return NextResponse.json({ error: "Email уже занят" }, { status: 409 });
+      return jsonError(409, "Email уже занят");
     }
     update.email = emailNormalized;
   }
@@ -334,3 +333,4 @@ export async function PATCH(request: NextRequest) {
     return jsonError(500, "Не удалось сохранить данные. Попробуйте позже.");
   }
 }
+

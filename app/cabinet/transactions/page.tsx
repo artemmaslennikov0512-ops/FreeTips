@@ -6,7 +6,7 @@ import { CheckCircle2, Clock, XCircle, ChevronLeft, ChevronRight } from "lucide-
 import { formatMoney, formatDate } from "@/lib/utils";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { feeKopForPayout } from "@/lib/payment/paygine-fee";
-import { Stats, cabinetInputClassName } from "../shared";
+import { Stats } from "../shared";
 import { PremiumCard } from "../PremiumCard";
 
 type Operation = {
@@ -73,7 +73,7 @@ function formatDayLabel(isoDateKey: string): string {
 
 export default function CabinetTransactionsPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
+  useSearchParams(); // subscribe to URL updates
   const [loading, setLoading] = useState(true);
   const [list, setList] = useState<Operation[]>([]);
   const [total, setTotal] = useState(0);
@@ -408,38 +408,6 @@ export default function CabinetTransactionsPage() {
               ))}
             </div>
 
-            {/* Мобильная версия: пагинация под списком операций */}
-            {totalPages > 1 && (
-              <div className="flex flex-wrap items-center justify-between gap-4 border-t border-[var(--color-brand-gold)]/20 px-4 py-4 md:hidden">
-                <p className="text-sm text-[var(--color-text)]/90">
-                  Показано {(currentPage - 1) * PER_PAGE + 1}–{Math.min(currentPage * PER_PAGE, list.length)} из {list.length}
-                </p>
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                    disabled={currentPage <= 1}
-                    className="inline-flex h-9 min-w-[36px] items-center justify-center rounded-lg border border-[var(--color-brand-gold)]/20 bg-transparent px-2 text-sm font-medium text-[var(--color-text)] transition-colors hover:bg-[var(--color-dark-gray)]/10 disabled:opacity-40 disabled:pointer-events-none"
-                    aria-label="Предыдущая страница"
-                  >
-                    <ChevronLeft className="h-5 w-5" />
-                  </button>
-                  <span className="text-sm text-[var(--color-text)]/90">
-                    {currentPage} из {totalPages}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                    disabled={currentPage >= totalPages}
-                    className="inline-flex h-9 min-w-[36px] items-center justify-center rounded-lg border border-[var(--color-brand-gold)]/20 bg-transparent px-2 text-sm font-medium text-[var(--color-text)] transition-colors hover:bg-[var(--color-dark-gray)]/10 disabled:opacity-40 disabled:pointer-events-none"
-                    aria-label="Следующая страница"
-                  >
-                    <ChevronRight className="h-5 w-5" />
-                  </button>
-                </div>
-              </div>
-            )}
-
             {/* Десктоп: таблица */}
             <div className="hidden overflow-x-auto md:block">
               <table className="w-full min-w-[640px] border-collapse text-left text-sm text-[var(--color-text)]">
@@ -500,8 +468,9 @@ export default function CabinetTransactionsPage() {
                 </tbody>
               </table>
             </div>
+            {/* Пагинация — одна на всех экранах (мобильные и десктоп) */}
             {totalPages > 1 && (
-              <div className="flex flex-wrap items-center justify-between gap-4 border-t border-[var(--color-brand-gold)]/20 px-6 py-4">
+              <div className="flex flex-wrap items-center justify-between gap-4 border-t border-[var(--color-brand-gold)]/20 px-4 py-4 md:px-6">
                 <p className="text-sm text-[var(--color-text)]/90">
                   Показано {(currentPage - 1) * PER_PAGE + 1}–{Math.min(currentPage * PER_PAGE, list.length)} из {list.length}
                 </p>

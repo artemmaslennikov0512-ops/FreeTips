@@ -32,7 +32,6 @@ const CURRENCY_STR = "643";
 const CASE_ID_SUCCESS = "150";
 const FEE_PERCENT_SBP = 2.5;
 const RELOCATE_DELAY_MS = Number(process.env.PAYGINE_SBP_RELOCATE_DELAY_MS) || 12_000;
-const TIMEOUT_MS = Number(process.env.PAYGINE_REQUEST_TIMEOUT_MS) || 30_000;
 
 /** Подпись по Приложению №2: значения в порядке + password → SHA256(UTF-8) → hex lowercase → Base64. */
 function sign(tagValues: string[], password: string): string {

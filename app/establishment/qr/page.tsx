@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { FileDown, QrCode, ImageIcon, X } from "lucide-react";
+import { FileDown, ImageIcon, X } from "lucide-react";
 import { authHeaders } from "@/lib/auth-client";
 import { getBaseUrl } from "@/lib/get-base-url";
 

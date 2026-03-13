@@ -36,7 +36,7 @@ interface BrandSettings {
 const DEFAULT_HEX = { primary: "#c9a227", secondary: "#0a192f", mainBg: "#0a192f", blocksBg: "#1e293b", font: "#fafafa", border: "rgba(197,165,114,0.5)" };
 
 export default function EstablishmentBrandPage() {
-  const [settings, setSettings] = useState<BrandSettings | null>(null);
+  const [, setSettings] = useState<BrandSettings | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [resetting, setResetting] = useState(false);

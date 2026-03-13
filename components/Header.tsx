@@ -215,7 +215,7 @@ export function Header() {
   }
 
   return (
-    <header className="site-header sticky top-0 z-30 mx-3 mt-2 w-[calc(100%-1.5rem)] rounded-[10px] border border-white/10 bg-transparent">
+    <header className="site-header sticky top-0 z-30 mx-0 mt-2 w-full rounded-none border-0 border-b border-white/10 bg-transparent max-lg:rounded-none lg:mx-3 lg:w-[calc(100%-1.5rem)] lg:rounded-[10px] lg:border">
         <div className="mx-auto flex h-16 w-full items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link
           href={site.logo.href}

@@ -7,7 +7,6 @@ import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { AutoSubmitForm } from "@/components/AutoSubmitForm";
 import { getPaygineConfig, getAppUrl } from "@/lib/config";
-import { buildSDPayInFormParams } from "@/lib/payment/paygine/client";
 import { createPayRedirectToken } from "@/lib/payment/redirect-token";
 
 export default async function PayRedirectPage({ searchParams }: { searchParams: Promise<{ tid?: string; method?: string }> }) {

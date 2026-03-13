@@ -4,7 +4,7 @@
  */
 
 import { db } from "@/lib/db";
-import { getAppUrl } from "@/lib/config";
+import { getAppUrl, getPaygineConfig, getNodeEnv, getPaygineSdRefLegal, getPaygineRelocateDelayMs, getPaygineRelocateRetryMs } from "@/lib/config";
 import type {
   PaymentGateway,
   CreatePaymentParams,
@@ -35,10 +35,7 @@ function createOrderSdRef(transactionId: string): string {
 }
 
 function getConfig(): { sector: string; password: string } | null {
-  const sector = process.env.PAYGINE_SECTOR;
-  const password = process.env.PAYGINE_PASSWORD;
-  if (!sector || !password) return null;
-  return { sector, password };
+  return getPaygineConfig();
 }
 
 /**
@@ -101,7 +98,7 @@ export class PayginePaymentGateway implements PaymentGateway {
     const base = getBaseForRedirect(baseUrl);
     if (!base) {
       const msg =
-        process.env.NODE_ENV === "production"
+        getNodeEnv() === "production"
           ? "Задайте NEXT_PUBLIC_APP_URL в окружении (production)"
           : "Не указан baseUrl для редиректа";
       return { success: false, error: msg };
@@ -182,7 +179,8 @@ export class PayginePaymentGateway implements PaymentGateway {
     return tx ? { status: tx.status } : null;
   }
 
-  async handleWebhook(rawBody: string, _signature: string | null): Promise<{ ok: boolean }> {
+  async handleWebhook(rawBody: string, signature: string | null): Promise<{ ok: boolean }> {
+    void signature; // interface requires param; verification uses rawBody + config.password
     const config = getConfig();
     if (!config) return { ok: false };
 
@@ -259,7 +257,7 @@ export class PayginePaymentGateway implements PaymentGateway {
       orderSdRef !== waiterSdRef &&
       (() => {
         const isSbp = tx.paymentMethod === "sbp";
-        const companySdRef = process.env.PAYGINE_SD_REF_LEGAL?.trim();
+        const companySdRef = getPaygineSdRefLegal();
         const feeKopNum = Number(tx.feeKop ?? 0);
         const amountKopNum = Number(tx.amountKop);
         const toWaiterKop = isSbp && companySdRef && feeKopNum > 0 ? amountKopNum - feeKopNum : amountKopNum;
@@ -353,7 +351,7 @@ export async function runRelocateForTransaction(txId: string): Promise<{ ok: boo
   const waiterSdRef = recipient?.paygineSdRef?.trim();
 
   const isSbp = tx.paymentMethod === "sbp";
-  const companySdRef = process.env.PAYGINE_SD_REF_LEGAL?.trim();
+  const companySdRef = getPaygineSdRefLegal();
   const feeKopNum = Number(tx.feeKop ?? 0);
   const amountKopNum = Number(tx.amountKop);
   const toWaiterKop = isSbp && companySdRef && feeKopNum > 0 ? amountKopNum - feeKopNum : amountKopNum;
@@ -381,8 +379,8 @@ export async function runRelocateForTransaction(txId: string): Promise<{ ok: boo
   });
   if (claimed.count === 0) return { ok: false };
 
-  const delayMs = Number(process.env.PAYGINE_RELOCATE_DELAY_MS) || 10_000;
-  const retryDelayMs = Number(process.env.PAYGINE_RELOCATE_RETRY_MS) || 8_000;
+  const delayMs = getPaygineRelocateDelayMs();
+  const retryDelayMs = getPaygineRelocateRetryMs();
 
   try {
     await new Promise((r) => setTimeout(r, delayMs));

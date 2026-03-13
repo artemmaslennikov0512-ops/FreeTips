@@ -245,9 +245,8 @@ async function main() {
 
   const passwordHash = await hashPassword(TEST_PASSWORD);
   let slug: string;
-  let linkId: string;
   let linkIds: string[] = [];
-  let batchSlugs: string[] = [];
+  const batchSlugs: string[] = [];
 
   if (batchMode) {
     console.log(`1. Подготовка ${numAccountsBatch} тестовых аккаунтов (по ${BATCH_REDIRECTS_PER_ACCOUNT} редиректов на аккаунт)…`);
@@ -287,7 +286,6 @@ async function main() {
       select: { id: true },
     });
     if (existingLink) {
-      linkId = existingLink.id;
       linkIds = [existingLink.id];
       slug = E2E_SLUG;
       console.log("   Используется существующая ссылка:", E2E_SLUG);
@@ -308,7 +306,6 @@ async function main() {
       const tipLink = await prisma.tipLink.create({
         data: { userId: user.id, slug: E2E_SLUG },
       });
-      linkId = tipLink.id;
       linkIds = [tipLink.id];
       slug = E2E_SLUG;
       console.log("   Создан пользователь и ссылка:", E2E_SLUG);

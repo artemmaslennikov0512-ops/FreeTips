@@ -10,6 +10,7 @@
 
 import { createHmac, timingSafeEqual } from "crypto";
 import { db } from "@/lib/db";
+import { getPaygineConfig } from "@/lib/config";
 import type { PaymentGateway, CreatePaymentParams, CreatePaymentResult, GetStatusResult } from "./gateway";
 import { TransactionStatus } from "@prisma/client";
 import { broadcastBalanceUpdated } from "@/lib/ws-broadcast";
@@ -87,9 +88,7 @@ let instance: PaymentGateway | null = null;
 
 export function getPaymentGateway(): PaymentGateway {
   if (!instance) {
-    const sector = process.env.PAYGINE_SECTOR;
-    const password = process.env.PAYGINE_PASSWORD;
-    if (sector && password) {
+    if (getPaygineConfig()) {
       instance = new PayginePaymentGateway();
     } else {
       instance = new StubPaymentGateway();

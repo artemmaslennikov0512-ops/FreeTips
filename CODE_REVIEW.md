@@ -133,3 +133,38 @@
 [AQB:Doc] CODE_REVIEW.md и docs/ актуализированы; inline-комментарии в theme-context и globals (dark variant) достаточны.
 [AQB:Biz] Лендинг и темы соответствуют требованиям; переключение светлая/тёмная и чередование секций работают.
 ```
+
+---
+
+## 9. Раунд ревью (март 2025)
+
+### 9.1 [MEDIUM] ESLint: require() в lib/logger.ts — исправлено
+- **Файл:** `lib/logger.ts`
+- **Проблема:** `require("fs").appendFileSync(LOG_FILE, line)` — правило `@typescript-eslint/no-require-imports` запрещает require.
+- **Исправлено:** Заменено на `import * as fs from "fs"` и `fs.appendFileSync(LOG_FILE, line)`.
+
+### 9.2 [LOW] Неиспользуемый импорт createHash в lib/api-key-auth.ts — исправлено
+- **Файл:** `lib/api-key-auth.ts`
+- **Проблема:** Импортировался `createHash` из "crypto", но не использовался.
+- **Исправлено:** Удалён `createHash` из импорта.
+
+### 9.3 [LOW] Единообразие ответа 429 при rate limit — исправлено
+- **Файл:** `app/api/registration-requests/route.ts`
+- **Проблема:** Ответ 429 без заголовка Retry-After.
+- **Исправлено:** Используется `rateLimit429Response(rateLimit, "Слишком много заявок. Попробуйте позже.")`.
+
+### 9.4 [LOW] Чтение Paygine-конфига из process.env вне lib/config
+- **Файлы:** `lib/payment/paygine-gateway.ts`, `lib/payment/send-payout-to-paygine.ts`, `lib/payment/request-paygine-balance.ts`, `lib/payment/stub-gateway.ts`
+- **Проблема:** PAYGINE_SECTOR, PAYGINE_PASSWORD и др. читаются напрямую из `process.env`, тогда как в `lib/config.ts` есть валидация и централизованные геттеры (`getPaygineConfig()`, `getPaygineBaseUrl()`).
+- **Рекомендация:** По возможности использовать геттеры из `lib/config.ts`, чтобы не дублировать логику и иметь одну точку валидации env.
+
+### 9.5 [LOW] console.error в Error Boundary (клиент)
+- **Файл:** `components/ErrorBoundaryContent.tsx`
+- **Проблема:** В `useEffect` вызывается `console.error(error)`. Для клиентского error boundary это приемлемо (логгер в lib/logger ориентирован на сервер), но в проекте предпочтение отдаётся единому подходу.
+- **Рекомендация:** Оставить как есть с комментарием: «Логирование в консоль для отладки ошибок рендера на клиенте» или подключить клиентский логгер/мониторинг при появлении.
+
+### 9.6 [INFO] Положительные моменты
+- **Безопасность:** Секреты не захардкожены; JWT с отдельными секретами для access/refresh; CSRF через timing-safe сравнение; API-ключи сравниваются через timingSafeEqual; пароли и чувствительные поля редактируются в логгере.
+- **API:** Единый формат ошибок через `jsonError`/`zodErrorResponse`; лимит размера тела; rate limit на auth, registration-requests, pay, webhook; админ-маршруты защищены `requireRole`/`requireEstablishmentAdmin`.
+- **Данные:** Prisma (параметризованные запросы); единственный raw — `SELECT 1` в health без пользовательского ввода.
+- **Валидация:** Zod-схемы в `lib/validations.ts` с лимитами (длина пароля, суммы, slug и т.д.).

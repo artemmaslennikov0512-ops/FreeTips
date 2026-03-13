@@ -122,7 +122,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: true });
   } catch (err) {
     logError("verification.upload.error", err, {});
-    const message = err instanceof Error ? err.message : "Ошибка загрузки";
     return NextResponse.json(
       { error: "Ошибка загрузки. Убедитесь, что миграции БД применены (npx prisma migrate deploy)." },
       { status: 500 },

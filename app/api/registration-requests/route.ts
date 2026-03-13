@@ -7,16 +7,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { createRegistrationRequestSchema } from "@/lib/validations";
 import { checkRateLimitByIP, getClientIP, REGISTRATION_REQUEST_RATE_LIMIT } from "@/lib/middleware/rate-limit";
-import { parseJsonWithLimit, MAX_BODY_SIZE_DEFAULT, jsonError } from "@/lib/api/helpers";
+import { parseJsonWithLimit, MAX_BODY_SIZE_DEFAULT, jsonError, rateLimit429Response } from "@/lib/api/helpers";
 
 export async function POST(request: NextRequest) {
   const ip = getClientIP(request);
   const rateLimit = await checkRateLimitByIP(ip, REGISTRATION_REQUEST_RATE_LIMIT);
   if (!rateLimit.allowed) {
-    return NextResponse.json(
-      { error: "Слишком много заявок. Попробуйте позже." },
-      { status: 429 },
-    );
+    return rateLimit429Response(rateLimit, "Слишком много заявок. Попробуйте позже.");
   }
 
   const parsed = await parseJsonWithLimit(request, MAX_BODY_SIZE_DEFAULT);

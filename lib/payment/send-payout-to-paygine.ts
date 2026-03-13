@@ -4,6 +4,7 @@
  */
 
 import { db } from "@/lib/db";
+import { getPaygineConfig } from "@/lib/config";
 import { getBalance } from "@/lib/balance";
 import { sdPayOut } from "@/lib/payment/paygine/client";
 import { feeKopForPayout } from "@/lib/payment/paygine-fee";
@@ -23,8 +24,9 @@ export async function sendPayoutToPaygine(
   payoutId: string,
   options: SendPayoutToPaygineOptions = {}
 ): Promise<SendPayoutToPaygineResult> {
-  const sector = process.env.PAYGINE_SECTOR?.trim();
-  const password = process.env.PAYGINE_PASSWORD?.trim();
+  const config = getPaygineConfig();
+  const sector = config?.sector?.trim();
+  const password = config?.password;
   if (!sector || !password) {
     return { success: false, error: "Paygine не настроен" };
   }
@@ -73,10 +75,9 @@ export async function sendPayoutToPaygine(
     };
   }
 
-  const config = { sector, password };
   const description = (payout.details ?? "Вывод").trim().slice(0, 250) || "Вывод";
 
-  const payOutResult = await sdPayOut(config, {
+  const payOutResult = await sdPayOut({ sector, password }, {
     sdRef,
     pan,
     amountKop: amount,
@@ -114,7 +115,8 @@ export async function sendPayoutToPaygine(
 
 /** Включена ли автоотправка новых заявок в Paygine (Paygine настроен). */
 export function isPayginePayoutAutoSendEnabled(): boolean {
-  const sector = process.env.PAYGINE_SECTOR?.trim();
-  const password = process.env.PAYGINE_PASSWORD?.trim();
+  const config = getPaygineConfig();
+  const sector = config?.sector?.trim();
+  const password = config?.password;
   return !!(sector && password);
 }

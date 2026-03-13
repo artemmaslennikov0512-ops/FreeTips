@@ -94,7 +94,6 @@ export async function POST(request: NextRequest) {
 
   const submitParsed = verificationSubmitSchema.safeParse(parsedBody.data);
   if (submitParsed.success) {
-    const data = submitParsed.data;
     const req = await db.verificationRequest.findFirst({
       where: { userId, status: "PENDING" },
       orderBy: { createdAt: "desc" },

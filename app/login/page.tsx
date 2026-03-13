@@ -156,7 +156,7 @@ export default function LoginPage() {
               )}
               <Link
                 href="/forgot-password"
-                className="mt-1.5 block text-xs text-[var(--color-accent-gold)] hover:opacity-90 hover:underline transition-colors"
+                className="mt-1.5 block text-xs text-[var(--color-brand-gold)] hover:opacity-90 hover:underline transition-colors"
               >
                 Забыли пароль?
               </Link>
@@ -179,16 +179,16 @@ export default function LoginPage() {
           <div className="auth-page-footer-links mt-4 flex w-full flex-col items-center gap-2 text-center text-sm leading-snug">
             <div className="m-0 text-center">
               <span className="text-white">Нет аккаунта? </span>
-              <Link href="/zayavka" className="font-medium text-[var(--color-accent-gold)] hover:opacity-90 hover:underline transition-colors">
+              <Link href="/zayavka" className="font-medium text-[var(--color-brand-gold)] hover:opacity-90 hover:underline transition-colors">
                 Оставить заявку
               </Link>
             </div>
-            <Link href="/login/establishment" className="m-0 text-center font-medium text-[var(--color-accent-gold)] hover:opacity-90 hover:underline transition-colors">
+            <Link href="/login/establishment" className="m-0 text-center font-medium text-[var(--color-brand-gold)] hover:opacity-90 hover:underline transition-colors">
               Вход для управляющего заведением →
             </Link>
             <Link
               href="/"
-              className="m-0 block text-center text-[var(--color-muted)] hover:text-[var(--color-text)] transition-colors"
+              className="m-0 block text-center text-white hover:opacity-90 transition-colors"
             >
               ← На главную
             </Link>

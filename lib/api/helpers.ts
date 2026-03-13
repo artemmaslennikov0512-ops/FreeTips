@@ -4,6 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
+import type { ZodError } from "zod";
 import { getNodeEnv } from "@/lib/config";
 import type { RateLimitResult } from "@/lib/middleware/rate-limit";
 
@@ -142,4 +143,20 @@ export function internalError(
   const isProd = getNodeEnv() === "production";
   const message = isProd ? genericMessage : (devMessage ?? genericMessage);
   return NextResponse.json({ error: message }, { status: 500 });
+}
+
+/**
+ * Формирует JSON-ответ 400 из ошибки валидации Zod.
+ * В production details не включаются (hideDetailsInProduction).
+ */
+export function zodErrorResponse(
+  error: ZodError,
+  defaultMessage: string = "Неверные данные",
+): NextResponse<ApiErrorBody> {
+  const details = error.issues.map((e) => ({
+    path: e.path.join(".") || "(корневой)",
+    message: e.message,
+  }));
+  const message = details[0]?.message ?? defaultMessage;
+  return jsonError(400, message, details, { hideDetailsInProduction: true });
 }

@@ -5,7 +5,7 @@
  * Сравнение в константное время (timing-safe).
  */
 
-import { createHash, timingSafeEqual } from "crypto";
+import { timingSafeEqual } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getApiKeyPrefix, hashApiKey } from "@/lib/auth/api-key";

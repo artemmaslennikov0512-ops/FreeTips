@@ -17,7 +17,7 @@ import { getWaiterPaygineSdRef } from "@/lib/payment/paygine-sd-ref";
 import { getSystemDefaultLimitsForNewUser } from "@/lib/system-default-limits";
 import { logError, logSecurity } from "@/lib/logger";
 import { getRequestId } from "@/lib/security/request";
-import { parseJsonWithLimit, MAX_BODY_SIZE_AUTH, jsonError, internalError, rateLimit429Response } from "@/lib/api/helpers";
+import { parseJsonWithLimit, MAX_BODY_SIZE_AUTH, jsonError, internalError, rateLimit429Response, zodErrorResponse } from "@/lib/api/helpers";
 import { verifyCsrfFromRequest } from "@/lib/security/csrf";
 import { consumeEmailVerified } from "@/lib/email-verification-store";
 
@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     const rateLimit = await checkRateLimitByIP(ip, AUTH_RATE_LIMIT);
     if (!rateLimit.allowed) return rateLimit429Response(rateLimit);
     if (!verifyCsrfFromRequest(request)) {
-      return NextResponse.json({ error: "Некорректный CSRF токен" }, { status: 403 });
+      return jsonError(403, "Некорректный CSRF токен");
     }
 
     const parsed = await parseJsonWithLimit(request, MAX_BODY_SIZE_AUTH);
@@ -46,9 +46,9 @@ export async function POST(request: NextRequest) {
     if (validated.email) {
       const verified = consumeEmailVerified(validated.email);
       if (!verified) {
-        return NextResponse.json(
-          { error: "Подтвердите почту перед регистрацией: введите email, нажмите «Подтвердить почту», введите код из письма." },
-          { status: 400 },
+        return jsonError(
+          400,
+          "Подтвердите почту перед регистрацией: введите email, нажмите «Подтвердить почту», введите код из письма.",
         );
       }
     }
@@ -58,10 +58,7 @@ export async function POST(request: NextRequest) {
 
     if (existing) {
       logSecurity("auth.register.conflict", { requestId, ip, login: validated.login });
-      return NextResponse.json(
-        { error: "Пользователь с таким логином уже зарегистрирован" },
-        { status: 409 },
-      );
+      return jsonError(409, "Пользователь с таким логином уже зарегистрирован");
     }
 
     const tokenHash = hashRegistrationToken(validated.registrationToken);
@@ -74,10 +71,7 @@ export async function POST(request: NextRequest) {
     });
     if (!regToken) {
       logSecurity("auth.register.invalid_token", { requestId, ip, login: validated.login });
-      return NextResponse.json(
-        { error: "Неверный или уже использованный токен регистрации" },
-        { status: 403 },
-      );
+      return jsonError(403, "Неверный или уже использованный токен регистрации");
     }
 
     const passwordHash = await hashPassword(validated.password);
@@ -171,18 +165,10 @@ export async function POST(request: NextRequest) {
     );
   } catch (error) {
     if (error instanceof z.ZodError) {
-      const details = error.issues.map((e) => ({
-        path: e.path.join(".") || "(корневой)",
-        message: e.message,
-      }));
-      const message = details[0]?.message ?? "Неверные данные";
-      return jsonError(400, message, details, { hideDetailsInProduction: true });
+      return zodErrorResponse(error);
     }
     if (error instanceof Error && error.message === "TOKEN_ALREADY_USED") {
-      return NextResponse.json(
-        { error: "Неверный или уже использованный токен регистрации" },
-        { status: 403 },
-      );
+      return jsonError(403, "Неверный или уже использованный токен регистрации");
     }
 
     logError("auth.register.error", error, { requestId, ip });

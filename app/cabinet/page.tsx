@@ -343,68 +343,9 @@ export default function CabinetDashboardPage() {
             </h3>
           </div>
           <div className="p-6">
-            {/* 1. Goal card — saved goal text + "Изменить" or input + "Сохранить" */}
-            <div className="cabinet-block-inner mb-6 rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 p-4">
-              <div className="mb-2 text-sm font-semibold text-[var(--color-text)]">Укажите цель, на которую собираете: 🎯</div>
-              {savingFor && !savingForEditing ? (
-                <>
-                  <p className="mb-3 text-[14px] text-[var(--color-text)]">{savingFor}</p>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSavingForEditing(true);
-                      setSavingForEdit(savingFor);
-                    }}
-                    className="rounded-[10px] border border-[var(--color-brand-gold)]/40 bg-transparent px-4 py-2 text-[14px] font-semibold text-[var(--color-brand-gold)] transition-all hover:bg-[var(--color-brand-gold)]/15"
-                  >
-                    Изменить
-                  </button>
-                </>
-              ) : (
-                <>
-                  <div className="cabinet-input-window mb-3 w-full rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-bg-sides)] px-3 py-2 text-[14px] text-[var(--color-text)] placeholder:text-[var(--color-text)]/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-brand-gold)]/50">
-                    <input
-                      type="text"
-                      value={savingForEdit}
-                      onChange={(e) => setSavingForEdit(e.target.value)}
-                      placeholder="Например: новый ноутбук, отпуск…"
-                      maxLength={500}
-                      className="w-full min-w-0 bg-transparent"
-                      aria-label="Цель (на что коплю)"
-                    />
-                  </div>
-                  <button
-                    type="button"
-                    onClick={saveSavingFor}
-                    disabled={savingForSaving || (savingForEdit.trim() || null) === (savingFor ?? null)}
-                    className="rounded-[10px] bg-[var(--color-brand-gold)] px-4 py-2 text-[14px] font-semibold text-[#0a192f] transition-all hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {savingForSaving ? "Сохранение…" : "Сохранить"}
-                  </button>
-                </>
-              )}
-            </div>
-
-            {/* 2. Four quick action cards */}
-            <div className="mb-6 grid grid-cols-2 gap-4">
-              {QUICK_ACTIONS.map(({ href, icon: Icon, title, desc }) => (
-                <Link
-                  key={href}
-                  href={href}
-                  className="cabinet-block-inner flex flex-col items-center rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 p-6 transition-all hover:bg-[var(--color-accent-gold)]/15 hover:-translate-y-1 shadow-[var(--shadow-subtle)]"
-                >
-                  <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-[var(--color-brand-gold)] text-[#0a192f]">
-                    <Icon className="h-5 w-5" />
-                  </div>
-                  <div className="font-semibold text-[var(--color-text)] text-center">{title}</div>
-                  <div className="mt-1 text-center text-sm text-[var(--color-text)]/90">{desc}</div>
-                </Link>
-              ))}
-            </div>
-
-            {/* 3. Your link for tea — at the bottom */}
+            {/* 1. Your link for tea — сверху */}
             {tipLink && (
-              <div className="cabinet-block-inner rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 p-4">
+              <div className="cabinet-block-inner mb-6 rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 p-4">
                 <div className="mb-2 text-sm font-semibold text-[var(--color-text)]">Ваша ссылка для чаевых</div>
                 <div className="cabinet-input-window mb-3 break-all rounded-lg bg-[var(--color-bg-sides)] px-3 py-2 font-mono text-xs text-[var(--color-text)]/90">
                   {tipLink}
@@ -430,6 +371,67 @@ export default function CabinetDashboardPage() {
                 </div>
               </div>
             )}
+
+            {/* 2. Four quick action cards */}
+            <div className="mb-6 grid grid-cols-2 gap-4">
+              {QUICK_ACTIONS.map(({ href, icon: Icon, title, desc }) => (
+                <Link
+                  key={href}
+                  href={href}
+                  className="cabinet-block-inner flex flex-col items-center rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 p-6 transition-all hover:bg-[var(--color-accent-gold)]/15 hover:-translate-y-1 shadow-[var(--shadow-subtle)]"
+                >
+                  <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-[var(--color-brand-gold)] text-[#0a192f]">
+                    <Icon className="h-5 w-5" />
+                  </div>
+                  <div className="font-semibold text-[var(--color-text)] text-center">{title}</div>
+                  <div className="mt-1 text-center text-sm text-[var(--color-text)]/90">{desc}</div>
+                </Link>
+              ))}
+            </div>
+
+            {/* 3. Goal card — внизу, с фоном, заголовок крупнее и по центру */}
+            <div className="cabinet-goal-card cabinet-block-inner rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/20 p-5 shadow-[var(--shadow-subtle)]">
+              <div className="mb-4 text-center text-base font-semibold text-[var(--color-text)]">
+                Укажите цель, на которую собираете 🎯
+              </div>
+              {savingFor && !savingForEditing ? (
+                <div className="flex flex-col items-center text-center">
+                  <p className="mb-3 text-[14px] text-[var(--color-text)]">{savingFor}</p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSavingForEditing(true);
+                      setSavingForEdit(savingFor);
+                    }}
+                    className="rounded-[10px] border border-[var(--color-brand-gold)]/40 bg-transparent px-4 py-2 text-[14px] font-semibold text-[var(--color-brand-gold)] transition-all hover:bg-[var(--color-brand-gold)]/15"
+                  >
+                    Изменить
+                  </button>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center">
+                  <div className="cabinet-input-window mb-3 w-full max-w-md rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-bg-sides)] px-3 py-2 text-[14px] text-[var(--color-text)] placeholder:text-[var(--color-text)]/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-brand-gold)]/50">
+                    <input
+                      type="text"
+                      value={savingForEdit}
+                      onChange={(e) => setSavingForEdit(e.target.value)}
+                      placeholder="Например: новый ноутбук, отпуск…"
+                      maxLength={500}
+                      className="w-full min-w-0 bg-transparent"
+                      aria-label="Цель (на что коплю)"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={saveSavingFor}
+                    disabled={savingForSaving || (savingForEdit.trim() || null) === (savingFor ?? null)}
+                    className="rounded-[10px] bg-[var(--color-brand-gold)] px-4 py-2 text-[14px] font-semibold text-[#0a192f] transition-all hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {savingForSaving ? "Сохранение…" : "Сохранить"}
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

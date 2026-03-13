@@ -15,17 +15,24 @@ type ThemeContextValue = {
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
-/** Тема из localStorage применяется в ЛК, админке, странице чаевых (/pay) и Вход/Регистрация/Заявка; на лендинге всегда светлая. */
+/** Тема из localStorage применяется в ЛК, админке, странице чаевых (/pay); на лендинге всегда светлая. */
 function isThemeScope(pathname: string | null): boolean {
   if (!pathname) return false;
   return (
     pathname.startsWith("/cabinet") ||
     pathname.startsWith("/admin") ||
     pathname.startsWith("/establishment") ||
-    pathname.startsWith("/pay") ||
+    pathname.startsWith("/pay")
+  );
+}
+
+/** Заявка, вход, регистрация, восстановление/сброс пароля — всегда тёмная тема, светлой нет. */
+function isAuthOnlyPage(pathname: string | null): boolean {
+  if (!pathname) return false;
+  return (
+    pathname.startsWith("/zayavka") ||
     pathname.startsWith("/login") ||
     pathname.startsWith("/register") ||
-    pathname.startsWith("/zayavka") ||
     pathname.startsWith("/forgot-password") ||
     pathname.startsWith("/change-password") ||
     pathname.startsWith("/reset-password")
@@ -53,10 +60,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   useLayoutEffect(() => {
     if (!mounted) return;
+    const authOnly = isAuthOnlyPage(pathname);
     const applyHere = isThemeScope(pathname);
-    const effective = applyHere ? theme : "light";
+    const effective = authOnly ? "dark" : applyHere ? theme : "light";
     document.documentElement.setAttribute("data-theme", effective);
-    if (applyHere) window.localStorage.setItem(STORAGE_KEY, theme);
+    if (applyHere && !authOnly) window.localStorage.setItem(STORAGE_KEY, theme);
   }, [mounted, theme, pathname]);
 
   const setTheme = useCallback((next: Theme) => {

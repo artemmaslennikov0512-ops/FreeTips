@@ -184,7 +184,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
       {/* Боковая панель — только на десктопе (lg+); на мобильном навигация в выпадающем списке под кнопкой */}
       <aside
-        className="admin-sidebar cabinet-sidebar hidden lg:flex fixed left-4 top-4 z-40 h-auto max-h-[calc(100vh-2rem)] w-[260px] shrink-0 flex-col overflow-hidden rounded-[10px] border border-white/10 bg-[var(--color-navy)] py-6 shadow-sm backdrop-blur-xl lg:static lg:left-auto lg:top-auto lg:ml-4 lg:mt-4 lg:mr-0 lg:mb-0 lg:max-h-none lg:self-start lg:translate-x-0"
+        className="admin-sidebar cabinet-sidebar hidden lg:flex fixed left-4 top-4 z-40 h-auto max-h-[calc(100vh-2rem)] w-[260px] shrink-0 flex-col overflow-hidden rounded-[10px] border border-white/10 bg-[var(--color-navy)] py-6 shadow-sm backdrop-blur-xl lg:static lg:left-auto lg:top-auto lg:ml-0 lg:mt-4 lg:mr-0 lg:mb-0 lg:max-h-none lg:self-start lg:translate-x-0"
       >
         <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
           <div className="cabinet-sidebar-profile cabinet-block-inner mx-4 mb-4 rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-4 py-3">
@@ -232,7 +232,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </aside>
 
       <main className="min-h-screen min-w-0 flex-1 overflow-x-hidden pl-4 pr-4 lg:pl-0 lg:pr-0 lg:ml-0 flex flex-col">
-        <div className="admin-main-block cabinet-main-block mt-4 mr-0 mb-4 ml-0 lg:mr-4 lg:ml-4 flex min-h-[calc(100vh-2rem)] flex-1 flex-col rounded-[10px] border border-white/10 bg-white/[0.06] backdrop-blur-xl">
+        <div className="admin-main-block cabinet-main-block mt-4 mr-0 mb-4 ml-0 lg:mr-0 lg:ml-4 flex min-h-[calc(100vh-2rem)] flex-1 flex-col rounded-[10px] border border-white/10 bg-white/[0.06] backdrop-blur-xl">
           <div className="p-4 sm:p-6 lg:p-8 min-w-0 max-w-full flex-1 overflow-x-hidden flex flex-col" id="main-content">
             <div className="mb-4 flex justify-start lg:hidden relative">
               <button

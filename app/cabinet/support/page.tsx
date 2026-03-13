@@ -151,7 +151,7 @@ export default function CabinetSupportPage() {
         </div>
       )}
 
-      <div className="mt-6 flex flex-col rounded-2xl border border-white/10 bg-white/[0.04] overflow-hidden">
+      <div className="support-chat-block mt-6 flex flex-col rounded-2xl border border-white/10 overflow-hidden">
         <div className="support-chat-messages flex min-h-[320px] max-h-[50vh] flex-col overflow-y-auto pl-4 pt-4 pb-4 pr-8 space-y-4">
           {/* Приветственное сообщение при открытии чата */}
           <div className="flex justify-start">

@@ -91,18 +91,18 @@
   --section-dark-heading: #171717;
 }
 
-/* Светлая тема: основной фон страницы ЛК и админки — светло-серый, неяркий */
+/* Светлая тема: основной фон страницы ЛК и админки — тёплый светло-серый, без синего */
 html:not([data-theme="dark"]) body.cabinet-page,
 html:not([data-theme="dark"]) body.admin-page {
-  background: #dde0e4;
+  background: #e0dfdc;
 }
 html:not([data-theme="dark"]) .cabinet-premium {
   background: transparent;
 }
 
-/* Светлая тема: сайдбар — матовое стекло (размытие + полупрозрачный navy, как в тёмной) */
+/* Светлая тема: сайдбар — матовое стекло, чуть насыщеннее чтобы не бледно */
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-sidebar:not(.admin-sidebar) {
-  background: linear-gradient(135deg, rgba(10, 25, 47, 0.72) 0%, rgba(30, 42, 58, 0.68) 50%, rgba(10, 25, 47, 0.72) 100%);
+  background: linear-gradient(135deg, rgba(10, 25, 47, 0.78) 0%, rgba(30, 42, 58, 0.74) 50%, rgba(10, 25, 47, 0.78) 100%);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   border: none;
@@ -185,6 +185,22 @@ html:not([data-theme="dark"]) .cabinet-premium .cabinet-nav-dropdown .cabinet-na
   color: #ffffff !important;
 }
 
+/* Блок навигации в сайдбаре — фон как у блока профиля */
+html:not([data-theme="dark"]) .cabinet-premium .cabinet-sidebar:not(.admin-sidebar) .cabinet-nav-block nav {
+  background: #ffffff !important;
+  border: 0.5px solid rgba(197, 165, 114, 0.55) !important;
+  box-shadow: 0 0 0 0.5px rgba(255, 255, 255, 0.15);
+}
+html:not([data-theme="dark"]) .admin-panel .admin-sidebar .cabinet-nav-block nav {
+  background: rgba(255, 255, 255, 0.15) !important;
+  border: 0.5px solid rgba(197, 165, 114, 0.5) !important;
+}
+[data-theme="dark"] .cabinet-premium .cabinet-sidebar .cabinet-nav-block nav,
+[data-theme="dark"] .admin-panel .admin-sidebar .cabinet-nav-block nav {
+  background: rgba(0, 0, 0, 0.25) !important;
+  border: 0.5px solid rgba(255, 255, 255, 0.15) !important;
+}
+
 /* Блок навигации в сайдбаре — подпись «Навигация», скругление как у сайдбара */
 .cabinet-premium .cabinet-nav-block .cabinet-nav-label {
   font-family: var(--font-inter), system-ui, sans-serif;
@@ -199,7 +215,7 @@ html:not([data-theme="dark"]) .admin-panel .admin-sidebar .cabinet-nav-label {
 
 /* Светлая тема: сайдбар админки — матовое стекло как у ЛК */
 html:not([data-theme="dark"]) .admin-panel .admin-sidebar {
-  background: linear-gradient(135deg, rgba(10, 25, 47, 0.72) 0%, rgba(30, 42, 58, 0.68) 50%, rgba(10, 25, 47, 0.72) 100%) !important;
+  background: linear-gradient(135deg, rgba(10, 25, 47, 0.78) 0%, rgba(30, 42, 58, 0.74) 50%, rgba(10, 25, 47, 0.78) 100%) !important;
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   border-color: rgba(197, 165, 114, 0.55) !important;
@@ -334,8 +350,9 @@ html:not([data-theme="dark"]) .cabinet-premium[data-brand-active] .cabinet-sideb
 }
 
 /* Светлая тема: карта баланса — белая, скругление, тень «парения» */
+/* Светлая тема: карта баланса — светло-серый фон, не слепит */
 html:not([data-theme="dark"]) .cabinet-premium .premium-card-front {
-  background: #ffffff !important;
+  background: #e8e6e4 !important;
   background-image: none !important;
   border-radius: 10px !important;
   box-shadow: inset 0 0 0 1px rgba(10, 25, 47, 0.08) !important;
@@ -464,7 +481,7 @@ body.admin-page .admin-panel.cabinet-premium {
 /* Светлая тема: шапка — фон как у виртуальной карты (градиент navy) */
 html:not([data-theme="dark"]) body.cabinet-page .site-header,
 html:not([data-theme="dark"]) body.admin-page .site-header {
-  background: linear-gradient(135deg, rgba(10, 25, 47, 0.72) 0%, rgba(30, 42, 58, 0.68) 50%, rgba(10, 25, 47, 0.72) 100%);
+  background: linear-gradient(135deg, rgba(10, 25, 47, 0.78) 0%, rgba(30, 42, 58, 0.74) 50%, rgba(10, 25, 47, 0.78) 100%);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   border: none;
@@ -501,10 +518,10 @@ html:not([data-theme="dark"]) body.admin-page .site-header .site-header-logo-ico
   color: inherit;
 }
 
-/* Светлая тема: основной блок ЛК и админки — матовое стекло (размытие + полупрозрачный navy) */
+/* Светлая тема: основной блок ЛК и админки — матовое стекло, чуть насыщеннее */
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-main-block:not(.admin-main-block),
 html:not([data-theme="dark"]) .admin-panel .admin-main-block.cabinet-main-block {
-  background: linear-gradient(135deg, rgba(10, 25, 47, 0.72) 0%, rgba(30, 42, 58, 0.68) 50%, rgba(10, 25, 47, 0.72) 100%);
+  background: linear-gradient(135deg, rgba(10, 25, 47, 0.78) 0%, rgba(30, 42, 58, 0.74) 50%, rgba(10, 25, 47, 0.78) 100%);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   border: none;
@@ -1527,6 +1544,14 @@ html:not([data-theme="dark"]) .cabinet-premium #operations-history.cabinet-card 
 }
 .cabinet-premium .support-chat-msg-date {
   opacity: 0.9;
+}
+
+/* Блок чата поддержки: чуть меньше прозрачность в обеих темах */
+html:not([data-theme="dark"]) .support-chat-block {
+  background: rgba(255, 255, 255, 0.1);
+}
+[data-theme="dark"] .support-chat-block {
+  background: rgba(255, 255, 255, 0.08);
 }
 
 /* Чат поддержки: скрыть полосу прокрутки, прокрутка остаётся */

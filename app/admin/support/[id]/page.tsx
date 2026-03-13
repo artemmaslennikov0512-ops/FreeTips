@@ -190,7 +190,7 @@ export default function AdminSupportThreadPage() {
         Обновить
       </button>
 
-      <div className="flex flex-col rounded-2xl border border-white/10 bg-white/[0.04] overflow-hidden">
+      <div className="support-chat-block flex flex-col rounded-2xl border border-white/10 overflow-hidden">
         <div className="support-chat-messages flex min-h-[320px] max-h-[50vh] flex-col overflow-y-auto p-4 space-y-3">
           {messages.length === 0 && (
             <p className="py-8 text-center text-white/90">

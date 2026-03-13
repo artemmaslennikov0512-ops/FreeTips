@@ -16,7 +16,10 @@ COPY . .
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_OPTIONS="--max-old-space-size=4096"
+# Заглушки для сборки: при импорте модулей (config, auth) эти переменные не должны отсутствовать
 ENV DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy"
+ENV JWT_SECRET=build-time-dummy-secret-min-32-chars
+ENV JWT_REFRESH_SECRET=build-time-dummy-refresh-secret-min-32-chars
 RUN npm run build
 
 # --- runner ---

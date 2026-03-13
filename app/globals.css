@@ -255,17 +255,17 @@ html:not([data-theme="dark"]) .cabinet-premium .cabinet-sidebar-avatar {
   --cabinet-shadow-medium: 0 2px 4px rgba(0, 0, 0, 0.25);
   --cabinet-border: 1px solid rgba(255, 255, 255, 0.12);
   --color-bg-sides: #2d2d2d;
-  background: #000;
+  background: transparent;
 }
 
 [data-theme="dark"] .cabinet-premium .cabinet-main-block {
-  background: rgba(255, 255, 255, 0.06);
+  background: transparent;
   border: 1px solid rgba(192, 192, 192, 0.4);
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3), 0 2px 6px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(192, 192, 192, 0.08);
 }
 
 [data-theme="dark"] .cabinet-premium .cabinet-sidebar {
-  background: rgba(255, 255, 255, 0.06);
+  background: transparent;
   border: 1px solid rgba(192, 192, 192, 0.4);
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3), 0 2px 6px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(192, 192, 192, 0.08);
   color: #fafafa;
@@ -1592,7 +1592,7 @@ html:not([data-theme="dark"]) .cabinet-premium .cabinet-verification-status p {
 /* Тёмная тема: шторка ЛК (официант и админ) — тёмное стекло */
 [data-theme="dark"] body.cabinet-page .site-header,
 [data-theme="dark"] body.admin-page .site-header {
-  background: rgba(255, 255, 255, 0.06);
+  background: transparent;
   border: 1px solid rgba(192, 192, 192, 0.4);
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3), 0 2px 6px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(192, 192, 192, 0.08);
 }
@@ -1631,13 +1631,13 @@ html:not([data-theme="dark"]) .cabinet-premium .cabinet-verification-status p {
 
 /* ЛК админа — тёмная тема как в ЛК официанта: стекло, обводка */
 [data-theme="dark"] .admin-panel .admin-sidebar {
-  background: rgba(255, 255, 255, 0.06) !important;
+  background: transparent !important;
   border: 1px solid rgba(192, 192, 192, 0.4) !important;
   box-shadow: 0 0 0 1px rgba(192, 192, 192, 0.08);
   backdrop-filter: blur(24px);
 }
 [data-theme="dark"] .admin-panel main {
-  background: #000;
+  background: transparent;
 }
 
 /* Карточки секций в админке (тёмная тема) */
@@ -2204,7 +2204,7 @@ body {
   min-height: 100vh;
 }
 [data-theme="dark"] body.admin-page .admin-panel {
-  background: #000;
+  background: transparent;
   min-height: 100vh;
 }
 

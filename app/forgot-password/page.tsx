@@ -60,13 +60,13 @@ export default function ForgotPasswordPage() {
         <div className={`${AUTH_CARD_CLASS} text-center`}>
           {/* Иконка, заголовок и описание — по центру */}
           <div className="forgot-password-header mx-auto max-w-full">
-            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[var(--color-accent-gold)]/20 text-[var(--color-accent-gold)] ring-2 ring-[var(--color-accent-gold)]/40">
-              <KeyRound className="h-6 w-6" />
+            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[var(--color-brand-gold)]/25 text-[var(--color-brand-gold)] ring-2 ring-[var(--color-brand-gold)]/50">
+              <KeyRound className="h-6 w-6" strokeWidth={2} />
             </div>
-            <h1 className="forgot-password-title">
+            <h1 className="forgot-password-title text-2xl font-bold sm:text-3xl">
               Восстановление пароля
             </h1>
-            <p className="forgot-password-desc mt-3 text-[var(--color-text-secondary)] max-w-md mx-auto">
+            <p className="forgot-password-desc mt-5 text-[var(--color-text-secondary)] max-w-md mx-auto">
               {success
                 ? "На указанный email отправлена ссылка для сброса пароля. Проверьте почту и папку «Спам»."
                 : "Укажите логин и почту — мы отправим ссылку на сброс пароля. Логин и email должны принадлежать одному аккаунту."}

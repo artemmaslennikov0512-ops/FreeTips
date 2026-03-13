@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Link2, List, Key, Copy, RotateCw, Settings, ExternalLink, ShieldCheck, ShieldAlert, Download } from "lucide-react";
@@ -43,6 +43,14 @@ export default function CabinetDashboardPage() {
   const [savingForEdit, setSavingForEdit] = useState("");
   const [savingForSaving, setSavingForSaving] = useState(false);
   const [savingForEditing, setSavingForEditing] = useState(false);
+  const goalTextareaRef = useRef<HTMLTextAreaElement | null>(null);
+
+  useEffect(() => {
+    const el = goalTextareaRef.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = `${el.scrollHeight}px`;
+  }, [savingForEdit]);
 
   const fetchProfileAndData = useCallback(async () => {
     const token = localStorage.getItem("accessToken");
@@ -389,14 +397,14 @@ export default function CabinetDashboardPage() {
               ))}
             </div>
 
-            {/* 3. Goal card — внизу, с фоном, заголовок крупнее и по центру */}
-            <div className="cabinet-goal-card cabinet-block-inner rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/20 p-5 shadow-[var(--shadow-subtle)]">
-              <div className="mb-4 text-center text-base font-semibold text-[var(--color-text)]">
+            {/* 3. Goal card — внизу, с фоном, заголовок и контент по центру */}
+            <div className="cabinet-goal-card cabinet-block-inner flex flex-col items-center rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/20 p-5 shadow-[var(--shadow-subtle)]">
+              <div className="mb-4 w-full text-center text-base font-semibold text-[var(--color-text)]">
                 Укажите цель, на которую собираете 🎯
               </div>
               {savingFor && !savingForEditing ? (
                 <div className="flex flex-col items-center text-center">
-                  <div className="mb-3 w-full max-w-md rounded-lg border border-[var(--color-brand-gold)]/35 bg-[var(--color-bg-sides)] px-4 py-3 text-center">
+                  <div className="cabinet-goal-display mb-3 w-max max-w-full rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-4 py-3 text-center">
                     <p className="text-[14px] font-medium text-[var(--color-text)]">{savingFor}</p>
                   </div>
                   <button
@@ -411,15 +419,16 @@ export default function CabinetDashboardPage() {
                   </button>
                 </div>
               ) : (
-                <div className="flex flex-col items-center">
-                  <div className="cabinet-input-window mb-3 w-full max-w-md rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-bg-sides)] px-3 py-2 text-[14px] text-[var(--color-text)] placeholder:text-[var(--color-text)]/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-brand-gold)]/50">
-                    <input
-                      type="text"
+                <div className="flex flex-col items-center text-center">
+                  <div className="cabinet-goal-input cabinet-input-window mb-3 w-max min-w-[200px] max-w-full rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-center text-[14px] text-[var(--color-text)] placeholder:text-[var(--color-text)]/50 focus-within:ring-2 focus-within:ring-[var(--color-brand-gold)]/50 focus-within:outline-none">
+                    <textarea
+                      ref={goalTextareaRef}
                       value={savingForEdit}
                       onChange={(e) => setSavingForEdit(e.target.value)}
                       placeholder="Например: новый ноутбук, отпуск…"
                       maxLength={500}
-                      className="w-full min-w-0 bg-transparent"
+                      rows={1}
+                      className="cabinet-goal-textarea w-full min-w-[16ch] max-w-full resize-none overflow-hidden border-0 bg-transparent p-0 text-center align-baseline focus:outline-none focus:ring-0"
                       aria-label="Цель (на что коплю)"
                     />
                   </div>

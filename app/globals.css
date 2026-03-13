@@ -1472,6 +1472,13 @@ html:not([data-theme="dark"]) .cabinet-premium #quick-actions.cabinet-card .cabi
   color: #fff !important;
 }
 
+/* Поле цели — в тёмной теме тот же полупрозрачный фон, что у блока «Ваша ссылка для чаевых», а не сплошной серый */
+[data-theme="dark"] .cabinet-premium #quick-actions .cabinet-goal-input.cabinet-input-window,
+[data-theme="dark"] .cabinet-premium #quick-actions .cabinet-goal-display {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border-color: rgba(197, 165, 114, 0.5) !important;
+}
+
 /* Светлая тема: блок «API для уведомлений» — весь текст белый */
 html:not([data-theme="dark"]) .cabinet-premium #api-key.cabinet-card h3 {
   color: #fff !important;
@@ -2466,23 +2473,29 @@ p {
   text-align: center !important;
 }
 
-/* Страница восстановления пароля: переопределяем глобальные h1/p, чтобы заголовок был по центру и мельче, подсказки 10px */
+/* Страница восстановления пароля: заголовок крупный, подсказка с отступом от заголовка */
 .forgot-password-page .forgot-password-title {
-  font-size: 14px !important;
-  font-weight: 600 !important;
+  font-size: 1.5rem !important;
+  font-weight: 700 !important;
   text-align: center !important;
-  line-height: 1.2 !important;
+  line-height: 1.25 !important;
   margin-bottom: 0 !important;
   color: var(--color-text) !important;
+}
+@media (min-width: 640px) {
+  .forgot-password-page .forgot-password-title {
+    font-size: 1.875rem !important;
+  }
 }
 .forgot-password-page .forgot-password-header {
   text-align: center !important;
 }
 .forgot-password-page .forgot-password-desc {
-  font-size: 12px !important;
+  font-size: 0.875rem !important;
   font-weight: 400 !important;
   text-align: center !important;
   margin-bottom: 0 !important;
+  margin-top: 1.5rem !important;
 }
 .forgot-password-page .forgot-password-tip {
   font-size: 10px !important;

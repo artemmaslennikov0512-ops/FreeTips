@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { User, Lock, ArrowRight } from "lucide-react";
@@ -11,7 +11,7 @@ import { getFieldErrors } from "@/lib/form-errors";
 import { AUTH_CARD_CLASS, AUTH_INPUT_CLASS, AUTH_ERROR_BORDER, AUTH_BTN_PRIMARY } from "@/lib/auth-form-classes";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const resetSuccess = searchParams.get("reset") === "success";
@@ -204,5 +204,19 @@ export default function LoginPage() {
         </div>
       </div>
     </AuthPageShell>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <AuthPageShell>
+        <div className="mx-auto max-w-md px-4 py-16">
+          <LoadingSpinner message="Загрузка…" className="min-h-[40vh]" />
+        </div>
+      </AuthPageShell>
+    }>
+      <LoginForm />
+    </Suspense>
   );
 }

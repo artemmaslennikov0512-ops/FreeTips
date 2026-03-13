@@ -20,7 +20,9 @@ ENV NODE_OPTIONS="--max-old-space-size=4096"
 ENV DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy"
 ENV JWT_SECRET=build-time-dummy-secret-min-32-chars
 ENV JWT_REFRESH_SECRET=build-time-dummy-refresh-secret-min-32-chars
-RUN npm run build
+# Раздельно, чтобы видеть, на каком шаге падает. Полный лог: docker build --progress=plain
+RUN npx prisma generate
+RUN npx next build --webpack
 
 # --- runner ---
 FROM node:20-slim AS runner

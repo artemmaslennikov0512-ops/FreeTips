@@ -91,11 +91,14 @@
   --section-dark-heading: #171717;
 }
 
-/* Светлая тема: основной фон страницы ЛК и админки — светло-серый */
+/* Светлая тема: основной фон страницы ЛК и админки — премиальный фон с золотом */
 html:not([data-theme="dark"]) body.cabinet-page,
-html:not([data-theme="dark"]) body.admin-page,
+html:not([data-theme="dark"]) body.admin-page {
+  background: #e5e7eb url(/images/lk-bg-light-premium.png) center center / cover no-repeat;
+  background-attachment: fixed;
+}
 html:not([data-theme="dark"]) .cabinet-premium {
-  background: #e5e7eb;
+  background: transparent;
 }
 
 /* Светлая тема: сайдбар — тёмно-синее стекло, светлый текст */
@@ -2190,12 +2193,14 @@ body {
 }
 
 [data-theme="dark"] body.cabinet-page {
-  background: #000;
+  background: #000 url(/images/lk-bg-dark-premium.png) center center / cover no-repeat;
+  background-attachment: fixed;
 }
 
-/* ЛК админа — чёрный фон на всю страницу под основными блоками */
+/* ЛК админа — премиальный тёмный фон на всю страницу */
 [data-theme="dark"] body.admin-page {
-  background: #000 !important;
+  background: #000 url(/images/lk-bg-dark-premium.png) center center / cover no-repeat !important;
+  background-attachment: fixed;
   min-height: 100vh;
 }
 [data-theme="dark"] body.admin-page .admin-panel {

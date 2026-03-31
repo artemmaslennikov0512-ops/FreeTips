@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import Image from "next/image";
 import { FileDown, ImageIcon, X } from "lucide-react";
 import { authHeaders } from "@/lib/auth-client";
 import { getBaseUrl } from "@/lib/get-base-url";
@@ -154,7 +155,14 @@ export default function EstablishmentQrPage() {
               {exampleQrUrl && (
                 <div className="flex flex-col items-center gap-2">
                   <span className="text-xs text-white/70">QR-код этой ссылки</span>
-                  <img src={exampleQrUrl} alt="" className="w-40 h-40 rounded-lg bg-white p-1" />
+                  <Image
+                    src={exampleQrUrl}
+                    alt=""
+                    width={160}
+                    height={160}
+                    unoptimized
+                    className="h-40 w-40 rounded-lg bg-white p-1"
+                  />
                 </div>
               )}
             </>

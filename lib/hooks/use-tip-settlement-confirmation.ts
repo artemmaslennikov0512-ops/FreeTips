@@ -24,15 +24,15 @@ export function useTipSettlementConfirmation(
 
   useEffect(() => {
     if (!tid || !urlOutcome) {
-      setPhase("idle");
-      return;
+      const t = window.setTimeout(() => setPhase("idle"), 0);
+      return () => clearTimeout(t);
     }
     if (urlOutcome === "fail") {
-      setPhase("fail");
-      return;
+      const t = window.setTimeout(() => setPhase("fail"), 0);
+      return () => clearTimeout(t);
     }
 
-    setPhase("verifying");
+    const tVerify = window.setTimeout(() => setPhase("verifying"), 0);
     let cancelled = false;
 
     const run = async () => {
@@ -75,6 +75,7 @@ export function useTipSettlementConfirmation(
     void run();
     return () => {
       cancelled = true;
+      clearTimeout(tVerify);
     };
   }, [tid, urlOutcome]);
 

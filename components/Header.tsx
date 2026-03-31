@@ -9,6 +9,7 @@ import { site } from "@/config/site";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { getAccessToken, authHeaders, clearAccessToken } from "@/lib/auth-client";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { isCabinetM5CompetitionTheme } from "@/config/cabinet-theme-logins";
 
 export function Header() {
   const router = useRouter();
@@ -113,6 +114,9 @@ export function Header() {
   }, [sideOpen, close]);
 
   const isLanding = pathname === "/";
+  const isCabinetM5Header =
+    Boolean(pathname?.startsWith("/cabinet")) &&
+    isCabinetM5CompetitionTheme(user?.login);
 
   if (isLanding) {
     return (
@@ -215,7 +219,9 @@ export function Header() {
   }
 
   return (
-    <header className="site-header sticky top-0 z-30 mx-0 mt-2 w-full rounded-none border-0 border-b border-white/10 bg-transparent max-lg:rounded-none lg:mx-3 lg:w-[calc(100%-1.5rem)] lg:rounded-[10px] lg:border">
+    <header
+      className={`site-header sticky top-0 z-30 mx-0 mt-2 w-full rounded-none border-0 border-b border-white/10 bg-transparent max-lg:rounded-none lg:mx-3 lg:w-[calc(100%-1.5rem)] lg:rounded-[10px] lg:border${isCabinetM5Header ? " site-header--cabinet-m5" : ""}`}
+    >
         <div className="mx-auto flex h-16 w-full items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link
           href={site.logo.href}
@@ -266,7 +272,7 @@ export function Header() {
             <button
               type="button"
               onClick={handleLogout}
-              className="min-h-[44px] inline-flex items-center justify-center gap-2 rounded-xl bg-[var(--color-brand-gold)] px-4 py-2.5 text-[12px] font-semibold text-[#0a192f] hover:opacity-90 hover:-translate-y-0.5 transition-all shadow-[var(--shadow-subtle)]"
+              className={`min-h-[44px] inline-flex items-center justify-center gap-2 rounded-xl bg-[var(--color-brand-gold)] px-4 py-2.5 text-[12px] font-semibold text-[#0a192f] hover:opacity-90 hover:-translate-y-0.5 transition-all shadow-[var(--shadow-subtle)]${isCabinetM5Header ? " site-header-m5-logout" : ""}`}
             >
               <LogOut className="h-3.5 w-3.5" />
               Выйти
@@ -295,7 +301,7 @@ export function Header() {
             ref={menuButtonRef}
             type="button"
             onClick={() => setSideOpen(true)}
-            className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded-lg text-[var(--color-brand-gold)] hover:bg-[var(--color-brand-gold)]/10 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-gold)]/50 focus-visible:ring-offset-2"
+            className={`min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded-lg text-[var(--color-brand-gold)] hover:bg-[var(--color-brand-gold)]/10 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-gold)]/50 focus-visible:ring-offset-2${isCabinetM5Header ? " site-header-m5-menu-btn" : ""}`}
             aria-label="Открыть меню"
             aria-expanded={sideOpen}
             aria-controls="side-menu"
@@ -325,11 +331,16 @@ export function Header() {
             <aside
               ref={(el) => { sideMenuRef.current = el; }}
               className={`header-mobile-panel absolute top-0 right-0 z-10 flex h-full w-[min(calc(100%-4rem),20rem)] flex-col border-0 bg-[#0a192f] shadow-2xl transition-transform duration-300 ease-out ${
-                sideOpen ? "translate-x-0" : "translate-x-full"
-              }`}
+                isCabinetM5Header ? " header-mobile-panel--cabinet-m5" : ""
+              } ${sideOpen ? "translate-x-0" : "translate-x-full"}`}
             >
               <div className="flex h-16 items-center justify-between px-4 border-0">
-                <span className="font-[family:var(--font-playfair)] font-bold"><span className="text-white">Free</span><span className="text-[var(--color-brand-gold)]">Tips</span></span>
+                <span
+                  className={`font-[family:var(--font-playfair)] font-bold${isCabinetM5Header ? " header-mobile-m5-brand" : ""}`}
+                >
+                  <span className="text-white">Free</span>
+                  <span className="text-[var(--color-brand-gold)]">Tips</span>
+                </span>
                 <button
                   type="button"
                   onClick={close}

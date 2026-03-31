@@ -8,6 +8,7 @@ import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { FEE_PERCENT_PAYOUT_CARD, feeKopForPayout } from "@/lib/payment/paygine-fee";
 import { Stats } from "../shared";
 import { PremiumCard } from "../PremiumCard";
+import { isCabinetM5CompetitionTheme } from "@/config/cabinet-theme-logins";
 
 type Operation = {
   id: string;
@@ -86,6 +87,7 @@ export default function CabinetTransactionsPage() {
   const [sdPageNewTabHint, setSdPageNewTabHint] = useState(false);
   const [maxPayoutPerRequestKop, setMaxPayoutPerRequestKop] = useState<number>(10_000_000);
   const [verificationStatus, setVerificationStatus] = useState<string | null>(null);
+  const [login, setLogin] = useState<string | null>(null);
 
   const totalPages = Math.max(1, Math.ceil(list.length / PER_PAGE));
   const paginatedList = useMemo(
@@ -130,7 +132,13 @@ export default function CabinetTransactionsPage() {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (profileRes.ok) {
-        const profile = (await profileRes.json()) as { stats?: Stats; maxPayoutPerRequestKop?: number; verificationStatus?: string };
+        const profile = (await profileRes.json()) as {
+          login?: string;
+          stats?: Stats;
+          maxPayoutPerRequestKop?: number;
+          verificationStatus?: string;
+        };
+        setLogin(profile.login ?? null);
         setStats(profile.stats ?? null);
         if (typeof profile.maxPayoutPerRequestKop === "number" && profile.maxPayoutPerRequestKop > 0) {
           setMaxPayoutPerRequestKop(profile.maxPayoutPerRequestKop);
@@ -240,6 +248,8 @@ export default function CabinetTransactionsPage() {
     );
   }
 
+  const isM5Cabinet = isCabinetM5CompetitionTheme(login);
+
   return (
     <div className="space-y-8">
       {stats && (
@@ -250,7 +260,7 @@ export default function CabinetTransactionsPage() {
             </div>
             <div className="p-6">
               <div className="overflow-hidden rounded-2xl">
-                <PremiumCard balanceKop={stats.balanceKop} compact hideButtons />
+                <PremiumCard balanceKop={stats.balanceKop} compact hideButtons variant={isM5Cabinet ? "m5" : "default"} />
               </div>
               <div className="mt-8 flex flex-col items-center gap-4">
                 <p className="text-center text-sm text-[var(--color-text)]">

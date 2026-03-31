@@ -8,6 +8,8 @@ type Props = {
   balanceKop?: number | null;
   compact?: boolean;
   hideButtons?: boolean;
+  /** BMW M5 Competition: карбон + полосы M на карте */
+  variant?: "default" | "m5";
 };
 
 const CARD_STYLES = `
@@ -30,7 +32,7 @@ const CARD_STYLES = `
   border-radius: 10px;
   overflow: hidden;
 }
-.premium-card-front {
+.premium-card-front:not(.premium-card-front--m5) {
   background: radial-gradient(ellipse 120% 120% at 50% 50%, #d4b896 0%, var(--color-brand-gold) 40%, #b8985c 100%);
   box-shadow: inset 0 0 0 1px rgba(255,255,255,0.25), inset -20px -20px 40px rgba(0,0,0,0.08);
 }
@@ -93,9 +95,10 @@ function formatCardHolder(name: string | null | undefined): string {
     .slice(0, 30);
 }
 
-export function PremiumCard({ fullName, balanceKop, compact }: Props) {
+export function PremiumCard({ fullName, balanceKop, compact, variant = "default" }: Props) {
   const holderName = formatCardHolder(fullName);
   const showBalance = balanceKop != null;
+  const isM5 = variant === "m5";
 
   const graffitiSvg =
     "url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 100\"><path d=\"M40,70 Q60,30 80,70 T120,30 T160,70\" stroke=\"%23ffffff\" stroke-width=\"3\" fill=\"none\" opacity=\"0.7\"/><path d=\"M30,50 Q50,10 70,50 T110,10 T150,50\" stroke=\"%23cccccc\" stroke-width=\"2\" fill=\"none\" opacity=\"0.5\"/><text x=\"100\" y=\"85\" text-anchor=\"middle\" fill=\"%23ffffff\" font-family=\"Arial\" font-size=\"10\" font-weight=\"bold\" opacity=\"0.9\">FREE</text></svg>')";
@@ -110,9 +113,15 @@ export function PremiumCard({ fullName, balanceKop, compact }: Props) {
             <p className="text-sm text-[var(--color-muted)]">Виртуальная премиальная карта в черно-белом стиле</p>
           </>
         )}
-        <div className="premium-card w-full max-w-[320px]">
+        <div className={`premium-card w-full max-w-[320px]${isM5 ? " premium-card--m5" : ""}`}>
           <div className="premium-card-inner">
-            <div className="premium-card-face premium-card-front">
+            <div className={`premium-card-face premium-card-front${isM5 ? " premium-card-front--m5" : ""}`}>
+              {isM5 && (
+                <>
+                  <div className="premium-card-m-stripes-edge premium-card-m-stripes-edge--left" aria-hidden />
+                  <div className="premium-card-m-stripes-edge premium-card-m-stripes-edge--bottom" aria-hidden />
+                </>
+              )}
               <div className="premium-dynamic-pattern" aria-hidden />
               <div className="premium-glass" aria-hidden />
               <div className="premium-card-shine" aria-hidden />

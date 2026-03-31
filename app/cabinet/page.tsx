@@ -240,7 +240,13 @@ export default function CabinetDashboardPage() {
                   )}
                 </p>
                 <div className="w-full overflow-hidden">
-                  <PremiumCard fullName={fullName} uniqueId={uniqueId} balanceKop={stats?.balanceKop ?? undefined} compact />
+                  <PremiumCard
+                    fullName={fullName}
+                    uniqueId={uniqueId}
+                    balanceKop={stats?.balanceKop ?? undefined}
+                    compact
+                    variant={isM5Cabinet ? "m5" : "default"}
+                  />
                 </div>
               </div>
             </div>

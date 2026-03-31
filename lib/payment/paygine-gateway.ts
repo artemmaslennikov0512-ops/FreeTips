@@ -196,11 +196,29 @@ export class PayginePaymentGateway implements PaymentGateway {
     const operationIdMatch = rawBody.match(/<id>(\d+)<\/id>/i);
 
     const reference = referenceMatch?.[1]?.trim();
-    if (!reference) return { ok: true };
+    if (!reference) {
+      logInfo("payment.webhook.no_reference", { bodyLength: rawBody.length });
+      return { ok: true };
+    }
+
+    logInfo("payment.webhook.callback", {
+      referenceLen: reference.length,
+      referencePrefix: reference.slice(0, 48),
+      bodyLength: rawBody.length,
+    });
 
     const tx = await db.transaction.findUnique({
       where: { idempotencyKey: reference },
-      select: { id: true, status: true, recipientId: true, amountKop: true, feeKop: true, paymentMethod: true, paygineOrderSdRef: true },
+      select: {
+        id: true,
+        status: true,
+        recipientId: true,
+        amountKop: true,
+        feeKop: true,
+        paymentMethod: true,
+        paygineOrderSdRef: true,
+        payerInfo: true,
+      },
     });
 
     // reference может быть id заявки на вывод (SDPayOutPage): Paygine шлёт callback с reference = payout.id
@@ -233,11 +251,23 @@ export class PayginePaymentGateway implements PaymentGateway {
           orderState: orderState ?? null,
         });
         void broadcastBalanceUpdated(payout.userId);
+      } else {
+        logInfo("payment.webhook.unknown_reference", {
+          referencePrefix: reference.slice(0, 48),
+          hint: "Нет Transaction с таким idempotencyKey и нет PayoutRequest PROCESSING с таким id",
+        });
       }
       return { ok: true };
     }
 
-    if (tx.status !== TransactionStatus.PENDING) return { ok: true };
+    if (tx.status !== TransactionStatus.PENDING) {
+      logInfo("payment.webhook.tip_skip_not_pending", {
+        transactionId: tx.id,
+        status: tx.status,
+        referencePrefix: reference.slice(0, 48),
+      });
+      return { ok: true };
+    }
 
     const state = stateMatch?.[1]?.trim().toUpperCase();
     const orderState = orderStateMatch?.[1]?.trim().toUpperCase();
@@ -270,11 +300,28 @@ export class PayginePaymentGateway implements PaymentGateway {
         ? TransactionStatus.SUCCESS
         : TransactionStatus.PENDING;
 
+    // Не перезаписываем externalId: это id заказа Register, нужен для webapi/Order и синка с ПЦ.
+    // Id операции из колбэка — только в payerInfo (диагностика).
+    let mergedPayerInfo: string | undefined;
+    if (operationIdMatch?.[1]) {
+      try {
+        const prev = tx.payerInfo ? (JSON.parse(tx.payerInfo) as Record<string, unknown>) : {};
+        mergedPayerInfo = JSON.stringify({
+          ...prev,
+          paygineCallbackOperationId: operationIdMatch[1],
+        });
+      } catch {
+        mergedPayerInfo = JSON.stringify({
+          paygineCallbackOperationId: operationIdMatch[1],
+        });
+      }
+    }
+
     await db.transaction.update({
       where: { id: tx.id },
       data: {
         status: setStatusImmediately,
-        ...(operationIdMatch?.[1] && { externalId: operationIdMatch[1] }),
+        ...(mergedPayerInfo && { payerInfo: mergedPayerInfo }),
       },
     });
 
@@ -442,6 +489,10 @@ export async function runRelocateForTransaction(txId: string): Promise<{ ok: boo
     logInfo("payment.webhook.relocate_error", {
       transactionId: txId,
       error: err instanceof Error ? err.message : String(err),
+    });
+    await db.transaction.updateMany({
+      where: { id: txId, status: TransactionStatus.PENDING },
+      data: { relocateStartedAt: null },
     });
     return { ok: false };
   }

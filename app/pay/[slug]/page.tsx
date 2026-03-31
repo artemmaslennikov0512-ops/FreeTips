@@ -1,7 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { useParams, useSearchParams } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { useTipSettlementConfirmation } from "@/lib/hooks/use-tip-settlement-confirmation";
 import Link from "next/link";
 import { CheckCircle2, XCircle, Loader2, User, Smartphone, CreditCard } from "lucide-react";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
@@ -18,6 +19,7 @@ function toKopecks(rub: number): number {
 
 export default function PayPage() {
   const params = useParams();
+  const router = useRouter();
   const searchParams = useSearchParams();
   const slug = typeof params.slug === "string" ? params.slug : "";
 
@@ -52,23 +54,24 @@ export default function PayPage() {
     }
   }, [slug]);
 
-  useEffect(() => {
-    const tid = searchParams.get("tid");
-    const outcome = searchParams.get("outcome");
-    if (tid && (outcome === "success" || outcome === "fail")) {
-      setResult(outcome);
-      return;
-    }
-  }, [searchParams]);
+  const tidFromUrl = searchParams.get("tid");
+  const outcomeFromUrl = searchParams.get("outcome");
+  const urlOutcome =
+    outcomeFromUrl === "success"
+      ? ("success" as const)
+      : outcomeFromUrl === "fail"
+        ? ("fail" as const)
+        : null;
+  const settlementPhase = useTipSettlementConfirmation(tidFromUrl, urlOutcome);
 
   // На мобильном после редиректа с Paygine позиция прокрутки может остаться внизу — прокручиваем к блоку «Спасибо»
   useEffect(() => {
-    if (result === "success") {
+    if (result === "success" || (urlOutcome === "success" && settlementPhase === "success")) {
       window.scrollTo(0, 0);
       document.documentElement.scrollTop = 0;
       document.body.scrollTop = 0;
     }
-  }, [result]);
+  }, [result, urlOutcome, settlementPhase]);
 
   useEffect(() => {
     if (!slug) return;
@@ -173,6 +176,123 @@ export default function PayPage() {
     }
   };
 
+  const payReturnFail = urlOutcome === "fail" || (urlOutcome === "success" && settlementPhase === "fail");
+
+  if (tidFromUrl && urlOutcome && payReturnFail) {
+    return (
+      <div className="pay-success-always-light flex min-h-screen min-h-[100dvh] w-full flex-col items-center justify-center px-4 py-8">
+        <div className="pay-success-card w-full max-w-sm rounded-2xl border border-[var(--color-brand-gold)]/40 bg-white p-8 text-center shadow-[var(--shadow-card)]">
+          <div className="pay-result-icon pay-result-icon-error mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[var(--color-accent-red)]/15">
+            <XCircle className="h-9 w-9 text-[var(--color-accent-red)]" />
+          </div>
+          <div className="mt-8 flex flex-col items-center text-center">
+            <h1 className="font-[family:var(--font-playfair)] text-2xl font-semibold text-[#0a192f]">Оплата не прошла</h1>
+            <p className="mt-3 text-center text-sm text-[#2d3748]">
+              Платёж был отклонён или отменён. Вы можете попробовать снова.
+            </p>
+          </div>
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
+            <Link
+              href={slug ? `/pay/${slug}` : "/"}
+              className="rounded-xl border border-[#0a192f]/35 bg-transparent px-5 py-2.5 text-center text-sm font-medium text-[#0a192f] hover:bg-[#0a192f]/8"
+            >
+              Попробовать снова
+            </Link>
+            <Link
+              href="/"
+              className="rounded-xl bg-[var(--color-navy)] px-5 py-2.5 text-center text-[14px] font-semibold text-white shadow-[var(--shadow-subtle)] transition-all hover:opacity-90"
+            >
+              На главную
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (tidFromUrl && urlOutcome === "success" && settlementPhase === "verifying") {
+    return (
+      <div className="pay-success-always-light flex min-h-screen min-h-[100dvh] w-full flex-col items-center justify-center px-4 py-8">
+        <div className="pay-success-card w-full max-w-sm rounded-2xl border border-[var(--color-brand-gold)]/40 bg-white p-8 text-center shadow-[var(--shadow-card)]">
+          <Loader2 className="mx-auto h-12 w-12 animate-spin text-[var(--color-accent-emerald)]" aria-hidden />
+          <p className="mt-6 text-center text-lg font-medium text-[#0a192f]">Подтверждаем зачисление…</p>
+          <p className="mt-2 text-center text-sm text-[#2d3748]">
+            Платёж прошёл, дождитесь подтверждения — обычно это несколько секунд.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (tidFromUrl && urlOutcome === "success" && settlementPhase === "slow") {
+    return (
+      <div className="pay-success-always-light flex min-h-screen min-h-[100dvh] w-full flex-col items-center justify-center px-4 py-8">
+        <div className="pay-success-card w-full max-w-sm rounded-2xl border border-[var(--color-brand-gold)]/40 bg-white p-8 text-center shadow-[var(--shadow-card)]">
+          <div className="pay-result-icon mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-amber-500/15">
+            <Loader2 className="h-9 w-9 text-amber-600 animate-spin" aria-hidden />
+          </div>
+          <div className="mt-8 flex flex-col items-center text-center">
+            <h1 className="font-[family:var(--font-playfair)] text-2xl font-semibold text-[#0a192f]">Платёж принят</h1>
+            <p className="mt-3 text-center text-sm text-[#2d3748]">
+              Банк подтвердил оплату. Зачисление на баланс получателя может занять несколько минут — это нормально.
+            </p>
+          </div>
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
+            <Link
+              href="/"
+              className="rounded-xl bg-[var(--color-navy)] px-5 py-2.5 text-center text-[14px] font-semibold text-white shadow-[var(--shadow-subtle)] transition-all hover:opacity-90"
+            >
+              На главную
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const successRecipientLabel = (recipientName?.trim() || "Получатель") as string;
+
+  if (tidFromUrl && urlOutcome === "success" && settlementPhase === "success") {
+    return (
+      <div className="pay-success-always-light flex min-h-screen min-h-[100dvh] w-full flex-col items-center justify-center px-4 py-8">
+        <div className="pay-success-card w-full max-w-sm rounded-2xl border border-[var(--color-brand-gold)]/40 bg-white p-8 text-center shadow-[var(--shadow-card)]">
+          <div className="pay-result-icon pay-result-icon-success mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[var(--color-accent-emerald)]/15">
+            <CheckCircle2 className="h-9 w-9 text-[var(--color-accent-emerald)]" />
+          </div>
+          <div className="mt-8 flex flex-col items-center text-center">
+            <h1 className="font-[family:var(--font-playfair)] text-2xl font-semibold text-[#0a192f]">
+              Спасибо!
+            </h1>
+            <p className="mt-1 text-center text-lg font-medium text-[#0a192f]">Чаевые зачислены.</p>
+            <p className="mt-3 text-center text-sm text-[#2d3748]">{successRecipientLabel} получил вашу благодарность.</p>
+          </div>
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
+            <button
+              type="button"
+              onClick={() => {
+                setResult(null);
+                setResultError(null);
+                setAmount(100);
+                setCustomAmount("");
+                setComment("");
+                if (slug) router.replace(`/pay/${slug}`);
+              }}
+              className="rounded-xl border border-[#0a192f]/35 bg-transparent px-5 py-2.5 text-sm font-medium text-[#0a192f] hover:bg-[#0a192f]/8 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a192f]/25"
+            >
+              Отправить ещё
+            </button>
+            <Link
+              href="/"
+              className="rounded-xl bg-[var(--color-navy)] px-5 py-2.5 text-[14px] font-semibold text-white shadow-[var(--shadow-subtle)] transition-all hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-navy)]/50"
+            >
+              На главную
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (loading) {
     return (
       <div className="mx-auto max-w-md px-4">
@@ -218,6 +338,7 @@ export default function PayPage() {
                 setAmount(100);
                 setCustomAmount("");
                 setComment("");
+                if (slug) router.replace(`/pay/${slug}`);
               }}
               className="rounded-xl border border-[#0a192f]/35 bg-transparent px-5 py-2.5 text-sm font-medium text-[#0a192f] hover:bg-[#0a192f]/8 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a192f]/25"
             >

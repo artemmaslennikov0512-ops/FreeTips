@@ -11,8 +11,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireRole } from "@/lib/middleware/auth";
 import { db } from "@/lib/db";
-import { getOrderStatus } from "@/lib/payment/paygine/client";
-import { runRelocateForTransaction } from "@/lib/payment/paygine-gateway";
+import { syncTipTransactionFromPaygine } from "@/lib/payment/sync-tip-from-paygine";
 import { TransactionStatus } from "@prisma/client";
 
 export async function POST(request: NextRequest) {
@@ -41,31 +40,13 @@ export async function POST(request: NextRequest) {
   const errors: string[] = [];
 
   for (const tx of transactions) {
-    const orderId = tx.externalId ? parseInt(tx.externalId, 10) : NaN;
-    if (!Number.isInteger(orderId)) {
-      errors.push(`Transaction ${tx.id}: неверный externalId ${tx.externalId}`);
+    const r = await syncTipTransactionFromPaygine(tx.id, { failIfPaygineNotCompleted: true });
+    if (!r.ok && r.error) {
+      errors.push(`Transaction ${tx.id}: ${r.error}`);
       continue;
     }
-
-    const result = await getOrderStatus({ sector, password }, orderId);
-    if (!result.ok) {
-      errors.push(`Transaction ${tx.id} (order ${orderId}): ${result.description ?? result.code ?? "ошибка"}`);
-      continue;
-    }
-
-    if (result.orderState === "COMPLETED") {
-      if (tx.status === TransactionStatus.PENDING) {
-        const rel = await runRelocateForTransaction(tx.id);
-        if (rel.ok) recovered++;
-      }
-      continue;
-    }
-
-    await db.transaction.update({
-      where: { id: tx.id },
-      data: { status: TransactionStatus.FAILED },
-    });
-    corrected++;
+    if (r.recovered) recovered++;
+    if (r.markedFailed) corrected++;
   }
 
   return NextResponse.json({

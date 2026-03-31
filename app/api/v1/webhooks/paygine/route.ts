@@ -6,7 +6,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { getPaymentGateway } from "@/lib/payment/stub-gateway";
-import { logError, logSecurity } from "@/lib/logger";
+import { logError, logInfo, logSecurity } from "@/lib/logger";
 import { getRequestId } from "@/lib/security/request";
 import { getClientIP, checkRateLimitByIP, WEBHOOK_RATE_LIMIT } from "@/lib/middleware/rate-limit";
 import { readTextWithLimit, MAX_BODY_SIZE_WEBHOOK } from "@/lib/api/helpers";
@@ -23,6 +23,13 @@ export async function POST(request: NextRequest) {
   if (!bodyResult.ok) return bodyResult.response;
   const rawBody = bodyResult.text;
   const signature = request.headers.get("X-Webhook-Signature") ?? request.headers.get("X-Signature") ?? null;
+
+  logInfo("payment.webhook.invoke", {
+    requestId,
+    ip,
+    bodyLength: rawBody.length,
+    path: "/api/v1/webhooks/paygine",
+  });
 
   const gateway = getPaymentGateway();
   try {

@@ -9,7 +9,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireRole } from "@/lib/middleware/auth";
 import { db } from "@/lib/db";
-import { getOrderStatus } from "@/lib/payment/paygine/client";
+import { getOrderStatus, isPaygineOrderPaidInOrderResponse } from "@/lib/payment/paygine/client";
 import { broadcastBalanceUpdated } from "@/lib/ws-broadcast";
 
 export async function POST(request: NextRequest) {
@@ -47,8 +47,12 @@ export async function POST(request: NextRequest) {
       continue;
     }
 
-    const newStatus =
-      result.orderState === "COMPLETED" ? "COMPLETED" : "REJECTED";
+    const newStatus = isPaygineOrderPaidInOrderResponse(
+      result.orderState,
+      result.operationState,
+    )
+      ? "COMPLETED"
+      : "REJECTED";
     await db.payoutRequest.update({
       where: { id: p.id },
       data: { status: newStatus },

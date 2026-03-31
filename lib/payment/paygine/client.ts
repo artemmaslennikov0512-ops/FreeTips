@@ -138,27 +138,107 @@ export async function registerOrder(
 
 /**
  * webapi/Order — получение информации по заказу (Таблица 15).
- * Подпись: sector, id, reference, password (при запросе по id можно sector, id, password).
+ * Подпись строго: sector, id, reference, password (reference — пустая строка, если не передаём).
+ * Без reference в подписи ПЦ отвечает ошибкой; в &lt;description&gt; часто попадает description заказа (у нас — slug ссылки).
  */
 export type OrderStatusResult =
-  | { ok: true; orderState: string }
+  | {
+      ok: true;
+      /** Тег <order_state> или <state> уровня заказа (до <operations>). */
+      orderState: string;
+      /** Статус последней релевантной операции (не REVERSE) внутри <operations> — как <state> в вебхуке. */
+      operationState: string | null;
+    }
   | { ok: false; code?: string; description?: string };
+
+/**
+ * В части ответов Paygine order_state приходит числом (код из таблицы: 2 = COMPLETED).
+ * Без нормализации синк не считает заказ оплаченным при «2» в XML.
+ */
+const ORDER_STATE_NUMERIC: Record<string, string> = {
+  "0": "REGISTERED",
+  "1": "AUTHORIZED",
+  "2": "COMPLETED",
+  "3": "CANCELED",
+  "4": "BLOCKED",
+  "6": "EXPIRED",
+  "7": "P2PAUTHORIZED",
+};
+
+export function normalizePaygineOrderStateToken(raw: string): string {
+  const s = raw.trim();
+  if (/^\d+$/.test(s) && ORDER_STATE_NUMERIC[s]) return ORDER_STATE_NUMERIC[s];
+  const u = s.toUpperCase();
+  if (u === "COMPLETE") return "COMPLETED";
+  return u;
+}
+
+/**
+ * Разбор ответа webapi/Order: в доке бывает и <order_state>, и формат <order><state>…</state><operations><operation><state>APPROVED</state>.
+ */
+export function parsePaygineOrderResponseXml(text: string): {
+  orderState: string;
+  operationState: string | null;
+} | null {
+  const orderStateRaw = text.match(/<order_state>([^<]*)<\/order_state>/i)?.[1]?.trim() ?? "";
+  const beforeOps = text.split(/<operations\b/i)[0] ?? text;
+  const orderLevelRaw = beforeOps.match(/<state>([^<]*)<\/state>/i)?.[1]?.trim() ?? "";
+
+  let operationState: string | null = null;
+  const opBlocks = text.match(/<operation>[\s\S]*?<\/operation>/gi) ?? [];
+  for (const block of opBlocks) {
+    const type = (block.match(/<type>([^<]*)<\/type>/i)?.[1] ?? "").trim().toUpperCase();
+    if (type.includes("REVERSE")) continue;
+    const st = block.match(/<state>([^<]*)<\/state>/i)?.[1]?.trim() ?? "";
+    if (st) operationState = normalizePaygineOrderStateToken(st);
+  }
+
+  const orderStateTag = orderStateRaw ? normalizePaygineOrderStateToken(orderStateRaw) : "";
+  const orderLevelState = orderLevelRaw ? normalizePaygineOrderStateToken(orderLevelRaw) : "";
+  const orderState = orderStateTag || orderLevelState;
+  if (!orderState && !operationState) return null;
+
+  return {
+    orderState: orderState || orderLevelState || "UNKNOWN",
+    operationState,
+  };
+}
+
+/** Согласовано с вебхуком (paygine-gateway): успех операции или завершённый заказ. */
+export function isPaygineOrderPaidInOrderResponse(orderState: string, operationState: string | null): boolean {
+  const os = orderState.toUpperCase();
+  const op = (operationState ?? "").toUpperCase();
+  return (
+    op === "APPROVED" ||
+    op === "P2PAUTHORIZED" ||
+    os === "COMPLETED" ||
+    os === "P2PAUTHORIZED"
+  );
+}
+
+export type GetOrderStatusOptions = {
+  /** Номер заказа на стороне ТСП — тот же reference, что в webapi/Register (idempotencyKey чаевых). */
+  reference?: string | null;
+};
 
 export async function getOrderStatus(
   config: PaygineConfig,
-  orderId: number
+  orderId: number,
+  options: GetOrderStatusOptions = {},
 ): Promise<OrderStatusResult> {
   return withPaygineSerial(async () => {
   const { sector, password } = config;
-  const signParts = [String(sector), String(orderId)];
+  const reference = (options.reference ?? "").trim();
+  const signParts = [String(sector), String(orderId), reference];
   const signature = buildPaygineSignature(signParts, password);
 
-  const body = new URLSearchParams([
+  const pairs: [string, string][] = [
     ["sector", String(sector)],
     ["id", String(orderId)],
-    ["mode", "1"],
-    ["signature", signature],
-  ]);
+  ];
+  if (reference) pairs.push(["reference", reference]);
+  pairs.push(["mode", "1"], ["signature", signature]);
+  const body = new URLSearchParams(pairs);
 
   const res = await fetch(`${getPaygineBaseUrl()}/Order`, {
     method: "POST",
@@ -171,9 +251,9 @@ export async function getOrderStatus(
     return { ok: false, description: text.slice(0, 500) || `HTTP ${res.status}` };
   }
 
-  const orderStateMatch = text.match(/<order_state>([^<]*)<\/order_state>/i);
-  if (orderStateMatch) {
-    return { ok: true, orderState: orderStateMatch[1].trim().toUpperCase() };
+  const parsed = parsePaygineOrderResponseXml(text);
+  if (parsed) {
+    return { ok: true, orderState: parsed.orderState, operationState: parsed.operationState };
   }
 
   const errCode = text.match(/<code>([^<]+)<\/code>/)?.[1];

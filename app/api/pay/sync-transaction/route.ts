@@ -38,6 +38,7 @@ export async function POST(request: NextRequest) {
     dbStatus: r.status,
     paygineOrderState: r.paygineOrderState ?? null,
     recovered: r.recovered ?? false,
+    paygineErrorCode: r.paygineErrorCode ?? null,
     error: r.error ?? null,
   });
 
@@ -50,6 +51,7 @@ export async function POST(request: NextRequest) {
       status: r.status,
       synced: r.ok,
       paygineOrderState: r.paygineOrderState ?? null,
+      paygineErrorCode: r.paygineErrorCode ?? null,
       error: r.error ?? null,
     },
     { headers: { "Cache-Control": "no-store" } },

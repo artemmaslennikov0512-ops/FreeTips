@@ -14,6 +14,9 @@ import type {
 import { TransactionStatus } from "@prisma/client";
 import { broadcastBalanceUpdated } from "@/lib/ws-broadcast";
 import { logInfo } from "@/lib/logger";
+
+/** Если relocateStartedAt выставлен и процесс упал — без сброса все следующие синки получают claimed.count=0 и БД навсегда PENDING. */
+const RELOCATE_CLAIM_STALE_MS = 15 * 60 * 1000;
 import { registerOrder, sdRelocateFunds } from "./paygine/client";
 import { buildPaygineSignature } from "./paygine/signature";
 import { feeKopForIncoming } from "./paygine-fee";
@@ -390,6 +393,17 @@ export async function runRelocateForTransaction(txId: string): Promise<{ ok: boo
     return { ok: false };
   }
 
+  if (tx.relocateStartedAt) {
+    const age = Date.now() - new Date(tx.relocateStartedAt).getTime();
+    if (age > RELOCATE_CLAIM_STALE_MS) {
+      await db.transaction.updateMany({
+        where: { id: txId, status: TransactionStatus.PENDING },
+        data: { relocateStartedAt: null },
+      });
+      logInfo("payment.relocate.stale_claim_reset", { transactionId: txId, staleAgeMs: age });
+    }
+  }
+
   const orderSdRef = tx.paygineOrderSdRef.trim();
   const recipient = await db.user.findUnique({
     where: { id: tx.recipientId },
@@ -424,7 +438,13 @@ export async function runRelocateForTransaction(txId: string): Promise<{ ok: boo
     where: { id: txId, status: TransactionStatus.PENDING, relocateStartedAt: null },
     data: { relocateStartedAt: new Date() },
   });
-  if (claimed.count === 0) return { ok: false };
+  if (claimed.count === 0) {
+    logInfo("payment.relocate.claim_skipped", {
+      transactionId: txId,
+      hint: "Другой инстанс держит перелив или relocateStartedAt не null (повторите через минуту или дождитесь сброса по таймауту)",
+    });
+    return { ok: false };
+  }
 
   const delayMs = getPaygineRelocateDelayMs();
   const retryDelayMs = getPaygineRelocateRetryMs();

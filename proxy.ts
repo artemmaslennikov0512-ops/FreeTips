@@ -11,7 +11,13 @@ import {
 
 const SAFE_METHODS = new Set(["GET", "HEAD", "OPTIONS"]);
 const API_PREFIX = "/api";
-const CSRF_EXEMPT_PREFIXES = ["/api/payment/webhook", "/api/pay/redirect-proxy", "/api/v1/webhooks/paygine"];
+const CSRF_EXEMPT_PREFIXES = [
+  "/api/payment/webhook",
+  "/api/pay/redirect-proxy",
+  "/api/v1/webhooks/paygine",
+  /** tid в теле — секретный идентификатор сессии оплаты; после редиректа с Paygine cookie CSRF часто не успевает совпасть с поллингом */
+  "/api/pay/sync-transaction",
+];
 const JSON_CONTENT_TYPE = "application/json";
 const SECOND_MS = 1000;
 const MINUTE_MS = 60 * SECOND_MS;

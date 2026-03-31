@@ -6,7 +6,7 @@
 import { TransactionStatus } from "@prisma/client";
 import { db } from "@/lib/db";
 import { getPaygineConfig } from "@/lib/config";
-import { getOrderStatus } from "@/lib/payment/paygine/client";
+import { getOrderStatus, isPaygineOrderPaidInOrderResponse } from "@/lib/payment/paygine/client";
 import { runRelocateForTransaction } from "@/lib/payment/paygine-gateway";
 import { logInfo } from "@/lib/logger";
 
@@ -22,6 +22,8 @@ export type SyncTipFromPaygineResult = {
   ok: boolean;
   status: TransactionStatus;
   paygineOrderState?: string;
+  /** Код ошибки из XML Paygine при сбое webapi/Order (напр. 109 — подпись). */
+  paygineErrorCode?: string;
   error?: string;
   /** Было PENDING, после перелива стало SUCCESS */
   recovered?: boolean;
@@ -41,7 +43,7 @@ export async function syncTipTransactionFromPaygine(
 
   const tx = await db.transaction.findUnique({
     where: { id: txId },
-    select: { id: true, status: true, externalId: true },
+    select: { id: true, status: true, externalId: true, idempotencyKey: true },
   });
 
   if (!tx) {
@@ -74,26 +76,39 @@ export async function syncTipTransactionFromPaygine(
     return { ok: false, status: tx.status, error: "Некорректный externalId" };
   }
 
-  const result = await getOrderStatus(config, orderId);
+  const reference = tx.idempotencyKey?.trim() || undefined;
+  const result = await getOrderStatus(config, orderId, { reference });
   if (!result.ok) {
     logInfo("payment.sync_paygine.order_query_failed", {
       transactionId: txId,
       orderId,
       code: result.code ?? null,
       description: result.description ?? null,
+      referenceInSignature: Boolean(reference),
     });
     return {
       ok: false,
       status: tx.status,
-      error: result.description ?? result.code ?? "Ошибка запроса Order",
+      paygineErrorCode: result.code,
+      error:
+        result.code === "109"
+          ? "Paygine: неверная подпись запроса Order (проверьте reference/id и сектор)"
+          : (result.description ?? result.code ?? "Ошибка запроса Order"),
     };
   }
 
   const orderState = result.orderState;
+  const operationState = result.operationState;
+  const paidInPaygine = isPaygineOrderPaidInOrderResponse(orderState, operationState);
 
-  if (orderState === "COMPLETED") {
+  if (paidInPaygine) {
     if (tx.status === TransactionStatus.PENDING) {
-      logInfo("payment.sync_paygine.order_completed_relocate", { transactionId: txId, orderId });
+      logInfo("payment.sync_paygine.order_completed_relocate", {
+        transactionId: txId,
+        orderId,
+        paygineOrderState: orderState,
+        paygineOperationState: operationState ?? null,
+      });
       await runRelocateForTransaction(txId);
       const updated = await db.transaction.findUnique({
         where: { id: txId },
@@ -108,6 +123,15 @@ export async function syncTipTransactionFromPaygine(
         dbStatusAfter: after,
         recovered,
       });
+      if (after === TransactionStatus.PENDING) {
+        logInfo("payment.sync_paygine.still_pending_after_relocate", {
+          transactionId: txId,
+          orderId,
+          paygineOrderState: orderState,
+          paygineOperationState: operationState ?? null,
+          hint: "Проверьте логи payment.relocate.* и payment.webhook.relocate_failed; при залипшем relocate сброс через 15 мин",
+        });
+      }
       return {
         ok: true,
         status: after,
@@ -119,6 +143,8 @@ export async function syncTipTransactionFromPaygine(
       transactionId: txId,
       orderId,
       dbStatus: tx.status,
+      paygineOrderState: orderState,
+      paygineOperationState: operationState ?? null,
     });
     return { ok: true, status: tx.status, paygineOrderState: orderState };
   }
@@ -141,6 +167,7 @@ export async function syncTipTransactionFromPaygine(
     transactionId: txId,
     orderId,
     paygineOrderState: orderState,
+    paygineOperationState: operationState ?? null,
     dbStatus: tx.status,
   });
   return { ok: true, status: tx.status, paygineOrderState: orderState };

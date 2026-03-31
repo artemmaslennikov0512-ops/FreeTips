@@ -90,7 +90,7 @@ export class PayginePaymentGateway implements PaymentGateway {
     if (!tipLink) {
       return { success: false, error: "Ссылка для чаевых не найдена" };
     }
-    const linkSlug = tipLink.slug;
+    const linkSlug = tipLink.slug.trim();
     const paymentPagePath = `/pay/${linkSlug}`;
 
     const existing = await db.transaction.findUnique({
@@ -145,7 +145,8 @@ export class PayginePaymentGateway implements PaymentGateway {
         amount,
         currency: CURRENCY_RUB,
         reference: idempotencyKey,
-        description: linkSlug,
+        /** Описание заказа в ЛК Paygine = slug из ссылки /pay/{slug} */
+        description: linkSlug.slice(0, 1000),
         fee: feeKop > 0 ? feeKop : undefined,
         url: successUrl,
         failurl: failUrl,

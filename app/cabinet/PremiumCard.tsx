@@ -8,7 +8,7 @@ type Props = {
   balanceKop?: number | null;
   compact?: boolean;
   hideButtons?: boolean;
-  /** BMW M5 Competition: карбон + полосы M на карте */
+  /** M5 Competition: тёмный металлик, полосы ///M, без золота (без логотипов BMW) */
   variant?: "default" | "m5";
 };
 
@@ -107,31 +107,36 @@ export function PremiumCard({ fullName, balanceKop, compact, variant = "default"
     <>
       <style>{CARD_STYLES}</style>
       <div className={`flex flex-col items-center ${compact ? "gap-4" : "gap-6"}`}>
-        {!compact && (
-          <>
-            <h2 className="text-xl font-bold text-[var(--color-on-navy)]">FreeTips Premium Service</h2>
-            <p className="text-sm text-[var(--color-muted)]">Виртуальная премиальная карта в черно-белом стиле</p>
-          </>
-        )}
+        {!compact &&
+          (isM5 ? (
+            <>
+              <h2 className="text-xl font-bold text-[var(--color-text)]">Виртуальная карта</h2>
+              <p className="text-sm text-[var(--color-muted)] text-center max-w-[320px]">
+                Виртуальная карта в стиле BMW M5 Competition
+              </p>
+            </>
+          ) : (
+            <>
+              <h2 className="text-xl font-bold text-[var(--color-on-navy)]">FreeTips Premium Service</h2>
+              <p className="text-sm text-[var(--color-muted)]">Виртуальная премиальная карта в черно-белом стиле</p>
+            </>
+          ))}
         <div className={`premium-card w-full max-w-[320px]${isM5 ? " premium-card--m5" : ""}`}>
           <div className="premium-card-inner">
             <div className={`premium-card-face premium-card-front${isM5 ? " premium-card-front--m5" : ""}`}>
-              {isM5 && (
-                <>
-                  <div className="premium-card-m-stripes-edge premium-card-m-stripes-edge--left" aria-hidden />
-                  <div className="premium-card-m-stripes-edge premium-card-m-stripes-edge--bottom" aria-hidden />
-                </>
-              )}
+              {isM5 && <div className="premium-card-m-stripes-edge premium-card-m-stripes-edge--left" aria-hidden />}
               <div className="premium-dynamic-pattern" aria-hidden />
               <div className="premium-glass" aria-hidden />
               <div className="premium-card-shine" aria-hidden />
-              <div
-                className="absolute top-[10px] right-[12px] h-6 w-12 opacity-50 z-[2]"
-                style={{ background: `${graffitiSvg} no-repeat center` }}
-                aria-hidden
-              />
+              {!isM5 && (
+                <div
+                  className="absolute top-[10px] right-[12px] h-6 w-12 opacity-50 z-[2]"
+                  style={{ background: `${graffitiSvg} no-repeat center` }}
+                  aria-hidden
+                />
+              )}
               <div className="absolute left-[12px] top-[10px] z-[3]">
-                <div className="premium-badge">VIRTUAL</div>
+                <div className={isM5 ? "premium-badge premium-badge--m5" : "premium-badge"}>VIRTUAL</div>
               </div>
               {/* Одна строка: лого+FreeTips вплотную слева, сумма справа на одном уровне */}
               <div className="absolute left-[12px] right-[12px] bottom-[28px] z-[3] flex items-center justify-between gap-2">

@@ -174,17 +174,28 @@ html:not([data-theme="dark"]) .cabinet-premium {
   background: linear-gradient(90deg, #1c69d4 0%, #b01e22 55%, #e5252a 100%) !important;
 }
 
-/* Шапка сайта: M5 в /cabinet (класс из Header + :has, светлая и тёмная тема) */
+/* Шапка M5 /cabinet: та же поверхность, что основной блок (светлая тема сайта) */
 html:not([data-theme="dark"]) header.site-header.site-header--cabinet-m5,
 html:not([data-theme="dark"])
   body.cabinet-page:has(.cabinet-premium[data-cabinet-theme="m5-competition"])
   header.site-header:not(.site-header-landing) {
-  background: linear-gradient(180deg, #13151c 0%, #0b0c10 100%) !important;
-  border-color: rgba(28, 105, 212, 0.38) !important;
+  background:
+    linear-gradient(165deg, #14161c 0%, #0e1014 55%, #12141a 100%),
+    linear-gradient(
+      118deg,
+      transparent 0%,
+      rgba(28, 105, 212, 0.04) 22%,
+      transparent 45%,
+      rgba(229, 37, 42, 0.06) 72%,
+      transparent 100%
+    ) !important;
+  background-size: 100% 100%, 160% 160% !important;
+  background-position: 0 0, 62% 42% !important;
+  border: 1px solid rgba(28, 105, 212, 0.3) !important;
   box-shadow:
-    0 6px 28px rgba(0, 0, 0, 0.38),
-    inset 0 1px 0 rgba(255, 255, 255, 0.04),
-    inset 0 -1px 0 rgba(229, 37, 42, 0.12) !important;
+    0 0 0 1px rgba(0, 0, 0, 0.4),
+    0 8px 24px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
 }
 
 [data-theme="dark"] header.site-header.site-header--cabinet-m5,
@@ -277,34 +288,42 @@ body.cabinet-page:has(.cabinet-premium[data-cabinet-theme="m5-competition"])
   color: #e5252a !important;
 }
 
-/* Premium BMW M: карбон + полосы M на лице карты */
+/* Premium M5 Competition: тёмный металлик, ///M слева (официальные оттенки M), без золота */
 .premium-card--m5 .premium-card-front--m5 {
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.065) 0%, transparent 38%, rgba(0, 0, 0, 0.5) 100%),
-    repeating-linear-gradient(
-      122deg,
-      rgba(255, 255, 255, 0.038) 0px,
-      rgba(255, 255, 255, 0.038) 1px,
-      transparent 1px,
-      transparent 5px
-    ),
-    repeating-linear-gradient(
-      58deg,
-      rgba(0, 0, 0, 0.4) 0px,
-      rgba(0, 0, 0, 0.4) 1px,
-      transparent 1px,
-      transparent 4px
-    ),
-    linear-gradient(155deg, #1a1d26 0%, #0a0a0c 42%, #14161d 100%) !important;
+    linear-gradient(148deg, rgba(255, 255, 255, 0.06) 0%, transparent 24%, transparent 52%, rgba(0, 0, 0, 0.28) 100%),
+    linear-gradient(168deg, #040405 0%, #111318 36%, #2a2d35 68%, #1c1f26 100%) !important;
   box-shadow:
-    inset 0 0 0 1px rgba(28, 105, 212, 0.28),
-    0 16px 44px rgba(0, 0, 0, 0.55),
-    0 0 0 1px rgba(0, 0, 0, 0.35) !important;
+    inset 0 0 0 1px rgba(255, 255, 255, 0.09),
+    0 16px 44px rgba(0, 0, 0, 0.48),
+    0 0 0 1px rgba(0, 0, 0, 0.42) !important;
 }
 
+[data-theme="dark"] .premium-card--m5 .premium-card-front--m5 {
+  background:
+    linear-gradient(148deg, rgba(255, 255, 255, 0.045) 0%, transparent 22%, transparent 55%, rgba(0, 0, 0, 0.4) 100%),
+    linear-gradient(168deg, #020203 0%, #0c0d11 38%, #242830 70%, #16181e 100%) !important;
+}
+
+/* Диагональный блик (металл), без золотого тона */
 .premium-card--m5 .premium-card-front--m5 .premium-card-shine {
-  opacity: 0.55 !important;
-  background: linear-gradient(125deg, rgba(255, 255, 255, 0.12) 0%, transparent 45%, transparent 100%) !important;
+  opacity: 0.9 !important;
+  background: linear-gradient(
+    126deg,
+    rgba(255, 255, 255, 0.2) 0%,
+    rgba(255, 255, 255, 0.07) 12%,
+    transparent 36%,
+    transparent 100%
+  ) !important;
+}
+
+.premium-card--m5 .premium-card-front--m5 .premium-glass {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.035) 0%,
+    transparent 44%,
+    rgba(0, 0, 0, 0.14) 100%
+  ) !important;
 }
 
 .premium-card--m5 .premium-card-m-stripes-edge {
@@ -313,62 +332,58 @@ body.cabinet-page:has(.cabinet-premium[data-cabinet-theme="m5-competition"])
   pointer-events: none;
 }
 
+/* Полоски ///M слева: тёмно-синий M → BMW M синий → M красный */
 .premium-card--m5 .premium-card-m-stripes-edge--left {
   left: 0;
   top: 0;
   bottom: 0;
-  width: 5px;
-  background: linear-gradient(
-    180deg,
-    #9fd0ff 0%,
-    #9fd0ff 30%,
-    #1c69d4 30%,
-    #1c69d4 64%,
-    #e5252a 64%,
-    #e5252a 100%
-  );
-  border-radius: 10px 0 0 10px;
-  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.35);
-}
-
-.premium-card--m5 .premium-card-m-stripes-edge--bottom {
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 5px;
+  width: 7px;
   background: linear-gradient(
     90deg,
-    #9fd0ff 0%,
-    #9fd0ff 33%,
-    #1c69d4 33%,
-    #1c69d4 66%,
-    #e5252a 66%,
-    #e5252a 100%
+    #0066b1 0%,
+    #0066b1 33.33%,
+    #1c69d4 33.33%,
+    #1c69d4 66.66%,
+    #e30613 66.66%,
+    #e30613 100%
   );
-  border-radius: 0 0 10px 10px;
-  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+  border-radius: 10px 0 0 10px;
+  box-shadow: inset -1px 0 2px rgba(0, 0, 0, 0.4);
 }
 
 .premium-card--m5 .premium-card-brand {
-  color: #e8ecf4 !important;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.65) !important;
+  color: rgba(248, 250, 252, 0.94) !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.45) !important;
 }
 
+/* Чип FT: «хром», тёмные буквы */
 .premium-card--m5 .premium-logo-icon {
-  background: linear-gradient(145deg, #3d8ef0 0%, #1c69d4 100%) !important;
-  color: #fff !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  background: linear-gradient(
+    148deg,
+    #f4f5f7 0%,
+    #c5c9d1 24%,
+    #eef0f3 48%,
+    #9aa0a8 65%,
+    #dcdfe4 100%
+  ) !important;
+  color: #141414 !important;
+  border: 1px solid rgba(255, 255, 255, 0.55) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    0 1px 3px rgba(0, 0, 0, 0.35) !important;
 }
 
-.premium-card--m5 .premium-badge {
-  background: linear-gradient(180deg, rgba(40, 44, 54, 0.95), rgba(20, 22, 28, 0.98)) !important;
-  color: #8ec5ff !important;
-  border: 1px solid rgba(28, 105, 212, 0.45) !important;
+/* VIRTUAL: тёмная подложка, светлая обводка */
+.premium-card--m5 .premium-badge--m5 {
+  background: rgba(6, 7, 10, 0.94) !important;
+  color: rgba(241, 245, 249, 0.96) !important;
+  border: 1px solid rgba(255, 255, 255, 0.38) !important;
+  box-shadow: none !important;
 }
 
 .premium-card--m5 .premium-card-balance-text {
-  color: #f0f3f8 !important;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.55) !important;
+  color: rgba(241, 245, 249, 0.96) !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4) !important;
 }
 
 .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-nav-label {
@@ -414,12 +429,23 @@ html:not([data-theme="dark"]) body.cabinet-page:has(.cabinet-premium[data-cabine
 }
 
 html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-sidebar:not(.admin-sidebar) {
-  background: linear-gradient(180deg, #12141a 0%, #0d0f14 100%) !important;
-  border: 1px solid rgba(28, 105, 212, 0.38) !important;
+  background:
+    linear-gradient(165deg, #14161c 0%, #0e1014 55%, #12141a 100%),
+    linear-gradient(
+      118deg,
+      transparent 0%,
+      rgba(28, 105, 212, 0.04) 22%,
+      transparent 45%,
+      rgba(229, 37, 42, 0.06) 72%,
+      transparent 100%
+    ) !important;
+  background-size: 100% 100%, 160% 160% !important;
+  background-position: 0 0, 62% 42% !important;
+  border: 1px solid rgba(28, 105, 212, 0.3) !important;
   box-shadow:
-    0 0 0 1px rgba(0, 0, 0, 0.5),
-    0 8px 32px rgba(0, 0, 0, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
+    0 0 0 1px rgba(0, 0, 0, 0.4),
+    0 8px 24px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
   color: rgba(232, 234, 239, 0.95) !important;
 }
 
@@ -490,14 +516,25 @@ html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competitio
 }
 
 html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-nav-dropdown {
-  background: linear-gradient(180deg, #12141a 0%, #0d0f14 100%) !important;
-  border: 1px solid rgba(28, 105, 212, 0.36) !important;
+  background:
+    linear-gradient(165deg, #14161c 0%, #0e1014 55%, #12141a 100%),
+    linear-gradient(
+      118deg,
+      transparent 0%,
+      rgba(28, 105, 212, 0.04) 22%,
+      transparent 45%,
+      rgba(229, 37, 42, 0.06) 72%,
+      transparent 100%
+    ) !important;
+  background-size: 100% 100%, 160% 160% !important;
+  background-position: 0 0, 62% 42% !important;
+  border: 1px solid rgba(28, 105, 212, 0.3) !important;
   color: rgba(232, 234, 239, 0.95) !important;
 }
 
 html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-nav-dropdown::before {
-  background: #12141a !important;
-  border-color: rgba(28, 105, 212, 0.38) !important;
+  background: #14161c !important;
+  border-color: rgba(28, 105, 212, 0.32) !important;
 }
 
 html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-overlay {
@@ -598,6 +635,124 @@ html:not([data-theme="dark"])
   #main-content
   :is(button, a)[class*="bg-[var(--color-brand-gold)]"]:active:not(:disabled) {
   transform: translateY(0) scale(0.98) !important;
+}
+
+/* Одиночная CTA — как активный пункт сайдбара M5 (без класса bg gold в разметке) */
+.cabinet-premium[data-cabinet-theme="m5-competition"]
+  #main-content
+  :is(button, a).cabinet-m5-btn-nav-like {
+  background:
+    linear-gradient(180deg, rgba(28, 105, 212, 0.2), rgba(10, 12, 16, 0.72)) padding-box,
+    linear-gradient(135deg, #e5252a 0%, #9a1a1e 28%, #1c69d4 72%, #4a9fff 100%) border-box !important;
+  border: 1.5px solid transparent !important;
+  color: #f2f5fa !important;
+  box-shadow: 0 0 26px rgba(28, 105, 212, 0.18) !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+  font-weight: 600 !important;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.25s ease,
+    filter 0.2s ease !important;
+}
+
+.cabinet-premium[data-cabinet-theme="m5-competition"]
+  #main-content
+  :is(button, a).cabinet-m5-btn-nav-like:hover:not(:disabled) {
+  filter: brightness(1.06) !important;
+  box-shadow: 0 0 32px rgba(28, 105, 212, 0.26) !important;
+}
+
+.cabinet-premium[data-cabinet-theme="m5-competition"]
+  #main-content
+  :is(button, a).cabinet-m5-btn-nav-like:active:not(:disabled) {
+  transform: translateY(0) scale(0.98) !important;
+}
+
+.cabinet-premium[data-cabinet-theme="m5-competition"]
+  #main-content
+  :is(button, a).cabinet-m5-btn-nav-like:focus-visible {
+  outline: 2px solid rgba(74, 159, 255, 0.65);
+  outline-offset: 2px;
+}
+
+/* Две кнопки рядом — красная / синяя в тонах M5 (без класса bg gold) */
+.cabinet-premium[data-cabinet-theme="m5-competition"]
+  #main-content
+  :is(button, a).cabinet-m5-btn-pair-red {
+  background: linear-gradient(180deg, #f04550 0%, #e5252a 42%, #b01e22 100%) !important;
+  color: #fff !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    0 2px 0 rgba(0, 0, 0, 0.28),
+    0 6px 18px rgba(229, 37, 42, 0.38) !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+  font-weight: 600 !important;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.25s ease,
+    filter 0.2s ease !important;
+}
+
+.cabinet-premium[data-cabinet-theme="m5-competition"]
+  #main-content
+  :is(button, a).cabinet-m5-btn-pair-red:hover:not(:disabled) {
+  filter: brightness(1.06) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    0 8px 22px rgba(229, 37, 42, 0.45) !important;
+}
+
+.cabinet-premium[data-cabinet-theme="m5-competition"]
+  #main-content
+  :is(button, a).cabinet-m5-btn-pair-red:active:not(:disabled) {
+  transform: translateY(0) scale(0.98) !important;
+}
+
+.cabinet-premium[data-cabinet-theme="m5-competition"]
+  #main-content
+  :is(button, a).cabinet-m5-btn-pair-blue {
+  background: linear-gradient(180deg, #3d8ef0 0%, #1c69d4 48%, #155aad 100%) !important;
+  color: #f8fafc !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    0 2px 0 rgba(0, 0, 0, 0.3),
+    0 6px 20px rgba(28, 105, 212, 0.4) !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+  font-weight: 600 !important;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.25s ease,
+    filter 0.2s ease !important;
+}
+
+.cabinet-premium[data-cabinet-theme="m5-competition"]
+  #main-content
+  :is(button, a).cabinet-m5-btn-pair-blue:hover:not(:disabled) {
+  filter: brightness(1.06) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.36),
+    0 8px 26px rgba(28, 105, 212, 0.5) !important;
+}
+
+.cabinet-premium[data-cabinet-theme="m5-competition"]
+  #main-content
+  :is(button, a).cabinet-m5-btn-pair-blue:active:not(:disabled) {
+  transform: translateY(0) scale(0.98) !important;
+}
+
+.cabinet-premium[data-cabinet-theme="m5-competition"]
+  #main-content
+  :is(button, a).cabinet-m5-btn-pair-red:focus-visible,
+.cabinet-premium[data-cabinet-theme="m5-competition"]
+  #main-content
+  :is(button, a).cabinet-m5-btn-pair-blue:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.45);
+  outline-offset: 2px;
 }
 
 /* Вторичные и контурные кнопки */
@@ -1132,7 +1287,7 @@ html:not([data-theme="dark"]) .cabinet-premium[data-brand-active] .cabinet-sideb
 
 /* Светлая тема: карта баланса — белая, скругление, тень «парения» */
 /* Светлая тема: карта баланса — светло-серый фон, не слепит */
-html:not([data-theme="dark"]) .cabinet-premium .premium-card-front {
+html:not([data-theme="dark"]) .cabinet-premium .premium-card-front:not(.premium-card-front--m5) {
   background: #e8e6e4 !important;
   background-image: none !important;
   border-radius: 10px !important;
@@ -1142,15 +1297,15 @@ html:not([data-theme="dark"]) .cabinet-premium .premium-card-inner {
   border-radius: 10px !important;
   box-shadow: 0 25px 50px -12px rgba(10, 25, 47, 0.18), 0 12px 24px -8px rgba(10, 25, 47, 0.1) !important;
 }
-html:not([data-theme="dark"]) .cabinet-premium .premium-card-brand {
+html:not([data-theme="dark"]) .cabinet-premium .premium-card:not(.premium-card--m5) .premium-card-brand {
   color: #374151 !important;
   text-shadow: none !important;
 }
-/* Светлая тема: текст баланса на белой карте — тёмный, хорошо виден */
-html:not([data-theme="dark"]) .cabinet-premium .premium-card-face.premium-card-front p,
-html:not([data-theme="dark"]) .cabinet-premium .premium-card-balance-block,
-html:not([data-theme="dark"]) .cabinet-premium .premium-card-balance-block p,
-html:not([data-theme="dark"]) .cabinet-premium .premium-card-balance-text {
+/* Светлая тема: текст баланса на белой карте — тёмный (не M5-карбон) */
+html:not([data-theme="dark"]) .cabinet-premium .premium-card-face.premium-card-front:not(.premium-card-front--m5) p,
+html:not([data-theme="dark"]) .cabinet-premium .premium-card:not(.premium-card--m5) .premium-card-balance-block,
+html:not([data-theme="dark"]) .cabinet-premium .premium-card:not(.premium-card--m5) .premium-card-balance-block p,
+html:not([data-theme="dark"]) .cabinet-premium .premium-card:not(.premium-card--m5) .premium-card-balance-text {
   color: #0a192f !important;
   opacity: 1 !important;
 }
@@ -1161,8 +1316,8 @@ html:not([data-theme="dark"]) .cabinet-premium .premium-glass {
   background: linear-gradient(180deg, rgba(10, 25, 47, 0.02) 0%, transparent 50%);
 }
 
-/* Тёмная тема: карта баланса — золотистый градиент, скругление, тень «парения» */
-[data-theme="dark"] .cabinet-premium .premium-card-front {
+/* Тёмная тема: карта баланса — золотистый градиент (не M5: там карбон в .premium-card-front--m5) */
+[data-theme="dark"] .cabinet-premium .premium-card-front:not(.premium-card-front--m5) {
   background: radial-gradient(ellipse 120% 120% at 50% 50%, #d4b896 0%, var(--color-brand-gold) 40%, #b8985c 100%) !important;
   background-image: radial-gradient(ellipse 120% 120% at 50% 50%, #d4b896 0%, var(--color-brand-gold) 40%, #b8985c 100%) !important;
   border: none !important;
@@ -1170,7 +1325,7 @@ html:not([data-theme="dark"]) .cabinet-premium .premium-glass {
   box-shadow: inset 0 0 0 1px rgba(255,255,255,0.25), inset -20px -20px 40px rgba(0,0,0,0.08) !important;
 }
 
-[data-theme="dark"] .cabinet-premium .premium-card-brand {
+[data-theme="dark"] .cabinet-premium .premium-card:not(.premium-card--m5) .premium-card-brand {
   color: #4a4a4a !important;
   text-shadow: 0 1px 0 rgba(255,255,255,0.4) !important;
 }
@@ -1313,6 +1468,45 @@ html:not([data-theme="dark"]) body.admin-page .site-header .site-header-logo-ico
 html:not([data-theme="dark"]) body.cabinet-page .site-header .site-header-logo-icon span,
 html:not([data-theme="dark"]) body.admin-page .site-header .site-header-logo-icon span {
   color: inherit;
+}
+
+/* M5 Competition + светлая тема сайта: перекрыть общую шапку ЛК (#1e2a3a) и белый FT — как у main-block */
+html:not([data-theme="dark"]) body.cabinet-page:has(.cabinet-premium[data-cabinet-theme="m5-competition"]) header.site-header.site-header--cabinet-m5,
+html:not([data-theme="dark"]) body.cabinet-page:has(.cabinet-premium[data-cabinet-theme="m5-competition"]) header.site-header:not(.site-header-landing) {
+  background:
+    linear-gradient(165deg, #14161c 0%, #0e1014 55%, #12141a 100%),
+    linear-gradient(
+      118deg,
+      transparent 0%,
+      rgba(28, 105, 212, 0.04) 22%,
+      transparent 45%,
+      rgba(229, 37, 42, 0.06) 72%,
+      transparent 100%
+    ) !important;
+  background-size: 100% 100%, 160% 160% !important;
+  background-position: 0 0, 62% 42% !important;
+  border: 1px solid rgba(28, 105, 212, 0.3) !important;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.4),
+    0 8px 24px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+}
+
+html:not([data-theme="dark"]) body.cabinet-page:has(.cabinet-premium[data-cabinet-theme="m5-competition"]) .site-header .site-header-logo-icon {
+  border-radius: 9999px !important;
+  background: linear-gradient(145deg, #3d8ef0 0%, #1c69d4 50%, #155aad 100%) !important;
+  color: #ffffff !important;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.12),
+    0 4px 12px rgba(28, 105, 212, 0.3) !important;
+}
+
+html:not([data-theme="dark"]) body.cabinet-page:has(.cabinet-premium[data-cabinet-theme="m5-competition"]) .site-header .site-header-logo-free {
+  color: #b8dcff !important;
+}
+
+html:not([data-theme="dark"]) body.cabinet-page:has(.cabinet-premium[data-cabinet-theme="m5-competition"]) .site-header .site-header-logo-text span:not(.site-header-logo-free) {
+  color: #e5252a !important;
 }
 
 /* Светлая тема: основной блок ЛК и админки — однотонный navy с контрастом, без градиента */
@@ -2275,12 +2469,12 @@ html:not([data-theme="dark"]) .cabinet-premium #link-payment.cabinet-card .cabin
   padding: 0.4375rem 0.875rem;
 }
 
-/* Кнопки в карточках ЛК официанта — чёрный шрифт */
-html:not([data-theme="dark"]) .cabinet-premium #link-payment.cabinet-card button,
-html:not([data-theme="dark"]) .cabinet-premium #link-payment.cabinet-card a[download],
-html:not([data-theme="dark"]) .cabinet-premium #quick-actions.cabinet-card button,
-html:not([data-theme="dark"]) .cabinet-premium #api-key.cabinet-card button,
-html:not([data-theme="dark"]) .cabinet-premium #api-key.cabinet-card .cabinet-block-inner button {
+/* Кнопки в карточках ЛК официанта — чёрный шрифт (M5 — свои цвета на CTA) */
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) #link-payment.cabinet-card button,
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) #link-payment.cabinet-card a[download],
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) #quick-actions.cabinet-card button,
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) #api-key.cabinet-card button,
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) #api-key.cabinet-card .cabinet-block-inner button {
   color: #0a192f !important;
 }
 

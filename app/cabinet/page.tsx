@@ -218,6 +218,15 @@ export default function CabinetDashboardPage() {
   const dashName = fullName?.trim() || "Официант";
   const m5DashName = isM5Cabinet ? m5SplitDisplayName(dashName) : null;
 
+  const m5BtnNavLike =
+    "cabinet-m5-btn-nav-like inline-flex items-center justify-center gap-2 rounded-[10px] px-4 py-2 text-[14px] font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed";
+  const m5BtnPairRed =
+    "cabinet-m5-btn-pair-red inline-flex items-center justify-center gap-2 rounded-[10px] px-4 py-2 text-[14px] font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed";
+  const m5BtnPairBlue =
+    "cabinet-m5-btn-pair-blue inline-flex items-center justify-center gap-2 rounded-[10px] px-4 py-2 text-[14px] font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed";
+  const m5BtnNavLikeWide =
+    "cabinet-m5-btn-nav-like inline-flex items-center gap-2 rounded-[10px] px-5 py-2.5 text-[14px] font-semibold transition-all focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed";
+
   return (
     <div className="space-y-8">
       <div className="grid gap-6 lg:grid-cols-2">
@@ -281,7 +290,11 @@ export default function CabinetDashboardPage() {
                     </p>
                     <Link
                       href="/cabinet/verification"
-                      className="inline-flex items-center gap-2 rounded-[10px] bg-[var(--color-brand-gold)] px-4 py-2 text-sm font-semibold text-[#0a192f] hover:opacity-90"
+                      className={
+                        isM5Cabinet
+                          ? `${m5BtnNavLike} text-sm`
+                          : "inline-flex items-center gap-2 rounded-[10px] bg-[var(--color-brand-gold)] px-4 py-2 text-sm font-semibold text-[#0a192f] hover:opacity-90"
+                      }
                     >
                       <ShieldCheck className="h-4 w-4" />
                       Пройти верификацию
@@ -387,7 +400,11 @@ export default function CabinetDashboardPage() {
                   <button
                     type="button"
                     onClick={copyTipLink}
-                    className="inline-flex items-center justify-center gap-2 rounded-[10px] bg-[var(--color-brand-gold)] px-4 py-2 text-[14px] font-semibold text-[#0a192f] transition-all hover:opacity-90"
+                    className={
+                      isM5Cabinet
+                        ? m5BtnPairRed
+                        : "inline-flex items-center justify-center gap-2 rounded-[10px] bg-[var(--color-brand-gold)] px-4 py-2 text-[14px] font-semibold text-[#0a192f] transition-all hover:opacity-90"
+                    }
                   >
                     <Copy className="h-4 w-4" />
                     {linkCopied ? "Скопировано!" : "Копировать ссылку"}
@@ -396,7 +413,11 @@ export default function CabinetDashboardPage() {
                     href={tipLink}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="cabinet-card-btn-link inline-flex items-center justify-center gap-2 rounded-[10px] bg-[var(--color-brand-gold)] px-4 py-2 text-[14px] font-semibold text-[#0a192f] transition-all hover:opacity-90"
+                    className={
+                      isM5Cabinet
+                        ? `cabinet-card-btn-link ${m5BtnPairBlue}`
+                        : "cabinet-card-btn-link inline-flex items-center justify-center gap-2 rounded-[10px] bg-[var(--color-brand-gold)] px-4 py-2 text-[14px] font-semibold text-[#0a192f] transition-all hover:opacity-90"
+                    }
                   >
                     <ExternalLink className="h-4 w-4" />
                     Перейти по ссылке
@@ -461,7 +482,11 @@ export default function CabinetDashboardPage() {
                     type="button"
                     onClick={saveSavingFor}
                     disabled={savingForSaving || (savingForEdit.trim() || null) === (savingFor ?? null)}
-                    className="rounded-[10px] bg-[var(--color-brand-gold)] px-4 py-2 text-[14px] font-semibold text-[#0a192f] transition-all hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className={
+                      isM5Cabinet
+                        ? `${m5BtnNavLike} disabled:opacity-50 disabled:cursor-not-allowed`
+                        : "rounded-[10px] bg-[var(--color-brand-gold)] px-4 py-2 text-[14px] font-semibold text-[#0a192f] transition-all hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+                    }
                   >
                     {savingForSaving ? "Сохранение…" : "Сохранить"}
                   </button>
@@ -487,7 +512,11 @@ export default function CabinetDashboardPage() {
             <a
               href={`${getBaseUrl()}/freetips.apk`}
               download="freetips.apk"
-              className="inline-flex items-center gap-2 rounded-[10px] bg-[var(--color-brand-gold)] px-5 py-2.5 text-[14px] font-semibold text-[#0a192f] transition-all hover:opacity-90 focus:outline-none"
+              className={
+                isM5Cabinet
+                  ? m5BtnNavLikeWide
+                  : "inline-flex items-center gap-2 rounded-[10px] bg-[var(--color-brand-gold)] px-5 py-2.5 text-[14px] font-semibold text-[#0a192f] transition-all hover:opacity-90 focus:outline-none"
+              }
             >
               <Download className="h-4 w-4 shrink-0" />
               Скачать приложение (APK)
@@ -514,7 +543,11 @@ export default function CabinetDashboardPage() {
                   <button
                     type="button"
                     onClick={copyApiKey}
-                    className="inline-flex items-center gap-2 rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-bg-sides)] px-5 py-2.5 text-[14px] font-semibold text-[#0a192f] shadow-sm transition-all duration-200 hover:bg-[var(--color-light-gray)] hover:shadow-md active:scale-[0.98] active:shadow-inner focus:outline-none"
+                    className={
+                      isM5Cabinet
+                        ? `${m5BtnPairRed} px-5 py-2.5 focus:outline-none`
+                        : "inline-flex items-center gap-2 rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-bg-sides)] px-5 py-2.5 text-[14px] font-semibold text-[#0a192f] shadow-sm transition-all duration-200 hover:bg-[var(--color-light-gray)] hover:shadow-md active:scale-[0.98] active:shadow-inner focus:outline-none"
+                    }
                   >
                     <Copy className="h-4 w-4 shrink-0" />
                     {apiKeyCopied ? "Скопировано" : "Копировать"}
@@ -523,7 +556,11 @@ export default function CabinetDashboardPage() {
                     type="button"
                     onClick={regenerateApiKey}
                     disabled={apiKeyLoading}
-                    className="inline-flex items-center gap-2 rounded-[10px] bg-[var(--color-brand-gold)] px-5 py-2.5 text-[14px] font-semibold text-[#0a192f] hover:opacity-90 disabled:opacity-50"
+                    className={
+                      isM5Cabinet
+                        ? `${m5BtnPairBlue} px-5 py-2.5`
+                        : "inline-flex items-center gap-2 rounded-[10px] bg-[var(--color-brand-gold)] px-5 py-2.5 text-[14px] font-semibold text-[#0a192f] hover:opacity-90 disabled:opacity-50"
+                    }
                   >
                     <RotateCw className="h-4 w-4" />
                     {apiKeyLoading ? "Создаём…" : "Создать новый ключ"}
@@ -534,7 +571,11 @@ export default function CabinetDashboardPage() {
                   type="button"
                   onClick={regenerateApiKey}
                   disabled={apiKeyLoading}
-                  className="inline-flex items-center gap-2 rounded-[10px] bg-[var(--color-brand-gold)] px-5 py-2.5 text-[14px] font-semibold text-[#0a192f] hover:opacity-90 disabled:opacity-50"
+                  className={
+                    isM5Cabinet
+                      ? m5BtnNavLikeWide
+                      : "inline-flex items-center gap-2 rounded-[10px] bg-[var(--color-brand-gold)] px-5 py-2.5 text-[14px] font-semibold text-[#0a192f] hover:opacity-90 disabled:opacity-50"
+                  }
                 >
                   <Key className="h-4 w-4" />
                   {apiKeyLoading ? "Создаём…" : hasApiKey ? "Создать новый ключ" : "Создать ключ"}

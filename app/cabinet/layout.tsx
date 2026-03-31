@@ -219,9 +219,13 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
   const profileBlockStyle: React.CSSProperties =
     !isM5Cabinet && sidebarBg ? { backgroundColor: sidebarBg } : {};
 
+  const navActiveClasses = isM5Cabinet
+    ? "cabinet-nav-active border border-[var(--color-brand-gold)]/45 bg-[var(--color-brand-gold)]/14 text-[var(--color-text)] font-semibold shadow-[inset_0_0_0_1px_rgba(28,105,212,0.12)]"
+    : "cabinet-nav-active border border-[#0a192f]/25 bg-[#0a192f]/10 text-[#0a192f] font-semibold";
+
   return (
     <div
-      className="cabinet-premium flex min-h-screen w-full max-w-full overflow-x-hidden bg-[var(--color-bg)] font-[family:var(--font-inter)] text-[var(--color-text)] pt-2"
+      className={`cabinet-premium flex min-h-screen w-full max-w-full overflow-x-hidden font-[family:var(--font-inter)] text-[var(--color-text)] pt-2 ${isM5Cabinet ? "bg-transparent" : "bg-[var(--color-bg)]"}`}
       data-brand-active={applyEstablishmentBrand ? "true" : undefined}
       data-cabinet-theme={isM5Cabinet ? "m5-competition" : undefined}
       style={Object.keys(brandStyle).length ? brandStyle : undefined}
@@ -262,7 +266,9 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
                 className="cabinet-sidebar-avatar h-14 w-14 shrink-0 rounded-full object-cover bg-[var(--color-brand-gold)]"
               />
             ) : (
-              <div className="cabinet-sidebar-avatar flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[var(--color-brand-gold)] font-semibold text-[#0a192f] text-base">
+              <div
+                className={`cabinet-sidebar-avatar flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[var(--color-brand-gold)] font-semibold text-base ${isM5Cabinet ? "text-[#0a0a0c]" : "text-[#0a192f]"}`}
+              >
                 {initials}
               </div>
             )}
@@ -270,7 +276,10 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
               <div className="flex items-center gap-1.5">
                 <span className="truncate font-semibold text-[var(--color-text)]" style={brandFont ? { color: brandFont } : undefined}>{displayName}</span>
                 {user?.verificationStatus === "VERIFIED" && (
-                  <BadgeCheck className="h-5 w-5 shrink-0 text-blue-500" aria-label="Аккаунт верифицирован" />
+                  <BadgeCheck
+                    className={`h-5 w-5 shrink-0 ${isM5Cabinet ? "text-[#1c69d4]" : "text-blue-500"}`}
+                    aria-label="Аккаунт верифицирован"
+                  />
                 )}
               </div>
               <div className="text-sm text-[var(--color-text)]/80" style={brandFont ? { color: brandFont } : undefined}>Официант</div>
@@ -289,7 +298,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
                 onClick={closeSidebar}
                 className={`flex items-center gap-3 rounded-lg px-3 py-3 font-medium transition-colors ${
                   isActive(href)
-                    ? "cabinet-nav-active border border-[#0a192f]/25 bg-[#0a192f]/10 text-[#0a192f] font-semibold"
+                    ? navActiveClasses
                     : "border border-transparent text-[var(--color-text)]/80 hover:bg-[var(--color-dark-gray)]/10 hover:text-[var(--color-text)]"
                 }`}
                 style={!isActive(href) && brandFont ? { color: `${brandFont}cc` } : undefined}
@@ -370,12 +379,21 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
                       {user?.employeePhotoUrl ? (
                         <img src={user.employeePhotoUrl} alt="" className="h-9 w-9 shrink-0 rounded-full object-cover bg-[var(--color-brand-gold)]" />
                       ) : (
-                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--color-brand-gold)] font-semibold text-[#0a192f] text-xs">{initials}</div>
+                        <div
+                          className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--color-brand-gold)] font-semibold text-xs ${isM5Cabinet ? "text-[#0a0a0c]" : "text-[#0a192f]"}`}
+                        >
+                          {initials}
+                        </div>
                       )}
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-1">
                           <span className="truncate font-semibold text-[var(--color-text)] text-sm" style={brandFont ? { color: brandFont } : undefined}>{displayName}</span>
-                          {user?.verificationStatus === "VERIFIED" && <BadgeCheck className="h-4 w-4 shrink-0 text-blue-500" aria-label="Верифицирован" />}
+                          {user?.verificationStatus === "VERIFIED" && (
+                            <BadgeCheck
+                              className={`h-4 w-4 shrink-0 ${isM5Cabinet ? "text-[#1c69d4]" : "text-blue-500"}`}
+                              aria-label="Верифицирован"
+                            />
+                          )}
                         </div>
                         <div className="text-xs text-[var(--color-text)]/80" style={brandFont ? { color: brandFont } : undefined}>Официант</div>
                       </div>
@@ -390,7 +408,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
                         onClick={closeSidebar}
                         role="menuitem"
                         className={`flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium transition-colors ${
-                          isActive(href) ? "cabinet-nav-active border border-[#0a192f]/25 bg-[#0a192f]/10 text-[#0a192f] font-semibold" : "border border-transparent text-[var(--color-text)]/80 hover:bg-[var(--color-dark-gray)]/10 hover:text-[var(--color-text)]"
+                          isActive(href) ? navActiveClasses : "border border-transparent text-[var(--color-text)]/80 hover:bg-[var(--color-dark-gray)]/10 hover:text-[var(--color-text)]"
                         }`}
                         style={!isActive(href) && brandFont ? { color: `${brandFont}cc` } : undefined}
                       >

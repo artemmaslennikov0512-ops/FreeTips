@@ -4,7 +4,7 @@
  * Цвета — только #RRGGBB (как в PayPageClient).
  */
 /** Slug страницы /pay/:slug — доп. класс `pay-page--m5-competition` в PayPageClient (глобальные стили). */
-export const PAY_PAGE_M5_SHELL_SLUGS = new Set(["ahmedm5f90"]);
+export const PAY_PAGE_M5_SHELL_SLUGS = new Set(["ahmedm5f90", "ahmedm5f98"]);
 
 export function isPayPageM5ShellSlug(slug: string): boolean {
   return PAY_PAGE_M5_SHELL_SLUGS.has(slug.trim().toLowerCase());
@@ -23,18 +23,21 @@ export type PayPageBrandingOverride = {
   borderOpacityPercent?: number | null;
 };
 
+/** Страница оплаты в стиле ЛК BMW M5 (карбон, золото калиперов). */
+const PAY_PAGE_M5_COMPETITION_BRANDING: PayPageBrandingOverride = {
+  primaryColor: "#c9a962",
+  secondaryColor: "#14161c",
+  mainBackgroundColor: "#08090b",
+  blocksBackgroundColor: "#1c1f28",
+  fontColor: "#e8eaef",
+  borderColor: "#8a7344",
+  borderWidthPx: 1,
+  borderOpacityPercent: 82,
+};
+
 export const PAY_PAGE_BRANDING_OVERRIDES: Partial<Record<string, PayPageBrandingOverride>> = {
-  /** В стиле ЛК BMW M5 Competition: карбон, золото калиперов, приглушённая обводка */
-  ahmedm5f90: {
-    primaryColor: "#c9a962",
-    secondaryColor: "#14161c",
-    mainBackgroundColor: "#08090b",
-    blocksBackgroundColor: "#1c1f28",
-    fontColor: "#e8eaef",
-    borderColor: "#8a7344",
-    borderWidthPx: 1,
-    borderOpacityPercent: 82,
-  },
+  ahmedm5f90: PAY_PAGE_M5_COMPETITION_BRANDING,
+  ahmedm5f98: PAY_PAGE_M5_COMPETITION_BRANDING,
   /** Отдельный визуал только для /pay/ahmedm5f90-1; ahmedm5f90 и прочие slug не меняются. */
   "ahmedm5f90-1": {
     primaryColor: "#14b8a6",

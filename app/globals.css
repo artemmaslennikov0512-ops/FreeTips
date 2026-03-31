@@ -102,21 +102,21 @@ html:not([data-theme="dark"]) .cabinet-premium {
 
 /* --------------------------------------------------------------------------
    ЛК: BMW M5 Competition — только data-cabinet-theme="m5-competition" (логин в config)
-   Углерод, золото калиперов, холодный металл, тонкая полоса M (синий / красный / золото)
+   Углерод, M Motorsport: синий / красный, полосы M на карточке и обводках
    -------------------------------------------------------------------------- */
-@keyframes m5-gold-glow-pulse {
+@keyframes m5-primary-glow-pulse {
   0%,
   100% {
     box-shadow:
-      0 0 0 1px rgba(201, 169, 98, 0.35),
-      0 4px 20px rgba(201, 169, 98, 0.18),
-      0 0 24px rgba(28, 105, 212, 0.06);
+      0 0 0 1px rgba(28, 105, 212, 0.45),
+      0 4px 20px rgba(28, 105, 212, 0.22),
+      0 0 24px rgba(229, 37, 42, 0.08);
   }
   50% {
     box-shadow:
-      0 0 0 1px rgba(201, 169, 98, 0.55),
-      0 6px 28px rgba(201, 169, 98, 0.28),
-      0 0 32px rgba(28, 105, 212, 0.12);
+      0 0 0 1px rgba(229, 37, 42, 0.4),
+      0 6px 28px rgba(28, 105, 212, 0.32),
+      0 0 32px rgba(28, 105, 212, 0.18);
   }
 }
 @keyframes m5-card-gleam {
@@ -129,7 +129,9 @@ html:not([data-theme="dark"]) .cabinet-premium {
   }
 }
 .cabinet-premium[data-cabinet-theme="m5-competition"] {
-  --color-brand-gold: #c9a962;
+  /* Primary CTA и круги иконок — BMW M синий (вместо золота калиперов) */
+  --color-brand-gold: #1c69d4;
+  --color-accent-gold: #4a9fff;
   --m5-m-blue: #1c69d4;
   --m5-m-red: #e5252a;
   --m5-carbon: #0a0a0c;
@@ -152,11 +154,31 @@ html:not([data-theme="dark"]) .cabinet-premium {
   letter-spacing: 0.01em;
 }
 
+/* Активный пункт меню: градиентная обводка красный → синий */
+.cabinet-premium[data-cabinet-theme="m5-competition"] a.cabinet-nav-active-m5 {
+  background:
+    linear-gradient(180deg, rgba(28, 105, 212, 0.18), rgba(10, 12, 16, 0.65)) padding-box,
+    linear-gradient(135deg, #e5252a 0%, #9a1a1e 28%, #1c69d4 72%, #4a9fff 100%) border-box !important;
+  border: 1.5px solid transparent !important;
+  color: #f2f5fa !important;
+  box-shadow: 0 0 26px rgba(28, 105, 212, 0.16) !important;
+}
+
+.cabinet-premium[data-cabinet-theme="m5-competition"] #quick-actions .cabinet-quick-action-icon {
+  background: linear-gradient(145deg, #3d8ef0 0%, #1c69d4 50%, #155aad 100%) !important;
+  color: #fff !important;
+  box-shadow: 0 4px 14px rgba(28, 105, 212, 0.35) !important;
+}
+
+.cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-limits-track > div[class*="rounded-full"] {
+  background: linear-gradient(90deg, #1c69d4 0%, #b01e22 55%, #e5252a 100%) !important;
+}
+
 .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-nav-label {
   letter-spacing: 0.22em !important;
   font-weight: 600 !important;
   color: rgba(184, 188, 198, 0.75) !important;
-  text-shadow: 0 0 20px rgba(201, 169, 98, 0.12);
+  text-shadow: 0 0 20px rgba(28, 105, 212, 0.14);
 }
 
 .cabinet-premium[data-cabinet-theme="m5-competition"] #main-content :is(h1, h2) {
@@ -166,14 +188,14 @@ html:not([data-theme="dark"]) .cabinet-premium {
   color: #f2f4f8 !important;
   text-shadow:
     0 1px 0 rgba(255, 255, 255, 0.06),
-    0 0 28px rgba(201, 169, 98, 0.14);
+    0 0 28px rgba(28, 105, 212, 0.2);
 }
 
 .cabinet-premium[data-cabinet-theme="m5-competition"] #main-content h3 {
   letter-spacing: 0.05em !important;
   font-weight: 650 !important;
   color: #f0f2f6 !important;
-  text-shadow: 0 0 20px rgba(201, 169, 98, 0.1);
+  text-shadow: 0 0 20px rgba(229, 37, 42, 0.08);
 }
 
 .cabinet-premium[data-cabinet-theme="m5-competition"] #main-content h1 {
@@ -196,7 +218,7 @@ html:not([data-theme="dark"]) body.cabinet-page:has(.cabinet-premium[data-cabine
 
 html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-sidebar:not(.admin-sidebar) {
   background: linear-gradient(180deg, #12141a 0%, #0d0f14 100%) !important;
-  border: 1px solid rgba(201, 169, 98, 0.35) !important;
+  border: 1px solid rgba(28, 105, 212, 0.38) !important;
   box-shadow:
     0 0 0 1px rgba(0, 0, 0, 0.5),
     0 8px 32px rgba(0, 0, 0, 0.45),
@@ -211,27 +233,20 @@ html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competitio
 
 html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-sidebar-profile {
   background: rgba(255, 255, 255, 0.04) !important;
-  border-color: rgba(201, 169, 98, 0.45) !important;
+  border-color: rgba(28, 105, 212, 0.42) !important;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
   color: rgba(232, 234, 239, 0.98) !important;
 }
 
 html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-sidebar-avatar {
-  background: linear-gradient(145deg, #d4b876 0%, #c9a962 40%, #8a7344 100%) !important;
-  border-color: rgba(201, 169, 98, 0.6) !important;
-  color: #0a0a0c !important;
-}
-
-html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-sidebar:not(.admin-sidebar) .cabinet-nav-active {
-  background: rgba(201, 169, 98, 0.12) !important;
-  border-color: rgba(201, 169, 98, 0.55) !important;
-  color: #f5f0e6 !important;
-  box-shadow: inset 0 0 0 1px rgba(28, 105, 212, 0.15) !important;
+  background: linear-gradient(145deg, #3d8ef0 0%, #1c69d4 45%, #1356a8 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  color: #fff !important;
 }
 
 html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-nav-block nav {
   background: rgba(0, 0, 0, 0.28) !important;
-  border-color: rgba(201, 169, 98, 0.35) !important;
+  border-color: rgba(28, 105, 212, 0.32) !important;
 }
 
 html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-main-block:not(.admin-main-block) {
@@ -242,7 +257,7 @@ html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competitio
       transparent 0%,
       rgba(28, 105, 212, 0.04) 22%,
       transparent 45%,
-      rgba(201, 169, 98, 0.05) 72%,
+      rgba(229, 37, 42, 0.06) 72%,
       transparent 100%
     ) !important;
   background-size:
@@ -251,13 +266,13 @@ html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competitio
   background-position:
     0 0,
     62% 42% !important;
-  border: 1px solid rgba(201, 169, 98, 0.28) !important;
+  border: 1px solid rgba(28, 105, 212, 0.3) !important;
   box-shadow:
     0 0 0 1px rgba(0, 0, 0, 0.4),
     0 12px 40px rgba(0, 0, 0, 0.35),
     inset 0 3px 0 0 #1c69d4,
     inset 0 6px 0 0 #e5252a,
-    inset 0 9px 0 0 #c9a962 !important;
+    inset 0 9px 0 0 rgba(200, 206, 216, 0.35) !important;
 }
 
 html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-main-block #main-content {
@@ -267,31 +282,25 @@ html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competitio
 html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-card,
 html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-section-header {
   background: rgba(255, 255, 255, 0.035) !important;
-  border: 1px solid rgba(201, 169, 98, 0.32) !important;
+  border: 1px solid rgba(28, 105, 212, 0.28) !important;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
 }
 
 html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-menu-btn {
-  border-color: rgba(201, 169, 98, 0.45) !important;
+  border-color: rgba(28, 105, 212, 0.45) !important;
   background: rgba(255, 255, 255, 0.06) !important;
-  color: #c9a962 !important;
+  color: #4a9fff !important;
 }
 
 html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-nav-dropdown {
   background: linear-gradient(180deg, #12141a 0%, #0d0f14 100%) !important;
-  border: 1px solid rgba(201, 169, 98, 0.38) !important;
+  border: 1px solid rgba(28, 105, 212, 0.36) !important;
   color: rgba(232, 234, 239, 0.95) !important;
 }
 
 html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-nav-dropdown::before {
   background: #12141a !important;
-  border-color: rgba(201, 169, 98, 0.4) !important;
-}
-
-html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-nav-dropdown .cabinet-nav-active {
-  background: rgba(201, 169, 98, 0.12) !important;
-  border-color: rgba(201, 169, 98, 0.5) !important;
-  color: #f5f0e6 !important;
+  border-color: rgba(28, 105, 212, 0.38) !important;
 }
 
 html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-overlay {
@@ -302,10 +311,10 @@ html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competitio
   background: linear-gradient(145deg, #1c1e26 0%, #0f1014 45%, #16181f 100%) !important;
   background-image: linear-gradient(145deg, #1c1e26 0%, #0f1014 45%, #16181f 100%) !important;
   box-shadow:
-    inset 0 0 0 1px rgba(201, 169, 98, 0.35),
+    inset 0 0 0 1px rgba(28, 105, 212, 0.35),
     inset 0 2px 0 0 #1c69d4,
     inset 0 4px 0 0 #e5252a,
-    inset 0 6px 0 0 rgba(201, 169, 98, 0.85) !important;
+    inset 0 6px 0 0 rgba(200, 206, 216, 0.45) !important;
 }
 
 html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competition"] .premium-card-brand,
@@ -317,14 +326,14 @@ html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competitio
 }
 
 html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-btn-gold {
-  background: linear-gradient(180deg, #e0cc8a 0%, #c9a962 38%, #a6843a 100%) !important;
-  color: #0a0a0c !important;
+  background: linear-gradient(180deg, #3d8ef0 0%, #1c69d4 42%, #155aad 100%) !important;
+  color: #f8fafc !important;
   border: 1px solid rgba(255, 255, 255, 0.22) !important;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
     0 2px 0 rgba(0, 0, 0, 0.35),
-    0 6px 20px rgba(201, 169, 98, 0.35),
-    0 0 0 1px rgba(201, 169, 98, 0.4) !important;
+    0 6px 22px rgba(28, 105, 212, 0.45),
+    0 0 0 1px rgba(229, 37, 42, 0.22) !important;
   font-weight: 650 !important;
   letter-spacing: 0.06em !important;
   text-transform: uppercase !important;
@@ -338,13 +347,13 @@ html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competitio
 html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-btn-gold:hover:not(:disabled) {
   transform: translateY(-2px) !important;
   filter: brightness(1.06) !important;
-  animation: m5-gold-glow-pulse 2.8s ease-in-out infinite !important;
+  animation: m5-primary-glow-pulse 2.8s ease-in-out infinite !important;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
     0 3px 0 rgba(0, 0, 0, 0.25),
-    0 10px 28px rgba(201, 169, 98, 0.45),
-    0 0 0 1px rgba(28, 105, 212, 0.25),
-    0 0 40px rgba(28, 105, 212, 0.15) !important;
+    0 10px 28px rgba(28, 105, 212, 0.5),
+    0 0 0 1px rgba(229, 37, 42, 0.35),
+    0 0 40px rgba(28, 105, 212, 0.2) !important;
 }
 
 html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-btn-gold:active:not(:disabled) {
@@ -356,13 +365,14 @@ html:not([data-theme="dark"])
   .cabinet-premium[data-cabinet-theme="m5-competition"]
   #main-content
   :is(button, a)[class*="bg-[var(--color-brand-gold)]"] {
-  background: linear-gradient(180deg, #e0cc8a 0%, #c9a962 40%, #9a7d42 100%) !important;
-  color: #0a0a0c !important;
+  background: linear-gradient(180deg, #3d8ef0 0%, #1c69d4 45%, #155aad 100%) !important;
+  color: #f8fafc !important;
   border: 1px solid rgba(255, 255, 255, 0.2) !important;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
     0 2px 0 rgba(0, 0, 0, 0.3),
-    0 6px 18px rgba(201, 169, 98, 0.32) !important;
+    0 6px 20px rgba(28, 105, 212, 0.38),
+    0 0 0 1px rgba(229, 37, 42, 0.18) !important;
   font-weight: 650 !important;
   letter-spacing: 0.05em !important;
   text-transform: uppercase !important;
@@ -379,9 +389,9 @@ html:not([data-theme="dark"])
   transform: translateY(-2px) !important;
   filter: brightness(1.05) !important;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.4),
-    0 8px 24px rgba(201, 169, 98, 0.42),
-    0 0 28px rgba(28, 105, 212, 0.12) !important;
+    inset 0 1px 0 rgba(255, 255, 255, 0.38),
+    0 8px 26px rgba(28, 105, 212, 0.48),
+    0 0 28px rgba(229, 37, 42, 0.12) !important;
 }
 
 html:not([data-theme="dark"])
@@ -400,7 +410,7 @@ html:not([data-theme="dark"])
   .cabinet-premium[data-cabinet-theme="m5-competition"]
   #main-content
   button[class*="border-[var(--color-brand-gold)]"][class*="text-[var(--color-text)]"] {
-  border-color: rgba(201, 169, 98, 0.5) !important;
+  border-color: rgba(28, 105, 212, 0.55) !important;
   color: #e8eaef !important;
   background: rgba(0, 0, 0, 0.25) !important;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
@@ -421,22 +431,22 @@ html:not([data-theme="dark"])
   .cabinet-premium[data-cabinet-theme="m5-competition"]
   #main-content
   button[class*="border-[var(--color-brand-gold)]"][class*="text-[var(--color-text)]"]:hover:not(:disabled) {
-  border-color: rgba(201, 169, 98, 0.85) !important;
-  background: rgba(201, 169, 98, 0.1) !important;
+  border-color: rgba(229, 37, 42, 0.45) !important;
+  background: rgba(28, 105, 212, 0.12) !important;
   box-shadow:
-    0 0 20px rgba(201, 169, 98, 0.15),
-    inset 0 0 0 1px rgba(28, 105, 212, 0.12) !important;
-  color: #f5f0e6 !important;
+    0 0 20px rgba(28, 105, 212, 0.2),
+    inset 0 0 0 1px rgba(229, 37, 42, 0.15) !important;
+  color: #f5f8fc !important;
 }
 
-/* «Обводка + золотой текст» (цель, верификация) */
+/* Контурные кнопки с акцентом primary */
 html:not([data-theme="dark"])
   .cabinet-premium[data-cabinet-theme="m5-competition"]
   #main-content
   :is(button, a)[class*="text-[var(--color-brand-gold)]"][class*="border"] {
-  color: #dfc78a !important;
-  text-shadow: 0 0 16px rgba(201, 169, 98, 0.25) !important;
-  border-color: rgba(201, 169, 98, 0.55) !important;
+  color: #8ec5ff !important;
+  text-shadow: 0 0 16px rgba(28, 105, 212, 0.25) !important;
+  border-color: rgba(28, 105, 212, 0.55) !important;
   letter-spacing: 0.05em !important;
   font-weight: 650 !important;
   transition:
@@ -449,9 +459,9 @@ html:not([data-theme="dark"])
   .cabinet-premium[data-cabinet-theme="m5-competition"]
   #main-content
   :is(button, a)[class*="text-[var(--color-brand-gold)]"][class*="border"]:hover:not(:disabled) {
-  background: rgba(201, 169, 98, 0.12) !important;
-  box-shadow: 0 0 24px rgba(201, 169, 98, 0.2) !important;
-  color: #f5edd8 !important;
+  background: rgba(28, 105, 212, 0.14) !important;
+  box-shadow: 0 0 24px rgba(28, 105, 212, 0.22) !important;
+  color: #cfe4ff !important;
 }
 
 /* Светлая заливка у кнопок копирования — под карбон */
@@ -465,7 +475,7 @@ html:not([data-theme="dark"])
   :is(button, a)[class*="border-[var(--color-brand-gold)]"][class*="--color-bg-sides"] {
   background: linear-gradient(180deg, #2a2d36 0%, #1a1c22 100%) !important;
   color: #e8eaef !important;
-  border-color: rgba(201, 169, 98, 0.45) !important;
+  border-color: rgba(28, 105, 212, 0.45) !important;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.06),
     0 4px 14px rgba(0, 0, 0, 0.35) !important;
@@ -481,9 +491,9 @@ html:not([data-theme="dark"])
   .cabinet-premium[data-cabinet-theme="m5-competition"]
   #main-content
   :is(button, a)[class*="border-[var(--color-brand-gold)]"][class*="bg-white"]:hover:not(:disabled) {
-  border-color: rgba(201, 169, 98, 0.75) !important;
+  border-color: rgba(229, 37, 42, 0.4) !important;
   box-shadow:
-    0 0 22px rgba(201, 169, 98, 0.2),
+    0 0 22px rgba(28, 105, 212, 0.25),
     inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
   transform: translateY(-1px) !important;
 }
@@ -505,8 +515,8 @@ html:not([data-theme="dark"])
   .cabinet-premium[data-cabinet-theme="m5-competition"]
   .cabinet-sidebar:not(.admin-sidebar)
   button[type="button"]:hover {
-  background: rgba(201, 169, 98, 0.08) !important;
-  box-shadow: 0 0 18px rgba(28, 105, 212, 0.1) !important;
+  background: rgba(28, 105, 212, 0.1) !important;
+  box-shadow: 0 0 18px rgba(28, 105, 212, 0.18) !important;
   color: #fff !important;
 }
 
@@ -518,7 +528,7 @@ html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competitio
 }
 
 html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-menu-btn:hover {
-  box-shadow: 0 0 24px rgba(201, 169, 98, 0.25) !important;
+  box-shadow: 0 0 24px rgba(28, 105, 212, 0.3) !important;
   transform: scale(1.02) !important;
 }
 
@@ -536,35 +546,28 @@ html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competitio
 html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-card:hover {
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.06),
-    0 0 0 1px rgba(201, 169, 98, 0.25),
+    0 0 0 1px rgba(28, 105, 212, 0.35),
     0 12px 36px rgba(0, 0, 0, 0.35),
-    0 0 40px rgba(201, 169, 98, 0.06) !important;
-  border-color: rgba(201, 169, 98, 0.45) !important;
+    0 0 40px rgba(229, 37, 42, 0.06) !important;
+  border-color: rgba(28, 105, 212, 0.42) !important;
 }
 
 [data-theme="dark"] .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-sidebar:not(.admin-sidebar),
 [data-theme="dark"] .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-main-block:not(.admin-main-block) {
-  border-color: rgba(201, 169, 98, 0.35) !important;
+  border-color: rgba(28, 105, 212, 0.32) !important;
   box-shadow:
     0 0 0 1px rgba(0, 0, 0, 0.35),
     inset 0 3px 0 0 #1c69d4,
     inset 0 6px 0 0 #e5252a,
-    inset 0 9px 0 0 #c9a962 !important;
-}
-
-[data-theme="dark"] .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-nav-active,
-[data-theme="dark"] .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-nav-dropdown .cabinet-nav-active {
-  border-color: rgba(201, 169, 98, 0.45) !important;
-  background: rgba(201, 169, 98, 0.1) !important;
-  color: #f5f0e6 !important;
+    inset 0 9px 0 0 rgba(200, 206, 216, 0.35) !important;
 }
 
 [data-theme="dark"] .cabinet-premium[data-cabinet-theme="m5-competition"] .premium-card-front {
   box-shadow:
-    inset 0 0 0 1px rgba(201, 169, 98, 0.35),
+    inset 0 0 0 1px rgba(28, 105, 212, 0.35),
     inset 0 2px 0 0 #1c69d4,
     inset 0 4px 0 0 #e5252a,
-    inset 0 6px 0 0 rgba(201, 169, 98, 0.85) !important;
+    inset 0 6px 0 0 rgba(200, 206, 216, 0.45) !important;
 }
 
 [data-theme="dark"] .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-btn-gold,
@@ -572,12 +575,13 @@ html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competitio
   .cabinet-premium[data-cabinet-theme="m5-competition"]
   #main-content
   :is(button, a)[class*="bg-[var(--color-brand-gold)]"] {
-  background: linear-gradient(180deg, #e0cc8a 0%, #c9a962 40%, #9a7d42 100%) !important;
-  color: #0a0a0c !important;
+  background: linear-gradient(180deg, #3d8ef0 0%, #1c69d4 45%, #155aad 100%) !important;
+  color: #f8fafc !important;
   border: 1px solid rgba(255, 255, 255, 0.2) !important;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.28),
-    0 4px 18px rgba(201, 169, 98, 0.3) !important;
+    0 4px 20px rgba(28, 105, 212, 0.38),
+    0 0 0 1px rgba(229, 37, 42, 0.18) !important;
   font-weight: 650 !important;
   letter-spacing: 0.05em !important;
   text-transform: uppercase !important;
@@ -596,8 +600,8 @@ html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competitio
   filter: brightness(1.06) !important;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.38),
-    0 8px 26px rgba(201, 169, 98, 0.4),
-    0 0 28px rgba(28, 105, 212, 0.12) !important;
+    0 8px 28px rgba(28, 105, 212, 0.48),
+    0 0 28px rgba(229, 37, 42, 0.12) !important;
 }
 
 [data-theme="dark"] .cabinet-premium[data-cabinet-theme="m5-competition"] .premium-card-shine {
@@ -612,10 +616,10 @@ html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competitio
 
 [data-theme="dark"] .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-card:hover {
   box-shadow:
-    0 0 0 1px rgba(201, 169, 98, 0.2),
+    0 0 0 1px rgba(28, 105, 212, 0.28),
     0 10px 32px rgba(0, 0, 0, 0.4),
-    0 0 36px rgba(201, 169, 98, 0.08) !important;
-  border-color: rgba(201, 169, 98, 0.4) !important;
+    0 0 36px rgba(229, 37, 42, 0.08) !important;
+  border-color: rgba(28, 105, 212, 0.38) !important;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -3571,8 +3575,9 @@ button {
 }
 
 [data-theme="dark"] .cabinet-premium[data-cabinet-theme="m5-competition"] {
-  --color-brand-gold: #c9a962;
-  --cabinet-accent-gold: #c9a962;
+  --color-brand-gold: #1c69d4;
+  --color-accent-gold: #4a9fff;
+  --cabinet-accent-gold: #1c69d4;
   --cabinet-accent-emerald: #059669;
   --cabinet-accent-red: #dc2626;
   --color-bg: #08090b;
@@ -3588,7 +3593,7 @@ button {
 
 [data-theme="dark"] .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-sidebar:not(.admin-sidebar) {
   background: linear-gradient(180deg, #12141a 0%, #0d0f14 100%) !important;
-  border: 1px solid rgba(201, 169, 98, 0.35) !important;
+  border: 1px solid rgba(28, 105, 212, 0.36) !important;
   box-shadow:
     0 0 0 1px rgba(0, 0, 0, 0.5),
     0 8px 32px rgba(0, 0, 0, 0.45),
@@ -3603,19 +3608,19 @@ button {
 
 [data-theme="dark"] .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-sidebar-profile {
   background: rgba(255, 255, 255, 0.04) !important;
-  border-color: rgba(201, 169, 98, 0.45) !important;
+  border-color: rgba(28, 105, 212, 0.4) !important;
   color: rgba(232, 234, 239, 0.98) !important;
 }
 
 [data-theme="dark"] .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-sidebar-avatar {
-  background: linear-gradient(145deg, #d4b876 0%, #c9a962 40%, #8a7344 100%) !important;
-  border-color: rgba(201, 169, 98, 0.6) !important;
-  color: #0a0a0c !important;
+  background: linear-gradient(145deg, #3d8ef0 0%, #1c69d4 45%, #1356a8 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  color: #fff !important;
 }
 
 [data-theme="dark"] .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-nav-block nav {
   background: rgba(0, 0, 0, 0.28) !important;
-  border-color: rgba(201, 169, 98, 0.35) !important;
+  border-color: rgba(28, 105, 212, 0.32) !important;
 }
 
 [data-theme="dark"] .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-nav-label {
@@ -3630,18 +3635,18 @@ button {
       transparent 0%,
       rgba(28, 105, 212, 0.04) 22%,
       transparent 45%,
-      rgba(201, 169, 98, 0.05) 72%,
+      rgba(229, 37, 42, 0.06) 72%,
       transparent 100%
     ) !important;
   background-size: 100% 100%, 160% 160% !important;
   background-position: 0 0, 62% 42% !important;
-  border: 1px solid rgba(201, 169, 98, 0.28) !important;
+  border: 1px solid rgba(28, 105, 212, 0.28) !important;
   box-shadow:
     0 0 0 1px rgba(0, 0, 0, 0.4),
     0 12px 40px rgba(0, 0, 0, 0.35),
     inset 0 3px 0 0 #1c69d4,
     inset 0 6px 0 0 #e5252a,
-    inset 0 9px 0 0 #c9a962 !important;
+    inset 0 9px 0 0 rgba(200, 206, 216, 0.35) !important;
 }
 
 [data-theme="dark"] .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-main-block #main-content {
@@ -3651,7 +3656,7 @@ button {
 [data-theme="dark"] .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-card,
 [data-theme="dark"] .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-section-header {
   background: rgba(28, 31, 40, 0.92) !important;
-  border: 1px solid rgba(201, 169, 98, 0.28) !important;
+  border: 1px solid rgba(28, 105, 212, 0.26) !important;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.04),
     0 2px 14px rgba(0, 0, 0, 0.35) !important;
@@ -3660,17 +3665,17 @@ button {
 [data-theme="dark"] .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-block-inner,
 [data-theme="dark"] .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-limits-block {
   background: rgba(0, 0, 0, 0.22) !important;
-  border-color: rgba(201, 169, 98, 0.3) !important;
+  border-color: rgba(28, 105, 212, 0.28) !important;
 }
 
 [data-theme="dark"] .cabinet-premium[data-cabinet-theme="m5-competition"] .premium-card-front {
   background: linear-gradient(145deg, #1c1e26 0%, #0f1014 45%, #16181f 100%) !important;
   background-image: linear-gradient(145deg, #1c1e26 0%, #0f1014 45%, #16181f 100%) !important;
   box-shadow:
-    inset 0 0 0 1px rgba(201, 169, 98, 0.35),
+    inset 0 0 0 1px rgba(28, 105, 212, 0.35),
     inset 0 2px 0 0 #1c69d4,
     inset 0 4px 0 0 #e5252a,
-    inset 0 6px 0 0 rgba(201, 169, 98, 0.85) !important;
+    inset 0 6px 0 0 rgba(200, 206, 216, 0.45) !important;
 }
 
 [data-theme="dark"] .cabinet-premium[data-cabinet-theme="m5-competition"] .premium-card-brand,
@@ -3684,7 +3689,7 @@ button {
 
 [data-theme="dark"] .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-nav-dropdown {
   background: linear-gradient(180deg, #12141a 0%, #0d0f14 100%) !important;
-  border: 1px solid rgba(201, 169, 98, 0.38) !important;
+  border: 1px solid rgba(28, 105, 212, 0.34) !important;
   color: rgba(232, 234, 239, 0.95) !important;
 }
 
@@ -3693,16 +3698,18 @@ button {
 }
 
 [data-theme="dark"] .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-menu-btn {
-  border-color: rgba(201, 169, 98, 0.45) !important;
+  border-color: rgba(28, 105, 212, 0.45) !important;
   background: rgba(255, 255, 255, 0.06) !important;
-  color: #c9a962 !important;
+  color: #4a9fff !important;
 }
 
-/* Запасное перекрытие: navy из Tailwind у активного пункта (если классы разъедутся) */
-html .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-sidebar a.cabinet-nav-active,
-html .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-nav-dropdown a.cabinet-nav-active {
-  background-color: rgba(201, 169, 98, 0.14) !important;
-  border-color: rgba(201, 169, 98, 0.48) !important;
-  color: #f5f0e6 !important;
-  box-shadow: inset 0 0 0 1px rgba(28, 105, 212, 0.12) !important;
+/* Запасное перекрытие активного пункта M5 (градиентная обводка) */
+html .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-sidebar a.cabinet-nav-active-m5,
+html .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-nav-dropdown a.cabinet-nav-active-m5 {
+  background:
+    linear-gradient(180deg, rgba(28, 105, 212, 0.2), rgba(10, 12, 16, 0.72)) padding-box,
+    linear-gradient(135deg, #e5252a 0%, #9a1a1e 28%, #1c69d4 72%, #4a9fff 100%) border-box !important;
+  border: 1.5px solid transparent !important;
+  color: #f2f5fa !important;
+  box-shadow: 0 0 26px rgba(28, 105, 212, 0.18) !important;
 }

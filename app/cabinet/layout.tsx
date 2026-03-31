@@ -19,7 +19,7 @@ import {
 import { getAccessToken, fetchWithAuth, clearAccessToken } from "@/lib/auth-client";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
-import { isCabinetM5CompetitionTheme } from "@/config/cabinet-theme-logins";
+import { isCabinetM5CompetitionTheme, m5SplitDisplayName } from "@/config/cabinet-theme-logins";
 const NAV = [
   { label: "Дашборд", href: "/cabinet", icon: LayoutDashboard },
   { label: "Операции", href: "/cabinet/transactions", icon: List },
@@ -179,6 +179,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
   }
 
   const displayName = user?.fullName?.trim() || "Пользователь";
+  const m5Name = isM5Cabinet ? m5SplitDisplayName(displayName) : null;
   const initials = displayName
     .split(/\s+/)
     .map((s) => s[0])
@@ -220,7 +221,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
     !isM5Cabinet && sidebarBg ? { backgroundColor: sidebarBg } : {};
 
   const navActiveClasses = isM5Cabinet
-    ? "cabinet-nav-active border border-[var(--color-brand-gold)]/45 bg-[var(--color-brand-gold)]/14 text-[var(--color-text)] font-semibold shadow-[inset_0_0_0_1px_rgba(28,105,212,0.12)]"
+    ? "cabinet-nav-active cabinet-nav-active-m5 font-semibold text-[var(--color-text)]"
     : "cabinet-nav-active border border-[#0a192f]/25 bg-[#0a192f]/10 text-[#0a192f] font-semibold";
 
   return (
@@ -267,14 +268,26 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
               />
             ) : (
               <div
-                className={`cabinet-sidebar-avatar flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[var(--color-brand-gold)] font-semibold text-base ${isM5Cabinet ? "text-[#0a0a0c]" : "text-[#0a192f]"}`}
+                className={`cabinet-sidebar-avatar flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[var(--color-brand-gold)] font-semibold text-base ${isM5Cabinet ? "text-white" : "text-[#0a192f]"}`}
               >
                 {initials}
               </div>
             )}
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-1.5">
-                <span className="truncate font-semibold text-[var(--color-text)]" style={brandFont ? { color: brandFont } : undefined}>{displayName}</span>
+                {m5Name ? (
+                  m5Name.rest != null ? (
+                    <span className="truncate font-semibold">
+                      <span className="text-[#8ec5ff]">{m5Name.first}</span>
+                      <span className="text-[var(--color-text)]"> </span>
+                      <span className="text-[#e5252a]">{m5Name.rest}</span>
+                    </span>
+                  ) : (
+                    <span className="truncate font-semibold text-[#8ec5ff]">{m5Name.first}</span>
+                  )
+                ) : (
+                  <span className="truncate font-semibold text-[var(--color-text)]" style={brandFont ? { color: brandFont } : undefined}>{displayName}</span>
+                )}
                 {user?.verificationStatus === "VERIFIED" && (
                   <BadgeCheck
                     className={`h-5 w-5 shrink-0 ${isM5Cabinet ? "text-[#1c69d4]" : "text-blue-500"}`}
@@ -380,14 +393,25 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
                         <img src={user.employeePhotoUrl} alt="" className="h-9 w-9 shrink-0 rounded-full object-cover bg-[var(--color-brand-gold)]" />
                       ) : (
                         <div
-                          className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--color-brand-gold)] font-semibold text-xs ${isM5Cabinet ? "text-[#0a0a0c]" : "text-[#0a192f]"}`}
+                          className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--color-brand-gold)] font-semibold text-xs ${isM5Cabinet ? "text-white" : "text-[#0a192f]"}`}
                         >
                           {initials}
                         </div>
                       )}
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-1">
-                          <span className="truncate font-semibold text-[var(--color-text)] text-sm" style={brandFont ? { color: brandFont } : undefined}>{displayName}</span>
+                          {m5Name ? (
+                            m5Name.rest != null ? (
+                              <span className="truncate font-semibold text-sm">
+                                <span className="text-[#8ec5ff]">{m5Name.first}</span>{" "}
+                                <span className="text-[#e5252a]">{m5Name.rest}</span>
+                              </span>
+                            ) : (
+                              <span className="truncate font-semibold text-sm text-[#8ec5ff]">{m5Name.first}</span>
+                            )
+                          ) : (
+                            <span className="truncate font-semibold text-[var(--color-text)] text-sm" style={brandFont ? { color: brandFont } : undefined}>{displayName}</span>
+                          )}
                           {user?.verificationStatus === "VERIFIED" && (
                             <BadgeCheck
                               className={`h-4 w-4 shrink-0 ${isM5Cabinet ? "text-[#1c69d4]" : "text-blue-500"}`}

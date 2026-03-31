@@ -7,6 +7,7 @@ import { Link2, List, Key, Copy, RotateCw, Settings, ExternalLink, ShieldCheck, 
 import { PremiumCard } from "./PremiumCard";
 import { formatMoney } from "@/lib/utils";
 import { getBaseUrl } from "@/lib/get-base-url";
+import { isCabinetM5CompetitionTheme, m5SplitDisplayName } from "@/config/cabinet-theme-logins";
 import { CabinetSkeleton } from "@/components/CabinetSkeleton";
 import { Stats } from "./shared";
 
@@ -26,6 +27,7 @@ export default function CabinetDashboardPage() {
   const [apiKeyLoading, setApiKeyLoading] = useState(false);
   const [apiKeyCopied, setApiKeyCopied] = useState(false);
   const [fullName, setFullName] = useState<string | null>(null);
+  const [login, setLogin] = useState<string | null>(null);
   const [uniqueId, setUniqueId] = useState<string | null>(null);
   const [payoutLimits, setPayoutLimits] = useState<{
     dailyLimitCount: number;
@@ -75,6 +77,7 @@ export default function CabinetDashboardPage() {
         return;
       }
       const profile = (await profileRes.json()) as {
+        login?: string;
         stats?: Stats;
         hasApiKey?: boolean;
         fullName?: string | null;
@@ -88,6 +91,7 @@ export default function CabinetDashboardPage() {
       setStats(profile.stats ?? null);
       setHasApiKey(profile.hasApiKey ?? false);
       setApiKey(null);
+      setLogin(profile.login ?? null);
       setFullName(profile.fullName ?? null);
       setUniqueId(profile.uniqueId ?? null);
       setSavingFor(profile.savingFor ?? null);
@@ -210,6 +214,10 @@ export default function CabinetDashboardPage() {
     );
   }
 
+  const isM5Cabinet = isCabinetM5CompetitionTheme(login);
+  const dashName = fullName?.trim() || "Официант";
+  const m5DashName = isM5Cabinet ? m5SplitDisplayName(dashName) : null;
+
   return (
     <div className="space-y-8">
       <div className="grid gap-6 lg:grid-cols-2">
@@ -217,8 +225,19 @@ export default function CabinetDashboardPage() {
           <div className="p-6">
             <div className="flex flex-col items-center">
               <div className="w-full max-w-[320px] flex flex-col items-center">
-                <p className="w-full text-center text-lg font-semibold text-white mb-3">
-                  {fullName?.trim() || "Официант"}
+                <p className="cabinet-dashboard-display-name w-full text-center text-lg font-semibold mb-3">
+                  {m5DashName ? (
+                    m5DashName.rest != null ? (
+                      <>
+                        <span className="text-[#8ec5ff]">{m5DashName.first}</span>{" "}
+                        <span className="text-[#e5252a]">{m5DashName.rest}</span>
+                      </>
+                    ) : (
+                      <span className="text-[#8ec5ff]">{m5DashName.first}</span>
+                    )
+                  ) : (
+                    <span className="text-white">{dashName}</span>
+                  )}
                 </p>
                 <div className="w-full overflow-hidden">
                   <PremiumCard fullName={fullName} uniqueId={uniqueId} balanceKop={stats?.balanceKop ?? undefined} compact />
@@ -388,7 +407,7 @@ export default function CabinetDashboardPage() {
                   href={href}
                   className="cabinet-block-inner flex flex-col items-center rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 p-6 transition-all hover:bg-[var(--color-accent-gold)]/15 hover:-translate-y-1 shadow-[var(--shadow-subtle)]"
                 >
-                  <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-[var(--color-brand-gold)] text-[#0a192f]">
+                  <div className="cabinet-quick-action-icon mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-[var(--color-brand-gold)] text-[#0a192f]">
                     <Icon className="h-5 w-5" />
                   </div>
                   <div className="font-semibold text-[var(--color-text)] text-center">{title}</div>

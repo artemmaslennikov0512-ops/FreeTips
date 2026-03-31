@@ -10,6 +10,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import QRCode from "qrcode";
 import { getBaseUrl } from "@/lib/get-base-url";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
+import { isPayPageM5ShellSlug } from "@/config/pay-branding-overrides";
 
 const PRESETS = [50, 100, 200, 500] as const;
 
@@ -378,7 +379,10 @@ export default function PayPageClient() {
   if (fontClr) cardStyle["--pay-font" as string] = fontClr;
 
   return (
-    <div className="pay-page pay-page--cards flex min-h-screen w-full flex-col justify-center px-4 py-8" style={wrapperStyle}>
+    <div
+      className={`pay-page pay-page--cards flex min-h-screen w-full flex-col justify-center px-4 py-8${isPayPageM5ShellSlug(slug) ? " pay-page--m5-competition" : ""}`}
+      style={wrapperStyle}
+    >
       <div className="mx-auto w-full max-w-md">
         {/* Основной блок со скруглёнными краями и отступами — внутри все карточки */}
         <div

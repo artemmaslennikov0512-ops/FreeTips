@@ -19,6 +19,7 @@ import {
 import { getAccessToken, fetchWithAuth, clearAccessToken } from "@/lib/auth-client";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
+import { isCabinetM5CompetitionTheme } from "@/config/cabinet-theme-logins";
 const NAV = [
   { label: "Дашборд", href: "/cabinet", icon: LayoutDashboard },
   { label: "Операции", href: "/cabinet/transactions", icon: List },
@@ -34,6 +35,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
   const [mounted, setMounted] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [user, setUser] = useState<{
+    login?: string;
     role?: string;
     fullName?: string | null;
     verificationStatus?: string;
@@ -67,14 +69,25 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
   const brandFont = hex(brand?.fontColor ?? null);
   const brandBorder = hex(brand?.borderColor ?? null);
 
+  const hasBrand =
+    !!brandPrimary || !!brandSecondary || !!brandMainBg || !!brandBlocksBg || !!brandFont || !!brandBorder;
+  const isM5Cabinet = isCabinetM5CompetitionTheme(user?.login);
+  const applyEstablishmentBrand = hasBrand && !isM5Cabinet;
+
   useEffect(() => {
-    if (brandMainBg) {
+    if (isM5Cabinet) {
+      document.body.style.backgroundColor = "#08090b";
+      return () => {
+        document.body.style.backgroundColor = "";
+      };
+    }
+    if (brandMainBg && applyEstablishmentBrand) {
       document.body.style.backgroundColor = brandMainBg;
       return () => {
         document.body.style.backgroundColor = "";
       };
     }
-  }, [brandMainBg]);
+  }, [isM5Cabinet, brandMainBg, applyEstablishmentBrand]);
 
   useEffect(() => {
     if (!mounted || typeof window === "undefined") return;
@@ -101,6 +114,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
           return;
         }
         if (data) setUser({
+          login: data.login,
           role: data.role,
           fullName: data.fullName,
           verificationStatus: data.verificationStatus,
@@ -172,34 +186,44 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
     .toUpperCase()
     .slice(0, 2);
 
-  const hasBrand =
-    !!brandPrimary || !!brandSecondary || !!brandMainBg || !!brandBlocksBg || !!brandFont || !!brandBorder;
   const brandStyle: React.CSSProperties & Record<string, string> = {};
-  if (brandPrimary) brandStyle["--color-brand-gold"] = brandPrimary;
-  if (brandMainBg) brandStyle.backgroundColor = brandMainBg;
-  if (brandFont) {
-    brandStyle.color = brandFont;
-    brandStyle["--color-text"] = brandFont;
-    brandStyle["--color-text-secondary"] = brandFont + "e6";
-    brandStyle["--color-muted"] = brandFont + "99";
+  if (applyEstablishmentBrand) {
+    if (brandPrimary) brandStyle["--color-brand-gold"] = brandPrimary;
+    if (brandMainBg) brandStyle.backgroundColor = brandMainBg;
+    if (brandFont) {
+      brandStyle.color = brandFont;
+      brandStyle["--color-text"] = brandFont;
+      brandStyle["--color-text-secondary"] = brandFont + "e6";
+      brandStyle["--color-muted"] = brandFont + "99";
+    }
+    if (brandBlocksBg) {
+      brandStyle["--color-bg-sides"] = brandBlocksBg;
+      brandStyle["--cabinet-block-bg"] = brandBlocksBg;
+    }
+    if (brandBorder) brandStyle["--cabinet-border-color"] = brandBorder;
   }
-  if (brandBlocksBg) {
-    brandStyle["--color-bg-sides"] = brandBlocksBg;
-    brandStyle["--cabinet-block-bg"] = brandBlocksBg;
-  }
-  if (brandBorder) brandStyle["--cabinet-border-color"] = brandBorder;
-  const sidebarBg = brandBlocksBg ?? brandSecondary;
-  const mainBlockBg = brandBlocksBg ?? brandSecondary;
-  const sidebarStyle: React.CSSProperties = { backgroundColor: sidebarBg ?? "rgba(255,255,255,0.06)" };
-  if (brandBorder) sidebarStyle.borderColor = brandBorder;
-  const mainBlockStyle: React.CSSProperties = { backgroundColor: mainBlockBg ?? "rgba(255,255,255,0.06)" };
-  if (brandBorder) mainBlockStyle.borderColor = brandBorder;
-  const profileBlockStyle: React.CSSProperties = sidebarBg ? { backgroundColor: sidebarBg } : {};
+  const sidebarBg = applyEstablishmentBrand ? (brandBlocksBg ?? brandSecondary) : undefined;
+  const mainBlockBg = applyEstablishmentBrand ? (brandBlocksBg ?? brandSecondary) : undefined;
+  const sidebarStyle: React.CSSProperties = isM5Cabinet
+    ? {}
+    : {
+        backgroundColor: sidebarBg ?? "rgba(255,255,255,0.06)",
+        ...(brandBorder && applyEstablishmentBrand ? { borderColor: brandBorder } : {}),
+      };
+  const mainBlockStyle: React.CSSProperties = isM5Cabinet
+    ? {}
+    : {
+        backgroundColor: mainBlockBg ?? "rgba(255,255,255,0.06)",
+        ...(brandBorder && applyEstablishmentBrand ? { borderColor: brandBorder } : {}),
+      };
+  const profileBlockStyle: React.CSSProperties =
+    !isM5Cabinet && sidebarBg ? { backgroundColor: sidebarBg } : {};
 
   return (
     <div
       className="cabinet-premium flex min-h-screen w-full max-w-full overflow-x-hidden bg-[var(--color-bg)] font-[family:var(--font-inter)] text-[var(--color-text)] pt-2"
-      data-brand-active={hasBrand ? "true" : undefined}
+      data-brand-active={applyEstablishmentBrand ? "true" : undefined}
+      data-cabinet-theme={isM5Cabinet ? "m5-competition" : undefined}
       style={Object.keys(brandStyle).length ? brandStyle : undefined}
     >
       {/* Мобильная шторка — закрывает выпадающее меню при клике вне */}

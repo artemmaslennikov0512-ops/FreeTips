@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { CheckCircle2, Clock, XCircle, ChevronLeft, ChevronRight } from "lucide-react";
 import { formatMoney, formatDate } from "@/lib/utils";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
-import { feeKopForPayout } from "@/lib/payment/paygine-fee";
+import { FEE_PERCENT_PAYOUT_CARD, feeKopForPayout } from "@/lib/payment/paygine-fee";
 import { Stats } from "../shared";
 import { PremiumCard } from "../PremiumCard";
 
@@ -309,7 +309,7 @@ export default function CabinetTransactionsPage() {
                         <span className="font-medium">{hasValidAmount ? formatMoney(BigInt(amountKop)) : "—"}</span>
                       </div>
                       <div className="mt-2 flex justify-between text-[var(--color-text)]">
-                        <span>Комиссия (1,2%):</span>
+                        <span>Комиссия ({FEE_PERCENT_PAYOUT_CARD.toLocaleString("ru-RU")}%):</span>
                         <span className="font-medium">{hasValidAmount ? formatMoney(BigInt(feeKop)) : "—"}</span>
                       </div>
                       <div className="mt-2 flex justify-between font-medium text-[var(--color-text)]">

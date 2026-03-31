@@ -21,6 +21,8 @@ import {
 import { parseJsonWithLimit, MAX_BODY_SIZE_DEFAULT, jsonError, internalError, rateLimit429Response } from "@/lib/api/helpers";
 import { verifyCsrfFromRequest } from "@/lib/security/csrf";
 import { site } from "@/config/site";
+import { PAY_PAGE_BRANDING_OVERRIDES } from "@/config/pay-branding-overrides";
+import { mergePayPageBranding } from "@/lib/pay-branding-merge";
 
 const DEMO_SLUG = "demoPaySlug" in site && typeof site.demoPaySlug === "string" ? site.demoPaySlug : null;
 
@@ -80,21 +82,21 @@ export async function GET(request: NextRequest, { params }: Params) {
       : "";
   const displayName = firstNameFromFullName || employeeName || login || "";
   const recipientName = displayName ? `Официант, ${displayName}` : "Официант";
-  const branding =
-    tipLink.employee?.establishment
-      ? {
-          logoUrl: tipLink.employee.establishment.logoUrl ?? undefined,
-          logoOpacityPercent: tipLink.employee.establishment.logoOpacityPercent ?? undefined,
-          primaryColor: tipLink.employee.establishment.primaryColor ?? undefined,
-          secondaryColor: tipLink.employee.establishment.secondaryColor ?? undefined,
-          mainBackgroundColor: tipLink.employee.establishment.mainBackgroundColor ?? undefined,
-          blocksBackgroundColor: tipLink.employee.establishment.blocksBackgroundColor ?? undefined,
-          fontColor: tipLink.employee.establishment.fontColor ?? undefined,
-          borderColor: tipLink.employee.establishment.borderColor ?? undefined,
-          borderWidthPx: tipLink.employee.establishment.borderWidthPx ?? undefined,
-          borderOpacityPercent: tipLink.employee.establishment.borderOpacityPercent ?? undefined,
-        }
-      : undefined;
+  const brandingFromEstablishment = tipLink.employee?.establishment
+    ? {
+        logoUrl: tipLink.employee.establishment.logoUrl ?? undefined,
+        logoOpacityPercent: tipLink.employee.establishment.logoOpacityPercent ?? undefined,
+        primaryColor: tipLink.employee.establishment.primaryColor ?? undefined,
+        secondaryColor: tipLink.employee.establishment.secondaryColor ?? undefined,
+        mainBackgroundColor: tipLink.employee.establishment.mainBackgroundColor ?? undefined,
+        blocksBackgroundColor: tipLink.employee.establishment.blocksBackgroundColor ?? undefined,
+        fontColor: tipLink.employee.establishment.fontColor ?? undefined,
+        borderColor: tipLink.employee.establishment.borderColor ?? undefined,
+        borderWidthPx: tipLink.employee.establishment.borderWidthPx ?? undefined,
+        borderOpacityPercent: tipLink.employee.establishment.borderOpacityPercent ?? undefined,
+      }
+    : undefined;
+  const branding = mergePayPageBranding(brandingFromEstablishment, PAY_PAGE_BRANDING_OVERRIDES[slug]);
   const savingFor = tipLink.user.savingFor?.trim() || undefined;
   const baseUrl = getBaseUrlFromRequest(request);
   const recipientPhotoUrl =

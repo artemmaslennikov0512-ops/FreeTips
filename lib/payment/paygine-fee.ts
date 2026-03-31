@@ -5,13 +5,13 @@
  */
 
 /** Процент комиссии при выводе на карту (SDPayOut). С кубышки списывается amount + fee, на карту зачисляется amount. */
-export const FEE_PERCENT_PAYOUT_CARD = 1.2;
+export const FEE_PERCENT_PAYOUT_CARD = 1;
 
 /** Процент комиссии при приёме по QR (СБП). Взимается с плательщика дополнительно к amount; amount зачисляется на кубышку. */
 export const FEE_PERCENT_IN_QR_SBP = 2.5;
 
-/** Процент комиссии при приёме по номеру карты. Взимается с плательщика дополнительно к amount; amount зачисляется на кубышку. */
-export const FEE_PERCENT_IN_CARD = 4;
+/** Процент комиссии при приёме по карте (основной канал в проде). Взимается с плательщика дополнительно к amount; amount зачисляется на кубышку. */
+export const FEE_PERCENT_IN_CARD = 2.5;
 
 export function feeKopForPayout(amountKop: number): number {
   return Math.round((amountKop * FEE_PERCENT_PAYOUT_CARD) / 100);

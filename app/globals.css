@@ -3556,3 +3556,137 @@ button {
 @media print {
   * { background: transparent !important; color: black !important; box-shadow: none !important; }
 }
+
+/* =============================================================================
+   ЛК BMW M5 — при data-theme="dark" общие .cabinet-premium шли ниже и перебивали M5
+   (серый сайдбар, золотая карта, #161616 карточки). Этот блок в конце файла — полное
+   перекрытие только для [data-cabinet-theme="m5-competition"].
+   ============================================================================= */
+[data-theme="dark"] body.cabinet-page:has(.cabinet-premium[data-cabinet-theme="m5-competition"]) {
+  background: #08090b !important;
+}
+
+[data-theme="dark"] .cabinet-premium[data-cabinet-theme="m5-competition"] {
+  --color-brand-gold: #c9a962;
+  --cabinet-accent-gold: #c9a962;
+  --cabinet-accent-emerald: #059669;
+  --cabinet-accent-red: #dc2626;
+  --color-text: #e8eaef;
+  --color-text-secondary: #b8bcc6;
+  --color-muted: #7c8290;
+  --color-bg-sides: #1c1f28;
+  --color-on-dark: rgba(255, 255, 255, 0.95);
+  color: #e8eaef !important;
+}
+
+[data-theme="dark"] .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-sidebar:not(.admin-sidebar) {
+  background: linear-gradient(180deg, #12141a 0%, #0d0f14 100%) !important;
+  border: 1px solid rgba(201, 169, 98, 0.35) !important;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.5),
+    0 8px 32px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
+  color: rgba(232, 234, 239, 0.95) !important;
+}
+
+[data-theme="dark"] .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-sidebar:not(.admin-sidebar) a,
+[data-theme="dark"] .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-sidebar:not(.admin-sidebar) button {
+  color: rgba(232, 234, 239, 0.92) !important;
+}
+
+[data-theme="dark"] .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-sidebar-profile {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border-color: rgba(201, 169, 98, 0.45) !important;
+  color: rgba(232, 234, 239, 0.98) !important;
+}
+
+[data-theme="dark"] .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-sidebar-avatar {
+  background: linear-gradient(145deg, #d4b876 0%, #c9a962 40%, #8a7344 100%) !important;
+  border-color: rgba(201, 169, 98, 0.6) !important;
+  color: #0a0a0c !important;
+}
+
+[data-theme="dark"] .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-nav-block nav {
+  background: rgba(0, 0, 0, 0.28) !important;
+  border-color: rgba(201, 169, 98, 0.35) !important;
+}
+
+[data-theme="dark"] .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-nav-label {
+  color: rgba(184, 188, 198, 0.75) !important;
+}
+
+[data-theme="dark"] .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-main-block:not(.admin-main-block) {
+  background:
+    linear-gradient(165deg, #14161c 0%, #0e1014 55%, #12141a 100%),
+    linear-gradient(
+      118deg,
+      transparent 0%,
+      rgba(28, 105, 212, 0.04) 22%,
+      transparent 45%,
+      rgba(201, 169, 98, 0.05) 72%,
+      transparent 100%
+    ) !important;
+  background-size: 100% 100%, 160% 160% !important;
+  background-position: 0 0, 62% 42% !important;
+  border: 1px solid rgba(201, 169, 98, 0.28) !important;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.4),
+    0 12px 40px rgba(0, 0, 0, 0.35),
+    inset 0 3px 0 0 #1c69d4,
+    inset 0 6px 0 0 #e5252a,
+    inset 0 9px 0 0 #c9a962 !important;
+}
+
+[data-theme="dark"] .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-main-block #main-content {
+  color: #e8eaef !important;
+}
+
+[data-theme="dark"] .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-card,
+[data-theme="dark"] .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-section-header {
+  background: rgba(28, 31, 40, 0.92) !important;
+  border: 1px solid rgba(201, 169, 98, 0.28) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 2px 14px rgba(0, 0, 0, 0.35) !important;
+}
+
+[data-theme="dark"] .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-block-inner,
+[data-theme="dark"] .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-limits-block {
+  background: rgba(0, 0, 0, 0.22) !important;
+  border-color: rgba(201, 169, 98, 0.3) !important;
+}
+
+[data-theme="dark"] .cabinet-premium[data-cabinet-theme="m5-competition"] .premium-card-front {
+  background: linear-gradient(145deg, #1c1e26 0%, #0f1014 45%, #16181f 100%) !important;
+  background-image: linear-gradient(145deg, #1c1e26 0%, #0f1014 45%, #16181f 100%) !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(201, 169, 98, 0.35),
+    inset 0 2px 0 0 #1c69d4,
+    inset 0 4px 0 0 #e5252a,
+    inset 0 6px 0 0 rgba(201, 169, 98, 0.85) !important;
+}
+
+[data-theme="dark"] .cabinet-premium[data-cabinet-theme="m5-competition"] .premium-card-brand,
+[data-theme="dark"] .cabinet-premium[data-cabinet-theme="m5-competition"] .premium-card-balance-text,
+[data-theme="dark"] .cabinet-premium[data-cabinet-theme="m5-competition"] .premium-card-face.premium-card-front p,
+[data-theme="dark"] .cabinet-premium[data-cabinet-theme="m5-competition"] .premium-card-balance-block,
+[data-theme="dark"] .cabinet-premium[data-cabinet-theme="m5-competition"] .premium-card-balance-block p {
+  color: #e8eaef !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5) !important;
+}
+
+[data-theme="dark"] .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-nav-dropdown {
+  background: linear-gradient(180deg, #12141a 0%, #0d0f14 100%) !important;
+  border: 1px solid rgba(201, 169, 98, 0.38) !important;
+  color: rgba(232, 234, 239, 0.95) !important;
+}
+
+[data-theme="dark"] .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-overlay {
+  background: rgba(4, 5, 8, 0.82) !important;
+}
+
+[data-theme="dark"] .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-menu-btn {
+  border-color: rgba(201, 169, 98, 0.45) !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+  color: #c9a962 !important;
+}

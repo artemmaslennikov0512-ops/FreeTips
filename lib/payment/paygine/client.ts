@@ -31,10 +31,13 @@ export function getPaygineBaseUrl(): string {
     const u = new URL(url);
     const host = u.hostname.toLowerCase();
     if (!ALLOWED_HOSTS.includes(host)) return TEST_BASE_URL;
-    // Если указан только хост (без /webapi), дополняем
-    const path = u.pathname.replace(/\/+$/, "") || "";
+    let path = u.pathname.replace(/\/+$/, "") || "";
+    /** Ошибка в .env или старые скрипты: .../webapi/webapi → один /webapi */
+    while (path.includes("/webapi/webapi")) {
+      path = path.replace(/\/webapi\/webapi/g, "/webapi");
+    }
     if (path === "" || path === "/") return `${u.origin}/webapi`;
-    return url;
+    return `${u.origin}${path}`;
   } catch {
     /* invalid URL */
   }

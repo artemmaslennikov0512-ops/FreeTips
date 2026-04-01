@@ -99,7 +99,7 @@ export function getPaygineConfig(): { sector: string; password: string } | null 
   return { sector, password };
 }
 
-/** Paygine base URL (без слэша). */
+/** Paygine base URL (без слэша). Для HTTP к ПЦ см. getPaygineBaseUrl в lib/payment/paygine/client.ts. */
 export function getPaygineBaseUrl(): string {
   return getEnv().PAYGINE_BASE_URL?.trim().replace(/\/$/, "") ?? "";
 }

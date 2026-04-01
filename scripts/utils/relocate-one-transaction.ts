@@ -7,8 +7,9 @@
  *   npx tsx scripts/utils/relocate-one-transaction.ts --external-id <paygineOrderId>
  *   npx tsx scripts/utils/relocate-one-transaction.ts --amount <amountKop>
  *     — последняя PENDING-транзакция с такой суммой и заданным paygineOrderSdRef.
+ *   Флаг --allow-failed — если в БД уже FAILED (перелив упал), но в ЛК Paygine деньги ещё на кубышке заказа.
  *
- * При успехе для PENDING: в БД выставляется SUCCESS и сбрасывается relocateStartedAt.
+ * При успехе: в БД выставляется SUCCESS и сбрасывается relocateStartedAt.
  * При заданном PAYGINE_SD_REF_LEGAL и feeKop у транзакции: комиссия → ЮЛ, остаток → официант.
  * Требуется: .env (DATABASE_URL), scripts/.env или корневой .env (PAYGINE_*, опционально PAYGINE_SD_REF_LEGAL).
  */
@@ -39,17 +40,21 @@ function sign(tagValues: string[], password: string): string {
 }
 
 async function main(): Promise<void> {
-  const args = process.argv.slice(2);
+  const argv = process.argv.slice(2);
+  const allowFailed = argv.includes("--allow-failed");
+  const args = argv.filter((a) => a !== "--allow-failed");
   const byExternalId = args[0] === "--external-id" && args[1];
   const byAmount = args[0] === "--amount" && args[1];
   const txId = !byExternalId && !byAmount ? args[0]?.trim() : null;
   const externalIdArg = byExternalId ? args[1].trim() : null;
   const amountArg = byAmount ? args[1].trim() : null;
 
+  const pendingOrFailed = allowFailed ? ({ in: ["PENDING", "FAILED"] } as const) : ("PENDING" as const);
+
   if (!txId && !byExternalId && !byAmount) {
-    console.error("Usage: npx tsx scripts/utils/relocate-one-transaction.ts <transactionId>");
-    console.error("       npx tsx scripts/utils/relocate-one-transaction.ts --external-id <paygineOrderId>");
-    console.error("       npx tsx scripts/utils/relocate-one-transaction.ts --amount <amountKop>");
+    console.error("Usage: npx tsx scripts/utils/relocate-one-transaction.ts <transactionId> [--allow-failed]");
+    console.error("       npx tsx scripts/utils/relocate-one-transaction.ts --external-id <paygineOrderId> [--allow-failed]");
+    console.error("       npx tsx scripts/utils/relocate-one-transaction.ts --amount <amountKop> [--allow-failed]");
     process.exit(1);
   }
 
@@ -65,7 +70,7 @@ async function main(): Promise<void> {
 
   if (byExternalId) {
     tx = await prisma.transaction.findFirst({
-      where: { externalId: externalIdArg!, status: "PENDING", paygineOrderSdRef: { not: null } },
+      where: { externalId: externalIdArg!, status: pendingOrFailed, paygineOrderSdRef: { not: null } },
       orderBy: { createdAt: "desc" },
       select: { id: true, status: true, amountKop: true, feeKop: true, paymentMethod: true, paygineOrderSdRef: true, recipientId: true },
     });
@@ -76,7 +81,7 @@ async function main(): Promise<void> {
       process.exit(1);
     }
     tx = await prisma.transaction.findFirst({
-      where: { status: "PENDING", amountKop, paygineOrderSdRef: { not: null } },
+      where: { status: pendingOrFailed, amountKop, paygineOrderSdRef: { not: null } },
       orderBy: { createdAt: "desc" },
       select: { id: true, status: true, amountKop: true, feeKop: true, paymentMethod: true, paygineOrderSdRef: true, recipientId: true },
     });
@@ -96,13 +101,28 @@ async function main(): Promise<void> {
     console.error("Транзакция не найдена.", hint);
     process.exit(1);
   }
-  if (tx.status !== "PENDING") {
+  const okStatus = tx.status === "PENDING" || (allowFailed && tx.status === "FAILED");
+  if (!okStatus) {
+    const failedHint =
+      tx.status === "FAILED" && !allowFailed
+        ? " Добавьте --allow-failed, если в ЛК Paygine средства ещё на кубышке заказа (не на официанте)."
+        : "";
     console.error(
-      "Ожидается PENDING (оплата прошла в ПЦ, перелив в БД ещё не завершён). Сейчас:",
-      tx.status,
-      "— при SUCCESS перелив уже учтён в приложении; не запускайте скрипт без консультации.",
+      "Ожидается PENDING" +
+        (allowFailed ? " или FAILED (с --allow-failed)." : " (оплата в ПЦ прошла, перелив в БД не завершён).") +
+        " Сейчас:",
+      tx.status +
+        (tx.status === "SUCCESS"
+          ? " — перелив в приложении уже учтён; скрипт не нужен."
+          : "") +
+        failedHint,
     );
     process.exit(1);
+  }
+  if (tx.status === "FAILED" && allowFailed) {
+    console.error(
+      "ВНИМАНИЕ: в БД FAILED — приложение уже получило ошибку перелива. Повтор возможен только если в Paygine деньги ещё на paygineOrderSdRef заказа, а не на кубышке официанта.",
+    );
   }
   const orderSdRef = tx.paygineOrderSdRef?.trim();
   if (!orderSdRef) {

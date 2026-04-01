@@ -145,6 +145,7 @@ export default function PayPageClient() {
     setResultError(null);
 
     const idempotencyKey = `pay-${slug}-${crypto.randomUUID()}`;
+    let leaveForPaygine = false;
 
     try {
       const res = await fetch(`/api/pay/${slug}`, {
@@ -170,8 +171,9 @@ export default function PayPageClient() {
         return;
       }
 
-      if (data.redirectUrl) {
-        window.location.href = data.redirectUrl;
+      if (typeof data.redirectUrl === "string" && data.redirectUrl.trim()) {
+        leaveForPaygine = true;
+        window.location.assign(data.redirectUrl.trim());
         return;
       }
 
@@ -181,7 +183,7 @@ export default function PayPageClient() {
       setResultError("Ошибка соединения");
       setResult("fail");
     } finally {
-      setPaying(false);
+      if (!leaveForPaygine) setPaying(false);
     }
   };
 

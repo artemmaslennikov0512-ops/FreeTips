@@ -1,11 +1,13 @@
 "use client";
 
-import { useEffect } from "react";
+import { useLayoutEffect } from "react";
 
 export function AutoSubmitForm({ formId }: { formId: string }) {
-  useEffect(() => {
+  useLayoutEffect(() => {
     const form = document.getElementById(formId) as HTMLFormElement | null;
-    if (form) form.submit();
+    if (!form) return;
+    // Сразу после вставки DOM в дерево — до отрисовки, чтобы реже ловить гонку с Strict Mode / гидрацией.
+    form.submit();
   }, [formId]);
   return null;
 }

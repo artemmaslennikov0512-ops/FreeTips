@@ -1,15 +1,16 @@
 /**
- * Ручной перелив на постоянную кубышку для одной транзакции (SUCCESS).
- * Используйте, если вебхук не смог выполнить SDRelocateFunds (например 133 или таймаут).
+ * Ручной перелив на постоянную кубышку для одной транзакции (статус PENDING после оплаты).
+ * Используйте, если вебхук не смог выполнить SDRelocateFunds (код 133, таймаут, ответ без APPROVED).
  *
  * Запуск из корня проекта:
  *   npx tsx scripts/utils/relocate-one-transaction.ts <transactionId>
  *   npx tsx scripts/utils/relocate-one-transaction.ts --external-id <paygineOrderId>
  *   npx tsx scripts/utils/relocate-one-transaction.ts --amount <amountKop>
- *     — последняя SUCCESS-транзакция с такой суммой (если externalId не пришёл в колбэке).
+ *     — последняя PENDING-транзакция с такой суммой и заданным paygineOrderSdRef.
  *
+ * При успехе для PENDING: в БД выставляется SUCCESS и сбрасывается relocateStartedAt.
  * При заданном PAYGINE_SD_REF_LEGAL и feeKop у транзакции: комиссия → ЮЛ, остаток → официант.
- * Требуется: .env (DATABASE_URL), scripts/.env (PAYGINE_*, опционально PAYGINE_SD_REF_LEGAL).
+ * Требуется: .env (DATABASE_URL), scripts/.env или корневой .env (PAYGINE_*, опционально PAYGINE_SD_REF_LEGAL).
  */
 
 import "dotenv/config";
@@ -20,9 +21,14 @@ import { PrismaClient } from "@prisma/client";
 loadScriptsEnv();
 
 const prisma = new PrismaClient();
-const REGISTER_PATH = "/webapi/Register";
-const SDRELOCATE_PATH = "/webapi/b2puser/sd-services/SDRelocateFunds";
 const CURRENCY_RUB = 643;
+
+/** Как в lib/payment/paygine/client.ts: база уже с суффиксом /webapi. */
+function normalizePaygineWebapiBase(raw: string): string {
+  const t = raw.trim().replace(/\/$/, "");
+  if (!t) return "";
+  return t.endsWith("/webapi") ? t : `${t}/webapi`;
+}
 const DELAY_MS = Number(process.env.PAYGINE_RELOCATE_DELAY_MS) || 3_000;
 const RETRY_DELAY_MS = Number(process.env.PAYGINE_RELOCATE_RETRY_MS) || 8_000;
 
@@ -59,7 +65,7 @@ async function main(): Promise<void> {
 
   if (byExternalId) {
     tx = await prisma.transaction.findFirst({
-      where: { externalId: externalIdArg! },
+      where: { externalId: externalIdArg!, status: "PENDING", paygineOrderSdRef: { not: null } },
       orderBy: { createdAt: "desc" },
       select: { id: true, status: true, amountKop: true, feeKop: true, paymentMethod: true, paygineOrderSdRef: true, recipientId: true },
     });
@@ -70,7 +76,7 @@ async function main(): Promise<void> {
       process.exit(1);
     }
     tx = await prisma.transaction.findFirst({
-      where: { status: "SUCCESS", amountKop, paygineOrderSdRef: { not: null } },
+      where: { status: "PENDING", amountKop, paygineOrderSdRef: { not: null } },
       orderBy: { createdAt: "desc" },
       select: { id: true, status: true, amountKop: true, feeKop: true, paymentMethod: true, paygineOrderSdRef: true, recipientId: true },
     });
@@ -90,8 +96,12 @@ async function main(): Promise<void> {
     console.error("Транзакция не найдена.", hint);
     process.exit(1);
   }
-  if (tx.status !== "SUCCESS") {
-    console.error("Транзакция должна быть в статусе SUCCESS, сейчас:", tx.status);
+  if (tx.status !== "PENDING") {
+    console.error(
+      "Ожидается PENDING (оплата прошла в ПЦ, перелив в БД ещё не завершён). Сейчас:",
+      tx.status,
+      "— при SUCCESS перелив уже учтён в приложении; не запускайте скрипт без консультации.",
+    );
     process.exit(1);
   }
   const orderSdRef = tx.paygineOrderSdRef?.trim();
@@ -114,11 +124,11 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
-  const baseUrl = process.env.PAYGINE_BASE_URL?.trim().replace(/\/$/, "");
+  const baseUrl = normalizePaygineWebapiBase(process.env.PAYGINE_BASE_URL?.trim() ?? "");
   const sector = process.env.PAYGINE_SECTOR?.trim();
   const password = process.env.PAYGINE_PASSWORD;
   if (!baseUrl || !sector || !password) {
-    console.error("Задайте PAYGINE_BASE_URL, PAYGINE_SECTOR, PAYGINE_PASSWORD в scripts/.env");
+    console.error("Задайте PAYGINE_BASE_URL (как в приложении, с /webapi), PAYGINE_SECTOR, PAYGINE_PASSWORD в .env");
     process.exit(1);
   }
 
@@ -146,7 +156,7 @@ async function main(): Promise<void> {
       signature: regSig,
       mode: "1",
     });
-    const regRes = await fetch(`${baseUrl}${REGISTER_PATH}`, {
+    const regRes = await fetch(`${baseUrl}/Register`, {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: regBody.toString(),
@@ -170,7 +180,7 @@ async function main(): Promise<void> {
       to_sd_ref: toSdRef,
       signature: relSig,
     });
-    let relRes = await fetch(`${baseUrl}${SDRELOCATE_PATH}`, {
+    let relRes = await fetch(`${baseUrl}/b2puser/sd-services/SDRelocateFunds`, {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: relBody.toString(),
@@ -178,7 +188,7 @@ async function main(): Promise<void> {
     let relText = await relRes.text();
     if (relText.match(/<code>133<\/code>/)) {
       await new Promise((r) => setTimeout(r, RETRY_DELAY_MS));
-      relRes = await fetch(`${baseUrl}${SDRELOCATE_PATH}`, {
+      relRes = await fetch(`${baseUrl}/b2puser/sd-services/SDRelocateFunds`, {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: relBody.toString(),
@@ -186,7 +196,11 @@ async function main(): Promise<void> {
       relText = await relRes.text();
     }
     const ok =
-      relText.includes("<state>APPROVED</state>") || relText.includes("<order_state>COMPLETED</order_state>");
+      /<state>\s*APPROVED\s*<\/state>/i.test(relText) ||
+      /<order_state>\s*COMPLETED\s*<\/order_state>/i.test(relText);
+    if (!ok) {
+      console.error("SDRelocateFunds: ответ ПЦ (фрагмент):", relText.slice(0, 600));
+    }
     return ok ? { ok: true, orderId } : { ok: false };
   };
 
@@ -202,6 +216,10 @@ async function main(): Promise<void> {
   if (isSbp && companySdRef && feeKopNum > 0) {
     const rFee = await doOneRelocate(feeKopNum, companySdRef, `Комиссия ЮЛ (чаевые ${tx.id})`);
     if (!rFee.ok) {
+      await prisma.transaction.updateMany({
+        where: { id: tx.id, status: "PENDING" },
+        data: { relocateStartedAt: null },
+      });
       console.error("Ошибка перевода комиссии на ЮЛ.");
       process.exit(1);
     }
@@ -210,7 +228,11 @@ async function main(): Promise<void> {
 
   if (toWaiterKop < 1) {
     console.error("Сумма официанту 0 (вся ушла в комиссию).");
-    console.log(JSON.stringify({ ok: true, transactionId: tx.id, feeToLegalKop: feeKopNum }, null, 2));
+    await prisma.transaction.update({
+      where: { id: tx.id },
+      data: { status: "SUCCESS", relocateStartedAt: null },
+    });
+    console.log(JSON.stringify({ ok: true, transactionId: tx.id, feeToLegalKop: feeKopNum, dbStatus: "SUCCESS" }, null, 2));
     await prisma.$disconnect();
     process.exit(0);
   }
@@ -218,9 +240,18 @@ async function main(): Promise<void> {
   const rWaiter = await doOneRelocate(toWaiterKop, waiterSdRef, `Перевод чаевых → ${waiterSdRef}`);
   if (!rWaiter.ok) {
     console.error("Ошибка перевода на кубышку официанта.");
+    await prisma.transaction.updateMany({
+      where: { id: tx.id, status: "PENDING" },
+      data: { relocateStartedAt: null },
+    });
+    console.error("relocateStartedAt сброшен — можно повторить позже или вызвать POST /api/pay/sync-transaction");
     process.exit(1);
   }
   console.error("Перелив выполнен успешно.");
+  await prisma.transaction.update({
+    where: { id: tx.id },
+    data: { status: "SUCCESS", relocateStartedAt: null },
+  });
   console.log(
     JSON.stringify(
       {
@@ -228,6 +259,7 @@ async function main(): Promise<void> {
         transactionId: tx.id,
         toSdRef: waiterSdRef,
         amountKop: toWaiterKop,
+        dbStatus: "SUCCESS",
         ...(isSbp && companySdRef && feeKopNum > 0 ? { feeToLegalKop: feeKopNum } : {}),
       },
       null,

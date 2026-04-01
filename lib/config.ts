@@ -88,11 +88,13 @@ export function getRedisUrl(): string {
   return getEnv().REDIS_URL?.trim() ?? "";
 }
 
-/** Paygine: sector и password (null если не настроен). */
+/** Paygine: sector и password (null если не настроен). Пароль trim + BOM — иначе лишний символ даёт «Invalid signature» от ПЦ. */
 export function getPaygineConfig(): { sector: string; password: string } | null {
   const env = getEnv();
   const sector = env.PAYGINE_SECTOR?.trim();
-  const password = env.PAYGINE_PASSWORD;
+  const passwordRaw = env.PAYGINE_PASSWORD;
+  const password =
+    typeof passwordRaw === "string" ? passwordRaw.trim().replace(/^\uFEFF/, "") : "";
   if (!sector || !password) return null;
   return { sector, password };
 }

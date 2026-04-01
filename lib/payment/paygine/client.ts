@@ -468,7 +468,7 @@ export type SDRelocateFundsParams = {
 
 export type SDRelocateFundsResult =
   | { ok: true }
-  | { ok: false; code?: string; description?: string };
+  | { ok: false; code?: string; description?: string; debugBody?: string };
 
 /**
  * webapi/b2puser/sd-services/SDRelocateFunds.
@@ -511,13 +511,21 @@ export async function sdRelocateFunds(
     return { ok: false, description: text.slice(0, 500) || `HTTP ${res.status}` };
   }
 
+  /** ПЦ может отдавать регистр тегов/значений иначе, чем в примерах документации. */
   const approved =
-    text.includes("<state>APPROVED</state>") || text.includes("<order_state>COMPLETED</order_state>");
+    /<state>\s*APPROVED\s*<\/state>/i.test(text) ||
+    /<order_state>\s*COMPLETED\s*<\/order_state>/i.test(text);
   if (approved) return { ok: true };
 
   const code = text.match(/<code>([^<]+)<\/code>/)?.[1];
   const desc = text.match(/<description>([^<]*)<\/description>/)?.[1]?.trim();
-  return { ok: false, code, description: (desc ?? text).slice(0, 500) };
+  const description = (desc ?? text).slice(0, 500);
+  return {
+    ok: false,
+    code,
+    description,
+    debugBody: text.slice(0, 800),
+  };
   });
 }
 

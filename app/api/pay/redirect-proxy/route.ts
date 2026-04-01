@@ -95,8 +95,21 @@ export async function POST(request: NextRequest) {
   <p>Перенаправление на платёжную форму…</p>
   <form id="f" method="POST" action="${escapeHtml(paygineUrl)}">
     ${inputs}
+    <p style="margin-top:1rem;font:14px/1.4 system-ui,sans-serif;color:#333">
+      Если страница не открылась, нажмите кнопку:
+    </p>
+    <p style="margin-top:0.5rem">
+      <button type="submit" style="padding:10px 18px;font:600 14px system-ui,sans-serif;cursor:pointer;border-radius:8px;border:1px solid #ccc;background:#f5f5f5">
+        Перейти к оплате
+      </button>
+    </p>
   </form>
-  <script>document.getElementById("f").submit();</script>
+  <script>
+    (function () {
+      var f = document.getElementById("f");
+      if (f) f.submit();
+    })();
+  </script>
 </body>
 </html>`;
 

@@ -31,6 +31,19 @@ function getBaseForRedirect(baseUrlFromRequest: string | undefined): string {
 
 const CURRENCY_RUB = 643;
 
+/** Текст ошибки Register от Paygine (часто XML description или JSON) → понятное сообщение для API. */
+function formatPaygineRegisterUserError(raw: string | undefined): string {
+  const d = (raw ?? "").trim();
+  if (!d) return "Ошибка регистрации заказа Paygine";
+  if (/invalid signature/i.test(d) || /<code>\s*109\s*<\/code>/i.test(d)) {
+    return (
+      "Paygine: неверная подпись (код 109). На сервере проверьте PAYGINE_PASSWORD и PAYGINE_SECTOR — без кавычек, пробелов и переносов в конце строки в .env; " +
+      "PAYGINE_BASE_URL должен соответствовать контуру учётки (прод: https://pay.paygine.com/webapi, тест: https://test.paygine.com/webapi)."
+    );
+  }
+  return d.length > 400 ? `${d.slice(0, 400)}…` : d;
+}
+
 /** Уникальная кубышка заказа (временная). После оплаты — Relocate на кубышку официанта. */
 function createOrderSdRef(transactionId: string): string {
   const safe = transactionId.replace(/-/g, "").slice(0, 20);
@@ -160,7 +173,10 @@ export class PayginePaymentGateway implements PaymentGateway {
         where: { id: tx.id },
         data: { status: TransactionStatus.FAILED },
       });
-      return { success: false, error: regResult.description ?? "Ошибка регистрации заказа" };
+      return {
+        success: false,
+        error: formatPaygineRegisterUserError(regResult.description),
+      };
     }
 
     await db.transaction.update({
@@ -470,7 +486,14 @@ export async function runRelocateForTransaction(txId: string): Promise<{ ok: boo
         await new Promise((r) => setTimeout(r, retryDelayMs));
         rel = await sdRelocateFunds(config, { orderId: reg.orderId, fromSdRef: orderSdRef, toSdRef });
       }
-      return rel.ok ? { ok: true } : { ok: false, code: rel.code, description: rel.description };
+      return rel.ok
+        ? { ok: true as const }
+        : {
+            ok: false as const,
+            code: rel.code,
+            description: rel.description,
+            debugBody: rel.debugBody,
+          };
     };
 
     if (isSbp && companySdRef && feeKopNum > 0) {
@@ -482,6 +505,7 @@ export async function runRelocateForTransaction(txId: string): Promise<{ ok: boo
           description: relFee.description,
           toSdRef: companySdRef,
           role: "fee_legal",
+          ...(relFee.debugBody && { paygineResponsePreview: relFee.debugBody }),
         });
       }
     }
@@ -502,6 +526,7 @@ export async function runRelocateForTransaction(txId: string): Promise<{ ok: boo
         code: relWaiter.code,
         description: relWaiter.description,
         hint: "Ручной перелив: npx tsx scripts/utils/relocate-one-transaction.ts " + txId,
+        ...(relWaiter.debugBody && { paygineResponsePreview: relWaiter.debugBody }),
       });
       await db.transaction.update({ where: { id: txId }, data: { status: TransactionStatus.FAILED } });
     }

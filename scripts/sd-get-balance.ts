@@ -127,14 +127,18 @@ async function main(): Promise<void> {
   const descMatch = text.match(/<description>\s*([^<]*)\s*<\/description>/);
   const code = codeMatch?.[1];
   const description = descMatch?.[1]?.trim() ?? "";
+  const hintByCode: Record<string, string> = {
+    "167": "Сектор не поддерживает операцию — в ЛК Paygine включите SD/кубышки для сектора.",
+    "261":
+      "sd_ref не найден в ПЦ: опечатка, другой сектор, или кубышка ещё не создана (часто после первого Relocate/зачисления). Сверьте ref в ЛК Paygine и User.paygineSdRef в БД.",
+    "109": "Неверная подпись — проверьте PAYGINE_PASSWORD и PAYGINE_SECTOR.",
+  };
+  const hint =
+    (code && hintByCode[code]) || "См. коды ошибок Paygine: docs/paygine/апи.md (Таблица 57).";
+
   console.error("Ответ ПЦ (ошибка):");
   console.error(text.slice(0, 500));
-  console.log(JSON.stringify({
-    ok: false,
-    paygineCode: code,
-    description,
-    hint: "Код 167 — сектор не поддерживает операцию (баланс/кубышки). Проверь настройки сектора в ЛК Paygine.",
-  }, null, 2));
+  console.log(JSON.stringify({ ok: false, paygineCode: code, description, hint }, null, 2));
   process.exit(1);
 }
 

@@ -229,9 +229,9 @@ export default function CabinetDashboardPage() {
 
   return (
     <div className="space-y-8">
-      <div className="cabinet-dashboard-hero-grid grid min-w-0 grid-cols-1 items-start gap-6 lg:[grid-template-columns:repeat(2,minmax(0,1fr))]">
-        <div className="cabinet-card min-w-0 rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden">
-          <div className="p-6">
+      <div className="cabinet-dashboard-hero-grid grid min-w-0 grid-cols-1 gap-6 lg:[grid-template-columns:repeat(2,minmax(0,1fr))] lg:items-stretch">
+        <div className="cabinet-card flex min-h-0 min-w-0 flex-col rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden lg:h-full">
+          <div className="flex min-h-0 flex-1 flex-col p-6">
             <div className="flex flex-col items-center">
               <div className="w-full max-w-[320px] flex flex-col items-center">
                 <p className="cabinet-dashboard-display-name cabinet-dashboard-card-title w-full text-center font-[family:var(--font-playfair)] text-lg font-semibold mb-3 text-[var(--color-text)]">
@@ -382,8 +382,8 @@ export default function CabinetDashboardPage() {
           </div>
         </div>
 
-        <div id="quick-actions" className="cabinet-card min-w-0 rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden">
-          <div className="p-6">
+        <div id="quick-actions" className="cabinet-card flex min-h-0 min-w-0 flex-col rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden lg:h-full">
+          <div className="flex min-h-0 flex-1 flex-col p-6">
             <h3 className="cabinet-dashboard-card-title mb-3 text-center font-[family:var(--font-playfair)] text-lg font-semibold text-[var(--color-text)]">
               Быстрые действия
             </h3>

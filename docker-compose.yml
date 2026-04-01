@@ -25,9 +25,10 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:-tips}
     volumes:
       - pgdata:/var/lib/postgresql/data
-    # Не публикуем 5432 на 0.0.0.0 — web ходит в БД по имени сервиса db:5432.
-    # Админка: docker compose exec db psql -U app -d tips
-    # Временно с хоста: в compose на одну сессию — "127.0.0.1:15432:5432"
+    # Только localhost на сервере (не 0.0.0.0) — для DBeaver через SSH-туннель.
+    ports:
+      - "127.0.0.1:15432:5432"
+    # Web по-прежнему ходит на db:5432 по внутренней сети Docker.
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-app} -d ${POSTGRES_DB:-tips}"]
       interval: 5s

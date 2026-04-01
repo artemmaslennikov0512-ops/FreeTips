@@ -3,7 +3,7 @@
 /** Скелетон загрузки для страниц кабинета и админки */
 export function CabinetSkeleton() {
   return (
-    <div className="space-y-6 animate-pulse" role="status" aria-label="Загрузка">
+    <div className="cabinet-loading-skeleton space-y-6 animate-pulse" role="status" aria-label="Загрузка">
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {[1, 2, 3, 4].map((i) => (
           <div

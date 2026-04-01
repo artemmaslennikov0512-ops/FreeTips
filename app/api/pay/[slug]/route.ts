@@ -21,8 +21,13 @@ import {
 import { parseJsonWithLimit, MAX_BODY_SIZE_DEFAULT, jsonError, internalError, rateLimit429Response } from "@/lib/api/helpers";
 import { verifyCsrfFromRequest } from "@/lib/security/csrf";
 import { site } from "@/config/site";
-import { PAY_PAGE_BRANDING_OVERRIDES } from "@/config/pay-branding-overrides";
+import {
+  PAY_PAGE_BRANDING_OVERRIDES,
+  PAY_PAGE_M5_COMPETITION_BRANDING,
+  PAY_PAGE_SLUGS_SKIP_M5_LOGIN_BRANDING,
+} from "@/config/pay-branding-overrides";
 import { mergePayPageBranding } from "@/lib/pay-branding-merge";
+import { isCabinetM5CompetitionTheme } from "@/config/cabinet-theme-logins";
 
 const DEMO_SLUG = "demoPaySlug" in site && typeof site.demoPaySlug === "string" ? site.demoPaySlug : null;
 
@@ -96,7 +101,15 @@ export async function GET(request: NextRequest, { params }: Params) {
         borderOpacityPercent: tipLink.employee.establishment.borderOpacityPercent ?? undefined,
       }
     : undefined;
-  const branding = mergePayPageBranding(brandingFromEstablishment, PAY_PAGE_BRANDING_OVERRIDES[slug]);
+  const slugNorm = slug.trim().toLowerCase();
+  const slugBrandingOverride =
+    PAY_PAGE_BRANDING_OVERRIDES[slug] ?? PAY_PAGE_BRANDING_OVERRIDES[slugNorm];
+  let branding = mergePayPageBranding(brandingFromEstablishment, slugBrandingOverride);
+  const m5Login =
+    isCabinetM5CompetitionTheme(login) && !PAY_PAGE_SLUGS_SKIP_M5_LOGIN_BRANDING.has(slugNorm);
+  if (m5Login) {
+    branding = mergePayPageBranding(branding, PAY_PAGE_M5_COMPETITION_BRANDING);
+  }
   const savingFor = tipLink.user.savingFor?.trim() || undefined;
   const baseUrl = getBaseUrlFromRequest(request);
   const recipientPhotoUrl =
@@ -110,6 +123,7 @@ export async function GET(request: NextRequest, { params }: Params) {
     ...(branding && { branding }),
     ...(savingFor && { savingFor }),
     ...(recipientPhotoUrl && { recipientPhotoUrl }),
+    ...(m5Login && { m5PayShell: true }),
   });
 }
 

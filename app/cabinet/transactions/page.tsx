@@ -368,7 +368,7 @@ export default function CabinetTransactionsPage() {
           )}
         </div>
         {list.length === 0 ? (
-          <div className="px-6 py-12 text-center text-[var(--color-text)]/90">Операций пока нет</div>
+          <div className="cabinet-m5-empty px-6 py-12 text-center text-[var(--color-text)]/90">Операций пока нет</div>
         ) : (
           <>
             {/* Мобильная версия: карточки по одной операции */}

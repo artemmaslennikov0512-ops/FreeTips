@@ -125,7 +125,7 @@ export default function CabinetLinkPage() {
 
       {!link ? (
         <div className="cabinet-card rounded-xl border-0 bg-[var(--color-bg-sides)] p-10 shadow-[var(--shadow-subtle)]">
-          <div className="flex flex-col items-center gap-6 text-center">
+          <div className="cabinet-m5-empty flex flex-col items-center gap-6 text-center">
             <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[var(--color-dark-gray)]/10">
               <Link2 className="h-8 w-8 text-[var(--color-text)]" />
             </div>

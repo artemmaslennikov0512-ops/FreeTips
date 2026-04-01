@@ -174,7 +174,7 @@ export default function CabinetSupportPage() {
           </div>
 
           {messages.length === 0 && (
-            <p className="py-4 text-center text-sm text-[var(--color-text)]/70">
+            <p className="cabinet-m5-empty py-4 text-center text-sm text-[var(--color-text)]/70">
               Пока нет сообщений. Напишите первым — мы ответим.
             </p>
           )}

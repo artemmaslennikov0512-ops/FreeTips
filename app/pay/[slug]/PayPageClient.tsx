@@ -24,6 +24,8 @@ export default function PayPageClient() {
   const searchParams = useSearchParams();
   const slug = typeof params.slug === "string" ? params.slug : "";
 
+  const [payM5Shell, setPayM5Shell] = useState(() => isPayPageM5ShellSlug(slug));
+
   const [loading, setLoading] = useState(true);
   const [recipientName, setRecipientName] = useState<string | null>(null);
   const [savingFor, setSavingFor] = useState<string | null>(null);
@@ -47,6 +49,10 @@ export default function PayPageClient() {
   const [result, setResult] = useState<"success" | "fail" | null>(null);
   const [resultError, setResultError] = useState<string | null>(null);
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    setPayM5Shell(isPayPageM5ShellSlug(slug));
+  }, [slug]);
 
   useEffect(() => {
     if (typeof window !== "undefined" && slug) {
@@ -92,6 +98,7 @@ export default function PayPageClient() {
           recipientName: string;
           savingFor?: string;
           recipientPhotoUrl?: string;
+          m5PayShell?: boolean;
           branding?: {
             logoUrl?: string;
             logoOpacityPercent?: number | null;
@@ -107,6 +114,7 @@ export default function PayPageClient() {
         setSavingFor(data.savingFor ?? null);
         setRecipientPhotoUrl(data.recipientPhotoUrl ?? null);
         setBranding(data.branding ?? null);
+        setPayM5Shell(isPayPageM5ShellSlug(slug) || data.m5PayShell === true);
       } catch {
         setError("Ошибка соединения");
       } finally {
@@ -179,10 +187,13 @@ export default function PayPageClient() {
 
   const payReturnFail = urlOutcome === "fail" || (urlOutcome === "success" && settlementPhase === "fail");
 
+  const m5c = payM5Shell ? " pay-page--m5-competition" : "";
+  const m5SuccessCard = payM5Shell ? " pay-success-card--m5" : "";
+
   if (tidFromUrl && urlOutcome && payReturnFail) {
     return (
-      <div className="pay-success-always-light flex min-h-screen min-h-[100dvh] w-full flex-col items-center justify-center px-4 py-8">
-        <div className="pay-success-card w-full max-w-sm rounded-2xl border border-[var(--color-brand-gold)]/40 bg-white p-8 text-center shadow-[var(--shadow-card)]">
+      <div className={`pay-page${m5c} pay-success-always-light flex min-h-screen min-h-[100dvh] w-full flex-col items-center justify-center px-4 py-8`}>
+        <div className={`pay-success-card${m5SuccessCard} w-full max-w-sm rounded-2xl border border-[var(--color-brand-gold)]/40 bg-white p-8 text-center shadow-[var(--shadow-card)]`}>
           <div className="pay-result-icon pay-result-icon-error mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[var(--color-accent-red)]/15">
             <XCircle className="h-9 w-9 text-[var(--color-accent-red)]" />
           </div>
@@ -195,13 +206,13 @@ export default function PayPageClient() {
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
             <Link
               href={slug ? `/pay/${slug}` : "/"}
-              className="rounded-xl border border-[#0a192f]/35 bg-transparent px-5 py-2.5 text-center text-sm font-medium text-[#0a192f] hover:bg-[#0a192f]/8"
+              className="pay-m5-cta-secondary rounded-xl border border-[#0a192f]/35 bg-transparent px-5 py-2.5 text-center text-sm font-medium text-[#0a192f] hover:bg-[#0a192f]/8"
             >
               Попробовать снова
             </Link>
             <Link
               href="/"
-              className="rounded-xl bg-[var(--color-navy)] px-5 py-2.5 text-center text-[14px] font-semibold text-white shadow-[var(--shadow-subtle)] transition-all hover:opacity-90"
+              className="pay-m5-cta-primary rounded-xl bg-[var(--color-navy)] px-5 py-2.5 text-center text-[14px] font-semibold text-white shadow-[var(--shadow-subtle)] transition-all hover:opacity-90"
             >
               На главную
             </Link>
@@ -213,8 +224,8 @@ export default function PayPageClient() {
 
   if (tidFromUrl && urlOutcome === "success" && settlementPhase === "verifying") {
     return (
-      <div className="pay-success-always-light flex min-h-screen min-h-[100dvh] w-full flex-col items-center justify-center px-4 py-8">
-        <div className="pay-success-card w-full max-w-sm rounded-2xl border border-[var(--color-brand-gold)]/40 bg-white p-8 text-center shadow-[var(--shadow-card)]">
+      <div className={`pay-page${m5c} pay-success-always-light flex min-h-screen min-h-[100dvh] w-full flex-col items-center justify-center px-4 py-8`}>
+        <div className={`pay-success-card${m5SuccessCard} w-full max-w-sm rounded-2xl border border-[var(--color-brand-gold)]/40 bg-white p-8 text-center shadow-[var(--shadow-card)]`}>
           <Loader2 className="mx-auto h-12 w-12 animate-spin text-[var(--color-accent-emerald)]" aria-hidden />
           <p className="mt-6 text-center text-lg font-medium text-[#0a192f]">Подтверждаем зачисление…</p>
           <p className="mt-2 text-center text-sm text-[#2d3748]">
@@ -227,8 +238,8 @@ export default function PayPageClient() {
 
   if (tidFromUrl && urlOutcome === "success" && settlementPhase === "slow") {
     return (
-      <div className="pay-success-always-light flex min-h-screen min-h-[100dvh] w-full flex-col items-center justify-center px-4 py-8">
-        <div className="pay-success-card w-full max-w-sm rounded-2xl border border-[var(--color-brand-gold)]/40 bg-white p-8 text-center shadow-[var(--shadow-card)]">
+      <div className={`pay-page${m5c} pay-success-always-light flex min-h-screen min-h-[100dvh] w-full flex-col items-center justify-center px-4 py-8`}>
+        <div className={`pay-success-card${m5SuccessCard} w-full max-w-sm rounded-2xl border border-[var(--color-brand-gold)]/40 bg-white p-8 text-center shadow-[var(--shadow-card)]`}>
           <div className="pay-result-icon mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-amber-500/15">
             <Loader2 className="h-9 w-9 text-amber-600 animate-spin" aria-hidden />
           </div>
@@ -241,7 +252,7 @@ export default function PayPageClient() {
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
             <Link
               href="/"
-              className="rounded-xl bg-[var(--color-navy)] px-5 py-2.5 text-center text-[14px] font-semibold text-white shadow-[var(--shadow-subtle)] transition-all hover:opacity-90"
+              className="pay-m5-cta-primary rounded-xl bg-[var(--color-navy)] px-5 py-2.5 text-center text-[14px] font-semibold text-white shadow-[var(--shadow-subtle)] transition-all hover:opacity-90"
             >
               На главную
             </Link>
@@ -255,8 +266,8 @@ export default function PayPageClient() {
 
   if (tidFromUrl && urlOutcome === "success" && settlementPhase === "success") {
     return (
-      <div className="pay-success-always-light flex min-h-screen min-h-[100dvh] w-full flex-col items-center justify-center px-4 py-8">
-        <div className="pay-success-card w-full max-w-sm rounded-2xl border border-[var(--color-brand-gold)]/40 bg-white p-8 text-center shadow-[var(--shadow-card)]">
+      <div className={`pay-page${m5c} pay-success-always-light flex min-h-screen min-h-[100dvh] w-full flex-col items-center justify-center px-4 py-8`}>
+        <div className={`pay-success-card${m5SuccessCard} w-full max-w-sm rounded-2xl border border-[var(--color-brand-gold)]/40 bg-white p-8 text-center shadow-[var(--shadow-card)]`}>
           <div className="pay-result-icon pay-result-icon-success mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[var(--color-accent-emerald)]/15">
             <CheckCircle2 className="h-9 w-9 text-[var(--color-accent-emerald)]" />
           </div>
@@ -278,13 +289,13 @@ export default function PayPageClient() {
                 setComment("");
                 if (slug) router.replace(`/pay/${slug}`);
               }}
-              className="rounded-xl border border-[#0a192f]/35 bg-transparent px-5 py-2.5 text-sm font-medium text-[#0a192f] hover:bg-[#0a192f]/8 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a192f]/25"
+              className="pay-m5-cta-secondary rounded-xl border border-[#0a192f]/35 bg-transparent px-5 py-2.5 text-sm font-medium text-[#0a192f] hover:bg-[#0a192f]/8 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a192f]/25"
             >
               Отправить ещё
             </button>
             <Link
               href="/"
-              className="rounded-xl bg-[var(--color-navy)] px-5 py-2.5 text-[14px] font-semibold text-white shadow-[var(--shadow-subtle)] transition-all hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-navy)]/50"
+              className="pay-m5-cta-primary rounded-xl bg-[var(--color-navy)] px-5 py-2.5 text-[14px] font-semibold text-white shadow-[var(--shadow-subtle)] transition-all hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-navy)]/50"
             >
               На главную
             </Link>
@@ -296,15 +307,17 @@ export default function PayPageClient() {
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-md px-4">
-        <LoadingSpinner message="Загрузка…" className="min-h-[60vh]" />
+      <div className={`pay-page pay-page--cards${m5c} w-full`}>
+        <div className="mx-auto max-w-md px-4">
+          <LoadingSpinner message="Загрузка…" className="min-h-[60vh]" />
+        </div>
       </div>
     );
   }
 
   if (error || !recipientName) {
     return (
-      <div className="mx-auto flex min-h-[60vh] max-w-md flex-col items-center justify-center px-4 text-center">
+      <div className={`pay-page pay-page--cards${m5c} mx-auto flex min-h-[60vh] max-w-md flex-col items-center justify-center px-4 text-center`}>
         <XCircle className="h-14 w-14 text-[var(--color-text-secondary)]" />
         <h1 className="mt-4 text-xl font-semibold text-[var(--color-text)]">{error ?? "Ссылка не найдена"}</h1>
         <Link href="/" className="mt-6 text-[var(--color-accent-gold)] hover:opacity-90 hover:underline">
@@ -316,8 +329,8 @@ export default function PayPageClient() {
 
   if (result === "success") {
     return (
-      <div className="pay-success-always-light flex min-h-screen min-h-[100dvh] w-full flex-col items-center justify-center px-4 py-8">
-        <div className="pay-success-card w-full max-w-sm rounded-2xl border border-[var(--color-brand-gold)]/40 bg-white p-8 text-center shadow-[var(--shadow-card)]">
+      <div className={`pay-page${m5c} pay-success-always-light flex min-h-screen min-h-[100dvh] w-full flex-col items-center justify-center px-4 py-8`}>
+        <div className={`pay-success-card${m5SuccessCard} w-full max-w-sm rounded-2xl border border-[var(--color-brand-gold)]/40 bg-white p-8 text-center shadow-[var(--shadow-card)]`}>
           <div className="pay-result-icon pay-result-icon-success mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[var(--color-accent-emerald)]/15">
             <CheckCircle2 className="h-9 w-9 text-[var(--color-accent-emerald)]" />
           </div>
@@ -341,13 +354,13 @@ export default function PayPageClient() {
                 setComment("");
                 if (slug) router.replace(`/pay/${slug}`);
               }}
-              className="rounded-xl border border-[#0a192f]/35 bg-transparent px-5 py-2.5 text-sm font-medium text-[#0a192f] hover:bg-[#0a192f]/8 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a192f]/25"
+              className="pay-m5-cta-secondary rounded-xl border border-[#0a192f]/35 bg-transparent px-5 py-2.5 text-sm font-medium text-[#0a192f] hover:bg-[#0a192f]/8 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a192f]/25"
             >
               Отправить ещё
             </button>
             <Link
               href="/"
-              className="rounded-xl bg-[var(--color-navy)] px-5 py-2.5 text-[14px] font-semibold text-white shadow-[var(--shadow-subtle)] transition-all hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-navy)]/50"
+              className="pay-m5-cta-primary rounded-xl bg-[var(--color-navy)] px-5 py-2.5 text-[14px] font-semibold text-white shadow-[var(--shadow-subtle)] transition-all hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-navy)]/50"
             >
               На главную
             </Link>
@@ -380,7 +393,7 @@ export default function PayPageClient() {
 
   return (
     <div
-      className={`pay-page pay-page--cards flex min-h-screen w-full flex-col justify-center px-4 py-8${isPayPageM5ShellSlug(slug) ? " pay-page--m5-competition" : ""}`}
+      className={`pay-page pay-page--cards flex min-h-screen w-full flex-col justify-center px-4 py-8${m5c}`}
       style={wrapperStyle}
     >
       <div className="mx-auto w-full max-w-md">
@@ -404,13 +417,10 @@ export default function PayPageClient() {
             />
           ) : (
             <div className="flex items-center gap-2">
-              <span className="pay-page-logo-ft logo-ft-abbr flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--color-brand-gold)] text-sm text-[#0a192f]">FT</span>
-              <span
-                className="font-[family:var(--font-playfair)] text-lg font-bold pay-page-logo-text"
-                style={{ color: fontClr ?? "var(--color-text)" }}
-              >
-                <span className="pay-page-logo-free" style={{ color: fontClr ? "inherit" : undefined, opacity: fontClr ? undefined : 0.95 }}>Free</span>
-                <span className="text-[var(--color-brand-gold)]">Tips</span>
+                <span className="pay-page-logo-ft logo-ft-abbr flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--color-brand-gold)] text-sm text-[#0a192f]">FT</span>
+              <span className="font-[family:var(--font-playfair)] text-lg font-bold pay-page-logo-text">
+                <span className="pay-page-logo-free">Free</span>
+                <span className="pay-page-logo-tips text-[var(--color-brand-gold)]">Tips</span>
               </span>
             </div>
           )}

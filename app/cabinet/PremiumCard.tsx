@@ -8,7 +8,7 @@ type Props = {
   balanceKop?: number | null;
   compact?: boolean;
   hideButtons?: boolean;
-  /** M5 Competition: тёмный металлик, полосы ///M, без золота (без логотипов BMW) */
+  /** M5 Competition: тёмный металлик, полосы ///M снизу, без золота (без логотипов BMW) */
   variant?: "default" | "m5";
 };
 
@@ -124,7 +124,7 @@ export function PremiumCard({ fullName, balanceKop, compact, variant = "default"
         <div className={`premium-card w-full max-w-[320px]${isM5 ? " premium-card--m5" : ""}`}>
           <div className="premium-card-inner">
             <div className={`premium-card-face premium-card-front${isM5 ? " premium-card-front--m5" : ""}`}>
-              {isM5 && <div className="premium-card-m-stripes-edge premium-card-m-stripes-edge--left" aria-hidden />}
+              {isM5 && <div className="premium-card-m-stripes-edge premium-card-m-stripes-edge--bottom" aria-hidden />}
               <div className="premium-dynamic-pattern" aria-hidden />
               <div className="premium-glass" aria-hidden />
               <div className="premium-card-shine" aria-hidden />

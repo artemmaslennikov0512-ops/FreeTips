@@ -101,7 +101,7 @@ export default function CabinetPayoutsPage() {
           </h2>
         </div>
         {payouts.length === 0 ? (
-          <div className="px-6 py-12 text-center text-[var(--color-text-secondary)]">Заявок пока нет</div>
+          <div className="cabinet-m5-empty px-6 py-12 text-center text-[var(--color-text-secondary)]">Заявок пока нет</div>
         ) : (
           <>
             {/* Мобильная версия: карточки */}

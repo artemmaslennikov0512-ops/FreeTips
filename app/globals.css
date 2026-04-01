@@ -128,6 +128,35 @@ html:not([data-theme="dark"]) .cabinet-premium {
     opacity: 0.32;
   }
 }
+
+@keyframes m5-header-logo-icon-shimmer {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes m5-header-logo-text-shimmer {
+  0% {
+    background-position: 0% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+@keyframes m5-skeleton-shimmer {
+  0% {
+    background-position: 0% 0%;
+  }
+  100% {
+    background-position: 200% 0%;
+  }
+}
+
 .cabinet-premium[data-cabinet-theme="m5-competition"] {
   /* Primary CTA и круги иконок — BMW M синий (вместо золота калиперов) */
   --color-brand-gold: #1c69d4;
@@ -214,11 +243,24 @@ body.cabinet-page:has(.cabinet-premium[data-cabinet-theme="m5-competition"])
   header.site-header:not(.site-header-landing)
   .site-header-logo-icon {
   border-radius: 9999px !important;
-  background: linear-gradient(145deg, #3d8ef0 0%, #1c69d4 50%, #155aad 100%) !important;
+  background:
+    linear-gradient(
+      125deg,
+      #4a9fff 0%,
+      #1c69d4 22%,
+      #0d4a9e 38%,
+      #c43236 52%,
+      #e5252a 68%,
+      #1c69d4 85%,
+      #7eb6ff 100%
+    ) !important;
+  background-size: 280% 280% !important;
+  animation: m5-header-logo-icon-shimmer 10s ease-in-out infinite !important;
   color: #fff !important;
   box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.12),
-    0 4px 12px rgba(28, 105, 212, 0.35) !important;
+    0 0 0 1px rgba(255, 255, 255, 0.14),
+    0 0 20px rgba(28, 105, 212, 0.25),
+    0 4px 14px rgba(0, 0, 0, 0.35) !important;
 }
 
 header.site-header.site-header--cabinet-m5 .site-header-logo-text .site-header-logo-free,
@@ -226,7 +268,23 @@ body.cabinet-page:has(.cabinet-premium[data-cabinet-theme="m5-competition"])
   header.site-header:not(.site-header-landing)
   .site-header-logo-text
   .site-header-logo-free {
-  color: #b8dcff !important;
+  display: inline-block !important;
+  background: linear-gradient(
+    95deg,
+    #e8f4ff 0%,
+    #8ec5ff 18%,
+    #4a9fff 35%,
+    #b8dcff 52%,
+    #6eb5ff 70%,
+    #cfe8ff 88%,
+    #4a9fff 100%
+  ) !important;
+  background-size: 220% 100% !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+  -webkit-text-fill-color: transparent !important;
+  animation: m5-header-logo-text-shimmer 5.5s linear infinite !important;
 }
 
 header.site-header.site-header--cabinet-m5 .site-header-logo-text span:not(.site-header-logo-free),
@@ -234,7 +292,23 @@ body.cabinet-page:has(.cabinet-premium[data-cabinet-theme="m5-competition"])
   header.site-header:not(.site-header-landing)
   .site-header-logo-text
   span:not(.site-header-logo-free) {
-  color: #e5252a !important;
+  display: inline-block !important;
+  background: linear-gradient(
+    95deg,
+    #ff9a9e 0%,
+    #e5252a 22%,
+    #ff6b6e 42%,
+    #b01e22 58%,
+    #ff5558 75%,
+    #e5252a 92%,
+    #ff8a8c 100%
+  ) !important;
+  background-size: 220% 100% !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+  -webkit-text-fill-color: transparent !important;
+  animation: m5-header-logo-text-shimmer 5.5s linear infinite reverse !important;
 }
 
 header.site-header.site-header--cabinet-m5 .theme-toggle-btn,
@@ -254,16 +328,28 @@ body.cabinet-page:has(.cabinet-premium[data-cabinet-theme="m5-competition"])
   color: #4a9fff !important;
 }
 
+/* M5 шапка «Выйти»: как активный пункт — ровная подложка, градиент только в обводке */
 header.site-header.site-header--cabinet-m5 .site-header-m5-logout,
 body.cabinet-page:has(.cabinet-premium[data-cabinet-theme="m5-competition"])
   header.site-header:not(.site-header-landing)
   .site-header-m5-logout {
-  background: linear-gradient(180deg, #3d8ef0 0%, #1c69d4 48%, #155aad 100%) !important;
-  color: #f8fafc !important;
-  border: 1px solid rgba(255, 255, 255, 0.15) !important;
-  box-shadow:
-    0 4px 16px rgba(28, 105, 212, 0.35),
-    0 0 0 1px rgba(229, 37, 42, 0.15) !important;
+  background:
+    linear-gradient(180deg, #12151c, #12151c) padding-box,
+    linear-gradient(135deg, #e5252a 0%, #9a1a1e 28%, #1c69d4 72%, #4a9fff 100%) border-box !important;
+  border: 1.5px solid transparent !important;
+  color: #f2f5fa !important;
+  box-shadow: 0 0 22px rgba(28, 105, 212, 0.16) !important;
+  text-transform: none !important;
+  letter-spacing: 0.03em !important;
+  font-weight: 600 !important;
+}
+
+header.site-header.site-header--cabinet-m5 .site-header-m5-logout:hover,
+body.cabinet-page:has(.cabinet-premium[data-cabinet-theme="m5-competition"])
+  header.site-header:not(.site-header-landing)
+  .site-header-m5-logout:hover {
+  filter: brightness(1.05) !important;
+  box-shadow: 0 0 28px rgba(28, 105, 212, 0.22) !important;
 }
 
 header.site-header.site-header--cabinet-m5 .site-header-m5-menu-btn,
@@ -281,14 +367,85 @@ body.cabinet-page:has(.cabinet-premium[data-cabinet-theme="m5-competition"])
 }
 
 .header-mobile-m5-brand > span:first-child {
-  color: #b8dcff !important;
+  display: inline-block !important;
+  background: linear-gradient(
+    95deg,
+    #e8f4ff 0%,
+    #8ec5ff 18%,
+    #4a9fff 35%,
+    #b8dcff 52%,
+    #6eb5ff 70%,
+    #cfe8ff 88%,
+    #4a9fff 100%
+  ) !important;
+  background-size: 220% 100% !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+  -webkit-text-fill-color: transparent !important;
+  animation: m5-header-logo-text-shimmer 5.5s linear infinite !important;
 }
 
 .header-mobile-m5-brand > span:last-child {
-  color: #e5252a !important;
+  display: inline-block !important;
+  background: linear-gradient(
+    95deg,
+    #ff9a9e 0%,
+    #e5252a 22%,
+    #ff6b6e 42%,
+    #b01e22 58%,
+    #ff5558 75%,
+    #e5252a 92%,
+    #ff8a8c 100%
+  ) !important;
+  background-size: 220% 100% !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+  -webkit-text-fill-color: transparent !important;
+  animation: m5-header-logo-text-shimmer 5.5s linear infinite reverse !important;
 }
 
-/* Premium M5 Competition: тёмный металлик, ///M слева (официальные оттенки M), без золота */
+@media (prefers-reduced-motion: reduce) {
+  header.site-header.site-header--cabinet-m5 .site-header-logo-icon,
+  body.cabinet-page:has(.cabinet-premium[data-cabinet-theme="m5-competition"])
+    header.site-header:not(.site-header-landing)
+    .site-header-logo-icon,
+  html:not([data-theme="dark"])
+    body.cabinet-page:has(.cabinet-premium[data-cabinet-theme="m5-competition"])
+    .site-header
+    .site-header-logo-icon {
+    animation: none !important;
+    background-position: 0% 50% !important;
+  }
+
+  header.site-header.site-header--cabinet-m5 .site-header-logo-text .site-header-logo-free,
+  body.cabinet-page:has(.cabinet-premium[data-cabinet-theme="m5-competition"])
+    header.site-header:not(.site-header-landing)
+    .site-header-logo-text
+    .site-header-logo-free,
+  html:not([data-theme="dark"])
+    body.cabinet-page:has(.cabinet-premium[data-cabinet-theme="m5-competition"])
+    .site-header
+    .site-header-logo-free,
+  header.site-header.site-header--cabinet-m5 .site-header-logo-text span:not(.site-header-logo-free),
+  body.cabinet-page:has(.cabinet-premium[data-cabinet-theme="m5-competition"])
+    header.site-header:not(.site-header-landing)
+    .site-header-logo-text
+    span:not(.site-header-logo-free),
+  html:not([data-theme="dark"])
+    body.cabinet-page:has(.cabinet-premium[data-cabinet-theme="m5-competition"])
+    .site-header
+    .site-header-logo-text
+    span:not(.site-header-logo-free),
+  .header-mobile-m5-brand > span:first-child,
+  .header-mobile-m5-brand > span:last-child {
+    animation: none !important;
+    background-position: 0% center !important;
+  }
+}
+
+/* Premium M5 Competition: тёмный металлик, ///M снизу (официальные оттенки M), без золота */
 .premium-card--m5 .premium-card-front--m5 {
   background:
     linear-gradient(148deg, rgba(255, 255, 255, 0.06) 0%, transparent 24%, transparent 52%, rgba(0, 0, 0, 0.28) 100%),
@@ -332,12 +489,12 @@ body.cabinet-page:has(.cabinet-premium[data-cabinet-theme="m5-competition"])
   pointer-events: none;
 }
 
-/* Полоски ///M слева: тёмно-синий M → BMW M синий → M красный */
-.premium-card--m5 .premium-card-m-stripes-edge--left {
+/* Полоски ///M снизу: тёмно-синий M → BMW M синий → M красный */
+.premium-card--m5 .premium-card-m-stripes-edge--bottom {
   left: 0;
-  top: 0;
+  right: 0;
   bottom: 0;
-  width: 7px;
+  height: 7px;
   background: linear-gradient(
     90deg,
     #0066b1 0%,
@@ -347,8 +504,8 @@ body.cabinet-page:has(.cabinet-premium[data-cabinet-theme="m5-competition"])
     #e30613 66.66%,
     #e30613 100%
   );
-  border-radius: 10px 0 0 10px;
-  box-shadow: inset -1px 0 2px rgba(0, 0, 0, 0.4);
+  border-radius: 0 0 10px 10px;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.35);
 }
 
 .premium-card--m5 .premium-card-brand {
@@ -424,6 +581,107 @@ body.cabinet-page:has(.cabinet-premium[data-cabinet-theme="m5-competition"])
   text-shadow: 0 0 12px rgba(28, 105, 212, 0.08);
 }
 
+/* M5 ЛК: табличные цифры, фокус, разделители между карточками, таблица, скелетон, пустые состояния */
+.cabinet-premium[data-cabinet-theme="m5-competition"] #main-content {
+  font-variant-numeric: tabular-nums;
+}
+
+.cabinet-premium[data-cabinet-theme="m5-competition"] #main-content :focus-visible {
+  outline: 2px solid transparent !important;
+  box-shadow:
+    0 0 0 2px rgba(28, 105, 212, 0.75),
+    0 0 0 4px rgba(229, 37, 42, 0.22) !important;
+}
+
+.cabinet-premium[data-cabinet-theme="m5-competition"] #main-content .cabinet-card + .cabinet-card {
+  position: relative;
+  margin-top: 0.35rem !important;
+  padding-top: 0.6rem;
+}
+
+.cabinet-premium[data-cabinet-theme="m5-competition"] #main-content .cabinet-card + .cabinet-card::before {
+  content: "";
+  position: absolute;
+  left: 5%;
+  right: 5%;
+  top: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(28, 105, 212, 0.55) 28%,
+    rgba(229, 37, 42, 0.5) 58%,
+    rgba(184, 188, 198, 0.25) 82%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+.cabinet-premium[data-cabinet-theme="m5-competition"] #main-content table thead tr {
+  border-bottom-color: rgba(28, 105, 212, 0.35) !important;
+  box-shadow: inset 0 -1px 0 0 rgba(229, 37, 42, 0.22);
+}
+
+.cabinet-premium[data-cabinet-theme="m5-competition"] #main-content table tbody tr {
+  transition: background-color 0.18s ease;
+}
+
+.cabinet-premium[data-cabinet-theme="m5-competition"] #main-content table tbody tr:hover {
+  background: rgba(28, 105, 212, 0.07) !important;
+}
+
+.cabinet-premium[data-cabinet-theme="m5-competition"] #main-content table tbody tr.border-b {
+  border-color: rgba(28, 105, 212, 0.18) !important;
+}
+
+.cabinet-premium[data-cabinet-theme="m5-competition"] #main-content [role="alert"] {
+  border-left: 3px solid rgba(28, 105, 212, 0.5) !important;
+}
+
+.cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-loading-skeleton .rounded-xl,
+.cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-loading-skeleton .rounded,
+.cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-loading-skeleton .h-4,
+.cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-loading-skeleton .h-6 {
+  background: linear-gradient(
+    105deg,
+    rgba(24, 27, 34, 0.95) 0%,
+    rgba(40, 48, 62, 0.9) 40%,
+    rgba(28, 105, 212, 0.12) 52%,
+    rgba(40, 48, 62, 0.9) 64%,
+    rgba(24, 27, 34, 0.95) 100%
+  ) !important;
+  background-size: 200% 100% !important;
+  animation: m5-skeleton-shimmer 2.2s ease-in-out infinite !important;
+}
+
+.cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-m5-empty {
+  position: relative;
+  max-width: 22rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-m5-empty::before {
+  content: "";
+  display: block;
+  width: 3rem;
+  height: 3px;
+  margin: 0 auto 1rem;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #1c69d4 0%, #e5252a 45%, #b8bcc6 100%);
+  opacity: 0.65;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-loading-skeleton .rounded-xl,
+  .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-loading-skeleton .rounded,
+  .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-loading-skeleton .h-4,
+  .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-loading-skeleton .h-6 {
+    animation: none !important;
+    background: rgba(24, 27, 34, 0.88) !important;
+  }
+}
+
 html:not([data-theme="dark"]) body.cabinet-page:has(.cabinet-premium[data-cabinet-theme="m5-competition"]) {
   background: #08090b !important;
 }
@@ -492,10 +750,7 @@ html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competitio
   border: 1px solid rgba(28, 105, 212, 0.3) !important;
   box-shadow:
     0 0 0 1px rgba(0, 0, 0, 0.4),
-    0 12px 40px rgba(0, 0, 0, 0.35),
-    inset 0 3px 0 0 #1c69d4,
-    inset 0 6px 0 0 #e5252a,
-    inset 0 9px 0 0 rgba(200, 206, 216, 0.35) !important;
+    0 12px 40px rgba(0, 0, 0, 0.35) !important;
 }
 
 html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-main-block #main-content {
@@ -509,10 +764,48 @@ html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competitio
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
 }
 
+/* Светлая тема сайта + M5 ЛК: внутренние блоки и поля — синяя обводка, без «золотого стекла» классического ЛК */
+html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-block-inner,
+html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-limits-block {
+  background: rgba(0, 0, 0, 0.22) !important;
+  border-color: rgba(28, 105, 212, 0.28) !important;
+  color: rgba(232, 234, 239, 0.95) !important;
+}
+html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-block-inner .cabinet-limits-label,
+html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-block-inner [class*="text-[var(--color-text)]"],
+html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-block-inner [class*="text-[var(--color-text-secondary)]"] {
+  color: rgba(232, 234, 239, 0.92) !important;
+}
+html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-input-window {
+  background: rgba(0, 0, 0, 0.28) !important;
+  border: 1px solid rgba(28, 105, 212, 0.35) !important;
+  color: #e8eaef !important;
+}
+html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-input-window:hover {
+  border-color: rgba(28, 105, 212, 0.5) !important;
+}
+html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-input-window:focus-within {
+  border-color: rgba(74, 159, 255, 0.45) !important;
+  box-shadow: 0 0 0 2px rgba(28, 105, 212, 0.15) !important;
+}
+html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-card .cabinet-input-window input,
+html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-card .cabinet-input-window textarea {
+  color: #e8eaef !important;
+}
+html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-card .cabinet-input-window input::placeholder,
+html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-card .cabinet-input-window textarea::placeholder {
+  color: rgba(180, 186, 198, 0.65) !important;
+}
+
 html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-menu-btn {
   border-color: rgba(28, 105, 212, 0.45) !important;
   background: rgba(255, 255, 255, 0.06) !important;
   color: #4a9fff !important;
+}
+
+html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-menu-btn[aria-expanded="true"] {
+  border-color: rgba(28, 105, 212, 0.55) !important;
+  background: rgba(28, 105, 212, 0.12) !important;
 }
 
 html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-nav-dropdown {
@@ -562,17 +855,15 @@ html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competitio
 }
 
 html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-btn-gold {
-  background: linear-gradient(180deg, #3d8ef0 0%, #1c69d4 42%, #155aad 100%) !important;
-  color: #f8fafc !important;
-  border: 1px solid rgba(255, 255, 255, 0.22) !important;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.28),
-    0 2px 0 rgba(0, 0, 0, 0.35),
-    0 6px 22px rgba(28, 105, 212, 0.45),
-    0 0 0 1px rgba(229, 37, 42, 0.22) !important;
-  font-weight: 650 !important;
-  letter-spacing: 0.06em !important;
-  text-transform: uppercase !important;
+  background:
+    linear-gradient(180deg, #12151c, #12151c) padding-box,
+    linear-gradient(135deg, #e5252a 0%, #9a1a1e 28%, #1c69d4 72%, #4a9fff 100%) border-box !important;
+  border: 1.5px solid transparent !important;
+  color: #f2f5fa !important;
+  box-shadow: 0 0 22px rgba(28, 105, 212, 0.16) !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.04em !important;
+  text-transform: none !important;
   font-size: 0.8125rem !important;
   transition:
     transform 0.2s ease,
@@ -581,37 +872,32 @@ html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competitio
 }
 
 html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-btn-gold:hover:not(:disabled) {
-  transform: translateY(-2px) !important;
-  filter: brightness(1.06) !important;
-  animation: m5-primary-glow-pulse 2.8s ease-in-out infinite !important;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.4),
-    0 3px 0 rgba(0, 0, 0, 0.25),
-    0 10px 28px rgba(28, 105, 212, 0.5),
-    0 0 0 1px rgba(229, 37, 42, 0.35),
-    0 0 40px rgba(28, 105, 212, 0.2) !important;
+  filter: brightness(1.05) !important;
+  box-shadow: 0 0 30px rgba(28, 105, 212, 0.22) !important;
 }
 
 html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-btn-gold:active:not(:disabled) {
   transform: translateY(0) scale(0.98) !important;
 }
 
-/* Основные CTA в контенте (классы Tailwind с --color-brand-gold) */
+/* Основные CTA: только реальный bg gold (не hover:bg-… — иначе ловится подстрока в class) */
 html:not([data-theme="dark"])
   .cabinet-premium[data-cabinet-theme="m5-competition"]
   #main-content
-  :is(button, a)[class*="bg-[var(--color-brand-gold)]"] {
-  background: linear-gradient(180deg, #3d8ef0 0%, #1c69d4 45%, #155aad 100%) !important;
-  color: #f8fafc !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.28),
-    0 2px 0 rgba(0, 0, 0, 0.3),
-    0 6px 20px rgba(28, 105, 212, 0.38),
-    0 0 0 1px rgba(229, 37, 42, 0.18) !important;
-  font-weight: 650 !important;
-  letter-spacing: 0.05em !important;
-  text-transform: uppercase !important;
+  :is(button, a):where(
+    [class^="bg-[var(--color-brand-gold)]"],
+    [class*=" bg-[var(--color-brand-gold)]"],
+    [class*=" !bg-[var(--color-brand-gold)]"]
+  ) {
+  background:
+    linear-gradient(180deg, #12151c, #12151c) padding-box,
+    linear-gradient(135deg, #e5252a 0%, #9a1a1e 28%, #1c69d4 72%, #4a9fff 100%) border-box !important;
+  border: 1.5px solid transparent !important;
+  color: #f2f5fa !important;
+  box-shadow: 0 0 22px rgba(28, 105, 212, 0.16) !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.04em !important;
+  text-transform: none !important;
   transition:
     transform 0.2s ease,
     box-shadow 0.25s ease,
@@ -621,20 +907,59 @@ html:not([data-theme="dark"])
 html:not([data-theme="dark"])
   .cabinet-premium[data-cabinet-theme="m5-competition"]
   #main-content
-  :is(button, a)[class*="bg-[var(--color-brand-gold)]"]:hover:not(:disabled) {
-  transform: translateY(-2px) !important;
+  :is(button, a):where(
+    [class^="bg-[var(--color-brand-gold)]"],
+    [class*=" bg-[var(--color-brand-gold)]"],
+    [class*=" !bg-[var(--color-brand-gold)]"]
+  ):hover:not(:disabled) {
   filter: brightness(1.05) !important;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.38),
-    0 8px 26px rgba(28, 105, 212, 0.48),
-    0 0 28px rgba(229, 37, 42, 0.12) !important;
+  box-shadow: 0 0 30px rgba(28, 105, 212, 0.24) !important;
 }
 
 html:not([data-theme="dark"])
   .cabinet-premium[data-cabinet-theme="m5-competition"]
   #main-content
-  :is(button, a)[class*="bg-[var(--color-brand-gold)]"]:active:not(:disabled) {
+  :is(button, a):where(
+    [class^="bg-[var(--color-brand-gold)]"],
+    [class*=" bg-[var(--color-brand-gold)]"],
+    [class*=" !bg-[var(--color-brand-gold)]"]
+  ):active:not(:disabled) {
   transform: translateY(0) scale(0.98) !important;
+}
+
+/* Кнопка выбора файла (верификация и др.): тот же плоский M5-стиль */
+.cabinet-premium[data-cabinet-theme="m5-competition"]
+  #main-content
+  input[type="file"][class*="file:bg-[var(--color-brand-gold)]"]::file-selector-button {
+  background:
+    linear-gradient(180deg, #12151c, #12151c) padding-box,
+    linear-gradient(135deg, #e5252a 0%, #9a1a1e 28%, #1c69d4 72%, #4a9fff 100%) border-box !important;
+  border: 1.5px solid transparent !important;
+  border-radius: 0.5rem !important;
+  color: #f2f5fa !important;
+  font-weight: 600 !important;
+  padding: 0.5rem 1rem !important;
+  margin-right: 0.75rem !important;
+  cursor: pointer !important;
+  box-shadow: 0 0 18px rgba(28, 105, 212, 0.12) !important;
+}
+
+.cabinet-premium[data-cabinet-theme="m5-competition"]
+  #main-content
+  input[type="file"][class*="file:bg-[var(--color-brand-gold)]"]::file-selector-button:hover {
+  filter: brightness(1.05) !important;
+}
+
+/* История операций: чип даты (span с gold) — тот же плоский M5 */
+.cabinet-premium[data-cabinet-theme="m5-competition"]
+  #operations-history
+  span:where([class*="bg-[var(--color-brand-gold)]"]) {
+  background:
+    linear-gradient(180deg, #12151c, #12151c) padding-box,
+    linear-gradient(135deg, #e5252a 0%, #9a1a1e 28%, #1c69d4 72%, #4a9fff 100%) border-box !important;
+  border: 1.5px solid transparent !important;
+  color: #f2f5fa !important;
+  box-shadow: 0 0 14px rgba(28, 105, 212, 0.12) !important;
 }
 
 /* Одиночная CTA — как активный пункт сайдбара M5 (без класса bg gold в разметке) */
@@ -642,7 +967,7 @@ html:not([data-theme="dark"])
   #main-content
   :is(button, a).cabinet-m5-btn-nav-like {
   background:
-    linear-gradient(180deg, rgba(28, 105, 212, 0.2), rgba(10, 12, 16, 0.72)) padding-box,
+    linear-gradient(180deg, #12151c, #12151c) padding-box,
     linear-gradient(135deg, #e5252a 0%, #9a1a1e 28%, #1c69d4 72%, #4a9fff 100%) border-box !important;
   border: 1.5px solid transparent !important;
   color: #f2f5fa !important;
@@ -676,17 +1001,18 @@ html:not([data-theme="dark"])
   outline-offset: 2px;
 }
 
-/* Две кнопки рядом — красная / синяя в тонах M5 (без класса bg gold) */
+/* Две кнопки рядом — тот же характер, что одиночная CTA: тёмная подложка + градиентная обводка M5, акцент красный / синий */
 .cabinet-premium[data-cabinet-theme="m5-competition"]
   #main-content
   :is(button, a).cabinet-m5-btn-pair-red {
-  background: linear-gradient(180deg, #f04550 0%, #e5252a 42%, #b01e22 100%) !important;
-  color: #fff !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  background:
+    linear-gradient(180deg, #12151c, #12151c) padding-box,
+    linear-gradient(135deg, #e5252a 0%, #9a1a1e 38%, #3d4a5c 62%, #1c69d4 92%, #3568a8 100%) border-box !important;
+  border: 1.5px solid transparent !important;
+  color: #f2f5fa !important;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.22),
-    0 2px 0 rgba(0, 0, 0, 0.28),
-    0 6px 18px rgba(229, 37, 42, 0.38) !important;
+    0 0 22px rgba(229, 37, 42, 0.12),
+    0 0 20px rgba(28, 105, 212, 0.1) !important;
   text-transform: none !important;
   letter-spacing: normal !important;
   font-weight: 600 !important;
@@ -701,8 +1027,8 @@ html:not([data-theme="dark"])
   :is(button, a).cabinet-m5-btn-pair-red:hover:not(:disabled) {
   filter: brightness(1.06) !important;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.3),
-    0 8px 22px rgba(229, 37, 42, 0.45) !important;
+    0 0 30px rgba(229, 37, 42, 0.16),
+    0 0 26px rgba(28, 105, 212, 0.12) !important;
 }
 
 .cabinet-premium[data-cabinet-theme="m5-competition"]
@@ -714,13 +1040,12 @@ html:not([data-theme="dark"])
 .cabinet-premium[data-cabinet-theme="m5-competition"]
   #main-content
   :is(button, a).cabinet-m5-btn-pair-blue {
-  background: linear-gradient(180deg, #3d8ef0 0%, #1c69d4 48%, #155aad 100%) !important;
-  color: #f8fafc !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.28),
-    0 2px 0 rgba(0, 0, 0, 0.3),
-    0 6px 20px rgba(28, 105, 212, 0.4) !important;
+  background:
+    linear-gradient(180deg, #12151c, #12151c) padding-box,
+    linear-gradient(135deg, #c43236 0%, #5c2830 26%, #1c69d4 58%, #4a9fff 100%) border-box !important;
+  border: 1.5px solid transparent !important;
+  color: #f2f5fa !important;
+  box-shadow: 0 0 26px rgba(28, 105, 212, 0.16) !important;
   text-transform: none !important;
   letter-spacing: normal !important;
   font-weight: 600 !important;
@@ -734,9 +1059,7 @@ html:not([data-theme="dark"])
   #main-content
   :is(button, a).cabinet-m5-btn-pair-blue:hover:not(:disabled) {
   filter: brightness(1.06) !important;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.36),
-    0 8px 26px rgba(28, 105, 212, 0.5) !important;
+  box-shadow: 0 0 32px rgba(28, 105, 212, 0.22) !important;
 }
 
 .cabinet-premium[data-cabinet-theme="m5-competition"]
@@ -747,11 +1070,15 @@ html:not([data-theme="dark"])
 
 .cabinet-premium[data-cabinet-theme="m5-competition"]
   #main-content
-  :is(button, a).cabinet-m5-btn-pair-red:focus-visible,
+  :is(button, a).cabinet-m5-btn-pair-red:focus-visible {
+  outline: 2px solid rgba(229, 37, 42, 0.55);
+  outline-offset: 2px;
+}
+
 .cabinet-premium[data-cabinet-theme="m5-competition"]
   #main-content
   :is(button, a).cabinet-m5-btn-pair-blue:focus-visible {
-  outline: 2px solid rgba(255, 255, 255, 0.45);
+  outline: 2px solid rgba(74, 159, 255, 0.65);
   outline-offset: 2px;
 }
 
@@ -766,8 +1093,8 @@ html:not([data-theme="dark"])
   button[class*="border-[var(--color-brand-gold)]"][class*="text-[var(--color-text)]"] {
   border-color: rgba(28, 105, 212, 0.55) !important;
   color: #e8eaef !important;
-  background: rgba(0, 0, 0, 0.25) !important;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
+  background: rgba(0, 0, 0, 0.32) !important;
+  box-shadow: none !important;
   letter-spacing: 0.04em !important;
   font-weight: 600 !important;
   transition:
@@ -787,9 +1114,7 @@ html:not([data-theme="dark"])
   button[class*="border-[var(--color-brand-gold)]"][class*="text-[var(--color-text)]"]:hover:not(:disabled) {
   border-color: rgba(229, 37, 42, 0.45) !important;
   background: rgba(28, 105, 212, 0.12) !important;
-  box-shadow:
-    0 0 20px rgba(28, 105, 212, 0.2),
-    inset 0 0 0 1px rgba(229, 37, 42, 0.15) !important;
+  box-shadow: none !important;
   color: #f5f8fc !important;
 }
 
@@ -799,10 +1124,10 @@ html:not([data-theme="dark"])
   #main-content
   :is(button, a)[class*="text-[var(--color-brand-gold)]"][class*="border"] {
   color: #8ec5ff !important;
-  text-shadow: 0 0 16px rgba(28, 105, 212, 0.25) !important;
+  text-shadow: none !important;
   border-color: rgba(28, 105, 212, 0.55) !important;
-  letter-spacing: 0.05em !important;
-  font-weight: 650 !important;
+  letter-spacing: 0.04em !important;
+  font-weight: 600 !important;
   transition:
     background 0.2s ease,
     box-shadow 0.25s ease,
@@ -814,7 +1139,7 @@ html:not([data-theme="dark"])
   #main-content
   :is(button, a)[class*="text-[var(--color-brand-gold)]"][class*="border"]:hover:not(:disabled) {
   background: rgba(28, 105, 212, 0.14) !important;
-  box-shadow: 0 0 24px rgba(28, 105, 212, 0.22) !important;
+  box-shadow: none !important;
   color: #cfe4ff !important;
 }
 
@@ -906,8 +1231,7 @@ html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competitio
   border-color: rgba(28, 105, 212, 0.42) !important;
 }
 
-[data-theme="dark"] .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-sidebar:not(.admin-sidebar),
-[data-theme="dark"] .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-main-block:not(.admin-main-block) {
+[data-theme="dark"] .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-sidebar:not(.admin-sidebar) {
   border-color: rgba(28, 105, 212, 0.32) !important;
   box-shadow:
     0 0 0 1px rgba(0, 0, 0, 0.35),
@@ -930,17 +1254,20 @@ html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competitio
 [data-theme="dark"]
   .cabinet-premium[data-cabinet-theme="m5-competition"]
   #main-content
-  :is(button, a)[class*="bg-[var(--color-brand-gold)]"] {
-  background: linear-gradient(180deg, #3d8ef0 0%, #1c69d4 45%, #155aad 100%) !important;
-  color: #f8fafc !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.28),
-    0 4px 20px rgba(28, 105, 212, 0.38),
-    0 0 0 1px rgba(229, 37, 42, 0.18) !important;
-  font-weight: 650 !important;
-  letter-spacing: 0.05em !important;
-  text-transform: uppercase !important;
+  :is(button, a):where(
+    [class^="bg-[var(--color-brand-gold)]"],
+    [class*=" bg-[var(--color-brand-gold)]"],
+    [class*=" !bg-[var(--color-brand-gold)]"]
+  ) {
+  background:
+    linear-gradient(180deg, #12151c, #12151c) padding-box,
+    linear-gradient(135deg, #e5252a 0%, #9a1a1e 28%, #1c69d4 72%, #4a9fff 100%) border-box !important;
+  border: 1.5px solid transparent !important;
+  color: #f2f5fa !important;
+  box-shadow: 0 0 22px rgba(28, 105, 212, 0.14) !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.04em !important;
+  text-transform: none !important;
   transition:
     transform 0.2s ease,
     box-shadow 0.25s ease,
@@ -951,13 +1278,13 @@ html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competitio
 [data-theme="dark"]
   .cabinet-premium[data-cabinet-theme="m5-competition"]
   #main-content
-  :is(button, a)[class*="bg-[var(--color-brand-gold)]"]:hover:not(:disabled) {
-  transform: translateY(-2px) !important;
-  filter: brightness(1.06) !important;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.38),
-    0 8px 28px rgba(28, 105, 212, 0.48),
-    0 0 28px rgba(229, 37, 42, 0.12) !important;
+  :is(button, a):where(
+    [class^="bg-[var(--color-brand-gold)]"],
+    [class*=" bg-[var(--color-brand-gold)]"],
+    [class*=" !bg-[var(--color-brand-gold)]"]
+  ):hover:not(:disabled) {
+  filter: brightness(1.05) !important;
+  box-shadow: 0 0 30px rgba(28, 105, 212, 0.22) !important;
 }
 
 [data-theme="dark"] .cabinet-premium[data-cabinet-theme="m5-competition"] .premium-card-shine {
@@ -985,15 +1312,15 @@ html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competitio
   }
 }
 
-/* Светлая тема: сайдбар — однотонный navy с контрастом, как шапка и основной блок */
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-sidebar:not(.admin-sidebar) {
+/* Светлая тема: сайдбар — однотонный navy (не M5 — у M5 свой карбон выше по файлу) */
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-sidebar:not(.admin-sidebar) {
   background: #1e2a3a !important;
   border: 0.5px solid rgba(197, 165, 114, 0.4) !important;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.08);
   color: rgba(255, 255, 255, 0.92);
 }
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-sidebar:not(.admin-sidebar) a,
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-sidebar:not(.admin-sidebar) button {
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-sidebar:not(.admin-sidebar) a,
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-sidebar:not(.admin-sidebar) button {
   color: rgba(255, 255, 255, 0.92);
 }
 
@@ -1003,12 +1330,12 @@ html:not([data-theme="dark"]) .cabinet-premium .cabinet-sidebar:not(.admin-sideb
 }
 
 /* Светлая тема: блок пользователя в сайдбаре — светлый текст на navy */
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-sidebar-profile {
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-sidebar-profile {
   color: rgba(255, 255, 255, 0.95) !important;
 }
 
-/* Светлая тема: активный пункт в сайдбаре — светлая подсветка на navy */
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-sidebar:not(.admin-sidebar) .cabinet-nav-active {
+/* Светлая тема: активный пункт в сайдбаре — светлая подсветка на navy (не M5 — там cabinet-nav-active-m5) */
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-sidebar:not(.admin-sidebar) .cabinet-nav-active {
   border-color: rgba(255, 255, 255, 0.35) !important;
   background: rgba(255, 255, 255, 0.15) !important;
   color: #ffffff !important;
@@ -1038,43 +1365,43 @@ html:not([data-theme="dark"]) .cabinet-premium .cabinet-sidebar:not(.admin-sideb
   transform: rotate(45deg);
   border-radius: 1px;
 }
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-nav-dropdown::before {
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-nav-dropdown::before {
   background: #1e2a3a;
   border-color: rgba(197, 165, 114, 0.4);
 }
 [data-theme="dark"] .cabinet-premium .cabinet-nav-dropdown::before {
   display: none;
 }
-.cabinet-premium .cabinet-menu-btn[aria-expanded="true"] {
+.cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-menu-btn[aria-expanded="true"] {
   border-color: rgba(197, 165, 114, 0.45);
   background: rgba(197, 165, 114, 0.12);
 }
-/* Светлая тема: мобильное меню — как сайдбар (тот же фон, обводка, тень) */
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-nav-dropdown {
+/* Светлая тема: мобильное меню — как сайдбар (не M5 — у M5 свои правила) */
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-nav-dropdown {
   background: #1e2a3a !important;
   color: rgba(255, 255, 255, 0.92);
   border: 0.5px solid rgba(197, 165, 114, 0.4) !important;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.08) !important;
 }
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-nav-dropdown a,
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-nav-dropdown button {
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-nav-dropdown a,
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-nav-dropdown button {
   color: inherit;
 }
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-nav-dropdown .cabinet-nav-label {
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-nav-dropdown .cabinet-nav-label {
   color: rgba(255, 255, 255, 0.8) !important;
 }
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-nav-dropdown .cabinet-nav-active {
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-nav-dropdown .cabinet-nav-active {
   border-color: rgba(255, 255, 255, 0.35) !important;
   background: rgba(255, 255, 255, 0.15) !important;
   color: #ffffff !important;
 }
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-nav-dropdown .cabinet-sidebar-profile {
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-nav-dropdown .cabinet-sidebar-profile {
   color: rgba(255, 255, 255, 0.95) !important;
   background: rgba(255, 255, 255, 0.1) !important;
   border-width: 0.5px !important;
   border-color: rgba(197, 165, 114, 0.4) !important;
 }
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-nav-dropdown nav {
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-nav-dropdown nav {
   background: rgba(255, 255, 255, 0.1) !important;
   border-width: 0.5px !important;
   border-style: solid !important;
@@ -1116,7 +1443,7 @@ html:not([data-theme="dark"]) .cabinet-premium .cabinet-nav-dropdown nav {
 }
 
 /* Блок навигации в сайдбаре — те же заливка и обводка, что у блока профиля (из .cabinet-sidebar-profile) */
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-sidebar:not(.admin-sidebar) .cabinet-nav-block nav {
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-sidebar:not(.admin-sidebar) .cabinet-nav-block nav {
   background: rgba(255, 255, 255, 0.1) !important;
   border-width: 0.5px !important;
   border-style: solid !important;
@@ -1144,7 +1471,7 @@ html:not([data-theme="dark"]) .admin-panel .admin-sidebar .cabinet-nav-block nav
   font-family: var(--font-inter), system-ui, sans-serif;
 }
 /* Светлая тема: подпись «Навигация» в сайдбаре */
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-sidebar:not(.admin-sidebar) .cabinet-nav-label {
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-sidebar:not(.admin-sidebar) .cabinet-nav-label {
   color: rgba(255, 255, 255, 0.8) !important;
 }
 html:not([data-theme="dark"]) .admin-panel .admin-sidebar .cabinet-nav-label {
@@ -1182,15 +1509,15 @@ html:not([data-theme="dark"]) .admin-panel .admin-sidebar .cabinet-sidebar-profi
   color: #fff !important;
 }
 
-/* Светлая тема: блок профиля в сайдбаре — белый фон, обводка тоньше; аватар — золотой фон, тёмные инициалы */
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-sidebar-profile {
+/* Светлая тема: блок профиля в сайдбаре — белый фон, обводка тоньше; аватар — золотой фон, тёмные инициалы (не M5) */
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-sidebar-profile {
   background: rgba(255, 255, 255, 0.1) !important;
   border-width: 0.5px !important;
   border-style: solid !important;
   border-color: rgba(197, 165, 114, 0.45) !important;
   box-shadow: none;
 }
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-sidebar-avatar {
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-sidebar-avatar {
   background: var(--color-brand-gold) !important;
   border: 0.5px solid rgba(197, 165, 114, 0.7);
   color: #0a192f !important;
@@ -1494,23 +1821,68 @@ html:not([data-theme="dark"]) body.cabinet-page:has(.cabinet-premium[data-cabine
 
 html:not([data-theme="dark"]) body.cabinet-page:has(.cabinet-premium[data-cabinet-theme="m5-competition"]) .site-header .site-header-logo-icon {
   border-radius: 9999px !important;
-  background: linear-gradient(145deg, #3d8ef0 0%, #1c69d4 50%, #155aad 100%) !important;
+  background:
+    linear-gradient(
+      125deg,
+      #4a9fff 0%,
+      #1c69d4 22%,
+      #0d4a9e 38%,
+      #c43236 52%,
+      #e5252a 68%,
+      #1c69d4 85%,
+      #7eb6ff 100%
+    ) !important;
+  background-size: 280% 280% !important;
+  animation: m5-header-logo-icon-shimmer 10s ease-in-out infinite !important;
   color: #ffffff !important;
   box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.12),
-    0 4px 12px rgba(28, 105, 212, 0.3) !important;
+    0 0 0 1px rgba(255, 255, 255, 0.14),
+    0 0 20px rgba(28, 105, 212, 0.25),
+    0 4px 14px rgba(0, 0, 0, 0.35) !important;
 }
 
 html:not([data-theme="dark"]) body.cabinet-page:has(.cabinet-premium[data-cabinet-theme="m5-competition"]) .site-header .site-header-logo-free {
-  color: #b8dcff !important;
+  display: inline-block !important;
+  background: linear-gradient(
+    95deg,
+    #e8f4ff 0%,
+    #8ec5ff 18%,
+    #4a9fff 35%,
+    #b8dcff 52%,
+    #6eb5ff 70%,
+    #cfe8ff 88%,
+    #4a9fff 100%
+  ) !important;
+  background-size: 220% 100% !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+  -webkit-text-fill-color: transparent !important;
+  animation: m5-header-logo-text-shimmer 5.5s linear infinite !important;
 }
 
 html:not([data-theme="dark"]) body.cabinet-page:has(.cabinet-premium[data-cabinet-theme="m5-competition"]) .site-header .site-header-logo-text span:not(.site-header-logo-free) {
-  color: #e5252a !important;
+  display: inline-block !important;
+  background: linear-gradient(
+    95deg,
+    #ff9a9e 0%,
+    #e5252a 22%,
+    #ff6b6e 42%,
+    #b01e22 58%,
+    #ff5558 75%,
+    #e5252a 92%,
+    #ff8a8c 100%
+  ) !important;
+  background-size: 220% 100% !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+  -webkit-text-fill-color: transparent !important;
+  animation: m5-header-logo-text-shimmer 5.5s linear infinite reverse !important;
 }
 
-/* Светлая тема: основной блок ЛК и админки — однотонный navy с контрастом, без градиента */
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-main-block:not(.admin-main-block),
+/* Светлая тема: основной блок ЛК и админки — однотонный navy (не M5 — у M5 карбон-градиент) */
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-main-block:not(.admin-main-block),
 html:not([data-theme="dark"]) .admin-panel .admin-main-block.cabinet-main-block {
   background: #1e2a3a !important;
   border: none;
@@ -1528,9 +1900,9 @@ html:not([data-theme="dark"]) .admin-panel .admin-main-block.cabinet-main-block 
   color: var(--color-text-secondary);
 }
 
-/* Светлая тема: блоки на основном блоке — тот же фон и рамка, что у блока чата поддержки */
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-card,
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-section-header {
+/* Светлая тема: блоки на основном блоке — тот же фон и рамка, что у блока чата поддержки (не M5) */
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-card,
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-section-header {
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(197, 165, 114, 0.5);
   border-radius: 1rem;
@@ -1651,6 +2023,65 @@ html:not([data-theme="dark"]) .card-block {
   border-color: rgba(10, 25, 47, 0.35) !important;
 }
 
+/* M5: экраны успеха/ошибки — карбон вместо «сайтового» белого */
+.pay-page--m5-competition.pay-success-always-light {
+  background: #08090b !important;
+  -webkit-font-smoothing: antialiased;
+}
+.pay-page--m5-competition .pay-success-card--m5 {
+  background: linear-gradient(165deg, #14161c 0%, #0e1014 55%, #12141a 100%) !important;
+  border: 1px solid rgba(28, 105, 212, 0.38) !important;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.45),
+    0 16px 48px rgba(0, 0, 0, 0.42),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+}
+.pay-page--m5-competition .pay-success-card--m5 h1,
+.pay-page--m5-competition .pay-success-card--m5 .text-2xl {
+  color: #e8eaef !important;
+}
+.pay-page--m5-competition .pay-success-card--m5 p,
+.pay-page--m5-competition .pay-success-card--m5 .text-lg {
+  color: rgba(232, 234, 239, 0.92) !important;
+}
+.pay-page--m5-competition .pay-success-card--m5 p.text-sm,
+.pay-page--m5-competition .pay-success-card--m5 .text-sm {
+  color: rgba(184, 188, 198, 0.88) !important;
+}
+.pay-page--m5-competition .pay-success-card--m5 .pay-m5-cta-secondary {
+  border-color: rgba(28, 105, 212, 0.45) !important;
+  color: #b8dcff !important;
+  background: rgba(0, 0, 0, 0.22) !important;
+}
+.pay-page--m5-competition .pay-success-card--m5 .pay-m5-cta-secondary:hover {
+  background: rgba(28, 105, 212, 0.12) !important;
+}
+.pay-page--m5-competition .pay-success-card--m5 .pay-m5-cta-primary {
+  background:
+    linear-gradient(180deg, #12151c, #12151c) padding-box,
+    linear-gradient(135deg, #e5252a 0%, #9a1a1e 28%, #1c69d4 72%, #4a9fff 100%) border-box !important;
+  border: 1.5px solid transparent !important;
+  color: #f2f5fa !important;
+  box-shadow: 0 0 22px rgba(28, 105, 212, 0.2) !important;
+}
+[data-theme="dark"] .pay-page--m5-competition.pay-success-always-light .pay-success-card--m5 {
+  background: linear-gradient(165deg, #14161c 0%, #0e1014 55%, #12141a 100%) !important;
+  border-color: rgba(28, 105, 212, 0.42) !important;
+}
+[data-theme="dark"] .pay-page--m5-competition.pay-success-always-light .pay-success-card--m5 h1,
+[data-theme="dark"] .pay-page--m5-competition.pay-success-always-light .pay-success-card--m5 p {
+  color: #e8eaef !important;
+}
+[data-theme="dark"] .pay-page--m5-competition.pay-success-always-light .pay-success-card--m5 p.text-sm {
+  color: rgba(184, 188, 198, 0.9) !important;
+}
+[data-theme="dark"] .pay-page--m5-competition.pay-success-always-light .pay-success-card--m5 .pay-m5-cta-primary {
+  background:
+    linear-gradient(180deg, #12151c, #12151c) padding-box,
+    linear-gradient(135deg, #e5252a 0%, #9a1a1e 28%, #1c69d4 72%, #4a9fff 100%) border-box !important;
+  color: #f2f5fa !important;
+}
+
 /* Кнопка «Оплатить» на странице чаевых — всегда золотая (светлая и тёмная тема) */
 .pay-btn-gold {
   background: var(--color-brand-gold) !important;
@@ -1722,20 +2153,22 @@ html:not([data-theme="dark"]) .pay-page .pay-page-outer-block {
   box-shadow: var(--shadow-card);
 }
 
-/* Светлая тема: на тёмном фоне основного блока логотип — светлый */
-html:not([data-theme="dark"]) .pay-page .pay-page-outer-block .pay-page-logo-wrap,
-html:not([data-theme="dark"]) .pay-page .pay-page-outer-block .pay-page-logo-wrap .font-\[family\:var\(--font-playfair\)\] {
-  color: rgba(255, 255, 255, 0.95);
+/* Светлая тема: логотип FreeTips на фоне блока (бренд заведения: --pay-font / --pay-brand-primary) */
+html:not([data-theme="dark"]) .pay-page:not(.pay-page--m5-competition) .pay-page-outer-block .pay-page-logo-text {
+  color: var(--pay-font, rgba(255, 255, 255, 0.95));
 }
-html:not([data-theme="dark"]) .pay-page .pay-page-outer-block .pay-page-logo-wrap .font-\[family\:var\(--font-playfair\)\] span {
-  color: inherit;
+html:not([data-theme="dark"]) .pay-page:not(.pay-page--m5-competition) .pay-page-outer-block .pay-page-logo-free {
+  color: inherit !important;
+  opacity: 0.98;
 }
-html:not([data-theme="dark"]) .pay-page .pay-page-outer-block .pay-page-logo-wrap span.text-\[\var\(--color-brand-gold\)\] {
-  color: var(--color-brand-gold) !important;
+html:not([data-theme="dark"]) .pay-page:not(.pay-page--m5-competition) .pay-page-outer-block .pay-page-logo-tips {
+  color: var(--pay-brand-primary, var(--color-brand-gold)) !important;
 }
-/* Светлая тема: «Free» в логотипе страницы оплаты — белый на тёмном фоне блока */
-html:not([data-theme="dark"]) .pay-page .pay-page-outer-block .pay-page-logo-wrap .pay-page-logo-free {
-  color: #ffffff !important;
+[data-theme="dark"] .pay-page:not(.pay-page--m5-competition) .pay-page-outer-block .pay-page-logo-text {
+  color: var(--pay-font, var(--pay-page-text));
+}
+[data-theme="dark"] .pay-page:not(.pay-page--m5-competition) .pay-page-outer-block .pay-page-logo-tips {
+  color: var(--pay-brand-primary, var(--pay-page-accent)) !important;
 }
 
 /* Отступ логотипа от блока ниже */
@@ -1839,23 +2272,25 @@ html:not([data-theme="dark"]) .layout-login .auth-page-card a:not(.auth-btn-prim
   padding: 16px;
 }
 
-/* /pay/ahmedm5f90, /pay/ahmedm5f98 — оболочка как ЛК M5 (класс pay-page--m5-competition из конфига) */
-html:not([data-theme="dark"]) .pay-page.pay-page--m5-competition {
+/* /pay — M5: класс pay-page--m5-competition (slug из конфига или m5PayShell по логину получателя) */
+.pay-page.pay-page--m5-competition.pay-page--cards {
+  background: #08090b !important;
   -webkit-font-smoothing: antialiased;
+  font-variant-numeric: tabular-nums;
 }
 html:not([data-theme="dark"]) .pay-page.pay-page--m5-competition .pay-page-outer-block {
   background: linear-gradient(165deg, #14161c 0%, #0e1014 55%, #12141a 100%) !important;
-  border: 1px solid rgba(201, 169, 98, 0.3) !important;
+  border: 1px solid rgba(28, 105, 212, 0.38) !important;
   box-shadow:
     0 0 0 1px rgba(0, 0, 0, 0.45),
     0 12px 40px rgba(0, 0, 0, 0.4),
     inset 0 2px 0 0 #1c69d4,
     inset 0 4px 0 0 #e5252a,
-    inset 0 6px 0 0 rgba(201, 169, 98, 0.8) !important;
+    inset 0 6px 0 0 rgba(184, 188, 198, 0.35) !important;
 }
 html:not([data-theme="dark"]) .pay-page.pay-page--m5-competition .pay-page-card.card {
   background: rgba(28, 31, 40, 0.96) !important;
-  border: 1px solid rgba(201, 169, 98, 0.28) !important;
+  border: 1px solid rgba(28, 105, 212, 0.28) !important;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.04),
     0 2px 14px rgba(0, 0, 0, 0.35) !important;
@@ -1871,41 +2306,105 @@ html:not([data-theme="dark"]) .pay-page.pay-page--m5-competition .pay-page-card.
 }
 html:not([data-theme="dark"]) .pay-page.pay-page--m5-competition .pay-page-card.card .info-block {
   background: rgba(0, 0, 0, 0.22) !important;
-  border: 0.5px solid rgba(201, 169, 98, 0.22) !important;
-}
-html:not([data-theme="dark"]) .pay-page.pay-page--m5-competition .pay-page-logo-wrap .pay-page-logo-free {
-  color: #e8eaef !important;
+  border: 0.5px solid rgba(28, 105, 212, 0.22) !important;
 }
 html:not([data-theme="dark"]) .pay-page.pay-page--m5-competition .pay-page-logo-ft {
-  background: linear-gradient(180deg, #e0cc8a 0%, #c9a962 50%, #9a7d42 100%) !important;
-  color: #0a0a0c !important;
+  border-radius: 9999px !important;
+  background:
+    linear-gradient(
+      125deg,
+      #4a9fff 0%,
+      #1c69d4 22%,
+      #0d4a9e 38%,
+      #c43236 52%,
+      #e5252a 68%,
+      #1c69d4 85%,
+      #7eb6ff 100%
+    ) !important;
+  background-size: 280% 280% !important;
+  animation: m5-header-logo-icon-shimmer 10s ease-in-out infinite !important;
+  color: #ffffff !important;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.12),
+    0 4px 14px rgba(28, 105, 212, 0.3) !important;
 }
-html:not([data-theme="dark"]) .pay-page.pay-page--m5-competition .review-textarea {
-  background: rgba(0, 0, 0, 0.28) !important;
-  border-color: rgba(201, 169, 98, 0.28) !important;
-  color: #e8eaef !important;
+html:not([data-theme="dark"]) .pay-page.pay-page--m5-competition .pay-page-logo-wrap .pay-page-logo-free {
+  display: inline-block !important;
+  background: linear-gradient(
+    95deg,
+    #e8f4ff 0%,
+    #8ec5ff 18%,
+    #4a9fff 35%,
+    #b8dcff 52%,
+    #6eb5ff 70%,
+    #cfe8ff 88%,
+    #4a9fff 100%
+  ) !important;
+  background-size: 220% 100% !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+  -webkit-text-fill-color: transparent !important;
+  animation: m5-header-logo-text-shimmer 5.5s linear infinite !important;
 }
+html:not([data-theme="dark"]) .pay-page.pay-page--m5-competition .pay-page-logo-wrap .pay-page-logo-tips {
+  display: inline-block !important;
+  background: linear-gradient(
+    95deg,
+    #ff9a9e 0%,
+    #e5252a 22%,
+    #ff6b6e 42%,
+    #b01e22 58%,
+    #ff5558 75%,
+    #e5252a 92%,
+    #ff8a8c 100%
+  ) !important;
+  background-size: 220% 100% !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+  -webkit-text-fill-color: transparent !important;
+  animation: m5-header-logo-text-shimmer 5.5s linear infinite reverse !important;
+}
+html:not([data-theme="dark"]) .pay-page.pay-page--m5-competition .review-textarea,
 html:not([data-theme="dark"]) .pay-page.pay-page--m5-competition .pay-page-input-wrap input {
-  background: rgba(0, 0, 0, 0.25) !important;
-  border-color: rgba(201, 169, 98, 0.3) !important;
+  background: rgba(0, 0, 0, 0.28) !important;
+  border-color: rgba(28, 105, 212, 0.32) !important;
   color: #e8eaef !important;
+}
+html:not([data-theme="dark"]) .pay-page.pay-page--m5-competition .pay-page-input-wrap input:focus-visible,
+html:not([data-theme="dark"]) .pay-page.pay-page--m5-competition .review-textarea:focus-visible {
+  outline: 2px solid transparent !important;
+  box-shadow:
+    0 0 0 2px rgba(28, 105, 212, 0.65),
+    0 0 0 4px rgba(229, 37, 42, 0.2) !important;
+}
+html:not([data-theme="dark"]) .pay-page.pay-page--m5-competition .pay-page-amount-btn.is-active.active {
+  border-color: rgba(28, 105, 212, 0.65) !important;
+  box-shadow: 0 0 0 1px rgba(229, 37, 42, 0.25) !important;
+}
+html:not([data-theme="dark"]) .pay-page.pay-page--m5-competition .theme-toggle-btn {
+  border-color: rgba(28, 105, 212, 0.5) !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+  color: #e8eaef !important;
+}
+html:not([data-theme="dark"]) .pay-page.pay-page--m5-competition .theme-toggle-btn .theme-toggle-icon,
+html:not([data-theme="dark"]) .pay-page.pay-page--m5-competition .theme-toggle-btn svg {
+  color: #4a9fff !important;
 }
 html:not([data-theme="dark"]) .pay-page.pay-page--m5-competition .pay-page-submit {
-  background: linear-gradient(180deg, #e0cc8a 0%, #c9a962 40%, #9a7d42 100%) !important;
-  color: #0a0a0c !important;
-  border: none !important;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.3),
-    0 6px 22px rgba(201, 169, 98, 0.38) !important;
-  font-weight: 650 !important;
-  letter-spacing: 0.05em !important;
+  background:
+    linear-gradient(180deg, #12151c, #12151c) padding-box,
+    linear-gradient(135deg, #e5252a 0%, #9a1a1e 28%, #1c69d4 72%, #4a9fff 100%) border-box !important;
+  border: 1.5px solid transparent !important;
+  color: #f2f5fa !important;
+  box-shadow: 0 0 22px rgba(28, 105, 212, 0.18) !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.04em !important;
 }
 html:not([data-theme="dark"]) .pay-page.pay-page--m5-competition .pay-page-submit:hover:not(:disabled) {
-  filter: brightness(1.06);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.38),
-    0 8px 28px rgba(201, 169, 98, 0.48),
-    0 0 26px rgba(28, 105, 212, 0.12) !important;
+  filter: brightness(1.05) !important;
+  box-shadow: 0 0 30px rgba(28, 105, 212, 0.26) !important;
 }
 [data-theme="dark"] .pay-page.pay-page--m5-competition .pay-page-outer-block {
   box-shadow:
@@ -1913,19 +2412,109 @@ html:not([data-theme="dark"]) .pay-page.pay-page--m5-competition .pay-page-submi
     0 8px 28px rgba(0, 0, 0, 0.35),
     inset 0 2px 0 0 #1c69d4,
     inset 0 4px 0 0 #e5252a,
-    inset 0 6px 0 0 rgba(201, 169, 98, 0.75) !important;
-  border-color: rgba(201, 169, 98, 0.32) !important;
+    inset 0 6px 0 0 rgba(184, 188, 198, 0.3) !important;
+  border-color: rgba(28, 105, 212, 0.36) !important;
 }
 [data-theme="dark"] .pay-page.pay-page--m5-competition .pay-page-card.card {
-  border-color: rgba(201, 169, 98, 0.28) !important;
+  border-color: rgba(28, 105, 212, 0.3) !important;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.04),
     0 2px 14px rgba(0, 0, 0, 0.35) !important;
 }
+[data-theme="dark"] .pay-page.pay-page--m5-competition .pay-page-card.card .pay-page-recipient-name,
+[data-theme="dark"] .pay-page.pay-page--m5-competition .pay-page-card.card .pay-page-section-title,
+[data-theme="dark"] .pay-page.pay-page--m5-competition .pay-page-card.card .pay-page-label,
+[data-theme="dark"] .pay-page.pay-page--m5-competition .pay-page-card.card .pay-page-saving-goal-text,
+[data-theme="dark"] .pay-page.pay-page--m5-competition .pay-page-card.card .info-block,
+[data-theme="dark"] .pay-page.pay-page--m5-competition .pay-page-card.card .info-row,
+[data-theme="dark"] .pay-page.pay-page--m5-competition .pay-page-card.card .info-row span {
+  color: rgba(232, 234, 239, 0.94) !important;
+}
+[data-theme="dark"] .pay-page.pay-page--m5-competition .review-textarea,
+[data-theme="dark"] .pay-page.pay-page--m5-competition .pay-page-input-wrap input {
+  border-color: rgba(28, 105, 212, 0.35) !important;
+}
+[data-theme="dark"] .pay-page.pay-page--m5-competition .theme-toggle-btn {
+  border-color: rgba(28, 105, 212, 0.45) !important;
+  color: #e8eaef !important;
+}
 [data-theme="dark"] .pay-page.pay-page--m5-competition .pay-page-submit {
-  background: linear-gradient(180deg, #e0cc8a 0%, #c9a962 40%, #9a7d42 100%) !important;
-  color: #0a0a0c !important;
-  box-shadow: 0 6px 20px rgba(201, 169, 98, 0.32) !important;
+  background:
+    linear-gradient(180deg, #12151c, #12151c) padding-box,
+    linear-gradient(135deg, #e5252a 0%, #9a1a1e 28%, #1c69d4 72%, #4a9fff 100%) border-box !important;
+  border: 1.5px solid transparent !important;
+  color: #f2f5fa !important;
+  box-shadow: 0 0 22px rgba(28, 105, 212, 0.2) !important;
+}
+[data-theme="dark"] .pay-page.pay-page--m5-competition .pay-page-logo-ft {
+  border-radius: 9999px !important;
+  background:
+    linear-gradient(
+      125deg,
+      #4a9fff 0%,
+      #1c69d4 22%,
+      #0d4a9e 38%,
+      #c43236 52%,
+      #e5252a 68%,
+      #1c69d4 85%,
+      #7eb6ff 100%
+    ) !important;
+  background-size: 280% 280% !important;
+  animation: m5-header-logo-icon-shimmer 10s ease-in-out infinite !important;
+  color: #ffffff !important;
+}
+[data-theme="dark"] .pay-page.pay-page--m5-competition .pay-page-logo-wrap .pay-page-logo-free {
+  display: inline-block !important;
+  background: linear-gradient(
+    95deg,
+    #e8f4ff 0%,
+    #8ec5ff 18%,
+    #4a9fff 35%,
+    #b8dcff 52%,
+    #6eb5ff 70%,
+    #cfe8ff 88%,
+    #4a9fff 100%
+  ) !important;
+  background-size: 220% 100% !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+  -webkit-text-fill-color: transparent !important;
+  animation: m5-header-logo-text-shimmer 5.5s linear infinite !important;
+}
+[data-theme="dark"] .pay-page.pay-page--m5-competition .pay-page-logo-wrap .pay-page-logo-tips {
+  display: inline-block !important;
+  background: linear-gradient(
+    95deg,
+    #ff9a9e 0%,
+    #e5252a 22%,
+    #ff6b6e 42%,
+    #b01e22 58%,
+    #ff5558 75%,
+    #e5252a 92%,
+    #ff8a8c 100%
+  ) !important;
+  background-size: 220% 100% !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+  -webkit-text-fill-color: transparent !important;
+  animation: m5-header-logo-text-shimmer 5.5s linear infinite reverse !important;
+}
+.pay-page.pay-page--m5-competition [role="status"] svg {
+  color: #4a9fff !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .pay-page.pay-page--m5-competition .pay-page-logo-ft,
+  .pay-page.pay-page--m5-competition .pay-page-logo-wrap .pay-page-logo-free,
+  .pay-page.pay-page--m5-competition .pay-page-logo-wrap .pay-page-logo-tips {
+    animation: none !important;
+    background-position: 0% 50% !important;
+  }
+  .pay-page.pay-page--m5-competition .pay-page-logo-wrap .pay-page-logo-free,
+  .pay-page.pay-page--m5-competition .pay-page-logo-wrap .pay-page-logo-tips {
+    background-position: 0% center !important;
+  }
 }
 
 /* Внутренние карточки: тонкая обводка, тень, небольшое скругление */
@@ -2387,8 +2976,8 @@ html:not([data-theme="dark"]) .pay-page .pay-page-submit:hover:not(:disabled) {
   }
 }
 
-/* Светлая тема: кнопка «Вывести» — всегда золотая */
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-btn-gold {
+/* Светлая тема: кнопка «Вывести» — золотая (не M5 — там M5-стиль выше по файлу) */
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-btn-gold {
   background: var(--color-brand-gold) !important;
   color: #0a192f !important;
   border: 1px solid rgba(197, 165, 114, 0.6);
@@ -2399,37 +2988,37 @@ html:not([data-theme="dark"]) .cabinet-premium .cabinet-btn-gold {
   background-color: var(--cabinet-block-bg, rgba(255, 255, 255, 0.06));
 }
 
-/* Светлая тема: карточки внутри блоков — как на фото (пузырь «Поддержка»: полупрозрачный тёмный фон, светлая обводка) */
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-block-inner {
+/* Светлая тема: карточки внутри блоков — «стекло» + золотая обводка (не M5) */
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-block-inner {
   background: var(--cabinet-block-bg, rgba(255, 255, 255, 0.15)) !important;
   border: 1px solid rgba(197, 165, 114, 0.5);
   color: rgba(255, 255, 255, 0.95);
 }
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-block-inner .cabinet-limits-label,
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-block-inner [class*="text-[var(--color-text)]"],
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-block-inner [class*="text-[var(--color-text-secondary)]"] {
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-block-inner .cabinet-limits-label,
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-block-inner [class*="text-[var(--color-text)]"],
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-block-inner [class*="text-[var(--color-text-secondary)]"] {
   color: rgba(255, 255, 255, 0.9) !important;
 }
 
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-input-window {
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-input-window {
   background: rgba(255, 255, 255, 0.15) !important;
   border: 1px solid rgba(197, 165, 114, 0.5);
   color: #fff !important;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-input-window:hover {
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-input-window:hover {
   border-color: rgba(255, 255, 255, 0.35);
 }
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-input-window:focus-within {
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-input-window:focus-within {
   border-color: rgba(255, 255, 255, 0.4);
   box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
 }
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-card .cabinet-input-window,
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-card .cabinet-input-window input {
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-card .cabinet-input-window,
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-card .cabinet-input-window input {
   color: #fff !important;
 }
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-card .cabinet-input-window input::placeholder,
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-card .cabinet-input-window textarea::placeholder {
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-card .cabinet-input-window input::placeholder,
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-card .cabinet-input-window textarea::placeholder {
   color: rgba(255, 255, 255, 0.6) !important;
 }
 
@@ -2555,6 +3144,19 @@ html:not([data-theme="dark"]) .cabinet-premium #operations-history.cabinet-card 
   color: #64748b !important;
 }
 
+/* M5 ЛК: тёмные панели при светлой теме сайта — светлый текст в полях (перебивает правило выше) */
+.cabinet-premium[data-cabinet-theme="m5-competition"] input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="hidden"]),
+.cabinet-premium[data-cabinet-theme="m5-competition"] textarea,
+.cabinet-premium[data-cabinet-theme="m5-competition"] select {
+  color: var(--color-text) !important;
+  -webkit-text-fill-color: var(--color-text);
+}
+.cabinet-premium[data-cabinet-theme="m5-competition"] input::placeholder,
+.cabinet-premium[data-cabinet-theme="m5-competition"] textarea::placeholder {
+  color: var(--color-muted) !important;
+  -webkit-text-fill-color: var(--color-muted);
+}
+
 /* Тёмная тема: поля ввода — тёмно-серый фон как в чате (#363636), светлый текст, плейсхолдер #8e8e8e */
 [data-theme="dark"] .cabinet-premium input,
 [data-theme="dark"] .cabinet-premium textarea {
@@ -2662,21 +3264,21 @@ html:not([data-theme="dark"]) .support-chat-block {
   color: rgba(255, 255, 255, 0.6) !important;
 }
 
-/* Светлая тема: блок «Доступные лимиты» — как на фото (полупрозрачный фон, светлая обводка) */
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-limits-block {
+/* Светлая тема: блок «Доступные лимиты» — как на фото (не M5) */
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-limits-block {
   background: rgba(255, 255, 255, 0.15) !important;
   border-color: rgba(197, 165, 114, 0.5);
 }
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-card .cabinet-limits-block {
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-card .cabinet-limits-block {
   background: rgba(255, 255, 255, 0.15) !important;
   border-color: rgba(197, 165, 114, 0.5);
 }
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-limits-block .cabinet-limits-track {
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-limits-block .cabinet-limits-track {
   background: rgba(0, 0, 0, 0.25) !important;
 }
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-limits-block .cabinet-limits-label,
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-limits-block h4,
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-limits-block .font-medium {
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-limits-block .cabinet-limits-label,
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-limits-block h4,
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-limits-block .font-medium {
   color: rgba(255, 255, 255, 0.9) !important;
 }
 
@@ -2713,20 +3315,20 @@ html:not([data-theme="dark"]) .cabinet-premium .cabinet-verification-status p {
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3), 0 2px 6px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(192, 192, 192, 0.08);
 }
 
-/* В ЛК (официант и админ) текст логотипа «FreeTips» — золотой; «Free» — белый для контраста на тёмном фоне */
-[data-theme="dark"] body.cabinet-page .site-header .site-header-logo-text,
-[data-theme="dark"] body.admin-page .site-header .site-header-logo-text {
+/* В ЛК (официант и админ) текст логотипа «FreeTips» — золотой; «Free» — белый для контраста на тёмном фоне (M5 — градиент на span, блоки выше) */
+[data-theme="dark"] body.cabinet-page .site-header:not(.site-header--cabinet-m5) .site-header-logo-text,
+[data-theme="dark"] body.admin-page .site-header:not(.site-header--cabinet-m5) .site-header-logo-text {
   color: var(--color-brand-gold);
 }
-[data-theme="dark"] .site-header .site-header-logo-free {
+[data-theme="dark"] .site-header:not(.site-header--cabinet-m5) .site-header-logo-free {
   color: #ffffff !important;
 }
-/* Тёмная тема: в логотипе FT — тёмно-синий текст, светлый фон для читаемости */
-[data-theme="dark"] .site-header .site-header-logo-icon {
+/* Тёмная тема: в логотипе FT — тёмно-синий текст, светлый фон для читаемости (не M5) */
+[data-theme="dark"] .site-header:not(.site-header--cabinet-m5) .site-header-logo-icon {
   background: #ffffff !important;
   color: #0a192f !important;
 }
-[data-theme="dark"] .site-header .site-header-logo-icon span {
+[data-theme="dark"] .site-header:not(.site-header--cabinet-m5) .site-header-logo-icon span {
   color: inherit;
 }
 
@@ -2905,21 +3507,21 @@ html:not([data-theme="dark"]) .establishment-team-table .establishment-team-tabl
   color: #ffffff !important;
 }
 
-/* Светлая тема: заголовок страницы (h1) на тёмном градиенте основного блока — белым */
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-main-block #main-content > h1 {
+/* Светлая тема: заголовок страницы (h1) на тёмном фоне — белым (не M5 — там типографика #main-content) */
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-main-block #main-content > h1 {
   color: #ffffff !important;
 }
 
-/* Светлая тема: все заголовки в основном блоке (ЛК заведения и др.) на тёмном фоне — белым (глобальный h1–h6 задаёт var(--color-navy)) */
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-main-block h1,
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-main-block h2,
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-main-block h3,
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-main-block h4 {
+/* Светлая тема: заголовки в основном блоке — белым (не M5) */
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-main-block h1,
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-main-block h2,
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-main-block h3,
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-main-block h4 {
   color: #ffffff !important;
 }
 
-/* Светлая тема: заголовок «Кабинет заведения» в сайдбаре на тёмном фоне — белым */
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-sidebar .font-bold {
+/* Светлая тема: заголовок в сайдбаре — белым (не M5 — там имя/акценты M5) */
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-sidebar .font-bold {
   color: #ffffff !important;
 }
 
@@ -4038,10 +4640,7 @@ button {
   border: 1px solid rgba(28, 105, 212, 0.28) !important;
   box-shadow:
     0 0 0 1px rgba(0, 0, 0, 0.4),
-    0 12px 40px rgba(0, 0, 0, 0.35),
-    inset 0 3px 0 0 #1c69d4,
-    inset 0 6px 0 0 #e5252a,
-    inset 0 9px 0 0 rgba(200, 206, 216, 0.35) !important;
+    0 12px 40px rgba(0, 0, 0, 0.35) !important;
 }
 
 [data-theme="dark"] .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-main-block #main-content {

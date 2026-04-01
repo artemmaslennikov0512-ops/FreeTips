@@ -9,6 +9,7 @@ import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { patchProfileSchema, changePasswordSchema } from "@/lib/validations";
 import { getFieldErrors } from "@/lib/form-errors";
 import { cabinetInputClassName } from "../shared";
+import { isCabinetDesignV2Theme } from "@/config/cabinet-theme-logins";
 
 type Profile = {
   id: string;
@@ -265,7 +266,11 @@ export default function CabinetSettingsPage() {
         <p className="text-[var(--color-text-secondary)]">{error}</p>
         <button
           onClick={() => window.location.reload()}
-          className="mt-4 rounded-xl bg-[var(--color-brand-gold)] px-5 py-2.5 text-[14px] font-semibold text-[#0a192f] hover:opacity-90"
+          className={
+            isCabinetDesignV2Theme(user?.login ?? null)
+              ? "cabinet-v2-btn-primary mt-4 rounded-xl px-5 py-2.5 text-[14px] font-semibold"
+              : "mt-4 rounded-xl bg-[var(--color-brand-gold)] px-5 py-2.5 text-[14px] font-semibold text-[#0a192f] hover:opacity-90"
+          }
         >
           Повторить
         </button>
@@ -276,6 +281,7 @@ export default function CabinetSettingsPage() {
   const isEmployee = user?.role?.toUpperCase() === "EMPLOYEE";
   const isRecipient = user?.role?.toUpperCase() === "RECIPIENT";
   const canUploadPhoto = isEmployee || isRecipient;
+  const isDesignV2Cabinet = isCabinetDesignV2Theme(user?.login ?? null);
 
   return (
     <div className="mx-auto max-w-2xl space-y-8">
@@ -320,7 +326,11 @@ export default function CabinetSettingsPage() {
                     type="button"
                     onClick={() => photoInputRef.current?.click()}
                     disabled={photoUploading}
-                    className="inline-flex items-center gap-2 rounded-xl bg-[var(--color-brand-gold)] px-4 py-2.5 text-[14px] font-semibold text-[#0a192f] hover:opacity-90 disabled:opacity-50"
+                    className={
+                      isDesignV2Cabinet
+                        ? "cabinet-v2-btn-primary inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-[14px] font-semibold disabled:opacity-50"
+                        : "inline-flex items-center gap-2 rounded-xl bg-[var(--color-brand-gold)] px-4 py-2.5 text-[14px] font-semibold text-[#0a192f] hover:opacity-90 disabled:opacity-50"
+                    }
                   >
                     {photoUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ImageIcon className="h-4 w-4" />}
                     {photoUploading ? "Загрузка…" : "Загрузить фото"}
@@ -329,7 +339,11 @@ export default function CabinetSettingsPage() {
                     <button
                       type="button"
                       onClick={() => window.location.reload()}
-                      className="inline-flex items-center gap-2 rounded-xl border border-white/30 bg-white/10 px-4 py-2.5 text-[14px] font-semibold text-white hover:bg-white/20 transition-colors"
+                      className={
+                        isDesignV2Cabinet
+                          ? "cabinet-v2-btn-secondary inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-[14px] font-semibold"
+                          : "inline-flex items-center gap-2 rounded-xl border border-white/30 bg-white/10 px-4 py-2.5 text-[14px] font-semibold text-white hover:bg-white/20 transition-colors"
+                      }
                     >
                       Сохранить и обновить
                     </button>
@@ -467,7 +481,11 @@ export default function CabinetSettingsPage() {
           type="button"
           onClick={handleSaveProfile}
           disabled={saving || !hasProfileChanges}
-          className="mt-4 inline-flex items-center gap-2 rounded-xl bg-[var(--color-brand-gold)] px-4 py-2.5 text-[14px] font-semibold text-[#0a192f] hover:opacity-90 disabled:opacity-50"
+          className={
+            isDesignV2Cabinet
+              ? "cabinet-v2-btn-primary mt-4 inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-[14px] font-semibold disabled:opacity-50"
+              : "mt-4 inline-flex items-center gap-2 rounded-xl bg-[var(--color-brand-gold)] px-4 py-2.5 text-[14px] font-semibold text-[#0a192f] hover:opacity-90 disabled:opacity-50"
+          }
         >
           {saving && <Loader2 className="h-4 w-4 animate-spin" />}
           Сохранить
@@ -538,7 +556,11 @@ export default function CabinetSettingsPage() {
           type="button"
           onClick={handleChangePassword}
           disabled={pwSaving || !pwCurrent || !pwNew || !pwConfirm}
-          className="mt-6 inline-flex items-center gap-2 rounded-xl border border-[var(--color-brand-gold)]/20 bg-white px-5 py-2.5 text-[14px] font-semibold text-[#0a192f] transition-all hover:bg-[var(--color-light-gray)] disabled:opacity-50"
+          className={
+            isDesignV2Cabinet
+              ? "cabinet-v2-btn-secondary mt-6 inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-[14px] font-semibold disabled:opacity-50"
+              : "mt-6 inline-flex items-center gap-2 rounded-xl border border-[var(--color-brand-gold)]/20 bg-white px-5 py-2.5 text-[14px] font-semibold text-[#0a192f] transition-all hover:bg-[var(--color-light-gray)] disabled:opacity-50"
+          }
         >
           {pwSaving && <Loader2 className="h-4 w-4 animate-spin" />}
           Сменить пароль

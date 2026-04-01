@@ -369,7 +369,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
                 ref={menuButtonRef}
                 type="button"
                 onClick={() => setSidebarOpen((o) => !o)}
-                className="cabinet-menu-btn flex h-14 w-14 min-w-14 items-center justify-center gap-1.5 rounded-xl border border-white/20 bg-white/10 text-[var(--color-brand-gold)] hover:bg-[var(--color-brand-gold)]/20 hover:border-[var(--color-brand-gold)]/40 active:scale-95 transition-all"
+                className={`cabinet-menu-btn flex h-14 w-14 min-w-14 items-center justify-center gap-1.5 rounded-xl border border-white/20 bg-white/10 text-[var(--color-brand-gold)] hover:bg-[var(--color-brand-gold)]/20 hover:border-[var(--color-brand-gold)]/40 active:scale-95 transition-all${isDesignV2Cabinet ? " cabinet-v2-menu-btn" : ""}`}
                 aria-label="Меню"
                 aria-expanded={sidebarOpen}
                 aria-haspopup="true"

@@ -8,7 +8,7 @@ import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { FEE_PERCENT_PAYOUT_CARD, feeKopForPayout } from "@/lib/payment/paygine-fee";
 import { Stats } from "../shared";
 import { PremiumCard } from "../PremiumCard";
-import { isCabinetM5CompetitionTheme } from "@/config/cabinet-theme-logins";
+import { isCabinetM5CompetitionTheme, isCabinetDesignV2Theme } from "@/config/cabinet-theme-logins";
 
 type Operation = {
   id: string;
@@ -249,6 +249,7 @@ export default function CabinetTransactionsPage() {
   }
 
   const isM5Cabinet = isCabinetM5CompetitionTheme(login);
+  const isDesignV2Cabinet = isCabinetDesignV2Theme(login);
 
   return (
     <div className="space-y-8">
@@ -291,7 +292,11 @@ export default function CabinetTransactionsPage() {
                       parseFloat(sdPageAmount) < 100 ||
                       Math.round(parseFloat(sdPageAmount) * 100) > maxPayoutPerRequestKop
                     }
-                    className="cabinet-btn-gold w-auto rounded-xl bg-[var(--color-brand-gold)] px-6 py-3 text-[14px] font-semibold text-[#0a192f] transition-all hover:opacity-90 disabled:opacity-50 disabled:pointer-events-none"
+                    className={
+                      isDesignV2Cabinet
+                        ? "cabinet-btn-gold cabinet-v2-btn-primary w-auto rounded-xl px-6 py-3 text-[14px] font-semibold disabled:opacity-50 disabled:pointer-events-none"
+                        : "cabinet-btn-gold w-auto rounded-xl bg-[var(--color-brand-gold)] px-6 py-3 text-[14px] font-semibold text-[#0a192f] transition-all hover:opacity-90 disabled:opacity-50 disabled:pointer-events-none"
+                    }
                     title={verificationStatus !== "VERIFIED" ? "Вывод доступен после прохождения верификации" : undefined}
                   >
                     {sdPageLoading ? "Переход…" : "Вывести средства"}

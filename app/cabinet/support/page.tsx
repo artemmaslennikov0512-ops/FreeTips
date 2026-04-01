@@ -6,6 +6,7 @@ import { MessageCircle, Send, Loader2, RefreshCw } from "lucide-react";
 import { getAccessToken, authHeaders, clearAccessToken } from "@/lib/auth-client";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
+import { isCabinetDesignV2Theme } from "@/config/cabinet-theme-logins";
 
 const WELCOME_LINES = [
   "Вас приветствует служба поддержки FreeTips!",
@@ -30,7 +31,19 @@ export default function CabinetSupportPage() {
   const [input, setInput] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [cabinetLogin, setCabinetLogin] = useState<string | null>(null);
   const listEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const token = getAccessToken();
+    if (!token) return;
+    fetch("/api/profile", { headers: authHeaders() })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d: { login?: string } | null) => {
+        if (d?.login) setCabinetLogin(d.login);
+      })
+      .catch(() => {});
+  }, []);
 
   const fetchMessages = useCallback(async () => {
     const token = getAccessToken();
@@ -123,6 +136,8 @@ export default function CabinetSupportPage() {
     return <LoadingSpinner message="Загрузка чата…" className="min-h-[40vh]" />;
   }
 
+  const isDesignV2Cabinet = isCabinetDesignV2Theme(cabinetLogin);
+
   return (
     <div className="support-chat-header mx-auto max-w-2xl text-center">
       <h1 className="flex items-center justify-center gap-2 text-2xl font-bold text-[var(--color-text)] text-center">
@@ -138,7 +153,11 @@ export default function CabinetSupportPage() {
           type="button"
           onClick={refresh}
           disabled={refreshing}
-          className="flex items-center gap-2 rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-sm text-[var(--color-text)] hover:bg-white/10 disabled:opacity-50"
+          className={
+            isDesignV2Cabinet
+              ? "cabinet-v2-btn-secondary flex items-center gap-2 rounded-xl px-4 py-2 text-sm disabled:opacity-50"
+              : "flex items-center gap-2 rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-sm text-[var(--color-text)] hover:bg-white/10 disabled:opacity-50"
+          }
         >
           <RefreshCw className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`} />
           Обновить
@@ -247,7 +266,11 @@ export default function CabinetSupportPage() {
             <button
               type="submit"
               disabled={sending || !input.trim()}
-              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[var(--color-brand-gold)] text-[#0a192f] hover:opacity-90 disabled:opacity-50"
+              className={
+                isDesignV2Cabinet
+                  ? "cabinet-v2-btn-primary flex h-12 w-12 shrink-0 items-center justify-center rounded-xl disabled:opacity-50"
+                  : "flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[var(--color-brand-gold)] text-[#0a192f] hover:opacity-90 disabled:opacity-50"
+              }
               aria-label="Отправить"
             >
               {sending ? (

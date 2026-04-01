@@ -8,6 +8,7 @@ import { cabinetInputClassName } from "../shared";
 import { getFieldErrors } from "@/lib/form-errors";
 import { verificationStep1Schema, verificationSubmitSchema } from "@/lib/validations";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
+import { isCabinetDesignV2Theme } from "@/config/cabinet-theme-logins";
 
 type VerificationData = {
   verificationStatus: string;
@@ -51,6 +52,18 @@ export default function CabinetVerificationPage() {
   const [uploading, setUploading] = useState<Record<string, boolean>>({});
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [submitOk, setSubmitOk] = useState(false);
+  const [cabinetLogin, setCabinetLogin] = useState<string | null>(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+    if (!token) return;
+    fetch("/api/profile", { headers: { Authorization: `Bearer ${token}` } })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d: { login?: string } | null) => {
+        if (d?.login) setCabinetLogin(d.login);
+      })
+      .catch(() => {});
+  }, []);
 
   const fetchVerification = useCallback(async () => {
     const token = localStorage.getItem("accessToken");
@@ -260,6 +273,8 @@ export default function CabinetVerificationPage() {
     );
   }
 
+  const isDesignV2Cabinet = isCabinetDesignV2Theme(cabinetLogin);
+
   return (
     <div className="space-y-8">
       <h1 className="font-[family:var(--font-playfair)] text-xl font-semibold text-[var(--color-text)] text-center">
@@ -361,7 +376,11 @@ export default function CabinetVerificationPage() {
                 type="button"
                 onClick={handleStep1}
                 disabled={saving}
-                className="rounded-[10px] bg-[var(--color-brand-gold)] px-5 py-2.5 text-[14px] font-semibold text-[#0a192f] hover:opacity-90 disabled:opacity-50"
+                className={
+                  isDesignV2Cabinet
+                    ? "cabinet-v2-btn-primary rounded-[10px] px-5 py-2.5 text-[14px] font-semibold disabled:opacity-50"
+                    : "rounded-[10px] bg-[var(--color-brand-gold)] px-5 py-2.5 text-[14px] font-semibold text-[#0a192f] hover:opacity-90 disabled:opacity-50"
+                }
               >
                 {saving ? "Сохранение…" : "Далее"}
               </button>
@@ -395,7 +414,11 @@ export default function CabinetVerificationPage() {
                   <input
                     type="file"
                     accept="image/jpeg,image/png,image/webp"
-                    className="block w-full text-sm text-white file:mr-3 file:rounded-lg file:border-0 file:bg-[var(--color-brand-gold)] file:px-4 file:py-2 file:text-[#0a192f] file:font-semibold"
+                    className={
+                      isDesignV2Cabinet
+                        ? "cabinet-v2-file-input block w-full text-sm text-white"
+                        : "block w-full text-sm text-white file:mr-3 file:rounded-lg file:border-0 file:bg-[var(--color-brand-gold)] file:px-4 file:py-2 file:text-[#0a192f] file:font-semibold"
+                    }
                     onChange={(e) => {
                       const f = e.target.files?.[0];
                       if (f) handleUpload(type, f);
@@ -443,7 +466,11 @@ export default function CabinetVerificationPage() {
                 <button
                   type="button"
                   onClick={() => setStep(1)}
-                  className="rounded-[10px] border border-[var(--color-brand-gold)]/40 px-5 py-2.5 text-[14px] font-semibold text-white hover:bg-[var(--color-dark-gray)]/10"
+                  className={
+                    isDesignV2Cabinet
+                      ? "cabinet-v2-btn-secondary rounded-[10px] px-5 py-2.5 text-[14px] font-semibold"
+                      : "rounded-[10px] border border-[var(--color-brand-gold)]/40 px-5 py-2.5 text-[14px] font-semibold text-white hover:bg-[var(--color-dark-gray)]/10"
+                  }
                 >
                   Назад
                 </button>
@@ -457,7 +484,11 @@ export default function CabinetVerificationPage() {
                     !data?.currentRequest?.hasPassportSpread ||
                     !data?.currentRequest?.hasSelfie
                   }
-                  className="rounded-[10px] bg-[var(--color-brand-gold)] px-5 py-2.5 text-[14px] font-semibold text-[#0a192f] hover:opacity-90 disabled:opacity-50"
+                  className={
+                    isDesignV2Cabinet
+                      ? "cabinet-v2-btn-primary rounded-[10px] px-5 py-2.5 text-[14px] font-semibold disabled:opacity-50"
+                      : "rounded-[10px] bg-[var(--color-brand-gold)] px-5 py-2.5 text-[14px] font-semibold text-[#0a192f] hover:opacity-90 disabled:opacity-50"
+                  }
                 >
                   {saving ? "Отправка…" : "Отправить заявку"}
                 </button>

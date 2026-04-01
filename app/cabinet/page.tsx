@@ -229,12 +229,12 @@ export default function CabinetDashboardPage() {
 
   return (
     <div className="space-y-8">
-      <div className="grid min-w-0 grid-cols-1 gap-6 lg:[grid-template-columns:repeat(2,minmax(0,1fr))]">
+      <div className="cabinet-dashboard-hero-grid grid min-w-0 grid-cols-1 items-start gap-6 lg:[grid-template-columns:repeat(2,minmax(0,1fr))]">
         <div className="cabinet-card min-w-0 rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden">
           <div className="p-6">
             <div className="flex flex-col items-center">
               <div className="w-full max-w-[320px] flex flex-col items-center">
-                <p className="cabinet-dashboard-display-name w-full text-center text-lg font-semibold mb-3">
+                <p className="cabinet-dashboard-display-name cabinet-dashboard-card-title w-full text-center font-[family:var(--font-playfair)] text-lg font-semibold mb-3 text-[var(--color-text)]">
                   {m5DashName ? (
                     m5DashName.rest != null ? (
                       <>
@@ -383,12 +383,10 @@ export default function CabinetDashboardPage() {
         </div>
 
         <div id="quick-actions" className="cabinet-card min-w-0 rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden">
-          <div className="border-0 px-6 py-4 text-center">
-            <h3 className="font-[family:var(--font-playfair)] text-lg font-semibold text-[var(--color-text)] text-center">
+          <div className="p-6">
+            <h3 className="cabinet-dashboard-card-title mb-3 text-center font-[family:var(--font-playfair)] text-lg font-semibold text-[var(--color-text)]">
               Быстрые действия
             </h3>
-          </div>
-          <div className="p-6">
             {/* 1. Your link for tea — сверху */}
             {tipLink && (
               <div className="cabinet-block-inner mb-6 rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 p-4">

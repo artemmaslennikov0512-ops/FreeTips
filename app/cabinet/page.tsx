@@ -229,8 +229,8 @@ export default function CabinetDashboardPage() {
 
   return (
     <div className="space-y-8">
-      <div className="grid gap-6 lg:grid-cols-2">
-        <div className="cabinet-card rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden">
+      <div className="grid min-w-0 grid-cols-1 gap-6 lg:[grid-template-columns:repeat(2,minmax(0,1fr))]">
+        <div className="cabinet-card min-w-0 rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden">
           <div className="p-6">
             <div className="flex flex-col items-center">
               <div className="w-full max-w-[320px] flex flex-col items-center">
@@ -382,7 +382,7 @@ export default function CabinetDashboardPage() {
           </div>
         </div>
 
-        <div id="quick-actions" className="cabinet-card rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden">
+        <div id="quick-actions" className="cabinet-card min-w-0 rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden">
           <div className="border-0 px-6 py-4 text-center">
             <h3 className="font-[family:var(--font-playfair)] text-lg font-semibold text-[var(--color-text)] text-center">
               Быстрые действия
@@ -393,7 +393,7 @@ export default function CabinetDashboardPage() {
             {tipLink && (
               <div className="cabinet-block-inner mb-6 rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 p-4">
                 <div className="mb-2 text-sm font-semibold text-[var(--color-text)]">Ваша ссылка для чаевых</div>
-                <div className="cabinet-input-window mb-3 break-all rounded-lg bg-[var(--color-bg-sides)] px-3 py-2 font-mono text-xs text-[var(--color-text)]/90">
+                <div className="cabinet-input-window mb-3 min-w-0 max-w-full break-all rounded-lg bg-[var(--color-bg-sides)] px-3 py-2 font-mono text-xs text-[var(--color-text)]/90">
                   {tipLink}
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
@@ -427,12 +427,12 @@ export default function CabinetDashboardPage() {
             )}
 
             {/* 2. Four quick action cards */}
-            <div className="mb-6 grid grid-cols-2 gap-4">
+            <div className="mb-6 grid min-w-0 grid-cols-2 gap-4">
               {QUICK_ACTIONS.map(({ href, icon: Icon, title, desc }) => (
                 <Link
                   key={href}
                   href={href}
-                  className="cabinet-block-inner flex flex-col items-center rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 p-6 transition-all hover:bg-[var(--color-accent-gold)]/15 hover:-translate-y-1 shadow-[var(--shadow-subtle)]"
+                  className="cabinet-block-inner flex min-w-0 flex-col items-center rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 p-6 transition-all hover:bg-[var(--color-accent-gold)]/15 hover:-translate-y-1 shadow-[var(--shadow-subtle)]"
                 >
                   <div className="cabinet-quick-action-icon mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-[var(--color-brand-gold)] text-[#0a192f]">
                     <Icon className="h-5 w-5" />

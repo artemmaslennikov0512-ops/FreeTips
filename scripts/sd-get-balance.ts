@@ -7,15 +7,23 @@
  * Параметры: sector, sd_ref, signature. Подпись по Приложению №2: sector, sd_ref, password.
  *
  * Запуск: npx tsx scripts/sd-get-balance.ts [sd_ref]
- * Параметры и номер кубышки — из scripts/.env (см. scripts/.env.example). Аргумент sd_ref переопределяет PAYGINE_SD_REF.
+ * Параметры: корневой .env (как у docker compose) и/или scripts/.env. Аргумент sd_ref переопределяет PAYGINE_SD_REF.
  */
 
+import "dotenv/config";
 import { loadScriptsEnv } from "./utils/load-env";
 import { createHash } from "crypto";
 
 loadScriptsEnv();
 
 const DEFAULT_TIMEOUT_MS = 30_000;
+
+/** Согласовано с lib/payment/paygine/client.ts и relocate-one-transaction.ts */
+function normalizePaygineWebapiBase(raw: string): string {
+  const t = raw.trim().replace(/\/$/, "");
+  if (!t) return "";
+  return t.endsWith("/webapi") ? t : `${t}/webapi`;
+}
 
 function computePaygineSignature(tagValuesInOrder: string[], password: string): string {
   const str = tagValuesInOrder.join("") + password;
@@ -27,7 +35,7 @@ async function main(): Promise<void> {
   const sdRefArg = process.argv[2]?.trim();
   const sdRef = sdRefArg || process.env.PAYGINE_SD_REF?.trim();
 
-  const baseUrl = process.env.PAYGINE_BASE_URL?.trim().replace(/\/$/, "");
+  const baseUrl = normalizePaygineWebapiBase(process.env.PAYGINE_BASE_URL?.trim() ?? "");
   const sector = process.env.PAYGINE_SECTOR?.trim();
   const password = process.env.PAYGINE_PASSWORD;
 
@@ -47,7 +55,7 @@ async function main(): Promise<void> {
   const passwordStr = password as string;
   const sdRefStr = sdRef as string;
 
-  const path = "/webapi/b2puser/sd-services/SDGetBalance";
+  const path = "/b2puser/sd-services/SDGetBalance";
   const url = `${baseUrlStr}${path}`;
 
   // Подпись по апи.md, Таблица 22, Приложение №2: sector, sd_ref, password.
@@ -60,7 +68,7 @@ async function main(): Promise<void> {
   const bodyStr = body.toString();
 
   console.error("--- SDGetBalance (апи.md: Таблица 22) ---");
-  console.error(`POST ${path}`);
+  console.error(`POST .../webapi${path}`);
   console.error(`Host: ${new URL(url).host}`);
   console.error("Content-Type: application/x-www-form-urlencoded");
   console.error("(body: sector, sd_ref, signature — подпись: sector + sd_ref + password)");

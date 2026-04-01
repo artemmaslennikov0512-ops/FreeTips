@@ -1,5 +1,5 @@
 /**
- * GET /api/admin/users — список пользователей (поиск по login/email).
+ * GET /api/admin/users — список пользователей (поиск по login/email/slug).
  * Требует: Authorization: Bearer <access_token>
  * GET: роль SUPERADMIN
  */
@@ -53,6 +53,21 @@ export async function GET(request: NextRequest) {
         OR: [
           { login: { contains: search, mode: "insensitive" as const } },
           { email: { contains: search, mode: "insensitive" as const } },
+          {
+            tipLinks: {
+              some: { slug: { contains: search, mode: "insensitive" as const } },
+            },
+          },
+          {
+            employeeProfile: {
+              qrCodeIdentifier: { contains: search, mode: "insensitive" as const },
+            },
+          },
+          {
+            establishmentRelation: {
+              uniqueSlug: { contains: search, mode: "insensitive" as const },
+            },
+          },
         ],
       }
     : baseWhere;

@@ -6,6 +6,7 @@ import { Copy, Download, Link2, Loader2 } from "lucide-react";
 import QRCode from "qrcode";
 import { getBaseUrl } from "@/lib/get-base-url";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
+import { isCabinetDesignV2Theme } from "@/config/cabinet-theme-logins";
 
 type LinkRow = { id: string; slug: string; createdAt: string };
 
@@ -17,6 +18,18 @@ export default function CabinetLinkPage() {
   const [error, setError] = useState<string | null>(null);
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [cabinetLogin, setCabinetLogin] = useState<string | null>(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+    if (!token) return;
+    fetch("/api/profile", { headers: { Authorization: `Bearer ${token}` } })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d: { login?: string } | null) => {
+        if (d?.login) setCabinetLogin(d.login);
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -115,6 +128,8 @@ export default function CabinetLinkPage() {
     );
   }
 
+  const designV2Cabinet = isCabinetDesignV2Theme(cabinetLogin);
+
   return (
     <div className="space-y-8">
       {error && (
@@ -156,7 +171,7 @@ export default function CabinetLinkPage() {
                 <button
                   type="button"
                   onClick={handleCopy}
-                  className="inline-flex items-center gap-2 rounded-xl bg-[var(--color-brand-gold)] px-5 py-2.5 font-semibold text-[#0a192f] transition-all hover:opacity-90 hover:-translate-y-0.5"
+                  className={`inline-flex items-center gap-2 rounded-xl bg-[var(--color-brand-gold)] px-5 py-2.5 font-semibold text-[#0a192f] transition-all hover:opacity-90 hover:-translate-y-0.5${designV2Cabinet ? " cabinet-copy-trigger" : ""}${designV2Cabinet && copied ? " cabinet-copy-trigger--success" : ""}`}
                 >
                   <Copy className="h-4 w-4" />
                   {copied ? "Скопировано" : "Копировать ссылку"}

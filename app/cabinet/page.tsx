@@ -7,9 +7,24 @@ import { Link2, List, Key, Copy, RotateCw, Settings, ExternalLink, ShieldCheck, 
 import { PremiumCard } from "./PremiumCard";
 import { formatMoney } from "@/lib/utils";
 import { getBaseUrl } from "@/lib/get-base-url";
-import { isCabinetM5CompetitionTheme, m5SplitDisplayName } from "@/config/cabinet-theme-logins";
+import { isCabinetM5CompetitionTheme, isCabinetDesignV2Theme, m5SplitDisplayName } from "@/config/cabinet-theme-logins";
 import { CabinetSkeleton } from "@/components/CabinetSkeleton";
 import { Stats } from "./shared";
+
+function cabinetLimitsFillClass(percent: number, designV2: boolean): string {
+  const p = Math.min(100, Math.max(0, Number.isFinite(percent) ? percent : 0));
+  if (!designV2) return "h-full rounded-full bg-[var(--color-brand-gold)] transition-all duration-300";
+  let tier = "cabinet-limits-fill--ok";
+  if (p >= 95) tier = "cabinet-limits-fill--critical";
+  else if (p >= 80) tier = "cabinet-limits-fill--warn";
+  return `cabinet-limits-fill h-full rounded-full transition-all duration-300 ${tier}`;
+}
+
+function cabinetLimitLabelTitle(designV2: boolean, pct: number, label: string): string | undefined {
+  if (!designV2 || pct < 80) return undefined;
+  if (pct >= 95) return `${label} — почти достигнут лимит`;
+  return `${label} — приближаетесь к лимиту`;
+}
 
 const QUICK_ACTIONS = [
   { href: "/cabinet/link", icon: Link2, title: "Ссылка и QR", desc: "Скопировать ссылку для чаевых" },
@@ -45,7 +60,9 @@ export default function CabinetDashboardPage() {
   const [savingForEdit, setSavingForEdit] = useState("");
   const [savingForSaving, setSavingForSaving] = useState(false);
   const [savingForEditing, setSavingForEditing] = useState(false);
+  const [balanceFlash, setBalanceFlash] = useState(false);
   const goalTextareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const prevBalanceKopRef = useRef<number | undefined>(undefined);
 
   useEffect(() => {
     const el = goalTextareaRef.current;
@@ -137,6 +154,20 @@ export default function CabinetDashboardPage() {
     return () => document.removeEventListener("visibilitychange", onVisible);
   }, [fetchProfileAndData]);
 
+  useEffect(() => {
+    if (!isCabinetDesignV2Theme(login)) return;
+    const cur = stats?.balanceKop;
+    if (typeof cur !== "number") return;
+    const prev = prevBalanceKopRef.current;
+    if (typeof prev === "number" && prev !== cur) {
+      setBalanceFlash(true);
+      const id = window.setTimeout(() => setBalanceFlash(false), 950);
+      prevBalanceKopRef.current = cur;
+      return () => clearTimeout(id);
+    }
+    prevBalanceKopRef.current = cur;
+  }, [stats?.balanceKop, login]);
+
   const copyTipLink = useCallback(async () => {
     if (!tipLink) return;
     try {
@@ -215,6 +246,7 @@ export default function CabinetDashboardPage() {
   }
 
   const isM5Cabinet = isCabinetM5CompetitionTheme(login);
+  const isDesignV2Cabinet = isCabinetDesignV2Theme(login);
   const dashName = fullName?.trim() || "Официант";
   const m5DashName = isM5Cabinet ? m5SplitDisplayName(dashName) : null;
 
@@ -226,6 +258,28 @@ export default function CabinetDashboardPage() {
     "cabinet-m5-btn-pair-blue inline-flex items-center justify-center gap-2 rounded-[10px] px-4 py-2 text-[14px] font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed";
   const m5BtnNavLikeWide =
     "cabinet-m5-btn-nav-like inline-flex items-center gap-2 rounded-[10px] px-5 py-2.5 text-[14px] font-semibold transition-all focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed";
+
+  const limitPcts =
+    payoutLimits != null
+      ? {
+          dayCount:
+            payoutLimits.dailyLimitCount > 0
+              ? Math.min(100, ((payoutUsageToday?.count ?? 0) / payoutLimits.dailyLimitCount) * 100)
+              : 0,
+          daySum:
+            payoutLimits.dailyLimitKop > 0
+              ? Math.min(100, (Number(payoutUsageToday?.sumKop ?? 0) / payoutLimits.dailyLimitKop) * 100)
+              : 0,
+          monthCount:
+            typeof payoutLimits.monthlyLimitCount === "number" && payoutLimits.monthlyLimitCount > 0
+              ? Math.min(100, ((payoutUsageMonth?.count ?? 0) / payoutLimits.monthlyLimitCount) * 100)
+              : 0,
+          monthSum:
+            typeof payoutLimits.monthlyLimitKop === "number" && payoutLimits.monthlyLimitKop > 0
+              ? Math.min(100, (Number(payoutUsageMonth?.sumKop ?? 0) / payoutLimits.monthlyLimitKop) * 100)
+              : 0,
+        }
+      : null;
 
   return (
     <div className="space-y-8">
@@ -248,7 +302,9 @@ export default function CabinetDashboardPage() {
                     <span className="text-white">{dashName}</span>
                   )}
                 </p>
-                <div className="w-full overflow-hidden">
+                <div
+                  className={`w-full overflow-hidden${isDesignV2Cabinet && balanceFlash ? " cabinet-balance-flash-target" : ""}`}
+                >
                   <PremiumCard
                     fullName={fullName}
                     uniqueId={uniqueId}
@@ -261,7 +317,16 @@ export default function CabinetDashboardPage() {
             </div>
 
             {verificationStatus && (
-              <div className="cabinet-limits-block cabinet-verification-status mt-6 w-full min-w-0 max-w-full rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 p-5 flex flex-col items-center text-center">
+              <div
+                className="cabinet-limits-block cabinet-verification-status mt-6 w-full min-w-0 max-w-full rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 p-5 flex flex-col items-center text-center"
+                data-verification-state={
+                  verificationStatus === "VERIFIED"
+                    ? "verified"
+                    : verificationStatus === "PENDING"
+                      ? "pending"
+                      : "required"
+                }
+              >
                 {verificationStatus === "VERIFIED" ? (
                   <div className="flex w-full min-w-0 max-w-full flex-col items-center gap-2 text-center">
                     <div className="flex flex-wrap items-center justify-center gap-2">
@@ -310,14 +375,19 @@ export default function CabinetDashboardPage() {
                 <div className="space-y-4">
                   <div>
                     <div className="mb-1 flex justify-between text-sm">
-                      <span className="cabinet-limits-label text-[var(--color-text-secondary)]">Заявок в сутки</span>
+                      <span
+                        className="cabinet-limits-label text-[var(--color-text-secondary)]"
+                        title={cabinetLimitLabelTitle(isDesignV2Cabinet, limitPcts?.dayCount ?? 0, "Заявок в сутки")}
+                      >
+                        Заявок в сутки
+                      </span>
                       <span className="font-medium text-[var(--color-text)]">
                         {payoutUsageToday?.count ?? 0} из {payoutLimits.dailyLimitCount}
                       </span>
                     </div>
                     <div className="cabinet-limits-track h-2.5 w-full overflow-hidden rounded-full bg-[var(--color-dark-gray)]/20">
                       <div
-                        className="h-full rounded-full bg-[var(--color-brand-gold)] transition-all duration-300"
+                        className={cabinetLimitsFillClass(limitPcts?.dayCount ?? 0, isDesignV2Cabinet)}
                         style={{
                           width: `${Math.min(100, ((payoutUsageToday?.count ?? 0) / payoutLimits.dailyLimitCount) * 100)}%`,
                         }}
@@ -326,14 +396,19 @@ export default function CabinetDashboardPage() {
                   </div>
                   <div>
                     <div className="mb-1 flex justify-between text-sm">
-                      <span className="cabinet-limits-label text-[var(--color-text-secondary)]">Сумма в сутки</span>
+                      <span
+                        className="cabinet-limits-label text-[var(--color-text-secondary)]"
+                        title={cabinetLimitLabelTitle(isDesignV2Cabinet, limitPcts?.daySum ?? 0, "Сумма в сутки")}
+                      >
+                        Сумма в сутки
+                      </span>
                       <span className="font-medium text-[var(--color-text)]">
                         {formatMoney(BigInt(payoutUsageToday?.sumKop ?? 0))} из {formatMoney(BigInt(payoutLimits.dailyLimitKop))}
                       </span>
                     </div>
                     <div className="cabinet-limits-track h-2.5 w-full overflow-hidden rounded-full bg-[var(--color-dark-gray)]/20">
                       <div
-                        className="h-full rounded-full bg-[var(--color-brand-gold)] transition-all duration-300"
+                        className={cabinetLimitsFillClass(limitPcts?.daySum ?? 0, isDesignV2Cabinet)}
                         style={{
                           width: `${Math.min(100, payoutLimits.dailyLimitKop > 0 ? (Number(payoutUsageToday?.sumKop ?? 0) / payoutLimits.dailyLimitKop) * 100 : 0)}%`,
                         }}
@@ -344,14 +419,19 @@ export default function CabinetDashboardPage() {
                     <>
                       <div>
                         <div className="mb-1 flex justify-between text-sm">
-                          <span className="cabinet-limits-label text-[var(--color-text-secondary)]">Заявок в месяц</span>
+                          <span
+                            className="cabinet-limits-label text-[var(--color-text-secondary)]"
+                            title={cabinetLimitLabelTitle(isDesignV2Cabinet, limitPcts?.monthCount ?? 0, "Заявок в месяц")}
+                          >
+                            Заявок в месяц
+                          </span>
                           <span className="font-medium text-[var(--color-text)]">
                             {payoutUsageMonth?.count ?? 0} из {payoutLimits.monthlyLimitCount}
                           </span>
                         </div>
                         <div className="cabinet-limits-track h-2.5 w-full overflow-hidden rounded-full bg-[var(--color-dark-gray)]/20">
                           <div
-                            className="h-full rounded-full bg-[var(--color-brand-gold)] transition-all duration-300"
+                            className={cabinetLimitsFillClass(limitPcts?.monthCount ?? 0, isDesignV2Cabinet)}
                             style={{
                               width: `${Math.min(100, payoutLimits.monthlyLimitCount > 0 ? ((payoutUsageMonth?.count ?? 0) / payoutLimits.monthlyLimitCount) * 100 : 0)}%`,
                             }}
@@ -360,14 +440,19 @@ export default function CabinetDashboardPage() {
                       </div>
                       <div>
                         <div className="mb-1 flex justify-between text-sm">
-                          <span className="cabinet-limits-label text-[var(--color-text-secondary)]">Сумма в месяц</span>
+                          <span
+                            className="cabinet-limits-label text-[var(--color-text-secondary)]"
+                            title={cabinetLimitLabelTitle(isDesignV2Cabinet, limitPcts?.monthSum ?? 0, "Сумма в месяц")}
+                          >
+                            Сумма в месяц
+                          </span>
                           <span className="font-medium text-[var(--color-text)]">
                             {formatMoney(BigInt(payoutUsageMonth?.sumKop ?? 0))} из {formatMoney(BigInt(payoutLimits.monthlyLimitKop))}
                           </span>
                         </div>
                         <div className="cabinet-limits-track h-2.5 w-full overflow-hidden rounded-full bg-[var(--color-dark-gray)]/20">
                           <div
-                            className="h-full rounded-full bg-[var(--color-brand-gold)] transition-all duration-300"
+                            className={cabinetLimitsFillClass(limitPcts?.monthSum ?? 0, isDesignV2Cabinet)}
                             style={{
                               width: `${Math.min(100, payoutLimits.monthlyLimitKop > 0 ? (Number(payoutUsageMonth?.sumKop ?? 0) / payoutLimits.monthlyLimitKop) * 100 : 0)}%`,
                             }}
@@ -401,7 +486,7 @@ export default function CabinetDashboardPage() {
                     className={
                       isM5Cabinet
                         ? m5BtnPairRed
-                        : "inline-flex items-center justify-center gap-2 rounded-[10px] bg-[var(--color-brand-gold)] px-4 py-2 text-[14px] font-semibold text-[#0a192f] transition-all hover:opacity-90"
+                        : `inline-flex items-center justify-center gap-2 rounded-[10px] bg-[var(--color-brand-gold)] px-4 py-2 text-[14px] font-semibold text-[#0a192f] transition-all hover:opacity-90${isDesignV2Cabinet ? " cabinet-copy-trigger" : ""}${isDesignV2Cabinet && linkCopied ? " cabinet-copy-trigger--success" : ""}`
                     }
                   >
                     <Copy className="h-4 w-4" />
@@ -544,7 +629,7 @@ export default function CabinetDashboardPage() {
                     className={
                       isM5Cabinet
                         ? `${m5BtnPairRed} px-5 py-2.5 focus:outline-none`
-                        : "inline-flex items-center gap-2 rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-bg-sides)] px-5 py-2.5 text-[14px] font-semibold text-[#0a192f] shadow-sm transition-all duration-200 hover:bg-[var(--color-light-gray)] hover:shadow-md active:scale-[0.98] active:shadow-inner focus:outline-none"
+                        : `inline-flex items-center gap-2 rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-bg-sides)] px-5 py-2.5 text-[14px] font-semibold text-[#0a192f] shadow-sm transition-all duration-200 hover:bg-[var(--color-light-gray)] hover:shadow-md active:scale-[0.98] active:shadow-inner focus:outline-none${isDesignV2Cabinet ? " cabinet-copy-trigger" : ""}${isDesignV2Cabinet && apiKeyCopied ? " cabinet-copy-trigger--success" : ""}`
                     }
                   >
                     <Copy className="h-4 w-4 shrink-0" />

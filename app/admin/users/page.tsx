@@ -249,7 +249,7 @@ export default function AdminUsersPage() {
           <Search className="pointer-events-none absolute left-3 h-5 w-5 text-white/80" style={{top:"50%",transform:"translateY(-50%)"}} />
           <input
             type="text"
-            placeholder="Поиск по логину или email..."
+            placeholder="Логин, email или slug (ссылка /pay/…, QR, заведение)…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="admin-users-search-input cabinet-section-header w-full rounded-xl border-0 py-2.5 pl-10 pr-4 text-sm text-white placeholder:text-white/70 focus:outline-none"

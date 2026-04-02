@@ -4,9 +4,17 @@
  */
 const CABINET_M5_COMPETITION_LOGINS = new Set(["ahmedm5f90", "ahmedm5f98"]);
 
+/** Пилот улучшенного визуала ЛК (не M5). Расширяйте список после проверки. */
+const CABINET_DESIGN_V2_LOGINS = new Set(["test1112"]);
+
 export function isCabinetM5CompetitionTheme(login: string | null | undefined): boolean {
   if (!login || typeof login !== "string") return false;
   return CABINET_M5_COMPETITION_LOGINS.has(login.trim().toLowerCase());
+}
+
+export function isCabinetDesignV2Theme(login: string | null | undefined): boolean {
+  if (!login || typeof login !== "string") return false;
+  return CABINET_DESIGN_V2_LOGINS.has(login.trim().toLowerCase());
 }
 
 /** Первое слово — светло-синее, остаток — красный (как на M5-дашборде). */

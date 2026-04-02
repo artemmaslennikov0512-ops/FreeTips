@@ -19,7 +19,7 @@ import {
 import { getAccessToken, fetchWithAuth, clearAccessToken } from "@/lib/auth-client";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
-import { isCabinetM5CompetitionTheme, m5SplitDisplayName } from "@/config/cabinet-theme-logins";
+import { isCabinetM5CompetitionTheme, isCabinetDesignV2Theme, m5SplitDisplayName } from "@/config/cabinet-theme-logins";
 const NAV = [
   { label: "Дашборд", href: "/cabinet", icon: LayoutDashboard },
   { label: "Операции", href: "/cabinet/transactions", icon: List },
@@ -72,6 +72,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
   const hasBrand =
     !!brandPrimary || !!brandSecondary || !!brandMainBg || !!brandBlocksBg || !!brandFont || !!brandBorder;
   const isM5Cabinet = isCabinetM5CompetitionTheme(user?.login);
+  const isDesignV2Cabinet = !isM5Cabinet && isCabinetDesignV2Theme(user?.login);
   const applyEstablishmentBrand = hasBrand && !isM5Cabinet;
 
   useEffect(() => {
@@ -226,9 +227,9 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
 
   return (
     <div
-      className={`cabinet-premium flex min-h-screen w-full max-w-full overflow-x-hidden font-[family:var(--font-inter)] text-[var(--color-text)] pt-2 ${isM5Cabinet ? "bg-transparent" : "bg-[var(--color-bg)]"}`}
+      className={`cabinet-premium flex min-h-screen w-full max-w-full overflow-x-hidden font-[family:var(--font-inter)] text-[var(--color-text)] pt-2 ${isM5Cabinet || isDesignV2Cabinet ? "bg-transparent" : "bg-[var(--color-bg)]"}`}
       data-brand-active={applyEstablishmentBrand ? "true" : undefined}
-      data-cabinet-theme={isM5Cabinet ? "m5-competition" : undefined}
+      data-cabinet-theme={isM5Cabinet ? "m5-competition" : isDesignV2Cabinet ? "design-v2" : undefined}
       style={Object.keys(brandStyle).length ? brandStyle : undefined}
     >
       {/* Мобильная шторка — закрывает выпадающее меню при клике вне */}
@@ -320,7 +321,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
                 <span>{label}</span>
                 {href === "/cabinet/support" && supportUnreadCount > 0 && (
                   <span
-                    className="cabinet-support-unread-badge ml-auto flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[var(--color-accent-red)] px-1.5 text-xs font-semibold text-white"
+                    className={`cabinet-support-unread-badge ml-auto flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[var(--color-accent-red)] px-1.5 text-xs font-semibold text-white${isDesignV2Cabinet ? " cabinet-support-unread-badge--v2" : ""}`}
                     aria-label={`Непрочитанных: ${supportUnreadCount}`}
                   >
                     {supportUnreadCount > 99 ? "99+" : supportUnreadCount}
@@ -368,7 +369,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
                 ref={menuButtonRef}
                 type="button"
                 onClick={() => setSidebarOpen((o) => !o)}
-                className="cabinet-menu-btn flex h-14 w-14 min-w-14 items-center justify-center gap-1.5 rounded-xl border border-white/20 bg-white/10 text-[var(--color-brand-gold)] hover:bg-[var(--color-brand-gold)]/20 hover:border-[var(--color-brand-gold)]/40 active:scale-95 transition-all"
+                className={`cabinet-menu-btn flex h-14 w-14 min-w-14 items-center justify-center gap-1.5 rounded-xl border border-white/20 bg-white/10 text-[var(--color-brand-gold)] hover:bg-[var(--color-brand-gold)]/20 hover:border-[var(--color-brand-gold)]/40 active:scale-95 transition-all${isDesignV2Cabinet ? " cabinet-v2-menu-btn" : ""}`}
                 aria-label="Меню"
                 aria-expanded={sidebarOpen}
                 aria-haspopup="true"
@@ -381,8 +382,8 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
                 id="cabinet-nav-dropdown"
                 role="menu"
                 className={`cabinet-nav-dropdown absolute left-0 top-full z-50 mt-2 w-[min(100vw-2rem,320px)] origin-top rounded-[10px] border border-[var(--color-brand-gold)]/20 shadow-[var(--shadow-card)] backdrop-blur-xl transition-[opacity,transform] duration-200 ${
-                  sidebarOpen ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"
-                }`}
+                  isDesignV2Cabinet ? "cabinet-nav-dropdown-v2 " : ""
+                }${sidebarOpen ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"}`}
                 style={sidebarStyle}
                 aria-hidden={!sidebarOpen}
               >
@@ -440,7 +441,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
                         <span>{label}</span>
                         {href === "/cabinet/support" && supportUnreadCount > 0 && (
                           <span
-                            className="cabinet-support-unread-badge ml-auto flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[var(--color-accent-red)] px-1.5 text-xs font-semibold text-white"
+                            className={`cabinet-support-unread-badge ml-auto flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[var(--color-accent-red)] px-1.5 text-xs font-semibold text-white${isDesignV2Cabinet ? " cabinet-support-unread-badge--v2" : ""}`}
                           >
                             {supportUnreadCount > 99 ? "99+" : supportUnreadCount}
                           </span>

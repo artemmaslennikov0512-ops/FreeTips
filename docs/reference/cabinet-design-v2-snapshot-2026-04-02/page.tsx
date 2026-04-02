@@ -7,16 +7,21 @@ import { Link2, List, Key, Copy, RotateCw, Settings, ExternalLink, ShieldCheck, 
 import { PremiumCard } from "./PremiumCard";
 import { formatMoney } from "@/lib/utils";
 import { getBaseUrl } from "@/lib/get-base-url";
-import { isCabinetM5CompetitionTheme, m5SplitDisplayName } from "@/config/cabinet-theme-logins";
+import { isCabinetM5CompetitionTheme, isCabinetDesignV2Theme, m5SplitDisplayName } from "@/config/cabinet-theme-logins";
 import { CabinetSkeleton } from "@/components/CabinetSkeleton";
 import { Stats } from "./shared";
 
-function cabinetLimitsFillClass(): string {
-  return "h-full rounded-full bg-[var(--color-brand-gold)] transition-all duration-300";
+function cabinetLimitsFillClass(percent: number, designV2: boolean): string {
+  const p = Math.min(100, Math.max(0, Number.isFinite(percent) ? percent : 0));
+  if (!designV2) return "h-full rounded-full bg-[var(--color-brand-gold)] transition-all duration-300";
+  let tier = "cabinet-limits-fill--ok";
+  if (p >= 95) tier = "cabinet-limits-fill--critical";
+  else if (p >= 80) tier = "cabinet-limits-fill--warn";
+  return `cabinet-limits-fill h-full rounded-full transition-all duration-300 ${tier}`;
 }
 
-function cabinetLimitLabelTitle(pct: number, label: string): string | undefined {
-  if (pct < 80) return undefined;
+function cabinetLimitLabelTitle(designV2: boolean, pct: number, label: string): string | undefined {
+  if (!designV2 || pct < 80) return undefined;
   if (pct >= 95) return `${label} — почти достигнут лимит`;
   return `${label} — приближаетесь к лимиту`;
 }
@@ -211,6 +216,7 @@ export default function CabinetDashboardPage() {
   }
 
   const isM5Cabinet = isCabinetM5CompetitionTheme(login);
+  const isDesignV2Cabinet = isCabinetDesignV2Theme(login);
 
   if (error) {
     return (
@@ -218,7 +224,11 @@ export default function CabinetDashboardPage() {
         <p className="text-[var(--color-text-secondary)]">{error}</p>
         <button
           onClick={() => window.location.reload()}
-          className="mt-4 rounded-[10px] bg-[var(--color-brand-gold)] px-5 py-2.5 text-[14px] font-semibold text-[#0a192f] hover:opacity-90"
+          className={
+            isDesignV2Cabinet
+              ? "cabinet-v2-btn-primary mt-4 rounded-[10px] px-5 py-2.5 text-[14px] font-semibold"
+              : "mt-4 rounded-[10px] bg-[var(--color-brand-gold)] px-5 py-2.5 text-[14px] font-semibold text-[#0a192f] hover:opacity-90"
+          }
         >
           Повторить
         </button>
@@ -263,24 +273,53 @@ export default function CabinetDashboardPage() {
     <div className="space-y-8">
       <div className="cabinet-dashboard-hero-grid grid min-w-0 grid-cols-1 gap-6 lg:[grid-template-columns:repeat(2,minmax(0,1fr))] lg:items-stretch">
         <div className="cabinet-card flex min-h-0 min-w-0 flex-col rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden lg:h-full">
-          <div className="flex min-h-0 flex-1 flex-col p-6">
+          <div
+            className={`flex min-h-0 flex-1 flex-col p-6${isDesignV2Cabinet ? " cabinet-v2-hero-card-inner" : ""}`}
+          >
             <div className="flex flex-col items-center">
               <div className="w-full max-w-[320px] flex flex-col items-center">
-                <p className="cabinet-dashboard-display-name cabinet-dashboard-card-title w-full text-center font-[family:var(--font-playfair)] text-lg font-semibold mb-3 text-[var(--color-text)]">
-                  {m5DashName ? (
-                    m5DashName.rest != null ? (
-                      <>
-                        <span className="text-[#8ec5ff]">{m5DashName.first}</span>{" "}
-                        <span className="text-[#e5252a]">{m5DashName.rest}</span>
-                      </>
+                {isDesignV2Cabinet ? (
+                  <header className="cabinet-v2-waiter-hero mb-5 w-full">
+                    <p className="cabinet-v2-waiter-kicker">Ваш профиль</p>
+                    <div className="cabinet-v2-waiter-name">
+                      {m5DashName ? (
+                        <p className="cabinet-v2-waiter-name-inner cabinet-dashboard-display-name text-center font-[family:var(--font-playfair)] text-[clamp(1.15rem,3.8vw,1.65rem)] font-semibold leading-snug tracking-wide">
+                          {m5DashName.rest != null ? (
+                            <>
+                              <span className="text-[#8ec5ff]">{m5DashName.first}</span>{" "}
+                              <span className="text-[#e5252a]">{m5DashName.rest}</span>
+                            </>
+                          ) : (
+                            <span className="text-[#8ec5ff]">{m5DashName.first}</span>
+                          )}
+                        </p>
+                      ) : (
+                        <p className="cabinet-v2-waiter-name-gradient cabinet-dashboard-display-name text-center font-[family:var(--font-playfair)] text-[clamp(1.2rem,4vw,1.75rem)] font-semibold leading-tight tracking-[0.03em]">
+                          {dashName}
+                        </p>
+                      )}
+                    </div>
+                  </header>
+                ) : (
+                  <p className="cabinet-dashboard-display-name cabinet-dashboard-card-title w-full text-center font-[family:var(--font-playfair)] text-lg font-semibold mb-3 text-[var(--color-text)]">
+                    {m5DashName ? (
+                      m5DashName.rest != null ? (
+                        <>
+                          <span className="text-[#8ec5ff]">{m5DashName.first}</span>{" "}
+                          <span className="text-[#e5252a]">{m5DashName.rest}</span>
+                        </>
+                      ) : (
+                        <span className="text-[#8ec5ff]">{m5DashName.first}</span>
+                      )
                     ) : (
-                      <span className="text-[#8ec5ff]">{m5DashName.first}</span>
-                    )
-                  ) : (
-                    <span className="text-white">{dashName}</span>
-                  )}
-                </p>
+                      <span className="text-white">{dashName}</span>
+                    )}
+                  </p>
+                )}
                 <div className="cabinet-dashboard-balance-wrap mt-1 flex w-full max-w-[320px] shrink-0 flex-col items-center justify-center overflow-visible">
+                  {isDesignV2Cabinet && (
+                    <p className="cabinet-v2-section-label mb-3 w-full text-center">Карта и баланс</p>
+                  )}
                   <PremiumCard
                     fullName={fullName}
                     uniqueId={uniqueId}
@@ -334,7 +373,9 @@ export default function CabinetDashboardPage() {
                       className={
                         isM5Cabinet
                           ? `${m5BtnNavLike} text-sm`
-                          : "inline-flex items-center gap-2 rounded-[10px] bg-[var(--color-brand-gold)] px-4 py-2 text-sm font-semibold text-[#0a192f] hover:opacity-90"
+                          : isDesignV2Cabinet
+                            ? "cabinet-v2-btn-primary inline-flex items-center gap-2 rounded-[10px] px-4 py-2 text-sm font-semibold"
+                            : "inline-flex items-center gap-2 rounded-[10px] bg-[var(--color-brand-gold)] px-4 py-2 text-sm font-semibold text-[#0a192f] hover:opacity-90"
                       }
                     >
                       <ShieldCheck className="h-4 w-4" />
@@ -347,13 +388,17 @@ export default function CabinetDashboardPage() {
 
             {payoutLimits && (
               <div className="cabinet-limits-block mt-6 rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 p-5">
-                <h4 className="mb-4 text-sm font-semibold text-[var(--color-text)]">Доступные лимиты</h4>
+                <h4
+                  className={`mb-4 text-sm font-semibold text-[var(--color-text)]${isDesignV2Cabinet ? " cabinet-v2-section-label" : ""}`}
+                >
+                  Доступные лимиты
+                </h4>
                 <div className="space-y-4">
                   <div>
                     <div className="mb-1 flex justify-between text-sm">
                       <span
                         className="cabinet-limits-label text-[var(--color-text-secondary)]"
-                        title={cabinetLimitLabelTitle(limitPcts?.dayCount ?? 0, "Заявок в сутки")}
+                        title={cabinetLimitLabelTitle(isDesignV2Cabinet, limitPcts?.dayCount ?? 0, "Заявок в сутки")}
                       >
                         Заявок в сутки
                       </span>
@@ -363,7 +408,7 @@ export default function CabinetDashboardPage() {
                     </div>
                     <div className="cabinet-limits-track h-2.5 w-full overflow-hidden rounded-full bg-[var(--color-dark-gray)]/20">
                       <div
-                        className={cabinetLimitsFillClass()}
+                        className={cabinetLimitsFillClass(limitPcts?.dayCount ?? 0, isDesignV2Cabinet)}
                         style={{
                           width: `${Math.min(100, ((payoutUsageToday?.count ?? 0) / payoutLimits.dailyLimitCount) * 100)}%`,
                         }}
@@ -374,7 +419,7 @@ export default function CabinetDashboardPage() {
                     <div className="mb-1 flex justify-between text-sm">
                       <span
                         className="cabinet-limits-label text-[var(--color-text-secondary)]"
-                        title={cabinetLimitLabelTitle(limitPcts?.daySum ?? 0, "Сумма в сутки")}
+                        title={cabinetLimitLabelTitle(isDesignV2Cabinet, limitPcts?.daySum ?? 0, "Сумма в сутки")}
                       >
                         Сумма в сутки
                       </span>
@@ -384,7 +429,7 @@ export default function CabinetDashboardPage() {
                     </div>
                     <div className="cabinet-limits-track h-2.5 w-full overflow-hidden rounded-full bg-[var(--color-dark-gray)]/20">
                       <div
-                        className={cabinetLimitsFillClass()}
+                        className={cabinetLimitsFillClass(limitPcts?.daySum ?? 0, isDesignV2Cabinet)}
                         style={{
                           width: `${Math.min(100, payoutLimits.dailyLimitKop > 0 ? (Number(payoutUsageToday?.sumKop ?? 0) / payoutLimits.dailyLimitKop) * 100 : 0)}%`,
                         }}
@@ -397,7 +442,7 @@ export default function CabinetDashboardPage() {
                         <div className="mb-1 flex justify-between text-sm">
                           <span
                             className="cabinet-limits-label text-[var(--color-text-secondary)]"
-                            title={cabinetLimitLabelTitle(limitPcts?.monthCount ?? 0, "Заявок в месяц")}
+                            title={cabinetLimitLabelTitle(isDesignV2Cabinet, limitPcts?.monthCount ?? 0, "Заявок в месяц")}
                           >
                             Заявок в месяц
                           </span>
@@ -407,7 +452,7 @@ export default function CabinetDashboardPage() {
                         </div>
                         <div className="cabinet-limits-track h-2.5 w-full overflow-hidden rounded-full bg-[var(--color-dark-gray)]/20">
                           <div
-                            className={cabinetLimitsFillClass()}
+                            className={cabinetLimitsFillClass(limitPcts?.monthCount ?? 0, isDesignV2Cabinet)}
                             style={{
                               width: `${Math.min(100, payoutLimits.monthlyLimitCount > 0 ? ((payoutUsageMonth?.count ?? 0) / payoutLimits.monthlyLimitCount) * 100 : 0)}%`,
                             }}
@@ -418,7 +463,7 @@ export default function CabinetDashboardPage() {
                         <div className="mb-1 flex justify-between text-sm">
                           <span
                             className="cabinet-limits-label text-[var(--color-text-secondary)]"
-                            title={cabinetLimitLabelTitle(limitPcts?.monthSum ?? 0, "Сумма в месяц")}
+                            title={cabinetLimitLabelTitle(isDesignV2Cabinet, limitPcts?.monthSum ?? 0, "Сумма в месяц")}
                           >
                             Сумма в месяц
                           </span>
@@ -428,7 +473,7 @@ export default function CabinetDashboardPage() {
                         </div>
                         <div className="cabinet-limits-track h-2.5 w-full overflow-hidden rounded-full bg-[var(--color-dark-gray)]/20">
                           <div
-                            className={cabinetLimitsFillClass()}
+                            className={cabinetLimitsFillClass(limitPcts?.monthSum ?? 0, isDesignV2Cabinet)}
                             style={{
                               width: `${Math.min(100, payoutLimits.monthlyLimitKop > 0 ? (Number(payoutUsageMonth?.sumKop ?? 0) / payoutLimits.monthlyLimitKop) * 100 : 0)}%`,
                             }}
@@ -444,27 +489,37 @@ export default function CabinetDashboardPage() {
         </div>
 
         <div id="quick-actions" className="cabinet-card flex min-h-0 min-w-0 flex-col rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden lg:h-full">
-          <div className="flex min-h-0 flex-1 flex-col p-6">
-            <h3 className="cabinet-dashboard-card-title mb-3 text-center font-[family:var(--font-playfair)] text-lg font-semibold text-[var(--color-text)]">
+          <div className={`flex min-h-0 flex-1 flex-col p-6${isDesignV2Cabinet ? " cabinet-v2-quick-actions-inner" : ""}`}>
+            <h3
+              className={`cabinet-dashboard-card-title mb-3 text-center font-[family:var(--font-playfair)] text-lg font-semibold text-[var(--color-text)]${isDesignV2Cabinet ? " cabinet-v2-section-title" : ""}`}
+            >
               Быстрые действия
             </h3>
             {/* 1. Your link for tea — сверху */}
             {tipLink && (
-              <div className="cabinet-block-inner mb-6 rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 p-4">
-                <div className="mb-2 text-sm font-semibold text-[var(--color-text)]">
+              <div
+                className={`cabinet-block-inner mb-6 rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 p-4${isDesignV2Cabinet ? " cabinet-v2-tip-link-block text-center" : ""}`}
+              >
+                <div
+                  className={`mb-2 text-sm font-semibold text-[var(--color-text)]${isDesignV2Cabinet ? " cabinet-v2-section-label" : ""}`}
+                >
                   Ваша ссылка для чаевых
                 </div>
                 <div className="cabinet-input-window mb-3 min-w-0 max-w-full break-all rounded-lg bg-[var(--color-bg-sides)] px-3 py-2 font-mono text-xs text-[var(--color-text)]/90">
                   {tipLink}
                 </div>
-                <div className="flex flex-wrap items-center gap-2">
+                <div
+                  className={`flex flex-wrap items-center gap-2${isDesignV2Cabinet ? " cabinet-v2-tip-link-actions justify-center" : ""}`}
+                >
                   <button
                     type="button"
                     onClick={copyTipLink}
                     className={
                       isM5Cabinet
                         ? m5BtnPairRed
-                        : `inline-flex items-center justify-center gap-2 rounded-[10px] bg-[var(--color-brand-gold)] px-4 py-2 text-[14px] font-semibold text-[#0a192f] transition-all hover:opacity-90`
+                        : isDesignV2Cabinet
+                          ? `cabinet-v2-btn-primary inline-flex items-center justify-center gap-2 rounded-[10px] px-4 py-2 text-[14px] font-semibold cabinet-copy-trigger${linkCopied ? " cabinet-copy-trigger--success" : ""}`
+                          : `inline-flex items-center justify-center gap-2 rounded-[10px] bg-[var(--color-brand-gold)] px-4 py-2 text-[14px] font-semibold text-[#0a192f] transition-all hover:opacity-90`
                     }
                   >
                     <Copy className="h-4 w-4" />
@@ -477,7 +532,9 @@ export default function CabinetDashboardPage() {
                     className={
                       isM5Cabinet
                         ? `cabinet-card-btn-link ${m5BtnPairBlue}`
-                        : "cabinet-card-btn-link inline-flex items-center justify-center gap-2 rounded-[10px] bg-[var(--color-brand-gold)] px-4 py-2 text-[14px] font-semibold text-[#0a192f] transition-all hover:opacity-90"
+                        : isDesignV2Cabinet
+                          ? "cabinet-card-btn-link cabinet-v2-btn-primary inline-flex items-center justify-center gap-2 rounded-[10px] px-4 py-2 text-[14px] font-semibold"
+                          : "cabinet-card-btn-link inline-flex items-center justify-center gap-2 rounded-[10px] bg-[var(--color-brand-gold)] px-4 py-2 text-[14px] font-semibold text-[#0a192f] transition-all hover:opacity-90"
                     }
                   >
                     <ExternalLink className="h-4 w-4" />
@@ -488,20 +545,30 @@ export default function CabinetDashboardPage() {
             )}
 
             {/* 2. Four quick action cards */}
-            <div className="mb-6 grid min-w-0 grid-cols-2 gap-4">
+            <div className={`mb-6 grid min-w-0 grid-cols-2 gap-4${isDesignV2Cabinet ? " cabinet-v2-quick-grid" : ""}`}>
               {QUICK_ACTIONS.map(({ href, icon: Icon, title, desc }) => (
                 <Link
                   key={href}
                   href={href}
-                  className="cabinet-block-inner flex min-w-0 flex-col items-center rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 p-6 transition-all hover:bg-[var(--color-accent-gold)]/15 hover:-translate-y-1 shadow-[var(--shadow-subtle)]"
+                  className={`cabinet-block-inner flex min-w-0 flex-col items-center rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 p-6 transition-all hover:bg-[var(--color-accent-gold)]/15 hover:-translate-y-1 shadow-[var(--shadow-subtle)]${isDesignV2Cabinet ? " cabinet-v2-quick-card" : ""}`}
                 >
-                  <div className="cabinet-quick-action-icon mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-[var(--color-brand-gold)] text-[#0a192f]">
-                    <Icon className="h-5 w-5" strokeWidth={2} />
+                  <div
+                    className={
+                      isDesignV2Cabinet
+                        ? "cabinet-quick-action-icon cabinet-v2-btn-icon cabinet-v2-quick-icon-wrap mb-3 flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-2xl text-[#0a192f]"
+                        : "cabinet-quick-action-icon mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-[var(--color-brand-gold)] text-[#0a192f]"
+                    }
+                  >
+                    <Icon className={`h-5 w-5${isDesignV2Cabinet ? " cabinet-v2-quick-action-svg" : ""}`} strokeWidth={isDesignV2Cabinet ? 2.25 : 2} />
                   </div>
-                  <div className="font-semibold text-[var(--color-text)] text-center">
+                  <div
+                    className={`font-semibold text-[var(--color-text)] text-center${isDesignV2Cabinet ? " cabinet-v2-quick-title text-balance" : ""}`}
+                  >
                     {title}
                   </div>
-                  <div className="mt-1 text-center text-sm text-[var(--color-text)]/90">
+                  <div
+                    className={`mt-1 text-center text-sm text-[var(--color-text)]/90${isDesignV2Cabinet ? " cabinet-v2-quick-desc text-balance leading-snug" : ""}`}
+                  >
                     {desc}
                   </div>
                 </Link>
@@ -510,7 +577,9 @@ export default function CabinetDashboardPage() {
 
             {/* 3. Goal card — внизу, с фоном, заголовок и контент по центру */}
             <div className="cabinet-goal-card cabinet-block-inner flex flex-col items-center rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/20 p-5 shadow-[var(--shadow-subtle)]">
-              <div className="mb-4 w-full text-center text-base font-semibold text-[var(--color-text)]">
+              <div
+                className={`mb-4 w-full text-center text-base font-semibold text-[var(--color-text)]${isDesignV2Cabinet ? " cabinet-v2-goal-heading font-[family:var(--font-playfair)] tracking-wide" : ""}`}
+              >
                 Укажите цель, на которую собираете 🎯
               </div>
               {savingFor && !savingForEditing ? (
@@ -524,7 +593,11 @@ export default function CabinetDashboardPage() {
                       setSavingForEditing(true);
                       setSavingForEdit(savingFor);
                     }}
-                    className="rounded-[10px] border border-[var(--color-brand-gold)]/40 bg-transparent px-4 py-2 text-[14px] font-semibold text-[var(--color-brand-gold)] transition-all hover:bg-[var(--color-brand-gold)]/15"
+                    className={
+                      isDesignV2Cabinet
+                        ? "cabinet-v2-btn-secondary rounded-[10px] px-4 py-2 text-[14px] font-semibold"
+                        : "rounded-[10px] border border-[var(--color-brand-gold)]/40 bg-transparent px-4 py-2 text-[14px] font-semibold text-[var(--color-brand-gold)] transition-all hover:bg-[var(--color-brand-gold)]/15"
+                    }
                   >
                     Изменить
                   </button>
@@ -550,7 +623,9 @@ export default function CabinetDashboardPage() {
                     className={
                       isM5Cabinet
                         ? `${m5BtnNavLike} disabled:opacity-50 disabled:cursor-not-allowed`
-                        : "rounded-[10px] bg-[var(--color-brand-gold)] px-4 py-2 text-[14px] font-semibold text-[#0a192f] transition-all hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+                        : isDesignV2Cabinet
+                          ? "cabinet-v2-btn-primary rounded-[10px] px-4 py-2 text-[14px] font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                          : "rounded-[10px] bg-[var(--color-brand-gold)] px-4 py-2 text-[14px] font-semibold text-[#0a192f] transition-all hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
                     }
                   >
                     {savingForSaving ? "Сохранение…" : "Сохранить"}
@@ -563,8 +638,10 @@ export default function CabinetDashboardPage() {
       </div>
 
       <div id="api-key" className="cabinet-card rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden">
-        <div className="border-0 px-6 py-4">
-          <h3 className="font-[family:var(--font-playfair)] text-lg font-semibold text-[var(--color-text)]">
+        <div className={`border-0 px-6 py-4${isDesignV2Cabinet ? " text-center" : ""}`}>
+          <h3
+            className={`font-[family:var(--font-playfair)] text-lg font-semibold text-[var(--color-text)]${isDesignV2Cabinet ? " cabinet-v2-section-title cabinet-v2-api-heading" : ""}`}
+          >
             API для уведомлений
           </h3>
         </div>
@@ -580,7 +657,9 @@ export default function CabinetDashboardPage() {
               className={
                 isM5Cabinet
                   ? m5BtnNavLikeWide
-                  : "inline-flex items-center gap-2 rounded-[10px] bg-[var(--color-brand-gold)] px-5 py-2.5 text-[14px] font-semibold text-[#0a192f] transition-all hover:opacity-90 focus:outline-none"
+                  : isDesignV2Cabinet
+                    ? "cabinet-v2-btn-primary inline-flex items-center gap-2 rounded-[10px] px-5 py-2.5 text-[14px] font-semibold focus:outline-none"
+                    : "inline-flex items-center gap-2 rounded-[10px] bg-[var(--color-brand-gold)] px-5 py-2.5 text-[14px] font-semibold text-[#0a192f] transition-all hover:opacity-90 focus:outline-none"
               }
             >
               <Download className="h-4 w-4 shrink-0" />
@@ -588,7 +667,11 @@ export default function CabinetDashboardPage() {
             </a>
           </p>
           <div className="cabinet-block-inner rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/6 p-5">
-            <div className="mb-4 text-sm font-semibold text-[var(--color-text)]">Ваш API ключ</div>
+            <div
+              className={`mb-4 text-sm font-semibold text-[var(--color-text)]${isDesignV2Cabinet ? " cabinet-v2-section-label text-center" : ""}`}
+            >
+              Ваш API ключ
+            </div>
             <div className="cabinet-input-window cabinet-block-inner mb-4 break-all rounded-md border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-3 font-mono text-sm text-[var(--color-text-secondary)]">
               {apiKey ?? (hasApiKey ? "••••••••••••••••" : "Ключ не создан")}
             </div>
@@ -602,7 +685,7 @@ export default function CabinetDashboardPage() {
                 Скопируйте ключ сейчас и вставьте в приложение — после обновления страницы он будет скрыт.
               </p>
             )}
-            <div className="flex flex-wrap gap-3">
+            <div className={`flex flex-wrap gap-3${isDesignV2Cabinet ? " justify-center" : ""}`}>
               {apiKey ? (
                 <>
                   <button
@@ -611,7 +694,9 @@ export default function CabinetDashboardPage() {
                     className={
                       isM5Cabinet
                         ? `${m5BtnPairRed} px-5 py-2.5 focus:outline-none`
-                        : `inline-flex items-center gap-2 rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-bg-sides)] px-5 py-2.5 text-[14px] font-semibold text-[#0a192f] shadow-sm transition-all duration-200 hover:bg-[var(--color-light-gray)] hover:shadow-md active:scale-[0.98] active:shadow-inner focus:outline-none`
+                        : isDesignV2Cabinet
+                          ? `cabinet-v2-btn-secondary inline-flex items-center gap-2 rounded-[10px] px-5 py-2.5 text-[14px] font-semibold focus:outline-none cabinet-copy-trigger${apiKeyCopied ? " cabinet-copy-trigger--success" : ""}`
+                          : `inline-flex items-center gap-2 rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-bg-sides)] px-5 py-2.5 text-[14px] font-semibold text-[#0a192f] shadow-sm transition-all duration-200 hover:bg-[var(--color-light-gray)] hover:shadow-md active:scale-[0.98] active:shadow-inner focus:outline-none`
                     }
                   >
                     <Copy className="h-4 w-4 shrink-0" />
@@ -624,7 +709,9 @@ export default function CabinetDashboardPage() {
                     className={
                       isM5Cabinet
                         ? `${m5BtnPairBlue} px-5 py-2.5`
-                        : "inline-flex items-center gap-2 rounded-[10px] bg-[var(--color-brand-gold)] px-5 py-2.5 text-[14px] font-semibold text-[#0a192f] hover:opacity-90 disabled:opacity-50"
+                        : isDesignV2Cabinet
+                          ? "cabinet-v2-btn-primary inline-flex items-center gap-2 rounded-[10px] px-5 py-2.5 text-[14px] font-semibold disabled:opacity-50"
+                          : "inline-flex items-center gap-2 rounded-[10px] bg-[var(--color-brand-gold)] px-5 py-2.5 text-[14px] font-semibold text-[#0a192f] hover:opacity-90 disabled:opacity-50"
                     }
                   >
                     <RotateCw className="h-4 w-4" />
@@ -639,7 +726,9 @@ export default function CabinetDashboardPage() {
                   className={
                     isM5Cabinet
                       ? m5BtnNavLikeWide
-                      : "inline-flex items-center gap-2 rounded-[10px] bg-[var(--color-brand-gold)] px-5 py-2.5 text-[14px] font-semibold text-[#0a192f] hover:opacity-90 disabled:opacity-50"
+                      : isDesignV2Cabinet
+                        ? "cabinet-v2-btn-primary inline-flex items-center gap-2 rounded-[10px] px-5 py-2.5 text-[14px] font-semibold disabled:opacity-50"
+                        : "inline-flex items-center gap-2 rounded-[10px] bg-[var(--color-brand-gold)] px-5 py-2.5 text-[14px] font-semibold text-[#0a192f] hover:opacity-90 disabled:opacity-50"
                   }
                 >
                   <Key className="h-4 w-4" />

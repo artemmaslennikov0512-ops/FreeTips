@@ -3536,6 +3536,54 @@ html:not([data-theme="dark"]) .cabinet-premium .cabinet-verification-status p {
   color: var(--color-brand-gold);
 }
 
+/* Переключатель темы: инерция ползунка, тень дорожки, свечение при перетаскивании */
+.theme-toggle-btn {
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    box-shadow 0.28s cubic-bezier(0.33, 1.15, 0.52, 1),
+    transform 0.28s cubic-bezier(0.33, 1.15, 0.52, 1);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .theme-toggle-track-svg circle.theme-toggle-knob:not(.theme-toggle-knob--drag) {
+    transition:
+      cx 0.48s cubic-bezier(0.33, 1.28, 0.52, 1),
+      cy 0.48s cubic-bezier(0.33, 1.28, 0.52, 1),
+      r 0.24s cubic-bezier(0.33, 1.35, 0.52, 1),
+      filter 0.3s ease;
+  }
+  .theme-toggle-track-svg line.theme-toggle-progress-line:not(.theme-toggle-progress-line--drag) {
+    transition: x2 0.48s cubic-bezier(0.33, 1.28, 0.52, 1);
+  }
+  .theme-toggle-knob-icon:not(.theme-toggle-knob-icon--drag) {
+    transition:
+      left 0.48s cubic-bezier(0.33, 1.28, 0.52, 1),
+      transform 0.24s cubic-bezier(0.33, 1.35, 0.52, 1),
+      filter 0.28s ease;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .theme-toggle-btn[data-dragging="true"] {
+    transform: scale(1.045);
+    box-shadow:
+      0 0 0 1px rgba(197, 165, 114, 0.28),
+      0 5px 16px rgba(0, 0, 0, 0.1),
+      0 0 22px rgba(197, 165, 114, 0.24);
+  }
+  [data-theme="dark"] .theme-toggle-btn[data-dragging="true"] {
+    box-shadow:
+      0 0 0 1px rgba(197, 165, 114, 0.4),
+      0 6px 20px rgba(0, 0, 0, 0.38),
+      0 0 26px rgba(197, 165, 114, 0.22);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .theme-toggle-btn[data-dragging="true"] .theme-toggle-knob-icon {
+    transform: translate(-50%, -50%) scale(1.14);
+    filter: drop-shadow(0 0 5px rgba(197, 165, 114, 0.5));
+  }
+}
+
 /* ЛК админа — тёмная тема как в ЛК официанта: стекло, обводка */
 /* Тёмная тема: сайдбар админки — тот же фон и обводка, что у основного блока */
 [data-theme="dark"] .admin-panel .admin-sidebar {

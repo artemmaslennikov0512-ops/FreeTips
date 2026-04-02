@@ -11,6 +11,7 @@ import QRCode from "qrcode";
 import { getBaseUrl } from "@/lib/get-base-url";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { isPayPageM5ShellSlug } from "@/config/pay-branding-overrides";
+import { PayTelegramSupportBlock } from "@/components/PayTelegramSupportBlock";
 
 const PRESETS = [50, 100, 200, 500] as const;
 
@@ -194,7 +195,7 @@ export default function PayPageClient() {
 
   if (tidFromUrl && urlOutcome && payReturnFail) {
     return (
-      <div className={`pay-page${m5c} pay-success-always-light flex min-h-screen min-h-[100dvh] w-full flex-col items-center justify-center px-4 py-8`}>
+      <div className={`pay-page${m5c} pay-success-always-light flex min-h-screen min-h-[100dvh] w-full flex-col items-center justify-center gap-0 px-4 py-8`}>
         <div className={`pay-success-card${m5SuccessCard} w-full max-w-sm rounded-2xl border border-[var(--color-brand-gold)]/40 bg-white p-8 text-center shadow-[var(--shadow-card)]`}>
           <div className="pay-result-icon pay-result-icon-error mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[var(--color-accent-red)]/15">
             <XCircle className="h-9 w-9 text-[var(--color-accent-red)]" />
@@ -220,6 +221,7 @@ export default function PayPageClient() {
             </Link>
           </div>
         </div>
+        <PayTelegramSupportBlock variant="result" className="mt-5 w-full max-w-sm shrink-0" />
       </div>
     );
   }
@@ -234,6 +236,7 @@ export default function PayPageClient() {
             Платёж прошёл, дождитесь подтверждения — обычно это несколько секунд.
           </p>
         </div>
+        <PayTelegramSupportBlock variant="result" className="mt-5 w-full max-w-sm shrink-0" />
       </div>
     );
   }
@@ -260,6 +263,7 @@ export default function PayPageClient() {
             </Link>
           </div>
         </div>
+        <PayTelegramSupportBlock variant="result" className="mt-5 w-full max-w-sm shrink-0" />
       </div>
     );
   }
@@ -303,6 +307,7 @@ export default function PayPageClient() {
             </Link>
           </div>
         </div>
+        <PayTelegramSupportBlock variant="result" className="mt-5 w-full max-w-sm shrink-0" />
       </div>
     );
   }
@@ -368,6 +373,7 @@ export default function PayPageClient() {
             </Link>
           </div>
         </div>
+        <PayTelegramSupportBlock variant="result" className="mt-5 w-full max-w-sm shrink-0" />
       </div>
     );
   }
@@ -549,6 +555,8 @@ export default function PayPageClient() {
             <span>Оплата банковской картой. Регистрация не нужна.</span>
           </div>
         </div>
+
+        <PayTelegramSupportBlock />
       </div>
       </div>
     </div>

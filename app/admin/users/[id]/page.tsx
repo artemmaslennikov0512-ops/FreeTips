@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, UserRound, Wallet, TrendingUp, Send, ListChecks, Clock, Sliders, Copy, Key, RotateCw, Lock, Unlock, ShieldCheck } from "lucide-react";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
+import { PAYOUT_MAX_AMOUNT_KOP, PAYOUT_MIN_AMOUNT_KOP } from "@/lib/payout-amount-bounds";
 import { formatDate, formatMoneyCompact } from "@/lib/utils";
 import { PremiumCard } from "@/app/cabinet/PremiumCard";
 
@@ -365,8 +366,10 @@ export default function AdminUserDetailsPage() {
       return;
     }
     const amountKop = Math.round(amountRub * 100);
-    if (amountKop < 10000 || amountKop > 100_000_00) {
-      setPayoutError("Сумма от 100 до 100 000 ₽");
+    if (amountKop < PAYOUT_MIN_AMOUNT_KOP || amountKop > PAYOUT_MAX_AMOUNT_KOP) {
+      setPayoutError(
+        `Сумма от ${(PAYOUT_MIN_AMOUNT_KOP / 100).toLocaleString("ru-RU")} до ${(PAYOUT_MAX_AMOUNT_KOP / 100).toLocaleString("ru-RU")} ₽`,
+      );
       return;
     }
     setPayoutLoading(true);

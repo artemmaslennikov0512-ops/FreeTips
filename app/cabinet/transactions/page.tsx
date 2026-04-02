@@ -5,7 +5,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { CheckCircle2, Clock, XCircle, ChevronLeft, ChevronRight } from "lucide-react";
 import { formatMoney, formatDate } from "@/lib/utils";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
-import { FEE_PERCENT_PAYOUT_CARD, feeKopForPayout } from "@/lib/payment/paygine-fee";
+import { PAYOUT_MIN_AMOUNT_KOP } from "@/lib/payout-amount-bounds";
+import { FEE_MIN_PAYOUT_KOP, FEE_PERCENT_PAYOUT_CARD, feeKopForPayout } from "@/lib/payment/paygine-fee";
 import { Stats } from "../shared";
 import { PremiumCard } from "../PremiumCard";
 import { isCabinetM5CompetitionTheme } from "@/config/cabinet-theme-logins";
@@ -181,8 +182,8 @@ export default function CabinetTransactionsPage() {
       return;
     }
     const amountKop = Math.round(rub * 100);
-    if (amountKop < 10000) {
-      setSdPageError("Минимальная сумма вывода 100 ₽");
+    if (amountKop < PAYOUT_MIN_AMOUNT_KOP) {
+      setSdPageError(`Минимальная сумма вывода ${(PAYOUT_MIN_AMOUNT_KOP / 100).toLocaleString("ru-RU")} ₽`);
       return;
     }
     if (amountKop > maxPayoutPerRequestKop) {
@@ -319,7 +320,10 @@ export default function CabinetTransactionsPage() {
                         <span className="font-medium">{hasValidAmount ? formatMoney(BigInt(amountKop)) : "—"}</span>
                       </div>
                       <div className="mt-2 flex justify-between text-[var(--color-text)]">
-                        <span>Комиссия ({FEE_PERCENT_PAYOUT_CARD.toLocaleString("ru-RU")}%):</span>
+                        <span>
+                          Комиссия ({FEE_PERCENT_PAYOUT_CARD.toLocaleString("ru-RU")}%, мин.{" "}
+                          {(FEE_MIN_PAYOUT_KOP / 100).toLocaleString("ru-RU")} ₽):
+                        </span>
                         <span className="font-medium">{hasValidAmount ? formatMoney(BigInt(feeKop)) : "—"}</span>
                       </div>
                       <div className="mt-2 flex justify-between font-medium text-[var(--color-text)]">

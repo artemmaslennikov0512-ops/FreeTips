@@ -4,6 +4,7 @@
  */
 
 import { z } from "zod";
+import { PAYOUT_MAX_AMOUNT_KOP, PAYOUT_MIN_AMOUNT_KOP } from "./payout-amount-bounds";
 
 const REGISTRATION_TOKEN_MIN_LENGTH = 10;
 const REGISTRATION_TOKEN_MAX_LENGTH = 512;
@@ -133,10 +134,6 @@ export const createPaymentSchema = z.object({
   idempotencyKey: z.string().min(1, "idempotencyKey обязателен").max(255),
 });
 
-// Лимиты вывода (антифрод): мин 100 ₽, макс 100 000 ₽ за заявку
-const AMOUNT_KOP_MIN_PAYOUT = BigInt(10000); // 100 ₽
-const AMOUNT_KOP_MAX_PAYOUT = BigInt("10000000"); // 100 000 ₽
-
 // Создание заявки на вывод
 /** Номер карты для вывода в Paygine (при автовыводе). Только цифры, 8–19 символов. */
 const panSchema = z
@@ -146,8 +143,8 @@ const panSchema = z
 
 export const createPayoutSchema = z.object({
   amountKop: amountKopSchema
-    .refine((v) => v >= AMOUNT_KOP_MIN_PAYOUT, "Минимальная сумма вывода 100 ₽")
-    .refine((v) => v <= AMOUNT_KOP_MAX_PAYOUT, "Максимальная сумма одной заявки 100 000 ₽"),
+    .refine((v) => v >= BigInt(PAYOUT_MIN_AMOUNT_KOP), "Минимальная сумма вывода 100 ₽")
+    .refine((v) => v <= BigInt(PAYOUT_MAX_AMOUNT_KOP), "Максимальная сумма одной заявки 100 000 ₽"),
   details: z
     .string()
     .min(1, "Реквизиты обязательны")

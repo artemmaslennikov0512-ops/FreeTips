@@ -4,6 +4,7 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { PAYOUT_MAX_AMOUNT_KOP, PAYOUT_MIN_AMOUNT_KOP } from "../../lib/payout-amount-bounds";
 import { createPaymentSchema, createPayoutSchema } from "../../lib/validations";
 
 test("createPaymentSchema accepts valid payment", () => {
@@ -47,33 +48,33 @@ test("createPaymentSchema accepts 5 000 000 kop max", () => {
   assert.equal(result.success, true);
 });
 
-test("createPayoutSchema rejects amount below 10 000 kop (100 руб)", () => {
+test("createPayoutSchema rejects amount below minimum (100 ₽)", () => {
   const result = createPayoutSchema.safeParse({
-    amountKop: 9999,
+    amountKop: PAYOUT_MIN_AMOUNT_KOP - 1,
     details: "Карта 1234 5678 9012 3456",
   });
   assert.equal(result.success, false);
 });
 
-test("createPayoutSchema accepts 10 000 kop (100 руб) minimum", () => {
+test("createPayoutSchema accepts minimum payout amount", () => {
   const result = createPayoutSchema.safeParse({
-    amountKop: 10000,
+    amountKop: PAYOUT_MIN_AMOUNT_KOP,
     details: "Карта 1234 5678 9012 3456",
   });
   assert.equal(result.success, true);
 });
 
-test("createPayoutSchema rejects amount above 10 000 000 kop (100 000 руб)", () => {
+test("createPayoutSchema rejects amount above maximum (100 000 ₽)", () => {
   const result = createPayoutSchema.safeParse({
-    amountKop: 10000001,
+    amountKop: PAYOUT_MAX_AMOUNT_KOP + 1,
     details: "Карта 1234 5678 9012 3456",
   });
   assert.equal(result.success, false);
 });
 
-test("createPayoutSchema accepts 10 000 000 kop max", () => {
+test("createPayoutSchema accepts maximum payout amount", () => {
   const result = createPayoutSchema.safeParse({
-    amountKop: 10000000,
+    amountKop: PAYOUT_MAX_AMOUNT_KOP,
     details: "Карта 1234 5678 9012 3456",
   });
   assert.equal(result.success, true);

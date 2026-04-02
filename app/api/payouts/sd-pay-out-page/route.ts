@@ -8,13 +8,11 @@ import { requireAuthOrApiKey } from "@/lib/auth-or-api-key";
 import { db } from "@/lib/db";
 import { getBalance } from "@/lib/balance";
 import { getUtcDayStart, getEffectivePayoutLimits } from "@/lib/payout-limits";
+import { PAYOUT_MAX_AMOUNT_KOP, PAYOUT_MIN_AMOUNT_KOP } from "@/lib/payout-amount-bounds";
 import { feeKopForPayout } from "@/lib/payment/paygine-fee";
 import { registerOrder, buildSDPayOutPageFormParams, getSDPayOutPageEndpoint } from "@/lib/payment/paygine/client";
 import { getBaseUrlFromRequest } from "@/lib/get-base-url";
 import { parseJsonWithLimit, MAX_BODY_SIZE_AUTH } from "@/lib/api/helpers";
-
-const AMOUNT_KOP_MIN = 10000; // 100 ₽
-const AMOUNT_KOP_MAX = 100_000_00; // 100 000 ₽
 const CURRENCY_RUB = 643;
 
 export async function POST(request: NextRequest) {
@@ -26,7 +24,7 @@ export async function POST(request: NextRequest) {
 
   const data = bodyResult.data as unknown;
   const amountKop = typeof data === "object" && data !== null && "amountKop" in data ? Number((data as { amountKop: number }).amountKop) : NaN;
-  if (!Number.isFinite(amountKop) || amountKop < AMOUNT_KOP_MIN || amountKop > AMOUNT_KOP_MAX) {
+  if (!Number.isFinite(amountKop) || amountKop < PAYOUT_MIN_AMOUNT_KOP || amountKop > PAYOUT_MAX_AMOUNT_KOP) {
     return NextResponse.json(
       { error: "Укажите сумму от 100 до 100 000 ₽" },
       { status: 400 },

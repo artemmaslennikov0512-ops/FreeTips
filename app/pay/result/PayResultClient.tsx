@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { CheckCircle2, XCircle, Loader2 } from "lucide-react";
 import { ScrollToTopOnMount } from "@/components/ScrollToTopOnMount";
+import { PayTelegramSupportBlock } from "@/components/PayTelegramSupportBlock";
 import { useTipSettlementConfirmation } from "@/lib/hooks/use-tip-settlement-confirmation";
 
 type Props = {
@@ -37,6 +38,7 @@ export function PayResultClient({ tid, outcome }: Props) {
             На главную
           </Link>
         </div>
+        <PayTelegramSupportBlock variant="result" className="mt-5 w-full max-w-sm shrink-0" />
       </div>
     );
   }
@@ -62,6 +64,7 @@ export function PayResultClient({ tid, outcome }: Props) {
             На главную
           </Link>
         </div>
+        <PayTelegramSupportBlock variant="result" className="mt-5 w-full max-w-sm shrink-0" />
       </div>
     );
   }
@@ -75,6 +78,7 @@ export function PayResultClient({ tid, outcome }: Props) {
           <p className="mt-6 text-center text-lg font-medium text-[#0a192f]">Подтверждаем зачисление…</p>
           <p className="mt-2 text-center text-sm text-[#2d3748]">Обычно это несколько секунд.</p>
         </div>
+        <PayTelegramSupportBlock variant="result" className="mt-5 w-full max-w-sm shrink-0" />
       </div>
     );
   }
@@ -100,6 +104,7 @@ export function PayResultClient({ tid, outcome }: Props) {
             На главную
           </Link>
         </div>
+        <PayTelegramSupportBlock variant="result" className="mt-5 w-full max-w-sm shrink-0" />
       </div>
     );
   }
@@ -145,6 +150,7 @@ export function PayResultClient({ tid, outcome }: Props) {
           На главную
         </Link>
       </div>
+      <PayTelegramSupportBlock variant="result" className="mt-5 w-full max-w-sm shrink-0" />
     </div>
   );
 }

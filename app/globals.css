@@ -3564,23 +3564,23 @@ html:not([data-theme="dark"]) .cabinet-premium .cabinet-verification-status p {
 }
 @media (prefers-reduced-motion: no-preference) {
   .theme-toggle-btn[data-dragging="true"] {
-    transform: scale(1.045);
+    transform: scale(1.028);
     box-shadow:
-      0 0 0 1px rgba(197, 165, 114, 0.28),
-      0 5px 16px rgba(0, 0, 0, 0.1),
-      0 0 22px rgba(197, 165, 114, 0.24);
+      0 0 0 1px rgba(197, 165, 114, 0.24),
+      0 3px 10px rgba(0, 0, 0, 0.08),
+      0 0 14px rgba(197, 165, 114, 0.2);
   }
   [data-theme="dark"] .theme-toggle-btn[data-dragging="true"] {
     box-shadow:
-      0 0 0 1px rgba(197, 165, 114, 0.4),
-      0 6px 20px rgba(0, 0, 0, 0.38),
-      0 0 26px rgba(197, 165, 114, 0.22);
+      0 0 0 1px rgba(197, 165, 114, 0.35),
+      0 4px 14px rgba(0, 0, 0, 0.32),
+      0 0 18px rgba(197, 165, 114, 0.18);
   }
 }
 @media (prefers-reduced-motion: no-preference) {
   .theme-toggle-btn[data-dragging="true"] .theme-toggle-knob-icon {
-    transform: translate(-50%, -50%) scale(1.14);
-    filter: drop-shadow(0 0 5px rgba(197, 165, 114, 0.5));
+    transform: translate(-50%, -50%) scale(1.08);
+    filter: drop-shadow(0 0 4px rgba(197, 165, 114, 0.42));
   }
 }
 

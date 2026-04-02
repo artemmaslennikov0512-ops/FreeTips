@@ -10,6 +10,7 @@ import { patchProfileSchema, changePasswordSchema } from "@/lib/validations";
 import { getFieldErrors } from "@/lib/form-errors";
 import { cabinetInputClassName } from "../shared";
 import { CABINET_WAITER_BTN_INLINE } from "@/lib/cabinet-button-classes";
+import { toDateInputValueFromApi } from "@/lib/utils";
 
 /** Одна пробельная норма для сравнения с сервером (убирает «двойные» пробелы в ФИО из БД). */
 function normalizeFullNameSpaced(s: string): string {
@@ -68,7 +69,7 @@ export default function CabinetSettingsPage() {
     setEditLastName(parts[0] ?? "");
     setEditFirstName(parts[1] ?? "");
     setEditPatronymic(parts.slice(2).join(" "));
-    setEditBirthDate(data.birthDate ?? "");
+    setEditBirthDate(toDateInputValueFromApi(data.birthDate));
     setEditEstablishment(data.establishment ?? "");
   }, []);
 
@@ -133,8 +134,13 @@ export default function CabinetSettingsPage() {
     if (normalizeFullNameSpaced(combinedFullName) !== normalizeFullNameSpaced(user.fullName ?? "")) {
       payload.fullName = combinedFullName || "";
     }
-    if (editBirthDate.trim() !== (user.birthDate ?? "")) payload.birthDate = editBirthDate.trim() || "";
-    if (editEstablishment.trim() !== (user.establishment ?? "")) payload.establishment = editEstablishment.trim() || "";
+    const serverBirthInput = toDateInputValueFromApi(user.birthDate);
+    if (editBirthDate.trim() !== serverBirthInput) {
+      payload.birthDate = editBirthDate.trim() || "";
+    }
+    if (editEstablishment.trim() !== (user.establishment ?? "").trim()) {
+      payload.establishment = editEstablishment.trim() || "";
+    }
 
     const parsed = patchProfileSchema.safeParse(payload);
     if (!parsed.success) {
@@ -314,9 +320,6 @@ export default function CabinetSettingsPage() {
             <h2 className="font-[family:var(--font-playfair)] text-lg font-semibold text-white">Фото профиля</h2>
           </div>
           <div className="p-6">
-            <p className="text-sm text-white/90 mb-2">
-              Загрузите фото — на странице оплаты чаевых гости увидят его рядом с вашим именем вместо иконки человека. Также отображается в сайдбаре ЛК. Доступно и получателям без заведения, и сотрудникам заведения.
-            </p>
             <p className="text-sm text-white/75 mb-4">
               Рекомендуется не менее 200×200 px. Форматы: JPEG, PNG, WebP, до 5 МБ.
             </p>

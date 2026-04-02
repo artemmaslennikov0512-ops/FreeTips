@@ -184,16 +184,16 @@ export const patchProfileSchema = z.object({
     .optional()
     .transform((v) => (v === "" ? null : v)),
   fullName: z
-    .string()
+    .union([z.string(), z.null()])
     .optional()
-    .transform((v) => (v == null || v.trim() === "" ? null : v.trim()))
+    .transform((v) => (v == null || (typeof v === "string" && v.trim() === "") ? null : v.trim()))
     .refine((v) => v === null || v.length <= 255, "ФИО слишком длинное"),
   birthDate: z
-    .string()
+    .union([z.string(), z.null()])
     .optional()
     .transform((v) => {
-      if (v == null || (typeof v === "string" && v.trim() === "")) return null;
-      const s = (v ?? "").trim();
+      if (v === null || v === undefined || (typeof v === "string" && v.trim() === "")) return null;
+      const s = v.trim();
       const dateOnly = s.includes("T") ? s.split("T")[0] ?? s : s;
       return dateOnly;
     })
@@ -202,9 +202,9 @@ export const patchProfileSchema = z.object({
       "Дата рождения должна быть в формате YYYY-MM-DD",
     ),
   establishment: z
-    .string()
+    .union([z.string(), z.null()])
     .optional()
-    .transform((v) => (v == null || (typeof v === "string" && v.trim() === "") ? null : (v ?? "").trim()))
+    .transform((v) => (v === null || v === undefined || (typeof v === "string" && v.trim() === "") ? null : v.trim()))
     .refine((v) => v === null || v.length <= 255, "Название заведения слишком длинное"),
   savingFor: z
     .union([z.string(), z.null()])

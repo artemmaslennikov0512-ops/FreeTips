@@ -12,6 +12,24 @@ export function formatDate(iso: string, opts?: { includeYear?: boolean }): strin
   }).format(new Date(iso));
 }
 
+/**
+ * Значение для input[type=date] (только yyyy-mm-dd). API может отдать ISO с временем или иной формат строки.
+ */
+export function toDateInputValueFromApi(raw: string | null | undefined): string {
+  if (raw == null) return "";
+  const s = String(raw).trim();
+  if (!s) return "";
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+  const head = s.match(/^(\d{4}-\d{2}-\d{2})/);
+  if (head) return head[1]!;
+  const d = new Date(s);
+  if (Number.isNaN(d.getTime())) return "";
+  const y = d.getUTCFullYear();
+  const m = String(d.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(d.getUTCDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
 /** Вариант 1: пробел — разделитель тысяч, точка — копейки. Пример: 10 000.00 ₽ */
 function formatRubWithSpaces(rub: number, withDecimals: boolean): string {
   const sign = rub < 0 ? "-" : "";

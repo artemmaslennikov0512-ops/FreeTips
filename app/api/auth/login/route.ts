@@ -8,7 +8,12 @@ import { db } from "@/lib/db";
 import { getUserRepository } from "@/lib/infrastructure/user-repository";
 import { loginRequestSchema } from "@/lib/validations";
 import { verifyPassword } from "@/lib/auth/password";
-import { generateAccessToken, generateRefreshToken, setRefreshTokenCookie } from "@/lib/auth/jwt";
+import {
+  generateAccessToken,
+  generateRefreshToken,
+  generateAdminTwoFactorPendingToken,
+  setRefreshTokenCookie,
+} from "@/lib/auth/jwt";
 import { checkRateLimitByIP, getClientIP, AUTH_RATE_LIMIT } from "@/lib/middleware/rate-limit";
 import { logError, logSecurity } from "@/lib/logger";
 import { getRequestId } from "@/lib/security/request";
@@ -16,6 +21,7 @@ import { parseJsonWithLimit, MAX_BODY_SIZE_AUTH, jsonError, internalError, rateL
 import { verifyCsrfFromRequest } from "@/lib/security/csrf";
 import { z } from "zod";
 import { FRAUD_RULE, recordFraudSignal } from "@/lib/fraud-signals";
+import { observeSharedAuthIp } from "@/lib/fraud-velocity-observe";
 
 export async function POST(request: NextRequest) {
   const requestId = getRequestId(request);
@@ -62,6 +68,26 @@ export async function POST(request: NextRequest) {
         dedupeMinutes: 45,
       });
       return jsonError(401, "Неверный логин или пароль");
+    }
+
+    await db.user.update({
+      where: { id: user.id },
+      data: { lastAuthIp: ip },
+    });
+    void observeSharedAuthIp(user.id, ip);
+
+    const isAdminRole = user.role === "ADMIN" || user.role === "SUPERADMIN";
+    if (isAdminRole && user.adminTotpEnabled && user.adminTotpSecretEnc) {
+      const twoFactorToken = await generateAdminTwoFactorPendingToken({
+        userId: user.id,
+        login: user.login,
+        role: user.role,
+      });
+      logSecurity("auth.login.pending_admin_2fa", { requestId, ip, userId: user.id });
+      return NextResponse.json(
+        { needsTwoFactor: true, twoFactorToken },
+        { status: 200 },
+      );
     }
 
     const tokenPayload = {

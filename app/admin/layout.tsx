@@ -16,6 +16,7 @@ import {
   FileCheck,
   ChevronDown,
   CreditCard,
+  KeyRound,
 } from "lucide-react";
 import { getAccessToken, fetchWithAuth, clearAccessToken } from "@/lib/auth-client";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
@@ -40,6 +41,7 @@ const NAV: { label: string; href: string; icon: LucideIcon; iconClass: string }[
   { label: "Поддержка", href: "/admin/support", icon: MessageCircle, iconClass: "!text-cyan-400" },
   { label: "Антифрод", href: "/admin/antifraud", icon: ShieldCheck, iconClass: "!text-rose-400" },
   { label: "Приём по ссылкам", href: "/admin/payment-accept", icon: CreditCard, iconClass: "!text-[var(--color-brand-gold)]" },
+  { label: "Безопасность (2FA)", href: "/admin/security", icon: KeyRound, iconClass: "!text-amber-300" },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

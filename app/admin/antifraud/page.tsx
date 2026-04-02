@@ -27,6 +27,16 @@ interface StatsDefaults {
   defaultAutoConfirmThresholdKop?: number | null;
 }
 
+interface FraudObserveEffective {
+  payoutWindowMinutes: number;
+  payoutMinCount: number;
+  payInitWindowMinutes: number;
+  payInitMinCount: number;
+  paySuccessIpWindowMinutes: number;
+  paySuccessIpMinCount: number;
+  sharedIpMinAccounts: number;
+}
+
 export default function AdminAntifraudPage() {
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -53,15 +63,30 @@ export default function AdminAntifraudPage() {
   const [inputMonthlyCount, setInputMonthlyCount] = useState("");
   const [loadingMonthlyCount, setLoadingMonthlyCount] = useState(false);
 
+  const [observeEffective, setObserveEffective] = useState<FraudObserveEffective | null>(null);
+  const [inpPayoutWin, setInpPayoutWin] = useState("");
+  const [inpPayoutCnt, setInpPayoutCnt] = useState("");
+  const [inpInitWin, setInpInitWin] = useState("");
+  const [inpInitCnt, setInpInitCnt] = useState("");
+  const [inpSuccWin, setInpSuccWin] = useState("");
+  const [inpSuccCnt, setInpSuccCnt] = useState("");
+  const [inpSharedIp, setInpSharedIp] = useState("");
+  const [loadingObserveSave, setLoadingObserveSave] = useState(false);
+
   useEffect(() => {
     const fetchStats = async () => {
       const token = localStorage.getItem("accessToken");
       if (!token) return;
 
       try {
-        const res = await fetch("/api/admin/stats", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const [res, obsRes] = await Promise.all([
+          fetch("/api/admin/stats", {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          fetch("/api/admin/fraud-observe-settings", {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+        ]);
 
         if (!res.ok) {
           setLoadError("Ошибка загрузки настроек");
@@ -94,6 +119,19 @@ export default function AdminAntifraudPage() {
           setAppliedAutoConfirmRub(null);
           setInputAutoConfirmRub("");
         }
+
+        if (obsRes.ok) {
+          const obs = (await obsRes.json()) as { effective: FraudObserveEffective };
+          const e = obs.effective;
+          setObserveEffective(e);
+          setInpPayoutWin(String(e.payoutWindowMinutes));
+          setInpPayoutCnt(String(e.payoutMinCount));
+          setInpInitWin(String(e.payInitWindowMinutes));
+          setInpInitCnt(String(e.payInitMinCount));
+          setInpSuccWin(String(e.paySuccessIpWindowMinutes));
+          setInpSuccCnt(String(e.paySuccessIpMinCount));
+          setInpSharedIp(String(e.sharedIpMinAccounts));
+        }
       } catch {
         setLoadError("Ошибка загрузки настроек");
       } finally {
@@ -103,6 +141,81 @@ export default function AdminAntifraudPage() {
 
     fetchStats();
   }, []);
+
+  const applyObserveSettings = async (resetToBuiltIn: boolean) => {
+    const token = localStorage.getItem("accessToken");
+    if (!token) return;
+    setLoadingObserveSave(true);
+    setAntifraudMessage(null);
+    try {
+      const body = resetToBuiltIn
+        ? {
+            observePayoutWindowMinutes: null,
+            observePayoutMinCount: null,
+            observePayInitWindowMinutes: null,
+            observePayInitMinCount: null,
+            observePaySuccessIpWindowMinutes: null,
+            observePaySuccessIpMinCount: null,
+            observeSharedIpMinAccounts: null,
+          }
+        : {
+            observePayoutWindowMinutes: parseInt(inpPayoutWin, 10),
+            observePayoutMinCount: parseInt(inpPayoutCnt, 10),
+            observePayInitWindowMinutes: parseInt(inpInitWin, 10),
+            observePayInitMinCount: parseInt(inpInitCnt, 10),
+            observePaySuccessIpWindowMinutes: parseInt(inpSuccWin, 10),
+            observePaySuccessIpMinCount: parseInt(inpSuccCnt, 10),
+            observeSharedIpMinAccounts: parseInt(inpSharedIp, 10),
+          };
+
+      if (!resetToBuiltIn) {
+        const nums = [
+          body.observePayoutWindowMinutes,
+          body.observePayoutMinCount,
+          body.observePayInitWindowMinutes,
+          body.observePayInitMinCount,
+          body.observePaySuccessIpWindowMinutes,
+          body.observePaySuccessIpMinCount,
+          body.observeSharedIpMinAccounts,
+        ];
+        if (nums.some((n) => !Number.isFinite(n) || Number.isNaN(n))) {
+          setAntifraudMessage({ type: "err", text: "Введите целые числа во все поля" });
+          setLoadingObserveSave(false);
+          return;
+        }
+      }
+
+      const res = await fetch("/api/admin/fraud-observe-settings", {
+        method: "PUT",
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const data = (await res.json()) as { error?: string; effective?: FraudObserveEffective };
+      if (!res.ok) {
+        setAntifraudMessage({ type: "err", text: data.error ?? "Ошибка сохранения порогов" });
+        return;
+      }
+      if (data.effective) {
+        setObserveEffective(data.effective);
+        const e = data.effective;
+        setInpPayoutWin(String(e.payoutWindowMinutes));
+        setInpPayoutCnt(String(e.payoutMinCount));
+        setInpInitWin(String(e.payInitWindowMinutes));
+        setInpInitCnt(String(e.payInitMinCount));
+        setInpSuccWin(String(e.paySuccessIpWindowMinutes));
+        setInpSuccCnt(String(e.paySuccessIpMinCount));
+        setInpSharedIp(String(e.sharedIpMinAccounts));
+      }
+      setAntifraudMessage({
+        type: "ok",
+        text: resetToBuiltIn ? "Пороги сброшены на встроенные дефолты" : "Пороги наблюдения сохранены",
+      });
+    } catch {
+      setAntifraudMessage({ type: "err", text: "Ошибка соединения" });
+    } finally {
+      setLoadingObserveSave(false);
+    }
+  };
 
   const applyAutoConfirmToggle = async (enabled: boolean) => {
     const token = localStorage.getItem("accessToken");
@@ -324,6 +437,127 @@ export default function AdminAntifraudPage() {
       <h1 className="antifraud-page-title mb-6 text-xl font-semibold text-white text-center">Антифрод и лимиты</h1>
 
       <FraudSignalsSection />
+
+      {observeEffective != null && (
+        <section className="cabinet-section-header mb-6 rounded-2xl border-0 p-4 sm:p-6">
+          <div className="min-w-0 rounded-xl border border-rose-500/30 bg-rose-950/15 p-4 sm:p-5">
+            <h2 className="mb-1 text-base font-semibold text-white">Пороги наблюдения (только сигналы)</h2>
+            <p className="mb-4 text-xs leading-relaxed text-white/75">
+              Не блокируют операции. Окно — за сколько минут считаем; порог — при каком количестве пишется сигнал в
+              «Подозрительная активность». Сброс удаляет переопределения в БД и включает встроенные дефолты.
+            </p>
+            <div className="space-y-3 text-sm text-white/90">
+              <div className="grid gap-2 sm:grid-cols-[1fr_auto_auto] sm:items-center sm:gap-3">
+                <span>Частый вывод</span>
+                <label className="flex items-center gap-2 sm:justify-end">
+                  <span className="text-xs text-white/60">мин</span>
+                  <input
+                    type="number"
+                    min={1}
+                    max={10080}
+                    value={inpPayoutWin}
+                    onChange={(e) => setInpPayoutWin(e.target.value)}
+                    className={ANTIFRAUD_INPUT}
+                  />
+                </label>
+                <label className="flex items-center gap-2 sm:justify-end">
+                  <span className="text-xs text-white/60">заявок ≥</span>
+                  <input
+                    type="number"
+                    min={2}
+                    max={50000}
+                    value={inpPayoutCnt}
+                    onChange={(e) => setInpPayoutCnt(e.target.value)}
+                    className={ANTIFRAUD_INPUT}
+                  />
+                </label>
+              </div>
+              <div className="grid gap-2 sm:grid-cols-[1fr_auto_auto] sm:items-center sm:gap-3">
+                <span>Всплеск инициализаций по одной ссылке</span>
+                <label className="flex items-center gap-2 sm:justify-end">
+                  <span className="text-xs text-white/60">мин</span>
+                  <input
+                    type="number"
+                    min={1}
+                    max={10080}
+                    value={inpInitWin}
+                    onChange={(e) => setInpInitWin(e.target.value)}
+                    className={ANTIFRAUD_INPUT}
+                  />
+                </label>
+                <label className="flex items-center gap-2 sm:justify-end">
+                  <span className="text-xs text-white/60">созданий ≥</span>
+                  <input
+                    type="number"
+                    min={2}
+                    max={50000}
+                    value={inpInitCnt}
+                    onChange={(e) => setInpInitCnt(e.target.value)}
+                    className={ANTIFRAUD_INPUT}
+                  />
+                </label>
+              </div>
+              <div className="grid gap-2 sm:grid-cols-[1fr_auto_auto] sm:items-center sm:gap-3">
+                <span>Успешные оплаты с одного IP</span>
+                <label className="flex items-center gap-2 sm:justify-end">
+                  <span className="text-xs text-white/60">мин</span>
+                  <input
+                    type="number"
+                    min={1}
+                    max={10080}
+                    value={inpSuccWin}
+                    onChange={(e) => setInpSuccWin(e.target.value)}
+                    className={ANTIFRAUD_INPUT}
+                  />
+                </label>
+                <label className="flex items-center gap-2 sm:justify-end">
+                  <span className="text-xs text-white/60">успехов ≥</span>
+                  <input
+                    type="number"
+                    min={2}
+                    max={50000}
+                    value={inpSuccCnt}
+                    onChange={(e) => setInpSuccCnt(e.target.value)}
+                    className={ANTIFRAUD_INPUT}
+                  />
+                </label>
+              </div>
+              <div className="grid gap-2 sm:grid-cols-[1fr_auto] sm:items-center sm:gap-3">
+                <span>Несколько аккаунтов с одного IP (вход/регистрация)</span>
+                <label className="flex items-center gap-2 sm:justify-end">
+                  <span className="text-xs text-white/60">аккаунтов ≥</span>
+                  <input
+                    type="number"
+                    min={2}
+                    max={50000}
+                    value={inpSharedIp}
+                    onChange={(e) => setInpSharedIp(e.target.value)}
+                    className={ANTIFRAUD_INPUT}
+                  />
+                </label>
+              </div>
+            </div>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <button
+                type="button"
+                disabled={loadingObserveSave}
+                onClick={() => void applyObserveSettings(false)}
+                className={ANTIFRAUD_BTN_APPLY}
+              >
+                {loadingObserveSave ? "Сохраняем…" : "Сохранить пороги"}
+              </button>
+              <button
+                type="button"
+                disabled={loadingObserveSave}
+                onClick={() => void applyObserveSettings(true)}
+                className={ANTIFRAUD_BTN_EDIT}
+              >
+                Сбросить к дефолтам
+              </button>
+            </div>
+          </div>
+        </section>
+      )}
 
       <section className="cabinet-section-header rounded-2xl border-0 p-4 sm:p-6">
         <div className="antifraud-inner cabinet-block-inner min-w-0 rounded-xl border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/85 p-4 sm:p-5">

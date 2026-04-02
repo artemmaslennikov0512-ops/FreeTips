@@ -19,6 +19,8 @@ export interface AuthUser {
   passwordHash: string;
   mustChangePassword: boolean;
   isBlocked: boolean;
+  adminTotpEnabled: boolean;
+  adminTotpSecretEnc: string | null;
 }
 
 /** Данные пользователя, достаточные для проверки доступа в auth-middleware */

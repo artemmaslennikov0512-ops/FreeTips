@@ -19,6 +19,7 @@ import { logError, logSecurity } from "@/lib/logger";
 import { getRequestId } from "@/lib/security/request";
 import { parseJsonWithLimit, MAX_BODY_SIZE_AUTH, jsonError, internalError, rateLimit429Response, zodErrorResponse } from "@/lib/api/helpers";
 import { verifyCsrfFromRequest } from "@/lib/security/csrf";
+import { observeSharedAuthIp } from "@/lib/fraud-velocity-observe";
 
 export async function POST(request: NextRequest) {
   const requestId = getRequestId(request);
@@ -94,6 +95,7 @@ export async function POST(request: NextRequest) {
         where: { id: created.id },
         data: {
           paygineSdRef: getWaiterPaygineSdRef(created.id),
+          lastAuthIp: ip,
           ...defaultLimits,
         },
       });
@@ -131,6 +133,7 @@ export async function POST(request: NextRequest) {
     });
 
     logSecurity("auth.register.success", { requestId, ip, userId: user.id });
+    void observeSharedAuthIp(user.id, ip);
     return NextResponse.json(
       {
         accessToken,

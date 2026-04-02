@@ -21,6 +21,9 @@ export default function LoginEstablishmentPage() {
     login: "",
     password: "",
   });
+  const [loginStep, setLoginStep] = useState<"credentials" | "totp">("credentials");
+  const [twoFactorToken, setTwoFactorToken] = useState<string | null>(null);
+  const [totpCode, setTotpCode] = useState("");
 
   useEffect(() => {
     const token = typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
@@ -75,6 +78,14 @@ export default function LoginEstablishmentPage() {
         return;
       }
 
+      if (data.needsTwoFactor === true && typeof data.twoFactorToken === "string") {
+        setTwoFactorToken(data.twoFactorToken);
+        setLoginStep("totp");
+        setTotpCode("");
+        setLoading(false);
+        return;
+      }
+
       if (data.accessToken && data.user) {
         if (data.user.role !== "ESTABLISHMENT_ADMIN") {
           setError(
@@ -95,6 +106,56 @@ export default function LoginEstablishmentPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleTotpSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    if (!twoFactorToken || totpCode.replace(/\s/g, "").length !== 6) {
+      setError("Введите 6 цифр кода из приложения");
+      return;
+    }
+    setLoading(true);
+    try {
+      const res = await fetch("/api/auth/login/totp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...getCsrfHeader() },
+        body: JSON.stringify({ twoFactorToken, code: totpCode.replace(/\s/g, "") }),
+        credentials: "include",
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error || "Ошибка проверки кода");
+        setLoading(false);
+        return;
+      }
+      if (data.accessToken && data.user) {
+        if (data.user.role !== "ESTABLISHMENT_ADMIN") {
+          setError(
+            "Этот аккаунт не является управляющим заведением. Используйте обычную страницу входа.",
+          );
+          setLoading(false);
+          return;
+        }
+        localStorage.setItem("accessToken", data.accessToken);
+        if (data.mustChangePassword) {
+          router.push("/change-password");
+        } else {
+          router.push("/establishment");
+        }
+      }
+    } catch {
+      setError("Ошибка соединения. Попробуйте позже.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const backToCredentials = () => {
+    setLoginStep("credentials");
+    setTwoFactorToken(null);
+    setTotpCode("");
+    setError(null);
   };
 
   if (checkingAuth) {
@@ -129,74 +190,114 @@ export default function LoginEstablishmentPage() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-            <div>
-              <label htmlFor="login" className="mb-1.5 block text-sm font-medium text-[var(--color-text)]">
-                Логин
-              </label>
-              <div className="relative">
-                <User className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--color-muted)]" />
+          {loginStep === "totp" ? (
+            <form onSubmit={handleTotpSubmit} className="mt-6 space-y-4">
+              <p className="text-center text-sm text-[var(--color-text-secondary)]">
+                Код из приложения-аутентификатора для <span className="font-medium text-[var(--color-text)]">{formData.login}</span>
+              </p>
+              <div>
+                <label htmlFor="totp" className="mb-1.5 block text-sm font-medium text-[var(--color-text)]">
+                  Код подтверждения
+                </label>
                 <input
-                  id="login"
+                  id="totp"
                   type="text"
-                  autoComplete="username"
-                  value={formData.login}
-                  onChange={(e) => setFormData({ ...formData, login: e.target.value })}
-                  placeholder="Логин управляющего"
-                  className={`${AUTH_INPUT_CLASS} ${fieldErrors.login ? AUTH_ERROR_BORDER : ""}`}
+                  inputMode="numeric"
+                  autoComplete="one-time-code"
+                  maxLength={8}
+                  value={totpCode}
+                  onChange={(e) => setTotpCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                  placeholder="000000"
+                  className={`${AUTH_INPUT_CLASS} text-center text-lg tracking-[0.35em]`}
+                  autoFocus
                 />
               </div>
-              {fieldErrors.login && (
-                <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">
-                  {fieldErrors.login}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <label htmlFor="password" className="mb-1.5 block text-sm font-medium text-[var(--color-text)]">
-                Пароль
-              </label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--color-muted)]" />
-                <input
-                  id="password"
-                  type="password"
-                  autoComplete="current-password"
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  placeholder="Пароль"
-                  className={`${AUTH_INPUT_CLASS} ${fieldErrors.password ? AUTH_ERROR_BORDER : ""}`}
-                />
-              </div>
-              {fieldErrors.password && (
-                <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">
-                  {fieldErrors.password}
-                </p>
-              )}
-              <Link
-                href="/forgot-password"
-                className="mt-1.5 block text-xs text-[var(--color-accent-gold)] hover:opacity-90 hover:underline transition-colors"
+              <button
+                type="submit"
+                disabled={loading || totpCode.length !== 6}
+                className={`${AUTH_BTN_PRIMARY} flex w-full items-center justify-center gap-2`}
               >
-                Забыли пароль?
-              </Link>
-            </div>
+                {loading ? "Проверка…" : (
+                  <>
+                    Продолжить
+                    <ArrowRight className="h-4 w-4" />
+                  </>
+                )}
+              </button>
+              <button type="button" onClick={backToCredentials} className="w-full text-sm text-[var(--color-accent-gold)] hover:underline">
+                ← Назад к логину и паролю
+              </button>
+            </form>
+          ) : (
+            <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+              <div>
+                <label htmlFor="login" className="mb-1.5 block text-sm font-medium text-[var(--color-text)]">
+                  Логин
+                </label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--color-muted)]" />
+                  <input
+                    id="login"
+                    type="text"
+                    autoComplete="username"
+                    value={formData.login}
+                    onChange={(e) => setFormData({ ...formData, login: e.target.value })}
+                    placeholder="Логин управляющего"
+                    className={`${AUTH_INPUT_CLASS} ${fieldErrors.login ? AUTH_ERROR_BORDER : ""}`}
+                  />
+                </div>
+                {fieldErrors.login && (
+                  <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">
+                    {fieldErrors.login}
+                  </p>
+                )}
+              </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className={`${AUTH_BTN_PRIMARY} flex w-full items-center justify-center gap-2`}
-            >
-              {loading ? (
-                "Вход…"
-              ) : (
-                <>
-                  Войти в кабинет заведения
-                  <ArrowRight className="h-4 w-4" />
-                </>
-              )}
-            </button>
-          </form>
+              <div>
+                <label htmlFor="password" className="mb-1.5 block text-sm font-medium text-[var(--color-text)]">
+                  Пароль
+                </label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--color-muted)]" />
+                  <input
+                    id="password"
+                    type="password"
+                    autoComplete="current-password"
+                    value={formData.password}
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    placeholder="Пароль"
+                    className={`${AUTH_INPUT_CLASS} ${fieldErrors.password ? AUTH_ERROR_BORDER : ""}`}
+                  />
+                </div>
+                {fieldErrors.password && (
+                  <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">
+                    {fieldErrors.password}
+                  </p>
+                )}
+                <Link
+                  href="/forgot-password"
+                  className="mt-1.5 block text-xs text-[var(--color-accent-gold)] hover:opacity-90 hover:underline transition-colors"
+                >
+                  Забыли пароль?
+                </Link>
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className={`${AUTH_BTN_PRIMARY} flex w-full items-center justify-center gap-2`}
+              >
+                {loading ? (
+                  "Вход…"
+                ) : (
+                  <>
+                    Войти в кабинет заведения
+                    <ArrowRight className="h-4 w-4" />
+                  </>
+                )}
+              </button>
+            </form>
+          )}
 
           <div className="mt-6 border-t border-white/10 pt-6 text-center text-sm text-[var(--color-text-secondary)]">
             <Link

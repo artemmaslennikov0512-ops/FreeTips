@@ -100,6 +100,24 @@ export const loginRequestSchema = z.object({
   password: z.string().min(1, "Пароль обязателен").max(PASSWORD_MAX_LENGTH, "Пароль слишком длинный"),
 });
 
+/** Код из Google Authenticator (6 цифр) */
+export const adminTotpCodeSchema = z
+  .string()
+  .trim()
+  .regex(/^\d{6}$/, "Введите 6 цифр кода");
+
+/** Завершение входа админа после TOTP */
+export const loginAdminTotpSchema = z.object({
+  twoFactorToken: z.string().min(10, "Некорректный токен"),
+  code: adminTotpCodeSchema,
+});
+
+/** Отключение TOTP в админке */
+export const adminTotpDisableSchema = z.object({
+  password: z.string().min(1, "Введите пароль").max(PASSWORD_MAX_LENGTH),
+  code: adminTotpCodeSchema,
+});
+
 // Запрос сброса пароля: только логин и email (логин без учёта регистра)
 export const forgotPasswordRequestSchema = z.object({
   login: z.string().trim().min(1, "Укажите логин").max(50, "Слишком длинный логин"),

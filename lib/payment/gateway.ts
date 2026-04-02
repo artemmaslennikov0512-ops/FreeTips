@@ -13,6 +13,8 @@ export type CreatePaymentParams = {
   comment?: string | null;
   /** Базовый URL сайта для url/failurl (редирект после оплаты). Нужен для Paygine. */
   baseUrl?: string;
+  /** IP инициатора (страница оплаты); для наблюдения скорости успешных оплат, без блокировок */
+  initiatorIp?: string | null;
 };
 
 export type CreatePaymentResult =

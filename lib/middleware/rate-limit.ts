@@ -29,6 +29,13 @@ export const AUTH_RATE_LIMIT = {
   keyPrefix: "auth",
 } as const;
 
+/** Проверка TOTP при входе админа — жёстче против перебора */
+export const AUTH_ADMIN_TOTP_RATE_LIMIT = {
+  windowMs: 15 * 60 * 1000,
+  maxRequests: 25,
+  keyPrefix: "auth-admin-totp",
+} as const;
+
 /** Окно и лимит для публичной подачи заявки на регистрацию */
 export const REGISTRATION_REQUEST_RATE_LIMIT = {
   windowMs: 15 * 60 * 1000,

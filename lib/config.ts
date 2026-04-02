@@ -10,6 +10,8 @@ const envSchema = z.object({
   DATABASE_URL: z.string().min(1).optional(),
   JWT_SECRET: z.string().min(1).optional(),
   JWT_REFRESH_SECRET: z.string().min(1).optional(),
+  /** Опционально: 64 hex = 32 байта для AES-256 шифрования секретов TOTP админки; иначе ключ выводится из JWT_SECRET */
+  TOTP_ENCRYPTION_KEY: z.string().optional(),
   NEXT_PUBLIC_APP_URL: z.string().url().optional().or(z.literal("")),
   REDIS_URL: z.string().url().optional().or(z.literal("")),
   PAYGINE_BASE_URL: z.string().optional(),
@@ -33,6 +35,7 @@ function getEnv(): EnvSchema {
     DATABASE_URL: process.env.DATABASE_URL,
     JWT_SECRET: process.env.JWT_SECRET,
     JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET,
+    TOTP_ENCRYPTION_KEY: process.env.TOTP_ENCRYPTION_KEY,
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
     REDIS_URL: process.env.REDIS_URL,
     PAYGINE_BASE_URL: process.env.PAYGINE_BASE_URL,

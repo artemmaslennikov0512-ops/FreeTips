@@ -31,6 +31,7 @@ import { isCabinetM5CompetitionTheme } from "@/config/cabinet-theme-logins";
 import { getPlatformPaymentSettings } from "@/lib/platform-payment-settings";
 import { recipientCanAcceptIncomingTips } from "@/lib/payment-accept-policy";
 import { FRAUD_RULE, recordFraudSignal } from "@/lib/fraud-signals";
+import { observePayInitBurstForSlug } from "@/lib/fraud-velocity-observe";
 
 const DEMO_SLUG = "demoPaySlug" in site && typeof site.demoPaySlug === "string" ? site.demoPaySlug : null;
 
@@ -224,6 +225,7 @@ export async function POST(request: NextRequest, { params }: Params) {
       idempotencyKey,
       comment: comment ?? null,
       baseUrl,
+      initiatorIp: ip,
     });
 
     if (!result.success) {
@@ -231,6 +233,7 @@ export async function POST(request: NextRequest, { params }: Params) {
       return NextResponse.json({ error: result.error }, { status: 400 });
     }
 
+    observePayInitBurstForSlug(tipLink.id, tipLink.userId, slug);
     logSecurity("pay.init.success", { requestId, ip, slug, transactionId: result.transactionId });
     const json: { success: true; transactionId: string; redirectUrl?: string } = {
       success: true,

@@ -89,6 +89,8 @@ export async function GET(request: NextRequest) {
             verificationRejectionReason: true,
             savingFor: true,
             profilePhotoUrl: true,
+            adminTotpEnabled: true,
+            adminTotpSecretEnc: true,
           },
         }),
         db.transaction.aggregate({
@@ -238,6 +240,8 @@ export async function GET(request: NextRequest) {
       verificationStatus: String(profile.verificationStatus),
       verificationRejectionReason: profile.verificationRejectionReason != null ? String(profile.verificationRejectionReason) : null,
       savingFor: profile.savingFor != null ? String(profile.savingFor) : null,
+      adminTotpEnabled: Boolean(profile.adminTotpEnabled),
+      adminTotpEnrollmentPending: Boolean(profile.adminTotpSecretEnc && !profile.adminTotpEnabled),
       /** Фото для ЛК (страница оплаты и сайдбар): EMPLOYEE — из Employee, RECIPIENT — из User.profilePhotoUrl. */
       employeePhotoUrl:
         employee?.photoUrl && employee?.id

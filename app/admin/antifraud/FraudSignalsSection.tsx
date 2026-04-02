@@ -51,6 +51,13 @@ function ruleKindBadge(ruleCode: string): { label: string; className: string } {
         "border border-rose-400/45 bg-rose-500/25 text-rose-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]",
     };
   }
+  if (ruleCode.startsWith("ACCOUNT_")) {
+    return {
+      label: "Аккаунт",
+      className:
+        "border border-violet-400/40 bg-violet-500/22 text-violet-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]",
+    };
+  }
   return {
     label: "Другое",
     className: "border border-white/25 bg-white/10 text-white/85 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]",

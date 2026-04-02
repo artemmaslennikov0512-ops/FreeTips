@@ -18,6 +18,7 @@ import { broadcastBalanceUpdated } from "@/lib/ws-broadcast";
 import { getRequestId } from "@/lib/security/request";
 import { getClientIP } from "@/lib/middleware/rate-limit";
 import { FRAUD_RULE, recordFraudSignal } from "@/lib/fraud-signals";
+import { observePayoutVelocityAfterCreate } from "@/lib/fraud-velocity-observe";
 
 export async function GET(request: NextRequest) {
   const auth = await requireAuthOrApiKey(request);
@@ -218,6 +219,8 @@ export async function POST(request: NextRequest) {
     },
     select: { id: true, amountKop: true, status: true, createdAt: true },
   });
+
+  observePayoutVelocityAfterCreate(auth.userId);
 
   let finalStatus = payout.status;
   const shouldAutoConfirm =

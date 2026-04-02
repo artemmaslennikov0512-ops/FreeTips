@@ -21,6 +21,7 @@ import { registerOrder, sdRelocateFunds } from "./paygine/client";
 import { buildPaygineSignature } from "./paygine/signature";
 import { feeKopForIncoming } from "./paygine-fee";
 import { paymentAcceptBlockedReasonForRecipient } from "@/lib/payment-accept-guard";
+import { observeTipSuccessBurstFromInitiatorIp } from "@/lib/fraud-velocity-observe";
 
 /** Базовый URL для редиректов: канонический из env, иначе из запроса (для dev). Paygine требует абсолютный URL. */
 function getBaseForRedirect(baseUrlFromRequest: string | undefined): string {
@@ -91,7 +92,7 @@ export class PayginePaymentGateway implements PaymentGateway {
       return { success: false, error: "Paygine не настроен" };
     }
 
-    const { linkId, recipientId, amountKop, idempotencyKey, comment, baseUrl } = params;
+    const { linkId, recipientId, amountKop, idempotencyKey, comment, baseUrl, initiatorIp } = params;
     const amount = Number(amountKop);
     if (!Number.isInteger(amount) || amount < 100) {
       return { success: false, error: "Сумма слишком мала" };
@@ -148,6 +149,7 @@ export class PayginePaymentGateway implements PaymentGateway {
         payerInfo: JSON.stringify({ comment: comment ?? undefined, paygineMethod: "card" }),
         status: TransactionStatus.PENDING,
         idempotencyKey,
+        initiatorIp: initiatorIp?.trim() || null,
       },
       select: { id: true },
     });
@@ -360,6 +362,7 @@ export class PayginePaymentGateway implements PaymentGateway {
 
     if (success && setStatusImmediately === TransactionStatus.SUCCESS) {
       void broadcastBalanceUpdated(tx.recipientId);
+      observeTipSuccessBurstFromInitiatorIp(tx.id);
     }
 
     if (success && setStatusImmediately === TransactionStatus.PENDING) {
@@ -444,15 +447,17 @@ export async function runRelocateForTransaction(txId: string): Promise<{ ok: boo
     orderSdRef !== waiterSdRef &&
     toWaiterKop >= 1;
 
-  if (!willRelocateToWaiter) {
+    if (!willRelocateToWaiter) {
     if (!waiterSdRef || orderSdRef === waiterSdRef) {
       await db.transaction.update({ where: { id: txId }, data: { status: TransactionStatus.SUCCESS } });
       void broadcastBalanceUpdated(tx.recipientId);
+      observeTipSuccessBurstFromInitiatorIp(txId);
       return { ok: true };
     }
     if (toWaiterKop < 1) {
       await db.transaction.update({ where: { id: txId }, data: { status: TransactionStatus.SUCCESS } });
       void broadcastBalanceUpdated(tx.recipientId);
+      observeTipSuccessBurstFromInitiatorIp(txId);
       return { ok: true };
     }
   }
@@ -519,6 +524,7 @@ export async function runRelocateForTransaction(txId: string): Promise<{ ok: boo
     if (toWaiterKop < 1) {
       await db.transaction.update({ where: { id: txId }, data: { status: TransactionStatus.SUCCESS } });
       void broadcastBalanceUpdated(tx.recipientId);
+      observeTipSuccessBurstFromInitiatorIp(txId);
       return { ok: true };
     }
 
@@ -526,6 +532,7 @@ export async function runRelocateForTransaction(txId: string): Promise<{ ok: boo
     if (relWaiter.ok) {
       await db.transaction.update({ where: { id: txId }, data: { status: TransactionStatus.SUCCESS } });
       void broadcastBalanceUpdated(tx.recipientId);
+      observeTipSuccessBurstFromInitiatorIp(txId);
     } else {
       logInfo("payment.webhook.relocate_failed", {
         transactionId: txId,

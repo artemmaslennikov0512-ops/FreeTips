@@ -72,6 +72,10 @@ model User {
   verificationRejectionReason String?   @db.VarChar(1000) // причина отказа (видна клиенту)
   savingFor         String?   @db.VarChar(500) // на что копит официант — показывается на странице оплаты
   profilePhotoUrl   String?   @db.VarChar(512) // фото получателя (RECIPIENT): страница оплаты и ЛК (путь в storage)
+  lastAuthIp        String?   @db.VarChar(64) // последний IP входа/регистрации (наблюдение: несколько аккаунтов с одного IP)
+  /** TOTP (Google Authenticator) для ADMIN/SUPERADMIN: секрет в БД только в зашифрованном виде */
+  adminTotpEnabled    Boolean   @default(false)
+  adminTotpSecretEnc  String?   @db.Text
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
 
@@ -96,6 +100,7 @@ model User {
   @@index([email])
   @@index([apiKeyPrefix])
   @@index([establishmentId])
+  @@index([lastAuthIp])
   @@map("users")
 }
 
@@ -176,6 +181,7 @@ model Transaction {
   externalId      String?           @unique @db.VarChar(255) // ID от платёжного провайдера
   paygineOrderSdRef String?         @db.VarChar(128) // кубышка заказа (временная, после оплаты — Relocate на кубышку официанта)
   idempotencyKey  String            @unique @db.VarChar(255) // для идемпотентности
+  initiatorIp     String?           @db.VarChar(64) // IP клиента при создании заказа (наблюдение скорости успешных оплат)
   relocateStartedAt DateTime?       // установить при старте перелива — защита от двойного запуска (два вебхука)
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
@@ -190,6 +196,7 @@ model Transaction {
   @@index([externalId])
   @@index([idempotencyKey])
   @@index([createdAt])
+  @@index([initiatorIp, status, updatedAt])
   @@map("transactions")
 }
 
@@ -446,6 +453,14 @@ model SystemDefaultLimits {
   payoutMonthlyLimitKop        BigInt?
   autoConfirmPayouts           Boolean  @default(false)
   autoConfirmPayoutThresholdKop BigInt?
+  /** Пороги наблюдения (сигналы без блокировок); null = встроенные дефолты в коде */
+  observePayoutWindowMinutes         Int?
+  observePayoutMinCount              Int?
+  observePayInitWindowMinutes        Int?
+  observePayInitMinCount             Int?
+  observePaySuccessIpWindowMinutes   Int?
+  observePaySuccessIpMinCount        Int?
+  observeSharedIpMinAccounts         Int?
   updatedAt                     DateTime @updatedAt
 
   @@map("system_default_limits")

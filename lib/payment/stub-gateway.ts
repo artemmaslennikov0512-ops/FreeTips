@@ -14,6 +14,7 @@ import { getPaygineConfig } from "@/lib/config";
 import type { PaymentGateway, CreatePaymentParams, CreatePaymentResult, GetStatusResult } from "./gateway";
 import { TransactionStatus } from "@prisma/client";
 import { broadcastBalanceUpdated } from "@/lib/ws-broadcast";
+import { observeTipSuccessBurstFromInitiatorIp } from "@/lib/fraud-velocity-observe";
 import { PayginePaymentGateway } from "./paygine-gateway";
 import { paymentAcceptBlockedReasonForRecipient } from "@/lib/payment-accept-guard";
 
@@ -41,7 +42,7 @@ function verifyWebhookSignature(rawBody: string, signature: string | null): bool
 
 export class StubPaymentGateway implements PaymentGateway {
   async createPayment(params: CreatePaymentParams): Promise<CreatePaymentResult> {
-    const { linkId, recipientId, amountKop, idempotencyKey, comment } = params;
+    const { linkId, recipientId, amountKop, idempotencyKey, comment, initiatorIp } = params;
 
     const existing = await db.transaction.findUnique({
       where: { idempotencyKey },
@@ -68,11 +69,13 @@ export class StubPaymentGateway implements PaymentGateway {
         payerInfo: comment ? JSON.stringify({ comment }) : null,
         status: TransactionStatus.SUCCESS,
         idempotencyKey,
+        initiatorIp: initiatorIp?.trim() || null,
       },
       select: { id: true },
     });
 
     void broadcastBalanceUpdated(recipientId);
+    observeTipSuccessBurstFromInitiatorIp(tx.id);
 
     return { success: true, transactionId: tx.id };
   }

@@ -15,6 +15,14 @@ export const FRAUD_RULE = {
   PAYOUT_LIMIT_MONTHLY_KOP: "PAYOUT_LIMIT_MONTHLY_KOP",
   PAY_RECIPIENT_BLOCKED: "PAY_RECIPIENT_BLOCKED",
   PAY_POLICY_BLOCKED: "PAY_POLICY_BLOCKED",
+  /** Наблюдение: частые заявки на вывод за короткий интервал (без отказа в операции) */
+  PAYOUT_VELOCITY_HOURLY: "PAYOUT_VELOCITY_HOURLY",
+  /** Наблюдение: много созданных заказов на одну ссылку за короткое время */
+  PAY_INIT_BURST_SLUG: "PAY_INIT_BURST_SLUG",
+  /** Наблюдение: много успешных оплат с одного IP за короткое время (получатель — в сигнале) */
+  PAY_SUCCESS_BURST_IP: "PAY_SUCCESS_BURST_IP",
+  /** Наблюдение: несколько учётных записей с одного IP (вход/регистрация) */
+  ACCOUNT_SHARED_AUTH_IP: "ACCOUNT_SHARED_AUTH_IP",
 } as const;
 
 export type FraudRuleCode = (typeof FRAUD_RULE)[keyof typeof FRAUD_RULE];

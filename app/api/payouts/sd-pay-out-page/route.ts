@@ -14,6 +14,7 @@ import { registerOrder, buildSDPayOutPageFormParams, getSDPayOutPageEndpoint } f
 import { getBaseUrlFromRequest } from "@/lib/get-base-url";
 import { parseJsonWithLimit, MAX_BODY_SIZE_AUTH } from "@/lib/api/helpers";
 import { FRAUD_RULE, recordFraudSignal } from "@/lib/fraud-signals";
+import { observePayoutVelocityAfterCreate } from "@/lib/fraud-velocity-observe";
 const CURRENCY_RUB = 643;
 
 export async function POST(request: NextRequest) {
@@ -127,6 +128,8 @@ export async function POST(request: NextRequest) {
     },
     select: { id: true },
   });
+
+  observePayoutVelocityAfterCreate(auth.userId);
 
   const successUrl = `${baseUrl}/cabinet/payout-return?success=1&payoutId=${payout.id}`;
   const failUrl = `${baseUrl}/cabinet/payout-return?success=0&payoutId=${payout.id}`;

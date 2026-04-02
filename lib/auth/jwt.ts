@@ -26,6 +26,16 @@ export interface TokenPayload extends JWTPayload {
   role: string;
 }
 
+/** Одноразовый шаг после пароля, до выдачи сессии (TOTP для админа) */
+export interface AdminTwoFactorPendingPayload extends JWTPayload {
+  purpose: "admin_2fa_pending";
+  userId: string;
+  login: string;
+  role: string;
+}
+
+const ADMIN_2FA_PENDING_EXPIRES = "10m";
+
 /**
  * Генерирует access token (короткоживущий)
  */
@@ -71,6 +81,31 @@ export async function verifyRefreshToken(token: string): Promise<TokenPayload | 
   try {
     const { payload } = await jwtVerify(token, getJWTRefreshSecretKey(), { algorithms: ["HS256"] });
     return payload as TokenPayload;
+  } catch {
+    return null;
+  }
+}
+
+export async function generateAdminTwoFactorPendingToken(
+  payload: Pick<AdminTwoFactorPendingPayload, "userId" | "login" | "role">,
+): Promise<string> {
+  const body: AdminTwoFactorPendingPayload = {
+    ...payload,
+    purpose: "admin_2fa_pending",
+  };
+  return new SignJWT(body)
+    .setProtectedHeader({ alg: "HS256" })
+    .setIssuedAt()
+    .setExpirationTime(ADMIN_2FA_PENDING_EXPIRES)
+    .sign(getJWTSecretKey());
+}
+
+export async function verifyAdminTwoFactorPendingToken(token: string): Promise<AdminTwoFactorPendingPayload | null> {
+  try {
+    const { payload } = await jwtVerify(token, getJWTSecretKey(), { algorithms: ["HS256"] });
+    const p = payload as AdminTwoFactorPendingPayload;
+    if (p.purpose !== "admin_2fa_pending" || !p.userId || !p.login || !p.role) return null;
+    return p;
   } catch {
     return null;
   }

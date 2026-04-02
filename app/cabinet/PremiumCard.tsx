@@ -13,25 +13,6 @@ type Props = {
 };
 
 const CARD_STYLES = `
-.premium-card {
-  width: 100%;
-  max-width: 320px;
-}
-.premium-card-inner {
-  width: 100%;
-  aspect-ratio: 320 / 192;
-  max-height: 192px;
-  position: relative;
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.2), 0 12px 24px -8px rgba(0, 0, 0, 0.12);
-}
-.premium-card-face {
-  position: absolute;
-  inset: 0;
-  border-radius: 10px;
-  overflow: hidden;
-}
 .premium-card-front:not(.premium-card-front--m5) {
   background: radial-gradient(ellipse 120% 120% at 50% 50%, #d4b896 0%, var(--color-brand-gold) 40%, #b8985c 100%);
   box-shadow: inset 0 0 0 1px rgba(255,255,255,0.25), inset -20px -20px 40px rgba(0,0,0,0.08);
@@ -81,9 +62,6 @@ const CARD_STYLES = `
   font-size: 0.5rem;
   font-weight: bold;
 }
-@media (max-width: 400px) {
-  .premium-card-inner { max-height: 160px; }
-}
 `;
 
 function formatCardHolder(name: string | null | undefined): string {
@@ -121,7 +99,7 @@ export function PremiumCard({ fullName, balanceKop, compact, variant = "default"
               <p className="text-sm text-[var(--color-muted)]">Виртуальная премиальная карта в черно-белом стиле</p>
             </>
           ))}
-        <div className={`premium-card w-full max-w-[320px]${isM5 ? " premium-card--m5" : ""}`}>
+        <div className={`premium-card${isM5 ? " premium-card--m5" : ""}`}>
           <div className="premium-card-inner">
             <div className={`premium-card-face premium-card-front${isM5 ? " premium-card-front--m5" : ""}`}>
               {isM5 && <div className="premium-card-m-stripes-edge premium-card-m-stripes-edge--bottom" aria-hidden />}

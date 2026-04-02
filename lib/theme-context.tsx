@@ -64,12 +64,14 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     const applyHere = isThemeScope(pathname);
     const effective = authOnly ? "dark" : applyHere ? theme : "light";
     document.documentElement.setAttribute("data-theme", effective);
+    document.documentElement.classList.toggle("app-shell-panel", applyHere);
     if (applyHere && !authOnly) window.localStorage.setItem(STORAGE_KEY, theme);
 
-    // Синхронизация theme-color с темой приложения (область даты/времени на мобильных)
-    const themeColorLight = "#e0dfdc";
-    const themeColorDark = "#171717";
-    const color = effective === "dark" ? themeColorDark : themeColorLight;
+    // Как фон body ЛК/админки/заведения в тёмной теме — иначе iOS при скролле «липнет» системный синий / несовпадение с viewport
+    const themeColorLight = "#d4d8de";
+    const themeColorLightPanel = "#e0dfdc";
+    const themeColorDark = "#0d0e12";
+    const color = effective === "dark" ? themeColorDark : applyHere ? themeColorLightPanel : themeColorLight;
     document.querySelectorAll('meta[name="theme-color"]').forEach((meta) => {
       meta.setAttribute("content", color);
     });

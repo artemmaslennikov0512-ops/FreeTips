@@ -133,19 +133,19 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
   const closeSidebar = () => setSidebarOpen(false);
 
   return (
-    <div className="establishment-panel cabinet-premium flex min-h-screen w-full min-w-0 max-w-full overflow-x-hidden bg-[var(--color-bg)] font-[family:var(--font-inter)] text-white pt-0 lg:pt-4">
+    <div className="establishment-panel cabinet-premium flex min-h-screen w-full min-w-0 max-w-full overflow-x-hidden bg-[var(--color-bg)] font-[family:var(--font-inter)] text-white pt-3 lg:pt-6">
       {/* Шторка на мобильном */}
       <div
-        className={`cabinet-overlay fixed inset-0 z-30 bg-[rgba(15,23,42,0.65)] backdrop-blur-xl transition-opacity duration-300 lg:hidden ${
+        className={`cabinet-overlay fixed inset-0 z-[90] bg-[rgba(15,23,42,0.65)] backdrop-blur-xl transition-opacity duration-300 lg:hidden ${
           sidebarOpen ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
         onClick={closeSidebar}
         aria-hidden
       />
 
-      {/* Сайдбар: не тянется до низа (адаптация по контенту), по верху в одну линию с основным блоком */}
+      {/* Сайдбар выше затемнения (fixed + z); на lg остаётся в потоке */}
       <aside
-        className={`cabinet-sidebar fixed left-0 top-0 z-40 flex max-h-[100vh] w-[min(calc(100vw-4rem),20rem)] max-w-[20rem] flex-col overflow-y-auto overflow-x-hidden rounded-[10px] border border-white/10 py-6 shadow-2xl backdrop-blur-xl transition-[transform] duration-300 ease-out lg:static lg:left-auto lg:top-auto lg:ml-0 lg:mt-0 lg:mr-0 lg:mb-0 lg:max-h-none lg:w-[260px] lg:max-w-none lg:translate-x-0 lg:border lg:self-start bg-white/[0.06] ${
+        className={`cabinet-sidebar fixed left-0 top-0 z-[100] flex max-h-[100vh] w-[min(calc(100vw-4rem),20rem)] max-w-[20rem] flex-col overflow-y-auto overflow-x-hidden rounded-[10px] border border-white/10 py-6 shadow-2xl backdrop-blur-xl transition-[transform] duration-300 ease-out lg:static lg:left-auto lg:top-auto lg:ml-0 lg:mt-3 lg:mr-0 lg:mb-0 lg:max-h-none lg:z-auto lg:w-[260px] lg:max-w-none lg:translate-x-0 lg:border lg:self-start bg-white/[0.06] ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -191,8 +191,8 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
         </nav>
       </aside>
 
-      <main className="min-h-0 min-w-0 flex-1 overflow-x-hidden px-0 pt-1 lg:pt-0 lg:pl-0 lg:pr-0 lg:ml-0 flex flex-col">
-        <div className="cabinet-main-block app-panel-main-surface relative mt-1 mr-0 mb-4 ml-0 flex min-h-0 flex-1 flex-col rounded-lg border border-white/10 bg-white/[0.06] backdrop-blur-xl lg:mt-0 lg:mr-0 lg:ml-4 lg:rounded-[10px]">
+      <main className="min-h-0 min-w-0 flex-1 overflow-x-hidden px-0 pt-2 lg:pt-1 lg:pl-0 lg:pr-0 lg:ml-0 flex flex-col">
+        <div className="cabinet-main-block app-panel-main-surface relative mt-2 mr-0 mb-4 ml-0 flex min-h-0 flex-1 flex-col rounded-lg border border-white/10 bg-white/[0.06] backdrop-blur-xl lg:mt-3 lg:mr-0 lg:ml-4 lg:rounded-[10px]">
           <div className="app-panel-mobile-nav pointer-events-none absolute right-2 top-2 z-[55] sm:right-3 sm:top-3 lg:hidden">
             <button
               type="button"

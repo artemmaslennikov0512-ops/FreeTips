@@ -9,6 +9,7 @@ import { formatMoney } from "@/lib/utils";
 import { getBaseUrl } from "@/lib/get-base-url";
 import { isCabinetM5CompetitionTheme, m5SplitDisplayName } from "@/config/cabinet-theme-logins";
 import { CabinetSkeleton } from "@/components/CabinetSkeleton";
+import { CabinetMobileNavCardButton } from "@/components/cabinet/CabinetMobileNav";
 import { CABINET_WAITER_BTN_INLINE } from "@/lib/cabinet-button-classes";
 import { Stats } from "./shared";
 
@@ -289,7 +290,8 @@ export default function CabinetDashboardPage() {
   return (
     <div className="space-y-8">
       <div className="cabinet-dashboard-hero-grid grid min-w-0 grid-cols-1 gap-6 lg:[grid-template-columns:repeat(2,minmax(0,1fr))] lg:items-stretch">
-        <div className="cabinet-card flex min-h-0 min-w-0 flex-col rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden lg:h-full">
+        <div className="cabinet-card relative flex min-h-0 min-w-0 flex-col rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden lg:h-full">
+          <CabinetMobileNavCardButton />
           <div className="flex min-h-0 flex-1 flex-col p-6">
             <div className="flex flex-col items-center gap-10">
               <div

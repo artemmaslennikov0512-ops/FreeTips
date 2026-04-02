@@ -20,6 +20,7 @@ import {
 import { getAccessToken, fetchWithAuth, clearAccessToken } from "@/lib/auth-client";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
+import { AdminMobileNavPortal } from "@/components/admin/AdminMobileNavPortal";
 import { ADMIN_REQUESTS_COUNTS_CHANGED } from "@/lib/admin-requests-counts-sync";
 import { ADMIN_BTN, ADMIN_BTN_PRIMARY } from "@/lib/admin-button-classes";
 
@@ -194,19 +195,20 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   return (
-    <div className="admin-panel cabinet-premium flex min-h-screen w-full min-w-0 max-w-full bg-[var(--color-bg)] font-[family:var(--font-inter)] text-[var(--color-text)] pt-0 lg:pt-4">
-      {/* Шторка — закрывает выпадающее меню при клике вне (мобильный) */}
-      <div
-        className={`admin-overlay cabinet-overlay fixed inset-0 z-30 border-0 bg-[rgba(15,23,42,0.65)] backdrop-blur-xl transition-opacity duration-300 lg:hidden ${
-          sidebarOpen ? "opacity-100" : "opacity-0 pointer-events-none"
-        }`}
-        onClick={closeSidebar}
-        aria-hidden
+    <div className="admin-panel cabinet-premium flex min-h-screen w-full min-w-0 max-w-full bg-[var(--color-bg)] font-[family:var(--font-inter)] text-[var(--color-text)] pt-3 lg:pt-6">
+      <AdminMobileNavPortal
+        sidebarOpen={sidebarOpen}
+        closeSidebar={closeSidebar}
+        user={user}
+        NAV={NAV}
+        isActive={isActive}
+        requestsPendingTotal={requestsPendingTotal}
+        handleLogout={handleLogout}
       />
 
-      {/* Боковая панель — только на десктопе (lg+); на мобильном навигация в выпадающем списке под кнопкой */}
+      {/* Боковая панель — только на десктопе (lg+); на мобильном навигация в модальном окне по центру */}
       <aside
-        className="admin-sidebar cabinet-sidebar hidden lg:flex fixed left-4 top-4 z-40 h-auto max-h-[calc(100vh-2rem)] w-[260px] shrink-0 flex-col overflow-hidden rounded-[10px] border border-white/10 bg-[var(--color-navy)] py-6 shadow-sm backdrop-blur-xl lg:static lg:left-auto lg:top-auto lg:ml-0 lg:mt-4 lg:mr-0 lg:mb-0 lg:max-h-none lg:self-start lg:translate-x-0"
+        className="admin-sidebar cabinet-sidebar hidden lg:flex fixed left-4 top-4 z-40 h-auto max-h-[calc(100vh-2rem)] w-[260px] shrink-0 flex-col overflow-hidden rounded-[10px] border border-white/10 bg-[var(--color-navy)] py-6 shadow-sm backdrop-blur-xl lg:static lg:left-auto lg:top-auto lg:ml-0 lg:mt-5 lg:mr-0 lg:mb-0 lg:max-h-none lg:self-start lg:translate-x-0"
       >
         <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
           <div className="cabinet-sidebar-profile cabinet-block-inner mx-4 mb-4 rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-4 py-3">
@@ -265,85 +267,23 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
       </aside>
 
-      <main className="min-h-screen min-w-0 flex-1 overflow-x-hidden px-0 pt-1 lg:pt-0 lg:pl-0 lg:pr-0 lg:ml-0 flex flex-col">
-        <div className="admin-main-block cabinet-main-block app-panel-main-surface relative mt-0 mr-0 mb-4 ml-0 flex min-h-0 w-full min-w-0 max-w-full flex-1 flex-col rounded-lg border border-white/10 bg-white/[0.06] backdrop-blur-xl lg:mt-4 lg:mr-0 lg:ml-4 lg:min-h-[calc(100vh-2rem)] lg:rounded-[10px]">
+      <main className="min-h-screen min-w-0 flex-1 overflow-x-hidden px-0 pt-2 lg:pt-1 lg:pl-0 lg:pr-0 lg:ml-0 flex flex-col">
+        <div className="admin-main-block cabinet-main-block app-panel-main-surface relative mt-0 mr-0 mb-4 ml-0 flex min-h-0 w-full min-w-0 max-w-full flex-1 flex-col rounded-lg border border-white/10 bg-white/[0.06] backdrop-blur-xl lg:mt-5 lg:mr-0 lg:ml-4 lg:min-h-[calc(100vh-2rem)] lg:rounded-[10px]">
           <div className="app-panel-mobile-nav pointer-events-none absolute right-2 top-2 z-[55] sm:right-3 sm:top-3 lg:hidden">
-            <div className="pointer-events-auto relative">
-              <button
-                ref={menuButtonRef}
-                type="button"
-                onClick={() => setSidebarOpen((o) => !o)}
-                className={`cabinet-menu-btn ${ADMIN_BTN} flex h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center !gap-0 !p-0 active:scale-95`}
-                aria-label="Меню"
-                aria-expanded={sidebarOpen}
-                aria-haspopup="true"
-                aria-controls="admin-nav-dropdown"
-              >
-                <Menu className="h-5 w-5 shrink-0 pointer-events-none" strokeWidth={2} aria-hidden />
-              </button>
-              <div
-                id="admin-nav-dropdown"
-                role="menu"
-                className={`cabinet-nav-dropdown admin-nav-dropdown absolute right-0 top-full z-50 mt-2 max-h-[min(70vh,calc(100dvh-8rem))] w-[min(100vw-2rem,20rem)] origin-top overflow-y-auto rounded-xl border border-[var(--color-brand-gold)]/20 bg-[var(--color-navy)] shadow-[var(--shadow-card)] backdrop-blur-xl transition-opacity duration-200 ${
-                  sidebarOpen ? "opacity-100" : "pointer-events-none invisible opacity-0"
-                }`}
-                aria-hidden={!sidebarOpen}
-              >
-                <div className="cabinet-nav-dropdown-inner overflow-hidden rounded-xl p-3 text-white">
-                  <div className="cabinet-sidebar-profile cabinet-block-inner mb-3 rounded-lg border border-[var(--color-brand-gold)]/20 bg-white/10 px-3 py-2.5">
-                    <div className="flex items-center gap-2.5">
-                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--color-brand-gold)] font-semibold text-[#0a192f] text-sm">
-                        {(user.login || "A").charAt(0).toUpperCase()}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="truncate font-semibold text-white text-sm">{user.login}</div>
-                        <div className="text-xs text-white/80">Админ</div>
-                      </div>
-                    </div>
-                  </div>
-                  <p className="cabinet-nav-label mb-1.5 px-2 text-center text-[10px] font-semibold uppercase tracking-wider text-white/50">Навигация</p>
-                  <nav className="flex flex-col gap-0.5 rounded-lg border border-[var(--color-brand-gold)]/15 bg-white/5 p-1" role="none">
-                    {NAV.map(({ label, href, icon: Icon, iconClass }) => {
-                      const showRequestsBadge =
-                        href === "/admin/verification-requests" && requestsPendingTotal != null && requestsPendingTotal > 0;
-                      const badgeN = requestsPendingTotal ?? 0;
-                      return (
-                        <Link
-                          key={href}
-                          href={href}
-                          onClick={closeSidebar}
-                          role="menuitem"
-                          className={`flex items-center gap-2.5 rounded-md px-2.5 py-2.5 text-sm font-medium transition-colors ${
-                            isActive(href) ? "cabinet-nav-active bg-white/15 text-white font-semibold" : "text-white/85 hover:bg-white/10 hover:text-white"
-                          }`}
-                        >
-                          <Icon className={`h-4 w-4 shrink-0 ${iconClass}`} aria-hidden />
-                          <span className="flex flex-1 items-center gap-2">
-                            {label}
-                            {showRequestsBadge && (
-                              <span className="inline-flex min-h-[1.25rem] min-w-[1.25rem] shrink-0 items-center justify-center rounded-full bg-[var(--color-accent-red)] px-1.5 text-[10px] font-bold leading-none text-white tabular-nums">
-                                {badgeN > 99 ? "99+" : badgeN}
-                              </span>
-                            )}
-                          </span>
-                        </Link>
-                      );
-                    })}
-                  </nav>
-                  <button
-                    type="button"
-                    onClick={() => { closeSidebar(); handleLogout(); }}
-                    className={`mt-3 ${ADMIN_BTN} w-full !justify-center gap-2.5 px-2.5 py-2.5 text-sm`}
-                    role="menuitem"
-                  >
-                    <LogOut className="h-4 w-4 shrink-0 text-[var(--color-brand-gold)]" aria-hidden />
-                    <span>Выйти</span>
-                  </button>
-                </div>
-              </div>
-            </div>
+            <button
+              ref={menuButtonRef}
+              type="button"
+              onClick={() => setSidebarOpen((o) => !o)}
+              className={`cabinet-menu-btn pointer-events-auto ${ADMIN_BTN} flex h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center !gap-0 !p-0 active:scale-95`}
+              aria-label="Меню"
+              aria-expanded={sidebarOpen}
+              aria-haspopup="dialog"
+              aria-controls="admin-nav-dropdown"
+            >
+              <Menu className="h-5 w-5 shrink-0 pointer-events-none" strokeWidth={2} aria-hidden />
+            </button>
           </div>
-          <div className="flex min-h-0 w-full max-w-full flex-1 flex-col overflow-x-hidden px-4 py-3 max-lg:pr-12 sm:px-6 sm:py-4 lg:p-8" id="main-content">
+          <div className="flex min-h-0 w-full max-w-full flex-1 flex-col overflow-x-hidden px-4 py-3 sm:px-6 sm:py-4 lg:p-8" id="main-content">
             {children}
           </div>
         </div>

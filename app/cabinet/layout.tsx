@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback, useRef, useMemo } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import type { LucideIcon } from "lucide-react";
@@ -9,7 +9,6 @@ import {
   List,
   Link2,
   Settings,
-  Menu,
   LogOut,
   MessageCircle,
   ShieldCheck,
@@ -22,6 +21,12 @@ import { getAccessToken, fetchWithAuth, clearAccessToken } from "@/lib/auth-clie
 import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { isCabinetM5CompetitionTheme } from "@/config/cabinet-theme-logins";
+import {
+  CabinetMobileNavProvider,
+  CabinetMobileNavPortals,
+  CabinetMobileNavFixedButton,
+  type CabinetMobileNavContextValue,
+} from "@/components/cabinet/CabinetMobileNav";
 const NAV: { label: string; href: string; icon: LucideIcon; iconClass: string }[] = [
   { label: "Дашборд", href: "/cabinet", icon: LayoutDashboard, iconClass: "!text-sky-400" },
   { label: "Операции", href: "/cabinet/transactions", icon: List, iconClass: "!text-emerald-400" },
@@ -230,16 +235,56 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
     ? "cabinet-nav-active cabinet-nav-active-m5 font-semibold text-[var(--color-text)]"
     : "cabinet-nav-active border border-[#0a192f]/25 bg-[#0a192f]/10 text-[#0a192f] font-semibold";
 
+  const isCabinetDashboard = pathname === "/cabinet" || pathname === "/cabinet/";
+
+  const mobileNavValue = useMemo<CabinetMobileNavContextValue>(
+    () => ({
+      sidebarOpen,
+      setSidebarOpen,
+      closeSidebar,
+      menuButtonRef,
+      user,
+      supportUnreadCount,
+      NAV,
+      isActive,
+      navActiveClasses,
+      handleLogout,
+      sidebarStyle,
+      profileBlockStyle,
+      sidebarBg,
+      isM5Cabinet,
+      brandFont,
+      sidebarDisplayLabel,
+      sidebarFirstName,
+    }),
+    [
+      sidebarOpen,
+      user,
+      supportUnreadCount,
+      pathname,
+      navActiveClasses,
+      handleLogout,
+      sidebarStyle,
+      profileBlockStyle,
+      sidebarBg,
+      isM5Cabinet,
+      brandFont,
+      sidebarDisplayLabel,
+      sidebarFirstName,
+    ],
+  );
+
   return (
+    <CabinetMobileNavProvider value={mobileNavValue}>
     <div
-      className={`cabinet-premium flex min-h-screen w-full max-w-full overflow-x-hidden font-[family:var(--font-inter)] text-[var(--color-text)] pt-0 lg:pt-2 ${isM5Cabinet ? "bg-transparent" : "bg-[var(--color-bg)]"}`}
+      className={`cabinet-premium flex min-h-screen w-full max-w-full overflow-x-hidden font-[family:var(--font-inter)] text-[var(--color-text)] pt-3 lg:pt-5 ${isM5Cabinet ? "bg-transparent" : "bg-[var(--color-bg)]"}`}
       data-brand-active={applyEstablishmentBrand ? "true" : undefined}
       data-cabinet-theme={isM5Cabinet ? "m5-competition" : undefined}
       style={Object.keys(brandStyle).length ? brandStyle : undefined}
     >
       {/* Левое меню: только на десктопе (lg+); на мобильном навигация в выпадающем списке под кнопкой */}
       <div
-        className={`cabinet-sidebar hidden lg:flex fixed left-0 top-0 z-40 h-full w-[min(calc(100vw-4rem),20rem)] max-w-[20rem] flex-col overflow-hidden border-0 border-r border-white/10 py-6 shadow-2xl backdrop-blur-xl transition-[transform] duration-300 ease-out lg:static lg:left-auto lg:top-auto lg:ml-0 lg:mt-2 lg:mr-0 lg:mb-0 lg:h-auto lg:max-h-[calc(100vh-2rem)] lg:w-[260px] lg:max-w-none lg:translate-x-0 lg:rounded-[10px] lg:border lg:self-start`}
+        className={`cabinet-sidebar hidden lg:flex fixed left-0 top-0 z-40 h-full w-[min(calc(100vw-4rem),20rem)] max-w-[20rem] flex-col overflow-hidden border-0 border-r border-white/10 py-6 shadow-2xl backdrop-blur-xl transition-[transform] duration-300 ease-out lg:static lg:left-auto lg:top-auto lg:ml-0 lg:mt-3 lg:mr-0 lg:mb-0 lg:h-auto lg:max-h-[calc(100vh-2rem)] lg:w-[260px] lg:max-w-none lg:translate-x-0 lg:rounded-[10px] lg:border lg:self-start`}
         style={sidebarStyle}
       >
         {user?.establishmentBrand?.logoUrl && (
@@ -342,128 +387,19 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
         </div>
       </div>
 
-      <main className="relative min-h-screen min-w-0 flex-1 overflow-x-hidden px-0 pt-1 pb-4 lg:px-0 lg:pt-2 lg:pr-4 lg:ml-0 lg:mr-0 flex flex-col">
-        {/* Затемнение основного контента под выпадающим меню (z ниже шапки z-30, выше карточки) */}
-        {sidebarOpen && (
-          <div
-            className="cabinet-overlay fixed inset-0 z-[28] cursor-default bg-[rgba(15,23,42,0.72)] backdrop-blur-sm transition-opacity duration-300 lg:hidden"
-            onClick={closeSidebar}
-            role="presentation"
-            aria-hidden
-          />
-        )}
-        {/* Основной блок — тянется до низа страницы с отступом */}
+      <main className="relative min-h-screen min-w-0 flex-1 overflow-x-hidden px-0 pt-2 pb-4 lg:px-0 lg:pt-3 lg:pr-4 lg:ml-0 lg:mr-0 flex flex-col">
         <div
           className="cabinet-main-block app-panel-main-surface relative z-10 mt-0 mr-0 mb-4 ml-0 flex min-h-0 w-full max-w-full flex-1 flex-col rounded-lg border border-white/10 backdrop-blur-xl md:rounded-[10px] lg:mr-4 lg:ml-4"
           style={mainBlockStyle}
         >
-          <div className="app-panel-mobile-nav pointer-events-none absolute right-2 top-2 z-[55] sm:right-3 sm:top-3 lg:hidden">
-            <div className="pointer-events-auto relative">
-              <button
-                ref={menuButtonRef}
-                type="button"
-                onClick={() => setSidebarOpen((o) => !o)}
-                className={`cabinet-menu-btn ${CABINET_WAITER_BTN} flex h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center !gap-0 !p-0 active:scale-95 transition-[transform,opacity]`}
-                aria-label="Меню"
-                aria-expanded={sidebarOpen}
-                aria-haspopup="true"
-                aria-controls="cabinet-nav-dropdown"
-              >
-                <Menu className="h-5 w-5 shrink-0 pointer-events-none" strokeWidth={2} aria-hidden />
-              </button>
-              <div
-                id="cabinet-nav-dropdown"
-                role="menu"
-                className={`cabinet-nav-dropdown absolute right-0 top-full z-[60] mt-2 w-[min(100vw-2rem,320px)] max-w-[calc(100vw-2rem)] origin-top rounded-[10px] border border-[var(--color-brand-gold)]/20 shadow-[var(--shadow-card)] backdrop-blur-xl transition-[opacity,transform] duration-200 ${
-                  sidebarOpen ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"
-                }`}
-                style={sidebarStyle}
-                aria-hidden={!sidebarOpen}
-              >
-                <div className="cabinet-nav-dropdown-inner overflow-hidden rounded-[10px] px-4 py-4">
-                  <div className={`cabinet-sidebar-profile cabinet-block-inner mb-4 rounded-[10px] border border-[var(--color-brand-gold)]/20 px-3 py-2.5 ${!sidebarBg ? "bg-[var(--color-dark-gray)]/10" : ""}`} style={Object.keys(profileBlockStyle).length ? profileBlockStyle : undefined}>
-                    <div className="flex items-center gap-2.5">
-                      {user?.employeePhotoUrl ? (
-                        <img src={user.employeePhotoUrl} alt="" className="h-9 w-9 shrink-0 rounded-full object-cover bg-[var(--color-brand-gold)]" />
-                      ) : (
-                        <div
-                          className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--color-brand-gold)] ${isM5Cabinet ? "text-white" : "text-[#0a192f]"}`}
-                          aria-hidden
-                        >
-                          <User className="h-5 w-5" strokeWidth={2} />
-                        </div>
-                      )}
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-1">
-                          <span
-                            className={`truncate font-semibold text-sm ${isM5Cabinet && sidebarFirstName ? "text-[#8ec5ff]" : "text-[var(--color-text)]"}`}
-                            style={!isM5Cabinet || !sidebarFirstName ? (brandFont ? { color: brandFont } : undefined) : undefined}
-                          >
-                            {sidebarDisplayLabel}
-                          </span>
-                          {user?.verificationStatus === "VERIFIED" && (
-                            <BadgeCheck
-                              className={`h-4 w-4 shrink-0 ${isM5Cabinet ? "text-[#1c69d4]" : "text-blue-500"}`}
-                              aria-label="Верифицирован"
-                            />
-                          )}
-                        </div>
-                        <div className="text-xs text-[var(--color-text)]/80" style={brandFont ? { color: brandFont } : undefined}>Официант</div>
-                      </div>
-                    </div>
-                  </div>
-                  <p className="cabinet-nav-label mb-2 px-3 text-center text-xs font-semibold uppercase tracking-wider text-[var(--color-text)]/50">Навигация</p>
-                  <nav className="flex flex-col gap-0.5 rounded-[10px] border border-[var(--color-brand-gold)]/15 bg-[var(--color-dark-gray)]/5 p-1.5 shadow-[var(--shadow-subtle)]" role="none">
-                    {NAV.map(({ label, href, icon: Icon, iconClass }) => (
-                      <Link
-                        key={href}
-                        href={href}
-                        onClick={closeSidebar}
-                        role="menuitem"
-                        className={`flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium transition-colors ${
-                          isActive(href) ? navActiveClasses : "border border-transparent text-[var(--color-text)]/80 hover:bg-[var(--color-dark-gray)]/10 hover:text-[var(--color-text)]"
-                        }`}
-                        style={!isActive(href) && brandFont ? { color: `${brandFont}cc` } : undefined}
-                      >
-                        <Icon className={`h-5 w-5 shrink-0 ${iconClass}`} aria-hidden />
-                        <span>{label}</span>
-                        {href === "/cabinet/support" && supportUnreadCount > 0 && (
-                          <span
-                            className="cabinet-support-unread-badge ml-auto flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[var(--color-accent-red)] px-1.5 text-xs font-semibold text-white"
-                          >
-                            {supportUnreadCount > 99 ? "99+" : supportUnreadCount}
-                          </span>
-                        )}
-                      </Link>
-                    ))}
-                    {user?.role === "ESTABLISHMENT_ADMIN" && (
-                      <Link href="/establishment" onClick={closeSidebar} role="menuitem" className="flex items-center gap-3 rounded-lg border border-transparent px-3 py-3 font-medium text-[var(--color-text)]/80 transition-colors hover:bg-[var(--color-dark-gray)]/10 hover:text-[var(--color-text)]" style={brandFont ? { color: `${brandFont}cc` } : undefined}>
-                        <Building2 className="h-5 w-5 shrink-0 !text-amber-400" aria-hidden />
-                        <span>Кабинет заведения</span>
-                      </Link>
-                    )}
-                  </nav>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      closeSidebar();
-                      handleLogout();
-                    }}
-                    className={`mt-4 flex ${CABINET_WAITER_BTN} w-full !justify-center gap-3 px-4 py-3 text-sm`}
-                    role="menuitem"
-                  >
-                    <LogOut className="h-4 w-4 shrink-0 text-[var(--color-brand-gold)]" aria-hidden />
-                    <span>Выйти</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="max-lg:pr-12 px-4 py-3 sm:px-6 md:py-6 lg:p-8" id="main-content">
+          <div className="px-4 py-3 sm:px-6 md:py-6 lg:p-8" id="main-content">
             {children}
           </div>
         </div>
       </main>
+      <CabinetMobileNavPortals />
+      {!isCabinetDashboard && <CabinetMobileNavFixedButton />}
     </div>
+    </CabinetMobileNavProvider>
   );
 }

@@ -76,10 +76,10 @@ export const viewport = {
   initialScale: 1,
   maximumScale: 5,
   viewportFit: "cover",
-  // Цвет области статус-бары/даты на мобильных — без этого браузер по умолчанию даёт синий
+  // Должен совпадать с фоном body ЛК/админки в тёмной теме (#0d0e12 в globals), иначе iOS Safari даёт артефакты в области статус-бара
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#d4d8de" },
-    { media: "(prefers-color-scheme: dark)", color: "#171717" },
+    { media: "(prefers-color-scheme: dark)", color: "#0d0e12" },
   ],
 };
 
@@ -93,7 +93,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body className="min-h-screen w-full max-w-full overflow-x-hidden flex flex-col font-sans antialiased bg-[var(--color-bg)] text-[var(--color-text)]">
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){var p=typeof location!=='undefined'?location.pathname:'';var authOnly=p.startsWith('/zayavka')||p.startsWith('/login')||p.startsWith('/register')||p.startsWith('/forgot-password')||p.startsWith('/change-password')||p.startsWith('/reset-password');var scope=!authOnly&&(p.startsWith('/cabinet')||p.startsWith('/admin')||p.startsWith('/establishment')||p.startsWith('/pay'));var t=authOnly?'dark':scope?localStorage.getItem('theme'):null;document.documentElement.setAttribute('data-theme',authOnly?'dark':t==='dark'?'dark':'light');})();`,
+            __html: `(function(){var p=typeof location!=='undefined'?location.pathname:'';var authOnly=p.startsWith('/zayavka')||p.startsWith('/login')||p.startsWith('/register')||p.startsWith('/forgot-password')||p.startsWith('/change-password')||p.startsWith('/reset-password');var scope=!authOnly&&(p.startsWith('/cabinet')||p.startsWith('/admin')||p.startsWith('/establishment')||p.startsWith('/pay'));var t=authOnly?'dark':scope?localStorage.getItem('theme'):null;document.documentElement.setAttribute('data-theme',authOnly?'dark':t==='dark'?'dark':'light');document.documentElement.classList.toggle('app-shell-panel',!!scope);var eff=document.documentElement.getAttribute('data-theme');var tc=eff==='dark'?'#0d0e12':scope?'#e0dfdc':'#d4d8de';document.querySelectorAll('meta[name="theme-color"]').forEach(function(m){m.setAttribute('content',tc);});})();`,
           }}
         />
         <GridCursorEffect />

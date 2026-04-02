@@ -4,6 +4,7 @@
    ПРЕМИАЛЬНАЯ ТЕМА — Navy, Gold, белые карточки
    ============================================ */
 :root {
+  color-scheme: light;
   --color-navy: #0a192f;
   --color-charcoal: #1e2a3a;
   --color-dark-gray: #2d3748;
@@ -58,6 +59,7 @@
 
 /* Тёмная тема — только белый и серый, без привязки акцентов. Все значения в переменных, можно править вручную. */
 [data-theme="dark"] {
+  color-scheme: dark;
   --color-navy: #e5e5e5;
   --color-charcoal: #d4d4d4;
   --color-dark-gray: #a3a3a3;
@@ -1474,8 +1476,9 @@ html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-compe
 
 /*
  * Панели ЛК / админки / заведения: на узком экране (< lg) колонка <main> без горизонтальных px —
- * .app-panel-main-surface как шапка; #main-content — px-4 sm:px-6 и max-lg:pr-12 под кнопку меню.
- * .app-panel-mobile-nav — absolute правый верх основного блока; выпадашка с right-0.
+ * .app-panel-main-surface как шапка; #main-content — px-4 sm:px-6 (без резерва под меню, если кнопка fixed/на карточке).
+ * ЛК официанта: дашборд — кнопка на первой .cabinet-card; иначе fixed под шапкой; меню — portal по центру экрана.
+ * Админ / заведение: .app-panel-mobile-nav — absolute правый верх основного блока; мобильное меню админки — portal по центру.
  */
 
 /* Выпадающий список навигации (мобильный) — продолжение кнопки «Меню» */
@@ -4625,6 +4628,17 @@ html {
   overflow-x: hidden;
   /* 100% вместо 100vw: на мобильных 100vw часто шире видимой области (полоса прокрутки) и даёт горизонтальный скролл */
   max-width: 100%;
+  /* iOS Safari + viewport-fit=cover: без фона на html при «резиновом» скролле и схлопывании панели виден системный синий */
+  min-height: 100%;
+  background-color: var(--color-bg);
+}
+
+/* Класс app-shell-panel выставляется inline-скриптом и ThemeProvider до/при навигации — фон как у ЛК, без просвета при overscroll на iOS */
+[data-theme="dark"] html.app-shell-panel {
+  background-color: #0d0e12;
+}
+html.app-shell-panel:not([data-theme="dark"]) {
+  background-color: #e0dfdc;
 }
 
 body {
@@ -4635,6 +4649,9 @@ body {
   line-height: 1.6;
   overflow-x: hidden;
   max-width: 100%;
+  /* Заполняем высоту экрана на iOS (100vh там нестабилен при скролле) */
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
 }
 
 /* ============================================
@@ -4665,7 +4682,15 @@ body {
   background: #0d0e12 !important;
   min-height: 100vh;
 }
+[data-theme="dark"] body.establishment-page {
+  background: #0d0e12 !important;
+  min-height: 100vh;
+}
 [data-theme="dark"] body.admin-page .admin-panel {
+  background: transparent;
+  min-height: 100vh;
+}
+[data-theme="dark"] body.establishment-page .establishment-panel {
   background: transparent;
   min-height: 100vh;
 }

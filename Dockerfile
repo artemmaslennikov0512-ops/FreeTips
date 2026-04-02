@@ -48,16 +48,11 @@ COPY --from=builder /app/node_modules/ws ./node_modules/ws
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
 COPY --from=builder /app/scripts ./scripts
 
-# tsx и bcryptjs для запуска seed в контейнере (prisma db seed / npx tsx prisma/seed.ts)
+# tsx и bcryptjs для seed / ручных ts-скриптов в контейнере
 COPY --from=builder /app/package.json /app/package-lock.json ./
 USER root
 RUN npm config set fetch-retries 5 && npm config set fetch-retry-mintimeout 20000 && npm config set fetch-timeout 120000 \
-    && npm install tsx bcryptjs --omit=dev --ignore-scripts \
-    && mkdir -p node_modules/.bin \
-    && echo '#!/bin/sh' > node_modules/.bin/tsx \
-    && echo 'exec node /app/node_modules/tsx/dist/cli.mjs "$$@"' >> node_modules/.bin/tsx \
-    && chmod +x node_modules/.bin/tsx \
-    && chown -R nextjs:nodejs /app/node_modules \
+    && npm install tsx bcryptjs --omit=dev --ignore-scripts && chown -R nextjs:nodejs /app/node_modules \
     && mkdir -p /app/storage && chown -R nextjs:nodejs /app/storage
 USER nextjs
 

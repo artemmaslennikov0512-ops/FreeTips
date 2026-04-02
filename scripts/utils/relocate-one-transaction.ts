@@ -13,14 +13,11 @@
  * При заданном PAYGINE_SD_REF_LEGAL и feeKop у транзакции: комиссия → ЮЛ, остаток → официант.
  * Требуется: .env (DATABASE_URL), scripts/.env или корневой .env (PAYGINE_*, опционально PAYGINE_SD_REF_LEGAL).
  *
- * На сервере с Docker: из корня проекта
- *   docker compose exec web ./node_modules/.bin/tsx scripts/utils/relocate-one-transaction.ts <args>
- * или: docker compose exec web node /app/node_modules/tsx/dist/cli.mjs scripts/utils/relocate-one-transaction.ts <args>
- * (путь с node_modules/ обязателен; без него Node ищет /app/tsx/... и падает).
- * (не npx tsx — у пользователя nextjs нет доступной домашней директории для кэша npm).
- * С хоста: если в .env указан localhost/127.0.0.1 с портом 5432 или без порта, скрипт подставляет 15432
- * (проброс PostgreSQL из docker-compose на хост). Отключить: DATABASE_URL_NO_DOCKER_HOST_PORT_REMAP=1.
- * Опечатка `localhost15432` без двоеточия — исправляется на localhost:15432.
+ * Запуск с хоста сервера (как раньше): npx tsx scripts/utils/relocate-one-transaction.ts <args>
+ * Prisma читает пароль из строки DATABASE_URL. Если обновил только POSTGRES_PASSWORD — для localhost/127.0.0.1
+ * скрипт подставит его в URL (отключить: RELOCATE_SKIP_DATABASE_URL_PASSWORD_SYNC=1).
+ * Порт на хосте к Docker-БД: из POSTGRES_PORT или 15432; localhost с 5432/без порта — ремап (отключить: DATABASE_URL_NO_DOCKER_HOST_PORT_REMAP=1).
+ * Опечатка localhost15432 без «:» — исправляется автоматически.
  */
 
 import "dotenv/config";
@@ -63,13 +60,36 @@ function remapDatabaseUrlLocalhostToDockerPublishedPort(): void {
   if (host !== "localhost" && host !== "127.0.0.1") return;
   const p = u.port;
   if (p !== "" && p !== "5432") return;
-  u.port = DOCKER_COMPOSE_DB_PUBLISHED_PORT;
+  const published = process.env.POSTGRES_PORT?.trim() || DOCKER_COMPOSE_DB_PUBLISHED_PORT;
+  u.port = published;
+  process.env.DATABASE_URL = u.toString();
+}
+
+/** Один источник пароля: POSTGRES_PASSWORD в .env, а в DATABASE_URL забыли обновить — только для localhost. */
+function syncDatabaseUrlPasswordFromPostgresEnv(): void {
+  if (process.env.RELOCATE_SKIP_DATABASE_URL_PASSWORD_SYNC === "1") return;
+  const pw = process.env.POSTGRES_PASSWORD;
+  if (pw === undefined || pw === "") return;
+  const raw = process.env.DATABASE_URL?.trim();
+  if (!raw) return;
+  let u: URL;
+  try {
+    u = new URL(raw);
+  } catch {
+    return;
+  }
+  const host = u.hostname.toLowerCase();
+  if (host !== "localhost" && host !== "127.0.0.1") return;
+  u.password = pw;
+  const user = process.env.POSTGRES_USER?.trim();
+  if (user) u.username = user;
   process.env.DATABASE_URL = u.toString();
 }
 
 loadScriptsEnv();
 fixDatabaseUrlLocalhostPortGluedTypo();
 remapDatabaseUrlLocalhostToDockerPublishedPort();
+syncDatabaseUrlPasswordFromPostgresEnv();
 
 const prisma = new PrismaClient();
 const CURRENCY_RUB = 643;

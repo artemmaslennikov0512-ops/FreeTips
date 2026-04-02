@@ -175,8 +175,10 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
     }
   }, [router]);
 
-  const isActive = (href: string) =>
-    href === "/cabinet" ? pathname === "/cabinet" : pathname.startsWith(href);
+  const isActive = useCallback(
+    (href: string) => (href === "/cabinet" ? pathname === "/cabinet" : pathname.startsWith(href)),
+    [pathname],
+  );
 
   const closeSidebar = useCallback(() => setSidebarOpen(false), []);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
@@ -189,10 +191,6 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [sidebarOpen, closeSidebar]);
-
-  if (!mounted) {
-    return <LoadingSpinner message="Загрузка…" className="min-h-[60vh]" />;
-  }
 
   const trimmedFullName = user?.fullName?.trim() ?? "";
   const sidebarFirstName = trimmedFullName ? trimmedFullName.split(/\s+/)[0]! : null;
@@ -259,9 +257,10 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
     }),
     [
       sidebarOpen,
+      closeSidebar,
       user,
       supportUnreadCount,
-      pathname,
+      isActive,
       navActiveClasses,
       handleLogout,
       sidebarStyle,
@@ -273,6 +272,10 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
       sidebarFirstName,
     ],
   );
+
+  if (!mounted) {
+    return <LoadingSpinner message="Загрузка…" className="min-h-[60vh]" />;
+  }
 
   return (
     <CabinetMobileNavProvider value={mobileNavValue}>

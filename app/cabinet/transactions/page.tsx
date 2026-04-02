@@ -259,7 +259,7 @@ export default function CabinetTransactionsPage() {
               <h3 className="font-[family:var(--font-playfair)] text-xl font-semibold text-[var(--color-text)] text-center">Карта официанта</h3>
             </div>
             <div className="p-6">
-              <div className="overflow-hidden rounded-2xl">
+              <div className="flex w-full justify-center overflow-hidden rounded-2xl">
                 <PremiumCard balanceKop={stats.balanceKop} compact hideButtons variant={isM5Cabinet ? "m5" : "default"} />
               </div>
               <div className="mt-8 flex flex-col items-center gap-4">

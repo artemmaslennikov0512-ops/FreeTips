@@ -1474,8 +1474,8 @@ html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-compe
 
 /*
  * Панели ЛК / админки / заведения: на узком экране (< lg) колонка <main> без горизонтальных px —
- * .app-panel-main-surface тянется на всю ширину, как шапка; отступы контента задаются в #main-content (px-4 sm:px-6).
- * Ряд кнопки «Меню»: .app-panel-mobile-nav (те же боковые отступы, что у шапки).
+ * .app-panel-main-surface как шапка; #main-content — px-4 sm:px-6 и max-lg:pr-12 под кнопку меню.
+ * .app-panel-mobile-nav — absolute правый верх основного блока; выпадашка с right-0.
  */
 
 /* Выпадающий список навигации (мобильный) — продолжение кнопки «Меню» */

@@ -192,18 +192,18 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
       </aside>
 
       <main className="min-h-0 min-w-0 flex-1 overflow-x-hidden px-0 pt-1 lg:pt-0 lg:pl-0 lg:pr-0 lg:ml-0 flex flex-col">
-        <div className="cabinet-main-block app-panel-main-surface mt-1 mr-0 mb-4 ml-0 flex min-h-0 flex-1 flex-col rounded-lg border border-white/10 bg-white/[0.06] backdrop-blur-xl lg:mt-0 lg:mr-0 lg:ml-4 lg:rounded-[10px]">
-          <div className="px-4 py-4 sm:px-6 lg:p-8" id="main-content">
-            <div className="app-panel-mobile-nav mb-2 lg:hidden">
-              <button
-                type="button"
-                onClick={() => setSidebarOpen(true)}
-                className="flex h-14 w-14 min-w-14 items-center justify-center rounded-xl border border-white/20 bg-white/10 text-[var(--color-brand-gold)] hover:bg-[var(--color-brand-gold)]/20 hover:border-[var(--color-brand-gold)]/40 active:scale-95"
-                aria-label="Меню"
-              >
-                <Menu className="h-7 w-7" strokeWidth={2} />
-              </button>
-            </div>
+        <div className="cabinet-main-block app-panel-main-surface relative mt-1 mr-0 mb-4 ml-0 flex min-h-0 flex-1 flex-col rounded-lg border border-white/10 bg-white/[0.06] backdrop-blur-xl lg:mt-0 lg:mr-0 lg:ml-4 lg:rounded-[10px]">
+          <div className="app-panel-mobile-nav pointer-events-none absolute right-2 top-2 z-[55] sm:right-3 sm:top-3 lg:hidden">
+            <button
+              type="button"
+              onClick={() => setSidebarOpen(true)}
+              className="pointer-events-auto flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-xl border border-white/20 bg-white/10 text-[var(--color-brand-gold)] hover:bg-[var(--color-brand-gold)]/20 hover:border-[var(--color-brand-gold)]/40 active:scale-95"
+              aria-label="Меню"
+            >
+              <Menu className="h-5 w-5" strokeWidth={2} />
+            </button>
+          </div>
+          <div className="max-lg:pr-12 px-4 py-4 sm:px-6 lg:p-8" id="main-content">
             {children}
           </div>
         </div>

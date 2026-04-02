@@ -316,7 +316,10 @@ export default function CabinetDashboardPage() {
                     )}
                   </p>
                 )}
-                <div className="w-full overflow-hidden flex justify-center">
+                <div className="cabinet-dashboard-balance-wrap mt-1 flex w-full max-w-[320px] shrink-0 flex-col items-center justify-center overflow-visible">
+                  {isDesignV2Cabinet && (
+                    <p className="cabinet-v2-section-label mb-3 w-full text-center">Карта и баланс</p>
+                  )}
                   <PremiumCard
                     fullName={fullName}
                     uniqueId={uniqueId}

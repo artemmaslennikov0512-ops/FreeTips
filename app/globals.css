@@ -1931,23 +1931,24 @@ html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-compe
  * ЛК design-v2 — пилот по логину (config/cabinet-theme-logins.ts, CABINET_DESIGN_V2_LOGINS).
  * data-cabinet-theme="design-v2" на .cabinet-premium; не пересекается с M5.
  */
+/* Canvas = та же холодная navy-сетка, что и сайдбар/main (без светлой «шторки» и без #171717) */
 html:not([data-theme="dark"]) body.cabinet-page:has(.cabinet-premium[data-cabinet-theme="design-v2"]) {
   background:
     radial-gradient(ellipse 85% 55% at 18% 0%, rgba(197, 165, 114, 0.1), transparent 58%),
-    radial-gradient(ellipse 55% 45% at 100% 100%, rgba(45, 74, 112, 0.09), transparent 52%),
-    linear-gradient(168deg, #f1f3f8 0%, #e4e9f1 44%, #d9e0ea 100%) !important;
+    radial-gradient(ellipse 55% 45% at 100% 100%, rgba(45, 62, 88, 0.45), transparent 52%),
+    linear-gradient(168deg, #2c3445 0%, #252d3d 42%, #1e2634 100%) !important;
 }
 
 [data-theme="dark"] body.cabinet-page:has(.cabinet-premium[data-cabinet-theme="design-v2"]) {
   background:
-    radial-gradient(ellipse 100% 68% at 50% -14%, rgba(197, 165, 114, 0.17), transparent 52%),
-    linear-gradient(168deg, #0f141c 0%, #131922 48%, var(--color-bg) 100%) !important;
+    radial-gradient(ellipse 100% 68% at 50% -14%, rgba(197, 165, 114, 0.15), transparent 52%),
+    linear-gradient(168deg, #151c24 0%, #121920 45%, #0f1419 100%) !important;
 }
 
 html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="design-v2"] .cabinet-main-block:not(.admin-main-block) {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.03) 16%, transparent 30%),
-    linear-gradient(168deg, #273648 0%, #1e2d3f 50%, #1a2838 100%) !important;
+    linear-gradient(168deg, #273648 0%, #1e2d3f 50%, #1e2634 100%) !important;
   border: 1px solid rgba(197, 165, 114, 0.36) !important;
   border-radius: 1rem !important;
   box-shadow:
@@ -1958,7 +1959,7 @@ html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="design-v2"] .
 }
 
 html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="design-v2"] .cabinet-sidebar:not(.admin-sidebar) {
-  background: linear-gradient(198deg, #323946 0%, #262f3e 52%, #1f2836 100%) !important;
+  background: linear-gradient(198deg, #323946 0%, #2a3142 38%, #222a38 72%, #1e2634 100%) !important;
   border: 1px solid rgba(197, 165, 114, 0.44) !important;
   border-radius: 14px !important;
   box-shadow:
@@ -2020,6 +2021,26 @@ html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="design-v2"] .
 }
 
 html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="design-v2"] .cabinet-sidebar-profile {
+  color: rgba(255, 255, 255, 0.95) !important;
+}
+
+/* Имя / роль: утилиты text-[var(--color-text)] перебивают наследование от .cabinet-sidebar-profile */
+html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="design-v2"] .cabinet-sidebar-profile [class*="text-[var(--color-text)]"] {
+  color: rgba(255, 255, 255, 0.96) !important;
+}
+
+html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="design-v2"] .cabinet-sidebar-profile [class*="text-[var(--color-text)]/8"] {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="design-v2"] .cabinet-sidebar-profile [class*="text-[var(--color-text)]/5"] {
+  color: rgba(255, 255, 255, 0.55) !important;
+}
+
+html:not([data-theme="dark"])
+  .cabinet-premium[data-cabinet-theme="design-v2"][data-brand-active]
+  .cabinet-sidebar
+  .cabinet-sidebar-profile {
   color: rgba(255, 255, 255, 0.95) !important;
 }
 
@@ -2125,6 +2146,7 @@ html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="design-v2"] .
   max-width: 20rem;
   margin-inline: auto;
   text-align: center;
+  align-self: stretch;
 }
 
 .cabinet-premium[data-cabinet-theme="design-v2"] .cabinet-v2-waiter-kicker {
@@ -2136,6 +2158,12 @@ html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="design-v2"] .
   color: color-mix(in srgb, var(--color-brand-gold) 88%, #fff);
   margin: 0 0 0.65rem;
   opacity: 0.88;
+  display: block;
+  width: 100%;
+  text-align: center;
+  /* letter-spacing даёт зазоры только между буквами — без компенсации строка визуально уезжает влево */
+  padding-inline-end: 0.24em;
+  box-sizing: border-box;
 }
 
 .cabinet-premium[data-cabinet-theme="design-v2"] .cabinet-v2-waiter-name {
@@ -2321,6 +2349,31 @@ html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="design-v2"] .
 html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="design-v2"] .cabinet-limits-block h4,
 html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="design-v2"] .cabinet-limits-block .font-medium {
   color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/*
+ * design-v2 + светлая тема сайта: контент ЛК на тёмном стекле, но --color-text остаётся «дневным».
+ * Светлая типографика в #main-content (аналог M5 на светлом html).
+ */
+html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="design-v2"] #main-content {
+  color: rgba(255, 255, 255, 0.92);
+}
+
+html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="design-v2"] #main-content [class*="text-[var(--color-text-secondary)]"] {
+  color: rgba(255, 255, 255, 0.82) !important;
+}
+
+html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="design-v2"] #main-content [class*="text-[var(--color-text)]"]:not(.cabinet-v2-section-label) {
+  color: rgba(255, 255, 255, 0.94) !important;
+}
+
+html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="design-v2"] #main-content .cabinet-v2-section-label {
+  color: color-mix(in srgb, var(--color-brand-gold) 75%, rgba(255, 255, 255, 0.9)) !important;
+}
+
+/* Окно URL на светлом фоне (bg-sides): после правил #main-content — тёмный текст */
+html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="design-v2"] #quick-actions .cabinet-v2-tip-link-block .cabinet-input-window {
+  color: #0a192f !important;
 }
 
 @keyframes cabinet-v2-support-pulse {
@@ -2655,10 +2708,11 @@ html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="design-v2"] #
     0 0 0 1px rgba(255, 255, 255, 0.09) !important;
   position: relative;
   overflow: hidden;
+  isolation: isolate;
 }
 
 .cabinet-premium[data-cabinet-theme="design-v2"] .premium-card:not(.premium-card--m5) .premium-card-face {
-  z-index: 1;
+  z-index: 2;
 }
 
 .cabinet-premium[data-cabinet-theme="design-v2"] .premium-card:not(.premium-card--m5) .premium-card-front::before {
@@ -2681,7 +2735,7 @@ html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="design-v2"] #
   inset: 0;
   border-radius: inherit;
   opacity: 0.045;
-  z-index: 0;
+  z-index: -1;
   mix-blend-mode: overlay;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
@@ -2711,7 +2765,7 @@ html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="design-v2"] #
 [data-theme="dark"] .cabinet-premium[data-cabinet-theme="design-v2"] .cabinet-main-block:not(.admin-main-block) {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.045) 0%, transparent 24%),
-    linear-gradient(168deg, #1c252f 0%, #141b24 52%, #10161d 100%) !important;
+    linear-gradient(168deg, #1a222c 0%, #151c24 52%, #121920 100%) !important;
   border: 1px solid rgba(212, 184, 130, 0.28) !important;
   border-radius: 1rem !important;
   box-shadow:
@@ -2721,7 +2775,7 @@ html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="design-v2"] #
 }
 
 [data-theme="dark"] .cabinet-premium[data-cabinet-theme="design-v2"] .cabinet-sidebar:not(.admin-sidebar) {
-  background: linear-gradient(198deg, #242d36 0%, #1a222a 55%, #151c24 100%) !important;
+  background: linear-gradient(198deg, #232c35 0%, #1b222b 50%, #161d25 100%) !important;
   border: 1px solid rgba(212, 184, 130, 0.26) !important;
   border-radius: 14px !important;
   box-shadow:
@@ -2760,7 +2814,7 @@ html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="design-v2"] #
 }
 
 [data-theme="dark"] .cabinet-premium[data-cabinet-theme="design-v2"] .cabinet-nav-dropdown {
-  background: linear-gradient(198deg, #242d36 0%, #1a222a 100%) !important;
+  background: linear-gradient(198deg, #232c35 0%, #1b222b 100%) !important;
   color: rgba(250, 250, 250, 0.95) !important;
   border: 1px solid rgba(212, 184, 130, 0.28) !important;
   box-shadow: 0 18px 48px -14px rgba(0, 0, 0, 0.5) !important;
@@ -4022,10 +4076,10 @@ html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-compe
   color: #0a192f !important;
 }
 
-/* Светлая тема: блок «Быстрые действия» — весь текст белый (кнопки — чёрный, см. правило выше) */
-html:not([data-theme="dark"]) .cabinet-premium #quick-actions.cabinet-card h3,
-html:not([data-theme="dark"]) .cabinet-premium #quick-actions.cabinet-card .cabinet-block-inner,
-html:not([data-theme="dark"]) .cabinet-premium #quick-actions.cabinet-card .cabinet-input-window {
+/* Светлая тема: блок «Быстрые действия» — весь текст белый (кнопки — чёрный, см. правило выше). design-v2 — свои цвета в #main-content + окно ссылки на светлом фоне */
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="design-v2"]) #quick-actions.cabinet-card h3,
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="design-v2"]) #quick-actions.cabinet-card .cabinet-block-inner,
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="design-v2"]) #quick-actions.cabinet-card .cabinet-input-window {
   color: #fff !important;
 }
 

@@ -227,7 +227,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
 
   return (
     <div
-      className={`cabinet-premium flex min-h-screen w-full max-w-full overflow-x-hidden font-[family:var(--font-inter)] text-[var(--color-text)] pt-2 ${isM5Cabinet ? "bg-transparent" : "bg-[var(--color-bg)]"}`}
+      className={`cabinet-premium flex min-h-screen w-full max-w-full overflow-x-hidden font-[family:var(--font-inter)] text-[var(--color-text)] pt-2 ${isM5Cabinet || isDesignV2Cabinet ? "bg-transparent" : "bg-[var(--color-bg)]"}`}
       data-brand-active={applyEstablishmentBrand ? "true" : undefined}
       data-cabinet-theme={isM5Cabinet ? "m5-competition" : isDesignV2Cabinet ? "design-v2" : undefined}
       style={Object.keys(brandStyle).length ? brandStyle : undefined}

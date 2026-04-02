@@ -18,6 +18,7 @@
  * (не npx tsx — у пользователя nextjs нет доступной домашней директории для кэша npm).
  * С хоста: если в .env указан localhost/127.0.0.1 с портом 5432 или без порта, скрипт подставляет 15432
  * (проброс PostgreSQL из docker-compose на хост). Отключить: DATABASE_URL_NO_DOCKER_HOST_PORT_REMAP=1.
+ * Опечатка `localhost15432` без двоеточия — исправляется на localhost:15432.
  */
 
 import "dotenv/config";
@@ -27,6 +28,24 @@ import { PrismaClient } from "@prisma/client";
 
 /** Порт `db` на хосте в docker-compose (127.0.0.1:15432:5432). */
 const DOCKER_COMPOSE_DB_PUBLISHED_PORT = "15432";
+
+/** `...@localhost15432:5432/...` (забыли `:`) → localhost + порт из суффикса. */
+function fixDatabaseUrlLocalhostPortGluedTypo(): void {
+  const raw = process.env.DATABASE_URL?.trim();
+  if (!raw) return;
+  let u: URL;
+  try {
+    u = new URL(raw);
+  } catch {
+    return;
+  }
+  const host = u.hostname.toLowerCase();
+  const m = /^localhost(\d+)$/.exec(host);
+  if (!m) return;
+  u.hostname = "localhost";
+  u.port = m[1];
+  process.env.DATABASE_URL = u.toString();
+}
 
 function remapDatabaseUrlLocalhostToDockerPublishedPort(): void {
   if (process.env.DATABASE_URL_NO_DOCKER_HOST_PORT_REMAP === "1") return;
@@ -47,6 +66,7 @@ function remapDatabaseUrlLocalhostToDockerPublishedPort(): void {
 }
 
 loadScriptsEnv();
+fixDatabaseUrlLocalhostPortGluedTypo();
 remapDatabaseUrlLocalhostToDockerPublishedPort();
 
 const prisma = new PrismaClient();

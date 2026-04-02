@@ -182,7 +182,7 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
           <button
             type="button"
             onClick={handleLogout}
-            className="mt-2 flex w-full items-center gap-3 rounded-[10px] px-4 py-3 text-sm font-medium text-white/80 transition-colors hover:bg-[var(--color-dark-gray)]/10 hover:text-white"
+            className="mt-2 flex w-full items-center justify-center gap-3 rounded-[10px] px-4 py-3 text-sm font-medium text-white/80 transition-colors hover:bg-[var(--color-dark-gray)]/10 hover:text-white"
           >
             <LogOut className="h-4 w-4 shrink-0" />
             <span>Выйти</span>
@@ -190,9 +190,9 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
         </nav>
       </aside>
 
-      <main className="min-h-0 min-w-0 flex-1 overflow-x-hidden pl-4 pr-4 lg:pl-0 lg:pr-0 lg:ml-0 flex flex-col">
+      <main className="min-h-0 min-w-0 flex-1 overflow-x-hidden px-4 sm:px-6 lg:pl-0 lg:pr-0 lg:ml-0 flex flex-col">
         <div className="cabinet-main-block mt-4 mr-0 mb-4 ml-0 lg:mt-0 lg:mr-0 lg:ml-4 flex min-h-0 flex-1 flex-col rounded-[10px] border border-white/10 bg-white/[0.06] backdrop-blur-xl">
-          <div className="p-6 lg:p-8" id="main-content">
+          <div className="px-0 py-6 lg:p-8" id="main-content">
             <div className="mb-4 lg:hidden">
               <button
                 type="button"

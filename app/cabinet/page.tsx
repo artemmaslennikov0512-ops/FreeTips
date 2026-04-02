@@ -293,20 +293,28 @@ export default function CabinetDashboardPage() {
           <div className="flex min-h-0 flex-1 flex-col p-6">
             <div className="flex flex-col items-center">
               <div className="w-full max-w-[320px] flex flex-col items-center">
-                <p className="cabinet-dashboard-display-name cabinet-dashboard-card-title w-full text-center font-[family:var(--font-playfair)] text-lg font-semibold mb-3 text-[var(--color-text)]">
-                  {m5DashName ? (
-                    m5DashName.rest != null ? (
-                      <>
-                        <span className="text-[#8ec5ff]">{m5DashName.first}</span>{" "}
-                        <span className="text-[#e5252a]">{m5DashName.rest}</span>
-                      </>
-                    ) : (
-                      <span className="text-[#8ec5ff]">{m5DashName.first}</span>
-                    )
-                  ) : (
-                    <span className="text-white">{dashName}</span>
-                  )}
-                </p>
+                <div
+                  className={`cabinet-dashboard-name-hero mb-3 ${isM5Cabinet ? "cabinet-dashboard-name-hero--m5" : ""}`}
+                >
+                  <div className="cabinet-dashboard-name-hero__pill">
+                    <p
+                      className={`cabinet-dashboard-name-hero__text ${isM5Cabinet ? "cabinet-dashboard-name-hero__text--m5" : ""}`}
+                    >
+                      {m5DashName ? (
+                        m5DashName.rest != null ? (
+                          <>
+                            <span className="text-[#8ec5ff]">{m5DashName.first}</span>{" "}
+                            <span className="text-[#e5252a]">{m5DashName.rest}</span>
+                          </>
+                        ) : (
+                          <span className="text-[#8ec5ff]">{m5DashName.first}</span>
+                        )
+                      ) : (
+                        dashName
+                      )}
+                    </p>
+                  </div>
+                </div>
                 <div className="cabinet-dashboard-balance-wrap mt-1 flex w-full max-w-[320px] shrink-0 flex-col items-center justify-center overflow-visible">
                   <PremiumCard
                     fullName={fullName}

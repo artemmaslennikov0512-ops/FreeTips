@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Users, TrendingUp, Send, DollarSign } from "lucide-react";
+import { Users, TrendingUp, Send, DollarSign, ShieldAlert } from "lucide-react";
 import { formatMoneyCompact } from "@/lib/utils";
 
 interface Stats {
@@ -18,6 +18,7 @@ interface Stats {
   defaultPayoutMonthlyLimitKop?: number | null;
   defaultAutoConfirmEnabled?: boolean;
   defaultAutoConfirmThresholdKop?: number | null;
+  fraudFlaggedUsers30d?: number;
 }
 
 export default function AdminDashboardPage() {
@@ -102,6 +103,25 @@ export default function AdminDashboardPage() {
 
   return (
     <div className="min-w-0 max-w-full">
+      {stats.fraudFlaggedUsers30d != null && stats.fraudFlaggedUsers30d > 0 && (
+        <Link
+          href="/admin/antifraud"
+          className="mb-4 flex items-center justify-center gap-2 rounded-2xl border border-rose-500/40 bg-rose-950/30 px-4 py-3 text-center text-sm text-rose-100 transition-colors hover:bg-rose-950/45"
+        >
+          <ShieldAlert className="h-4 w-4 shrink-0 text-rose-300" aria-hidden />
+          <span>
+            <span className="font-semibold tabular-nums text-rose-50">{stats.fraudFlaggedUsers30d}</span>{" "}
+            {stats.fraudFlaggedUsers30d % 10 === 1 && stats.fraudFlaggedUsers30d % 100 !== 11
+              ? "аккаунт"
+              : stats.fraudFlaggedUsers30d % 10 >= 2 &&
+                  stats.fraudFlaggedUsers30d % 10 <= 4 &&
+                  (stats.fraudFlaggedUsers30d % 100 < 10 || stats.fraudFlaggedUsers30d % 100 >= 20)
+                ? "аккаунта"
+                : "аккаунтов"}{" "}
+            со сигналами антифрода за 30 дней — открыть «Антифрод»
+          </span>
+        </Link>
+      )}
       {pendingRequestsTotal != null && pendingRequestsTotal > 0 && (
         <Link
           href="/admin/verification-requests"

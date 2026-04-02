@@ -114,9 +114,17 @@ export function Header() {
   }, [sideOpen, close]);
 
   const isLanding = pathname === "/";
+  const hideMobileSiteNav =
+    Boolean(pathname?.startsWith("/cabinet")) ||
+    Boolean(pathname?.startsWith("/admin")) ||
+    Boolean(pathname?.startsWith("/establishment"));
   const isCabinetM5Header =
     Boolean(pathname?.startsWith("/cabinet")) &&
     isCabinetM5CompetitionTheme(user?.login);
+
+  useEffect(() => {
+    if (hideMobileSiteNav) setSideOpen(false);
+  }, [hideMobileSiteNav]);
 
   if (isLanding) {
     return (
@@ -220,7 +228,7 @@ export function Header() {
 
   return (
     <header
-      className={`site-header sticky top-0 z-30 mx-0 mt-2 w-full rounded-none border-0 border-b border-white/10 bg-transparent max-lg:rounded-none lg:mx-3 lg:w-[calc(100%-1.5rem)] lg:rounded-[10px] lg:border${isCabinetM5Header ? " site-header--cabinet-m5" : ""}`}
+      className={`site-header sticky top-0 z-30 mx-0 mt-2 w-full overflow-hidden rounded-lg border border-white/10 bg-transparent md:rounded-[10px] lg:mx-3 lg:w-[calc(100%-1.5rem)]${isCabinetM5Header ? " site-header--cabinet-m5" : ""}`}
     >
         <div className="mx-auto flex h-16 w-full items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link
@@ -272,10 +280,10 @@ export function Header() {
             <button
               type="button"
               onClick={handleLogout}
-              className={`min-h-[44px] inline-flex items-center justify-center gap-2 rounded-xl bg-[var(--color-brand-gold)] px-4 py-2.5 text-[12px] font-semibold text-[#0a192f] hover:opacity-90 hover:-translate-y-0.5 transition-all shadow-[var(--shadow-subtle)]${isCabinetM5Header ? " site-header-m5-logout" : ""}`}
+              className={`site-header-logout-btn min-h-[44px] inline-flex w-max max-w-full shrink-0 items-center justify-center gap-2 rounded-xl bg-[var(--color-brand-gold)] px-4 py-2.5 text-[12px] font-semibold text-[#0a192f] hover:opacity-90 hover:-translate-y-0.5 transition-all shadow-[var(--shadow-subtle)]${isCabinetM5Header ? " site-header-m5-logout" : ""}`}
             >
-              <LogOut className="h-3.5 w-3.5" />
-              Выйти
+              <LogOut className="h-3.5 w-3.5 shrink-0" />
+              <span className="whitespace-nowrap">Выйти</span>
             </button>
           ) : (
             <>
@@ -297,22 +305,25 @@ export function Header() {
 
         <div className="md:hidden flex items-center gap-1">
           <ThemeToggle />
-          <button
-            ref={menuButtonRef}
-            type="button"
-            onClick={() => setSideOpen(true)}
-            className={`min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded-lg text-[var(--color-brand-gold)] hover:bg-[var(--color-brand-gold)]/10 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-gold)]/50 focus-visible:ring-offset-2${isCabinetM5Header ? " site-header-m5-menu-btn" : ""}`}
-            aria-label="Открыть меню"
-            aria-expanded={sideOpen}
-            aria-controls="side-menu"
-          >
-            <Menu className="h-6 w-6" />
-          </button>
+          {!hideMobileSiteNav && (
+            <button
+              ref={menuButtonRef}
+              type="button"
+              onClick={() => setSideOpen(true)}
+              className={`min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded-lg text-[var(--color-brand-gold)] hover:bg-[var(--color-brand-gold)]/10 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-gold)]/50 focus-visible:ring-offset-2${isCabinetM5Header ? " site-header-m5-menu-btn" : ""}`}
+              aria-label="Открыть меню"
+              aria-expanded={sideOpen}
+              aria-controls="side-menu"
+            >
+              <Menu className="h-6 w-6" />
+            </button>
+          )}
         </div>
       </div>
 
 {mounted &&
         typeof document !== "undefined" &&
+        !hideMobileSiteNav &&
         createPortal(
           <div
             id="side-menu"

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { ADMIN_BTN, ADMIN_BTN_PRIMARY } from "@/lib/admin-button-classes";
+import { FraudSignalsSection } from "./FraudSignalsSection";
 
 const ANTIFRAUD_INPUT =
   "antifraud-input w-36 min-w-[7rem] rounded-lg border border-[rgba(197,165,114,0.25)] bg-[var(--color-bg-sides)] px-3 py-2 text-center text-sm text-[var(--color-text)] placeholder:text-[var(--color-muted)] focus:outline-none focus:border-[var(--color-brand-gold)] disabled:bg-[var(--color-light-gray)] read-only:bg-[var(--color-light-gray)]";
@@ -321,6 +322,8 @@ export default function AdminAntifraudPage() {
   return (
     <div className="min-w-0 max-w-full">
       <h1 className="antifraud-page-title mb-6 text-xl font-semibold text-white text-center">Антифрод и лимиты</h1>
+
+      <FraudSignalsSection />
 
       <section className="cabinet-section-header rounded-2xl border-0 p-4 sm:p-6">
         <div className="antifraud-inner cabinet-block-inner min-w-0 rounded-xl border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/85 p-4 sm:p-5">

@@ -17,6 +17,7 @@ import { logSecurity } from "@/lib/logger";
 import { broadcastBalanceUpdated } from "@/lib/ws-broadcast";
 import { getRequestId } from "@/lib/security/request";
 import { getClientIP } from "@/lib/middleware/rate-limit";
+import { FRAUD_RULE, recordFraudSignal } from "@/lib/fraud-signals";
 
 export async function GET(request: NextRequest) {
   const auth = await requireAuthOrApiKey(request);
@@ -135,6 +136,13 @@ export async function POST(request: NextRequest) {
       amountKop: Number(amountBigInt),
       limit: limits.count,
     });
+    void recordFraudSignal({
+      userId: auth.userId,
+      ruleCode: FRAUD_RULE.PAYOUT_LIMIT_DAILY_COUNT,
+      message: `Попытка вывода при исчерпании лимита заявок в сутки (лимит: ${limits.count})`,
+      metadata: { limit: limits.count, amountKop: Number(amountBigInt) },
+      dedupeMinutes: 360,
+    });
     return jsonError(400, `Превышен лимит: не более ${limits.count} заявок в сутки`);
   }
   const todaySumKop = todaySum._sum.amountKop ?? BigInt(0);
@@ -149,6 +157,13 @@ export async function POST(request: NextRequest) {
       limitKop: Number(limits.kop),
     });
     const limitRub = Number(limits.kop) / 100;
+    void recordFraudSignal({
+      userId: auth.userId,
+      ruleCode: FRAUD_RULE.PAYOUT_LIMIT_DAILY_KOP,
+      message: `Попытка вывода при исчерпании суточного лимита суммы (лимит ${limitRub.toLocaleString("ru-RU")} ₽)`,
+      metadata: { limitKop: Number(limits.kop), amountKop: Number(amountBigInt) },
+      dedupeMinutes: 360,
+    });
     return jsonError(400, `Превышен лимит: не более ${limitRub.toLocaleString("ru-RU")} ₽ вывода в сутки`);
   }
 
@@ -161,6 +176,13 @@ export async function POST(request: NextRequest) {
       userId: auth.userId,
       amountKop: Number(amountBigInt),
       limit: monthlyLimits.count,
+    });
+    void recordFraudSignal({
+      userId: auth.userId,
+      ruleCode: FRAUD_RULE.PAYOUT_LIMIT_MONTHLY_COUNT,
+      message: `Попытка вывода при исчерпании лимита заявок в месяц (лимит: ${monthlyLimits.count})`,
+      metadata: { limit: monthlyLimits.count, amountKop: Number(amountBigInt) },
+      dedupeMinutes: 360,
     });
     return jsonError(400, `Превышен лимит: не более ${monthlyLimits.count} заявок в месяц`);
   }
@@ -176,6 +198,13 @@ export async function POST(request: NextRequest) {
       limitKop: Number(monthlyLimits.kop),
     });
     const limitRub = Number(monthlyLimits.kop) / 100;
+    void recordFraudSignal({
+      userId: auth.userId,
+      ruleCode: FRAUD_RULE.PAYOUT_LIMIT_MONTHLY_KOP,
+      message: `Попытка вывода при исчерпании месячного лимита суммы (лимит ${limitRub.toLocaleString("ru-RU")} ₽)`,
+      metadata: { limitKop: Number(monthlyLimits.kop), amountKop: Number(amountBigInt) },
+      dedupeMinutes: 360,
+    });
     return jsonError(400, `Превышен лимит: не более ${limitRub.toLocaleString("ru-RU")} ₽ вывода в месяц`);
   }
 

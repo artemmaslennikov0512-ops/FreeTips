@@ -126,8 +126,18 @@ export function PremiumCard({ fullName, balanceKop, compact, variant = "default"
                     FreeTips
                   </span>
                 </div>
-                <p className={`premium-card-balance-text text-[13px] font-medium m-0 leading-none shrink-0 ${showBalance ? "text-right" : "truncate max-w-[160px]"}`}>
-                  {showBalance ? formatMoney(BigInt(balanceKop)) : holderName}
+                <p
+                  className={`premium-card-balance-text text-[13px] font-medium m-0 leading-none shrink-0 ${showBalance ? "text-right" : "truncate max-w-[160px]"}`}
+                >
+                  {showBalance ? (
+                    isM5 ? (
+                      formatMoney(BigInt(balanceKop))
+                    ) : (
+                      <span className="premium-card-balance-plate">{formatMoney(BigInt(balanceKop))}</span>
+                    )
+                  ) : (
+                    holderName
+                  )}
                 </p>
               </div>
             </div>

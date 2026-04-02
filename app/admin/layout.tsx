@@ -255,7 +255,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <button
               type="button"
               onClick={handleLogout}
-              className={`mt-4 ${ADMIN_BTN} w-full !justify-start gap-3 px-4 py-3 text-sm`}
+              className={`mt-4 ${ADMIN_BTN} w-full !justify-center gap-3 px-4 py-3 text-sm`}
             >
               <LogOut className="h-4 w-4 shrink-0 text-[var(--color-brand-gold)]" aria-hidden />
               <span>Выйти</span>
@@ -264,22 +264,30 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
       </aside>
 
-      <main className="min-h-screen min-w-0 flex-1 overflow-x-hidden pl-4 pr-4 lg:pl-0 lg:pr-0 lg:ml-0 flex flex-col">
+      <main className="min-h-screen min-w-0 flex-1 overflow-x-hidden px-4 sm:px-6 lg:pl-0 lg:pr-0 lg:ml-0 flex flex-col">
         <div className="admin-main-block cabinet-main-block mt-4 mr-0 mb-4 ml-0 lg:mr-0 lg:ml-4 flex min-h-[calc(100vh-2rem)] flex-1 flex-col rounded-[10px] border border-white/10 bg-white/[0.06] backdrop-blur-xl">
-          <div className="p-4 sm:p-6 lg:p-8 min-w-0 max-w-full flex-1 overflow-x-hidden flex flex-col" id="main-content">
+          <div className="min-w-0 max-w-full flex-1 overflow-x-hidden flex flex-col px-0 py-4 sm:py-6 lg:p-8" id="main-content">
             <div className="mb-4 flex justify-start lg:hidden relative">
               <button
                 ref={menuButtonRef}
                 type="button"
                 onClick={() => setSidebarOpen((o) => !o)}
-                className={`cabinet-menu-btn ${ADMIN_BTN} h-14 min-h-14 w-14 min-w-14 shrink-0 gap-1 !p-0 active:scale-95`}
+                className={`cabinet-menu-btn ${ADMIN_BTN} relative flex h-14 min-h-14 w-14 min-w-14 shrink-0 items-center justify-center !gap-0 !p-0 active:scale-95`}
                 aria-label="Меню"
                 aria-expanded={sidebarOpen}
                 aria-haspopup="true"
                 aria-controls="admin-nav-dropdown"
               >
-                <Menu className="h-7 w-7" strokeWidth={2} />
-                <ChevronDown className={`h-5 w-5 transition-transform duration-200 ${sidebarOpen ? "rotate-180" : ""}`} aria-hidden />
+                <span
+                  className="pointer-events-none absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center gap-0.5"
+                  aria-hidden
+                >
+                  <Menu className="h-6 w-6 shrink-0" strokeWidth={2} />
+                  <ChevronDown
+                    className={`h-4 w-4 shrink-0 transition-transform duration-200 ${sidebarOpen ? "rotate-180" : ""}`}
+                    aria-hidden
+                  />
+                </span>
               </button>
               <div
                 id="admin-nav-dropdown"
@@ -333,7 +341,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   <button
                     type="button"
                     onClick={() => { closeSidebar(); handleLogout(); }}
-                    className={`mt-3 ${ADMIN_BTN} w-full !justify-start gap-2.5 px-2.5 py-2.5 text-sm`}
+                    className={`mt-3 ${ADMIN_BTN} w-full !justify-center gap-2.5 px-2.5 py-2.5 text-sm`}
                     role="menuitem"
                   >
                     <LogOut className="h-4 w-4 shrink-0 text-[var(--color-brand-gold)]" aria-hidden />

@@ -33,6 +33,8 @@ export async function GET(request: NextRequest) {
         ? { gte: new Date(now.getTime() - 7 * MS_PER_DAY) }
         : {};
 
+  const thirtyDaysAgo = new Date(now.getTime() - 30 * MS_PER_DAY);
+
   const [
     usersCount,
     transactionsCount,
@@ -42,6 +44,7 @@ export async function GET(request: NextRequest) {
     systemDefaultLimits,
     sampleMonthlyLimitsUser,
     sampleAutoConfirmUser,
+    fraudUsers30d,
   ] = await Promise.all([
     db.user.count({ where: { role: { not: "SUPERADMIN" } } }),
     db.transaction.count({
@@ -78,6 +81,10 @@ export async function GET(request: NextRequest) {
       orderBy: { id: "asc" },
       select: { autoConfirmPayouts: true, autoConfirmPayoutThresholdKop: true },
     }),
+    db.fraudSignal.groupBy({
+      by: ["userId"],
+      where: { createdAt: { gte: thirtyDaysAgo } },
+    }),
   ]);
 
   const defaults = systemDefaultLimits;
@@ -106,5 +113,7 @@ export async function GET(request: NextRequest) {
         : sampleAutoConfirmUser?.autoConfirmPayoutThresholdKop != null
           ? Number(sampleAutoConfirmUser.autoConfirmPayoutThresholdKop)
           : null,
+    /** Уникальные пользователи со сигналом антифрода за 30 дней (наблюдение) */
+    fraudFlaggedUsers30d: fraudUsers30d.length,
   });
 }

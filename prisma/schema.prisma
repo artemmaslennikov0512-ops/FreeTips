@@ -90,6 +90,7 @@ model User {
   supportThread             SupportThread?
   supportMessagesAuthored   SupportMessage[] @relation("SupportMessageAuthor")
   verificationRequests     VerificationRequest[]
+  fraudSignals             FraudSignal[]
 
   @@index([login])
   @@index([email])
@@ -460,4 +461,21 @@ model PlatformPaymentSettings {
   updatedAt               DateTime @updatedAt
 
   @@map("platform_payment_settings")
+}
+
+// Сигналы для наблюдения в админке (антифрод): не блокируют платежи автоматически.
+model FraudSignal {
+  id        String   @id @default(cuid())
+  userId    String
+  ruleCode  String   @db.VarChar(64)
+  message   String   @db.VarChar(500)
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt])
+  @@index([ruleCode])
+  @@map("fraud_signals")
 }

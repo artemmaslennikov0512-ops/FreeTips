@@ -15,6 +15,7 @@ import { getRequestId } from "@/lib/security/request";
 import { parseJsonWithLimit, MAX_BODY_SIZE_AUTH, jsonError, internalError, rateLimit429Response, zodErrorResponse } from "@/lib/api/helpers";
 import { verifyCsrfFromRequest } from "@/lib/security/csrf";
 import { z } from "zod";
+import { FRAUD_RULE, recordFraudSignal } from "@/lib/fraud-signals";
 
 export async function POST(request: NextRequest) {
   const requestId = getRequestId(request);
@@ -40,12 +41,26 @@ export async function POST(request: NextRequest) {
 
     if (user.isBlocked && user.role !== "ADMIN" && user.role !== "SUPERADMIN") {
       logSecurity("auth.login.blocked", { requestId, ip, userId: user.id });
+      void recordFraudSignal({
+        userId: user.id,
+        ruleCode: FRAUD_RULE.LOGIN_BLOCKED_ACCOUNT,
+        message: "Попытка входа в заблокированный аккаунт",
+        metadata: { ip },
+        dedupeMinutes: 120,
+      });
       return jsonError(403, "Доступ к личному кабинету ограничен");
     }
 
     const isValidPassword = await verifyPassword(validated.password, user.passwordHash);
     if (!isValidPassword) {
       logSecurity("auth.login.failed", { requestId, ip });
+      void recordFraudSignal({
+        userId: user.id,
+        ruleCode: FRAUD_RULE.LOGIN_WRONG_PASSWORD,
+        message: "Неверный пароль при входе (логин существует)",
+        metadata: { ip },
+        dedupeMinutes: 45,
+      });
       return jsonError(401, "Неверный логин или пароль");
     }
 

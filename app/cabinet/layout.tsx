@@ -177,6 +177,15 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
   const closeSidebar = useCallback(() => setSidebarOpen(false), []);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
 
+  useEffect(() => {
+    if (!sidebarOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeSidebar();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [sidebarOpen, closeSidebar]);
+
   if (!mounted) {
     return <LoadingSpinner message="Загрузка…" className="min-h-[60vh]" />;
   }
@@ -229,15 +238,6 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
       data-cabinet-theme={isM5Cabinet ? "m5-competition" : undefined}
       style={Object.keys(brandStyle).length ? brandStyle : undefined}
     >
-      {/* Мобильная шторка — закрывает выпадающее меню при клике вне */}
-      <div
-        className={`cabinet-overlay fixed inset-0 z-30 bg-[rgba(15,23,42,0.65)] backdrop-blur-xl transition-opacity duration-300 lg:hidden ${
-          sidebarOpen ? "opacity-100" : "opacity-0 pointer-events-none"
-        }`}
-        onClick={closeSidebar}
-        aria-hidden
-      />
-
       {/* Левое меню: только на десктопе (lg+); на мобильном навигация в выпадающем списке под кнопкой */}
       <div
         className={`cabinet-sidebar hidden lg:flex fixed left-0 top-0 z-40 h-full w-[min(calc(100vw-4rem),20rem)] max-w-[20rem] flex-col overflow-hidden border-0 border-r border-white/10 py-6 shadow-2xl backdrop-blur-xl transition-[transform] duration-300 ease-out lg:static lg:left-auto lg:top-auto lg:ml-0 lg:mt-2 lg:mr-0 lg:mb-0 lg:h-auto lg:max-h-[calc(100vh-2rem)] lg:w-[260px] lg:max-w-none lg:translate-x-0 lg:rounded-[10px] lg:border lg:self-start`}
@@ -335,7 +335,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
           <button
             type="button"
             onClick={handleLogout}
-            className={`mt-4 flex ${CABINET_WAITER_BTN} w-full !justify-start gap-3 px-4 py-3 text-sm`}
+            className={`mt-4 flex ${CABINET_WAITER_BTN} w-full !justify-center gap-3 px-4 py-3 text-sm`}
           >
             <LogOut className="h-4 w-4 shrink-0 text-[var(--color-brand-gold)]" aria-hidden />
             <span>Выйти</span>
@@ -343,115 +343,131 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
         </div>
       </div>
 
-      <main
-        className={`min-h-screen min-w-0 flex-1 overflow-x-hidden px-0 pt-2 pb-4 md:px-4 lg:pl-0 lg:pr-4 lg:ml-0 lg:mr-0 flex flex-col transition-[z-index] ${
-          sidebarOpen ? "relative z-40 pointer-events-none lg:pointer-events-auto lg:z-auto" : ""
-        }`}
-      >
-        {/* Основной блок — тянется до низа страницы с отступом */}
-        <div
-          className="cabinet-main-block mt-0 mr-0 mb-4 ml-0 lg:mr-4 lg:ml-4 flex min-h-0 flex-1 w-full max-w-full flex-col rounded-lg md:rounded-[10px] border border-white/10 backdrop-blur-xl"
-          style={mainBlockStyle}
-        >
-          <div className="p-4 md:p-6 lg:p-8" id="main-content">
-            <div className={`mb-4 lg:hidden relative ${sidebarOpen ? "pointer-events-auto" : ""}`}>
-              <button
-                ref={menuButtonRef}
-                type="button"
-                onClick={() => setSidebarOpen((o) => !o)}
-                className={`cabinet-menu-btn ${CABINET_WAITER_BTN} flex h-14 min-h-14 w-14 min-w-14 shrink-0 items-center justify-center gap-1 !p-0 active:scale-95 transition-[transform,opacity]`}
-                aria-label="Меню"
-                aria-expanded={sidebarOpen}
-                aria-haspopup="true"
-                aria-controls="cabinet-nav-dropdown"
-              >
-                <Menu className="h-7 w-7" strokeWidth={2} />
-                <ChevronDown className={`h-5 w-5 transition-transform duration-200 ${sidebarOpen ? "rotate-180" : ""}`} aria-hidden />
-              </button>
-              <div
-                id="cabinet-nav-dropdown"
-                role="menu"
-                className={`cabinet-nav-dropdown absolute left-0 top-full z-50 mt-2 w-[min(100vw-2rem,320px)] origin-top rounded-[10px] border border-[var(--color-brand-gold)]/20 shadow-[var(--shadow-card)] backdrop-blur-xl transition-[opacity,transform] duration-200 ${
-                  sidebarOpen ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"
-                }`}
-                style={sidebarStyle}
-                aria-hidden={!sidebarOpen}
-              >
-                <div className="cabinet-nav-dropdown-inner overflow-hidden rounded-[10px] px-4 py-4">
-                  <div className={`cabinet-sidebar-profile cabinet-block-inner mb-4 rounded-[10px] border border-[var(--color-brand-gold)]/20 px-3 py-2.5 ${!sidebarBg ? "bg-[var(--color-dark-gray)]/10" : ""}`} style={Object.keys(profileBlockStyle).length ? profileBlockStyle : undefined}>
-                    <div className="flex items-center gap-2.5">
-                      {user?.employeePhotoUrl ? (
-                        <img src={user.employeePhotoUrl} alt="" className="h-9 w-9 shrink-0 rounded-full object-cover bg-[var(--color-brand-gold)]" />
-                      ) : (
-                        <div
-                          className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--color-brand-gold)] ${isM5Cabinet ? "text-white" : "text-[#0a192f]"}`}
-                          aria-hidden
-                        >
-                          <User className="h-5 w-5" strokeWidth={2} />
-                        </div>
-                      )}
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-1">
-                          <span
-                            className={`truncate font-semibold text-sm ${isM5Cabinet && sidebarFirstName ? "text-[#8ec5ff]" : "text-[var(--color-text)]"}`}
-                            style={!isM5Cabinet || !sidebarFirstName ? (brandFont ? { color: brandFont } : undefined) : undefined}
-                          >
-                            {sidebarDisplayLabel}
-                          </span>
-                          {user?.verificationStatus === "VERIFIED" && (
-                            <BadgeCheck
-                              className={`h-4 w-4 shrink-0 ${isM5Cabinet ? "text-[#1c69d4]" : "text-blue-500"}`}
-                              aria-label="Верифицирован"
-                            />
-                          )}
-                        </div>
-                        <div className="text-xs text-[var(--color-text)]/80" style={brandFont ? { color: brandFont } : undefined}>Официант</div>
-                      </div>
+      <main className="relative min-h-screen min-w-0 flex-1 overflow-x-hidden px-4 sm:px-6 pt-2 pb-4 lg:pl-0 lg:pr-4 lg:ml-0 lg:mr-0 flex flex-col">
+        {/* Затемнение основного контента под выпадающим меню (z ниже шапки z-30, выше карточки) */}
+        {sidebarOpen && (
+          <div
+            className="cabinet-overlay fixed inset-0 z-[28] cursor-default bg-[rgba(15,23,42,0.72)] backdrop-blur-sm transition-opacity duration-300 lg:hidden"
+            onClick={closeSidebar}
+            role="presentation"
+            aria-hidden
+          />
+        )}
+        <div className="relative z-[50] mb-4 shrink-0 lg:hidden">
+          <button
+            ref={menuButtonRef}
+            type="button"
+            onClick={() => setSidebarOpen((o) => !o)}
+            className={`cabinet-menu-btn ${CABINET_WAITER_BTN} relative flex h-14 min-h-14 w-14 min-w-14 shrink-0 items-center justify-center !gap-0 !p-0 active:scale-95 transition-[transform,opacity]`}
+            aria-label="Меню"
+            aria-expanded={sidebarOpen}
+            aria-haspopup="true"
+            aria-controls="cabinet-nav-dropdown"
+          >
+            <span
+              className="pointer-events-none absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center gap-0.5"
+              aria-hidden
+            >
+              <Menu className="h-6 w-6 shrink-0" strokeWidth={2} />
+              <ChevronDown
+                className={`h-4 w-4 shrink-0 transition-transform duration-200 ${sidebarOpen ? "rotate-180" : ""}`}
+                aria-hidden
+              />
+            </span>
+          </button>
+          <div
+            id="cabinet-nav-dropdown"
+            role="menu"
+            className={`cabinet-nav-dropdown absolute left-0 top-full z-[60] mt-2 w-[min(100vw-2rem,320px)] max-w-[calc(100vw-2rem)] origin-top rounded-[10px] border border-[var(--color-brand-gold)]/20 shadow-[var(--shadow-card)] backdrop-blur-xl transition-[opacity,transform] duration-200 ${
+              sidebarOpen ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"
+            }`}
+            style={sidebarStyle}
+            aria-hidden={!sidebarOpen}
+          >
+            <div className="cabinet-nav-dropdown-inner overflow-hidden rounded-[10px] px-4 py-4">
+              <div className={`cabinet-sidebar-profile cabinet-block-inner mb-4 rounded-[10px] border border-[var(--color-brand-gold)]/20 px-3 py-2.5 ${!sidebarBg ? "bg-[var(--color-dark-gray)]/10" : ""}`} style={Object.keys(profileBlockStyle).length ? profileBlockStyle : undefined}>
+                <div className="flex items-center gap-2.5">
+                  {user?.employeePhotoUrl ? (
+                    <img src={user.employeePhotoUrl} alt="" className="h-9 w-9 shrink-0 rounded-full object-cover bg-[var(--color-brand-gold)]" />
+                  ) : (
+                    <div
+                      className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--color-brand-gold)] ${isM5Cabinet ? "text-white" : "text-[#0a192f]"}`}
+                      aria-hidden
+                    >
+                      <User className="h-5 w-5" strokeWidth={2} />
                     </div>
-                  </div>
-                  <p className="cabinet-nav-label mb-2 px-3 text-center text-xs font-semibold uppercase tracking-wider text-[var(--color-text)]/50">Навигация</p>
-                  <nav className="flex flex-col gap-0.5 rounded-[10px] border border-[var(--color-brand-gold)]/15 bg-[var(--color-dark-gray)]/5 p-1.5 shadow-[var(--shadow-subtle)]" role="none">
-                    {NAV.map(({ label, href, icon: Icon, iconClass }) => (
-                      <Link
-                        key={href}
-                        href={href}
-                        onClick={closeSidebar}
-                        role="menuitem"
-                        className={`flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium transition-colors ${
-                          isActive(href) ? navActiveClasses : "border border-transparent text-[var(--color-text)]/80 hover:bg-[var(--color-dark-gray)]/10 hover:text-[var(--color-text)]"
-                        }`}
-                        style={!isActive(href) && brandFont ? { color: `${brandFont}cc` } : undefined}
+                  )}
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-1">
+                      <span
+                        className={`truncate font-semibold text-sm ${isM5Cabinet && sidebarFirstName ? "text-[#8ec5ff]" : "text-[var(--color-text)]"}`}
+                        style={!isM5Cabinet || !sidebarFirstName ? (brandFont ? { color: brandFont } : undefined) : undefined}
                       >
-                        <Icon className={`h-5 w-5 shrink-0 ${iconClass}`} aria-hidden />
-                        <span>{label}</span>
-                        {href === "/cabinet/support" && supportUnreadCount > 0 && (
-                          <span
-                            className="cabinet-support-unread-badge ml-auto flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[var(--color-accent-red)] px-1.5 text-xs font-semibold text-white"
-                          >
-                            {supportUnreadCount > 99 ? "99+" : supportUnreadCount}
-                          </span>
-                        )}
-                      </Link>
-                    ))}
-                    {user?.role === "ESTABLISHMENT_ADMIN" && (
-                      <Link href="/establishment" onClick={closeSidebar} role="menuitem" className="flex items-center gap-3 rounded-lg border border-transparent px-3 py-3 font-medium text-[var(--color-text)]/80 transition-colors hover:bg-[var(--color-dark-gray)]/10 hover:text-[var(--color-text)]" style={brandFont ? { color: `${brandFont}cc` } : undefined}>
-                        <Building2 className="h-5 w-5 shrink-0 !text-amber-400" aria-hidden />
-                        <span>Кабинет заведения</span>
-                      </Link>
-                    )}
-                  </nav>
-                  <button
-                    type="button"
-                    onClick={() => { closeSidebar(); handleLogout(); }}
-                    className={`mt-4 flex ${CABINET_WAITER_BTN} w-full !justify-start gap-3 px-4 py-3 text-sm`}
-                    role="menuitem"
-                  >
-                    <LogOut className="h-4 w-4 shrink-0 text-[var(--color-brand-gold)]" aria-hidden />
-                    <span>Выйти</span>
-                  </button>
+                        {sidebarDisplayLabel}
+                      </span>
+                      {user?.verificationStatus === "VERIFIED" && (
+                        <BadgeCheck
+                          className={`h-4 w-4 shrink-0 ${isM5Cabinet ? "text-[#1c69d4]" : "text-blue-500"}`}
+                          aria-label="Верифицирован"
+                        />
+                      )}
+                    </div>
+                    <div className="text-xs text-[var(--color-text)]/80" style={brandFont ? { color: brandFont } : undefined}>Официант</div>
+                  </div>
                 </div>
               </div>
+              <p className="cabinet-nav-label mb-2 px-3 text-center text-xs font-semibold uppercase tracking-wider text-[var(--color-text)]/50">Навигация</p>
+              <nav className="flex flex-col gap-0.5 rounded-[10px] border border-[var(--color-brand-gold)]/15 bg-[var(--color-dark-gray)]/5 p-1.5 shadow-[var(--shadow-subtle)]" role="none">
+                {NAV.map(({ label, href, icon: Icon, iconClass }) => (
+                  <Link
+                    key={href}
+                    href={href}
+                    onClick={closeSidebar}
+                    role="menuitem"
+                    className={`flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium transition-colors ${
+                      isActive(href) ? navActiveClasses : "border border-transparent text-[var(--color-text)]/80 hover:bg-[var(--color-dark-gray)]/10 hover:text-[var(--color-text)]"
+                    }`}
+                    style={!isActive(href) && brandFont ? { color: `${brandFont}cc` } : undefined}
+                  >
+                    <Icon className={`h-5 w-5 shrink-0 ${iconClass}`} aria-hidden />
+                    <span>{label}</span>
+                    {href === "/cabinet/support" && supportUnreadCount > 0 && (
+                      <span
+                        className="cabinet-support-unread-badge ml-auto flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[var(--color-accent-red)] px-1.5 text-xs font-semibold text-white"
+                      >
+                        {supportUnreadCount > 99 ? "99+" : supportUnreadCount}
+                      </span>
+                    )}
+                  </Link>
+                ))}
+                {user?.role === "ESTABLISHMENT_ADMIN" && (
+                  <Link href="/establishment" onClick={closeSidebar} role="menuitem" className="flex items-center gap-3 rounded-lg border border-transparent px-3 py-3 font-medium text-[var(--color-text)]/80 transition-colors hover:bg-[var(--color-dark-gray)]/10 hover:text-[var(--color-text)]" style={brandFont ? { color: `${brandFont}cc` } : undefined}>
+                    <Building2 className="h-5 w-5 shrink-0 !text-amber-400" aria-hidden />
+                    <span>Кабинет заведения</span>
+                  </Link>
+                )}
+              </nav>
+              <button
+                type="button"
+                onClick={() => {
+                  closeSidebar();
+                  handleLogout();
+                }}
+                className={`mt-4 flex ${CABINET_WAITER_BTN} w-full !justify-center gap-3 px-4 py-3 text-sm`}
+                role="menuitem"
+              >
+                <LogOut className="h-4 w-4 shrink-0 text-[var(--color-brand-gold)]" aria-hidden />
+                <span>Выйти</span>
+              </button>
             </div>
+          </div>
+        </div>
+        {/* Основной блок — тянется до низа страницы с отступом */}
+        <div
+          className="cabinet-main-block relative z-10 mt-0 mr-0 mb-4 ml-0 flex min-h-0 w-full max-w-full flex-1 flex-col rounded-lg border border-white/10 backdrop-blur-xl md:rounded-[10px] lg:mr-4 lg:ml-4"
+          style={mainBlockStyle}
+        >
+          <div className="px-0 py-4 md:py-6 lg:p-8" id="main-content">
             {children}
           </div>
         </div>

@@ -30,6 +30,7 @@ import { mergePayPageBranding } from "@/lib/pay-branding-merge";
 import { isCabinetM5CompetitionTheme } from "@/config/cabinet-theme-logins";
 import { getPlatformPaymentSettings } from "@/lib/platform-payment-settings";
 import { recipientCanAcceptIncomingTips } from "@/lib/payment-accept-policy";
+import { FRAUD_RULE, recordFraudSignal } from "@/lib/fraud-signals";
 
 const DEMO_SLUG = "demoPaySlug" in site && typeof site.demoPaySlug === "string" ? site.demoPaySlug : null;
 
@@ -179,11 +180,25 @@ export async function POST(request: NextRequest, { params }: Params) {
 
   if (tipLink.user.isBlocked) {
     logSecurity("pay.init.recipient_blocked", { requestId, ip, slug, recipientId: tipLink.userId });
+    void recordFraudSignal({
+      userId: tipLink.userId,
+      ruleCode: FRAUD_RULE.PAY_RECIPIENT_BLOCKED,
+      message: "Попытка инициализации оплаты на заблокированного получателя",
+      metadata: { slug },
+      dedupeMinutes: 60,
+    });
     return NextResponse.json({ error: "Приём чаевых временно недоступен" }, { status: 403 });
   }
 
   if (!recipientCanAcceptIncomingTips(tipLink.userId, paymentSettings)) {
     logSecurity("pay.init.policy_blocked", { requestId, ip, slug, recipientId: tipLink.userId });
+    void recordFraudSignal({
+      userId: tipLink.userId,
+      ruleCode: FRAUD_RULE.PAY_POLICY_BLOCKED,
+      message: "Попытка оплаты при отключённом приёме (глобальный стоп, чёрный список или не в белом списке)",
+      metadata: { slug },
+      dedupeMinutes: 60,
+    });
     return NextResponse.json({ error: "Приём чаевых временно недоступен" }, { status: 403 });
   }
 

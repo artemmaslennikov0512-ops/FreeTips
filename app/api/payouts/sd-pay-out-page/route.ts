@@ -13,6 +13,7 @@ import { feeKopForPayout } from "@/lib/payment/paygine-fee";
 import { registerOrder, buildSDPayOutPageFormParams, getSDPayOutPageEndpoint } from "@/lib/payment/paygine/client";
 import { getBaseUrlFromRequest } from "@/lib/get-base-url";
 import { parseJsonWithLimit, MAX_BODY_SIZE_AUTH } from "@/lib/api/helpers";
+import { FRAUD_RULE, recordFraudSignal } from "@/lib/fraud-signals";
 const CURRENCY_RUB = 643;
 
 export async function POST(request: NextRequest) {
@@ -82,6 +83,13 @@ export async function POST(request: NextRequest) {
   ]);
 
   if (todayCount >= limits.count) {
+    void recordFraudSignal({
+      userId: auth.userId,
+      ruleCode: FRAUD_RULE.PAYOUT_LIMIT_DAILY_COUNT,
+      message: `Попытка вывода (SDPayOutPage) при исчерпании лимита заявок в сутки (лимит: ${limits.count})`,
+      metadata: { limit: limits.count, amountKop: Number(amountBigInt) },
+      dedupeMinutes: 360,
+    });
     return NextResponse.json(
       { error: `Превышен лимит: не более ${limits.count} заявок в сутки` },
       { status: 400 },
@@ -89,6 +97,14 @@ export async function POST(request: NextRequest) {
   }
   const todaySumKop = todaySum._sum.amountKop ?? BigInt(0);
   if (todaySumKop + amountBigInt > limits.kop) {
+    const limitRub = Number(limits.kop) / 100;
+    void recordFraudSignal({
+      userId: auth.userId,
+      ruleCode: FRAUD_RULE.PAYOUT_LIMIT_DAILY_KOP,
+      message: `Попытка вывода (SDPayOutPage) при исчерпании суточного лимита суммы (лимит ${limitRub.toLocaleString("ru-RU")} ₽)`,
+      metadata: { limitKop: Number(limits.kop), amountKop: Number(amountBigInt) },
+      dedupeMinutes: 360,
+    });
     return NextResponse.json(
       { error: `Превышен лимит: не более ${Number(limits.kop) / 100} ₽ вывода в сутки` },
       { status: 400 },

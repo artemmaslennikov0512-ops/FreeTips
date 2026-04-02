@@ -6,6 +6,7 @@ import { MessageCircle, Send, Loader2, RefreshCw } from "lucide-react";
 import { getAccessToken, authHeaders, clearAccessToken } from "@/lib/auth-client";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
+import { CABINET_WAITER_BTN } from "@/lib/cabinet-button-classes";
 const WELCOME_LINES = [
   "Вас приветствует служба поддержки FreeTips!",
   "Задайте свой вопрос, Вам ответит первый освободившийся оператор.",
@@ -155,13 +156,7 @@ export default function CabinetSupportPage() {
           {/* Приветственное сообщение при открытии чата */}
           <div className="flex justify-start">
             <div className="max-w-[85%] rounded-2xl rounded-bl-md border border-[var(--color-brand-gold)]/30 bg-[var(--color-brand-gold)]/10 px-4 py-3">
-              <div className="mb-2 flex items-center justify-center gap-2">
-                <span
-                  className="logo-ft-abbr flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-[var(--color-brand-gold)]/30 text-[10px] text-[var(--color-brand-gold)]"
-                  aria-hidden={true}
-                >
-                  FT
-                </span>
+              <div className="mb-2">
                 <span className="support-chat-name support-chat-name-staff inline-block rounded border border-[var(--color-brand-gold)]/60 px-1.5 py-0.5 text-xs font-semibold text-[var(--color-brand-gold)]">
                   Поддержка FreeTips
                 </span>
@@ -189,22 +184,10 @@ export default function CabinetSupportPage() {
                     : "rounded-br-md border border-white/25 bg-white/15"
                 }`}
               >
-                {m.isFromStaff ? (
-                  <div className="mb-1.5 flex items-center justify-center gap-2">
-                    <span
-                      className="logo-ft-abbr flex h-5 w-5 shrink-0 items-center justify-center rounded bg-[var(--color-brand-gold)]/30 text-[9px] text-[var(--color-brand-gold)]"
-                      aria-hidden={true}
-                    >
-                      FT
-                    </span>
+                {m.isFromStaff && (
+                  <div className="mb-1.5">
                     <span className="support-chat-name support-chat-name-staff inline-block rounded border border-[var(--color-brand-gold)]/60 px-1.5 py-0.5 text-xs font-semibold text-[var(--color-brand-gold)]">
                       Поддержка FreeTips
-                    </span>
-                  </div>
-                ) : (
-                  <div className="mb-1.5">
-                    <span className="support-chat-name support-chat-name-you inline-block rounded border border-white/50 px-1.5 py-0.5 text-xs font-semibold text-[var(--color-brand-gold)]">
-                      Вы
                     </span>
                   </div>
                 )}
@@ -246,7 +229,7 @@ export default function CabinetSupportPage() {
             <button
               type="submit"
               disabled={sending || !input.trim()}
-              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[var(--color-brand-gold)] text-[#0a192f] hover:opacity-90 disabled:opacity-50"
+              className={`flex h-12 w-12 shrink-0 items-center justify-center !p-0 ${CABINET_WAITER_BTN}`}
               aria-label="Отправить"
             >
               {sending ? (

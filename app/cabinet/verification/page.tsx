@@ -8,6 +8,7 @@ import { cabinetInputClassName } from "../shared";
 import { getFieldErrors } from "@/lib/form-errors";
 import { verificationStep1Schema, verificationSubmitSchema } from "@/lib/validations";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
+import { CABINET_WAITER_BTN_INLINE } from "@/lib/cabinet-button-classes";
 type VerificationData = {
   verificationStatus: string;
   verificationRejectionReason: string | null;
@@ -359,7 +360,7 @@ export default function CabinetVerificationPage() {
                 type="button"
                 onClick={handleStep1}
                 disabled={saving}
-                className="rounded-[10px] bg-[var(--color-brand-gold)] px-5 py-2.5 text-[14px] font-semibold text-[#0a192f] hover:opacity-90 disabled:opacity-50"
+                className={`${CABINET_WAITER_BTN_INLINE} px-5 py-2.5 text-[14px]`}
               >
                 {saving ? "Сохранение…" : "Далее"}
               </button>
@@ -391,7 +392,7 @@ export default function CabinetVerificationPage() {
                   <input
                     type="file"
                     accept="image/jpeg,image/png,image/webp"
-                    className="block w-full text-sm text-white file:mr-3 file:rounded-lg file:border-0 file:bg-[var(--color-brand-gold)] file:px-4 file:py-2 file:text-[#0a192f] file:font-semibold"
+                    className="block w-full text-sm text-white file:mr-3 file:inline-flex file:cursor-pointer file:items-center file:justify-center file:rounded-full file:border file:border-[rgba(197,165,114,0.55)] file:bg-transparent file:px-4 file:py-2 file:font-medium file:text-[var(--color-brand-gold)] file:font-[family:var(--font-inter,system-ui,sans-serif)]"
                     onChange={(e) => {
                       const f = e.target.files?.[0];
                       if (f) handleUpload(type, f);
@@ -439,7 +440,7 @@ export default function CabinetVerificationPage() {
                 <button
                   type="button"
                   onClick={() => setStep(1)}
-                  className="rounded-[10px] border border-[var(--color-brand-gold)]/40 px-5 py-2.5 text-[14px] font-semibold text-white hover:bg-[var(--color-dark-gray)]/10"
+                  className={`${CABINET_WAITER_BTN_INLINE} px-5 py-2.5 text-[14px]`}
                 >
                   Назад
                 </button>
@@ -452,7 +453,7 @@ export default function CabinetVerificationPage() {
                     !data?.currentRequest?.hasPassportMain ||
                     !data?.currentRequest?.hasPassportSpread
                   }
-                  className="rounded-[10px] bg-[var(--color-brand-gold)] px-5 py-2.5 text-[14px] font-semibold text-[#0a192f] hover:opacity-90 disabled:opacity-50"
+                  className={`${CABINET_WAITER_BTN_INLINE} px-5 py-2.5 text-[14px]`}
                 >
                   {saving ? "Отправка…" : "Отправить заявку"}
                 </button>

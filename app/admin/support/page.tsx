@@ -105,7 +105,6 @@ export default function AdminSupportPage() {
               )}
               {t.lastMessage && (
                 <p className="mt-1 truncate text-sm text-white/90">
-                  {t.lastMessage.fromStaff && "Вы: "}
                   {t.lastMessage.body}
                 </p>
               )}

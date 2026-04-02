@@ -215,11 +215,6 @@ export default function AdminSupportThreadPage() {
                     {m.authorName || m.authorLogin || "Клиент"}
                   </div>
                 )}
-                {m.isFromStaff && (
-                  <div className="mb-1 text-xs font-medium text-white/80">
-                    Вы
-                  </div>
-                )}
                 <div className="whitespace-pre-wrap break-words text-sm text-white">{m.body}</div>
                 <div className="mt-1 text-xs text-white/70">
                   {new Date(m.createdAt).toLocaleString("ru-RU", {

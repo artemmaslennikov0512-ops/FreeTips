@@ -9,6 +9,7 @@ import { formatMoney } from "@/lib/utils";
 import { getBaseUrl } from "@/lib/get-base-url";
 import { isCabinetM5CompetitionTheme, m5SplitDisplayName } from "@/config/cabinet-theme-logins";
 import { CabinetSkeleton } from "@/components/CabinetSkeleton";
+import { CABINET_WAITER_BTN_INLINE } from "@/lib/cabinet-button-classes";
 import { Stats } from "./shared";
 
 function cabinetLimitsFillClass(): string {
@@ -217,8 +218,9 @@ export default function CabinetDashboardPage() {
       <div className="flex min-h-[40vh] flex-col items-center justify-center">
         <p className="text-[var(--color-text-secondary)]">{error}</p>
         <button
+          type="button"
           onClick={() => window.location.reload()}
-          className="mt-4 rounded-[10px] bg-[var(--color-brand-gold)] px-5 py-2.5 text-[14px] font-semibold text-[#0a192f] hover:opacity-90"
+          className={`mt-4 ${CABINET_WAITER_BTN_INLINE} px-5 py-2.5 text-[14px]`}
         >
           Повторить
         </button>
@@ -335,7 +337,7 @@ export default function CabinetDashboardPage() {
                       className={
                         isM5Cabinet
                           ? `${m5BtnNavLike} text-sm`
-                          : "inline-flex items-center gap-2 rounded-[10px] bg-[var(--color-brand-gold)] px-4 py-2 text-sm font-semibold text-[#0a192f] hover:opacity-90"
+                          : `${CABINET_WAITER_BTN_INLINE} px-4 py-2 text-sm`
                       }
                     >
                       <ShieldCheck className="h-4 w-4" />
@@ -465,7 +467,7 @@ export default function CabinetDashboardPage() {
                     className={
                       isM5Cabinet
                         ? m5BtnPairRed
-                        : `inline-flex items-center justify-center gap-2 rounded-[10px] bg-[var(--color-brand-gold)] px-4 py-2 text-[14px] font-semibold text-[#0a192f] transition-all hover:opacity-90`
+                        : `${CABINET_WAITER_BTN_INLINE} px-4 py-2 text-[14px]`
                     }
                   >
                     <Copy className="h-4 w-4" />
@@ -478,7 +480,7 @@ export default function CabinetDashboardPage() {
                     className={
                       isM5Cabinet
                         ? `cabinet-card-btn-link ${m5BtnPairBlue}`
-                        : "cabinet-card-btn-link inline-flex items-center justify-center gap-2 rounded-[10px] bg-[var(--color-brand-gold)] px-4 py-2 text-[14px] font-semibold text-[#0a192f] transition-all hover:opacity-90"
+                        : `cabinet-card-btn-link ${CABINET_WAITER_BTN_INLINE} px-4 py-2 text-[14px]`
                     }
                   >
                     <ExternalLink className="h-4 w-4" />
@@ -494,7 +496,7 @@ export default function CabinetDashboardPage() {
                 <Link
                   key={href}
                   href={href}
-                  className="cabinet-block-inner flex min-w-0 flex-col items-center rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 p-6 transition-all hover:bg-[var(--color-accent-gold)]/15 hover:-translate-y-1 shadow-[var(--shadow-subtle)]"
+                  className="cabinet-block-inner flex min-w-0 flex-col items-center rounded-[10px] border border-[rgba(197,165,114,0.55)] bg-[var(--color-dark-gray)]/10 p-6 shadow-[var(--shadow-subtle)] transition-all hover:bg-[rgba(197,165,114,0.12)] hover:-translate-y-1"
                 >
                   <div className="cabinet-quick-action-icon mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-[var(--color-brand-gold)] text-[#0a192f]">
                     <Icon className="h-5 w-5" strokeWidth={2} />
@@ -525,7 +527,7 @@ export default function CabinetDashboardPage() {
                       setSavingForEditing(true);
                       setSavingForEdit(savingFor);
                     }}
-                    className="rounded-[10px] border border-[var(--color-brand-gold)]/40 bg-transparent px-4 py-2 text-[14px] font-semibold text-[var(--color-brand-gold)] transition-all hover:bg-[var(--color-brand-gold)]/15"
+                    className={`${CABINET_WAITER_BTN_INLINE} px-4 py-2 text-[14px]`}
                   >
                     Изменить
                   </button>
@@ -551,7 +553,7 @@ export default function CabinetDashboardPage() {
                     className={
                       isM5Cabinet
                         ? `${m5BtnNavLike} disabled:opacity-50 disabled:cursor-not-allowed`
-                        : "rounded-[10px] bg-[var(--color-brand-gold)] px-4 py-2 text-[14px] font-semibold text-[#0a192f] transition-all hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+                        : `${CABINET_WAITER_BTN_INLINE} px-4 py-2 text-[14px] disabled:cursor-not-allowed`
                     }
                   >
                     {savingForSaving ? "Сохранение…" : "Сохранить"}
@@ -581,7 +583,7 @@ export default function CabinetDashboardPage() {
               className={
                 isM5Cabinet
                   ? m5BtnNavLikeWide
-                  : "inline-flex items-center gap-2 rounded-[10px] bg-[var(--color-brand-gold)] px-5 py-2.5 text-[14px] font-semibold text-[#0a192f] transition-all hover:opacity-90 focus:outline-none"
+                  : `${CABINET_WAITER_BTN_INLINE} px-5 py-2.5 text-[14px] focus:outline-none`
               }
             >
               <Download className="h-4 w-4 shrink-0" />
@@ -612,7 +614,7 @@ export default function CabinetDashboardPage() {
                     className={
                       isM5Cabinet
                         ? `${m5BtnPairRed} px-5 py-2.5 focus:outline-none`
-                        : `inline-flex items-center gap-2 rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-bg-sides)] px-5 py-2.5 text-[14px] font-semibold text-[#0a192f] shadow-sm transition-all duration-200 hover:bg-[var(--color-light-gray)] hover:shadow-md active:scale-[0.98] active:shadow-inner focus:outline-none`
+                        : `${CABINET_WAITER_BTN_INLINE} px-5 py-2.5 text-[14px] focus:outline-none`
                     }
                   >
                     <Copy className="h-4 w-4 shrink-0" />
@@ -625,7 +627,7 @@ export default function CabinetDashboardPage() {
                     className={
                       isM5Cabinet
                         ? `${m5BtnPairBlue} px-5 py-2.5`
-                        : "inline-flex items-center gap-2 rounded-[10px] bg-[var(--color-brand-gold)] px-5 py-2.5 text-[14px] font-semibold text-[#0a192f] hover:opacity-90 disabled:opacity-50"
+                        : `${CABINET_WAITER_BTN_INLINE} px-5 py-2.5 text-[14px]`
                     }
                   >
                     <RotateCw className="h-4 w-4" />
@@ -640,7 +642,7 @@ export default function CabinetDashboardPage() {
                   className={
                     isM5Cabinet
                       ? m5BtnNavLikeWide
-                      : "inline-flex items-center gap-2 rounded-[10px] bg-[var(--color-brand-gold)] px-5 py-2.5 text-[14px] font-semibold text-[#0a192f] hover:opacity-90 disabled:opacity-50"
+                      : `${CABINET_WAITER_BTN_INLINE} px-5 py-2.5 text-[14px]`
                   }
                 >
                   <Key className="h-4 w-4" />

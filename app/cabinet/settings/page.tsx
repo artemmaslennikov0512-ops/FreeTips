@@ -9,6 +9,7 @@ import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { patchProfileSchema, changePasswordSchema } from "@/lib/validations";
 import { getFieldErrors } from "@/lib/form-errors";
 import { cabinetInputClassName } from "../shared";
+import { CABINET_WAITER_BTN_INLINE } from "@/lib/cabinet-button-classes";
 
 /** Одна пробельная норма для сравнения с сервером (убирает «двойные» пробелы в ФИО из БД). */
 function normalizeFullNameSpaced(s: string): string {
@@ -289,8 +290,9 @@ export default function CabinetSettingsPage() {
       <div className="flex min-h-[40vh] flex-col items-center justify-center">
         <p className="text-[var(--color-text-secondary)]">{error}</p>
         <button
+          type="button"
           onClick={() => window.location.reload()}
-          className="mt-4 rounded-xl bg-[var(--color-brand-gold)] px-5 py-2.5 text-[14px] font-semibold text-[#0a192f] hover:opacity-90"
+          className={`mt-4 ${CABINET_WAITER_BTN_INLINE} px-5 py-2.5 text-[14px]`}
         >
           Повторить
         </button>
@@ -344,7 +346,7 @@ export default function CabinetSettingsPage() {
                     type="button"
                     onClick={() => photoInputRef.current?.click()}
                     disabled={photoUploading}
-                    className="inline-flex items-center gap-2 rounded-xl bg-[var(--color-brand-gold)] px-4 py-2.5 text-[14px] font-semibold text-[#0a192f] hover:opacity-90 disabled:opacity-50"
+                    className={`${CABINET_WAITER_BTN_INLINE} px-4 py-2.5 text-[14px]`}
                   >
                     {photoUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ImageIcon className="h-4 w-4" />}
                     {photoUploading ? "Загрузка…" : "Загрузить фото"}
@@ -353,7 +355,7 @@ export default function CabinetSettingsPage() {
                     <button
                       type="button"
                       onClick={() => window.location.reload()}
-                      className="inline-flex items-center gap-2 rounded-xl border border-white/30 bg-white/10 px-4 py-2.5 text-[14px] font-semibold text-white hover:bg-white/20 transition-colors"
+                      className={`${CABINET_WAITER_BTN_INLINE} px-4 py-2.5 text-[14px]`}
                     >
                       Сохранить и обновить
                     </button>
@@ -512,7 +514,7 @@ export default function CabinetSettingsPage() {
           type="button"
           onClick={handleSaveProfile}
           disabled={saving || !hasProfileChanges}
-          className="mt-4 inline-flex items-center gap-2 rounded-xl bg-[var(--color-brand-gold)] px-4 py-2.5 text-[14px] font-semibold text-[#0a192f] hover:opacity-90 disabled:opacity-50"
+          className={`mt-4 ${CABINET_WAITER_BTN_INLINE} px-4 py-2.5 text-[14px]`}
         >
           {saving && <Loader2 className="h-4 w-4 animate-spin" />}
           Сохранить
@@ -583,7 +585,7 @@ export default function CabinetSettingsPage() {
           type="button"
           onClick={handleChangePassword}
           disabled={pwSaving || !pwCurrent || !pwNew || !pwConfirm}
-          className="mt-6 inline-flex items-center gap-2 rounded-xl border border-[var(--color-brand-gold)]/20 bg-white px-5 py-2.5 text-[14px] font-semibold text-[#0a192f] transition-all hover:bg-[var(--color-light-gray)] disabled:opacity-50"
+          className={`mt-6 ${CABINET_WAITER_BTN_INLINE} px-5 py-2.5 text-[14px]`}
         >
           {pwSaving && <Loader2 className="h-4 w-4 animate-spin" />}
           Сменить пароль

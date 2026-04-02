@@ -10,6 +10,7 @@ import { FEE_MIN_PAYOUT_KOP, FEE_PERCENT_PAYOUT_CARD, feeKopForPayout } from "@/
 import { Stats } from "../shared";
 import { PremiumCard } from "../PremiumCard";
 import { isCabinetM5CompetitionTheme } from "@/config/cabinet-theme-logins";
+import { CABINET_WAITER_BTN_INLINE } from "@/lib/cabinet-button-classes";
 
 type Operation = {
   id: string;
@@ -292,7 +293,7 @@ export default function CabinetTransactionsPage() {
                       parseFloat(sdPageAmount) < 100 ||
                       Math.round(parseFloat(sdPageAmount) * 100) > maxPayoutPerRequestKop
                     }
-                    className="cabinet-btn-gold w-auto rounded-xl bg-[var(--color-brand-gold)] px-6 py-3 text-[14px] font-semibold text-[#0a192f] transition-all hover:opacity-90 disabled:opacity-50 disabled:pointer-events-none"
+                    className={`w-auto ${CABINET_WAITER_BTN_INLINE} px-6 py-3 text-[14px] disabled:pointer-events-none`}
                     title={verificationStatus !== "VERIFIED" ? "Вывод доступен после прохождения верификации" : undefined}
                   >
                     {sdPageLoading ? "Переход…" : "Вывести средства"}

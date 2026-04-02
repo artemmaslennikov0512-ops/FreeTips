@@ -6,6 +6,7 @@ import { Copy, Download, Link2, Loader2 } from "lucide-react";
 import QRCode from "qrcode";
 import { getBaseUrl } from "@/lib/get-base-url";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
+import { CABINET_WAITER_BTN_INLINE } from "@/lib/cabinet-button-classes";
 type LinkRow = { id: string; slug: string; createdAt: string };
 
 export default function CabinetLinkPage() {
@@ -132,7 +133,7 @@ export default function CabinetLinkPage() {
               type="button"
               onClick={handleCreate}
               disabled={creating}
-              className="inline-flex items-center gap-2 rounded-xl bg-[var(--color-brand-gold)] px-6 py-3 font-semibold text-[#0a192f] transition-all hover:opacity-90 hover:-translate-y-0.5 disabled:opacity-60"
+              className={`${CABINET_WAITER_BTN_INLINE} px-6 py-3 text-[15px]`}
             >
               {creating ? <Loader2 className="h-5 w-5 animate-spin" /> : null}
               Создать ссылку
@@ -154,7 +155,7 @@ export default function CabinetLinkPage() {
                 <button
                   type="button"
                   onClick={handleCopy}
-                  className="inline-flex items-center gap-2 rounded-xl bg-[var(--color-brand-gold)] px-5 py-2.5 font-semibold text-[#0a192f] transition-all hover:opacity-90 hover:-translate-y-0.5"
+                  className={`${CABINET_WAITER_BTN_INLINE} px-5 py-2.5 text-[14px]`}
                 >
                   <Copy className="h-4 w-4" />
                   {copied ? "Скопировано" : "Копировать ссылку"}
@@ -163,7 +164,7 @@ export default function CabinetLinkPage() {
                   <a
                     href={qrDataUrl}
                     download="freetips-qr.png"
-                    className="inline-flex items-center gap-2 rounded-xl border border-[var(--color-brand-gold)]/20 bg-white px-5 py-2.5 font-semibold text-[#0a192f] transition-all hover:bg-[var(--color-light-gray)]"
+                    className={`${CABINET_WAITER_BTN_INLINE} px-5 py-2.5 text-[14px]`}
                   >
                     <Download className="h-4 w-4" />
                     Скачать QR

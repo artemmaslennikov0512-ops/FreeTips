@@ -12,8 +12,11 @@ import { getBaseUrl } from "@/lib/get-base-url";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { isPayPageM5ShellSlug } from "@/config/pay-branding-overrides";
 import { PayTelegramSupportBlock } from "@/components/PayTelegramSupportBlock";
+import { PAYMENT_MAX_AMOUNT_KOP, PAYMENT_MIN_AMOUNT_KOP } from "@/lib/payment-amount-bounds";
 
 const PRESETS = [50, 100, 200, 500] as const;
+
+const PAYMENT_MAX_ERROR = "Максимальная сумма пополнения — 1 000 ₽";
 
 function toKopecks(rub: number): number {
   return Math.round(rub * 100);
@@ -135,8 +138,13 @@ export default function PayPageClient() {
 
   const handlePay = async () => {
     const kop = amountKop();
-    if (kop < 100) {
+    if (kop < PAYMENT_MIN_AMOUNT_KOP) {
       setResultError("Минимальная сумма — 1 ₽");
+      setResult("fail");
+      return;
+    }
+    if (kop > PAYMENT_MAX_AMOUNT_KOP) {
+      setResultError(PAYMENT_MAX_ERROR);
       setResult("fail");
       return;
     }
@@ -491,7 +499,7 @@ export default function PayPageClient() {
               );
             })}
           </div>
-          <p className="pay-page-label">Выберите сумму или введите свою</p>
+          <p className="pay-page-label">Выберите сумму или введите свою (не больше 1 000 ₽)</p>
           <div className="pay-page-input-wrap custom-amount pay-page-custom-amount-row">
             <input
               type="text"
@@ -499,9 +507,14 @@ export default function PayPageClient() {
               placeholder="100"
               value={customAmount}
               onChange={(e) => setCustomAmount(e.target.value)}
-              aria-label="Своя сумма в рублях"
+              aria-label="Своя сумма в рублях, не больше 1 000"
             />
           </div>
+          {kop > PAYMENT_MAX_AMOUNT_KOP && (
+            <p className="mt-2 text-center text-sm text-[var(--color-accent-red)]" role="alert">
+              {PAYMENT_MAX_ERROR}
+            </p>
+          )}
         </div>
 
         {/* Карточка: отзыв */}
@@ -529,7 +542,7 @@ export default function PayPageClient() {
         <button
           type="button"
           onClick={handlePay}
-          disabled={paying || kop < 100}
+          disabled={paying || kop < PAYMENT_MIN_AMOUNT_KOP || kop > PAYMENT_MAX_AMOUNT_KOP}
           className="pay-button pay-page-submit"
         >
           {paying ? (

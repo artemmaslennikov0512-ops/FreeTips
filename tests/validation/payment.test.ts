@@ -4,6 +4,7 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { PAYMENT_MAX_AMOUNT_KOP } from "../../lib/payment-amount-bounds";
 import { PAYOUT_MAX_AMOUNT_KOP, PAYOUT_MIN_AMOUNT_KOP } from "../../lib/payout-amount-bounds";
 import { createPaymentSchema, createPayoutSchema } from "../../lib/validations";
 
@@ -32,17 +33,17 @@ test("createPaymentSchema accepts 100 kop (1 руб) minimum", () => {
   assert.equal(result.success, true);
 });
 
-test("createPaymentSchema rejects amount above 5 000 000 kop (50 000 руб)", () => {
+test("createPaymentSchema rejects amount above 100 000 kop (1 000 руб)", () => {
   const result = createPaymentSchema.safeParse({
-    amountKop: 5000001,
+    amountKop: PAYMENT_MAX_AMOUNT_KOP + 1,
     idempotencyKey: "test-key-123",
   });
   assert.equal(result.success, false);
 });
 
-test("createPaymentSchema accepts 5 000 000 kop max", () => {
+test("createPaymentSchema accepts 100 000 kop max (1 000 руб)", () => {
   const result = createPaymentSchema.safeParse({
-    amountKop: 5000000,
+    amountKop: PAYMENT_MAX_AMOUNT_KOP,
     idempotencyKey: "test-key-123",
   });
   assert.equal(result.success, true);

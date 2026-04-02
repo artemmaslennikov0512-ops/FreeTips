@@ -118,8 +118,8 @@ export function PremiumCard({ fullName, balanceKop, compact, variant = "default"
               <div className="absolute left-[12px] top-[10px] z-[3]">
                 <div className={isM5 ? "premium-badge premium-badge--m5" : "premium-badge"}>VIRTUAL</div>
               </div>
-              {/* Одна строка: лого+FreeTips вплотную слева, сумма справа на одном уровне */}
-              <div className="absolute left-[12px] right-[12px] bottom-[28px] z-[3] flex items-center justify-between gap-2">
+              {/* Нижняя полоса: ближе к низу карты; выравнивание по нижнему краю — плашка суммы не «висит» выше логотипа */}
+              <div className="absolute left-[12px] right-[12px] bottom-[10px] z-[3] flex items-end justify-between gap-2">
                 <div className="flex items-center gap-1.5 min-w-0 shrink-0">
                   <div className="premium-logo-icon logo-ft-abbr shrink-0">FT</div>
                   <span className="premium-card-brand text-xs font-extrabold leading-none whitespace-nowrap">
@@ -127,7 +127,7 @@ export function PremiumCard({ fullName, balanceKop, compact, variant = "default"
                   </span>
                 </div>
                 <p
-                  className={`premium-card-balance-text text-[13px] font-medium m-0 leading-none shrink-0 ${showBalance ? "text-right" : "truncate max-w-[160px]"}`}
+                  className={`premium-card-balance-text text-[12px] font-medium m-0 leading-none shrink-0 ${showBalance ? "text-right" : "truncate max-w-[160px]"}`}
                 >
                   {showBalance ? (
                     isM5 ? (

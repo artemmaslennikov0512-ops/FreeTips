@@ -293,7 +293,7 @@ export default function CabinetDashboardPage() {
           <div className="flex min-h-0 flex-1 flex-col p-6">
             <div className="flex flex-col items-center">
               <div
-                className={`cabinet-dashboard-name-hero mb-3 w-full min-w-0 px-0 ${isM5Cabinet ? "cabinet-dashboard-name-hero--m5" : ""}`}
+                className={`cabinet-dashboard-name-hero mb-2 w-full min-w-0 px-0 ${isM5Cabinet ? "cabinet-dashboard-name-hero--m5" : ""}`}
               >
                 <div className="cabinet-dashboard-name-hero__pill">
                   <p

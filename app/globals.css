@@ -632,22 +632,22 @@ body.cabinet-page:has(.cabinet-premium[data-cabinet-theme="m5-competition"])
   min-width: 0;
   align-items: center;
   justify-content: center;
-  padding: 0.35rem 1.1rem;
+  padding: 0.25rem 0.75rem;
   border-radius: 9999px;
-  border: 1px solid rgba(197, 165, 114, 0.42);
+  border: 1px solid rgba(197, 165, 114, 0.36);
   background: linear-gradient(
     155deg,
-    rgba(255, 255, 255, 0.09) 0%,
-    rgba(255, 255, 255, 0.03) 42%,
-    rgba(0, 0, 0, 0.14) 100%
+    rgba(255, 255, 255, 0.06) 0%,
+    rgba(255, 255, 255, 0.02) 42%,
+    rgba(0, 0, 0, 0.1) 100%
   );
   box-shadow:
-    0 0 0 1px rgba(0, 0, 0, 0.2),
-    0 6px 28px rgba(0, 0, 0, 0.18),
-    inset 0 1px 0 rgba(255, 255, 255, 0.14),
-    0 0 32px rgba(197, 165, 114, 0.08);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+    0 0 0 1px rgba(0, 0, 0, 0.14),
+    0 4px 18px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 0 22px rgba(197, 165, 114, 0.05);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 .cabinet-dashboard-name-hero__text {
   margin: 0;
@@ -655,9 +655,9 @@ body.cabinet-page:has(.cabinet-premium[data-cabinet-theme="m5-competition"])
   min-width: 0;
   text-align: center;
   font-family: var(--font-playfair), ui-serif, Georgia, serif;
-  font-size: clamp(0.9rem, 2.5vw, 1.15rem);
+  font-size: clamp(0.65rem, 1.75vw, 0.82rem);
   font-weight: 600;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.025em;
   line-height: 1.2;
   white-space: nowrap;
   overflow: hidden;
@@ -674,7 +674,7 @@ body.cabinet-page:has(.cabinet-premium[data-cabinet-theme="m5-competition"])
   background-clip: text;
   color: transparent;
   -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 2px 14px rgba(197, 165, 114, 0.22));
+  filter: drop-shadow(0 1px 8px rgba(197, 165, 114, 0.14));
 }
 .cabinet-dashboard-name-hero__text--m5 {
   background-image: none !important;
@@ -686,26 +686,24 @@ body.cabinet-page:has(.cabinet-premium[data-cabinet-theme="m5-competition"])
   letter-spacing: 0.03em;
 }
 .cabinet-dashboard-name-hero--m5 .cabinet-dashboard-name-hero__pill {
-  border-color: rgba(74, 159, 255, 0.38);
+  border-color: rgba(74, 159, 255, 0.32);
   background: linear-gradient(
     155deg,
-    rgba(74, 159, 255, 0.1) 0%,
-    rgba(255, 255, 255, 0.04) 45%,
-    rgba(229, 37, 42, 0.08) 100%
+    rgba(74, 159, 255, 0.07) 0%,
+    rgba(255, 255, 255, 0.03) 45%,
+    rgba(229, 37, 42, 0.06) 100%
   );
   box-shadow:
-    0 0 0 1px rgba(0, 0, 0, 0.25),
-    0 6px 26px rgba(0, 0, 0, 0.22),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1),
-    0 0 28px rgba(28, 105, 212, 0.12);
+    0 0 0 1px rgba(0, 0, 0, 0.18),
+    0 4px 18px rgba(0, 0, 0, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 0 20px rgba(28, 105, 212, 0.08);
 }
-/* Светлая тема: без градиентного клипа и drop-shadow у текста (иначе «грязь» и низкий контраст); pill без backdrop-blur — меньше артефактов наложения */
+/* Светлая тема: белый фон + золотая обводка; без blur; лёгкая тень, чтобы не «кричала» на карточке */
 html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-dashboard-name-hero__pill {
-  border-color: rgba(62, 54, 40, 0.28);
-  background: linear-gradient(155deg, #f7f5f2 0%, #ece9e3 48%, #e3ded6 100%);
-  box-shadow:
-    0 1px 3px rgba(0, 0, 0, 0.07),
-    inset 0 1px 0 rgba(255, 255, 255, 0.92);
+  border-color: rgba(197, 165, 114, 0.4);
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
 }
@@ -1805,58 +1803,28 @@ html:not([data-theme="dark"]) .cabinet-premium .premium-glass {
   justify-content: flex-end;
 }
 
-/* Золотая карта: баланс в тёмной «пластине» + золотой текст (одинаково в светлой и тёмной теме) */
-@keyframes premium-balance-plate-glow {
-  0%,
-  100% {
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.1),
-      inset 0 -1px 0 rgba(0, 0, 0, 0.45),
-      0 2px 10px rgba(0, 0, 0, 0.38),
-      0 0 14px rgba(197, 165, 114, 0.12);
-  }
-  50% {
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.14),
-      inset 0 -1px 0 rgba(0, 0, 0, 0.45),
-      0 2px 12px rgba(0, 0, 0, 0.42),
-      0 0 22px rgba(212, 184, 120, 0.24);
-  }
-}
-
+/* Золотая карта: баланс в тёмной плашке — плоская, без «объёма» и пульсации */
 .cabinet-premium .premium-card:not(.premium-card--m5) .premium-card-balance-text .premium-card-balance-plate {
   display: inline-block;
-  padding: 5px 12px;
+  padding: 3px 9px;
   border-radius: 999px;
-  font-weight: 650;
-  font-size: 0.8125rem;
-  line-height: 1.2;
-  letter-spacing: 0.03em;
+  font-weight: 600;
+  font-size: 0.75rem;
+  line-height: 1.25;
+  letter-spacing: 0.02em;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
-  color: #f4ebd4 !important;
-  text-shadow:
-    0 0 10px rgba(212, 184, 120, 0.42),
-    0 1px 2px rgba(0, 0, 0, 0.95);
+  color: #f2e8d8 !important;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.65);
   background: linear-gradient(
     168deg,
-    rgba(18, 22, 38, 0.95) 0%,
-    rgba(6, 8, 16, 0.99) 55%,
-    rgba(10, 12, 22, 0.98) 100%
+    rgba(22, 26, 40, 0.96) 0%,
+    rgba(12, 14, 24, 0.99) 100%
   ) !important;
-  border: 1px solid rgba(197, 165, 114, 0.45) !important;
+  border: 1px solid rgba(197, 165, 114, 0.38) !important;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.1),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.45),
-    0 2px 10px rgba(0, 0, 0, 0.38),
-    0 0 14px rgba(197, 165, 114, 0.14);
-  animation: premium-balance-plate-glow 4s ease-in-out infinite;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .cabinet-premium .premium-card:not(.premium-card--m5) .premium-card-balance-text .premium-card-balance-plate {
-    animation: none;
-  }
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 1px 2px rgba(0, 0, 0, 0.22);
 }
 
 [data-theme="dark"] .cabinet-premium .premium-animated-pattern,

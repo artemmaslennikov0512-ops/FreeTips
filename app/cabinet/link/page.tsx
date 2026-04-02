@@ -108,8 +108,8 @@ export default function CabinetLinkPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-[40vh] flex-col items-center justify-center">
-        <div className="text-[var(--color-text-secondary)]">Загрузка...</div>
+      <div className="cabinet-link-page-loading flex min-h-[40vh] flex-col items-center justify-center text-[var(--color-text-secondary)]">
+        <div className="text-sm font-medium">Загрузка...</div>
       </div>
     );
   }
@@ -117,18 +117,20 @@ export default function CabinetLinkPage() {
   return (
     <div className="space-y-8">
       {error && (
-        <div className="rounded-xl border-0 bg-[var(--color-muted)]/10 p-4 text-sm text-[var(--color-text-secondary)]">
+        <div className="cabinet-link-page-error rounded-xl border border-amber-500/35 bg-amber-500/10 p-4 text-sm text-[var(--color-text-secondary)]">
           {error}
         </div>
       )}
 
       {!link ? (
-        <div className="cabinet-card rounded-xl border-0 bg-[var(--color-bg-sides)] p-10 shadow-[var(--shadow-subtle)]">
+        <div className="cabinet-link-empty cabinet-card rounded-xl border-0 bg-[var(--color-bg-sides)] p-10 shadow-[var(--shadow-subtle)]">
           <div className="cabinet-m5-empty flex flex-col items-center gap-6 text-center">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[var(--color-dark-gray)]/10">
-              <Link2 className="h-8 w-8 text-[var(--color-text)]" />
+            <div className="cabinet-link-empty-icon-wrap flex h-16 w-16 items-center justify-center rounded-full bg-white/10">
+              <Link2 className="cabinet-link-empty-icon h-8 w-8 text-[var(--color-brand-gold)]" aria-hidden />
             </div>
-            <p className="text-[var(--color-text-secondary)]">У вас ещё нет ссылки для приёма чаевых.</p>
+            <p className="cabinet-link-empty-hint max-w-md text-base leading-relaxed text-[var(--color-text-secondary)]">
+              У вас ещё нет ссылки для приёма чаевых.
+            </p>
             <button
               type="button"
               onClick={handleCreate}
@@ -143,7 +145,7 @@ export default function CabinetLinkPage() {
       ) : (
         <div className="grid gap-8 md:grid-cols-2">
           <div id="link-payment" className="cabinet-card rounded-xl border-0 bg-[var(--color-bg-sides)] p-6 shadow-[var(--shadow-subtle)] transition-all hover:shadow-[var(--shadow-medium)]">
-            <h2 className="mb-4 font-[family:var(--font-playfair)] text-xl font-semibold text-[var(--color-text)]">
+            <h2 className="mb-4 text-center font-[family:var(--font-playfair)] text-xl font-semibold text-[var(--color-text)]">
               Ссылка для оплаты
             </h2>
             <div className="rounded-xl bg-[var(--color-dark-gray)]/6 p-5">
@@ -175,10 +177,10 @@ export default function CabinetLinkPage() {
           </div>
 
           <div id="link-qr-card" className="cabinet-card rounded-xl border-0 bg-[var(--color-bg-sides)] p-6 shadow-[var(--shadow-subtle)] transition-all hover:shadow-[var(--shadow-medium)]">
-            <h2 className="mb-4 font-[family:var(--font-playfair)] text-xl font-semibold text-[var(--color-text)]">
+            <h2 className="mb-4 text-center font-[family:var(--font-playfair)] text-xl font-semibold text-[var(--color-text)]">
               QR-код
             </h2>
-            <div className="flex flex-col items-start gap-4">
+            <div className="flex flex-col items-center gap-4">
               {qrDataUrl ? (
                 <>
                   <img

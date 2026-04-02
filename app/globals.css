@@ -3182,6 +3182,32 @@ html:not([data-theme="dark"]) .cabinet-premium #link-payment.cabinet-card .font-
 html:not([data-theme="dark"]) .cabinet-premium #link-payment.cabinet-card .cabinet-input-window {
   color: #fff !important;
 }
+
+/* Светлая тема: «Моя ссылка» — пустое состояние (ещё нет ссылки): светлый текст на тёмном стекле main-block */
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-link-empty.cabinet-card {
+  background: rgba(255, 255, 255, 0.11) !important;
+}
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-link-empty .cabinet-link-empty-hint {
+  color: rgba(255, 255, 255, 0.96) !important;
+  -webkit-text-fill-color: rgba(255, 255, 255, 0.96);
+}
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-link-empty .cabinet-link-empty-icon {
+  color: #c5a572 !important;
+  -webkit-text-fill-color: #c5a572;
+}
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-link-page-loading {
+  color: rgba(255, 255, 255, 0.92) !important;
+  -webkit-text-fill-color: rgba(255, 255, 255, 0.92);
+}
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-link-page-error {
+  color: rgba(255, 250, 235, 0.96) !important;
+  -webkit-text-fill-color: rgba(255, 250, 235, 0.96);
+}
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-link-empty .cabinet-waiter-btn {
+  color: #c5a572 !important;
+  -webkit-text-fill-color: #c5a572;
+}
+
 /* Кнопки в ЛК — компактный современный вид (и ссылки-кнопки в том же стиле) */
 .cabinet-premium .cabinet-main-block button,
 .cabinet-premium .cabinet-card button,
@@ -3194,12 +3220,13 @@ html:not([data-theme="dark"]) .cabinet-premium #link-payment.cabinet-card .cabin
   padding: 0.4375rem 0.875rem;
 }
 
-/* Кнопки в карточках ЛК официанта — чёрный шрифт (M5 — свои цвета на CTA) */
-html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) #link-payment.cabinet-card button,
-html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) #link-payment.cabinet-card a[download],
-html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) #quick-actions.cabinet-card button,
-html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) #api-key.cabinet-card button,
-html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) #api-key.cabinet-card .cabinet-block-inner button {
+/* Кнопки в карточках ЛК официанта — чёрный шрифт (M5 — свои цвета на CTA).
+   Капсулы .cabinet-waiter-btn — золотой текст (как обводка), не перебиваем */
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) #link-payment.cabinet-card button:not(.cabinet-waiter-btn),
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) #link-payment.cabinet-card a[download]:not(.cabinet-waiter-btn),
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) #quick-actions.cabinet-card button:not(.cabinet-waiter-btn),
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) #api-key.cabinet-card button:not(.cabinet-waiter-btn),
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) #api-key.cabinet-card .cabinet-block-inner button:not(.cabinet-waiter-btn) {
   color: #0a192f !important;
 }
 
@@ -3215,6 +3242,32 @@ html:not([data-theme="dark"]) .cabinet-premium #quick-actions.cabinet-card .cabi
 [data-theme="dark"] .cabinet-premium #quick-actions .cabinet-goal-display {
   background: rgba(255, 255, 255, 0.06) !important;
   border-color: rgba(197, 165, 114, 0.5) !important;
+}
+
+/* Блок «Цель» в быстрых действиях: текст цели и поле — белые (перебивает text-[var(--color-text)], бренд и .cabinet-premium textarea) */
+.cabinet-premium #quick-actions .cabinet-goal-display,
+.cabinet-premium #quick-actions .cabinet-goal-display p,
+.cabinet-premium #quick-actions .cabinet-goal-input,
+.cabinet-premium #quick-actions .cabinet-goal-input textarea,
+.cabinet-premium #quick-actions .cabinet-goal-textarea {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff;
+}
+.cabinet-premium #quick-actions .cabinet-goal-input textarea::placeholder {
+  color: rgba(255, 255, 255, 0.45) !important;
+  -webkit-text-fill-color: rgba(255, 255, 255, 0.45);
+}
+
+/* Кнопки «Сохранить» / «Изменить» в карточке цели — золотой текст как у остальных cabinet-waiter-btn (наследование от .cabinet-block-inner не должно перебивать) */
+.cabinet-premium #quick-actions .cabinet-goal-card .cabinet-waiter-btn {
+  color: #c5a572 !important;
+  -webkit-text-fill-color: #c5a572;
+}
+
+/* Блок API-ключа: капсулы на тёмном фоне — золотой текст (бренд / наследование от .cabinet-block-inner) */
+.cabinet-premium #api-key .cabinet-waiter-btn {
+  color: #c5a572 !important;
+  -webkit-text-fill-color: #c5a572;
 }
 
 /* Светлая тема: блок «API для уведомлений» — весь текст белый */
@@ -3707,7 +3760,9 @@ html:not([data-theme="dark"]) .establishment-team-table .establishment-team-tabl
   display: inline-flex;
 }
 
-/* ЛК официанта: кнопки как в админке (капсула, золото) */
+/* ЛК официанта: капсула с золотой обводкой. Текст — фиксированное золото (#c5a572),
+   не var(--color-brand-gold): при бренде заведения переменная = primary бренда, тогда
+   подпись сливается с тёмным фоном, а рамка остаётся шампанским из rgba ниже. */
 .cabinet-premium:not(.admin-panel) .cabinet-waiter-btn {
   display: inline-flex;
   align-items: center;
@@ -3717,7 +3772,8 @@ html:not([data-theme="dark"]) .establishment-team-table .establishment-team-tabl
   border-radius: 9999px;
   border: 1px solid rgba(197, 165, 114, 0.55);
   background: transparent;
-  color: var(--color-brand-gold);
+  color: #c5a572 !important;
+  -webkit-text-fill-color: #c5a572;
   font-weight: 500;
   font-size: 0.875rem;
   line-height: 1.25;

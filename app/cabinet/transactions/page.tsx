@@ -359,7 +359,7 @@ export default function CabinetTransactionsPage() {
 
       <div id="operations-history" className="cabinet-card overflow-hidden rounded-xl border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)]">
         <div className="border-0 px-4 py-4 md:px-6 md:py-5">
-          <h3 className="font-[family:var(--font-playfair)] text-xl font-semibold text-[var(--color-text)]">
+          <h3 className="text-center font-[family:var(--font-playfair)] text-xl font-semibold text-[var(--color-text)]">
             История операций
           </h3>
           {verificationStatus !== "VERIFIED" && (

@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Link2, List, Key, Copy, RotateCw, Settings, ExternalLink, ShieldCheck, ShieldAlert, Download } from "lucide-react";
+import { Link2, List, Key, Copy, RotateCw, Settings, ExternalLink, ShieldCheck, ShieldAlert, Download, Eye } from "lucide-react";
 import { PremiumCard } from "./PremiumCard";
 import { formatMoney } from "@/lib/utils";
 import { getBaseUrl } from "@/lib/get-base-url";
@@ -37,6 +37,8 @@ export default function CabinetDashboardPage() {
   const [hasApiKey, setHasApiKey] = useState(false);
   const [apiKeyLoading, setApiKeyLoading] = useState(false);
   const [apiKeyCopied, setApiKeyCopied] = useState(false);
+  const [revealKeyError, setRevealKeyError] = useState<string | null>(null);
+  const [revealKeyLoading, setRevealKeyLoading] = useState(false);
   const [fullName, setFullName] = useState<string | null>(null);
   const [login, setLogin] = useState<string | null>(null);
   const [uniqueId, setUniqueId] = useState<string | null>(null);
@@ -191,6 +193,7 @@ export default function CabinetDashboardPage() {
   const regenerateApiKey = useCallback(async () => {
     const token = localStorage.getItem("accessToken");
     if (!token) return;
+    setRevealKeyError(null);
     setApiKeyLoading(true);
     try {
       const res = await fetch("/api/profile/api-key", {
@@ -204,6 +207,28 @@ export default function CabinetDashboardPage() {
       }
     } finally {
       setApiKeyLoading(false);
+    }
+  }, []);
+
+  const revealApiKey = useCallback(async () => {
+    const token = localStorage.getItem("accessToken");
+    if (!token) return;
+    setRevealKeyError(null);
+    setRevealKeyLoading(true);
+    try {
+      const res = await fetch("/api/profile/api-key", {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const data = (await res.json()) as { apiKey: string };
+        setApiKey(data.apiKey);
+        return;
+      }
+      const body = (await res.json().catch(() => ({}))) as { error?: string };
+      setRevealKeyError(body?.error ?? "Не удалось получить ключ");
+    } finally {
+      setRevealKeyLoading(false);
     }
   }, []);
 
@@ -597,7 +622,7 @@ export default function CabinetDashboardPage() {
             </div>
             {hasApiKey && !apiKey && (
               <p className="mb-4 text-xs text-[var(--color-muted)]">
-                Ключ скрыт для безопасности. Чтобы скопировать его или ввести в приложении — нажмите «Создать новый ключ», затем сразу скопируйте ключ и вставьте в приложение. Старый ключ перестанет работать.
+                Ключ скрыт для безопасности. Нажмите «Показать ключ», если он доступен, либо «Создать новый ключ» — затем сразу скопируйте ключ в приложение. Старый ключ перестанет работать.
               </p>
             )}
             {apiKey && (
@@ -634,6 +659,42 @@ export default function CabinetDashboardPage() {
                     {apiKeyLoading ? "Создаём…" : "Создать новый ключ"}
                   </button>
                 </>
+              ) : hasApiKey ? (
+                <div className="flex w-full flex-col gap-2">
+                  <div className="flex flex-wrap gap-3">
+                    <button
+                      type="button"
+                      onClick={revealApiKey}
+                      disabled={apiKeyLoading || revealKeyLoading}
+                      className={
+                        isM5Cabinet
+                          ? `${m5BtnNavLikeWide} disabled:opacity-50 disabled:cursor-not-allowed`
+                          : `${CABINET_WAITER_BTN_INLINE} px-5 py-2.5 text-[14px] disabled:cursor-not-allowed`
+                      }
+                    >
+                      <Eye className="h-4 w-4 shrink-0" />
+                      {revealKeyLoading ? "Загрузка…" : "Показать ключ"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={regenerateApiKey}
+                      disabled={apiKeyLoading || revealKeyLoading}
+                      className={
+                        isM5Cabinet
+                          ? `${m5BtnNavLikeWide} disabled:opacity-50 disabled:cursor-not-allowed`
+                          : `${CABINET_WAITER_BTN_INLINE} px-5 py-2.5 text-[14px] disabled:cursor-not-allowed`
+                      }
+                    >
+                      <Key className="h-4 w-4 shrink-0" />
+                      {apiKeyLoading ? "Создаём…" : "Создать новый ключ"}
+                    </button>
+                  </div>
+                  {revealKeyError && (
+                    <p className="text-xs text-amber-200/95" role="alert">
+                      {revealKeyError}
+                    </p>
+                  )}
+                </div>
               ) : (
                 <button
                   type="button"
@@ -646,7 +707,7 @@ export default function CabinetDashboardPage() {
                   }
                 >
                   <Key className="h-4 w-4" />
-                  {apiKeyLoading ? "Создаём…" : hasApiKey ? "Создать новый ключ" : "Создать ключ"}
+                  {apiKeyLoading ? "Создаём…" : "Создать ключ"}
                 </button>
               )}
             </div>

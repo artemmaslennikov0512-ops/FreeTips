@@ -20,14 +20,12 @@ type VerificationData = {
     inn: string;
     hasPassportMain: boolean;
     hasPassportSpread: boolean;
-    hasSelfie: boolean;
   } | null;
 };
 
 const DOC_LABELS: Record<string, string> = {
   passport_main: "Главное фото паспорта",
   passport_spread: "Разворот паспорта",
-  selfie: "Селфи с паспортом",
 };
 
 export default function CabinetVerificationPage() {
@@ -241,8 +239,7 @@ export default function CabinetVerificationPage() {
     data?.verificationStatus === "PENDING" &&
     data.currentRequest &&
     data.currentRequest.hasPassportMain &&
-    data.currentRequest.hasPassportSpread &&
-    data.currentRequest.hasSelfie;
+    data.currentRequest.hasPassportSpread;
 
   if (pendingWithAllDocs) {
     return (
@@ -379,7 +376,7 @@ export default function CabinetVerificationPage() {
                   {uploadError}
                 </div>
               )}
-              {(["passport_main", "passport_spread", "selfie"] as const).map((type) => (
+              {(["passport_main", "passport_spread"] as const).map((type) => (
                 <div key={type} className="rounded-xl border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/5 p-4">
                   <div className="mb-2 flex items-center gap-2">
                     <FileImage className="h-5 w-5 text-[var(--color-brand-gold)]" />
@@ -387,9 +384,7 @@ export default function CabinetVerificationPage() {
                     {data?.currentRequest &&
                       (type === "passport_main"
                         ? data.currentRequest.hasPassportMain
-                        : type === "passport_spread"
-                          ? data.currentRequest.hasPassportSpread
-                          : data.currentRequest.hasSelfie) && (
+                        : data.currentRequest.hasPassportSpread) && (
                       <CheckCircle2 className="h-5 w-5 text-green-500" />
                     )}
                   </div>
@@ -438,7 +433,7 @@ export default function CabinetVerificationPage() {
                 <p className="text-sm font-medium text-green-600">Заявка отправлена на рассмотрение.</p>
               )}
               <p className="text-xs text-white/70">
-                Для отправки заявки необходимо загрузить все три документа и принять соглашение выше.
+                Для отправки заявки необходимо загрузить оба фото паспорта и принять соглашение выше.
               </p>
               <div className="flex gap-3">
                 <button
@@ -455,8 +450,7 @@ export default function CabinetVerificationPage() {
                     saving ||
                     !consent ||
                     !data?.currentRequest?.hasPassportMain ||
-                    !data?.currentRequest?.hasPassportSpread ||
-                    !data?.currentRequest?.hasSelfie
+                    !data?.currentRequest?.hasPassportSpread
                   }
                   className="rounded-[10px] bg-[var(--color-brand-gold)] px-5 py-2.5 text-[14px] font-semibold text-[#0a192f] hover:opacity-90 disabled:opacity-50"
                 >

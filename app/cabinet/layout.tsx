@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
+import type { LucideIcon } from "lucide-react";
 import {
   LayoutDashboard,
   List,
@@ -15,19 +16,21 @@ import {
   BadgeCheck,
   Building2,
   ChevronDown,
+  User,
 } from "lucide-react";
+import { CABINET_WAITER_BTN } from "@/lib/cabinet-button-classes";
 import { getAccessToken, fetchWithAuth, clearAccessToken } from "@/lib/auth-client";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
-import { isCabinetM5CompetitionTheme, m5SplitDisplayName } from "@/config/cabinet-theme-logins";
-const NAV = [
-  { label: "Дашборд", href: "/cabinet", icon: LayoutDashboard },
-  { label: "Операции", href: "/cabinet/transactions", icon: List },
-  { label: "Моя ссылка", href: "/cabinet/link", icon: Link2 },
-  { label: "Верификация", href: "/cabinet/verification", icon: ShieldCheck },
-  { label: "Поддержка", href: "/cabinet/support", icon: MessageCircle },
-  { label: "Настройки профиля", href: "/cabinet/settings", icon: Settings },
-] as const;
+import { isCabinetM5CompetitionTheme } from "@/config/cabinet-theme-logins";
+const NAV: { label: string; href: string; icon: LucideIcon; iconClass: string }[] = [
+  { label: "Дашборд", href: "/cabinet", icon: LayoutDashboard, iconClass: "!text-sky-400" },
+  { label: "Операции", href: "/cabinet/transactions", icon: List, iconClass: "!text-emerald-400" },
+  { label: "Моя ссылка", href: "/cabinet/link", icon: Link2, iconClass: "!text-amber-400" },
+  { label: "Верификация", href: "/cabinet/verification", icon: ShieldCheck, iconClass: "!text-violet-400" },
+  { label: "Поддержка", href: "/cabinet/support", icon: MessageCircle, iconClass: "!text-cyan-400" },
+  { label: "Настройки профиля", href: "/cabinet/settings", icon: Settings, iconClass: "!text-orange-400" },
+];
 
 export default function CabinetLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -178,14 +181,9 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
     return <LoadingSpinner message="Загрузка…" className="min-h-[60vh]" />;
   }
 
-  const displayName = user?.fullName?.trim() || "Пользователь";
-  const m5Name = isM5Cabinet ? m5SplitDisplayName(displayName) : null;
-  const initials = displayName
-    .split(/\s+/)
-    .map((s) => s[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
+  const trimmedFullName = user?.fullName?.trim() ?? "";
+  const sidebarFirstName = trimmedFullName ? trimmedFullName.split(/\s+/)[0]! : null;
+  const sidebarDisplayLabel = sidebarFirstName ?? user?.login ?? "";
 
   const brandStyle: React.CSSProperties & Record<string, string> = {};
   if (applyEstablishmentBrand) {
@@ -268,26 +266,20 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
               />
             ) : (
               <div
-                className={`cabinet-sidebar-avatar flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[var(--color-brand-gold)] font-semibold text-base ${isM5Cabinet ? "text-white" : "text-[#0a192f]"}`}
+                className={`cabinet-sidebar-avatar flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[var(--color-brand-gold)] ${isM5Cabinet ? "text-white" : "text-[#0a192f]"}`}
+                aria-hidden
               >
-                {initials}
+                <User className="h-7 w-7" strokeWidth={2} />
               </div>
             )}
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-1.5">
-                {m5Name ? (
-                  m5Name.rest != null ? (
-                    <span className="truncate font-semibold">
-                      <span className="text-[#8ec5ff]">{m5Name.first}</span>
-                      <span className="text-[var(--color-text)]"> </span>
-                      <span className="text-[#e5252a]">{m5Name.rest}</span>
-                    </span>
-                  ) : (
-                    <span className="truncate font-semibold text-[#8ec5ff]">{m5Name.first}</span>
-                  )
-                ) : (
-                  <span className="truncate font-semibold text-[var(--color-text)]" style={brandFont ? { color: brandFont } : undefined}>{displayName}</span>
-                )}
+                <span
+                  className={`truncate font-semibold ${isM5Cabinet && sidebarFirstName ? "text-[#8ec5ff]" : "text-[var(--color-text)]"}`}
+                  style={!isM5Cabinet || !sidebarFirstName ? (brandFont ? { color: brandFont } : undefined) : undefined}
+                >
+                  {sidebarDisplayLabel}
+                </span>
                 {user?.verificationStatus === "VERIFIED" && (
                   <BadgeCheck
                     className={`h-5 w-5 shrink-0 ${isM5Cabinet ? "text-[#1c69d4]" : "text-blue-500"}`}
@@ -304,7 +296,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
             Навигация
           </p>
           <nav className="flex flex-col gap-0.5 rounded-[10px] border border-[var(--color-brand-gold)]/15 bg-[var(--color-dark-gray)]/5 p-1.5 shadow-[var(--shadow-subtle)]" aria-label="Навигация по кабинету">
-            {NAV.map(({ label, href, icon: Icon }) => (
+            {NAV.map(({ label, href, icon: Icon, iconClass }) => (
               <Link
                 key={href}
                 href={href}
@@ -316,7 +308,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
                 }`}
                 style={!isActive(href) && brandFont ? { color: `${brandFont}cc` } : undefined}
               >
-                <Icon className="h-5 w-5 shrink-0" />
+                <Icon className={`h-5 w-5 shrink-0 ${iconClass}`} aria-hidden />
                 <span>{label}</span>
                 {href === "/cabinet/support" && supportUnreadCount > 0 && (
                   <span
@@ -335,7 +327,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
                 className="flex items-center gap-3 rounded-lg border border-transparent px-3 py-3 font-medium text-[var(--color-text)]/80 transition-colors hover:bg-[var(--color-dark-gray)]/10 hover:text-[var(--color-text)]"
                 style={brandFont ? { color: `${brandFont}cc` } : undefined}
               >
-                <Building2 className="h-5 w-5 shrink-0" />
+                <Building2 className="h-5 w-5 shrink-0 !text-amber-400" aria-hidden />
                 <span>Кабинет заведения</span>
               </Link>
             )}
@@ -343,10 +335,9 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
           <button
             type="button"
             onClick={handleLogout}
-            className="mt-4 flex w-full items-center gap-3 rounded-[10px] px-4 py-3 text-sm font-medium text-[var(--color-text)]/80 transition-colors hover:bg-[var(--color-dark-gray)]/10 hover:text-[var(--color-text)]"
-            style={brandFont ? { color: `${brandFont}cc` } : undefined}
+            className={`mt-4 flex ${CABINET_WAITER_BTN} w-full !justify-start gap-3 px-4 py-3 text-sm`}
           >
-            <LogOut className="h-4 w-4 shrink-0" />
+            <LogOut className="h-4 w-4 shrink-0 text-[var(--color-brand-gold)]" aria-hidden />
             <span>Выйти</span>
           </button>
         </div>
@@ -368,7 +359,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
                 ref={menuButtonRef}
                 type="button"
                 onClick={() => setSidebarOpen((o) => !o)}
-                className="cabinet-menu-btn flex h-14 w-14 min-w-14 items-center justify-center gap-1.5 rounded-xl border border-white/20 bg-white/10 text-[var(--color-brand-gold)] hover:bg-[var(--color-brand-gold)]/20 hover:border-[var(--color-brand-gold)]/40 active:scale-95 transition-all"
+                className={`cabinet-menu-btn ${CABINET_WAITER_BTN} flex h-14 min-h-14 w-14 min-w-14 shrink-0 items-center justify-center gap-1 !p-0 active:scale-95 transition-[transform,opacity]`}
                 aria-label="Меню"
                 aria-expanded={sidebarOpen}
                 aria-haspopup="true"
@@ -393,25 +384,20 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
                         <img src={user.employeePhotoUrl} alt="" className="h-9 w-9 shrink-0 rounded-full object-cover bg-[var(--color-brand-gold)]" />
                       ) : (
                         <div
-                          className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--color-brand-gold)] font-semibold text-xs ${isM5Cabinet ? "text-white" : "text-[#0a192f]"}`}
+                          className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--color-brand-gold)] ${isM5Cabinet ? "text-white" : "text-[#0a192f]"}`}
+                          aria-hidden
                         >
-                          {initials}
+                          <User className="h-5 w-5" strokeWidth={2} />
                         </div>
                       )}
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-1">
-                          {m5Name ? (
-                            m5Name.rest != null ? (
-                              <span className="truncate font-semibold text-sm">
-                                <span className="text-[#8ec5ff]">{m5Name.first}</span>{" "}
-                                <span className="text-[#e5252a]">{m5Name.rest}</span>
-                              </span>
-                            ) : (
-                              <span className="truncate font-semibold text-sm text-[#8ec5ff]">{m5Name.first}</span>
-                            )
-                          ) : (
-                            <span className="truncate font-semibold text-[var(--color-text)] text-sm" style={brandFont ? { color: brandFont } : undefined}>{displayName}</span>
-                          )}
+                          <span
+                            className={`truncate font-semibold text-sm ${isM5Cabinet && sidebarFirstName ? "text-[#8ec5ff]" : "text-[var(--color-text)]"}`}
+                            style={!isM5Cabinet || !sidebarFirstName ? (brandFont ? { color: brandFont } : undefined) : undefined}
+                          >
+                            {sidebarDisplayLabel}
+                          </span>
                           {user?.verificationStatus === "VERIFIED" && (
                             <BadgeCheck
                               className={`h-4 w-4 shrink-0 ${isM5Cabinet ? "text-[#1c69d4]" : "text-blue-500"}`}
@@ -425,7 +411,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
                   </div>
                   <p className="cabinet-nav-label mb-2 px-3 text-center text-xs font-semibold uppercase tracking-wider text-[var(--color-text)]/50">Навигация</p>
                   <nav className="flex flex-col gap-0.5 rounded-[10px] border border-[var(--color-brand-gold)]/15 bg-[var(--color-dark-gray)]/5 p-1.5 shadow-[var(--shadow-subtle)]" role="none">
-                    {NAV.map(({ label, href, icon: Icon }) => (
+                    {NAV.map(({ label, href, icon: Icon, iconClass }) => (
                       <Link
                         key={href}
                         href={href}
@@ -436,7 +422,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
                         }`}
                         style={!isActive(href) && brandFont ? { color: `${brandFont}cc` } : undefined}
                       >
-                        <Icon className="h-5 w-5 shrink-0" />
+                        <Icon className={`h-5 w-5 shrink-0 ${iconClass}`} aria-hidden />
                         <span>{label}</span>
                         {href === "/cabinet/support" && supportUnreadCount > 0 && (
                           <span
@@ -449,7 +435,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
                     ))}
                     {user?.role === "ESTABLISHMENT_ADMIN" && (
                       <Link href="/establishment" onClick={closeSidebar} role="menuitem" className="flex items-center gap-3 rounded-lg border border-transparent px-3 py-3 font-medium text-[var(--color-text)]/80 transition-colors hover:bg-[var(--color-dark-gray)]/10 hover:text-[var(--color-text)]" style={brandFont ? { color: `${brandFont}cc` } : undefined}>
-                        <Building2 className="h-5 w-5 shrink-0" />
+                        <Building2 className="h-5 w-5 shrink-0 !text-amber-400" aria-hidden />
                         <span>Кабинет заведения</span>
                       </Link>
                     )}
@@ -457,11 +443,10 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
                   <button
                     type="button"
                     onClick={() => { closeSidebar(); handleLogout(); }}
-                    className="mt-4 flex w-full items-center gap-3 rounded-[10px] px-4 py-3 text-sm font-medium text-[var(--color-text)]/80 hover:bg-[var(--color-dark-gray)]/10 hover:text-[var(--color-text)]"
-                    style={brandFont ? { color: `${brandFont}cc` } : undefined}
+                    className={`mt-4 flex ${CABINET_WAITER_BTN} w-full !justify-start gap-3 px-4 py-3 text-sm`}
                     role="menuitem"
                   >
-                    <LogOut className="h-4 w-4 shrink-0" />
+                    <LogOut className="h-4 w-4 shrink-0 text-[var(--color-brand-gold)]" aria-hidden />
                     <span>Выйти</span>
                   </button>
                 </div>

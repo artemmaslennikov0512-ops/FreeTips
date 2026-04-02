@@ -1,6 +1,6 @@
 /**
  * POST /api/auth/register
- * Регистрация: логин, пароль, подтверждение пароля, email (опционально)
+ * Регистрация по одноразовому токену: логин, пароль, подтверждение пароля
  * Создаёт пользователя и выдаёт токены (без SMS)
  */
 
@@ -19,7 +19,6 @@ import { logError, logSecurity } from "@/lib/logger";
 import { getRequestId } from "@/lib/security/request";
 import { parseJsonWithLimit, MAX_BODY_SIZE_AUTH, jsonError, internalError, rateLimit429Response, zodErrorResponse } from "@/lib/api/helpers";
 import { verifyCsrfFromRequest } from "@/lib/security/csrf";
-import { consumeEmailVerified } from "@/lib/email-verification-store";
 
 export async function POST(request: NextRequest) {
   const requestId = getRequestId(request);
@@ -33,25 +32,7 @@ export async function POST(request: NextRequest) {
 
     const parsed = await parseJsonWithLimit(request, MAX_BODY_SIZE_AUTH);
     if (!parsed.ok) return parsed.response;
-    type RegisterPayload = {
-      login: string;
-      password: string;
-      passwordConfirm: string;
-      registrationToken: string;
-      email?: string;
-      acceptOfferAndPrivacy: true;
-    };
-    const validated = registerSchema.parse(parsed.data) as RegisterPayload;
-
-    if (validated.email) {
-      const verified = consumeEmailVerified(validated.email);
-      if (!verified) {
-        return jsonError(
-          400,
-          "Подтвердите почту перед регистрацией: введите email, нажмите «Подтвердить почту», введите код из письма.",
-        );
-      }
-    }
+    const validated = registerSchema.parse(parsed.data);
 
     const userRepo = getUserRepository();
     const existing = await userRepo.findByLogin(validated.login);
@@ -104,7 +85,6 @@ export async function POST(request: NextRequest) {
         data: {
           login: validated.login,
           passwordHash,
-          email: validated.email,
           role,
           establishmentId: establishmentId ?? undefined,
         },

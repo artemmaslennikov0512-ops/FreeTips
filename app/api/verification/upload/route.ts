@@ -1,6 +1,6 @@
 /**
- * POST /api/verification/upload — загрузка документа верификации (фото паспорта, селфи).
- * FormData: requestId, type (passport_main | passport_spread | selfie), file.
+ * POST /api/verification/upload — загрузка документа верификации (фото паспорта).
+ * FormData: requestId, type (passport_main | passport_spread), file.
  * Только для авторизованного пользователя (Bearer).
  */
 
@@ -11,7 +11,7 @@ import { requireAuth } from "@/lib/middleware/auth";
 import { db } from "@/lib/db";
 import { logError } from "@/lib/logger";
 
-const ALLOWED_TYPES = ["passport_main", "passport_spread", "selfie"] as const;
+const ALLOWED_TYPES = ["passport_main", "passport_spread"] as const;
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
 const ALLOWED_MIMES = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
 
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
 
     if (!requestId || !type || !ALLOWED_TYPES.includes(type as (typeof ALLOWED_TYPES)[0])) {
       return NextResponse.json(
-        { error: "Укажите requestId и type (passport_main, passport_spread или selfie)" },
+        { error: "Укажите requestId и type (passport_main или passport_spread)" },
         { status: 400 },
       );
     }

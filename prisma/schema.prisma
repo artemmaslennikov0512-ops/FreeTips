@@ -294,11 +294,11 @@ model VerificationRequest {
   @@map("verification_requests")
 }
 
-// Документы верификации: фото паспорта, разворот, селфи. После выгрузки админом — удаление через 24 ч.
+// Документы верификации: главное фото паспорта и разворот (в БД могут остаться старые записи selfie).
 model VerificationDocument {
   id          String   @id @default(cuid())
   requestId   String
-  type        String   @db.VarChar(20) // passport_main | passport_spread | selfie
+  type        String   @db.VarChar(20) // passport_main | passport_spread | selfie (legacy)
   filePath    String   @db.VarChar(512) // относительный путь в storage/verification
   downloadedAt DateTime? // когда админ выгрузил; через 24 ч — автоудаление файла и записи
   createdAt   DateTime @default(now())

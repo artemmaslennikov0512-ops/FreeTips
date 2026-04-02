@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { User, Loader2, CheckCircle2, Camera, ImageIcon } from "lucide-react";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
@@ -9,6 +9,12 @@ import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { patchProfileSchema, changePasswordSchema } from "@/lib/validations";
 import { getFieldErrors } from "@/lib/form-errors";
 import { cabinetInputClassName } from "../shared";
+
+/** Одна пробельная норма для сравнения с сервером (убирает «двойные» пробелы в ФИО из БД). */
+function normalizeFullNameSpaced(s: string): string {
+  return s.trim().split(/\s+/).filter(Boolean).join(" ");
+}
+
 type Profile = {
   id: string;
   uniqueId: number;
@@ -51,6 +57,19 @@ export default function CabinetSettingsPage() {
   const [photoUploading, setPhotoUploading] = useState(false);
   const [photoError, setPhotoError] = useState<string | null>(null);
   const photoInputRef = useRef<HTMLInputElement>(null);
+  /** Пока true — не подменяем поля формы ответом повторной загрузки профиля (иначе «сбрасывает» при наборе). */
+  const profileFormTouchedRef = useRef(false);
+
+  const hydrateFormFromProfile = useCallback((data: Profile) => {
+    const parts = (data.fullName ?? "").trim().split(/\s+/).filter(Boolean);
+    setEditLogin(data.login);
+    setEditEmail(data.email ?? "");
+    setEditLastName(parts[0] ?? "");
+    setEditFirstName(parts[1] ?? "");
+    setEditPatronymic(parts.slice(2).join(" "));
+    setEditBirthDate(data.birthDate ?? "");
+    setEditEstablishment(data.establishment ?? "");
+  }, []);
 
   useEffect(() => {
     const token = getAccessToken();
@@ -59,9 +78,12 @@ export default function CabinetSettingsPage() {
       return;
     }
 
+    const ac = new AbortController();
+
     (async () => {
       try {
-        const res = await fetch("/api/profile", { headers: authHeaders() });
+        const res = await fetch("/api/profile", { headers: authHeaders(), signal: ac.signal });
+        if (ac.signal.aborted) return;
         if (res.status === 401) {
           clearAccessToken();
           router.replace("/login");
@@ -80,22 +102,21 @@ export default function CabinetSettingsPage() {
           return;
         }
         const data = (await res.json()) as Profile;
+        if (ac.signal.aborted) return;
         setUser(data);
-        setEditLogin(data.login);
-        setEditEmail(data.email ?? "");
-        const parts = (data.fullName ?? "").trim().split(/\s+/).filter(Boolean);
-        setEditLastName(parts[0] ?? "");
-        setEditFirstName(parts[1] ?? "");
-        setEditPatronymic(parts[2] ?? "");
-        setEditBirthDate(data.birthDate ?? "");
-        setEditEstablishment(data.establishment ?? "");
+        if (!profileFormTouchedRef.current) {
+          hydrateFormFromProfile(data);
+        }
       } catch {
+        if (ac.signal.aborted) return;
         setError("Ошибка соединения");
       } finally {
-        setLoading(false);
+        if (!ac.signal.aborted) setLoading(false);
       }
     })();
-  }, [router]);
+
+    return () => ac.abort();
+  }, [router, hydrateFormFromProfile]);
 
   const handleSaveProfile = async () => {
     if (!getAccessToken() || !user) return;
@@ -108,7 +129,9 @@ export default function CabinetSettingsPage() {
     const payload: Record<string, unknown> = {};
     if (editLogin.trim() !== user.login) payload.login = editLogin.trim();
     if (editEmail.trim() !== (user.email ?? "")) payload.email = editEmail.trim() || "";
-    if (combinedFullName !== (user.fullName ?? "").trim()) payload.fullName = combinedFullName || "";
+    if (normalizeFullNameSpaced(combinedFullName) !== normalizeFullNameSpaced(user.fullName ?? "")) {
+      payload.fullName = combinedFullName || "";
+    }
     if (editBirthDate.trim() !== (user.birthDate ?? "")) payload.birthDate = editBirthDate.trim() || "";
     if (editEstablishment.trim() !== (user.establishment ?? "")) payload.establishment = editEstablishment.trim() || "";
 
@@ -156,7 +179,10 @@ export default function CabinetSettingsPage() {
         return;
       }
 
-      setUser((prev) => (prev ? { ...prev, ...(j as Partial<Profile>) } : prev));
+      const saved = j as Profile;
+      setUser((prev) => (prev ? { ...prev, ...saved } : prev));
+      profileFormTouchedRef.current = false;
+      hydrateFormFromProfile(saved);
       setSaveOk(true);
       setTimeout(() => setSaveOk(false), 3000);
     } catch {
@@ -250,7 +276,7 @@ export default function CabinetSettingsPage() {
   const hasProfileChanges =
     editLogin.trim() !== (user?.login ?? "") ||
     editEmail.trim() !== (user?.email ?? "") ||
-    combinedFullNameForCompare !== (user?.fullName ?? "").trim() ||
+    normalizeFullNameSpaced(combinedFullNameForCompare) !== normalizeFullNameSpaced(user?.fullName ?? "") ||
     editBirthDate.trim() !== (user?.birthDate ?? "") ||
     editEstablishment.trim() !== (user?.establishment ?? "");
 
@@ -379,7 +405,10 @@ export default function CabinetSettingsPage() {
               id="settings-login"
               type="text"
               value={editLogin}
-              onChange={(e) => setEditLogin(e.target.value)}
+              onChange={(e) => {
+                profileFormTouchedRef.current = true;
+                setEditLogin(e.target.value);
+              }}
               className={cabinetInputClassName(!!profileFieldErrors.login)}
             />
             {profileFieldErrors.login && <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{profileFieldErrors.login}</p>}
@@ -390,7 +419,10 @@ export default function CabinetSettingsPage() {
               id="settings-email"
               type="email"
               value={editEmail}
-              onChange={(e) => setEditEmail(e.target.value)}
+              onChange={(e) => {
+                profileFormTouchedRef.current = true;
+                setEditEmail(e.target.value);
+              }}
               placeholder="email@example.com"
               className={cabinetInputClassName(!!profileFieldErrors.email)}
             />
@@ -407,7 +439,10 @@ export default function CabinetSettingsPage() {
                 id="settings-lastName"
                 type="text"
                 value={editLastName}
-                onChange={(e) => setEditLastName(e.target.value)}
+                onChange={(e) => {
+                  profileFormTouchedRef.current = true;
+                  setEditLastName(e.target.value);
+                }}
                 placeholder="Иванов"
                 className={cabinetInputClassName(!!profileFieldErrors.fullName)}
               />
@@ -419,7 +454,10 @@ export default function CabinetSettingsPage() {
                 id="settings-firstName"
                 type="text"
                 value={editFirstName}
-                onChange={(e) => setEditFirstName(e.target.value)}
+                onChange={(e) => {
+                  profileFormTouchedRef.current = true;
+                  setEditFirstName(e.target.value);
+                }}
                 placeholder="Иван"
                 className={cabinetInputClassName(false)}
               />
@@ -430,7 +468,10 @@ export default function CabinetSettingsPage() {
                 id="settings-patronymic"
                 type="text"
                 value={editPatronymic}
-                onChange={(e) => setEditPatronymic(e.target.value)}
+                onChange={(e) => {
+                  profileFormTouchedRef.current = true;
+                  setEditPatronymic(e.target.value);
+                }}
                 placeholder="Иванович"
                 className={cabinetInputClassName(false)}
               />
@@ -441,7 +482,10 @@ export default function CabinetSettingsPage() {
                 id="settings-birthDate"
                 type="date"
                 value={editBirthDate}
-                onChange={(e) => setEditBirthDate(e.target.value)}
+                onChange={(e) => {
+                  profileFormTouchedRef.current = true;
+                  setEditBirthDate(e.target.value);
+                }}
                 className={cabinetInputClassName(!!profileFieldErrors.birthDate)}
               />
               {profileFieldErrors.birthDate && <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{profileFieldErrors.birthDate}</p>}
@@ -452,7 +496,10 @@ export default function CabinetSettingsPage() {
                 id="settings-establishment"
                 type="text"
                 value={editEstablishment}
-                onChange={(e) => setEditEstablishment(e.target.value)}
+                onChange={(e) => {
+                  profileFormTouchedRef.current = true;
+                  setEditEstablishment(e.target.value);
+                }}
                 placeholder="Название заведения"
                 className={cabinetInputClassName(!!profileFieldErrors.establishment)}
               />

@@ -73,7 +73,6 @@ export async function GET(request: NextRequest) {
     uniqueId: r.user.uniqueId,
     hasPassportMain: r.documents.some((d) => d.type === "passport_main"),
     hasPassportSpread: r.documents.some((d) => d.type === "passport_spread"),
-    hasSelfie: r.documents.some((d) => d.type === "selfie"),
   }));
 
   return NextResponse.json({ requests: items });

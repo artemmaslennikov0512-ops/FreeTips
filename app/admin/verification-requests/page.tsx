@@ -40,7 +40,6 @@ interface VerificationRequestItem {
   uniqueId: number;
   hasPassportMain: boolean;
   hasPassportSpread: boolean;
-  hasSelfie: boolean;
 }
 
 type SectionCounts = { pending: number; approved: number; rejected: number };
@@ -54,7 +53,6 @@ type RequestsCountsPayload = {
 const DOC_LABELS: Record<string, string> = {
   passport_main: "Главное фото паспорта",
   passport_spread: "Разворот",
-  selfie: "Селфи с паспортом",
 };
 
 const ZERO_COUNTS: SectionCounts = { pending: 0, approved: 0, rejected: 0 };
@@ -249,20 +247,22 @@ export default function AdminVerificationRequestsPage() {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="flex flex-col gap-6">
       <div className="flex flex-col items-center gap-3 text-center">
         <h1 className="font-[family:var(--font-playfair)] text-xl font-semibold text-white">
           Заявки
         </h1>
-        <p className="max-w-lg text-sm text-white/85">
-          Выберите раздел: верификация официантов или подключение к сервису.
-        </p>
         <AdminRequestsMainTabs
           value={mainTab}
           onChange={setMainTab}
           pendingVerification={mainTabNewVerification}
           pendingConnection={mainTabNewConnection}
           className="pt-1"
+        />
+        <div
+          role="separator"
+          aria-hidden="true"
+          className="h-px w-full max-w-2xl shrink-0 bg-[var(--color-brand-gold)]/35"
         />
       </div>
 
@@ -312,9 +312,8 @@ export default function AdminVerificationRequestsPage() {
                       <p className="mt-2 rounded-lg bg-red-500/10 px-2 py-1.5 text-xs text-red-200/90">{r.rejectionReason}</p>
                     )}
                     <div className="mt-3 flex flex-wrap gap-2">
-                      {(["passport_main", "passport_spread", "selfie"] as const).map((type) => {
-                        const has =
-                          type === "passport_main" ? r.hasPassportMain : type === "passport_spread" ? r.hasPassportSpread : r.hasSelfie;
+                      {(["passport_main", "passport_spread"] as const).map((type) => {
+                        const has = type === "passport_main" ? r.hasPassportMain : r.hasPassportSpread;
                         const key = `${r.id}-${type}`;
                         return (
                           <button
@@ -401,13 +400,9 @@ export default function AdminVerificationRequestsPage() {
                         )}
                         <td className="px-4 py-3">
                           <div className="flex flex-wrap gap-2">
-                            {(["passport_main", "passport_spread", "selfie"] as const).map((type) => {
+                            {(["passport_main", "passport_spread"] as const).map((type) => {
                               const has =
-                                type === "passport_main"
-                                  ? r.hasPassportMain
-                                  : type === "passport_spread"
-                                    ? r.hasPassportSpread
-                                    : r.hasSelfie;
+                                type === "passport_main" ? r.hasPassportMain : r.hasPassportSpread;
                               const key = `${r.id}-${type}`;
                               return (
                                 <button
@@ -471,9 +466,6 @@ export default function AdminVerificationRequestsPage() {
 
       {mainTab === "connection" && (
         <section className="space-y-4">
-          <p className="mx-auto max-w-lg text-center text-sm text-white/80">
-            Регистрация заведений и отдельных получателей. Одобрение выдаёт ссылку для регистрации.
-          </p>
           <AdminConnectionRequestsBlock connectionCounts={cCounts} onAfterMutation={refreshCountsAndNotifyLayout} />
         </section>
       )}

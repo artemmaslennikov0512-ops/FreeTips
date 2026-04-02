@@ -3707,6 +3707,43 @@ html:not([data-theme="dark"]) .establishment-team-table .establishment-team-tabl
   display: inline-flex;
 }
 
+/* ЛК официанта: кнопки как в админке (капсула, золото) */
+.cabinet-premium:not(.admin-panel) .cabinet-waiter-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  box-sizing: border-box;
+  border-radius: 9999px;
+  border: 1px solid rgba(197, 165, 114, 0.55);
+  background: transparent;
+  color: var(--color-brand-gold);
+  font-weight: 500;
+  font-size: 0.875rem;
+  line-height: 1.25;
+  padding: 0.5rem 1rem;
+  font-family: var(--font-inter, system-ui, sans-serif);
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    opacity 0.15s ease,
+    color 0.15s ease;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.cabinet-premium:not(.admin-panel) .cabinet-waiter-btn:hover:not(:disabled) {
+  background: rgba(197, 165, 114, 0.12);
+}
+.cabinet-premium:not(.admin-panel) .cabinet-waiter-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+.cabinet-premium:not(.admin-panel) .cabinet-waiter-btn:focus-visible {
+  outline: 2px solid rgba(197, 165, 114, 0.45);
+  outline-offset: 2px;
+}
+
 /* Поле поиска в админке «Пользователи» — белый текст ввода */
 .admin-panel .admin-users-search-input {
   color: #ffffff !important;

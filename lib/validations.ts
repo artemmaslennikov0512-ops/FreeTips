@@ -72,7 +72,7 @@ export const slugSchema = z
   .max(50, "Slug не должен превышать 50 символов")
   .regex(/^[a-z0-9_-]+$/, "Slug может содержать только латиницу, цифры, дефисы и подчёркивания");
 
-// Регистрация (включая обязательное согласие с офертой и политикой ПДн)
+// Регистрация по одноразовой ссылке: логин, пароль, токен; email не требуется (идентификация через токен)
 export const registerSchema = z
   .object({
     login: loginSchema,
@@ -83,17 +83,6 @@ export const registerSchema = z
       .trim()
       .min(REGISTRATION_TOKEN_MIN_LENGTH, "Токен регистрации обязателен")
       .max(REGISTRATION_TOKEN_MAX_LENGTH, "Токен регистрации слишком длинный"),
-    email: z.preprocess(
-      (v) => {
-        if (v == null || v === "") return undefined;
-        if (typeof v === "string") {
-          const t = v.trim();
-          return t === "" ? undefined : t;
-        }
-        return v;
-      },
-      emailSchema.optional(),
-    ),
     acceptOfferAndPrivacy: z.literal(true, {
       errorMap: () => ({ message: "Необходимо принять условия Пользовательского соглашения и Политики обработки персональных данных" }),
     }),

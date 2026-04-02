@@ -12,6 +12,12 @@
  * При успехе: в БД выставляется SUCCESS и сбрасывается relocateStartedAt.
  * При заданном PAYGINE_SD_REF_LEGAL и feeKop у транзакции: комиссия → ЮЛ, остаток → официант.
  * Требуется: .env (DATABASE_URL), scripts/.env или корневой .env (PAYGINE_*, опционально PAYGINE_SD_REF_LEGAL).
+ *
+ * На сервере с Docker: из корня проекта
+ *   docker compose exec web ./node_modules/.bin/tsx scripts/utils/relocate-one-transaction.ts <args>
+ * (не npx tsx — у пользователя nextjs нет доступной домашней директории для кэша npm).
+ * С хоста: если в .env указан localhost/127.0.0.1 с портом 5432 или без порта, скрипт подставляет 15432
+ * (проброс PostgreSQL из docker-compose на хост). Отключить: DATABASE_URL_NO_DOCKER_HOST_PORT_REMAP=1.
  */
 
 import "dotenv/config";
@@ -19,7 +25,29 @@ import { loadScriptsEnv } from "./load-env";
 import { createHash } from "crypto";
 import { PrismaClient } from "@prisma/client";
 
+/** Порт `db` на хосте в docker-compose (127.0.0.1:15432:5432). */
+const DOCKER_COMPOSE_DB_PUBLISHED_PORT = "15432";
+
+function remapDatabaseUrlLocalhostToDockerPublishedPort(): void {
+  if (process.env.DATABASE_URL_NO_DOCKER_HOST_PORT_REMAP === "1") return;
+  const raw = process.env.DATABASE_URL?.trim();
+  if (!raw) return;
+  let u: URL;
+  try {
+    u = new URL(raw);
+  } catch {
+    return;
+  }
+  const host = u.hostname.toLowerCase();
+  if (host !== "localhost" && host !== "127.0.0.1") return;
+  const p = u.port;
+  if (p !== "" && p !== "5432") return;
+  u.port = DOCKER_COMPOSE_DB_PUBLISHED_PORT;
+  process.env.DATABASE_URL = u.toString();
+}
+
 loadScriptsEnv();
+remapDatabaseUrlLocalhostToDockerPublishedPort();
 
 const prisma = new PrismaClient();
 const CURRENCY_RUB = 643;

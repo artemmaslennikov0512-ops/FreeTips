@@ -46,6 +46,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [retryTrigger, setRetryTrigger] = useState(0);
+  /** Сумма pending по верификации и подключению — бейдж у пункта «Заявки». */
+  const [requestsPendingTotal, setRequestsPendingTotal] = useState<number | null>(null);
 
   useEffect(() => setMounted(true), []);
 
@@ -107,6 +109,30 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
     checkAuth();
   }, [mounted, retryTrigger, router]);
+
+  useEffect(() => {
+    if (!user || user.role !== "SUPERADMIN") return;
+    const token = getAccessToken();
+    if (!token) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch("/api/admin/requests-counts", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok || cancelled) return;
+        const data = (await res.json()) as { totalPending?: number };
+        if (!cancelled) {
+          setRequestsPendingTotal(typeof data.totalPending === "number" ? data.totalPending : 0);
+        }
+      } catch {
+        if (!cancelled) setRequestsPendingTotal(null);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [user, pathname]);
 
   const handleLogout = async () => {
     try {
@@ -189,21 +215,33 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               Навигация
             </p>
             <nav className="flex flex-col gap-0.5 rounded-[10px] border border-[var(--color-brand-gold)]/15 bg-white/5 p-1.5 shadow-[var(--shadow-subtle)]" aria-label="Навигация админ-панели">
-              {NAV.map(({ label, href, icon: Icon }) => (
-                <Link
-                  key={href}
-                  href={href}
-                  onClick={closeSidebar}
-                  className={`flex items-center gap-3 rounded-lg px-3 py-3 font-medium transition-colors ${
-                    isActive(href)
-                      ? "cabinet-nav-active border border-[#0a192f]/25 bg-[#0a192f]/10 text-[#0a192f] font-semibold"
-                      : "border border-transparent text-white/80 hover:bg-[var(--color-dark-gray)]/10 hover:text-white"
-                  }`}
-                >
-                  <Icon className="h-5 w-5 shrink-0" />
-                  <span className="min-w-0 break-words">{label}</span>
-                </Link>
-              ))}
+              {NAV.map(({ label, href, icon: Icon }) => {
+                const showRequestsBadge =
+                  href === "/admin/verification-requests" && requestsPendingTotal != null && requestsPendingTotal > 0;
+                const badgeN = requestsPendingTotal ?? 0;
+                return (
+                  <Link
+                    key={href}
+                    href={href}
+                    onClick={closeSidebar}
+                    className={`flex items-center gap-3 rounded-lg px-3 py-3 font-medium transition-colors ${
+                      isActive(href)
+                        ? "cabinet-nav-active border border-[#0a192f]/25 bg-[#0a192f]/10 text-[#0a192f] font-semibold"
+                        : "border border-transparent text-white/80 hover:bg-[var(--color-dark-gray)]/10 hover:text-white"
+                    }`}
+                  >
+                    <Icon className="h-5 w-5 shrink-0" />
+                    <span className="flex min-w-0 flex-1 items-center gap-2 break-words">
+                      {label}
+                      {showRequestsBadge && (
+                        <span className="inline-flex min-h-[1.25rem] min-w-[1.25rem] shrink-0 items-center justify-center rounded-full bg-[var(--color-accent-red)] px-1.5 text-[11px] font-bold leading-none text-white tabular-nums">
+                          {badgeN > 99 ? "99+" : badgeN}
+                        </span>
+                      )}
+                    </span>
+                  </Link>
+                );
+              })}
             </nav>
             <button
               type="button"
@@ -256,20 +294,32 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   </div>
                   <p className="cabinet-nav-label mb-1.5 px-2 text-center text-[10px] font-semibold uppercase tracking-wider text-white/50">Навигация</p>
                   <nav className="flex flex-col gap-0.5 rounded-lg border border-[var(--color-brand-gold)]/15 bg-white/5 p-1" role="none">
-                    {NAV.map(({ label, href, icon: Icon }) => (
-                      <Link
-                        key={href}
-                        href={href}
-                        onClick={closeSidebar}
-                        role="menuitem"
-                        className={`flex items-center gap-2.5 rounded-md px-2.5 py-2.5 text-sm font-medium transition-colors ${
-                          isActive(href) ? "cabinet-nav-active bg-white/15 text-white font-semibold" : "text-white/85 hover:bg-white/10 hover:text-white"
-                        }`}
-                      >
-                        <Icon className="h-4 w-4 shrink-0" />
-                        <span>{label}</span>
-                      </Link>
-                    ))}
+                    {NAV.map(({ label, href, icon: Icon }) => {
+                      const showRequestsBadge =
+                        href === "/admin/verification-requests" && requestsPendingTotal != null && requestsPendingTotal > 0;
+                      const badgeN = requestsPendingTotal ?? 0;
+                      return (
+                        <Link
+                          key={href}
+                          href={href}
+                          onClick={closeSidebar}
+                          role="menuitem"
+                          className={`flex items-center gap-2.5 rounded-md px-2.5 py-2.5 text-sm font-medium transition-colors ${
+                            isActive(href) ? "cabinet-nav-active bg-white/15 text-white font-semibold" : "text-white/85 hover:bg-white/10 hover:text-white"
+                          }`}
+                        >
+                          <Icon className="h-4 w-4 shrink-0" />
+                          <span className="flex flex-1 items-center gap-2">
+                            {label}
+                            {showRequestsBadge && (
+                              <span className="inline-flex min-h-[1.25rem] min-w-[1.25rem] shrink-0 items-center justify-center rounded-full bg-[var(--color-accent-red)] px-1.5 text-[10px] font-bold leading-none text-white tabular-nums">
+                                {badgeN > 99 ? "99+" : badgeN}
+                              </span>
+                            )}
+                          </span>
+                        </Link>
+                      );
+                    })}
                   </nav>
                   <button
                     type="button"

@@ -1,6 +1,7 @@
 "use client";
 
 import { Fragment, useEffect, useState } from "react";
+import Link from "next/link";
 import { Users, TrendingUp, Send, DollarSign, ChevronDown, ChevronRight, ClipboardCheck, Copy } from "lucide-react";
 import { formatMoneyCompact } from "@/lib/utils";
 
@@ -81,6 +82,7 @@ export default function AdminDashboardPage() {
   const [sendingTokenId, setSendingTokenId] = useState<string | null>(null);
   /** Выданные ссылки по id заявки (восстанавливаются из localStorage до истечения срока) */
   const [issuedLinksByRequestId, setIssuedLinksByRequestId] = useState<Record<string, string>>({});
+  const [pendingRequestsTotal, setPendingRequestsTotal] = useState<number | null>(null);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -107,6 +109,29 @@ export default function AdminDashboardPage() {
     };
 
     fetchStats();
+  }, []);
+
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+    if (!token) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch("/api/admin/requests-counts", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok || cancelled) return;
+        const data = (await res.json()) as { totalPending?: number };
+        if (!cancelled) {
+          setPendingRequestsTotal(typeof data.totalPending === "number" ? data.totalPending : 0);
+        }
+      } catch {
+        if (!cancelled) setPendingRequestsTotal(null);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   useEffect(() => {
@@ -243,6 +268,22 @@ export default function AdminDashboardPage() {
 
   return (
     <div className="min-w-0 max-w-full">
+      {pendingRequestsTotal != null && pendingRequestsTotal > 0 && (
+        <Link
+          href="/admin/verification-requests"
+          className="mb-6 block rounded-2xl border border-amber-500/45 bg-amber-500/15 px-4 py-3 text-center text-sm text-amber-100 transition-colors hover:bg-amber-500/25"
+        >
+          <span className="font-semibold tabular-nums text-amber-50">{pendingRequestsTotal}</span>{" "}
+          {pendingRequestsTotal % 10 === 1 && pendingRequestsTotal % 100 !== 11
+            ? "новая заявка"
+            : pendingRequestsTotal % 10 >= 2 &&
+                pendingRequestsTotal % 10 <= 4 &&
+                (pendingRequestsTotal % 100 < 10 || pendingRequestsTotal % 100 >= 20)
+              ? "новые заявки"
+              : "новых заявок"}{" "}
+          на рассмотрении — открыть раздел «Заявки»
+        </Link>
+      )}
       <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
         {cards.map((card) => {
           const Icon = card.icon;

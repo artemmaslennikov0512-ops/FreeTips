@@ -54,7 +54,14 @@ export interface RegistrationRequestRow {
   adminContactPhone?: string | null;
 }
 
-export function AdminConnectionRequestsBlock() {
+type BlockProps = {
+  /** Счётчики для бейджей на подвкладках «На рассмотрении / Принятые / Отклонённые». */
+  connectionCounts?: { pending: number; approved: number; rejected: number };
+  /** Вызвать после одобрения заявки (обновить счётчики в родителе). */
+  onAfterMutation?: () => void;
+};
+
+export function AdminConnectionRequestsBlock({ connectionCounts, onAfterMutation }: BlockProps) {
   const [tab, setTab] = useState<AdminRequestTab>("pending");
   const [list, setList] = useState<RegistrationRequestRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -131,6 +138,7 @@ export function AdminConnectionRequestsBlock() {
         }
       }
       await fetchList();
+      onAfterMutation?.();
     } finally {
       setApprovingId(null);
     }
@@ -177,9 +185,17 @@ export function AdminConnectionRequestsBlock() {
         ? "Нет принятых заявок"
         : "Нет отклонённых заявок";
 
+  const subTabBadges = connectionCounts
+    ? {
+        pending: connectionCounts.pending,
+        approved: connectionCounts.approved,
+        rejected: connectionCounts.rejected,
+      }
+    : undefined;
+
   return (
     <section className="space-y-4">
-      <AdminStatusTabs value={tab} onChange={setTab} />
+      <AdminStatusTabs value={tab} onChange={setTab} badges={subTabBadges} />
       {error && (
         <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-center text-sm text-red-200">
           {error}

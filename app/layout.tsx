@@ -75,6 +75,7 @@ export const viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
+  viewportFit: "cover",
   // Цвет области статус-бары/даты на мобильных — без этого браузер по умолчанию даёт синий
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#d4d8de" },

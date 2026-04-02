@@ -73,9 +73,9 @@ model User {
   savingFor         String?   @db.VarChar(500) // на что копит официант — показывается на странице оплаты
   profilePhotoUrl   String?   @db.VarChar(512) // фото получателя (RECIPIENT): страница оплаты и ЛК (путь в storage)
   lastAuthIp        String?   @db.VarChar(64) // последний IP входа/регистрации (наблюдение: несколько аккаунтов с одного IP)
-  /** TOTP (Google Authenticator) для ADMIN/SUPERADMIN: секрет в БД только в зашифрованном виде */
-  adminTotpEnabled    Boolean   @default(false)
-  adminTotpSecretEnc  String?   @db.Text
+  /** TOTP (Google Authenticator) для любого ЛК: секрет в БД только в зашифрованном виде */
+  totpEnabled    Boolean   @default(false)
+  totpSecretEnc  String?   @db.Text
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
 

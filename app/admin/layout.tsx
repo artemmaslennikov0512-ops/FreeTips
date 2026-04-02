@@ -14,7 +14,6 @@ import {
   MessageCircle,
   Building2,
   FileCheck,
-  ChevronDown,
   CreditCard,
   KeyRound,
 } from "lucide-react";
@@ -195,10 +194,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   return (
-    <div className="admin-panel cabinet-premium flex min-h-screen w-full min-w-0 max-w-full bg-[var(--color-bg)] font-[family:var(--font-inter)] text-[var(--color-text)] pt-4">
+    <div className="admin-panel cabinet-premium flex min-h-screen w-full min-w-0 max-w-full bg-[var(--color-bg)] font-[family:var(--font-inter)] text-[var(--color-text)] pt-0 lg:pt-4">
       {/* Шторка — закрывает выпадающее меню при клике вне (мобильный) */}
       <div
-        className={`admin-overlay cabinet-overlay fixed inset-0 z-30 rounded-xl border border-white/[0.12] bg-[rgba(15,23,42,0.65)] backdrop-blur-xl lg:hidden ml-4 mr-4 mt-4 mb-4 transition-opacity duration-300 ${
+        className={`admin-overlay cabinet-overlay fixed inset-0 z-30 border-0 bg-[rgba(15,23,42,0.65)] backdrop-blur-xl transition-opacity duration-300 lg:hidden ${
           sidebarOpen ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
         onClick={closeSidebar}
@@ -266,92 +265,84 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
       </aside>
 
-      <main className="min-h-screen min-w-0 flex-1 overflow-x-hidden px-4 sm:px-6 lg:pl-0 lg:pr-0 lg:ml-0 flex flex-col">
-        <div className="admin-main-block cabinet-main-block mt-4 mr-0 mb-4 ml-0 lg:mr-0 lg:ml-4 flex min-h-[calc(100vh-2rem)] flex-1 flex-col rounded-[10px] border border-white/10 bg-white/[0.06] backdrop-blur-xl">
-          <div className="min-w-0 max-w-full flex-1 overflow-x-hidden flex flex-col px-0 py-4 sm:py-6 lg:p-8" id="main-content">
-            <div className="mb-4 flex justify-start lg:hidden relative">
-              <button
-                ref={menuButtonRef}
-                type="button"
-                onClick={() => setSidebarOpen((o) => !o)}
-                className={`cabinet-menu-btn ${ADMIN_BTN} relative flex h-14 min-h-14 w-14 min-w-14 shrink-0 items-center justify-center !gap-0 !p-0 active:scale-95`}
-                aria-label="Меню"
-                aria-expanded={sidebarOpen}
-                aria-haspopup="true"
-                aria-controls="admin-nav-dropdown"
-              >
-                <span
-                  className="pointer-events-none absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center gap-0.5"
-                  aria-hidden
-                >
-                  <Menu className="h-6 w-6 shrink-0" strokeWidth={2} />
-                  <ChevronDown
-                    className={`h-4 w-4 shrink-0 transition-transform duration-200 ${sidebarOpen ? "rotate-180" : ""}`}
-                    aria-hidden
-                  />
-                </span>
-              </button>
-              <div
-                id="admin-nav-dropdown"
-                role="menu"
-                className={`cabinet-nav-dropdown admin-nav-dropdown absolute left-0 top-full z-50 mt-2 w-[min(100vw-2rem,320px)] origin-top rounded-xl border border-[var(--color-brand-gold)]/20 bg-[var(--color-navy)] shadow-[var(--shadow-card)] backdrop-blur-xl transition-[opacity,transform] duration-200 ${
-                  sidebarOpen ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"
-                }`}
-                aria-hidden={!sidebarOpen}
-              >
-                <div className="cabinet-nav-dropdown-inner overflow-hidden rounded-xl p-3 text-white">
-                  <div className="cabinet-sidebar-profile cabinet-block-inner mb-3 rounded-lg border border-[var(--color-brand-gold)]/20 bg-white/10 px-3 py-2.5">
-                    <div className="flex items-center gap-2.5">
-                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--color-brand-gold)] font-semibold text-[#0a192f] text-sm">
-                        {(user.login || "A").charAt(0).toUpperCase()}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="truncate font-semibold text-white text-sm">{user.login}</div>
-                        <div className="text-xs text-white/80">Админ</div>
-                      </div>
-                    </div>
+      <main className="min-h-screen min-w-0 flex-1 overflow-x-hidden px-0 pt-1 lg:pt-0 lg:pl-0 lg:pr-0 lg:ml-0 flex flex-col">
+        {/* Меню вне .admin-main-block (как в ЛК официанта): transform/scale у выпадашки не должен влиять на ширину основной карточки */}
+        <div className="app-panel-mobile-nav relative z-[50] mb-2 shrink-0 px-4 sm:px-6 lg:hidden">
+          <button
+            ref={menuButtonRef}
+            type="button"
+            onClick={() => setSidebarOpen((o) => !o)}
+            className={`cabinet-menu-btn ${ADMIN_BTN} relative flex h-14 min-h-14 w-14 min-w-14 shrink-0 items-center justify-center !gap-0 !p-0 active:scale-95`}
+            aria-label="Меню"
+            aria-expanded={sidebarOpen}
+            aria-haspopup="true"
+            aria-controls="admin-nav-dropdown"
+          >
+            <Menu className="h-6 w-6 shrink-0 pointer-events-none" strokeWidth={2} aria-hidden />
+          </button>
+          <div
+            id="admin-nav-dropdown"
+            role="menu"
+            className={`cabinet-nav-dropdown admin-nav-dropdown absolute left-0 top-full z-50 mt-2 max-h-[min(70vh,calc(100dvh-8rem))] w-[min(100vw-2rem,20rem)] origin-top overflow-y-auto rounded-xl border border-[var(--color-brand-gold)]/20 bg-[var(--color-navy)] shadow-[var(--shadow-card)] backdrop-blur-xl transition-opacity duration-200 ${
+              sidebarOpen ? "opacity-100" : "pointer-events-none invisible opacity-0"
+            }`}
+            aria-hidden={!sidebarOpen}
+          >
+            <div className="cabinet-nav-dropdown-inner overflow-hidden rounded-xl p-3 text-white">
+              <div className="cabinet-sidebar-profile cabinet-block-inner mb-3 rounded-lg border border-[var(--color-brand-gold)]/20 bg-white/10 px-3 py-2.5">
+                <div className="flex items-center gap-2.5">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--color-brand-gold)] font-semibold text-[#0a192f] text-sm">
+                    {(user.login || "A").charAt(0).toUpperCase()}
                   </div>
-                  <p className="cabinet-nav-label mb-1.5 px-2 text-center text-[10px] font-semibold uppercase tracking-wider text-white/50">Навигация</p>
-                  <nav className="flex flex-col gap-0.5 rounded-lg border border-[var(--color-brand-gold)]/15 bg-white/5 p-1" role="none">
-                    {NAV.map(({ label, href, icon: Icon, iconClass }) => {
-                      const showRequestsBadge =
-                        href === "/admin/verification-requests" && requestsPendingTotal != null && requestsPendingTotal > 0;
-                      const badgeN = requestsPendingTotal ?? 0;
-                      return (
-                        <Link
-                          key={href}
-                          href={href}
-                          onClick={closeSidebar}
-                          role="menuitem"
-                          className={`flex items-center gap-2.5 rounded-md px-2.5 py-2.5 text-sm font-medium transition-colors ${
-                            isActive(href) ? "cabinet-nav-active bg-white/15 text-white font-semibold" : "text-white/85 hover:bg-white/10 hover:text-white"
-                          }`}
-                        >
-                          <Icon className={`h-4 w-4 shrink-0 ${iconClass}`} aria-hidden />
-                          <span className="flex flex-1 items-center gap-2">
-                            {label}
-                            {showRequestsBadge && (
-                              <span className="inline-flex min-h-[1.25rem] min-w-[1.25rem] shrink-0 items-center justify-center rounded-full bg-[var(--color-accent-red)] px-1.5 text-[10px] font-bold leading-none text-white tabular-nums">
-                                {badgeN > 99 ? "99+" : badgeN}
-                              </span>
-                            )}
-                          </span>
-                        </Link>
-                      );
-                    })}
-                  </nav>
-                  <button
-                    type="button"
-                    onClick={() => { closeSidebar(); handleLogout(); }}
-                    className={`mt-3 ${ADMIN_BTN} w-full !justify-center gap-2.5 px-2.5 py-2.5 text-sm`}
-                    role="menuitem"
-                  >
-                    <LogOut className="h-4 w-4 shrink-0 text-[var(--color-brand-gold)]" aria-hidden />
-                    <span>Выйти</span>
-                  </button>
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate font-semibold text-white text-sm">{user.login}</div>
+                    <div className="text-xs text-white/80">Админ</div>
+                  </div>
                 </div>
               </div>
+              <p className="cabinet-nav-label mb-1.5 px-2 text-center text-[10px] font-semibold uppercase tracking-wider text-white/50">Навигация</p>
+              <nav className="flex flex-col gap-0.5 rounded-lg border border-[var(--color-brand-gold)]/15 bg-white/5 p-1" role="none">
+                {NAV.map(({ label, href, icon: Icon, iconClass }) => {
+                  const showRequestsBadge =
+                    href === "/admin/verification-requests" && requestsPendingTotal != null && requestsPendingTotal > 0;
+                  const badgeN = requestsPendingTotal ?? 0;
+                  return (
+                    <Link
+                      key={href}
+                      href={href}
+                      onClick={closeSidebar}
+                      role="menuitem"
+                      className={`flex items-center gap-2.5 rounded-md px-2.5 py-2.5 text-sm font-medium transition-colors ${
+                        isActive(href) ? "cabinet-nav-active bg-white/15 text-white font-semibold" : "text-white/85 hover:bg-white/10 hover:text-white"
+                      }`}
+                    >
+                      <Icon className={`h-4 w-4 shrink-0 ${iconClass}`} aria-hidden />
+                      <span className="flex flex-1 items-center gap-2">
+                        {label}
+                        {showRequestsBadge && (
+                          <span className="inline-flex min-h-[1.25rem] min-w-[1.25rem] shrink-0 items-center justify-center rounded-full bg-[var(--color-accent-red)] px-1.5 text-[10px] font-bold leading-none text-white tabular-nums">
+                            {badgeN > 99 ? "99+" : badgeN}
+                          </span>
+                        )}
+                      </span>
+                    </Link>
+                  );
+                })}
+              </nav>
+              <button
+                type="button"
+                onClick={() => { closeSidebar(); handleLogout(); }}
+                className={`mt-3 ${ADMIN_BTN} w-full !justify-center gap-2.5 px-2.5 py-2.5 text-sm`}
+                role="menuitem"
+              >
+                <LogOut className="h-4 w-4 shrink-0 text-[var(--color-brand-gold)]" aria-hidden />
+                <span>Выйти</span>
+              </button>
             </div>
+          </div>
+        </div>
+        <div className="admin-main-block cabinet-main-block app-panel-main-surface mt-0 mr-0 mb-4 ml-0 flex min-h-0 w-full min-w-0 max-w-full flex-1 flex-col rounded-lg border border-white/10 bg-white/[0.06] backdrop-blur-xl lg:mt-4 lg:mr-0 lg:ml-4 lg:min-h-[calc(100vh-2rem)] lg:rounded-[10px]">
+          <div className="min-w-0 w-full max-w-full flex-1 overflow-x-hidden flex flex-col px-4 py-3 sm:px-6 sm:py-4 lg:p-8" id="main-content">
             {children}
           </div>
         </div>

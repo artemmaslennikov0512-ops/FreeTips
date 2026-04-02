@@ -1472,6 +1472,12 @@ html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-compe
   color: #fafafa !important;
 }
 
+/*
+ * Панели ЛК / админки / заведения: на узком экране (< lg) колонка <main> без горизонтальных px —
+ * .app-panel-main-surface тянется на всю ширину, как шапка; отступы контента задаются в #main-content (px-4 sm:px-6).
+ * Ряд кнопки «Меню»: .app-panel-mobile-nav (те же боковые отступы, что у шапки).
+ */
+
 /* Выпадающий список навигации (мобильный) — продолжение кнопки «Меню» */
 .cabinet-premium .cabinet-nav-dropdown {
   box-shadow: var(--shadow-card), 0 0 0 1px rgba(197, 165, 114, 0.12);
@@ -1888,38 +1894,48 @@ html:not([data-theme="dark"]) .layout-auth .site-header .site-header-logo-free {
   color: var(--color-navy) !important;
 }
 
-/* В ЛК (официант и админ) шторка на всю ширину страницы с небольшими отступами слева и справа */
+/* ЛК / админ / заведение: шапка и панель — одни и те же боковые поля (десктоп) */
 body.cabinet-page .site-header,
-body.admin-page .site-header {
+body.admin-page .site-header,
+body.establishment-page .site-header {
   margin-left: 1rem;
   margin-right: 1rem;
   width: calc(100% - 2rem);
   max-width: none;
   margin-top: 1rem;
+  box-sizing: border-box;
 }
 
-/* Основной блок ЛК и админки — те же отступы от краёв, что у шапки (визуальное выравнивание справа) */
 body.cabinet-page .cabinet-premium,
-body.admin-page .admin-panel.cabinet-premium {
+body.admin-page .admin-panel.cabinet-premium,
+body.establishment-page .establishment-panel.cabinet-premium {
   margin-left: 1rem;
   margin-right: 1rem;
   width: calc(100% - 2rem);
   max-width: none;
+  box-sizing: border-box;
 }
 
-/* Мобильная версия: шапка и основной блок во всю ширину страницы (скругления как у .cabinet-main-block — в Tailwind на header) */
-@media (max-width: 1024px) {
+/*
+ * Мобильная (< lg, 1024px): не нулевые поля — один gutter у шапки и у панели,
+ * чтобы карточка контента совпадала по ширине с шапкой (и safe-area на вырезах).
+ */
+@media (max-width: 1023px) {
   body.cabinet-page .site-header,
-  body.admin-page .site-header {
-    margin-left: 0;
-    margin-right: 0;
-    width: 100%;
+  body.admin-page .site-header,
+  body.establishment-page .site-header {
+    margin-left: max(0.75rem, env(safe-area-inset-left, 0px));
+    margin-right: max(0.75rem, env(safe-area-inset-right, 0px));
+    width: auto;
+    max-width: none;
   }
   body.cabinet-page .cabinet-premium,
-  body.admin-page .admin-panel.cabinet-premium {
-    margin-left: 0;
-    margin-right: 0;
-    width: 100%;
+  body.admin-page .admin-panel.cabinet-premium,
+  body.establishment-page .establishment-panel.cabinet-premium {
+    margin-left: max(0.75rem, env(safe-area-inset-left, 0px));
+    margin-right: max(0.75rem, env(safe-area-inset-right, 0px));
+    width: auto;
+    max-width: none;
   }
 }
 
@@ -4607,7 +4623,8 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
-  max-width: 100vw;
+  /* 100% вместо 100vw: на мобильных 100vw часто шире видимой области (полоса прокрутки) и даёт горизонтальный скролл */
+  max-width: 100%;
 }
 
 body {
@@ -4617,7 +4634,7 @@ body {
   text-rendering: optimizeLegibility;
   line-height: 1.6;
   overflow-x: hidden;
-  max-width: 100vw;
+  max-width: 100%;
 }
 
 /* ============================================

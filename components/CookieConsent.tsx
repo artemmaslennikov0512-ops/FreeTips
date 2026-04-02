@@ -48,7 +48,7 @@ export function CookieConsent() {
       role="dialog"
       aria-live="polite"
       aria-label="Уведомление об использовании cookies"
-      className="fixed bottom-0 left-0 right-0 z-50 border-0 bg-[var(--color-white)] px-4 py-4 text-[var(--color-text)] shadow-[var(--shadow-medium)] sm:px-6"
+      className="fixed bottom-0 left-0 right-0 z-50 border-0 bg-[var(--color-white)] px-4 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] text-[var(--color-text)] shadow-[var(--shadow-medium)] sm:px-6"
     >
       <div className="mx-auto flex max-w-6xl flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-[var(--color-text-secondary)]">

@@ -1,18 +1,17 @@
 /**
- * TOTP для админов (Google Authenticator и совместимые приложения).
- * otplib v13: generateSecret, generateURI, verifySync.
+ * TOTP (Google Authenticator) для любого пользователя.
  */
 
 import { generateSecret, generateURI, verifySync } from "otplib";
 import { decryptTotpSecret } from "@/lib/auth/totp-crypto";
 
-const ISSUER = "1tips Admin";
+const ISSUER = "1tips";
 
 export function generateTotpSecretBase32(): string {
   return generateSecret();
 }
 
-export function buildAdminOtpauthUri(login: string, secretBase32: string): string {
+export function buildUserOtpauthUri(login: string, secretBase32: string): string {
   return generateURI({ issuer: ISSUER, label: login, secret: secretBase32 });
 }
 
@@ -31,9 +30,9 @@ export function verifyTotpCode(secretBase32: string, token: string): boolean {
   }
 }
 
-export function verifyTotpWithEncryptedSecret(adminTotpSecretEnc: string | null, token: string): boolean {
-  if (!adminTotpSecretEnc) return false;
-  const secret = decryptTotpSecret(adminTotpSecretEnc);
+export function verifyTotpWithEncryptedSecret(totpSecretEnc: string | null, token: string): boolean {
+  if (!totpSecretEnc) return false;
+  const secret = decryptTotpSecret(totpSecretEnc);
   if (!secret) return false;
   return verifyTotpCode(secret, token);
 }

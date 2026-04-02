@@ -18,8 +18,8 @@ const authSelect = {
   passwordHash: true,
   mustChangePassword: true,
   isBlocked: true,
-  adminTotpEnabled: true,
-  adminTotpSecretEnc: true,
+  totpEnabled: true,
+  totpSecretEnc: true,
 } as const;
 
 export class PrismaUserRepository implements IUserRepository {

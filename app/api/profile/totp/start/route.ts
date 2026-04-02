@@ -1,22 +1,21 @@
 /**
- * POST /api/admin/totp/start
- * Начало привязки Google Authenticator: генерирует секрет, сохраняет в БД (ожидание подтверждения кода).
- * Роли: ADMIN, SUPERADMIN
+ * POST /api/profile/totp/start
+ * Начало привязки Google Authenticator (любой авторизованный пользователь).
  */
 
 import { NextRequest, NextResponse } from "next/server";
 import QRCode from "qrcode";
-import { requireRole } from "@/lib/middleware/auth";
+import { requireAuth } from "@/lib/middleware/auth";
 import { db } from "@/lib/db";
 import { encryptTotpSecret } from "@/lib/auth/totp-crypto";
-import { buildAdminOtpauthUri, generateTotpSecretBase32 } from "@/lib/auth/admin-totp";
+import { buildUserOtpauthUri, generateTotpSecretBase32 } from "@/lib/auth/user-totp";
 import { logError, logSecurity } from "@/lib/logger";
 import { getRequestId } from "@/lib/security/request";
 import { jsonError, internalError } from "@/lib/api/helpers";
 
 export async function POST(request: NextRequest) {
   const requestId = getRequestId(request);
-  const auth = await requireRole(["ADMIN", "SUPERADMIN"])(request);
+  const auth = await requireAuth(request);
   if (auth.response) return auth.response;
 
   const userId = auth.user.userId;
@@ -24,14 +23,14 @@ export async function POST(request: NextRequest) {
   try {
     const existing = await db.user.findUnique({
       where: { id: userId },
-      select: { login: true, adminTotpEnabled: true },
+      select: { login: true, totpEnabled: true },
     });
 
     if (!existing) {
       return jsonError(404, "Пользователь не найден");
     }
 
-    if (existing.adminTotpEnabled) {
+    if (existing.totpEnabled) {
       return jsonError(400, "Двухфакторная аутентификация уже включена. Сначала отключите её.");
     }
 
@@ -39,16 +38,16 @@ export async function POST(request: NextRequest) {
     const enc = encryptTotpSecret(secretBase32);
     await db.user.update({
       where: { id: userId },
-      data: { adminTotpSecretEnc: enc, adminTotpEnabled: false },
+      data: { totpSecretEnc: enc, totpEnabled: false },
     });
 
-    const otpauthUrl = buildAdminOtpauthUri(existing.login, secretBase32);
+    const otpauthUrl = buildUserOtpauthUri(existing.login, secretBase32);
     const qrDataUrl = await QRCode.toDataURL(otpauthUrl, { width: 220, margin: 1 });
 
-    logSecurity("admin.totp.start", { requestId, userId });
+    logSecurity("profile.totp.start", { requestId, userId });
     return NextResponse.json({ otpauthUrl, qrDataUrl }, { status: 200 });
   } catch (err) {
-    logError("admin.totp.start.error", err, { requestId, userId });
+    logError("profile.totp.start.error", err, { requestId, userId });
     return internalError("Не удалось подготовить привязку");
   }
 }

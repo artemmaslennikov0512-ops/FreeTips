@@ -39,8 +39,8 @@ export function AppPremium() {
       />
       <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8 xl:max-w-7xl 2xl:max-w-screen-2xl relative z-10">
         <div className="max-w-[700px] mx-auto mb-10 sm:mb-14 flex flex-col items-center text-center">
-          <div className="flex flex-nowrap items-center justify-center gap-3 sm:gap-4 mb-4 w-full">
-            <h2 className="font-[family:var(--font-playfair)] text-2xl sm:text-3xl lg:text-4xl font-semibold !text-white">
+          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 mb-4 w-full min-w-0">
+            <h2 className="font-[family:var(--font-playfair)] text-2xl sm:text-3xl lg:text-4xl font-semibold !text-white min-w-0 max-w-full text-center">
               Своё приложение FreeTips
             </h2>
             <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center shrink-0 bg-[rgba(197,165,114,0.2)] text-[var(--color-accent-gold)] shadow-[0_4px_12px_rgba(0,0,0,0.15)]" aria-hidden>

@@ -122,6 +122,8 @@ function LoginForm() {
         localStorage.setItem("accessToken", data.accessToken);
         if (data.mustChangePassword) {
           router.push("/change-password");
+        } else if (data.user?.role === "ESTABLISHMENT_ADMIN") {
+          router.push("/establishment");
         } else if (data.user?.role === "ADMIN" || data.user?.role === "SUPERADMIN") {
           router.push("/admin/dashboard");
         } else {

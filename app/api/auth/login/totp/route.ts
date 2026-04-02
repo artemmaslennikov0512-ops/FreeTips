@@ -1,26 +1,26 @@
 /**
  * POST /api/auth/login/totp
- * Второй шаг входа для ADMIN/SUPERADMIN с включённым TOTP: twoFactorToken + 6-значный код.
+ * Второй шаг входа при включённом TOTP: twoFactorToken + 6-значный код.
  */
 
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { loginAdminTotpSchema } from "@/lib/validations";
-import { generateAccessToken, generateRefreshToken, setRefreshTokenCookie, verifyAdminTwoFactorPendingToken } from "@/lib/auth/jwt";
-import { checkRateLimitByIP, getClientIP, AUTH_ADMIN_TOTP_RATE_LIMIT } from "@/lib/middleware/rate-limit";
+import { loginTotpSchema } from "@/lib/validations";
+import { generateAccessToken, generateRefreshToken, setRefreshTokenCookie, verifyTwoFactorPendingToken } from "@/lib/auth/jwt";
+import { checkRateLimitByIP, getClientIP, AUTH_TOTP_VERIFY_RATE_LIMIT } from "@/lib/middleware/rate-limit";
 import { logError, logSecurity } from "@/lib/logger";
 import { getRequestId } from "@/lib/security/request";
 import { parseJsonWithLimit, MAX_BODY_SIZE_AUTH, jsonError, internalError, rateLimit429Response, zodErrorResponse } from "@/lib/api/helpers";
 import { verifyCsrfFromRequest } from "@/lib/security/csrf";
 import { z } from "zod";
-import { verifyTotpWithEncryptedSecret } from "@/lib/auth/admin-totp";
+import { verifyTotpWithEncryptedSecret } from "@/lib/auth/user-totp";
 import { observeSharedAuthIp } from "@/lib/fraud-velocity-observe";
 
 export async function POST(request: NextRequest) {
   const requestId = getRequestId(request);
   const ip = getClientIP(request);
   try {
-    const rateLimit = await checkRateLimitByIP(ip, AUTH_ADMIN_TOTP_RATE_LIMIT);
+    const rateLimit = await checkRateLimitByIP(ip, AUTH_TOTP_VERIFY_RATE_LIMIT);
     if (!rateLimit.allowed) return rateLimit429Response(rateLimit);
     if (!verifyCsrfFromRequest(request)) {
       return jsonError(403, "Некорректный CSRF токен");
@@ -28,17 +28,12 @@ export async function POST(request: NextRequest) {
 
     const parsed = await parseJsonWithLimit(request, MAX_BODY_SIZE_AUTH);
     if (!parsed.ok) return parsed.response;
-    const validated = loginAdminTotpSchema.parse(parsed.data);
+    const validated = loginTotpSchema.parse(parsed.data);
 
-    const pending = await verifyAdminTwoFactorPendingToken(validated.twoFactorToken);
+    const pending = await verifyTwoFactorPendingToken(validated.twoFactorToken);
     if (!pending) {
       logSecurity("auth.login.totp.invalid_pending_token", { requestId, ip });
       return jsonError(401, "Сессия подтверждения истекла. Войдите снова.");
-    }
-
-    const role = pending.role;
-    if (role !== "ADMIN" && role !== "SUPERADMIN") {
-      return jsonError(403, "Недостаточно прав");
     }
 
     const user = await db.user.findUnique({
@@ -50,8 +45,8 @@ export async function POST(request: NextRequest) {
         role: true,
         mustChangePassword: true,
         isBlocked: true,
-        adminTotpEnabled: true,
-        adminTotpSecretEnc: true,
+        totpEnabled: true,
+        totpSecretEnc: true,
       },
     });
 
@@ -68,11 +63,11 @@ export async function POST(request: NextRequest) {
       return jsonError(401, "Некорректный токен подтверждения");
     }
 
-    if (!user.adminTotpEnabled || !user.adminTotpSecretEnc) {
+    if (!user.totpEnabled || !user.totpSecretEnc) {
       return jsonError(400, "Двухфакторная аутентификация не включена");
     }
 
-    if (!verifyTotpWithEncryptedSecret(user.adminTotpSecretEnc, validated.code)) {
+    if (!verifyTotpWithEncryptedSecret(user.totpSecretEnc, validated.code)) {
       logSecurity("auth.login.totp.wrong_code", { requestId, ip, userId: user.id });
       return jsonError(401, "Неверный код");
     }
@@ -98,12 +93,12 @@ export async function POST(request: NextRequest) {
       data: {
         userId: user.id,
         refreshToken,
-        deviceInfo: JSON.stringify({ ip, adminTotp: true }),
+        deviceInfo: JSON.stringify({ ip, totp: true }),
         expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
       },
     });
 
-    logSecurity("auth.login.success_after_totp", { requestId, ip, userId: user.id });
+    logSecurity("auth.login.success_after_2fa", { requestId, ip, userId: user.id });
     return NextResponse.json(
       {
         accessToken,

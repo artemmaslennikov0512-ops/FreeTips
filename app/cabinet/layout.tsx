@@ -15,7 +15,6 @@ import {
   ShieldCheck,
   BadgeCheck,
   Building2,
-  ChevronDown,
   User,
 } from "lucide-react";
 import { CABINET_WAITER_BTN } from "@/lib/cabinet-button-classes";
@@ -233,7 +232,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
 
   return (
     <div
-      className={`cabinet-premium flex min-h-screen w-full max-w-full overflow-x-hidden font-[family:var(--font-inter)] text-[var(--color-text)] pt-2 ${isM5Cabinet ? "bg-transparent" : "bg-[var(--color-bg)]"}`}
+      className={`cabinet-premium flex min-h-screen w-full max-w-full overflow-x-hidden font-[family:var(--font-inter)] text-[var(--color-text)] pt-0 lg:pt-2 ${isM5Cabinet ? "bg-transparent" : "bg-[var(--color-bg)]"}`}
       data-brand-active={applyEstablishmentBrand ? "true" : undefined}
       data-cabinet-theme={isM5Cabinet ? "m5-competition" : undefined}
       style={Object.keys(brandStyle).length ? brandStyle : undefined}
@@ -343,7 +342,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
         </div>
       </div>
 
-      <main className="relative min-h-screen min-w-0 flex-1 overflow-x-hidden px-4 sm:px-6 pt-2 pb-4 lg:pl-0 lg:pr-4 lg:ml-0 lg:mr-0 flex flex-col">
+      <main className="relative min-h-screen min-w-0 flex-1 overflow-x-hidden px-0 pt-1 pb-4 lg:px-0 lg:pt-2 lg:pr-4 lg:ml-0 lg:mr-0 flex flex-col">
         {/* Затемнение основного контента под выпадающим меню (z ниже шапки z-30, выше карточки) */}
         {sidebarOpen && (
           <div
@@ -353,7 +352,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
             aria-hidden
           />
         )}
-        <div className="relative z-[50] mb-4 shrink-0 lg:hidden">
+        <div className="app-panel-mobile-nav relative z-[50] mb-2 shrink-0 px-4 sm:px-6 lg:hidden">
           <button
             ref={menuButtonRef}
             type="button"
@@ -364,16 +363,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
             aria-haspopup="true"
             aria-controls="cabinet-nav-dropdown"
           >
-            <span
-              className="pointer-events-none absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center gap-0.5"
-              aria-hidden
-            >
-              <Menu className="h-6 w-6 shrink-0" strokeWidth={2} />
-              <ChevronDown
-                className={`h-4 w-4 shrink-0 transition-transform duration-200 ${sidebarOpen ? "rotate-180" : ""}`}
-                aria-hidden
-              />
-            </span>
+            <Menu className="h-6 w-6 shrink-0 pointer-events-none" strokeWidth={2} aria-hidden />
           </button>
           <div
             id="cabinet-nav-dropdown"
@@ -464,10 +454,10 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
         </div>
         {/* Основной блок — тянется до низа страницы с отступом */}
         <div
-          className="cabinet-main-block relative z-10 mt-0 mr-0 mb-4 ml-0 flex min-h-0 w-full max-w-full flex-1 flex-col rounded-lg border border-white/10 backdrop-blur-xl md:rounded-[10px] lg:mr-4 lg:ml-4"
+          className="cabinet-main-block app-panel-main-surface relative z-10 mt-0 mr-0 mb-4 ml-0 flex min-h-0 w-full max-w-full flex-1 flex-col rounded-lg border border-white/10 backdrop-blur-xl md:rounded-[10px] lg:mr-4 lg:ml-4"
           style={mainBlockStyle}
         >
-          <div className="px-0 py-4 md:py-6 lg:p-8" id="main-content">
+          <div className="px-4 py-3 sm:px-6 md:py-6 lg:p-8" id="main-content">
             {children}
           </div>
         </div>

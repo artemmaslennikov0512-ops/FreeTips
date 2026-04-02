@@ -11,7 +11,7 @@ import { verifyPassword } from "@/lib/auth/password";
 import {
   generateAccessToken,
   generateRefreshToken,
-  generateAdminTwoFactorPendingToken,
+  generateTwoFactorPendingToken,
   setRefreshTokenCookie,
 } from "@/lib/auth/jwt";
 import { checkRateLimitByIP, getClientIP, AUTH_RATE_LIMIT } from "@/lib/middleware/rate-limit";
@@ -22,6 +22,11 @@ import { verifyCsrfFromRequest } from "@/lib/security/csrf";
 import { z } from "zod";
 import { FRAUD_RULE, recordFraudSignal } from "@/lib/fraud-signals";
 import { observeSharedAuthIp } from "@/lib/fraud-velocity-observe";
+import {
+  clearWrongPasswordAttempts,
+  recordWrongPasswordAttempt,
+  WRONG_PASSWORD_ATTEMPTS_BEFORE_SIGNAL,
+} from "@/lib/login-wrong-password-tracker";
 
 export async function POST(request: NextRequest) {
   const requestId = getRequestId(request);
@@ -60,15 +65,20 @@ export async function POST(request: NextRequest) {
     const isValidPassword = await verifyPassword(validated.password, user.passwordHash);
     if (!isValidPassword) {
       logSecurity("auth.login.failed", { requestId, ip });
-      void recordFraudSignal({
-        userId: user.id,
-        ruleCode: FRAUD_RULE.LOGIN_WRONG_PASSWORD,
-        message: "Неверный пароль при входе (логин существует)",
-        metadata: { ip },
-        dedupeMinutes: 45,
-      });
+      const fails = recordWrongPasswordAttempt(user.id);
+      if (fails >= WRONG_PASSWORD_ATTEMPTS_BEFORE_SIGNAL) {
+        void recordFraudSignal({
+          userId: user.id,
+          ruleCode: FRAUD_RULE.LOGIN_WRONG_PASSWORD,
+          message: `Много неверных паролей подряд (${fails} за окно наблюдения)`,
+          metadata: { ip, attemptsInWindow: fails },
+          dedupeMinutes: 45,
+        });
+      }
       return jsonError(401, "Неверный логин или пароль");
     }
+
+    clearWrongPasswordAttempts(user.id);
 
     await db.user.update({
       where: { id: user.id },
@@ -76,14 +86,13 @@ export async function POST(request: NextRequest) {
     });
     void observeSharedAuthIp(user.id, ip);
 
-    const isAdminRole = user.role === "ADMIN" || user.role === "SUPERADMIN";
-    if (isAdminRole && user.adminTotpEnabled && user.adminTotpSecretEnc) {
-      const twoFactorToken = await generateAdminTwoFactorPendingToken({
+    if (user.totpEnabled && user.totpSecretEnc) {
+      const twoFactorToken = await generateTwoFactorPendingToken({
         userId: user.id,
         login: user.login,
         role: user.role,
       });
-      logSecurity("auth.login.pending_admin_2fa", { requestId, ip, userId: user.id });
+      logSecurity("auth.login.pending_2fa", { requestId, ip, userId: user.id });
       return NextResponse.json(
         { needsTwoFactor: true, twoFactorToken },
         { status: 200 },

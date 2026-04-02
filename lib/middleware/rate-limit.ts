@@ -7,6 +7,7 @@
 import type { NextRequest } from "next/server";
 import { checkRateLimitRedis } from "@/lib/rate-limit-redis";
 import { getRedisUrl } from "@/lib/config";
+import { cleanupWrongPasswordAttemptsExpired } from "@/lib/login-wrong-password-tracker";
 
 export type RateLimitResult = { allowed: boolean; remaining: number; resetAt: number };
 
@@ -29,11 +30,11 @@ export const AUTH_RATE_LIMIT = {
   keyPrefix: "auth",
 } as const;
 
-/** Проверка TOTP при входе админа — жёстче против перебора */
-export const AUTH_ADMIN_TOTP_RATE_LIMIT = {
+/** Проверка TOTP при входе — жёстче против перебора */
+export const AUTH_TOTP_VERIFY_RATE_LIMIT = {
   windowMs: 15 * 60 * 1000,
   maxRequests: 25,
-  keyPrefix: "auth-admin-totp",
+  keyPrefix: "auth-totp-verify",
 } as const;
 
 /** Окно и лимит для публичной подачи заявки на регистрацию */
@@ -204,6 +205,7 @@ export function cleanupExpiredEntries(): void {
   for (const [key, entry] of genericStore.entries()) {
     if (now > entry.resetAt) genericStore.delete(key);
   }
+  cleanupWrongPasswordAttemptsExpired();
 }
 
 const CLEANUP_INTERVAL_MS = 5 * 60 * 1000; // 5 минут

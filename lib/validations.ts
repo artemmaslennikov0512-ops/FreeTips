@@ -101,21 +101,21 @@ export const loginRequestSchema = z.object({
 });
 
 /** Код из Google Authenticator (6 цифр) */
-export const adminTotpCodeSchema = z
+export const totpCodeSchema = z
   .string()
   .trim()
   .regex(/^\d{6}$/, "Введите 6 цифр кода");
 
-/** Завершение входа админа после TOTP */
-export const loginAdminTotpSchema = z.object({
+/** Завершение входа после TOTP */
+export const loginTotpSchema = z.object({
   twoFactorToken: z.string().min(10, "Некорректный токен"),
-  code: adminTotpCodeSchema,
+  code: totpCodeSchema,
 });
 
-/** Отключение TOTP в админке */
-export const adminTotpDisableSchema = z.object({
+/** Отключение TOTP */
+export const totpDisableSchema = z.object({
   password: z.string().min(1, "Введите пароль").max(PASSWORD_MAX_LENGTH),
-  code: adminTotpCodeSchema,
+  code: totpCodeSchema,
 });
 
 // Запрос сброса пароля: только логин и email (логин без учёта регистра)

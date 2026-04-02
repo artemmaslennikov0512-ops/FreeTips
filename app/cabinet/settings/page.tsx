@@ -6,6 +6,7 @@ import { User, Loader2, CheckCircle2, Camera, ImageIcon } from "lucide-react";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { getAccessToken, authHeaders, clearAccessToken } from "@/lib/auth-client";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
+import { ProfileTotpSection } from "@/components/ProfileTotpSection";
 import { patchProfileSchema, changePasswordSchema } from "@/lib/validations";
 import { getFieldErrors } from "@/lib/form-errors";
 import { cabinetInputClassName } from "../shared";
@@ -523,6 +524,16 @@ export default function CabinetSettingsPage() {
           Сохранить
         </button>
         </div>
+        </div>
+      </div>
+
+      <div id="settings-2fa" className="cabinet-card rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden">
+        <div className="border-0 px-6 py-4">
+          <h2 className="font-[family:var(--font-playfair)] text-lg font-semibold text-[var(--color-text)]">Безопасность</h2>
+          <p className="mt-1 text-sm text-[var(--color-text-secondary)]">Двухфакторный вход через приложение вроде Google Authenticator.</p>
+        </div>
+        <div className="border-t border-[var(--color-dark-gray)]/10 px-6 pb-6">
+          <ProfileTotpSection variant="cabinet" embedded />
         </div>
       </div>
 

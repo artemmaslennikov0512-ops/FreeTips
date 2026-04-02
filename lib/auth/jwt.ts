@@ -26,15 +26,15 @@ export interface TokenPayload extends JWTPayload {
   role: string;
 }
 
-/** Одноразовый шаг после пароля, до выдачи сессии (TOTP для админа) */
-export interface AdminTwoFactorPendingPayload extends JWTPayload {
-  purpose: "admin_2fa_pending";
+/** Одноразовый шаг после пароля, до выдачи сессии (TOTP) */
+export interface TwoFactorPendingPayload extends JWTPayload {
+  purpose: "login_2fa_pending";
   userId: string;
   login: string;
   role: string;
 }
 
-const ADMIN_2FA_PENDING_EXPIRES = "10m";
+const LOGIN_2FA_PENDING_EXPIRES = "10m";
 
 /**
  * Генерирует access token (короткоживущий)
@@ -86,26 +86,28 @@ export async function verifyRefreshToken(token: string): Promise<TokenPayload | 
   }
 }
 
-export async function generateAdminTwoFactorPendingToken(
-  payload: Pick<AdminTwoFactorPendingPayload, "userId" | "login" | "role">,
+export async function generateTwoFactorPendingToken(
+  payload: Pick<TwoFactorPendingPayload, "userId" | "login" | "role">,
 ): Promise<string> {
-  const body: AdminTwoFactorPendingPayload = {
+  const body: TwoFactorPendingPayload = {
     ...payload,
-    purpose: "admin_2fa_pending",
+    purpose: "login_2fa_pending",
   };
   return new SignJWT(body)
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
-    .setExpirationTime(ADMIN_2FA_PENDING_EXPIRES)
+    .setExpirationTime(LOGIN_2FA_PENDING_EXPIRES)
     .sign(getJWTSecretKey());
 }
 
-export async function verifyAdminTwoFactorPendingToken(token: string): Promise<AdminTwoFactorPendingPayload | null> {
+export async function verifyTwoFactorPendingToken(token: string): Promise<TwoFactorPendingPayload | null> {
   try {
     const { payload } = await jwtVerify(token, getJWTSecretKey(), { algorithms: ["HS256"] });
-    const p = payload as AdminTwoFactorPendingPayload;
-    if (p.purpose !== "admin_2fa_pending" || !p.userId || !p.login || !p.role) return null;
-    return p;
+    const p = payload as TwoFactorPendingPayload & { purpose?: string };
+    const okPurpose =
+      p.purpose === "login_2fa_pending" || p.purpose === "admin_2fa_pending";
+    if (!okPurpose || !p.userId || !p.login || !p.role) return null;
+    return p as TwoFactorPendingPayload;
   } catch {
     return null;
   }

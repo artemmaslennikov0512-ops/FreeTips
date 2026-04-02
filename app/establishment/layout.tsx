@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
-import { LayoutDashboard, LogOut, Users, PieChart, BarChart3, Palette, Menu, QrCode } from "lucide-react";
+import { LayoutDashboard, LogOut, Users, PieChart, BarChart3, Palette, Menu, QrCode, KeyRound } from "lucide-react";
 import { getAccessToken, fetchWithAuth, clearAccessToken } from "@/lib/auth-client";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
@@ -21,6 +21,7 @@ const NAV = [
   { label: "Распределение", href: "/establishment/payout-rules" },
   { label: "Аналитика", href: "/establishment/analytics" },
   { label: "Бренд", href: "/establishment/brand" },
+  { label: "Безопасность", href: "/establishment/security" },
 ] as const;
 
 export default function EstablishmentLayout({ children }: { children: React.ReactNode }) {
@@ -128,11 +129,11 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
   }
 
   const isActive = (href: string) => pathname === href || (href !== "/establishment" && pathname.startsWith(href));
-  const navIcons = [LayoutDashboard, Users, QrCode, PieChart, BarChart3, Palette] as const;
+  const navIcons = [LayoutDashboard, Users, QrCode, PieChart, BarChart3, Palette, KeyRound] as const;
   const closeSidebar = () => setSidebarOpen(false);
 
   return (
-    <div className="establishment-panel cabinet-premium flex min-h-screen w-full min-w-0 max-w-full overflow-x-hidden bg-[var(--color-bg)] font-[family:var(--font-inter)] text-white pt-4">
+    <div className="establishment-panel cabinet-premium flex min-h-screen w-full min-w-0 max-w-full overflow-x-hidden bg-[var(--color-bg)] font-[family:var(--font-inter)] text-white pt-0 lg:pt-4">
       {/* Шторка на мобильном */}
       <div
         className={`cabinet-overlay fixed inset-0 z-30 bg-[rgba(15,23,42,0.65)] backdrop-blur-xl transition-opacity duration-300 lg:hidden ${
@@ -190,10 +191,10 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
         </nav>
       </aside>
 
-      <main className="min-h-0 min-w-0 flex-1 overflow-x-hidden px-4 sm:px-6 lg:pl-0 lg:pr-0 lg:ml-0 flex flex-col">
-        <div className="cabinet-main-block mt-4 mr-0 mb-4 ml-0 lg:mt-0 lg:mr-0 lg:ml-4 flex min-h-0 flex-1 flex-col rounded-[10px] border border-white/10 bg-white/[0.06] backdrop-blur-xl">
-          <div className="px-0 py-6 lg:p-8" id="main-content">
-            <div className="mb-4 lg:hidden">
+      <main className="min-h-0 min-w-0 flex-1 overflow-x-hidden px-0 pt-1 lg:pt-0 lg:pl-0 lg:pr-0 lg:ml-0 flex flex-col">
+        <div className="cabinet-main-block app-panel-main-surface mt-1 mr-0 mb-4 ml-0 flex min-h-0 flex-1 flex-col rounded-lg border border-white/10 bg-white/[0.06] backdrop-blur-xl lg:mt-0 lg:mr-0 lg:ml-4 lg:rounded-[10px]">
+          <div className="px-4 py-4 sm:px-6 lg:p-8" id="main-content">
+            <div className="app-panel-mobile-nav mb-2 lg:hidden">
               <button
                 type="button"
                 onClick={() => setSidebarOpen(true)}

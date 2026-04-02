@@ -84,7 +84,9 @@ export function PremiumCard({ fullName, balanceKop, compact, variant = "default"
   return (
     <>
       <style>{CARD_STYLES}</style>
-      <div className={`flex flex-col items-center ${compact ? "gap-4" : "gap-6"}`}>
+      <div
+        className={`flex w-full max-w-[320px] flex-col items-center ${compact ? "gap-4" : "gap-6"}`}
+      >
         {!compact &&
           (isM5 ? (
             <>

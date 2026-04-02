@@ -15,6 +15,7 @@
  *
  * На сервере с Docker: из корня проекта
  *   docker compose exec web ./node_modules/.bin/tsx scripts/utils/relocate-one-transaction.ts <args>
+ * или без .bin: docker compose exec web node node_modules/tsx/dist/cli.mjs scripts/utils/relocate-one-transaction.ts <args>
  * (не npx tsx — у пользователя nextjs нет доступной домашней директории для кэша npm).
  * С хоста: если в .env указан localhost/127.0.0.1 с портом 5432 или без порта, скрипт подставляет 15432
  * (проброс PostgreSQL из docker-compose на хост). Отключить: DATABASE_URL_NO_DOCKER_HOST_PORT_REMAP=1.

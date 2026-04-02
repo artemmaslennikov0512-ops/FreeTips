@@ -28,6 +28,8 @@ import {
 } from "@/config/pay-branding-overrides";
 import { mergePayPageBranding } from "@/lib/pay-branding-merge";
 import { isCabinetM5CompetitionTheme } from "@/config/cabinet-theme-logins";
+import { getPlatformPaymentSettings } from "@/lib/platform-payment-settings";
+import { recipientCanAcceptIncomingTips } from "@/lib/payment-accept-policy";
 
 const DEMO_SLUG = "demoPaySlug" in site && typeof site.demoPaySlug === "string" ? site.demoPaySlug : null;
 
@@ -37,12 +39,13 @@ export async function GET(request: NextRequest, { params }: Params) {
   const { slug } = await params;
 
   if (DEMO_SLUG && slug === DEMO_SLUG) {
-    return NextResponse.json({ recipientName: "Демо-получатель" });
+    return NextResponse.json({ recipientName: "Демо-получатель", acceptPayments: false });
   }
 
-  const tipLink = await db.tipLink.findUnique({
-    where: { slug },
-    select: {
+  const [tipLink, paymentSettings] = await Promise.all([
+    db.tipLink.findUnique({
+      where: { slug },
+      select: {
       id: true,
       employeeId: true,
       employee: {
@@ -68,7 +71,9 @@ export async function GET(request: NextRequest, { params }: Params) {
       },
       user: { select: { id: true, login: true, fullName: true, savingFor: true, profilePhotoUrl: true } },
     },
-  });
+  }),
+    getPlatformPaymentSettings(),
+  ]);
 
   if (!tipLink) {
     return NextResponse.json({ error: "Ссылка не найдена" }, { status: 404 });
@@ -118,8 +123,11 @@ export async function GET(request: NextRequest, { params }: Params) {
       : tipLink.user.profilePhotoUrl
         ? `${baseUrl.replace(/\/$/, "")}/api/profile/photo/${tipLink.user.id}`
         : undefined;
+  const acceptPayments = recipientCanAcceptIncomingTips(tipLink.user.id, paymentSettings);
+
   return NextResponse.json({
     recipientName,
+    acceptPayments,
     ...(branding && { branding }),
     ...(savingFor && { savingFor }),
     ...(recipientPhotoUrl && { recipientPhotoUrl }),
@@ -156,10 +164,13 @@ export async function POST(request: NextRequest, { params }: Params) {
     return NextResponse.json({ error: "Некорректный запрос. Обновите страницу и попробуйте снова." }, { status: 403 });
   }
 
-  const tipLink = await db.tipLink.findUnique({
-    where: { slug },
-    select: { id: true, userId: true, user: { select: { isBlocked: true } } },
-  });
+  const [tipLink, paymentSettings] = await Promise.all([
+    db.tipLink.findUnique({
+      where: { slug },
+      select: { id: true, userId: true, user: { select: { isBlocked: true } } },
+    }),
+    getPlatformPaymentSettings(),
+  ]);
 
   if (!tipLink) {
     logSecurity("pay.init.not_found", { requestId, ip, slug });
@@ -168,6 +179,11 @@ export async function POST(request: NextRequest, { params }: Params) {
 
   if (tipLink.user.isBlocked) {
     logSecurity("pay.init.recipient_blocked", { requestId, ip, slug, recipientId: tipLink.userId });
+    return NextResponse.json({ error: "Приём чаевых временно недоступен" }, { status: 403 });
+  }
+
+  if (!recipientCanAcceptIncomingTips(tipLink.userId, paymentSettings)) {
+    logSecurity("pay.init.policy_blocked", { requestId, ip, slug, recipientId: tipLink.userId });
     return NextResponse.json({ error: "Приём чаевых временно недоступен" }, { status: 403 });
   }
 

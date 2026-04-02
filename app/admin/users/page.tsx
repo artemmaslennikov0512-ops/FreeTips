@@ -1,12 +1,19 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Search, Copy, Filter, ArrowUpDown, Lock, Check } from "lucide-react";
+import { Search, Copy, Filter, ArrowUpDown, Lock, Check, RefreshCw } from "lucide-react";
 import Link from "next/link";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { CustomDropdown } from "@/components/CustomDropdown";
 import { getBaseUrl } from "@/lib/get-base-url";
 import { formatDate, formatMoneyCompact } from "@/lib/utils";
+import {
+  ADMIN_BTN,
+  ADMIN_BTN_DANGER,
+  ADMIN_BTN_ICON,
+  ADMIN_BTN_PRIMARY,
+  ADMIN_BTN_SM,
+} from "@/lib/admin-button-classes";
 
 interface User {
   id: string;
@@ -85,13 +92,16 @@ export default function AdminUsersPage() {
     return () => clearTimeout(timer);
   }, [fetchUsers]);
 
+  const adminGoldPill =
+    "border border-[var(--color-brand-gold)]/35 bg-[var(--color-brand-gold)]/12 text-[var(--color-brand-gold)] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] transition-colors hover:border-[var(--color-brand-gold)]/50 hover:bg-[var(--color-brand-gold)]/18";
+
   const getRoleBadge = (role: string) => {
     const styles = {
-      RECIPIENT: "bg-[var(--color-dark-gray)]/50 text-white border border-white/20",
-      ADMIN: "bg-[var(--color-dark-gray)]/50 text-white border border-white/20",
-      SUPERADMIN: "bg-[var(--color-dark-gray)]/50 text-white border border-white/20",
-      ESTABLISHMENT_ADMIN: "bg-[var(--color-dark-gray)]/50 text-white border border-white/20",
-      EMPLOYEE: "bg-[var(--color-dark-gray)]/50 text-white border border-white/20",
+      RECIPIENT: adminGoldPill,
+      ADMIN: adminGoldPill,
+      SUPERADMIN: adminGoldPill,
+      ESTABLISHMENT_ADMIN: adminGoldPill,
+      EMPLOYEE: adminGoldPill,
     };
     const labels = {
       RECIPIENT: "Получатель",
@@ -190,6 +200,7 @@ export default function AdminUsersPage() {
       const data = (await res.json()) as { token: string; link?: string; expiresAt: string; validHours?: number };
       const link = data.link ?? `${getBaseUrl()}/register?token=${encodeURIComponent(data.token)}`;
       setRegistrationLink(link);
+      setLinkCopied(false);
     } catch {
       setError("Ошибка создания токена");
     } finally {
@@ -261,7 +272,7 @@ export default function AdminUsersPage() {
               type="button"
               onClick={handleCreateToken}
               disabled={tokenLoading}
-              className="admin-users-token-btn inline-flex items-center gap-2 rounded-xl bg-[var(--color-brand-gold)] px-4 py-2.5 text-[14px] font-semibold text-[#0a192f] transition-colors hover:opacity-90 disabled:opacity-60"
+              className={`admin-users-token-btn ${ADMIN_BTN} ${ADMIN_BTN_PRIMARY} gap-2 px-4 py-2.5 text-[14px] font-semibold disabled:opacity-60`}
             >
               {tokenLoading ? "Создание..." : "Выдать токен регистрации"}
             </button>
@@ -269,7 +280,7 @@ export default function AdminUsersPage() {
               type="button"
               onClick={handleBlockAll}
               disabled={blockAllLoading}
-              className="inline-flex items-center gap-1.5 rounded-xl border-0 bg-black px-4 py-2.5 text-[14px] font-semibold text-white transition-colors hover:bg-[#1a1a1a] disabled:opacity-60"
+              className={`${ADMIN_BTN} ${ADMIN_BTN_DANGER} gap-1.5 px-4 py-2.5 text-[14px] font-semibold`}
             >
               <Lock className="h-4 w-4" />
               {blockAllLoading ? "Выполняется..." : "Заблокировать всех"}
@@ -278,11 +289,7 @@ export default function AdminUsersPage() {
               <button
                 type="button"
                 onClick={handleCopyToken}
-                className={`flex items-center gap-1 rounded-lg border px-3 py-2 text-xs font-medium transition-colors ${
-                  linkCopied
-                    ? "border-[var(--color-accent-emerald)] bg-[var(--color-accent-emerald)]/20 text-white"
-                    : "border-white/25 bg-white/10 text-white hover:bg-white/20"
-                }`}
+                className={`${ADMIN_BTN} ${ADMIN_BTN_SM} gap-1 ${linkCopied ? "admin-btn--success" : "admin-btn--neutral"}`}
               >
                 {linkCopied ? (
                   <>
@@ -299,8 +306,20 @@ export default function AdminUsersPage() {
             )}
           </div>
           {registrationLink && (
-            <div className="mt-3 rounded-lg border-0 bg-[var(--color-light-gray)] px-3 py-2 font-mono text-xs text-[var(--color-text)]">
-              {registrationLink}
+            <div className="mt-3 flex items-stretch gap-2">
+              <div className="min-w-0 flex-1 rounded-lg border border-white/10 bg-black/20 px-3 py-2 font-mono text-xs text-white/90 break-all">
+                {registrationLink}
+              </div>
+              <button
+                type="button"
+                onClick={() => void handleCreateToken()}
+                disabled={tokenLoading}
+                title="Сгенерировать новую ссылку"
+                aria-label="Сгенерировать новую ссылку"
+                className={`${ADMIN_BTN} ${ADMIN_BTN_ICON} shrink-0 disabled:opacity-60`}
+              >
+                <RefreshCw className={`h-4 w-4 ${tokenLoading ? "animate-spin" : ""}`} aria-hidden />
+              </button>
             </div>
           )}
           {registrationLink && (
@@ -367,7 +386,7 @@ export default function AdminUsersPage() {
           <button
             type="button"
             onClick={() => setSortOrder((o) => (o === "desc" ? "asc" : "desc"))}
-            className="rounded-lg cabinet-section-header border-0 px-3 py-2 text-sm text-white hover:bg-white/10 transition-colors"
+            className={`cabinet-section-header ${ADMIN_BTN} admin-btn--neutral px-3 py-2 text-sm`}
           >
             {sortOrder === "desc" ? "↓ Убыв." : "↑ Возр."}
           </button>
@@ -376,7 +395,7 @@ export default function AdminUsersPage() {
           <button
             type="button"
             onClick={() => { setRoleFilter(""); setBlockedFilter(""); setSortBy("createdAt"); setSortOrder("desc"); }}
-            className="cabinet-section-header rounded-lg border-0 px-3 py-2 text-xs text-white/80 hover:text-white hover:bg-white/10 transition-colors"
+            className={`cabinet-section-header ${ADMIN_BTN} ${ADMIN_BTN_SM} admin-btn--neutral`}
           >
             Сбросить
           </button>
@@ -396,7 +415,7 @@ export default function AdminUsersPage() {
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <Link
                   href={`/admin/users/${user.id}`}
-                  className="min-w-0 flex-1 rounded-xl border border-white/25 bg-[var(--color-dark-gray)]/50 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-[var(--color-dark-gray)]/70 hover:border-white/40 break-all"
+                  className={`${ADMIN_BTN} min-w-0 flex-1 px-3 py-2 text-sm font-medium break-all`}
                 >
                   {user.login}
                 </Link>
@@ -419,7 +438,7 @@ export default function AdminUsersPage() {
                   type="button"
                   onClick={() => handleToggleBlocked(user)}
                   disabled={updatingId === user.id}
-                  className={`whitespace-nowrap rounded-lg border border-white/25 px-3 py-2 text-xs font-semibold text-white transition-colors bg-[var(--color-dark-gray)]/50 hover:bg-[var(--color-dark-gray)]/70 disabled:opacity-60 ${updatingId === user.id ? "opacity-60" : ""}`}
+                  className={`${ADMIN_BTN} ${ADMIN_BTN_SM} whitespace-nowrap font-semibold disabled:opacity-60 ${updatingId === user.id ? "opacity-60" : ""}`}
                 >
                   {user.isBlocked ? "Разблокировать" : "Ограничить"}
                 </button>
@@ -460,7 +479,7 @@ export default function AdminUsersPage() {
                   <td className="min-w-[120px] whitespace-nowrap px-4 py-3">
                     <Link
                       href={`/admin/users/${user.id}`}
-                      className="inline-block rounded-xl border border-white/25 bg-[var(--color-dark-gray)]/50 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[var(--color-dark-gray)]/70 hover:border-white/40 focus:outline-none focus:ring-2 focus:ring-white/30"
+                      className={`${ADMIN_BTN} inline-block px-4 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[var(--color-brand-gold)]/40`}
                     >
                       {user.login}
                     </Link>
@@ -477,7 +496,7 @@ export default function AdminUsersPage() {
                       type="button"
                       onClick={() => handleToggleBlocked(user)}
                       disabled={updatingId === user.id}
-                      className={`rounded-lg border border-white/25 px-3 py-1.5 text-xs font-semibold text-white transition-colors bg-[var(--color-dark-gray)]/50 hover:bg-[var(--color-dark-gray)]/70 disabled:opacity-60 whitespace-nowrap ${updatingId === user.id ? "opacity-60" : ""}`}
+                      className={`${ADMIN_BTN} ${ADMIN_BTN_SM} font-semibold disabled:opacity-60 whitespace-nowrap ${updatingId === user.id ? "opacity-60" : ""}`}
                     >
                       {user.isBlocked ? "Разблокировать" : "Ограничить"}
                     </button>

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Plus, Copy, RefreshCw } from "lucide-react";
 import { authHeaders } from "@/lib/auth-client";
+import { ADMIN_BTN, ADMIN_BTN_NEUTRAL_SM, ADMIN_BTN_PRIMARY, ADMIN_BTN_SM } from "@/lib/admin-button-classes";
 
 interface EstablishmentRow {
   id: string;
@@ -145,7 +146,7 @@ export default function AdminEstablishmentsPage() {
         <button
           type="button"
           onClick={() => setShowForm(true)}
-          className="inline-flex items-center gap-2 rounded-xl bg-[var(--color-brand-gold)] px-4 py-2.5 font-medium text-[#0a192f] hover:opacity-90"
+          className={`${ADMIN_BTN} ${ADMIN_BTN_PRIMARY} gap-2 px-4 py-2.5 font-medium`}
         >
           <Plus className="h-5 w-5" />
           Создать заведение
@@ -171,7 +172,7 @@ export default function AdminEstablishmentsPage() {
             <button
               type="button"
               onClick={() => copyLink(createdLink.link)}
-              className="inline-flex items-center gap-1 rounded-lg bg-white/10 px-3 py-2 text-sm text-white hover:bg-white/20"
+              className={`${ADMIN_BTN} admin-btn--neutral gap-1 px-3 py-2 text-sm`}
             >
               <Copy className="h-4 w-4" /> Копировать
             </button>
@@ -258,14 +259,14 @@ export default function AdminEstablishmentsPage() {
             <button
               type="submit"
               disabled={submitting}
-              className="rounded-xl bg-[var(--color-brand-gold)] px-4 py-2 font-medium text-[#0a192f] hover:opacity-90 disabled:opacity-50"
+              className={`${ADMIN_BTN} ${ADMIN_BTN_PRIMARY} px-4 py-2 disabled:opacity-50`}
             >
               {submitting ? "Создание…" : "Создать и получить ссылку"}
             </button>
             <button
               type="button"
               onClick={() => setShowForm(false)}
-              className="rounded-xl bg-white/10 px-4 py-2 text-white hover:bg-white/20"
+              className={`${ADMIN_BTN} admin-btn--neutral px-4 py-2`}
             >
               Отмена
             </button>
@@ -286,15 +287,15 @@ export default function AdminEstablishmentsPage() {
               <div className="mt-4 flex flex-wrap gap-2 border-t border-white/10 pt-3">
                 {linkByEstId[est.id] ? (
                   <>
-                    <button type="button" onClick={() => copyLink(linkByEstId[est.id])} className="inline-flex items-center gap-1 rounded-lg bg-white/10 px-3 py-2 text-xs text-white hover:bg-white/20">
+                    <button type="button" onClick={() => copyLink(linkByEstId[est.id])} className={`${ADMIN_BTN} ${ADMIN_BTN_NEUTRAL_SM} gap-1`}>
                       <Copy className="h-3 w-3" /> Копировать
                     </button>
-                    <button type="button" onClick={() => getOrRegenerateToken(est.id)} disabled={loadingTokenId === est.id} className="inline-flex items-center gap-1 rounded-lg bg-amber-500/20 px-3 py-2 text-xs text-amber-200 hover:bg-amber-500/30 disabled:opacity-50">
+                    <button type="button" onClick={() => getOrRegenerateToken(est.id)} disabled={loadingTokenId === est.id} className={`${ADMIN_BTN} ${ADMIN_BTN_SM} gap-1 disabled:opacity-50`}>
                       <RefreshCw className={`h-3 w-3 ${loadingTokenId === est.id ? "animate-spin" : ""}`} /> Сменить токен
                     </button>
                   </>
                 ) : (
-                  <button type="button" onClick={() => getOrRegenerateToken(est.id)} disabled={loadingTokenId === est.id} className="inline-flex items-center gap-1 rounded-lg bg-[var(--color-brand-gold)]/80 px-3 py-2 text-xs text-[#0a192f] hover:bg-[var(--color-brand-gold)] disabled:opacity-50">
+                  <button type="button" onClick={() => getOrRegenerateToken(est.id)} disabled={loadingTokenId === est.id} className={`${ADMIN_BTN} ${ADMIN_BTN_PRIMARY} ${ADMIN_BTN_SM} gap-1 disabled:opacity-50`}>
                     {loadingTokenId === est.id ? "…" : "Получить ссылку"}
                   </button>
                 )}
@@ -333,15 +334,15 @@ export default function AdminEstablishmentsPage() {
                   <td className="p-3">
                     {linkByEstId[est.id] ? (
                       <div className="flex flex-wrap items-center gap-2">
-                        <button type="button" onClick={() => copyLink(linkByEstId[est.id])} className="inline-flex items-center gap-1 rounded-lg bg-white/10 px-2 py-1.5 text-xs text-white hover:bg-white/20">
+                        <button type="button" onClick={() => copyLink(linkByEstId[est.id])} className={`${ADMIN_BTN} ${ADMIN_BTN_NEUTRAL_SM} gap-1 px-2 py-1.5`}>
                           <Copy className="h-3 w-3" /> Копировать
                         </button>
-                        <button type="button" onClick={() => getOrRegenerateToken(est.id)} disabled={loadingTokenId === est.id} className="inline-flex items-center gap-1 rounded-lg bg-amber-500/20 px-2 py-1.5 text-xs text-amber-200 hover:bg-amber-500/30 disabled:opacity-50">
+                        <button type="button" onClick={() => getOrRegenerateToken(est.id)} disabled={loadingTokenId === est.id} className={`${ADMIN_BTN} ${ADMIN_BTN_SM} gap-1 px-2 py-1.5 disabled:opacity-50`}>
                           <RefreshCw className={`h-3 w-3 ${loadingTokenId === est.id ? "animate-spin" : ""}`} /> Сменить токен
                         </button>
                       </div>
                     ) : (
-                      <button type="button" onClick={() => getOrRegenerateToken(est.id)} disabled={loadingTokenId === est.id} className="inline-flex items-center gap-1 rounded-lg bg-[var(--color-brand-gold)]/80 px-2 py-1.5 text-xs text-[#0a192f] hover:bg-[var(--color-brand-gold)] disabled:opacity-50">
+                      <button type="button" onClick={() => getOrRegenerateToken(est.id)} disabled={loadingTokenId === est.id} className={`${ADMIN_BTN} ${ADMIN_BTN_PRIMARY} ${ADMIN_BTN_SM} gap-1 disabled:opacity-50`}>
                         {loadingTokenId === est.id ? "…" : "Получить ссылку"}
                       </button>
                     )}

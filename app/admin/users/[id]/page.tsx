@@ -8,6 +8,7 @@ import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { PAYOUT_MAX_AMOUNT_KOP, PAYOUT_MIN_AMOUNT_KOP } from "@/lib/payout-amount-bounds";
 import { formatDate, formatMoneyCompact } from "@/lib/utils";
 import { PremiumCard } from "@/app/cabinet/PremiumCard";
+import { ADMIN_BTN, ADMIN_BTN_PRIMARY } from "@/lib/admin-button-classes";
 
 interface Transaction {
   id: string;
@@ -553,7 +554,7 @@ export default function AdminUserDetailsPage() {
       <div className="mb-6 flex flex-col items-center gap-3">
         <Link
           href="/admin/users"
-          className="cabinet-section-header self-start flex items-center gap-2 rounded-xl border-0 px-3 py-2 text-sm text-white/90 hover:bg-white/10"
+          className={`cabinet-section-header ${ADMIN_BTN} admin-btn--neutral self-start gap-2 px-3 py-2 text-sm`}
         >
           <ArrowLeft className="h-4 w-4" />
           Назад
@@ -576,7 +577,7 @@ export default function AdminUserDetailsPage() {
             type="button"
             onClick={handleBlockToggle}
             disabled={blockLoading}
-            className="inline-flex items-center gap-2 rounded-xl bg-[var(--color-brand-gold)] px-4 py-2.5 text-sm font-medium text-[#0a192f] hover:opacity-90 disabled:opacity-50"
+            className={`${ADMIN_BTN} ${ADMIN_BTN_PRIMARY} gap-2 px-4 py-2.5 text-sm disabled:opacity-50`}
           >
             {data.user.isBlocked ? (
               <>
@@ -595,7 +596,7 @@ export default function AdminUserDetailsPage() {
               type="button"
               onClick={handleManualVerify}
               disabled={verifyLoading}
-              className="inline-flex items-center gap-2 rounded-xl border border-[var(--color-brand-gold)] bg-transparent px-4 py-2.5 text-sm font-medium text-[var(--color-brand-gold)] hover:bg-[var(--color-brand-gold)]/10 disabled:opacity-50"
+              className={`${ADMIN_BTN} gap-2 px-4 py-2.5 text-sm disabled:opacity-50`}
             >
               <ShieldCheck className="h-4 w-4" />
               {verifyLoading ? "Сохранение..." : "Подтвердить верификацию"}
@@ -746,7 +747,7 @@ export default function AdminUserDetailsPage() {
               type="button"
               onClick={handlePasswordReset}
               disabled={passwordLoading || !newPassword || !newPasswordConfirm}
-              className="relative z-10 inline-flex items-center gap-2 rounded-xl bg-[var(--color-brand-gold)] px-5 py-2.5 text-sm font-medium text-[#0a192f] hover:opacity-90 disabled:opacity-60"
+              className={`relative z-10 ${ADMIN_BTN} ${ADMIN_BTN_PRIMARY} gap-2 px-5 py-2.5 text-sm disabled:opacity-60`}
             >
               {passwordLoading ? "Сохранение..." : "Обновить пароль"}
             </button>
@@ -853,7 +854,7 @@ export default function AdminUserDetailsPage() {
                     type="button"
                     onClick={row.onApply}
                     disabled={row.loading}
-                    className="shrink-0 rounded-xl bg-[var(--color-brand-gold)] px-4 py-2 text-sm font-medium text-[#0a192f] hover:opacity-90 disabled:opacity-50"
+                    className={`shrink-0 ${ADMIN_BTN} ${ADMIN_BTN_PRIMARY} px-4 py-2 text-sm disabled:opacity-50`}
                   >
                     {row.loading ? "Применяем…" : "Применить"}
                   </button>
@@ -861,7 +862,7 @@ export default function AdminUserDetailsPage() {
                   <button
                     type="button"
                     onClick={row.onEdit}
-                    className="shrink-0 rounded-xl border border-white/25 bg-white/10 px-4 py-2 text-sm font-medium text-white hover:bg-white/20"
+                    className={`shrink-0 ${ADMIN_BTN} admin-btn--neutral px-4 py-2 text-sm`}
                   >
                     Изменить
                   </button>
@@ -913,7 +914,7 @@ export default function AdminUserDetailsPage() {
               type="button"
               onClick={handlePayout}
               disabled={payoutLoading || !payoutAmount || parseFloat(payoutAmount) < 100}
-              className="relative z-10 mt-4 w-full rounded-xl bg-[var(--color-brand-gold)] px-5 py-2.5 text-sm font-medium text-[#0a192f] hover:opacity-90 disabled:opacity-60"
+              className={`relative z-10 mt-4 w-full ${ADMIN_BTN} ${ADMIN_BTN_PRIMARY} px-5 py-2.5 text-sm disabled:opacity-60`}
             >
               {payoutLoading ? "Открываем Paygine…" : "Вывести на карту (страница Paygine)"}
             </button>
@@ -947,7 +948,7 @@ export default function AdminUserDetailsPage() {
             type="button"
             onClick={handleRegenerateApiKey}
             disabled={apiKeyLoading}
-            className="inline-flex items-center gap-2 rounded-xl border border-white/25 bg-white/10 px-4 py-2.5 text-sm font-medium text-white hover:bg-white/20 disabled:opacity-50"
+            className={`${ADMIN_BTN} admin-btn--neutral gap-2 px-4 py-2.5 text-sm disabled:opacity-50`}
           >
             <RotateCw className={`h-4 w-4 ${apiKeyLoading ? "animate-spin" : ""}`} />
             {apiKeyLoading ? "Создание…" : data.user.hasApiKey ? "Обновить ключ" : "Создать ключ"}
@@ -956,7 +957,7 @@ export default function AdminUserDetailsPage() {
             <button
               type="button"
               onClick={handleCopyApiKey}
-              className="inline-flex items-center gap-2 rounded-xl border border-white/25 bg-white/10 px-4 py-2.5 text-sm font-medium text-white hover:bg-white/20"
+              className={`${ADMIN_BTN} admin-btn--neutral gap-2 px-4 py-2.5 text-sm`}
             >
               <Copy className="h-4 w-4" />
               {apiKeyCopied ? "Код скопирован" : "Копировать"}

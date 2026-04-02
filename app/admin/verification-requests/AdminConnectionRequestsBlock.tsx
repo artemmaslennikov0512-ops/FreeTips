@@ -1,6 +1,7 @@
 "use client";
 
 import { Fragment, useCallback, useEffect, useState } from "react";
+import { ADMIN_BTN, ADMIN_BTN_NEUTRAL_SM, ADMIN_BTN_PRIMARY, ADMIN_BTN_SM } from "@/lib/admin-button-classes";
 import { ChevronDown, ChevronRight, ClipboardCheck, Copy, Send, Loader2 } from "lucide-react";
 import { AdminStatusTabs, AdminRequestTab, apiStatusForTab } from "./AdminStatusTabs";
 
@@ -206,7 +207,7 @@ export function AdminConnectionRequestsBlock({ connectionCounts, onAfterMutation
           <Loader2 className="h-8 w-8 animate-spin text-[var(--color-brand-gold)]" />
         </div>
       ) : list.length === 0 ? (
-        <div className="rounded-xl border border-white/10 bg-white/5 px-6 py-8 text-center text-[var(--color-text)]/80">{emptyMessage}</div>
+        <div className="rounded-xl border border-white/10 bg-white/5 px-6 py-8 text-center text-white/90">{emptyMessage}</div>
       ) : (
         <>
           <div className="space-y-4 lg:hidden">
@@ -247,7 +248,7 @@ export function AdminConnectionRequestsBlock({ connectionCounts, onAfterMutation
                           type="button"
                           disabled={isApproving}
                           onClick={() => handleApprove(r.id)}
-                          className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--color-brand-gold)] px-3 py-2 text-sm font-medium text-[#0a192f] hover:opacity-90 disabled:opacity-50"
+                          className={`${ADMIN_BTN} ${ADMIN_BTN_PRIMARY} gap-1.5 px-3 py-2 text-sm disabled:opacity-50`}
                         >
                           <ClipboardCheck className="h-4 w-4" />
                           {isApproving ? "Создание ссылки..." : "Принять подключение"}
@@ -258,7 +259,7 @@ export function AdminConnectionRequestsBlock({ connectionCounts, onAfterMutation
                           <button
                             type="button"
                             onClick={() => copyLink(linkForRow)}
-                            className="inline-flex items-center gap-1 rounded-lg bg-white/10 px-3 py-2 text-xs text-white hover:bg-white/20"
+                            className={`${ADMIN_BTN} ${ADMIN_BTN_NEUTRAL_SM} gap-1`}
                             title="Копировать"
                           >
                             <Copy className="h-4 w-4" /> Копировать
@@ -267,7 +268,7 @@ export function AdminConnectionRequestsBlock({ connectionCounts, onAfterMutation
                             type="button"
                             disabled={sendingTokenId === r.id}
                             onClick={() => handleSendToken(r.id)}
-                            className="inline-flex items-center gap-1 rounded-lg border border-[var(--color-brand-gold)] bg-transparent px-3 py-2 text-xs font-medium text-[var(--color-brand-gold)] hover:bg-[var(--color-brand-gold)]/10 disabled:opacity-50"
+                            className={`${ADMIN_BTN} ${ADMIN_BTN_SM} gap-1 disabled:opacity-50`}
                           >
                             <Send className="h-3.5 w-3.5" />
                             {sendingTokenId === r.id ? "Отправка…" : "Выслать токен"}
@@ -279,7 +280,7 @@ export function AdminConnectionRequestsBlock({ connectionCounts, onAfterMutation
                           type="button"
                           disabled={sendingTokenId === r.id}
                           onClick={() => handleSendToken(r.id)}
-                          className="inline-flex items-center gap-1 rounded-lg border border-[var(--color-brand-gold)] bg-transparent px-3 py-2 text-xs font-medium text-[var(--color-brand-gold)] hover:bg-[var(--color-brand-gold)]/10 disabled:opacity-50"
+                          className={`${ADMIN_BTN} ${ADMIN_BTN_SM} gap-1 disabled:opacity-50`}
                         >
                           <Send className="h-3.5 w-3.5" />
                           {sendingTokenId === r.id ? "Отправка…" : "Выслать токен"}
@@ -294,7 +295,7 @@ export function AdminConnectionRequestsBlock({ connectionCounts, onAfterMutation
                           <button
                             type="button"
                             onClick={() => copyLink(linkForRow)}
-                            className="inline-flex items-center gap-1 rounded-lg bg-white/10 px-3 py-2 text-xs text-white hover:bg-white/20"
+                            className={`${ADMIN_BTN} ${ADMIN_BTN_NEUTRAL_SM} gap-1`}
                           >
                             <Copy className="h-4 w-4" /> Копировать
                           </button>
@@ -302,7 +303,7 @@ export function AdminConnectionRequestsBlock({ connectionCounts, onAfterMutation
                             type="button"
                             disabled={sendingTokenId === r.id}
                             onClick={() => handleSendToken(r.id)}
-                            className="inline-flex items-center gap-1 rounded-lg border border-[var(--color-brand-gold)] bg-transparent px-3 py-2 text-xs font-medium text-[var(--color-brand-gold)] hover:bg-[var(--color-brand-gold)]/10 disabled:opacity-50"
+                            className={`${ADMIN_BTN} ${ADMIN_BTN_SM} gap-1 disabled:opacity-50`}
                           >
                             <Send className="h-3.5 w-3.5" />
                             {sendingTokenId === r.id ? "Отправка…" : "Выслать токен"}
@@ -314,7 +315,7 @@ export function AdminConnectionRequestsBlock({ connectionCounts, onAfterMutation
                           type="button"
                           disabled={sendingTokenId === r.id}
                           onClick={() => handleSendToken(r.id)}
-                          className="inline-flex items-center gap-1 rounded-lg border border-[var(--color-brand-gold)] bg-transparent px-3 py-2 text-xs font-medium text-[var(--color-brand-gold)] hover:bg-[var(--color-brand-gold)]/10 disabled:opacity-50"
+                          className={`${ADMIN_BTN} ${ADMIN_BTN_SM} gap-1 disabled:opacity-50`}
                         >
                           <Send className="h-3.5 w-3.5" />
                           {sendingTokenId === r.id ? "Отправка…" : "Выслать токен"}
@@ -353,7 +354,7 @@ export function AdminConnectionRequestsBlock({ connectionCounts, onAfterMutation
                             <button
                               type="button"
                               onClick={() => setExpandedId(isExpanded ? null : r.id)}
-                              className="rounded p-1 text-white/80 hover:bg-white/15 hover:text-white"
+                              className={`${ADMIN_BTN} admin-btn--neutral !min-h-0 !min-w-0 !rounded-lg !p-1 !px-1`}
                               aria-label={isExpanded ? "Свернуть" : "Развернуть"}
                             >
                               {isExpanded ? <ChevronDown className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
@@ -392,7 +393,7 @@ export function AdminConnectionRequestsBlock({ connectionCounts, onAfterMutation
                                 type="button"
                                 disabled={isApproving}
                                 onClick={() => handleApprove(r.id)}
-                                className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--color-brand-gold)] px-3 py-1.5 text-sm font-medium text-[#0a192f] hover:opacity-90 disabled:opacity-50"
+                                className={`${ADMIN_BTN} ${ADMIN_BTN_PRIMARY} gap-1.5 px-3 py-1.5 text-sm disabled:opacity-50`}
                               >
                                 <ClipboardCheck className="h-4 w-4" />
                                 {isApproving ? "Создание ссылки..." : "Принять подключение"}
@@ -410,7 +411,7 @@ export function AdminConnectionRequestsBlock({ connectionCounts, onAfterMutation
                                   <button
                                     type="button"
                                     onClick={() => copyLink(linkForRow)}
-                                    className="rounded p-1.5 text-white/80 hover:bg-white/15 hover:text-white"
+                                    className={`${ADMIN_BTN} admin-btn--neutral !min-h-0 !min-w-0 !rounded-lg !p-1.5`}
                                     title="Копировать"
                                   >
                                     <Copy className="h-4 w-4" />
@@ -419,7 +420,7 @@ export function AdminConnectionRequestsBlock({ connectionCounts, onAfterMutation
                                     type="button"
                                     disabled={sendingTokenId === r.id}
                                     onClick={() => handleSendToken(r.id)}
-                                    className="inline-flex items-center gap-1 rounded-lg border border-[var(--color-brand-gold)] bg-transparent px-2.5 py-1 text-xs font-medium text-[var(--color-brand-gold)] hover:bg-[var(--color-brand-gold)]/10 disabled:opacity-50"
+                                    className={`${ADMIN_BTN} ${ADMIN_BTN_SM} gap-1 px-2.5 py-1 disabled:opacity-50`}
                                   >
                                     <Send className="h-3.5 w-3.5" />
                                     {sendingTokenId === r.id ? "Отправка…" : "Выслать токен"}
@@ -435,7 +436,7 @@ export function AdminConnectionRequestsBlock({ connectionCounts, onAfterMutation
                                   type="button"
                                   disabled={sendingTokenId === r.id}
                                   onClick={() => handleSendToken(r.id)}
-                                  className="inline-flex items-center gap-1 rounded-lg border border-[var(--color-brand-gold)] bg-transparent px-2.5 py-1 text-xs font-medium text-[var(--color-brand-gold)] hover:bg-[var(--color-brand-gold)]/10 disabled:opacity-50"
+                                  className={`${ADMIN_BTN} ${ADMIN_BTN_SM} gap-1 px-2.5 py-1 disabled:opacity-50`}
                                 >
                                   <Send className="h-3.5 w-3.5" />
                                   {sendingTokenId === r.id ? "Отправка…" : "Выслать токен"}
@@ -454,7 +455,8 @@ export function AdminConnectionRequestsBlock({ connectionCounts, onAfterMutation
                                   <button
                                     type="button"
                                     onClick={() => copyLink(linkForRow)}
-                                    className="rounded p-1.5 text-white/80 hover:bg-white/15 hover:text-white"
+                                    className={`${ADMIN_BTN} admin-btn--neutral !min-h-0 !min-w-0 !rounded-lg !p-1.5`}
+                                    title="Копировать"
                                   >
                                     <Copy className="h-4 w-4" />
                                   </button>
@@ -462,7 +464,7 @@ export function AdminConnectionRequestsBlock({ connectionCounts, onAfterMutation
                                     type="button"
                                     disabled={sendingTokenId === r.id}
                                     onClick={() => handleSendToken(r.id)}
-                                    className="inline-flex items-center gap-1 rounded-lg border border-[var(--color-brand-gold)] bg-transparent px-2.5 py-1 text-xs font-medium text-[var(--color-brand-gold)] hover:bg-[var(--color-brand-gold)]/10 disabled:opacity-50"
+                                    className={`${ADMIN_BTN} ${ADMIN_BTN_SM} gap-1 px-2.5 py-1 disabled:opacity-50`}
                                   >
                                     <Send className="h-3.5 w-3.5" />
                                     {sendingTokenId === r.id ? "Отправка…" : "Выслать токен"}
@@ -475,7 +477,7 @@ export function AdminConnectionRequestsBlock({ connectionCounts, onAfterMutation
                                 type="button"
                                 disabled={sendingTokenId === r.id}
                                 onClick={() => handleSendToken(r.id)}
-                                className="inline-flex items-center gap-1 rounded-lg border border-[var(--color-brand-gold)] bg-transparent px-2.5 py-1 text-xs font-medium text-[var(--color-brand-gold)] hover:bg-[var(--color-brand-gold)]/10 disabled:opacity-50"
+                                className={`${ADMIN_BTN} ${ADMIN_BTN_SM} gap-1 px-2.5 py-1 disabled:opacity-50`}
                               >
                                 <Send className="h-3.5 w-3.5" />
                                 {sendingTokenId === r.id ? "Отправка…" : "Выслать токен"}

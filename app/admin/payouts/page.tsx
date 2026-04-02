@@ -5,6 +5,7 @@ import { Send, CheckCircle2, XCircle } from "lucide-react";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { CustomDropdown } from "@/components/CustomDropdown";
 import { formatDate, formatMoneyCompact } from "@/lib/utils";
+import { ADMIN_BTN, ADMIN_BTN_DANGER, ADMIN_BTN_NEUTRAL_SM, ADMIN_BTN_PRIMARY, ADMIN_BTN_SM } from "@/lib/admin-button-classes";
 
 interface Payout {
   id: string;
@@ -213,19 +214,19 @@ export default function AdminPayoutsPage() {
               <div className="mt-4 flex flex-wrap gap-2 border-t border-white/10 pt-3">
                 {(payout.status === "CREATED" || payout.status === "PROCESSING") && (
                   <>
-                    <button type="button" onClick={() => handleOpenSendPaygineModal(payout.id)} disabled={sendingPaygine === payout.id} className="inline-flex items-center gap-1 rounded-lg bg-[var(--color-brand-gold)] px-3 py-2 text-xs font-medium text-[#0a192f] hover:opacity-90 disabled:opacity-50">
+                    <button type="button" onClick={() => handleOpenSendPaygineModal(payout.id)} disabled={sendingPaygine === payout.id} className={`${ADMIN_BTN} ${ADMIN_BTN_PRIMARY} ${ADMIN_BTN_SM} gap-1 disabled:opacity-50`}>
                       <Send className="h-3 w-3" />{sendingPaygine === payout.id ? "Отправка…" : "В Paygine"}
                     </button>
-                    <button type="button" onClick={() => handleStatusChange(payout.id, "REJECTED")} disabled={updating === payout.id} className="inline-flex items-center gap-1 rounded-lg bg-[var(--color-dark-gray)] px-3 py-2 text-xs font-medium text-white hover:opacity-90 disabled:opacity-50">
+                    <button type="button" onClick={() => handleStatusChange(payout.id, "REJECTED")} disabled={updating === payout.id} className={`${ADMIN_BTN} ${ADMIN_BTN_DANGER} ${ADMIN_BTN_SM} gap-1 disabled:opacity-50`}>
                       <XCircle className="h-3 w-3" />Отклонить
                     </button>
-                    <button type="button" onClick={() => { if (window.confirm("Отметить выполненной без отправки в Paygine?")) void handleStatusChange(payout.id, "COMPLETED"); }} disabled={updating === payout.id} className="inline-flex items-center gap-1 rounded-lg border border-white/20 px-3 py-2 text-xs font-medium text-white/90 hover:bg-white/10 disabled:opacity-50">
+                    <button type="button" onClick={() => { if (window.confirm("Отметить выполненной без отправки в Paygine?")) void handleStatusChange(payout.id, "COMPLETED"); }} disabled={updating === payout.id} className={`${ADMIN_BTN} ${ADMIN_BTN_NEUTRAL_SM} gap-1 disabled:opacity-50`}>
                       <CheckCircle2 className="h-3 w-3" />Вручную
                     </button>
                   </>
                 )}
                 {payout.status === "COMPLETED" && !payout.externalId && (
-                  <button type="button" onClick={() => handleOpenSendPaygineModal(payout.id)} disabled={sendingPaygine === payout.id} className="inline-flex items-center gap-1 rounded-lg bg-[var(--color-brand-gold)] px-3 py-2 text-xs font-medium text-[#0a192f] hover:opacity-90 disabled:opacity-50">
+                  <button type="button" onClick={() => handleOpenSendPaygineModal(payout.id)} disabled={sendingPaygine === payout.id} className={`${ADMIN_BTN} ${ADMIN_BTN_PRIMARY} ${ADMIN_BTN_SM} gap-1 disabled:opacity-50`}>
                     <Send className="h-3 w-3" />{sendingPaygine === payout.id ? "Отправка…" : "В Paygine"}
                   </button>
                 )}
@@ -270,19 +271,19 @@ export default function AdminPayoutsPage() {
                     <div className="flex flex-wrap gap-2">
                       {(payout.status === "CREATED" || payout.status === "PROCESSING") && (
                         <>
-                          <button type="button" onClick={() => handleOpenSendPaygineModal(payout.id)} disabled={sendingPaygine === payout.id} className="flex items-center gap-1 rounded-lg bg-[var(--color-brand-gold)] px-3 py-1.5 text-xs font-medium text-[#0a192f] transition-colors hover:opacity-90 disabled:opacity-50" title="Отправить вывод в Paygine на карту (SDPayOut).">
+                          <button type="button" onClick={() => handleOpenSendPaygineModal(payout.id)} disabled={sendingPaygine === payout.id} className={`${ADMIN_BTN} ${ADMIN_BTN_PRIMARY} ${ADMIN_BTN_SM} gap-1 disabled:opacity-50`} title="Отправить вывод в Paygine на карту (SDPayOut).">
                             <Send className="h-3 w-3" />{sendingPaygine === payout.id ? "Отправка…" : "В Paygine"}
                           </button>
-                          <button type="button" onClick={() => handleStatusChange(payout.id, "REJECTED")} disabled={updating === payout.id} className="flex items-center gap-1 rounded-lg bg-[var(--color-dark-gray)] px-3 py-1.5 text-xs font-medium text-[var(--color-white)] transition-colors hover:opacity-90 disabled:opacity-50">
+                          <button type="button" onClick={() => handleStatusChange(payout.id, "REJECTED")} disabled={updating === payout.id} className={`${ADMIN_BTN} ${ADMIN_BTN_DANGER} ${ADMIN_BTN_SM} gap-1 disabled:opacity-50`}>
                             <XCircle className="h-3 w-3" />Отклонить
                           </button>
-                          <button type="button" onClick={() => { if (window.confirm("Отметить выполненной без отправки в Paygine? Использовать только если выплата проведена другим способом (наличные и т.п.). В Paygine заказа не будет.")) void handleStatusChange(payout.id, "COMPLETED"); }} disabled={updating === payout.id} className="flex items-center gap-1 rounded-lg border border-[var(--color-border)] px-3 py-1.5 text-xs font-medium text-[var(--color-text-secondary)] transition-colors hover:opacity-90 disabled:opacity-50" title="Только для ручной выплаты вне Paygine">
+                          <button type="button" onClick={() => { if (window.confirm("Отметить выполненной без отправки в Paygine? Использовать только если выплата проведена другим способом (наличные и т.п.). В Paygine заказа не будет.")) void handleStatusChange(payout.id, "COMPLETED"); }} disabled={updating === payout.id} className={`${ADMIN_BTN} ${ADMIN_BTN_NEUTRAL_SM} gap-1 disabled:opacity-50`} title="Только для ручной выплаты вне Paygine">
                             <CheckCircle2 className="h-3 w-3" />Вручную
                           </button>
                         </>
                       )}
                       {payout.status === "COMPLETED" && !payout.externalId && (
-                        <button type="button" onClick={() => handleOpenSendPaygineModal(payout.id)} disabled={sendingPaygine === payout.id} className="flex items-center gap-1 rounded-lg bg-[var(--color-brand-gold)] px-3 py-1.5 text-xs font-medium text-[#0a192f] transition-colors hover:opacity-90 disabled:opacity-50" title="Заявка отмечена «Вручную» — отправить в Paygine сейчас (SDPayOut).">
+                        <button type="button" onClick={() => handleOpenSendPaygineModal(payout.id)} disabled={sendingPaygine === payout.id} className={`${ADMIN_BTN} ${ADMIN_BTN_PRIMARY} ${ADMIN_BTN_SM} gap-1 disabled:opacity-50`} title="Заявка отмечена «Вручную» — отправить в Paygine сейчас (SDPayOut).">
                           <Send className="h-3 w-3" />{sendingPaygine === payout.id ? "Отправка…" : "В Paygine"}
                         </button>
                       )}
@@ -322,7 +323,7 @@ export default function AdminPayoutsPage() {
               <button
                 type="button"
                 onClick={() => { setPayoutIdForPanModal(null); setPanInput(""); }}
-                className="rounded-lg bg-[var(--color-dark-gray)] px-4 py-2 text-sm font-medium text-[var(--color-white)] hover:opacity-90"
+                className={`${ADMIN_BTN} admin-btn--neutral px-4 py-2`}
               >
                 Отмена
               </button>
@@ -330,7 +331,7 @@ export default function AdminPayoutsPage() {
                 type="button"
                 onClick={() => void handleSendToPaygineSubmit()}
                 disabled={sendingPaygine === payoutIdForPanModal}
-                className="rounded-lg bg-[var(--color-brand-gold)] px-4 py-2 text-sm font-medium text-[#0a192f] hover:opacity-90 disabled:opacity-50"
+                className={`${ADMIN_BTN} ${ADMIN_BTN_PRIMARY} px-4 py-2 disabled:opacity-50`}
               >
                 {sendingPaygine === payoutIdForPanModal ? "Отправка…" : "Отправить"}
               </button>

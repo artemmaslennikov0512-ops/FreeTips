@@ -44,6 +44,7 @@ export default function PayPageClient() {
     borderColor?: string;
   } | null>(null);
   const [recipientPhotoUrl, setRecipientPhotoUrl] = useState<string | null>(null);
+  const [acceptPayments, setAcceptPayments] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const [amount, setAmount] = useState<number>(100);
@@ -100,6 +101,7 @@ export default function PayPageClient() {
         }
         const data = (await res.json()) as {
           recipientName: string;
+          acceptPayments?: boolean;
           savingFor?: string;
           recipientPhotoUrl?: string;
           m5PayShell?: boolean;
@@ -115,6 +117,7 @@ export default function PayPageClient() {
           };
         };
         setRecipientName(data.recipientName);
+        setAcceptPayments(data.acceptPayments !== false);
         setSavingFor(data.savingFor ?? null);
         setRecipientPhotoUrl(data.recipientPhotoUrl ?? null);
         setBranding(data.branding ?? null);
@@ -471,6 +474,19 @@ export default function PayPageClient() {
           </div>
         </div>
 
+        {!acceptPayments && (
+          <div
+            className="pay-page-card card border-amber-500/50 bg-amber-500/10"
+            role="alert"
+            style={Object.keys(cardStyle).length ? cardStyle : undefined}
+          >
+            <p className="pay-page-section-title text-[var(--color-text)]">Приём временно недоступен</p>
+            <p className="mt-2 text-center text-sm text-[var(--color-text-secondary)]">
+              Перевод по этой ссылке сейчас отключён администратором. Страница открывается, но оплату отправить нельзя — попробуйте позже.
+            </p>
+          </div>
+        )}
+
         {/* Блок только с целью: на что копит официант */}
         <div className="pay-page-saving-goal pay-page-card card" style={Object.keys(cardStyle).length ? cardStyle : undefined}>
           <p className="pay-page-saving-goal-text" style={{ color: fontClr ?? undefined }} title={savingFor?.trim() ? `Коплю на: ${savingFor}` : undefined}>
@@ -488,6 +504,7 @@ export default function PayPageClient() {
                 <button
                   key={r}
                   type="button"
+                  disabled={!acceptPayments}
                   onClick={() => {
                     setAmount(r);
                     setCustomAmount(String(r));
@@ -507,6 +524,7 @@ export default function PayPageClient() {
               placeholder="100"
               value={customAmount}
               onChange={(e) => setCustomAmount(e.target.value)}
+              disabled={!acceptPayments}
               aria-label="Своя сумма в рублях, не больше 1 000"
             />
           </div>
@@ -527,6 +545,7 @@ export default function PayPageClient() {
               value={comment}
               onChange={(e) => setComment(e.target.value)}
               maxLength={500}
+              disabled={!acceptPayments}
               placeholder="Спасибо за отличный сервис!"
               aria-label="Отзыв"
             />
@@ -542,7 +561,7 @@ export default function PayPageClient() {
         <button
           type="button"
           onClick={handlePay}
-          disabled={paying || kop < PAYMENT_MIN_AMOUNT_KOP || kop > PAYMENT_MAX_AMOUNT_KOP}
+          disabled={!acceptPayments || paying || kop < PAYMENT_MIN_AMOUNT_KOP || kop > PAYMENT_MAX_AMOUNT_KOP}
           className="pay-button pay-page-submit"
         >
           {paying ? (

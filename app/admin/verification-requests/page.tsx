@@ -7,6 +7,21 @@ import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { AdminStatusTabs, AdminRequestTab, apiStatusForTab } from "./AdminStatusTabs";
 import { AdminRequestsMainTabs, AdminRequestsMainTab } from "./AdminRequestsMainTabs";
 import { AdminConnectionRequestsBlock } from "./AdminConnectionRequestsBlock";
+import { notifyAdminRequestsCountsChanged } from "@/lib/admin-requests-counts-sync";
+import {
+  ADMIN_BTN,
+  ADMIN_BTN_DANGER,
+  ADMIN_BTN_NEUTRAL_SM,
+  ADMIN_BTN_SM,
+  ADMIN_BTN_SUCCESS,
+} from "@/lib/admin-button-classes";
+import {
+  mainTabNewPending,
+  readMainTabAckConnection,
+  readMainTabAckVerification,
+  writeMainTabAckConnection,
+  writeMainTabAckVerification,
+} from "@/lib/admin-requests-main-tab-ack";
 
 interface VerificationRequestItem {
   id: string;
@@ -57,6 +72,9 @@ export default function AdminVerificationRequestsPage() {
   const [rejectSubmitting, setRejectSubmitting] = useState(false);
   const [rejectError, setRejectError] = useState<string | null>(null);
   const [downloading, setDownloading] = useState<string | null>(null);
+  /** Снимок pending с момента последнего «просмотра» главной вкладки (sessionStorage + state). */
+  const [storedAckVerification, setStoredAckVerification] = useState<number | undefined>(undefined);
+  const [storedAckConnection, setStoredAckConnection] = useState<number | undefined>(undefined);
 
   const fetchCounts = useCallback(async () => {
     const token = localStorage.getItem("accessToken");
@@ -72,6 +90,11 @@ export default function AdminVerificationRequestsPage() {
       /* ignore */
     }
   }, []);
+
+  const refreshCountsAndNotifyLayout = useCallback(async () => {
+    await fetchCounts();
+    notifyAdminRequestsCountsChanged();
+  }, [fetchCounts]);
 
   const fetchList = useCallback(async () => {
     const token = localStorage.getItem("accessToken");
@@ -101,6 +124,25 @@ export default function AdminVerificationRequestsPage() {
   }, [fetchCounts]);
 
   useEffect(() => {
+    setStoredAckVerification(readMainTabAckVerification());
+    setStoredAckConnection(readMainTabAckConnection());
+  }, []);
+
+  useEffect(() => {
+    if (mainTab !== "verification" || counts == null) return;
+    const p = counts.verification.pending;
+    writeMainTabAckVerification(p);
+    setStoredAckVerification(p);
+  }, [mainTab, counts]);
+
+  useEffect(() => {
+    if (mainTab !== "connection" || counts == null) return;
+    const p = counts.connection.pending;
+    writeMainTabAckConnection(p);
+    setStoredAckConnection(p);
+  }, [mainTab, counts]);
+
+  useEffect(() => {
     if (mainTab !== "verification") return;
     fetchList();
   }, [fetchList, mainTab]);
@@ -122,7 +164,7 @@ export default function AdminVerificationRequestsPage() {
       });
       if (res.ok) {
         await fetchList();
-        await fetchCounts();
+        await refreshCountsAndNotifyLayout();
       } else {
         const body = (await res.json().catch(() => ({}))) as { error?: string };
         setError(body.error ?? "Ошибка подтверждения");
@@ -155,7 +197,7 @@ export default function AdminVerificationRequestsPage() {
         setRejectModal(null);
         setRejectReason("");
         await fetchList();
-        await fetchCounts();
+        await refreshCountsAndNotifyLayout();
       } else {
         setRejectError(body.error ?? "Ошибка отклонения");
       }
@@ -198,6 +240,8 @@ export default function AdminVerificationRequestsPage() {
 
   const vCounts = counts?.verification ?? ZERO_COUNTS;
   const cCounts = counts?.connection ?? ZERO_COUNTS;
+  const mainTabNewVerification = mainTabNewPending(vCounts.pending, storedAckVerification);
+  const mainTabNewConnection = mainTabNewPending(cCounts.pending, storedAckConnection);
   const verificationSubBadges: Partial<Record<AdminRequestTab, number>> = {
     pending: vCounts.pending,
     approved: vCounts.approved,
@@ -207,15 +251,17 @@ export default function AdminVerificationRequestsPage() {
   return (
     <div className="space-y-8">
       <div className="flex flex-col items-center gap-3 text-center">
-        <h1 className="font-[family:var(--font-playfair)] text-xl font-semibold text-[var(--color-text)]">Заявки</h1>
-        <p className="max-w-lg text-sm text-[var(--color-text)]/75">
-          Выберите раздел: верификация официантов или подключение к сервису
+        <h1 className="font-[family:var(--font-playfair)] text-xl font-semibold text-white">
+          Заявки
+        </h1>
+        <p className="max-w-lg text-sm text-white/85">
+          Выберите раздел: верификация официантов или подключение к сервису.
         </p>
         <AdminRequestsMainTabs
           value={mainTab}
           onChange={setMainTab}
-          pendingVerification={vCounts.pending}
-          pendingConnection={cCounts.pending}
+          pendingVerification={mainTabNewVerification}
+          pendingConnection={mainTabNewConnection}
           className="pt-1"
         />
       </div>
@@ -235,7 +281,7 @@ export default function AdminVerificationRequestsPage() {
               <Loader2 className="h-8 w-8 animate-spin text-[var(--color-brand-gold)]" />
             </div>
           ) : list.length === 0 ? (
-            <div className="rounded-xl border border-white/10 bg-white/5 px-6 py-8 text-center text-[var(--color-text)]/80">
+            <div className="rounded-xl border border-white/10 bg-white/5 px-6 py-8 text-center text-white/90">
               {emptyMessage}
             </div>
           ) : (
@@ -276,7 +322,7 @@ export default function AdminVerificationRequestsPage() {
                             type="button"
                             onClick={() => has && downloadDoc(r.id, type)}
                             disabled={!has || downloading === key}
-                            className="inline-flex items-center gap-1 rounded-lg border border-white/20 bg-white/5 px-2 py-1 text-xs font-medium text-white hover:bg-white/10 disabled:opacity-50"
+                            className={`${ADMIN_BTN} ${ADMIN_BTN_NEUTRAL_SM} gap-1 font-medium disabled:opacity-50`}
                           >
                             {downloading === key ? <Loader2 className="h-3 w-3 animate-spin" /> : <Download className="h-3 w-3" />}
                             {DOC_LABELS[type]}
@@ -290,7 +336,7 @@ export default function AdminVerificationRequestsPage() {
                           type="button"
                           onClick={() => handleApprove(r.id)}
                           disabled={approvingId === r.id}
-                          className="inline-flex items-center gap-1 rounded-lg bg-green-600/20 px-3 py-2 text-sm font-medium text-green-400 hover:bg-green-600/30 disabled:opacity-50"
+                          className={`${ADMIN_BTN} ${ADMIN_BTN_SUCCESS} gap-1 px-3 py-2 text-sm disabled:opacity-50`}
                         >
                           {approvingId === r.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
                           Подтвердить
@@ -302,7 +348,7 @@ export default function AdminVerificationRequestsPage() {
                             setRejectReason("");
                             setRejectError(null);
                           }}
-                          className="inline-flex items-center gap-1 rounded-lg bg-red-600/20 px-3 py-2 text-sm font-medium text-red-400 hover:bg-red-600/30"
+                          className={`${ADMIN_BTN} ${ADMIN_BTN_DANGER} gap-1 px-3 py-2 text-sm`}
                         >
                           <X className="h-4 w-4" />
                           Отклонить
@@ -369,7 +415,7 @@ export default function AdminVerificationRequestsPage() {
                                   type="button"
                                   onClick={() => has && downloadDoc(r.id, type)}
                                   disabled={!has || downloading === key}
-                                  className="inline-flex items-center gap-1 rounded-lg border border-white/20 bg-white/5 px-2 py-1 text-xs font-medium text-white hover:bg-white/10 disabled:opacity-50"
+                                  className={`${ADMIN_BTN} ${ADMIN_BTN_NEUTRAL_SM} gap-1 font-medium disabled:opacity-50`}
                                 >
                                   {downloading === key ? (
                                     <Loader2 className="h-3 w-3 animate-spin" />
@@ -389,7 +435,7 @@ export default function AdminVerificationRequestsPage() {
                                 type="button"
                                 onClick={() => handleApprove(r.id)}
                                 disabled={approvingId === r.id}
-                                className="inline-flex items-center gap-1 rounded-lg bg-green-600/20 px-3 py-1.5 text-sm font-medium text-green-400 hover:bg-green-600/30 disabled:opacity-50"
+                                className={`${ADMIN_BTN} ${ADMIN_BTN_SUCCESS} gap-1 px-3 py-1.5 text-sm disabled:opacity-50`}
                               >
                                 {approvingId === r.id ? (
                                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -405,7 +451,7 @@ export default function AdminVerificationRequestsPage() {
                                   setRejectReason("");
                                   setRejectError(null);
                                 }}
-                                className="inline-flex items-center gap-1 rounded-lg bg-red-600/20 px-3 py-1.5 text-sm font-medium text-red-400 hover:bg-red-600/30"
+                                className={`${ADMIN_BTN} ${ADMIN_BTN_DANGER} gap-1 px-3 py-1.5 text-sm`}
                               >
                                 <X className="h-4 w-4" />
                                 Отклонить
@@ -425,10 +471,10 @@ export default function AdminVerificationRequestsPage() {
 
       {mainTab === "connection" && (
         <section className="space-y-4">
-          <p className="mx-auto max-w-lg text-center text-sm text-[var(--color-text)]/70">
+          <p className="mx-auto max-w-lg text-center text-sm text-white/80">
             Регистрация заведений и отдельных получателей. Одобрение выдаёт ссылку для регистрации.
           </p>
-          <AdminConnectionRequestsBlock connectionCounts={cCounts} onAfterMutation={fetchCounts} />
+          <AdminConnectionRequestsBlock connectionCounts={cCounts} onAfterMutation={refreshCountsAndNotifyLayout} />
         </section>
       )}
 
@@ -462,7 +508,7 @@ export default function AdminVerificationRequestsPage() {
                   setRejectReason("");
                   setRejectError(null);
                 }}
-                className="rounded-xl border border-white/20 px-4 py-2 text-sm font-medium text-white/90 hover:bg-white/10"
+                className={`${ADMIN_BTN} admin-btn--neutral px-4 py-2`}
               >
                 Отмена
               </button>
@@ -470,7 +516,7 @@ export default function AdminVerificationRequestsPage() {
                 type="button"
                 onClick={handleRejectSubmit}
                 disabled={!rejectReason.trim() || rejectSubmitting}
-                className="rounded-xl bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-500 disabled:opacity-50"
+                className={`${ADMIN_BTN} ${ADMIN_BTN_DANGER} px-4 py-2`}
               >
                 {rejectSubmitting ? "Отправка…" : "Отклонить"}
               </button>

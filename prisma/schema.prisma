@@ -449,3 +449,15 @@ model SystemDefaultLimits {
 
   @@map("system_default_limits")
 }
+
+// Глобальный стоп-приём и белый/чёрный списки аккаунтов (user id) для ссылок /pay.
+// id = "main" — единственная строка.
+model PlatformPaymentSettings {
+  id                      String   @id @default("main")
+  globalPaymentsDisabled  Boolean  @default(false)
+  paymentWhitelistUserIds String[] @default([])
+  paymentBlacklistUserIds String[] @default([])
+  updatedAt               DateTime @updatedAt
+
+  @@map("platform_payment_settings")
+}

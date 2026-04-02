@@ -8,6 +8,7 @@ import { db } from "@/lib/db";
 import { getPaygineConfig, getAppUrl } from "@/lib/config";
 import { getSDPayInEndpoint, buildSDPayInFormParams } from "@/lib/payment/paygine/client";
 import { verifyPayRedirectToken } from "@/lib/payment/redirect-token";
+import { paymentAcceptBlockedReasonForRecipient } from "@/lib/payment-accept-guard";
 
 function escapeHtml(s: string): string {
   return s
@@ -57,12 +58,21 @@ export async function POST(request: NextRequest) {
       externalId: true,
       amountKop: true,
       paygineOrderSdRef: true,
+      recipientId: true,
       link: { select: { slug: true } },
     },
   });
 
   if (!tx || tx.status !== "PENDING" || !tx.externalId || !tx.paygineOrderSdRef?.trim() || !tx.link?.slug) {
     return new NextResponse("Платёж не найден или уже обработан. Создайте платёж заново.", { status: 400 });
+  }
+
+  const blockedReason = await paymentAcceptBlockedReasonForRecipient(tx.recipientId);
+  if (blockedReason) {
+    return new NextResponse(
+      `${blockedReason} Если платёж уже создан, обратитесь в поддержку.`,
+      { status: 403 },
+    );
   }
 
   const orderId = parseInt(tx.externalId, 10);

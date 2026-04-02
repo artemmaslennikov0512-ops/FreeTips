@@ -1,13 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { ADMIN_BTN, ADMIN_BTN_PRIMARY } from "@/lib/admin-button-classes";
 
 const ANTIFRAUD_INPUT =
   "antifraud-input w-36 min-w-[7rem] rounded-lg border border-[rgba(197,165,114,0.25)] bg-[var(--color-bg-sides)] px-3 py-2 text-center text-sm text-[var(--color-text)] placeholder:text-[var(--color-muted)] focus:outline-none focus:border-[var(--color-brand-gold)] disabled:bg-[var(--color-light-gray)] read-only:bg-[var(--color-light-gray)]";
-const ANTIFRAUD_BTN_APPLY =
-  "rounded-xl bg-[var(--color-brand-gold)] px-4 py-2 text-sm font-medium text-[#0a192f] hover:opacity-90 disabled:opacity-50";
-const ANTIFRAUD_BTN_EDIT =
-  "rounded-xl border border-white/25 bg-white/10 px-4 py-2 text-sm font-medium text-white hover:bg-white/20 hover:border-white/35";
+const ANTIFRAUD_BTN_APPLY = `${ADMIN_BTN} ${ADMIN_BTN_PRIMARY} px-4 py-2 text-sm disabled:opacity-50`;
+const ANTIFRAUD_BTN_EDIT = `${ADMIN_BTN} admin-btn--neutral px-4 py-2 text-sm`;
 
 /** Форматирует значение лимита для отображения (сумма в ₽ или число заявок). */
 function formatLimitDisplay(value: string | null, kind: "rub" | "count"): string {

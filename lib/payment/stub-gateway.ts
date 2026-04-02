@@ -15,6 +15,7 @@ import type { PaymentGateway, CreatePaymentParams, CreatePaymentResult, GetStatu
 import { TransactionStatus } from "@prisma/client";
 import { broadcastBalanceUpdated } from "@/lib/ws-broadcast";
 import { PayginePaymentGateway } from "./paygine-gateway";
+import { paymentAcceptBlockedReasonForRecipient } from "@/lib/payment-accept-guard";
 
 const WEBHOOK_SIGNATURE_PREFIX = "sha256=";
 
@@ -52,6 +53,11 @@ export class StubPaymentGateway implements PaymentGateway {
         return { success: true, transactionId: existing.id };
       }
       return { success: false, error: "Платёж не прошёл" };
+    }
+
+    const blockedReason = await paymentAcceptBlockedReasonForRecipient(recipientId);
+    if (blockedReason) {
+      return { success: false, error: blockedReason };
     }
 
     const tx = await db.transaction.create({

@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
+import type { LucideIcon } from "lucide-react";
 import {
   LogOut,
   LayoutDashboard,
@@ -14,10 +15,13 @@ import {
   Building2,
   FileCheck,
   ChevronDown,
+  CreditCard,
 } from "lucide-react";
 import { getAccessToken, fetchWithAuth, clearAccessToken } from "@/lib/auth-client";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
+import { ADMIN_REQUESTS_COUNTS_CHANGED } from "@/lib/admin-requests-counts-sync";
+import { ADMIN_BTN, ADMIN_BTN_PRIMARY } from "@/lib/admin-button-classes";
 
 interface User {
   id: string;
@@ -27,15 +31,16 @@ interface User {
   mustChangePassword?: boolean;
 }
 
-const NAV = [
-  { label: "Дашборд", href: "/admin/dashboard", icon: LayoutDashboard },
-  { label: "Заведения", href: "/admin/establishments", icon: Building2 },
-  { label: "Выводы", href: "/admin/payouts", icon: Send },
-  { label: "Пользователи", href: "/admin/users", icon: Users },
-  { label: "Заявки", href: "/admin/verification-requests", icon: FileCheck },
-  { label: "Поддержка", href: "/admin/support", icon: MessageCircle },
-  { label: "Антифрод", href: "/admin/antifraud", icon: ShieldCheck },
-] as const;
+const NAV: { label: string; href: string; icon: LucideIcon; iconClass: string }[] = [
+  { label: "Дашборд", href: "/admin/dashboard", icon: LayoutDashboard, iconClass: "!text-sky-400" },
+  { label: "Заведения", href: "/admin/establishments", icon: Building2, iconClass: "!text-amber-400" },
+  { label: "Выводы", href: "/admin/payouts", icon: Send, iconClass: "!text-emerald-400" },
+  { label: "Пользователи", href: "/admin/users", icon: Users, iconClass: "!text-violet-400" },
+  { label: "Заявки", href: "/admin/verification-requests", icon: FileCheck, iconClass: "!text-blue-400" },
+  { label: "Поддержка", href: "/admin/support", icon: MessageCircle, iconClass: "!text-cyan-400" },
+  { label: "Антифрод", href: "/admin/antifraud", icon: ShieldCheck, iconClass: "!text-rose-400" },
+  { label: "Приём по ссылкам", href: "/admin/payment-accept", icon: CreditCard, iconClass: "!text-[var(--color-brand-gold)]" },
+];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -110,29 +115,33 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     checkAuth();
   }, [mounted, retryTrigger, router]);
 
-  useEffect(() => {
+  const refreshRequestsPendingTotal = useCallback(async () => {
     if (!user || user.role !== "SUPERADMIN") return;
     const token = getAccessToken();
     if (!token) return;
-    let cancelled = false;
-    (async () => {
-      try {
-        const res = await fetch("/api/admin/requests-counts", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!res.ok || cancelled) return;
-        const data = (await res.json()) as { totalPending?: number };
-        if (!cancelled) {
-          setRequestsPendingTotal(typeof data.totalPending === "number" ? data.totalPending : 0);
-        }
-      } catch {
-        if (!cancelled) setRequestsPendingTotal(null);
-      }
-    })();
-    return () => {
-      cancelled = true;
+    try {
+      const res = await fetch("/api/admin/requests-counts", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) return;
+      const data = (await res.json()) as { totalPending?: number };
+      setRequestsPendingTotal(typeof data.totalPending === "number" ? data.totalPending : 0);
+    } catch {
+      setRequestsPendingTotal(null);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    void refreshRequestsPendingTotal();
+  }, [pathname, refreshRequestsPendingTotal]);
+
+  useEffect(() => {
+    const onCountsChanged = () => {
+      void refreshRequestsPendingTotal();
     };
-  }, [user, pathname]);
+    window.addEventListener(ADMIN_REQUESTS_COUNTS_CHANGED, onCountsChanged);
+    return () => window.removeEventListener(ADMIN_REQUESTS_COUNTS_CHANGED, onCountsChanged);
+  }, [refreshRequestsPendingTotal]);
 
   const handleLogout = async () => {
     try {
@@ -171,7 +180,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             setLoading(true);
             setRetryTrigger((t) => t + 1);
           }}
-          className="rounded-xl bg-[var(--color-brand-gold)] px-6 py-2.5 font-medium text-[#0a192f] hover:opacity-90"
+          className={`${ADMIN_BTN} ${ADMIN_BTN_PRIMARY} px-6 py-2.5 font-medium`}
         >
           Повторить
         </button>
@@ -215,7 +224,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               Навигация
             </p>
             <nav className="flex flex-col gap-0.5 rounded-[10px] border border-[var(--color-brand-gold)]/15 bg-white/5 p-1.5 shadow-[var(--shadow-subtle)]" aria-label="Навигация админ-панели">
-              {NAV.map(({ label, href, icon: Icon }) => {
+              {NAV.map(({ label, href, icon: Icon, iconClass }) => {
                 const showRequestsBadge =
                   href === "/admin/verification-requests" && requestsPendingTotal != null && requestsPendingTotal > 0;
                 const badgeN = requestsPendingTotal ?? 0;
@@ -230,7 +239,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                         : "border border-transparent text-white/80 hover:bg-[var(--color-dark-gray)]/10 hover:text-white"
                     }`}
                   >
-                    <Icon className="h-5 w-5 shrink-0" />
+                    <Icon className={`h-5 w-5 shrink-0 ${iconClass}`} aria-hidden />
                     <span className="flex min-w-0 flex-1 items-center gap-2 break-words">
                       {label}
                       {showRequestsBadge && (
@@ -246,9 +255,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <button
               type="button"
               onClick={handleLogout}
-              className="mt-4 flex w-full items-center gap-3 rounded-[10px] border border-transparent px-4 py-3 text-sm font-medium text-white/80 transition-colors hover:bg-[var(--color-dark-gray)]/10 hover:text-white"
+              className={`mt-4 ${ADMIN_BTN} w-full !justify-start gap-3 px-4 py-3 text-sm`}
             >
-              <LogOut className="h-4 w-4 shrink-0" />
+              <LogOut className="h-4 w-4 shrink-0 text-[var(--color-brand-gold)]" aria-hidden />
               <span>Выйти</span>
             </button>
           </div>
@@ -263,7 +272,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 ref={menuButtonRef}
                 type="button"
                 onClick={() => setSidebarOpen((o) => !o)}
-                className="cabinet-menu-btn flex h-14 w-14 min-w-14 items-center justify-center gap-1.5 rounded-xl border border-white/20 bg-white/10 text-[var(--color-brand-gold)] hover:bg-[var(--color-brand-gold)]/20 hover:border-[var(--color-brand-gold)]/40 active:scale-95 transition-all"
+                className={`cabinet-menu-btn ${ADMIN_BTN} h-14 min-h-14 w-14 min-w-14 shrink-0 gap-1 !p-0 active:scale-95`}
                 aria-label="Меню"
                 aria-expanded={sidebarOpen}
                 aria-haspopup="true"
@@ -294,7 +303,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   </div>
                   <p className="cabinet-nav-label mb-1.5 px-2 text-center text-[10px] font-semibold uppercase tracking-wider text-white/50">Навигация</p>
                   <nav className="flex flex-col gap-0.5 rounded-lg border border-[var(--color-brand-gold)]/15 bg-white/5 p-1" role="none">
-                    {NAV.map(({ label, href, icon: Icon }) => {
+                    {NAV.map(({ label, href, icon: Icon, iconClass }) => {
                       const showRequestsBadge =
                         href === "/admin/verification-requests" && requestsPendingTotal != null && requestsPendingTotal > 0;
                       const badgeN = requestsPendingTotal ?? 0;
@@ -308,7 +317,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                             isActive(href) ? "cabinet-nav-active bg-white/15 text-white font-semibold" : "text-white/85 hover:bg-white/10 hover:text-white"
                           }`}
                         >
-                          <Icon className="h-4 w-4 shrink-0" />
+                          <Icon className={`h-4 w-4 shrink-0 ${iconClass}`} aria-hidden />
                           <span className="flex flex-1 items-center gap-2">
                             {label}
                             {showRequestsBadge && (
@@ -324,10 +333,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   <button
                     type="button"
                     onClick={() => { closeSidebar(); handleLogout(); }}
-                    className="mt-3 flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2.5 text-sm font-medium text-white/80 hover:bg-white/10 hover:text-white"
+                    className={`mt-3 ${ADMIN_BTN} w-full !justify-start gap-2.5 px-2.5 py-2.5 text-sm`}
                     role="menuitem"
                   >
-                    <LogOut className="h-4 w-4 shrink-0" />
+                    <LogOut className="h-4 w-4 shrink-0 text-[var(--color-brand-gold)]" aria-hidden />
                     <span>Выйти</span>
                   </button>
                 </div>

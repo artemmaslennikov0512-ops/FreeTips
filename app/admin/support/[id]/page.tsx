@@ -7,6 +7,7 @@ import { ArrowLeft, Send, Loader2, RefreshCw } from "lucide-react";
 import { getAccessToken, authHeaders, clearAccessToken } from "@/lib/auth-client";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
+import { ADMIN_BTN, ADMIN_BTN_ICON, ADMIN_BTN_PRIMARY } from "@/lib/admin-button-classes";
 
 type Message = {
   id: string;
@@ -184,7 +185,7 @@ export default function AdminSupportThreadPage() {
         type="button"
         onClick={refresh}
         disabled={refreshing}
-        className="mb-4 flex items-center gap-2 rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-sm text-white hover:bg-white/10 disabled:opacity-50"
+        className={`mb-4 ${ADMIN_BTN} admin-btn--neutral gap-2 px-4 py-2 text-sm disabled:opacity-50`}
       >
         <RefreshCw className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`} />
         Обновить
@@ -254,7 +255,7 @@ export default function AdminSupportThreadPage() {
             <button
               type="submit"
               disabled={sending || !input.trim()}
-              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[var(--color-brand-gold)] text-[#0a192f] hover:opacity-90 disabled:opacity-50"
+              className={`${ADMIN_BTN} ${ADMIN_BTN_ICON} ${ADMIN_BTN_PRIMARY} !h-12 !w-12 shrink-0 disabled:opacity-50`}
               aria-label="Отправить"
             >
               {sending ? (

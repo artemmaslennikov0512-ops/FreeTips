@@ -20,6 +20,7 @@ const RELOCATE_CLAIM_STALE_MS = 15 * 60 * 1000;
 import { registerOrder, sdRelocateFunds } from "./paygine/client";
 import { buildPaygineSignature } from "./paygine/signature";
 import { feeKopForIncoming } from "./paygine-fee";
+import { paymentAcceptBlockedReasonForRecipient } from "@/lib/payment-accept-guard";
 
 /** Базовый URL для редиректов: канонический из env, иначе из запроса (для dev). Paygine требует абсолютный URL. */
 function getBaseForRedirect(baseUrlFromRequest: string | undefined): string {
@@ -129,6 +130,11 @@ export class PayginePaymentGateway implements PaymentGateway {
         return { success: true, transactionId: existing.id, redirectUrl };
       }
       return { success: false, error: "Платёж уже создан и не завершён" };
+    }
+
+    const blockedReason = await paymentAcceptBlockedReasonForRecipient(recipientId);
+    if (blockedReason) {
+      return { success: false, error: blockedReason };
     }
 
     const feeKop = feeKopForIncoming(amount, "card");

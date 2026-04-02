@@ -27,6 +27,7 @@
     <string name="operations_filter_amount_from">Сумма от, ₽</string>
     <string name="operations_filter_amount_to">Сумма до, ₽</string>
     <string name="operations_filter_apply">Показать</string>
+    <string name="api_key_hint">Вставьте или введите API-ключ</string>
     <string name="download_app">Скачать приложение с сайта</string>
     <string name="copy_link">Скопировать ссылку</string>
 </resources>

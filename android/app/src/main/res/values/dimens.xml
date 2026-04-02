@@ -9,9 +9,11 @@
     <dimen name="screen_padding">20dp</dimen>
     <dimen name="header_content_inset">16dp</dimen>
     <dimen name="screen_top_inset">40dp</dimen>
-    <dimen name="header_bell_area_top_margin">48dp</dimen>
-    <dimen name="content_top_padding">56dp</dimen>
-    <dimen name="content_bottom_padding">56dp</dimen>
+    <!-- Колокольчик уже под статус-баром; большой margin давал «чёрную полосу» под белым статус-баром -->
+    <dimen name="header_bell_area_top_margin">8dp</dimen>
+    <!-- Фрагмент не перекрывает bottom nav — 56dp давало пустую тёмную полосу над таббаром и ужимало контент -->
+    <dimen name="content_top_padding">16dp</dimen>
+    <dimen name="content_bottom_padding">16dp</dimen>
     <dimen name="section_title_to_content">12dp</dimen>
     <dimen name="card_to_section_margin">32dp</dimen>
     <dimen name="card_inset_margin">12dp</dimen>

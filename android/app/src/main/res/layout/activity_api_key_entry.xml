@@ -104,22 +104,29 @@
                             style="@style/Widget.FreeTips.TextInputLayout"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="API-ключ"
+                            android:hint="@string/api_key_hint"
+                            app:boxBackgroundColor="@android:color/white"
+                            app:boxStrokeColor="@color/box_stroke_color"
+                            app:cursorColor="@color/primary"
                             app:endIconDrawable="@drawable/ic_clear_24"
                             app:endIconMode="clear_text"
-                            app:endIconTint="@android:color/black"
-                            app:hintTextColor="@android:color/black"
-                            app:boxStrokeColor="@android:color/black">
+                            app:endIconTint="@color/login_field_hint"
+                            app:hintTextColor="@color/login_hint_color">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/inputApiKey"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
+                                android:gravity="center_vertical|start"
+                                android:includeFontPadding="false"
                                 android:inputType="text"
-                                android:minLines="2"
+                                android:maxLines="1"
+                                android:minHeight="@dimen/touch_target_min"
+                                android:scrollHorizontally="true"
+                                android:textAlignment="viewStart"
                                 android:textColor="@android:color/black"
-                                android:textColorHint="#666666"
-                                tools:ignore="Autofill" />
+                                android:textColorHint="@color/login_field_hint"
+                                android:textCursorDrawable="@drawable/cursor_primary" />
                         </com.google.android.material.textfield.TextInputLayout>
 
                         <com.google.android.material.button.MaterialButton

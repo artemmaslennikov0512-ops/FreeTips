@@ -36,6 +36,9 @@
     <!-- Кнопка колокольчика на белой шапке -->
     <color name="header_bell_bg">#E8E8E8</color>
 
+    <!-- Экран ввода API-ключа: подсказка на светлом градиенте карточки -->
+    <color name="login_field_hint">#374151</color>
+
     <!-- Legacy -->
     <color name="ic_launcher_background">#0D1117</color>
 </resources>

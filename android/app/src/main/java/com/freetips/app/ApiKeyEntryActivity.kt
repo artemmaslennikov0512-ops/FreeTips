@@ -1,7 +1,9 @@
 package com.freetips.app
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.view.inputmethod.InputMethodManager
 import android.graphics.LinearGradient
 import android.graphics.Shader
 import android.os.Bundle
@@ -64,6 +66,14 @@ class ApiKeyEntryActivity : AppCompatActivity() {
                     binding.errorText.text = getString(R.string.login_error_too_many_requests)
                 } else {
                     validateAndGo(savedKey)
+                }
+            } else {
+                binding.inputApiKey.post {
+                    if (binding.inputApiKey.text?.isBlank() != false) {
+                        binding.inputApiKey.requestFocus()
+                        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+                        imm?.showSoftInput(binding.inputApiKey, InputMethodManager.SHOW_IMPLICIT)
+                    }
                 }
             }
         } catch (t: Throwable) {

@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useTipSettlementConfirmation } from "@/lib/hooks/use-tip-settlement-confirmation";
 import Link from "next/link";
-import { CheckCircle2, XCircle, Loader2, User, Smartphone, CreditCard } from "lucide-react";
+import { CheckCircle2, XCircle, Loader2, User } from "lucide-react";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import QRCode from "qrcode";
@@ -541,20 +541,6 @@ export default function PayPageClient() {
             `Оплатить ${rub.toFixed(rub >= 1 ? 0 : 2)} ₽`
           )}
         </button>
-
-        {/* Пояснения: QR и оплата картой — без внешней карточки */}
-        <div className="info-block">
-          {qrDataUrl && (
-            <div className="info-row">
-              <Smartphone className="info-block-icon size-5 shrink-0" aria-hidden />
-              <span>Покажите QR — гость отсканирует эту страницу</span>
-            </div>
-          )}
-          <div className="info-row">
-            <CreditCard className="info-block-icon size-5 shrink-0" aria-hidden />
-            <span>Оплата банковской картой. Регистрация не нужна.</span>
-          </div>
-        </div>
 
         <PayTelegramSupportBlock />
       </div>

@@ -422,7 +422,7 @@ export default function PayPageClient() {
         style={Object.keys(cardStyle).length ? cardStyle : undefined}
       >
         <div className="absolute right-4 top-4">
-          <ThemeToggle />
+          <ThemeToggle variant={payM5Shell ? "m5" : "default"} />
         </div>
 
         {/* Логотип: только лого заведения или только FreeTips (без дублирования) */}

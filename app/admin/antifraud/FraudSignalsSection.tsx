@@ -93,9 +93,6 @@ export function FraudSignalsSection() {
         <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
           <div className="min-w-0 flex-1">
             <h2 className="fraud-signals-panel-title text-base font-semibold">Подозрительная активность</h2>
-            <p className="fraud-signals-panel-lead mt-1 text-xs leading-relaxed">
-              Только для наблюдения: сигналы не блокируют платежи. Блокировку делайте вручную в карточке пользователя.
-            </p>
           </div>
           <button
             type="button"
@@ -139,14 +136,14 @@ export function FraudSignalsSection() {
 
         {data && data.groups.length > 0 && (
           <div className="admin-fraud-signals-table-wrap max-h-[min(70vh,720px)] overflow-auto rounded-lg">
-            <table className="admin-fraud-signals-table w-full min-w-0 border-collapse text-left text-sm md:min-w-[680px]">
+            <table className="admin-fraud-signals-table w-full min-w-0 border-collapse text-center text-sm md:min-w-[680px]">
               <thead>
                 <tr className="text-xs uppercase tracking-wide">
                   <th className="px-3 py-2.5 font-medium">Пользователь</th>
                   <th className="px-3 py-2.5 font-medium">Статус</th>
                   <th className="px-3 py-2.5 font-medium whitespace-nowrap">Последний сигнал</th>
                   <th className="px-3 py-2.5 font-medium min-w-[12rem]">Причины (последние)</th>
-                  <th className="fraud-signals-action-cell px-3 py-2.5 font-medium text-right sm:text-left">Действие</th>
+                  <th className="fraud-signals-action-cell px-3 py-2.5 font-medium">Действие</th>
                 </tr>
               </thead>
               <tbody>
@@ -172,20 +169,20 @@ export function FraudSignalsSection() {
                       {formatDate(g.lastSignalAt, { includeYear: true })}
                     </td>
                     <td className="px-3 py-3">
-                      <ul className="m-0 max-w-xl list-none space-y-2 p-0">
+                      <ul className="m-0 mx-auto flex max-w-xl list-none flex-col items-center space-y-2 p-0 text-center">
                         {g.signals.map((s) => {
                           const badge = ruleKindBadge(s.ruleCode);
                           return (
                             <li
                               key={s.id}
-                              className="flex flex-col gap-1 sm:flex-row sm:items-start sm:gap-2"
+                              className="flex w-full max-w-xl flex-col items-center gap-1 sm:flex-row sm:justify-center sm:gap-2"
                             >
                               <span
-                                className={`inline-flex shrink-0 self-start rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${badge.className}`}
+                                className={`inline-flex shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${badge.className}`}
                               >
                                 {badge.label}
                               </span>
-                              <span className="min-w-0 flex-1 text-xs leading-snug">
+                              <span className="min-w-0 text-center text-xs leading-snug">
                                 <span className="text-white/45">{formatDate(s.createdAt, { includeYear: true })} — </span>
                                 <span className="text-white/[0.92]">{s.message}</span>
                                 <span className="ml-1 font-mono text-[10px] text-white/35">({s.ruleCode})</span>
@@ -195,7 +192,7 @@ export function FraudSignalsSection() {
                         })}
                       </ul>
                     </td>
-                    <td className="fraud-signals-action-cell px-3 py-3 text-right sm:text-left">
+                    <td className="fraud-signals-action-cell px-3 py-3">
                       <Link
                         href={`/admin/users/${g.userId}`}
                         className={`${ADMIN_BTN} ${ADMIN_BTN_SM} inline-flex items-center gap-1.5`}

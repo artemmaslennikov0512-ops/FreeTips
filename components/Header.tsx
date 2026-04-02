@@ -241,7 +241,7 @@ export function Header() {
         </Link>
 
         <div className="hidden md:flex items-center gap-3">
-          <ThemeToggle />
+          <ThemeToggle variant={isCabinetM5Header ? "m5" : "default"} />
           {isLanding && (
             <div
               className="relative group/nav"
@@ -304,7 +304,7 @@ export function Header() {
         </div>
 
         <div className="md:hidden flex items-center gap-1">
-          <ThemeToggle />
+          <ThemeToggle variant={isCabinetM5Header ? "m5" : "default"} />
           {!hideMobileSiteNav && (
             <button
               ref={menuButtonRef}

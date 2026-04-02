@@ -629,9 +629,10 @@ body.cabinet-page:has(.cabinet-premium[data-cabinet-theme="m5-competition"])
 .cabinet-dashboard-name-hero__pill {
   display: inline-flex;
   max-width: 100%;
+  min-width: 0;
   align-items: center;
   justify-content: center;
-  padding: 0.5rem 1.2rem 0.55rem;
+  padding: 0.35rem 1.1rem;
   border-radius: 9999px;
   border: 1px solid rgba(197, 165, 114, 0.42);
   background: linear-gradient(
@@ -651,14 +652,16 @@ body.cabinet-page:has(.cabinet-premium[data-cabinet-theme="m5-competition"])
 .cabinet-dashboard-name-hero__text {
   margin: 0;
   max-width: 100%;
+  min-width: 0;
   text-align: center;
   font-family: var(--font-playfair), ui-serif, Georgia, serif;
-  font-size: clamp(1.05rem, 3.2vw, 1.35rem);
+  font-size: clamp(0.9rem, 2.5vw, 1.15rem);
   font-weight: 600;
-  letter-spacing: 0.04em;
-  line-height: 1.35;
-  word-break: break-word;
-  hyphens: auto;
+  letter-spacing: 0.03em;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   background-image: linear-gradient(
     185deg,
     #fff9ed 0%,
@@ -696,22 +699,23 @@ body.cabinet-page:has(.cabinet-premium[data-cabinet-theme="m5-competition"])
     inset 0 1px 0 rgba(255, 255, 255, 0.1),
     0 0 28px rgba(28, 105, 212, 0.12);
 }
+/* Светлая тема: без градиентного клипа и drop-shadow у текста (иначе «грязь» и низкий контраст); pill без backdrop-blur — меньше артефактов наложения */
 html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-dashboard-name-hero__pill {
-  border-color: rgba(197, 165, 114, 0.5);
-  background: linear-gradient(
-    155deg,
-    rgba(255, 255, 255, 0.75) 0%,
-    rgba(255, 255, 255, 0.35) 50%,
-    rgba(245, 240, 230, 0.5) 100%
-  );
+  border-color: rgba(62, 54, 40, 0.28);
+  background: linear-gradient(155deg, #f7f5f2 0%, #ece9e3 48%, #e3ded6 100%);
   box-shadow:
-    0 2px 16px rgba(0, 0, 0, 0.06),
-    inset 0 1px 0 rgba(255, 255, 255, 0.95),
-    0 0 24px rgba(197, 165, 114, 0.12);
+    0 1px 3px rgba(0, 0, 0, 0.07),
+    inset 0 1px 0 rgba(255, 255, 255, 0.92);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-dashboard-name-hero__text:not(.cabinet-dashboard-name-hero__text--m5) {
-  background-image: linear-gradient(185deg, #3d3428 0%, #6b5a40 35%, #8b7349 55%, #4a3f30 100%);
-  filter: drop-shadow(0 1px 2px rgba(255, 255, 255, 0.35));
+  background-image: none;
+  -webkit-background-clip: unset;
+  background-clip: unset;
+  color: #1a1611;
+  -webkit-text-fill-color: #1a1611;
+  filter: none;
 }
 @media (prefers-reduced-motion: reduce) {
   .cabinet-dashboard-name-hero__pill,
@@ -1794,6 +1798,13 @@ html:not([data-theme="dark"]) .cabinet-premium .premium-glass {
   color: rgba(255, 255, 255, 0.95) !important;
 }
 
+/* Лицевая карта: <p> с суммой — flex, иначе line-box под inline-block .premium-card-balance-plate поднимает сумму выше FreeTips */
+.cabinet-premium .premium-card .premium-card-balance-text {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
 /* Золотая карта: баланс в тёмной «пластине» + золотой текст (одинаково в светлой и тёмной теме) */
 @keyframes premium-balance-plate-glow {
   0%,
@@ -1840,7 +1851,6 @@ html:not([data-theme="dark"]) .cabinet-premium .premium-glass {
     0 2px 10px rgba(0, 0, 0, 0.38),
     0 0 14px rgba(197, 165, 114, 0.14);
   animation: premium-balance-plate-glow 4s ease-in-out infinite;
-  vertical-align: baseline;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -4231,7 +4241,6 @@ html:not([data-theme="dark"]) .admin-panel .antifraud-inner .antifraud-value {
 .admin-panel .fraud-signals-panel .fraud-signals-panel-title {
   color: #ffffff !important;
 }
-.admin-panel .fraud-signals-panel .fraud-signals-panel-lead,
 .admin-panel .fraud-signals-panel .fraud-signals-panel-meta {
   color: rgba(255, 255, 255, 0.72) !important;
 }
@@ -4261,10 +4270,12 @@ html:not([data-theme="dark"]) .admin-panel .fraud-signals-panel .admin-fraud-sig
 .admin-panel .fraud-signals-panel .admin-fraud-signals-table thead th {
   color: rgba(255, 255, 255, 0.88) !important;
   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  text-align: center !important;
 }
 .admin-panel .fraud-signals-panel .admin-fraud-signals-table tbody td {
   color: rgba(255, 255, 255, 0.9) !important;
   vertical-align: top;
+  text-align: center !important;
 }
 .admin-panel .fraud-signals-panel .admin-fraud-signals-table tbody tr:nth-child(even) {
   background: rgba(0, 0, 0, 0.14);

@@ -36,7 +36,12 @@ function pointerToT(svg: SVGSVGElement, clientX: number, clientY: number): numbe
   return Math.min(1, Math.max(0, (p.x - TRACK_X0) / TRACK_LEN));
 }
 
-export function ThemeToggle() {
+type ThemeToggleProps = {
+  /** M5 шапка/страница: неактивная луна — холодный акцент, не коричневый */
+  variant?: "default" | "m5";
+};
+
+export function ThemeToggle({ variant = "default" }: ThemeToggleProps) {
   const baseId = useId().replace(/:/g, "");
   const trackGradientId = `${baseId}-track`;
   const filterIdleId = `${baseId}-f-idle`;
@@ -60,6 +65,9 @@ export function ThemeToggle() {
   const handle = tToPos(tVisual);
   const previewTheme = dragT !== null ? (dragT >= 0.5 ? "dark" : "light") : theme;
   const knobR = dragging ? KNOB_R_DRAG : KNOB_R_IDLE;
+
+  const moonInactiveClass =
+    variant === "m5" ? "text-[#7eb8ff] opacity-[0.82]" : "text-[#261f18] opacity-[0.9]";
 
   const onPointerDown = (e: React.PointerEvent<SVGSVGElement>) => {
     const svg = svgRef.current;
@@ -140,20 +148,20 @@ export function ThemeToggle() {
       aria-valuetext={valueText}
       onKeyDown={onKeyDown}
       data-dragging={dragging ? "true" : "false"}
-      className="theme-toggle-btn relative flex h-8 min-w-[4.375rem] shrink-0 cursor-grab touch-none select-none items-center justify-center gap-1 rounded-lg border border-[var(--color-brand-gold)]/30 bg-[var(--color-bg-sides)] px-1.5 outline-none hover:border-[var(--color-brand-gold)]/60 hover:bg-[var(--color-brand-gold)]/10 focus-visible:ring-2 focus-visible:ring-[var(--color-brand-gold)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-bg)] data-[dragging=true]:cursor-grabbing"
+      className="theme-toggle-btn relative flex h-11 min-h-[44px] min-w-[6.5rem] shrink-0 cursor-grab touch-none select-none items-center justify-center gap-2 rounded-xl border border-[var(--color-brand-gold)]/30 bg-[var(--color-bg-sides)] px-3 outline-none hover:border-[var(--color-brand-gold)]/60 hover:bg-[var(--color-brand-gold)]/10 focus-visible:ring-2 focus-visible:ring-[var(--color-brand-gold)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-bg)] data-[dragging=true]:cursor-grabbing"
     >
       <Sun
-        className={`pointer-events-none h-3 w-3 shrink-0 text-[var(--color-brand-gold)] transition-opacity duration-200 ease-out ${
-          previewTheme === "light" ? "opacity-[0.92]" : "opacity-35"
+        className={`pointer-events-none h-4 w-4 shrink-0 text-[var(--color-brand-gold)] transition-opacity duration-200 ease-out ${
+          previewTheme === "light" ? "opacity-[0.92]" : "opacity-40"
         }`}
         strokeWidth={2.15}
         aria-hidden
       />
-      <div className="relative flex flex-1 items-center justify-center">
+      <div className="relative flex min-w-0 flex-1 items-center justify-center">
         <svg
           ref={svgRef}
           viewBox={`0 0 ${VB_W} ${VB_H}`}
-          className="theme-toggle-track-svg theme-toggle-icon block h-[1.375rem] w-[2.6875rem] shrink-0 text-[var(--color-brand-gold)]"
+          className="theme-toggle-track-svg theme-toggle-icon block h-[1.9rem] w-[3.65rem] shrink-0 text-[var(--color-brand-gold)]"
           aria-hidden
           onPointerDown={onPointerDown}
         >
@@ -251,7 +259,7 @@ export function ThemeToggle() {
           />
         </svg>
         <div
-          className={`theme-toggle-knob-icon theme-toggle-icon pointer-events-none absolute flex h-3 w-3 -translate-x-1/2 -translate-y-1/2 items-center justify-center text-[var(--color-brand-gold)] ${
+          className={`theme-toggle-knob-icon theme-toggle-icon pointer-events-none absolute flex h-4 w-4 -translate-x-1/2 -translate-y-1/2 items-center justify-center text-[var(--color-brand-gold)] ${
             dragging ? "theme-toggle-knob-icon--drag" : ""
           }`}
           style={{
@@ -260,15 +268,15 @@ export function ThemeToggle() {
           }}
         >
           {previewTheme === "dark" ? (
-            <Moon className="h-2.5 w-2.5" strokeWidth={2} aria-hidden />
+            <Moon className="h-3.5 w-3.5" strokeWidth={2} aria-hidden />
           ) : (
-            <Sun className="h-2.5 w-2.5" strokeWidth={2.1} aria-hidden />
+            <Sun className="h-3.5 w-3.5" strokeWidth={2.1} aria-hidden />
           )}
         </div>
       </div>
       <Moon
-        className={`pointer-events-none h-3 w-3 shrink-0 text-[var(--color-brand-gold)] transition-opacity duration-200 ease-out ${
-          previewTheme === "dark" ? "opacity-[0.92]" : "opacity-35"
+        className={`pointer-events-none h-4 w-4 shrink-0 transition-opacity duration-200 ease-out ${
+          previewTheme === "dark" ? "text-[var(--color-brand-gold)] opacity-[0.92]" : moonInactiveClass
         }`}
         strokeWidth={1.95}
         aria-hidden

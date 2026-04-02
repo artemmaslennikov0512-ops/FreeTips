@@ -291,9 +291,9 @@ export default function CabinetDashboardPage() {
       <div className="cabinet-dashboard-hero-grid grid min-w-0 grid-cols-1 gap-6 lg:[grid-template-columns:repeat(2,minmax(0,1fr))] lg:items-stretch">
         <div className="cabinet-card flex min-h-0 min-w-0 flex-col rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden lg:h-full">
           <div className="flex min-h-0 flex-1 flex-col p-6">
-            <div className="flex flex-col items-center">
+            <div className="flex flex-col items-center gap-10">
               <div
-                className={`cabinet-dashboard-name-hero mb-2 w-full min-w-0 px-0 ${isM5Cabinet ? "cabinet-dashboard-name-hero--m5" : ""}`}
+                className={`cabinet-dashboard-name-hero w-full min-w-0 px-0 ${isM5Cabinet ? "cabinet-dashboard-name-hero--m5" : ""}`}
               >
                 <div className="cabinet-dashboard-name-hero__pill">
                   <p
@@ -314,7 +314,7 @@ export default function CabinetDashboardPage() {
                   </p>
                 </div>
               </div>
-              <div className="cabinet-dashboard-balance-wrap mt-1 flex w-full max-w-[320px] shrink-0 flex-col items-center justify-center overflow-visible">
+              <div className="cabinet-dashboard-balance-wrap flex w-full max-w-[320px] shrink-0 flex-col items-center justify-center overflow-visible">
                 <PremiumCard
                   fullName={fullName}
                   uniqueId={uniqueId}

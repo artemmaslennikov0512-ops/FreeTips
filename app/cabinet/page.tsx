@@ -304,14 +304,15 @@ export default function CabinetDashboardPage() {
                 }
               >
                 {verificationStatus === "VERIFIED" ? (
-                  <div className="flex w-full min-w-0 max-w-full flex-col items-center gap-2 text-center">
-                    <div className="flex flex-wrap items-center justify-center gap-2">
-                      <span className="font-semibold leading-none text-white">Аккаунт верифицирован!</span>
-                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-green-600/20 text-green-500">
-                        <ShieldCheck className="h-5 w-5" aria-hidden />
-                      </div>
+                  <div className="flex w-full min-w-0 max-w-full flex-col items-center justify-center gap-3 px-1 text-center">
+                    <div
+                      className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-green-600/20 text-green-500"
+                      aria-hidden={true}
+                    >
+                      <ShieldCheck className="h-6 w-6" />
                     </div>
-                    <p className="w-full text-center text-sm text-white">Ваша личность подтверждена.</p>
+                    <p className="mb-0 text-center text-base font-semibold leading-snug text-white">Аккаунт верифицирован!</p>
+                    <p className="mb-0 max-w-sm text-center text-sm leading-relaxed text-white">Ваша личность подтверждена.</p>
                   </div>
                 ) : verificationStatus === "PENDING" ? (
                   <div className="flex items-center justify-center gap-3 text-center">

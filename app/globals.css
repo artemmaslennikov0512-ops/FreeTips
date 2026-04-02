@@ -2021,6 +2021,11 @@ html:not([data-theme="dark"]) .card-block {
   color: #dc2626 !important;
 }
 
+/* Карточка результата оплаты: глобальная типографика (h1, p { text-align: left }) иначе ломает центр */
+.pay-success-always-light .pay-success-card :is(h1, p) {
+  text-align: center !important;
+}
+
 /* Блок «Спасибо!» после оплаты — всегда светлый (игнорируем тёмную тему) */
 [data-theme="dark"] .pay-success-always-light .pay-success-card {
   background: #ffffff !important;

@@ -32,7 +32,7 @@ const NAV = [
   { label: "Заведения", href: "/admin/establishments", icon: Building2 },
   { label: "Выводы", href: "/admin/payouts", icon: Send },
   { label: "Пользователи", href: "/admin/users", icon: Users },
-  { label: "Заявки на верификацию", href: "/admin/verification-requests", icon: FileCheck },
+  { label: "Заявки", href: "/admin/verification-requests", icon: FileCheck },
   { label: "Поддержка", href: "/admin/support", icon: MessageCircle },
   { label: "Антифрод", href: "/admin/antifraud", icon: ShieldCheck },
 ] as const;

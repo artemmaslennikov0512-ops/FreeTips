@@ -155,10 +155,10 @@ export default function CabinetSupportPage() {
           {/* Приветственное сообщение при открытии чата */}
           <div className="flex justify-start">
             <div className="max-w-[85%] rounded-2xl rounded-bl-md border border-[var(--color-brand-gold)]/30 bg-[var(--color-brand-gold)]/10 px-4 py-3">
-              <div className="mb-2 flex items-center gap-2">
+              <div className="mb-2 flex items-center justify-center gap-2">
                 <span
                   className="logo-ft-abbr flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-[var(--color-brand-gold)]/30 text-[10px] text-[var(--color-brand-gold)]"
-                  aria-hidden
+                  aria-hidden={true}
                 >
                   FT
                 </span>
@@ -190,10 +190,10 @@ export default function CabinetSupportPage() {
                 }`}
               >
                 {m.isFromStaff ? (
-                  <div className="mb-1.5 flex items-center gap-2">
+                  <div className="mb-1.5 flex items-center justify-center gap-2">
                     <span
                       className="logo-ft-abbr flex h-5 w-5 shrink-0 items-center justify-center rounded bg-[var(--color-brand-gold)]/30 text-[9px] text-[var(--color-brand-gold)]"
-                      aria-hidden
+                      aria-hidden={true}
                     >
                       FT
                     </span>

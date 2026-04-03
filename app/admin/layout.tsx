@@ -16,6 +16,8 @@ import {
   CreditCard,
   KeyRound,
   Laptop,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { getAccessToken, fetchWithAuth, clearAccessToken } from "@/lib/auth-client";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
@@ -48,6 +50,8 @@ const NAV: { label: string; href: string; icon: LucideIcon; iconClass: string }[
   { label: "Сессии", href: "/admin/sessions", icon: Laptop, iconClass: "!text-slate-300" },
 ];
 
+const ADMIN_LG_SIDEBAR_COLLAPSED_KEY = "admin-lg-sidebar-collapsed";
+
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -59,8 +63,27 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [retryTrigger, setRetryTrigger] = useState(0);
   /** Сумма pending по верификации и подключению — бейдж у пункта «Заявки». */
   const [requestsPendingTotal, setRequestsPendingTotal] = useState<number | null>(null);
+  const [lgSidebarCollapsed, setLgSidebarCollapsed] = useState(false);
 
   useEffect(() => setMounted(true), []);
+
+  useEffect(() => {
+    if (!mounted || typeof window === "undefined") return;
+    try {
+      if (localStorage.getItem(ADMIN_LG_SIDEBAR_COLLAPSED_KEY) === "1") setLgSidebarCollapsed(true);
+    } catch {
+      /* ignore */
+    }
+  }, [mounted]);
+
+  const setSidebarCollapsedPersisted = useCallback((collapsed: boolean) => {
+    setLgSidebarCollapsed(collapsed);
+    try {
+      localStorage.setItem(ADMIN_LG_SIDEBAR_COLLAPSED_KEY, collapsed ? "1" : "0");
+    } catch {
+      /* ignore */
+    }
+  }, []);
 
   useEffect(() => {
     document.body.classList.add("cabinet-page", "admin-page");
@@ -196,7 +219,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   return (
-    <div className="admin-panel cabinet-premium flex min-h-screen w-full min-w-0 max-w-full bg-[var(--color-bg)] font-[family:var(--font-inter)] text-[var(--color-text)] pt-3 lg:pt-6">
+    <div className="admin-panel cabinet-premium flex min-h-screen w-full min-w-0 max-w-full bg-[var(--color-bg)] font-[family:var(--font-inter)] text-[var(--color-text)] pt-3 lg:pt-5">
       <LkPresenceHeartbeat />
       <AdminMobileNavPortal
         sidebarOpen={sidebarOpen}
@@ -208,10 +231,22 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         handleLogout={handleLogout}
       />
 
-      {/* Боковая панель — только на десктопе (lg+); на мобильном навигация в модальном окне по центру */}
-      <aside
-        className="admin-sidebar cabinet-sidebar hidden lg:flex fixed left-4 top-4 z-40 h-auto max-h-[calc(100vh-2rem)] w-[260px] shrink-0 flex-col overflow-hidden rounded-[10px] border border-white/10 bg-[var(--color-navy)] py-6 shadow-sm backdrop-blur-xl lg:static lg:left-auto lg:top-auto lg:ml-0 lg:mt-5 lg:mr-0 lg:mb-0 lg:max-h-none lg:self-start lg:translate-x-0"
+      {/* Боковая панель — lg+; сворачивание как в ЛК официанта; на мобильном — модалка */}
+      <div
+        className={`hidden shrink-0 overflow-hidden transition-[width] duration-300 ease-out lg:mt-3 lg:flex lg:self-start ${
+          lgSidebarCollapsed ? "lg:w-0 lg:pointer-events-none" : "lg:w-[260px]"
+        }`}
       >
+        <aside className="admin-sidebar cabinet-sidebar relative flex h-full min-h-0 w-[260px] min-w-[260px] flex-col overflow-hidden rounded-[10px] border border-white/10 bg-[var(--color-navy)] py-6 shadow-sm backdrop-blur-xl lg:static lg:max-h-[calc(100vh-2rem)]">
+          <button
+            type="button"
+            onClick={() => setSidebarCollapsedPersisted(true)}
+            className="cabinet-lg-sidebar-toggle cabinet-lg-sidebar-toggle--collapse absolute right-2 top-1/2 z-20 flex h-11 w-9 -translate-y-1/2 items-center justify-center rounded-xl border border-[var(--color-brand-gold)]/28 bg-[var(--color-bg-sides)]/92 text-[var(--color-text)]/65 shadow-[0_4px_20px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-md transition-[color,background-color,border-color,box-shadow,transform] duration-200 hover:scale-[1.03] hover:border-[var(--color-brand-gold)]/50 hover:bg-[var(--color-brand-gold)]/12 hover:text-[var(--color-brand-gold)] hover:shadow-[0_6px_24px_rgba(197,165,114,0.18)] active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-gold)]/45 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+            aria-label="Скрыть боковое меню"
+            title="Скрыть меню"
+          >
+            <ChevronLeft className="h-5 w-5 shrink-0 text-white" strokeWidth={2.25} aria-hidden />
+          </button>
         <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
           <div className="cabinet-sidebar-profile cabinet-block-inner mx-4 mb-4 rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-4 py-3">
             <div className="flex items-center gap-3">
@@ -267,11 +302,26 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </button>
           </div>
         </div>
-      </aside>
+        </aside>
+      </div>
 
-      <main className="min-h-screen min-w-0 flex-1 overflow-x-hidden px-0 pt-2 lg:pt-1 lg:pl-0 lg:pr-4 lg:ml-0 flex flex-col">
-        <div className="admin-main-block cabinet-main-block app-panel-main-surface relative mt-0 mr-0 mb-4 ml-0 flex min-h-0 w-full min-w-0 max-w-full flex-1 flex-col rounded-lg border border-white/10 bg-white/[0.06] backdrop-blur-xl lg:mt-5 lg:mr-4 lg:ml-4 lg:min-h-[calc(100vh-2rem)] lg:rounded-[10px]">
-          <PanelMobileBackButton variant="admin" fallbackHref="/admin/dashboard" />
+      {lgSidebarCollapsed && (
+        <button
+          type="button"
+          onClick={() => setSidebarCollapsedPersisted(false)}
+          className="cabinet-lg-sidebar-toggle cabinet-lg-sidebar-toggle--expand fixed left-0 top-1/2 z-[35] hidden h-12 w-10 -translate-y-1/2 items-center justify-center rounded-r-xl border border-[var(--color-brand-gold)]/32 border-l-0 bg-[var(--color-bg-sides)]/95 text-[var(--color-text)]/70 shadow-[4px_0_28px_rgba(0,0,0,0.14),inset_0_1px_0_rgba(255,255,255,0.07)] backdrop-blur-md transition-[color,background-color,border-color,box-shadow,transform] duration-200 hover:translate-x-0.5 hover:border-[var(--color-brand-gold)]/55 hover:bg-[var(--color-brand-gold)]/14 hover:text-[var(--color-brand-gold)] hover:shadow-[6px_0_32px_rgba(197,165,114,0.22)] active:scale-[0.97] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-gold)]/45 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent lg:flex"
+          aria-label="Показать боковое меню"
+          title="Меню"
+        >
+          <ChevronRight className="h-5 w-5 shrink-0 text-white" strokeWidth={2.25} aria-hidden />
+        </button>
+      )}
+
+      <main className="min-h-screen min-w-0 flex-1 overflow-x-hidden px-0 pt-2 lg:pt-3 lg:pl-0 lg:pr-4 lg:ml-0 flex flex-col">
+        <div className="admin-main-block cabinet-main-block app-panel-main-surface relative mt-0 mr-0 mb-4 ml-0 flex min-h-0 w-full min-w-0 max-w-full flex-1 flex-col rounded-lg border border-white/10 bg-white/[0.06] backdrop-blur-xl lg:mr-4 lg:ml-4 lg:min-h-[calc(100vh-2rem)] lg:rounded-[10px]">
+          {pathname !== "/admin/dashboard" && (
+            <PanelMobileBackButton variant="admin" fallbackHref="/admin/dashboard" />
+          )}
           <div
             className="flex min-h-0 w-full max-w-full flex-1 flex-col overflow-x-hidden px-4 py-3 sm:px-6 sm:py-4 lg:p-8"
             id="main-content"

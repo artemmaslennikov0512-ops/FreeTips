@@ -506,10 +506,23 @@ export default function AdminUsersPage() {
                 <LkPresenceCell user={user} />
               </div>
               <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
-                <span className="text-white/60">Slug /pay/…</span>
-                <span className="min-w-0 font-mono text-xs text-white/90 break-all" title={user.tipSlugs.join(", ") || undefined}>
-                  {user.tipSlugs.length ? user.tipSlugs.join(", ") : "—"}
-                </span>
+                <span className="text-white/60">Slug</span>
+                <div className="min-w-0 space-y-1.5 font-mono text-xs">
+                  {user.tipSlugs.length ? (
+                    user.tipSlugs.map((slug) => (
+                      <Link
+                        key={slug}
+                        href={`/pay/${encodeURIComponent(slug)}`}
+                        className="block break-all text-[var(--color-brand-gold)] underline-offset-2 transition-opacity hover:underline hover:opacity-90"
+                        title={`Страница оплаты /pay/${slug}`}
+                      >
+                        {slug}
+                      </Link>
+                    ))
+                  ) : (
+                    <span className="text-white/90">—</span>
+                  )}
+                </div>
                 <span className="text-white/60">Email</span>
                 <span className="min-w-0 truncate text-white/90" title={user.email || undefined}>{user.email || "—"}</span>
                 <span className="text-white/60">Роль</span>
@@ -543,7 +556,7 @@ export default function AdminUsersPage() {
             <tr>
               <th className="whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">ID</th>
               <th className="whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">Логин</th>
-              <th className="whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">Slug (/pay/…)</th>
+              <th className="whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">Slug</th>
               <th
                 className="w-12 whitespace-nowrap px-3 py-3 text-left text-sm font-semibold text-[#0a192f]"
                 aria-label="Присутствие в личном кабинете"

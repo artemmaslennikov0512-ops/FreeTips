@@ -198,7 +198,9 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
 
       <main className="min-h-0 min-w-0 flex-1 overflow-x-hidden px-0 pt-2 lg:pt-1 lg:pl-0 lg:pr-0 lg:ml-0 flex flex-col">
         <div className="cabinet-main-block app-panel-main-surface relative mt-2 mr-0 mb-4 ml-0 flex min-h-0 flex-1 flex-col rounded-lg border border-white/10 bg-white/[0.06] backdrop-blur-xl lg:mt-3 lg:mr-0 lg:ml-4 lg:rounded-[10px]">
-          <PanelMobileBackButton variant="establishment" fallbackHref="/establishment" />
+          {pathname !== "/establishment" && (
+            <PanelMobileBackButton variant="establishment" fallbackHref="/establishment" />
+          )}
           <div
             className="flex min-h-0 flex-1 flex-col overflow-x-hidden px-4 py-4 sm:px-6 lg:p-8"
             id="main-content"

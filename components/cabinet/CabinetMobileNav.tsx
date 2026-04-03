@@ -37,6 +37,8 @@ export type CabinetMobileNavContextValue = {
   isActive: (href: string) => boolean;
   navActiveClasses: string;
   handleLogout: () => Promise<void>;
+  /** Подпись кнопки выхода (например, в режиме просмотра админом). */
+  logoutButtonLabel: string;
   sidebarStyle: CSSProperties;
   profileBlockStyle: CSSProperties;
   sidebarBg: string | undefined;
@@ -127,6 +129,7 @@ export function CabinetMobileNavPortals() {
     isActive,
     navActiveClasses,
     handleLogout,
+    logoutButtonLabel,
     sidebarStyle,
     profileBlockStyle,
     sidebarBg,
@@ -254,7 +257,7 @@ export function CabinetMobileNavPortals() {
             role="menuitem"
           >
             <LogOut className="h-4 w-4 shrink-0 text-[var(--color-brand-gold)]" aria-hidden />
-            <span>Выйти</span>
+            <span>{logoutButtonLabel}</span>
           </button>
         </div>
       </div>

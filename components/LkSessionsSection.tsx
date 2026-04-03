@@ -52,7 +52,7 @@ function formatRelativeLastSeen(iso: string): string {
 function shellForVariant(variant: LkSessionsVariant): { root: string; card: string; primaryBtn: string } {
   if (variant === "cabinet") {
     return {
-      root: "mx-auto max-w-4xl text-center",
+      root: "mx-auto w-full max-w-6xl text-center",
       card:
         "lk-sessions__card cabinet-card mt-6 rounded-[10px] border-0 p-4 sm:p-6 shadow-[var(--shadow-subtle)] text-left",
       primaryBtn: `lk-sessions__btn--primary ${CABINET_WAITER_BTN_INLINE}`,
@@ -60,7 +60,7 @@ function shellForVariant(variant: LkSessionsVariant): { root: string; card: stri
   }
   if (variant === "establishment") {
     return {
-      root: "mx-auto max-w-3xl text-center",
+      root: "mx-auto w-full max-w-6xl text-center",
       card:
         "lk-sessions__card cabinet-card mt-6 rounded-[10px] border-0 bg-[var(--color-bg-sides)] p-4 sm:p-6 shadow-[var(--shadow-subtle)] text-left",
       primaryBtn: "lk-sessions__btn--primary",

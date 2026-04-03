@@ -3722,6 +3722,32 @@ html:not([data-theme="dark"]) .cabinet-premium #operations-history.cabinet-card 
   color: #64748b !important;
 }
 
+/* Светлая тема сайта + карточки ЛК на navy: явно белое поле и тёмный текст (иначе автозаполнение/наслоения дают «коричневый» вид) */
+html:not([data-theme="dark"])
+  .cabinet-premium:not([data-cabinet-theme="m5-competition"])
+  .cabinet-card
+  .cabinet-surface-input,
+html:not([data-theme="dark"])
+  .cabinet-premium:not([data-cabinet-theme="m5-competition"])
+  .cabinet-section-header
+  .cabinet-surface-input {
+  background-color: #ffffff !important;
+  color: #0a192f !important;
+  -webkit-text-fill-color: #0a192f;
+  border-color: rgba(15, 23, 42, 0.2) !important;
+}
+html:not([data-theme="dark"])
+  .cabinet-premium:not([data-cabinet-theme="m5-competition"])
+  .cabinet-card
+  .cabinet-surface-input::placeholder,
+html:not([data-theme="dark"])
+  .cabinet-premium:not([data-cabinet-theme="m5-competition"])
+  .cabinet-section-header
+  .cabinet-surface-input::placeholder {
+  color: #64748b !important;
+  -webkit-text-fill-color: #64748b;
+}
+
 /* M5 ЛК: тёмные панели при светлой теме сайта — светлый текст в полях (перебивает правило выше) */
 .cabinet-premium[data-cabinet-theme="m5-competition"] input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="hidden"]),
 .cabinet-premium[data-cabinet-theme="m5-competition"] textarea,
@@ -3824,6 +3850,66 @@ html:not([data-theme="dark"]) .admin-panel textarea:autofill {
   -webkit-text-fill-color: #ffffff !important;
   caret-color: #ffffff;
   box-shadow: 0 0 0 1000px #363636 inset !important;
+  filter: none !important;
+  transition: background-color 99999s ease-out 0s !important;
+}
+
+/* Поверх правила выше: автозаполнение у полей с .cabinet-surface-input — белая подложка */
+html:not([data-theme="dark"])
+  .cabinet-premium:not([data-cabinet-theme="m5-competition"])
+  .cabinet-card
+  .cabinet-surface-input:-webkit-autofill,
+html:not([data-theme="dark"])
+  .cabinet-premium:not([data-cabinet-theme="m5-competition"])
+  .cabinet-card
+  .cabinet-surface-input:-webkit-autofill:hover,
+html:not([data-theme="dark"])
+  .cabinet-premium:not([data-cabinet-theme="m5-competition"])
+  .cabinet-card
+  .cabinet-surface-input:-webkit-autofill:focus,
+html:not([data-theme="dark"])
+  .cabinet-premium:not([data-cabinet-theme="m5-competition"])
+  .cabinet-card
+  .cabinet-surface-input:autofill,
+html:not([data-theme="dark"])
+  .cabinet-premium:not([data-cabinet-theme="m5-competition"])
+  .cabinet-section-header
+  .cabinet-surface-input:-webkit-autofill,
+html:not([data-theme="dark"])
+  .cabinet-premium:not([data-cabinet-theme="m5-competition"])
+  .cabinet-section-header
+  .cabinet-surface-input:-webkit-autofill:hover,
+html:not([data-theme="dark"])
+  .cabinet-premium:not([data-cabinet-theme="m5-competition"])
+  .cabinet-section-header
+  .cabinet-surface-input:-webkit-autofill:focus,
+html:not([data-theme="dark"])
+  .cabinet-premium:not([data-cabinet-theme="m5-competition"])
+  .cabinet-section-header
+  .cabinet-surface-input:autofill {
+  background-color: #ffffff !important;
+  background-image: none !important;
+  color: #0a192f !important;
+  border: 2px solid rgba(15, 23, 42, 0.22) !important;
+  -webkit-text-fill-color: #0a192f !important;
+  caret-color: #0a192f;
+  box-shadow: 0 0 0 1000px #ffffff inset !important;
+  filter: none !important;
+  transition: background-color 99999s ease-out 0s !important;
+}
+
+/* Антифрод: поверх общего autofill админки — белое поле и тёмный текст (светлая тема сайта) */
+html:not([data-theme="dark"]) .admin-panel .antifraud-input:-webkit-autofill,
+html:not([data-theme="dark"]) .admin-panel .antifraud-input:-webkit-autofill:hover,
+html:not([data-theme="dark"]) .admin-panel .antifraud-input:-webkit-autofill:focus,
+html:not([data-theme="dark"]) .admin-panel .antifraud-input:autofill {
+  background-color: #ffffff !important;
+  background-image: none !important;
+  color: #0a192f !important;
+  border: 1px solid rgba(10, 25, 47, 0.28) !important;
+  -webkit-text-fill-color: #0a192f !important;
+  caret-color: #0a192f;
+  box-shadow: 0 0 0 1000px #ffffff inset !important;
   filter: none !important;
   transition: background-color 99999s ease-out 0s !important;
 }
@@ -4408,12 +4494,24 @@ html:not([data-theme="dark"]) .admin-panel .antifraud-inner .antifraud-limit-row
   color: #fff !important;
 }
 html:not([data-theme="dark"]) .admin-panel .antifraud-input {
-  background: #d4d4d4 !important;
-  border-color: rgba(10, 25, 47, 0.2);
+  background: #ffffff !important;
+  color: #0a192f !important;
+  -webkit-text-fill-color: #0a192f;
+  border-color: rgba(10, 25, 47, 0.22) !important;
+}
+html:not([data-theme="dark"]) .admin-panel .antifraud-input::placeholder {
+  color: #64748b !important;
+  -webkit-text-fill-color: #64748b;
 }
 html:not([data-theme="dark"]) .admin-panel .antifraud-input:focus {
-  border-color: rgba(197, 165, 114, 0.6);
+  border-color: rgba(197, 165, 114, 0.65) !important;
   outline: none;
+}
+html:not([data-theme="dark"]) .admin-panel .antifraud-input:disabled,
+html:not([data-theme="dark"]) .admin-panel .antifraud-input:read-only {
+  background: #f1f5f9 !important;
+  color: #475569 !important;
+  -webkit-text-fill-color: #475569;
 }
 
 /* Светлая тема: раздел «Пользователи» → карточка пользователя — заголовки и иконка пользователя белые */
@@ -5829,6 +5927,7 @@ html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competitio
 
 .lk-sessions .lk-sessions__th {
   text-align: left;
+  padding: 0.65rem 0.75rem;
   font-size: 0.6875rem;
   font-weight: 600;
   text-transform: uppercase;
@@ -5836,17 +5935,13 @@ html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competitio
   color: var(--lk-fg-muted) !important;
 }
 
-/* Админка — сессии: шире таблица по контейнеру, заголовки по центру */
+/* Админка — сессии: заголовки по центру */
 .admin-panel .lk-sessions[data-lk-sessions-variant="admin"] .lk-sessions__th {
   text-align: center;
 }
 
-.admin-panel .lk-sessions[data-lk-sessions-variant="admin"] .lk-sessions__table {
-  min-width: min(100%, 56rem);
-}
-
 .lk-sessions .lk-sessions__td {
-  padding: 0.75rem 0;
+  padding: 0.7rem 0.75rem;
   font-size: 0.875rem;
   line-height: 1.4;
   color: var(--lk-fg) !important;
@@ -5976,7 +6071,7 @@ html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competitio
 
 .lk-sessions__table {
   width: 100%;
-  min-width: 640px;
+  min-width: min(100%, 56rem);
   border-collapse: collapse;
   text-align: left;
 }

@@ -118,17 +118,6 @@ export function FraudSignalsSection() {
 
         {loading && !data && <p className="text-center text-sm text-white/60">Загрузка…</p>}
 
-        {data && (
-          <p className="fraud-signals-panel-meta mb-3 text-center text-xs leading-relaxed">
-            За выбранный период (до {data.days} дн.) зафиксированы сигналы по{" "}
-            <span className="fraud-signals-panel-meta-num font-semibold tabular-nums">{data.distinctUserCount}</span>{" "}
-            {data.distinctUserCount % 10 === 1 && data.distinctUserCount % 100 !== 11
-              ? "аккаунту"
-              : "аккаунтам"}
-            . Ниже — до {data.groups.length} с последней активностью.
-          </p>
-        )}
-
         {data && data.groups.length === 0 && !loading && (
           <div
             className="flex flex-col items-center justify-center gap-2 rounded-xl border border-white/10 bg-black/15 px-4 py-8 text-center"

@@ -5,6 +5,7 @@
 
 import { getOrCreateDeviceClientId } from "@/lib/device-client-id";
 import { DEVICE_CLIENT_ID_HEADER } from "@/lib/auth-session-metadata";
+import { isCabinetImpersonating, drainImpersonationState } from "@/lib/cabinet-impersonation-state";
 
 const ACCESS_TOKEN_KEY = "accessToken";
 
@@ -47,6 +48,17 @@ export async function fetchWithAuth(
   });
   let res = await fetch(url, { ...init, credentials: init?.credentials ?? "include", headers: baseHeaders });
   if (res.status === 401) {
+    if (typeof window !== "undefined" && isCabinetImpersonating()) {
+      const { adminToken, returnPath } = drainImpersonationState();
+      if (adminToken) {
+        localStorage.setItem(ACCESS_TOKEN_KEY, adminToken);
+        window.location.assign(returnPath ?? "/admin/dashboard");
+      } else {
+        localStorage.removeItem(ACCESS_TOKEN_KEY);
+        window.location.assign("/login");
+      }
+      return res;
+    }
     const refreshHeaders = withDeviceClientHeader({});
     const refreshRes = await fetch("/api/auth/refresh", {
       method: "POST",

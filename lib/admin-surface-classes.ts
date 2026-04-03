@@ -22,7 +22,7 @@ export const ADMIN_PANEL_PAGE_WIDE =
 
 /** Очень широкая колонка (таблицы сессий и т.п.). */
 export const ADMIN_PANEL_PAGE_XL =
-  "mx-auto w-full max-w-6xl space-y-6 px-4 py-8 text-center text-white";
+  "mx-auto w-full max-w-7xl space-y-6 px-4 py-8 text-center text-white";
 
 /** Карточка секции на всю ширину родителя (внутри PAGE_WIDE). */
 export const ADMIN_PANEL_CARD =

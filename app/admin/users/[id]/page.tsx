@@ -1,14 +1,33 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, UserRound, Wallet, TrendingUp, Send, ListChecks, Clock, Sliders, Copy, Key, RotateCw, Lock, Unlock, ShieldCheck, ShieldOff } from "lucide-react";
+import {
+  ArrowLeft,
+  UserRound,
+  Wallet,
+  TrendingUp,
+  Send,
+  ListChecks,
+  Clock,
+  Sliders,
+  Copy,
+  Key,
+  RotateCw,
+  Lock,
+  Unlock,
+  ShieldCheck,
+  ShieldOff,
+  MonitorSmartphone,
+} from "lucide-react";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { PAYOUT_MAX_AMOUNT_KOP, PAYOUT_MIN_AMOUNT_KOP } from "@/lib/payout-amount-bounds";
 import { formatDate, formatMoneyCompact } from "@/lib/utils";
 import { PremiumCard } from "@/app/cabinet/PremiumCard";
 import { ADMIN_BTN, ADMIN_BTN_DANGER, ADMIN_BTN_PRIMARY } from "@/lib/admin-button-classes";
+import { getAccessToken } from "@/lib/auth-client";
+import { beginCabinetImpersonation } from "@/lib/cabinet-impersonation";
 
 interface Transaction {
   id: string;
@@ -49,8 +68,11 @@ interface UserDetailsResponse {
   transactions: Transaction[];
 }
 
+const CABINET_VIEW_ROLES = new Set(["RECIPIENT", "EMPLOYEE"]);
+
 export default function AdminUserDetailsPage() {
   const params = useParams<{ id: string }>();
+  const router = useRouter();
   const userId = params?.id;
   const [data, setData] = useState<UserDetailsResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -95,6 +117,8 @@ export default function AdminUserDetailsPage() {
   const [verifyLoading, setVerifyLoading] = useState(false);
   const [unverifyLoading, setUnverifyLoading] = useState(false);
   const [verifyError, setVerifyError] = useState<string | null>(null);
+  const [cabinetViewLoading, setCabinetViewLoading] = useState(false);
+  const [cabinetViewError, setCabinetViewError] = useState<string | null>(null);
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
@@ -571,6 +595,31 @@ export default function AdminUserDetailsPage() {
     }
   };
 
+  const handleOpenUserCabinet = async () => {
+    if (!userId) return;
+    const adminToken = getAccessToken();
+    if (!adminToken) return;
+    setCabinetViewLoading(true);
+    setCabinetViewError(null);
+    try {
+      const res = await fetch(`/api/admin/users/${userId}/cabinet-token`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${adminToken}` },
+      });
+      const body = (await res.json()) as { accessToken?: string; error?: string };
+      if (!res.ok || !body.accessToken) {
+        setCabinetViewError(body.error ?? "Не удалось открыть кабинет");
+        return;
+      }
+      beginCabinetImpersonation(adminToken, body.accessToken, `/admin/users/${userId}`);
+      router.push("/cabinet");
+    } catch {
+      setCabinetViewError("Ошибка соединения");
+    } finally {
+      setCabinetViewLoading(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
@@ -610,7 +659,20 @@ export default function AdminUserDetailsPage() {
         </div>
         {blockError && <p className="text-sm text-white/90">{blockError}</p>}
         {verifyError && <p className="text-sm text-white/90">{verifyError}</p>}
+        {cabinetViewError && <p className="text-sm text-amber-200/90">{cabinetViewError}</p>}
         <div className="flex w-full max-w-full flex-wrap items-center justify-center gap-3">
+          {CABINET_VIEW_ROLES.has(data.user.role) && (
+            <button
+              type="button"
+              onClick={handleOpenUserCabinet}
+              disabled={cabinetViewLoading || data.user.isBlocked}
+              title={data.user.isBlocked ? "Нельзя открыть кабинет заблокированного пользователя" : undefined}
+              className={`${ADMIN_BTN} gap-2 border border-[var(--color-brand-gold)]/35 bg-[var(--color-brand-gold)]/12 px-4 py-2.5 text-sm text-white hover:bg-[var(--color-brand-gold)]/20 disabled:opacity-50`}
+            >
+              <MonitorSmartphone className="h-4 w-4" />
+              {cabinetViewLoading ? "Открытие…" : "Кабинет как пользователь"}
+            </button>
+          )}
           <button
             type="button"
             onClick={handleBlockToggle}

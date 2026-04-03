@@ -18,12 +18,15 @@ function getJWTRefreshSecretKey(): Uint8Array {
 
 // Время жизни токенов (access 24h — без постоянного выброса из кабинета; refresh продлевает сессию до 7 дней)
 const ACCESS_TOKEN_EXPIRES_IN = "24h";
+const IMPERSONATION_ACCESS_EXPIRES_IN = "4h";
 const REFRESH_TOKEN_EXPIRES_IN = "7d";
 
 export interface TokenPayload extends JWTPayload {
   userId: string;
   login: string;
   role: string;
+  /** Выдан при входе супер-админа в кабинет пользователя (аудит). */
+  impersonatorUserId?: string;
 }
 
 /** Одноразовый шаг после пароля, до выдачи сессии (TOTP) */
@@ -47,6 +50,27 @@ export async function generateAccessToken(payload: TokenPayload): Promise<string
     .sign(getJWTSecretKey());
 
   return token;
+}
+
+/**
+ * Access token от имени целевого пользователя для просмотра кабинета супер-админом.
+ * Короче обычного access; refresh по cookie админа его не продлевает — клиент хранит бэкап токена админа.
+ */
+export async function generateImpersonationAccessToken(
+  target: Pick<TokenPayload, "userId" | "login" | "role">,
+  impersonatorUserId: string,
+): Promise<string> {
+  const body: TokenPayload = {
+    userId: target.userId,
+    login: target.login,
+    role: target.role,
+    impersonatorUserId,
+  };
+  return new SignJWT(body)
+    .setProtectedHeader({ alg: "HS256" })
+    .setIssuedAt()
+    .setExpirationTime(IMPERSONATION_ACCESS_EXPIRES_IN)
+    .sign(getJWTSecretKey());
 }
 
 /**

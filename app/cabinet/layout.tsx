@@ -21,6 +21,8 @@ import {
 } from "lucide-react";
 import { CABINET_WAITER_BTN } from "@/lib/cabinet-button-classes";
 import { getAccessToken, fetchWithAuth, clearAccessToken } from "@/lib/auth-client";
+import { isCabinetImpersonating } from "@/lib/cabinet-impersonation-state";
+import { endCabinetImpersonation } from "@/lib/cabinet-impersonation";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { isCabinetM5CompetitionTheme } from "@/config/cabinet-theme-logins";
@@ -65,8 +67,14 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
   } | null>(null);
   const [supportUnreadCount, setSupportUnreadCount] = useState(0);
   const [lgSidebarCollapsed, setLgSidebarCollapsed] = useState(false);
+  const [adminCabinetView, setAdminCabinetView] = useState(false);
 
   useEffect(() => setMounted(true), []);
+
+  useEffect(() => {
+    if (!mounted || typeof window === "undefined") return;
+    setAdminCabinetView(isCabinetImpersonating());
+  }, [mounted, pathname]);
 
   useEffect(() => {
     if (!mounted || typeof window === "undefined") return;
@@ -188,6 +196,12 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
   }, [fetchSupportUnread]);
 
   const handleLogout = useCallback(async () => {
+    if (isCabinetImpersonating()) {
+      const path = endCabinetImpersonation();
+      setAdminCabinetView(false);
+      router.replace(path);
+      return;
+    }
     try {
       await fetch("/api/auth/logout", {
         method: "POST",
@@ -199,6 +213,12 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
       clearAccessToken();
       router.replace("/");
     }
+  }, [router]);
+
+  const handleExitAdminCabinetView = useCallback(() => {
+    const path = endCabinetImpersonation();
+    setAdminCabinetView(false);
+    router.replace(path);
   }, [router]);
 
   const isActive = useCallback(
@@ -268,6 +288,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
       isActive,
       navActiveClasses,
       handleLogout,
+      logoutButtonLabel: adminCabinetView ? "Выйти из просмотра" : "Выйти",
       sidebarStyle,
       profileBlockStyle,
       sidebarBg,
@@ -286,6 +307,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
       isActive,
       navActiveClasses,
       handleLogout,
+      adminCabinetView,
       sidebarStyle,
       profileBlockStyle,
       sidebarBg,
@@ -303,8 +325,26 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
   return (
     <CabinetMobileNavProvider value={mobileNavValue}>
     <LkPresenceHeartbeat />
+    {adminCabinetView && (
+      <div
+        className="fixed inset-x-0 top-0 z-[110] flex flex-wrap items-center justify-center gap-2 border-b border-amber-500/35 bg-amber-950/95 px-3 py-2.5 text-center text-sm text-amber-50 shadow-lg backdrop-blur-md sm:justify-between sm:px-4"
+        role="status"
+      >
+        <span className="max-w-[min(100%,42rem)] leading-snug">
+          Режим просмотра: вы в кабинете пользователя. Действия выполняются от его имени.
+        </span>
+        <button
+          type="button"
+          onClick={handleExitAdminCabinetView}
+          className={`shrink-0 ${CABINET_WAITER_BTN} gap-2 px-4 py-2 text-sm`}
+        >
+          <ChevronLeft className="h-4 w-4 text-[var(--color-brand-gold)]" aria-hidden />
+          В админку
+        </button>
+      </div>
+    )}
     <div
-      className={`cabinet-premium flex min-h-screen w-full max-w-full overflow-x-hidden font-[family:var(--font-inter)] text-[var(--color-text)] pt-3 lg:pt-5 ${isM5Cabinet ? "bg-transparent" : "bg-[var(--color-bg)]"}`}
+      className={`cabinet-premium flex min-h-screen w-full max-w-full overflow-x-hidden font-[family:var(--font-inter)] text-[var(--color-text)] pt-3 lg:pt-5 ${adminCabinetView ? "pt-[52px] sm:pt-[48px]" : ""} ${isM5Cabinet ? "bg-transparent" : "bg-[var(--color-bg)]"}`}
       data-brand-active={applyEstablishmentBrand ? "true" : undefined}
       data-cabinet-theme={isM5Cabinet ? "m5-competition" : undefined}
       style={Object.keys(brandStyle).length ? brandStyle : undefined}
@@ -322,11 +362,11 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
         <button
           type="button"
           onClick={() => setSidebarCollapsedPersisted(true)}
-          className="absolute right-2 top-2 z-10 rounded-md p-1.5 text-[var(--color-text)]/30 transition-colors hover:bg-[var(--color-dark-gray)]/12 hover:text-[var(--color-text)]/55 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-gold)]/35"
+          className="cabinet-lg-sidebar-toggle cabinet-lg-sidebar-toggle--collapse absolute right-2 top-1/2 z-20 flex h-11 w-9 -translate-y-1/2 items-center justify-center rounded-xl border border-[var(--color-brand-gold)]/28 bg-[var(--color-bg-sides)]/92 text-[var(--color-text)]/65 shadow-[0_4px_20px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-md transition-[color,background-color,border-color,box-shadow,transform] duration-200 hover:scale-[1.03] hover:border-[var(--color-brand-gold)]/50 hover:bg-[var(--color-brand-gold)]/12 hover:text-[var(--color-brand-gold)] hover:shadow-[0_6px_24px_rgba(197,165,114,0.18)] active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-gold)]/45 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
           aria-label="Скрыть боковое меню"
           title="Скрыть меню"
         >
-          <ChevronLeft className="h-4 w-4" strokeWidth={2} aria-hidden />
+          <ChevronLeft className="h-5 w-5 shrink-0" strokeWidth={2.25} aria-hidden />
         </button>
         {user?.establishmentBrand?.logoUrl && (
           <div className="mx-4 mb-3 flex justify-center">
@@ -423,7 +463,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
             className={`mt-4 flex ${CABINET_WAITER_BTN} w-full !justify-center gap-3 px-4 py-3 text-sm`}
           >
             <LogOut className="h-4 w-4 shrink-0 text-[var(--color-brand-gold)]" aria-hidden />
-            <span>Выйти</span>
+            <span>{adminCabinetView ? "Выйти из просмотра" : "Выйти"}</span>
           </button>
         </div>
         </div>
@@ -433,11 +473,11 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
         <button
           type="button"
           onClick={() => setSidebarCollapsedPersisted(false)}
-          className="fixed left-0 top-1/2 z-[35] hidden -translate-y-1/2 rounded-r-md border border-[var(--color-brand-gold)]/18 border-l-0 bg-[var(--color-bg-sides)]/85 px-1 py-2.5 text-[var(--color-text)]/35 shadow-sm backdrop-blur-md transition-colors hover:text-[var(--color-text)]/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-gold)]/30 lg:block"
+          className="cabinet-lg-sidebar-toggle cabinet-lg-sidebar-toggle--expand fixed left-0 top-1/2 z-[35] hidden h-12 w-10 -translate-y-1/2 items-center justify-center rounded-r-xl border border-[var(--color-brand-gold)]/32 border-l-0 bg-[var(--color-bg-sides)]/95 text-[var(--color-text)]/70 shadow-[4px_0_28px_rgba(0,0,0,0.14),inset_0_1px_0_rgba(255,255,255,0.07)] backdrop-blur-md transition-[color,background-color,border-color,box-shadow,transform] duration-200 hover:translate-x-0.5 hover:border-[var(--color-brand-gold)]/55 hover:bg-[var(--color-brand-gold)]/14 hover:text-[var(--color-brand-gold)] hover:shadow-[6px_0_32px_rgba(197,165,114,0.22)] active:scale-[0.97] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-gold)]/45 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent lg:flex"
           aria-label="Показать боковое меню"
           title="Меню"
         >
-          <ChevronRight className="h-4 w-4" strokeWidth={2} aria-hidden />
+          <ChevronRight className="h-5 w-5 shrink-0" strokeWidth={2.25} aria-hidden />
         </button>
       )}
 
@@ -446,7 +486,9 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
           className="cabinet-main-block app-panel-main-surface relative z-10 mt-0 mr-0 mb-4 ml-0 flex min-h-0 w-full max-w-full flex-1 flex-col rounded-lg border-x border-b border-white/10 backdrop-blur-xl md:rounded-[10px] lg:mr-4 lg:ml-4"
           style={mainBlockStyle}
         >
-          <PanelMobileBackButton variant="cabinet" fallbackHref="/cabinet" />
+          {pathname !== "/cabinet" && (
+            <PanelMobileBackButton variant="cabinet" fallbackHref="/cabinet" />
+          )}
           <div
             className="flex min-h-0 flex-1 flex-col overflow-x-hidden px-4 py-3 sm:px-6 md:py-6 lg:p-8"
             id="main-content"

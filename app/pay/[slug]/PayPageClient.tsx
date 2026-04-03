@@ -418,31 +418,35 @@ export default function PayPageClient() {
       <div className="mx-auto w-full max-w-md">
         {/* Основной блок со скруглёнными краями и отступами — внутри все карточки */}
         <div
-          className="pay-page-outer-block relative rounded-2xl border-0 px-4 pt-5 pb-5 shadow-[var(--shadow-card)]"
+          className="pay-page-outer-block rounded-2xl border-0 px-4 pt-5 pb-5 shadow-[var(--shadow-card)]"
         style={Object.keys(cardStyle).length ? cardStyle : undefined}
       >
-        <div className="absolute right-3 top-4 max-[380px]:right-2 sm:right-4">
-          <ThemeToggle variant={payM5Shell ? "m5" : "default"} compact />
-        </div>
-
-        {/* Логотип: только лого заведения или только FreeTips (без дублирования) */}
-        <div className="pay-page-logo-wrap flex justify-center pr-[5.75rem] max-[380px]:pr-[5rem] sm:pr-20">
-          {branding?.logoUrl ? (
-            <img
-              src={branding.logoUrl}
-              alt=""
-              className="h-10 w-auto max-w-[120px] object-contain"
-              style={{ opacity: branding?.logoOpacityPercent != null ? branding.logoOpacityPercent / 100 : 1 }}
-            />
-          ) : (
-            <div className="flex items-center gap-2">
-                <span className="pay-page-logo-ft logo-ft-abbr flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--color-brand-gold)] text-sm text-[#0a192f]">FT</span>
-              <span className="font-[family:var(--font-playfair)] text-lg font-bold pay-page-logo-text">
-                <span className="pay-page-logo-free">Free</span>
-                <span className="pay-page-logo-tips text-[var(--color-brand-gold)]">Tips</span>
-              </span>
-            </div>
-          )}
+        {/* Центр логотипа — середина блока; тема — в правой колонке (сетка 1fr / auto / 1fr) */}
+        <div className="pay-page-header-row mb-1 grid grid-cols-[1fr_auto_1fr] items-center gap-x-2 sm:gap-x-3">
+          <span className="min-w-0" aria-hidden />
+          <div className="pay-page-logo-wrap flex justify-center">
+            {branding?.logoUrl ? (
+              <img
+                src={branding.logoUrl}
+                alt=""
+                className="h-10 w-auto max-w-[120px] object-contain"
+                style={{ opacity: branding?.logoOpacityPercent != null ? branding.logoOpacityPercent / 100 : 1 }}
+              />
+            ) : (
+              <div className="flex items-center gap-2">
+                <span className="pay-page-logo-ft logo-ft-abbr flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--color-brand-gold)] text-sm text-[#0a192f]">
+                  FT
+                </span>
+                <span className="font-[family:var(--font-playfair)] text-lg font-bold pay-page-logo-text">
+                  <span className="pay-page-logo-free">Free</span>
+                  <span className="pay-page-logo-tips text-[var(--color-brand-gold)]">Tips</span>
+                </span>
+              </div>
+            )}
+          </div>
+          <div className="flex min-w-0 justify-end self-center">
+            <ThemeToggle variant={payM5Shell ? "m5" : "default"} compact />
+          </div>
         </div>
 
         {/* Карточка: получатель — обводка до QR, отступ от QR как слева от блока */}

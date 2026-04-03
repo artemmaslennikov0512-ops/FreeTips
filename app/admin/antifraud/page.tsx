@@ -5,7 +5,7 @@ import { ADMIN_BTN, ADMIN_BTN_PRIMARY } from "@/lib/admin-button-classes";
 import { FraudSignalsSection } from "./FraudSignalsSection";
 
 const ANTIFRAUD_INPUT =
-  "antifraud-input w-36 min-w-[7rem] rounded-lg border border-[rgba(197,165,114,0.25)] bg-[var(--color-bg-sides)] px-3 py-2 text-center text-sm text-[var(--color-text)] placeholder:text-[var(--color-muted)] focus:outline-none focus:border-[var(--color-brand-gold)] disabled:bg-[var(--color-light-gray)] read-only:bg-[var(--color-light-gray)]";
+  "antifraud-input w-36 min-w-[7rem] max-w-full shrink-0 rounded-lg border border-[rgba(197,165,114,0.25)] bg-[var(--color-bg-sides)] px-3 py-2 text-center text-sm text-[var(--color-text)] placeholder:text-[var(--color-muted)] focus:outline-none focus:border-[var(--color-brand-gold)] disabled:bg-[var(--color-light-gray)] read-only:bg-[var(--color-light-gray)]";
 const ANTIFRAUD_BTN_APPLY = `${ADMIN_BTN} ${ADMIN_BTN_PRIMARY} px-4 py-2 text-sm disabled:opacity-50`;
 const ANTIFRAUD_BTN_EDIT = `${ADMIN_BTN} admin-btn--neutral px-4 py-2 text-sm`;
 
@@ -441,16 +441,12 @@ export default function AdminAntifraudPage() {
       {observeEffective != null && (
         <section className="cabinet-section-header mb-6 rounded-2xl border-0 p-4 sm:p-6">
           <div className="antifraud-inner cabinet-block-inner min-w-0 rounded-xl border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/85 p-4 sm:p-5">
-            <h2 className="mb-2 text-center text-base font-semibold text-white">Пороги наблюдения (только сигналы)</h2>
-            <p className="mb-5 text-center text-xs leading-relaxed text-white/75">
-              Не блокируют операции. Окно — за сколько минут считаем; порог — при каком количестве пишется сигнал в
-              «Подозрительная активность». Сброс удаляет переопределения в БД и включает встроенные дефолты.
-            </p>
+            <h2 className="mb-5 text-center text-base font-semibold text-white">Пороги наблюдения (только сигналы)</h2>
             <div className="space-y-5 text-sm text-white/90">
-              <div className="flex flex-col items-center gap-3 text-center">
+              <div className="flex w-full max-w-full flex-col items-center gap-3 text-center">
                 <span className="font-medium text-white">Частый вывод</span>
-                <div className="flex flex-wrap items-center justify-center gap-3">
-                  <label className="flex flex-col items-center gap-1">
+                <div className="flex w-full max-w-full flex-wrap items-center justify-center gap-x-4 gap-y-3">
+                  <label className="flex min-w-0 flex-col items-center gap-1">
                     <span className="text-xs text-white/60">мин</span>
                     <input
                       type="number"
@@ -461,7 +457,7 @@ export default function AdminAntifraudPage() {
                       className={ANTIFRAUD_INPUT}
                     />
                   </label>
-                  <label className="flex flex-col items-center gap-1">
+                  <label className="flex min-w-0 flex-col items-center gap-1">
                     <span className="text-xs text-white/60">заявок ≥</span>
                     <input
                       type="number"
@@ -474,10 +470,10 @@ export default function AdminAntifraudPage() {
                   </label>
                 </div>
               </div>
-              <div className="flex flex-col items-center gap-3 text-center">
+              <div className="flex w-full max-w-full flex-col items-center gap-3 text-center">
                 <span className="font-medium text-white">Всплеск инициализаций по одной ссылке</span>
-                <div className="flex flex-wrap items-center justify-center gap-3">
-                  <label className="flex flex-col items-center gap-1">
+                <div className="flex w-full max-w-full flex-wrap items-center justify-center gap-x-4 gap-y-3">
+                  <label className="flex min-w-0 flex-col items-center gap-1">
                     <span className="text-xs text-white/60">мин</span>
                     <input
                       type="number"
@@ -488,7 +484,7 @@ export default function AdminAntifraudPage() {
                       className={ANTIFRAUD_INPUT}
                     />
                   </label>
-                  <label className="flex flex-col items-center gap-1">
+                  <label className="flex min-w-0 flex-col items-center gap-1">
                     <span className="text-xs text-white/60">созданий ≥</span>
                     <input
                       type="number"
@@ -501,10 +497,10 @@ export default function AdminAntifraudPage() {
                   </label>
                 </div>
               </div>
-              <div className="flex flex-col items-center gap-3 text-center">
+              <div className="flex w-full max-w-full flex-col items-center gap-3 text-center">
                 <span className="font-medium text-white">Успешные оплаты с одного IP</span>
-                <div className="flex flex-wrap items-center justify-center gap-3">
-                  <label className="flex flex-col items-center gap-1">
+                <div className="flex w-full max-w-full flex-wrap items-center justify-center gap-x-4 gap-y-3">
+                  <label className="flex min-w-0 flex-col items-center gap-1">
                     <span className="text-xs text-white/60">мин</span>
                     <input
                       type="number"
@@ -515,7 +511,7 @@ export default function AdminAntifraudPage() {
                       className={ANTIFRAUD_INPUT}
                     />
                   </label>
-                  <label className="flex flex-col items-center gap-1">
+                  <label className="flex min-w-0 flex-col items-center gap-1">
                     <span className="text-xs text-white/60">успехов ≥</span>
                     <input
                       type="number"
@@ -528,9 +524,9 @@ export default function AdminAntifraudPage() {
                   </label>
                 </div>
               </div>
-              <div className="flex flex-col items-center gap-3 text-center">
+              <div className="flex w-full max-w-full flex-col items-center gap-3 text-center">
                 <span className="max-w-md font-medium text-white">Несколько аккаунтов с одного IP (вход/регистрация)</span>
-                <label className="flex flex-col items-center gap-1">
+                <label className="flex min-w-0 flex-col items-center gap-1">
                   <span className="text-xs text-white/60">аккаунтов ≥</span>
                   <input
                     type="number"
@@ -543,12 +539,12 @@ export default function AdminAntifraudPage() {
                 </label>
               </div>
             </div>
-            <div className="mt-5 flex flex-wrap justify-center gap-2">
+            <div className="mt-5 flex w-full max-w-full flex-wrap justify-center gap-x-3 gap-y-2">
               <button
                 type="button"
                 disabled={loadingObserveSave}
                 onClick={() => void applyObserveSettings(false)}
-                className={ANTIFRAUD_BTN_APPLY}
+                className={`${ANTIFRAUD_BTN_APPLY} min-w-0 shrink-0`}
               >
                 {loadingObserveSave ? "Сохраняем…" : "Сохранить пороги"}
               </button>
@@ -556,7 +552,7 @@ export default function AdminAntifraudPage() {
                 type="button"
                 disabled={loadingObserveSave}
                 onClick={() => void applyObserveSettings(true)}
-                className={ANTIFRAUD_BTN_EDIT}
+                className={`${ANTIFRAUD_BTN_EDIT} min-w-0 shrink-0`}
               >
                 Сбросить к дефолтам
               </button>

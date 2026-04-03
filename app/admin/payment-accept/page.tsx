@@ -21,7 +21,6 @@ export default function AdminPaymentAcceptPage() {
   const [blacklistText, setBlacklistText] = useState("");
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ type: "ok" | "err"; text: string } | null>(null);
-  const [updatedAt, setUpdatedAt] = useState<string | null>(null);
 
   useEffect(() => {
     const run = async () => {
@@ -44,7 +43,6 @@ export default function AdminPaymentAcceptPage() {
         setGlobalOff(data.globalPaymentsDisabled);
         setWhitelistText(data.whitelistText ?? "");
         setBlacklistText(data.blacklistText ?? "");
-        if (data.updatedAt) setUpdatedAt(data.updatedAt);
       } catch {
         setLoadError("Ошибка соединения");
       } finally {
@@ -88,7 +86,6 @@ export default function AdminPaymentAcceptPage() {
       if (data.globalPaymentsDisabled !== undefined) setGlobalOff(data.globalPaymentsDisabled);
       if (typeof data.whitelistText === "string") setWhitelistText(data.whitelistText);
       if (typeof data.blacklistText === "string") setBlacklistText(data.blacklistText);
-      if (data.updatedAt) setUpdatedAt(data.updatedAt);
 
       const unknown: string[] = [];
       if (data.whitelistUnknownTokens?.length) unknown.push(`Белый список — не найдены: ${data.whitelistUnknownTokens.join(", ")}`);
@@ -138,14 +135,6 @@ export default function AdminPaymentAcceptPage() {
           <h1 className="font-[family:var(--font-playfair)] text-2xl font-semibold text-white">
             Приём по платёжным ссылкам
           </h1>
-          <p className="mt-2 text-sm leading-relaxed text-white/80">
-            Один переключатель отключает новые переводы по всем ссылкам{" "}
-            <code className="rounded bg-white/10 px-1 py-0.5 text-xs text-white/90">/pay/…</code>, кроме белого списка. Сайт и
-            личные кабинеты продолжают работать. Чёрный список блокирует приём, когда глобальный стоп выключен.
-          </p>
-          {updatedAt && (
-            <p className="mt-2 text-xs text-white/50">Последнее изменение: {new Date(updatedAt).toLocaleString("ru-RU")}</p>
-          )}
         </div>
       </div>
 

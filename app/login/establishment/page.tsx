@@ -8,7 +8,13 @@ import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { AuthPageShell } from "@/components/AuthPageShell";
 import { loginRequestSchema } from "@/lib/validations";
 import { getFieldErrors } from "@/lib/form-errors";
-import { AUTH_CARD_CLASS, AUTH_INPUT_CLASS, AUTH_ERROR_BORDER, AUTH_BTN_PRIMARY } from "@/lib/auth-form-classes";
+import {
+  AUTH_CARD_CLASS,
+  AUTH_INPUT_CLASS,
+  AUTH_INPUT_CLASS_NO_ICON,
+  AUTH_ERROR_BORDER,
+  AUTH_BTN_PRIMARY,
+} from "@/lib/auth-form-classes";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 
 export default function LoginEstablishmentPage() {
@@ -208,7 +214,7 @@ export default function LoginEstablishmentPage() {
                   value={totpCode}
                   onChange={(e) => setTotpCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
                   placeholder="000000"
-                  className={`${AUTH_INPUT_CLASS} text-center text-lg tracking-[0.35em]`}
+                  className={`${AUTH_INPUT_CLASS_NO_ICON} text-center text-lg tracking-[0.35em]`}
                   autoFocus
                 />
               </div>

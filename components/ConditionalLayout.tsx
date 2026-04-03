@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import { Header } from "@/components/Header";
 import { ConditionalFooter } from "@/components/ConditionalFooter";
+import { PanelMobileMenuProvider } from "@/components/PanelMobileMenuContext";
 
 export function ConditionalLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname() ?? "";
@@ -10,6 +11,7 @@ export function ConditionalLayout({ children }: { children: React.ReactNode }) {
   const isCabinet = pathname.startsWith("/cabinet");
   const isAdmin = pathname.startsWith("/admin");
   const isEstablishment = pathname.startsWith("/establishment");
+  const isPanelShell = isCabinet || isAdmin || isEstablishment;
   const isAuthPage =
     pathname === "/login" ||
     pathname.startsWith("/login/") ||
@@ -35,13 +37,19 @@ export function ConditionalLayout({ children }: { children: React.ReactNode }) {
             ? "mx-auto max-w-6xl xl:max-w-7xl 2xl:max-w-screen-2xl"
             : "mx-auto max-w-6xl xl:max-w-7xl 2xl:max-w-screen-2xl bg-[var(--color-bg)]";
 
-  return (
-    <div className={`flex min-h-screen w-full min-w-0 flex-1 flex-col border-0 ${widthClass} ${isAuthPage ? "layout-auth" : ""} ${isPayPage ? "layout-pay" : ""} ${isZayavka ? "layout-zayavka" : ""} ${isLoginPage ? "layout-login" : ""}`}
-    >
+  const shell = (
+    <>
       {!hideHeader && <Header />}
       <main id="main-content" className="flex-1" tabIndex={-1}>
         {children}
       </main>
+    </>
+  );
+
+  return (
+    <div className={`flex min-h-screen w-full min-w-0 flex-1 flex-col border-0 ${widthClass} ${isAuthPage ? "layout-auth" : ""} ${isPayPage ? "layout-pay" : ""} ${isZayavka ? "layout-zayavka" : ""} ${isLoginPage ? "layout-login" : ""}`}
+    >
+      {isPanelShell ? <PanelMobileMenuProvider>{shell}</PanelMobileMenuProvider> : shell}
       <ConditionalFooter />
     </div>
   );

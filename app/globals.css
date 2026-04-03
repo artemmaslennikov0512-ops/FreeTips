@@ -1586,6 +1586,99 @@ html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-compe
   box-shadow: none !important;
 }
 
+/*
+ * Админка: мобильное меню через createPortal на body — вне .cabinet-premium, глобальные правила .cabinet-nav-dropdown выше не цепляются.
+ * Без этого в тёмной теме Tailwind bg-[var(--color-navy)] даёт светло-серый (#e5e5e5), затемнение rgba(15,23,42) — синеватый «шлейф» при скролле.
+ */
+.admin-mobile-nav-overlay {
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+html:not([data-theme="dark"]) .admin-mobile-nav-overlay {
+  background: rgba(10, 25, 47, 0.52);
+}
+[data-theme="dark"] .admin-mobile-nav-overlay {
+  background: rgba(0, 0, 0, 0.58);
+}
+
+/* ЛК официанта: оверлей мобильного меню (createPortal на body) — тёмная тема: нейтральное затемнение, не rgba(15,23,42) из светлой */
+.cabinet-mobile-nav-overlay {
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+html:not([data-theme="dark"]) .cabinet-mobile-nav-overlay {
+  background: rgba(10, 25, 47, 0.55);
+}
+[data-theme="dark"] .cabinet-mobile-nav-overlay {
+  background: rgba(0, 0, 0, 0.58);
+}
+
+html:not([data-theme="dark"]) .admin-mobile-nav-dialog {
+  background: #1e2a3a !important;
+  color: rgba(255, 255, 255, 0.95) !important;
+  border: 0.5px solid rgba(197, 165, 114, 0.45) !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.08) !important;
+}
+html:not([data-theme="dark"]) .admin-mobile-nav-dialog .cabinet-sidebar-profile {
+  background: rgba(255, 255, 255, 0.15) !important;
+  border-width: 0.5px !important;
+  border-style: solid !important;
+  border-color: rgba(197, 165, 114, 0.5) !important;
+  color: #fff !important;
+}
+html:not([data-theme="dark"]) .admin-mobile-nav-dialog .cabinet-nav-label {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+html:not([data-theme="dark"]) .admin-mobile-nav-dialog nav {
+  background: rgba(255, 255, 255, 0.15) !important;
+  border-width: 0.5px !important;
+  border-style: solid !important;
+  border-color: rgba(197, 165, 114, 0.5) !important;
+  box-shadow: none !important;
+}
+html:not([data-theme="dark"]) .admin-mobile-nav-dialog a {
+  color: rgba(255, 255, 255, 0.92) !important;
+}
+html:not([data-theme="dark"]) .admin-mobile-nav-dialog .cabinet-nav-active {
+  border-color: rgba(255, 255, 255, 0.5) !important;
+  background: rgba(255, 255, 255, 0.22) !important;
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .admin-mobile-nav-dialog {
+  background: rgba(255, 255, 255, 0.06) !important;
+  color: #fafafa !important;
+  border: 1px solid rgba(192, 192, 192, 0.4) !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3), 0 2px 6px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(192, 192, 192, 0.08) !important;
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  isolation: isolate;
+}
+[data-theme="dark"] .admin-mobile-nav-dialog a,
+[data-theme="dark"] .admin-mobile-nav-dialog button {
+  color: rgba(250, 250, 250, 0.9) !important;
+}
+[data-theme="dark"] .admin-mobile-nav-dialog .cabinet-nav-label {
+  color: rgba(250, 250, 250, 0.5) !important;
+}
+[data-theme="dark"] .admin-mobile-nav-dialog .cabinet-sidebar-profile {
+  background: rgba(0, 0, 0, 0.25) !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+  color: #fafafa !important;
+}
+[data-theme="dark"] .admin-mobile-nav-dialog .cabinet-nav-active {
+  border-color: rgba(255, 255, 255, 0.25) !important;
+  background: rgba(255, 255, 255, 0.12) !important;
+  color: #fafafa !important;
+}
+[data-theme="dark"] .admin-mobile-nav-dialog nav {
+  background: rgba(0, 0, 0, 0.25) !important;
+  border-width: 0.5px !important;
+  border-style: solid !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+  box-shadow: none !important;
+}
+
 /* Блок навигации в сайдбаре — те же заливка и обводка, что у блока профиля (из .cabinet-sidebar-profile) */
 html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-sidebar:not(.admin-sidebar) .cabinet-nav-block nav {
   background: rgba(255, 255, 255, 0.1) !important;
@@ -1907,6 +2000,15 @@ body.establishment-page .site-header {
   max-width: none;
   margin-top: 1rem;
   box-sizing: border-box;
+}
+
+/* Тема / гамбургер только до lg: на десктопе сайдбар уже есть — дублирующая строка скрыта жёстко */
+@media (min-width: 1024px) {
+  body.cabinet-page header.site-header .panel-shell-mobile-only,
+  body.admin-page header.site-header .panel-shell-mobile-only,
+  body.establishment-page header.site-header .panel-shell-mobile-only {
+    display: none !important;
+  }
 }
 
 body.cabinet-page .cabinet-premium,
@@ -3071,6 +3173,23 @@ html:not([data-theme="dark"]) .pay-page:not(.pay-page--m5-competition) .pay-page
   outline: none;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1), 0 0 0 2px rgba(197, 165, 114, 0.35);
 }
+.pay-page .pay-page-input-wrap input:-webkit-autofill,
+.pay-page .pay-page-input-wrap input:-webkit-autofill:hover,
+.pay-page .pay-page-input-wrap input:-webkit-autofill:focus,
+.pay-page .pay-page-input-wrap textarea:-webkit-autofill,
+.pay-page .pay-page-input-wrap textarea:-webkit-autofill:hover,
+.pay-page .pay-page-input-wrap textarea:-webkit-autofill:focus,
+.pay-page .pay-page-input-wrap input:autofill,
+.pay-page .pay-page-input-wrap textarea:autofill {
+  color: var(--pay-page-text) !important;
+  -webkit-text-fill-color: var(--pay-page-text) !important;
+  caret-color: var(--pay-page-text);
+  border: 0.5px solid rgba(197, 165, 114, 0.22) !important;
+  box-shadow: 0 0 0 1000px var(--pay-page-input-bg) inset !important;
+  background-image: none !important;
+  filter: none !important;
+  transition: background-color 99999s ease-out 0s !important;
+}
 
 /* Поле отзыва — многострочное (не M5 — там тёмные поля в блоке M5) */
 .pay-page:not(.pay-page--m5-competition) .review-textarea {
@@ -3647,12 +3766,105 @@ html:not([data-theme="dark"]) .cabinet-premium #operations-history.cabinet-card 
   -webkit-text-fill-color: #8e8e8e;
 }
 
+/* ЛК / админка: автозаполнение — как обычные поля (#363636), без жёлтой подложки */
+[data-theme="dark"] .cabinet-premium input:-webkit-autofill,
+[data-theme="dark"] .cabinet-premium input:-webkit-autofill:hover,
+[data-theme="dark"] .cabinet-premium input:-webkit-autofill:focus,
+[data-theme="dark"] .cabinet-premium textarea:-webkit-autofill,
+[data-theme="dark"] .cabinet-premium textarea:-webkit-autofill:hover,
+[data-theme="dark"] .cabinet-premium textarea:-webkit-autofill:focus,
+[data-theme="dark"] .cabinet-premium input:autofill,
+[data-theme="dark"] .cabinet-premium textarea:autofill,
+[data-theme="dark"] .admin-panel input:-webkit-autofill,
+[data-theme="dark"] .admin-panel input:-webkit-autofill:hover,
+[data-theme="dark"] .admin-panel input:-webkit-autofill:focus,
+[data-theme="dark"] .admin-panel textarea:-webkit-autofill,
+[data-theme="dark"] .admin-panel textarea:-webkit-autofill:hover,
+[data-theme="dark"] .admin-panel textarea:-webkit-autofill:focus,
+[data-theme="dark"] .admin-panel input:autofill,
+[data-theme="dark"] .admin-panel textarea:autofill {
+  background-color: #363636 !important;
+  background-image: none !important;
+  color: #ffffff !important;
+  border: 1px solid #5c5c5c !important;
+  -webkit-text-fill-color: #ffffff !important;
+  caret-color: #ffffff;
+  box-shadow: 0 0 0 1000px #363636 inset !important;
+  filter: none !important;
+  transition: background-color 99999s ease-out 0s !important;
+}
+
+/* Светлая тема сайта: поля панелей на тёмной карточке — автозаполнение не светлее обычного */
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) input:-webkit-autofill,
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) input:-webkit-autofill:hover,
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) input:-webkit-autofill:focus,
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) textarea:-webkit-autofill,
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) textarea:-webkit-autofill:hover,
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) textarea:-webkit-autofill:focus,
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) input:autofill,
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) textarea:autofill,
+html:not([data-theme="dark"]) .admin-panel input:-webkit-autofill,
+html:not([data-theme="dark"]) .admin-panel input:-webkit-autofill:hover,
+html:not([data-theme="dark"]) .admin-panel input:-webkit-autofill:focus,
+html:not([data-theme="dark"]) .admin-panel textarea:-webkit-autofill,
+html:not([data-theme="dark"]) .admin-panel textarea:-webkit-autofill:hover,
+html:not([data-theme="dark"]) .admin-panel textarea:-webkit-autofill:focus,
+html:not([data-theme="dark"]) .admin-panel input:autofill,
+html:not([data-theme="dark"]) .admin-panel textarea:autofill {
+  background-color: #363636 !important;
+  background-image: none !important;
+  color: #ffffff !important;
+  border: 1px solid #5c5c5c !important;
+  -webkit-text-fill-color: #ffffff !important;
+  caret-color: #ffffff;
+  box-shadow: 0 0 0 1000px #363636 inset !important;
+  filter: none !important;
+  transition: background-color 99999s ease-out 0s !important;
+}
+
+html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competition"] input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="hidden"]):-webkit-autofill,
+html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competition"] input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="hidden"]):-webkit-autofill:hover,
+html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competition"] input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="hidden"]):-webkit-autofill:focus,
+html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competition"] textarea:-webkit-autofill,
+html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competition"] textarea:-webkit-autofill:hover,
+html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competition"] textarea:-webkit-autofill:focus,
+html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competition"] input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="hidden"]):autofill,
+html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competition"] textarea:autofill {
+  background-color: var(--color-bg-sides) !important;
+  background-image: none !important;
+  color: var(--color-text) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  -webkit-text-fill-color: var(--color-text) !important;
+  caret-color: var(--color-text);
+  box-shadow: 0 0 0 1000px var(--color-bg-sides) inset !important;
+  filter: none !important;
+  transition: background-color 99999s ease-out 0s !important;
+}
+
 /* Чат поддержки: поле ввода на тёмном фоне — белый текст всегда */
 .cabinet-premium .support-chat-input {
   color: #fff !important;
 }
 .cabinet-premium .support-chat-input::placeholder {
   color: rgba(255, 255, 255, 0.6) !important;
+}
+[data-theme="dark"] .cabinet-premium .support-chat-input:-webkit-autofill,
+[data-theme="dark"] .cabinet-premium .support-chat-input:-webkit-autofill:hover,
+[data-theme="dark"] .cabinet-premium .support-chat-input:-webkit-autofill:focus,
+[data-theme="dark"] .cabinet-premium .support-chat-input:autofill,
+html:not([data-theme="dark"]) .cabinet-premium .support-chat-input:-webkit-autofill,
+html:not([data-theme="dark"]) .cabinet-premium .support-chat-input:-webkit-autofill:hover,
+html:not([data-theme="dark"]) .cabinet-premium .support-chat-input:-webkit-autofill:focus,
+html:not([data-theme="dark"]) .cabinet-premium .support-chat-input:autofill {
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+  caret-color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  box-shadow: 0 0 0 1000px rgba(255, 255, 255, 0.08) inset !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  filter: none !important;
+  transition: background-color 99999s ease-out 0s !important;
 }
 
 /* Чат поддержки: заголовок и описание по центру, белый текст */
@@ -3715,6 +3927,24 @@ html:not([data-theme="dark"]) .support-chat-block {
 }
 .admin-panel .admin-support-thread .support-chat-input::placeholder {
   color: rgba(255, 255, 255, 0.6) !important;
+}
+[data-theme="dark"] .admin-panel .admin-support-thread .support-chat-input:-webkit-autofill,
+[data-theme="dark"] .admin-panel .admin-support-thread .support-chat-input:-webkit-autofill:hover,
+[data-theme="dark"] .admin-panel .admin-support-thread .support-chat-input:-webkit-autofill:focus,
+[data-theme="dark"] .admin-panel .admin-support-thread .support-chat-input:autofill,
+html:not([data-theme="dark"]) .admin-panel .admin-support-thread .support-chat-input:-webkit-autofill,
+html:not([data-theme="dark"]) .admin-panel .admin-support-thread .support-chat-input:-webkit-autofill:hover,
+html:not([data-theme="dark"]) .admin-panel .admin-support-thread .support-chat-input:-webkit-autofill:focus,
+html:not([data-theme="dark"]) .admin-panel .admin-support-thread .support-chat-input:autofill {
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+  caret-color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  box-shadow: 0 0 0 1000px rgba(255, 255, 255, 0.08) inset !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  filter: none !important;
+  transition: background-color 99999s ease-out 0s !important;
 }
 
 /* Светлая тема: блок «Доступные лимиты» — как на фото (не M5) */
@@ -4221,7 +4451,7 @@ html:not([data-theme="dark"]) .admin-panel .antifraud-inner .antifraud-value {
   -webkit-text-fill-color: #8e8e8e;
 }
 
-/* Сигналы антифрода: текст не перебивается правилами бренда в #main-content; таблица читаема на rose-подложке */
+/* Сигналы антифрода: текст не перебивается правилами бренда в #main-content; таблица на общей карточке antifraud-inner */
 .admin-panel .fraud-signals-panel {
   color: rgba(255, 255, 255, 0.92);
 }
@@ -4428,6 +4658,156 @@ html:not([data-theme="dark"]) .zayavka-page .zayavka-card a:not(.auth-btn-primar
   color: #64748b !important;
   -webkit-text-fill-color: #64748b;
 }
+
+/*
+ * Заявка, дата рождения (type=date): на мобильных WebKit подполя (дд мм гггг) не должны наследовать белый цвет
+ * с карточки; пустое состояние — приглушённый текст. Иконка календаря — под слоем ввода (z-index в разметке).
+ * Селекторы с .zayavka-page .zayavka-card — выше специфичностью, чем общие правила полей карточки.
+ */
+.layout-zayavka input[type="date"].zayavka-date-input,
+html:not([data-theme="dark"]) .layout-zayavka .zayavka-page .zayavka-card input[type="date"].zayavka-date-input,
+[data-theme="dark"] .layout-zayavka .zayavka-page .zayavka-card input[type="date"].zayavka-date-input {
+  color-scheme: light;
+}
+.layout-zayavka input[type="date"].zayavka-date-input--empty,
+.layout-zayavka input[type="date"].zayavka-date-input--empty::-webkit-datetime-edit,
+.layout-zayavka input[type="date"].zayavka-date-input--empty::-webkit-datetime-edit-fields-wrapper,
+.layout-zayavka input[type="date"].zayavka-date-input--empty::-webkit-datetime-edit-text,
+.layout-zayavka input[type="date"].zayavka-date-input--empty::-webkit-datetime-edit-month-field,
+.layout-zayavka input[type="date"].zayavka-date-input--empty::-webkit-datetime-edit-day-field,
+.layout-zayavka input[type="date"].zayavka-date-input--empty::-webkit-datetime-edit-year-field,
+html:not([data-theme="dark"]) .layout-zayavka .zayavka-page .zayavka-card input[type="date"].zayavka-date-input--empty,
+html:not([data-theme="dark"]) .layout-zayavka .zayavka-page .zayavka-card input[type="date"].zayavka-date-input--empty::-webkit-datetime-edit,
+html:not([data-theme="dark"]) .layout-zayavka .zayavka-page .zayavka-card input[type="date"].zayavka-date-input--empty::-webkit-datetime-edit-fields-wrapper,
+html:not([data-theme="dark"]) .layout-zayavka .zayavka-page .zayavka-card input[type="date"].zayavka-date-input--empty::-webkit-datetime-edit-text,
+html:not([data-theme="dark"]) .layout-zayavka .zayavka-page .zayavka-card input[type="date"].zayavka-date-input--empty::-webkit-datetime-edit-month-field,
+html:not([data-theme="dark"]) .layout-zayavka .zayavka-page .zayavka-card input[type="date"].zayavka-date-input--empty::-webkit-datetime-edit-day-field,
+html:not([data-theme="dark"]) .layout-zayavka .zayavka-page .zayavka-card input[type="date"].zayavka-date-input--empty::-webkit-datetime-edit-year-field,
+[data-theme="dark"] .layout-zayavka .zayavka-page .zayavka-card input[type="date"].zayavka-date-input--empty,
+[data-theme="dark"] .layout-zayavka .zayavka-page .zayavka-card input[type="date"].zayavka-date-input--empty::-webkit-datetime-edit,
+[data-theme="dark"] .layout-zayavka .zayavka-page .zayavka-card input[type="date"].zayavka-date-input--empty::-webkit-datetime-edit-fields-wrapper,
+[data-theme="dark"] .layout-zayavka .zayavka-page .zayavka-card input[type="date"].zayavka-date-input--empty::-webkit-datetime-edit-text,
+[data-theme="dark"] .layout-zayavka .zayavka-page .zayavka-card input[type="date"].zayavka-date-input--empty::-webkit-datetime-edit-month-field,
+[data-theme="dark"] .layout-zayavka .zayavka-page .zayavka-card input[type="date"].zayavka-date-input--empty::-webkit-datetime-edit-day-field,
+[data-theme="dark"] .layout-zayavka .zayavka-page .zayavka-card input[type="date"].zayavka-date-input--empty::-webkit-datetime-edit-year-field {
+  color: #64748b !important;
+  -webkit-text-fill-color: #64748b !important;
+}
+.layout-zayavka input[type="date"].zayavka-date-input:not(.zayavka-date-input--empty),
+.layout-zayavka input[type="date"].zayavka-date-input:not(.zayavka-date-input--empty)::-webkit-datetime-edit,
+.layout-zayavka input[type="date"].zayavka-date-input:not(.zayavka-date-input--empty)::-webkit-datetime-edit-fields-wrapper,
+.layout-zayavka input[type="date"].zayavka-date-input:not(.zayavka-date-input--empty)::-webkit-datetime-edit-text,
+.layout-zayavka input[type="date"].zayavka-date-input:not(.zayavka-date-input--empty)::-webkit-datetime-edit-month-field,
+.layout-zayavka input[type="date"].zayavka-date-input:not(.zayavka-date-input--empty)::-webkit-datetime-edit-day-field,
+.layout-zayavka input[type="date"].zayavka-date-input:not(.zayavka-date-input--empty)::-webkit-datetime-edit-year-field,
+html:not([data-theme="dark"]) .layout-zayavka .zayavka-page .zayavka-card input[type="date"].zayavka-date-input:not(.zayavka-date-input--empty),
+html:not([data-theme="dark"]) .layout-zayavka .zayavka-page .zayavka-card input[type="date"].zayavka-date-input:not(.zayavka-date-input--empty)::-webkit-datetime-edit,
+html:not([data-theme="dark"]) .layout-zayavka .zayavka-page .zayavka-card input[type="date"].zayavka-date-input:not(.zayavka-date-input--empty)::-webkit-datetime-edit-fields-wrapper,
+html:not([data-theme="dark"]) .layout-zayavka .zayavka-page .zayavka-card input[type="date"].zayavka-date-input:not(.zayavka-date-input--empty)::-webkit-datetime-edit-text,
+html:not([data-theme="dark"]) .layout-zayavka .zayavka-page .zayavka-card input[type="date"].zayavka-date-input:not(.zayavka-date-input--empty)::-webkit-datetime-edit-month-field,
+html:not([data-theme="dark"]) .layout-zayavka .zayavka-page .zayavka-card input[type="date"].zayavka-date-input:not(.zayavka-date-input--empty)::-webkit-datetime-edit-day-field,
+html:not([data-theme="dark"]) .layout-zayavka .zayavka-page .zayavka-card input[type="date"].zayavka-date-input:not(.zayavka-date-input--empty)::-webkit-datetime-edit-year-field,
+[data-theme="dark"] .layout-zayavka .zayavka-page .zayavka-card input[type="date"].zayavka-date-input:not(.zayavka-date-input--empty),
+[data-theme="dark"] .layout-zayavka .zayavka-page .zayavka-card input[type="date"].zayavka-date-input:not(.zayavka-date-input--empty)::-webkit-datetime-edit,
+[data-theme="dark"] .layout-zayavka .zayavka-page .zayavka-card input[type="date"].zayavka-date-input:not(.zayavka-date-input--empty)::-webkit-datetime-edit-fields-wrapper,
+[data-theme="dark"] .layout-zayavka .zayavka-page .zayavka-card input[type="date"].zayavka-date-input:not(.zayavka-date-input--empty)::-webkit-datetime-edit-text,
+[data-theme="dark"] .layout-zayavka .zayavka-page .zayavka-card input[type="date"].zayavka-date-input:not(.zayavka-date-input--empty)::-webkit-datetime-edit-month-field,
+[data-theme="dark"] .layout-zayavka .zayavka-page .zayavka-card input[type="date"].zayavka-date-input:not(.zayavka-date-input--empty)::-webkit-datetime-edit-day-field,
+[data-theme="dark"] .layout-zayavka .zayavka-page .zayavka-card input[type="date"].zayavka-date-input:not(.zayavka-date-input--empty)::-webkit-datetime-edit-year-field {
+  color: #0a192f !important;
+  -webkit-text-fill-color: #0a192f !important;
+}
+
+/*
+ * Автозаполнение (логин/пароль и др.): без жёлтого/синего фона и смены цвета текста —
+ * WebKit (-webkit-autofill) и стандартный :autofill (Firefox и др.).
+ */
+[data-theme="dark"] .layout-auth input:-webkit-autofill,
+[data-theme="dark"] .layout-auth input:-webkit-autofill:hover,
+[data-theme="dark"] .layout-auth input:-webkit-autofill:focus,
+[data-theme="dark"] .layout-auth textarea:-webkit-autofill,
+[data-theme="dark"] .layout-auth textarea:-webkit-autofill:hover,
+[data-theme="dark"] .layout-auth textarea:-webkit-autofill:focus,
+[data-theme="dark"] .layout-login input:-webkit-autofill,
+[data-theme="dark"] .layout-login input:-webkit-autofill:hover,
+[data-theme="dark"] .layout-login input:-webkit-autofill:focus,
+[data-theme="dark"] .layout-login textarea:-webkit-autofill,
+[data-theme="dark"] .layout-login textarea:-webkit-autofill:hover,
+[data-theme="dark"] .layout-login textarea:-webkit-autofill:focus,
+[data-theme="dark"] .layout-zayavka input:-webkit-autofill,
+[data-theme="dark"] .layout-zayavka input:-webkit-autofill:hover,
+[data-theme="dark"] .layout-zayavka input:-webkit-autofill:focus,
+[data-theme="dark"] .layout-zayavka textarea:-webkit-autofill,
+[data-theme="dark"] .layout-zayavka textarea:-webkit-autofill:hover,
+[data-theme="dark"] .layout-zayavka textarea:-webkit-autofill:focus,
+[data-theme="dark"] .forgot-password-page input:-webkit-autofill,
+[data-theme="dark"] .forgot-password-page input:-webkit-autofill:hover,
+[data-theme="dark"] .forgot-password-page input:-webkit-autofill:focus,
+[data-theme="dark"] .forgot-password-page textarea:-webkit-autofill,
+[data-theme="dark"] .forgot-password-page textarea:-webkit-autofill:hover,
+[data-theme="dark"] .forgot-password-page textarea:-webkit-autofill:focus,
+[data-theme="dark"] .layout-auth input:autofill,
+[data-theme="dark"] .layout-auth textarea:autofill,
+[data-theme="dark"] .layout-login input:autofill,
+[data-theme="dark"] .layout-login textarea:autofill,
+[data-theme="dark"] .layout-zayavka input:autofill,
+[data-theme="dark"] .layout-zayavka textarea:autofill,
+[data-theme="dark"] .forgot-password-page input:autofill,
+[data-theme="dark"] .forgot-password-page textarea:autofill {
+  background-color: #ffffff !important;
+  background-image: none !important;
+  color: #0a192f !important;
+  border: 1px solid rgba(10, 25, 47, 0.2) !important;
+  -webkit-text-fill-color: #0a192f !important;
+  caret-color: #0a192f;
+  box-shadow: 0 0 0 1000px #ffffff inset !important;
+  filter: none !important;
+  transition: background-color 99999s ease-out 0s !important;
+}
+
+html:not([data-theme="dark"]) .layout-auth input:-webkit-autofill,
+html:not([data-theme="dark"]) .layout-auth input:-webkit-autofill:hover,
+html:not([data-theme="dark"]) .layout-auth input:-webkit-autofill:focus,
+html:not([data-theme="dark"]) .layout-auth textarea:-webkit-autofill,
+html:not([data-theme="dark"]) .layout-auth textarea:-webkit-autofill:hover,
+html:not([data-theme="dark"]) .layout-auth textarea:-webkit-autofill:focus,
+html:not([data-theme="dark"]) .layout-login input:-webkit-autofill,
+html:not([data-theme="dark"]) .layout-login input:-webkit-autofill:hover,
+html:not([data-theme="dark"]) .layout-login input:-webkit-autofill:focus,
+html:not([data-theme="dark"]) .layout-login textarea:-webkit-autofill,
+html:not([data-theme="dark"]) .layout-login textarea:-webkit-autofill:hover,
+html:not([data-theme="dark"]) .layout-login textarea:-webkit-autofill:focus,
+html:not([data-theme="dark"]) .layout-zayavka input:-webkit-autofill,
+html:not([data-theme="dark"]) .layout-zayavka input:-webkit-autofill:hover,
+html:not([data-theme="dark"]) .layout-zayavka input:-webkit-autofill:focus,
+html:not([data-theme="dark"]) .layout-zayavka textarea:-webkit-autofill,
+html:not([data-theme="dark"]) .layout-zayavka textarea:-webkit-autofill:hover,
+html:not([data-theme="dark"]) .layout-zayavka textarea:-webkit-autofill:focus,
+html:not([data-theme="dark"]) .forgot-password-page input:-webkit-autofill,
+html:not([data-theme="dark"]) .forgot-password-page input:-webkit-autofill:hover,
+html:not([data-theme="dark"]) .forgot-password-page input:-webkit-autofill:focus,
+html:not([data-theme="dark"]) .forgot-password-page textarea:-webkit-autofill,
+html:not([data-theme="dark"]) .forgot-password-page textarea:-webkit-autofill:hover,
+html:not([data-theme="dark"]) .forgot-password-page textarea:-webkit-autofill:focus,
+html:not([data-theme="dark"]) .layout-auth input:autofill,
+html:not([data-theme="dark"]) .layout-auth textarea:autofill,
+html:not([data-theme="dark"]) .layout-login input:autofill,
+html:not([data-theme="dark"]) .layout-login textarea:autofill,
+html:not([data-theme="dark"]) .layout-zayavka input:autofill,
+html:not([data-theme="dark"]) .layout-zayavka textarea:autofill,
+html:not([data-theme="dark"]) .forgot-password-page input:autofill,
+html:not([data-theme="dark"]) .forgot-password-page textarea:autofill {
+  background-color: var(--color-light-gray) !important;
+  background-image: none !important;
+  color: #0a192f !important;
+  border: 1px solid rgba(10, 25, 47, 0.18) !important;
+  -webkit-text-fill-color: #0a192f !important;
+  caret-color: #0a192f;
+  box-shadow: 0 0 0 1000px var(--color-light-gray) inset !important;
+  filter: none !important;
+  transition: background-color 99999s ease-out 0s !important;
+}
+
 [data-theme="dark"] .layout-zayavka .zayavka-select-wrap {
   background: #ffffff !important;
   border-color: rgba(10, 25, 47, 0.2) !important;
@@ -5077,6 +5457,13 @@ button {
   outline: 2px solid var(--color-accent-gold);
   outline-offset: 4px;
   border-radius: var(--radius-sm);
+}
+
+/* main с tabIndex={-1} для перехода с skip-link: глобальная *:focus-visible рисует рамку на всю ширину колонки — на скриншотах и при смене фокуса выглядит как лишние границы */
+#main-content:focus-visible {
+  outline: none !important;
+  outline-offset: 0;
+  box-shadow: none;
 }
 
 /* Поле телефона на заявке: убираем глобальную золотую обводку у input, чтобы не было «золотой скобки» слева; фокус показываем ring на обёртке */

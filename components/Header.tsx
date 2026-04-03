@@ -10,6 +10,7 @@ import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { getAccessToken, authHeaders, clearAccessToken } from "@/lib/auth-client";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { isCabinetM5CompetitionTheme } from "@/config/cabinet-theme-logins";
+import { useOptionalPanelMobileMenu } from "@/components/PanelMobileMenuContext";
 
 export function Header() {
   const router = useRouter();
@@ -121,6 +122,10 @@ export function Header() {
   const isCabinetM5Header =
     Boolean(pathname?.startsWith("/cabinet")) &&
     isCabinetM5CompetitionTheme(user?.login);
+  const panelMenu = useOptionalPanelMobileMenu();
+
+  const panelMenuControlsId =
+    pathname?.startsWith("/admin") ? "admin-nav-dropdown" : pathname?.startsWith("/establishment") ? "establishment-mobile-nav" : "cabinet-nav-dropdown";
 
   useEffect(() => {
     if (hideMobileSiteNav) setSideOpen(false);
@@ -228,7 +233,9 @@ export function Header() {
 
   return (
     <header
-      className={`site-header sticky top-0 z-30 mx-0 mt-2 w-full overflow-hidden rounded-lg border border-white/10 bg-transparent md:rounded-[10px] lg:mx-3 lg:w-[calc(100%-1.5rem)]${isCabinetM5Header ? " site-header--cabinet-m5" : ""}`}
+      className={`site-header sticky top-0 z-30 mx-0 mt-2 w-full overflow-hidden rounded-lg bg-transparent md:rounded-[10px] lg:mx-3 lg:w-[calc(100%-1.5rem)] ${
+        hideMobileSiteNav ? "border-0" : "border border-white/10"
+      }${isCabinetM5Header ? " site-header--cabinet-m5" : ""}`}
     >
         <div className="mx-auto flex h-16 w-full items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link
@@ -240,7 +247,7 @@ export function Header() {
           <span className="site-header-logo-text font-[family:var(--font-playfair)] text-lg font-bold text-[var(--color-navy)]"><span className="site-header-logo-free">Free</span><span className="text-[var(--color-brand-gold)]">Tips</span></span>
         </Link>
 
-        <div className="hidden md:flex items-center gap-3">
+        <div className="hidden lg:flex items-center gap-3">
           <ThemeToggle variant={isCabinetM5Header ? "m5" : "default"} />
           {isLanding && (
             <div
@@ -303,8 +310,22 @@ export function Header() {
           )}
         </div>
 
-        <div className="md:hidden flex items-center gap-1">
+        <div className="panel-shell-mobile-only hidden max-lg:flex items-center gap-1 shrink-0">
           <ThemeToggle variant={isCabinetM5Header ? "m5" : "default"} />
+          {hideMobileSiteNav && panelMenu && (
+            <button
+              ref={panelMenu.menuButtonRef}
+              type="button"
+              onClick={() => panelMenu.setSidebarOpen((o) => !o)}
+              className={`min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded-lg text-[var(--color-brand-gold)] hover:bg-[var(--color-brand-gold)]/10 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-gold)]/50 focus-visible:ring-offset-2${isCabinetM5Header ? " site-header-m5-menu-btn" : ""}`}
+              aria-label="Меню"
+              aria-expanded={panelMenu.sidebarOpen}
+              aria-haspopup={pathname?.startsWith("/establishment") ? "true" : "dialog"}
+              aria-controls={panelMenuControlsId}
+            >
+              <Menu className="h-5 w-5 shrink-0" strokeWidth={2} aria-hidden />
+            </button>
+          )}
           {!hideMobileSiteNav && (
             <button
               ref={menuButtonRef}
@@ -330,7 +351,7 @@ export function Header() {
             role="dialog"
             aria-modal="true"
             aria-label="Меню навигации"
-            className={`md:hidden fixed inset-0 z-[9999] overflow-hidden transition-opacity duration-300 ${
+            className={`lg:hidden fixed inset-0 z-[9999] overflow-hidden transition-opacity duration-300 ${
               sideOpen ? "opacity-100" : "opacity-0 pointer-events-none"
             }`}
             onClick={close}

@@ -178,11 +178,13 @@ export default function ZayavkaPage() {
       <AuthPageShell>
         <div className="zayavka-page mx-auto flex min-h-[80vh] max-w-md flex-col justify-center overflow-visible px-4 py-16">
           <div className={`${AUTH_CARD_CLASS} zayavka-card text-center`}>
-            <h1 className="font-[family:var(--font-playfair)] text-2xl font-semibold text-[var(--color-text)]">Спасибо за оставление заявки</h1>
-            <p className="mt-3 text-[var(--color-text-secondary)]">
+            <h1 className="text-center font-[family:var(--font-playfair)] text-2xl font-semibold text-[var(--color-text)]">
+              Спасибо за оставление заявки
+            </h1>
+            <p className="mt-3 text-center text-[var(--color-text-secondary)]">
               Ожидайте, с вами свяжутся в рабочие часы.
             </p>
-            <p className="mt-2 text-[var(--color-text-secondary)]">
+            <p className="mt-2 text-center text-[var(--color-text-secondary)]">
               Если остались вопросы, можете написать нам на{" "}
               <a href={`mailto:${supportEmail}`} className="font-medium text-[var(--color-accent-gold)] hover:opacity-90 hover:underline">
                 почту
@@ -325,14 +327,17 @@ export default function ZayavkaPage() {
                   {!isEstablishment && (
                     <div className="min-w-0">
                       <label htmlFor="zayavka-dateOfBirth" className="mb-1.5 block text-center text-sm font-medium text-[var(--color-text)]">Дата рождения</label>
-                      <div className="relative min-w-0 overflow-hidden rounded-xl focus-within:ring-2 focus-within:ring-[var(--color-accent-gold)]/40 focus-within:ring-offset-2 focus-within:ring-offset-[var(--color-bg)]">
-                        <Calendar className="absolute left-3 top-1/2 h-5 w-5 shrink-0 -translate-y-1/2 text-[var(--color-muted)]" />
+                      <div className="relative z-0 min-w-0 overflow-hidden rounded-xl focus-within:ring-2 focus-within:ring-[var(--color-accent-gold)]/40 focus-within:ring-offset-2 focus-within:ring-offset-[var(--color-bg)]">
+                        <Calendar
+                          className="pointer-events-none absolute left-3 top-1/2 z-0 h-5 w-5 shrink-0 -translate-y-1/2 text-[var(--color-muted)]"
+                          aria-hidden
+                        />
                         <input
                           id="zayavka-dateOfBirth"
                           type="date"
                           value={formData.dateOfBirth}
                           onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
-                          className={`${inputBase} min-w-0 max-w-full box-border`}
+                          className={`zayavka-date-input relative z-[1] min-h-[2.75rem] min-w-0 max-w-full box-border w-full rounded-xl border-0 bg-[var(--color-light-gray)] py-2.5 pl-12 pr-4 text-[var(--color-text)] caret-[var(--color-text)] focus:outline-none ${!formData.dateOfBirth ? "zayavka-date-input--empty" : ""}`}
                         />
                       </div>
                       {fieldErrors.dateOfBirth && <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{fieldErrors.dateOfBirth}</p>}

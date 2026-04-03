@@ -440,91 +440,97 @@ export default function AdminAntifraudPage() {
 
       {observeEffective != null && (
         <section className="cabinet-section-header mb-6 rounded-2xl border-0 p-4 sm:p-6">
-          <div className="min-w-0 rounded-xl border border-rose-500/30 bg-rose-950/15 p-4 sm:p-5">
-            <h2 className="mb-1 text-base font-semibold text-white">Пороги наблюдения (только сигналы)</h2>
-            <p className="mb-4 text-xs leading-relaxed text-white/75">
+          <div className="antifraud-inner cabinet-block-inner min-w-0 rounded-xl border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/85 p-4 sm:p-5">
+            <h2 className="mb-2 text-center text-base font-semibold text-white">Пороги наблюдения (только сигналы)</h2>
+            <p className="mb-5 text-center text-xs leading-relaxed text-white/75">
               Не блокируют операции. Окно — за сколько минут считаем; порог — при каком количестве пишется сигнал в
               «Подозрительная активность». Сброс удаляет переопределения в БД и включает встроенные дефолты.
             </p>
-            <div className="space-y-3 text-sm text-white/90">
-              <div className="grid gap-2 sm:grid-cols-[1fr_auto_auto] sm:items-center sm:gap-3">
-                <span>Частый вывод</span>
-                <label className="flex items-center gap-2 sm:justify-end">
-                  <span className="text-xs text-white/60">мин</span>
-                  <input
-                    type="number"
-                    min={1}
-                    max={10080}
-                    value={inpPayoutWin}
-                    onChange={(e) => setInpPayoutWin(e.target.value)}
-                    className={ANTIFRAUD_INPUT}
-                  />
-                </label>
-                <label className="flex items-center gap-2 sm:justify-end">
-                  <span className="text-xs text-white/60">заявок ≥</span>
-                  <input
-                    type="number"
-                    min={2}
-                    max={50000}
-                    value={inpPayoutCnt}
-                    onChange={(e) => setInpPayoutCnt(e.target.value)}
-                    className={ANTIFRAUD_INPUT}
-                  />
-                </label>
+            <div className="space-y-5 text-sm text-white/90">
+              <div className="flex flex-col items-center gap-3 text-center">
+                <span className="font-medium text-white">Частый вывод</span>
+                <div className="flex flex-wrap items-center justify-center gap-3">
+                  <label className="flex flex-col items-center gap-1">
+                    <span className="text-xs text-white/60">мин</span>
+                    <input
+                      type="number"
+                      min={1}
+                      max={10080}
+                      value={inpPayoutWin}
+                      onChange={(e) => setInpPayoutWin(e.target.value)}
+                      className={ANTIFRAUD_INPUT}
+                    />
+                  </label>
+                  <label className="flex flex-col items-center gap-1">
+                    <span className="text-xs text-white/60">заявок ≥</span>
+                    <input
+                      type="number"
+                      min={2}
+                      max={50000}
+                      value={inpPayoutCnt}
+                      onChange={(e) => setInpPayoutCnt(e.target.value)}
+                      className={ANTIFRAUD_INPUT}
+                    />
+                  </label>
+                </div>
               </div>
-              <div className="grid gap-2 sm:grid-cols-[1fr_auto_auto] sm:items-center sm:gap-3">
-                <span>Всплеск инициализаций по одной ссылке</span>
-                <label className="flex items-center gap-2 sm:justify-end">
-                  <span className="text-xs text-white/60">мин</span>
-                  <input
-                    type="number"
-                    min={1}
-                    max={10080}
-                    value={inpInitWin}
-                    onChange={(e) => setInpInitWin(e.target.value)}
-                    className={ANTIFRAUD_INPUT}
-                  />
-                </label>
-                <label className="flex items-center gap-2 sm:justify-end">
-                  <span className="text-xs text-white/60">созданий ≥</span>
-                  <input
-                    type="number"
-                    min={2}
-                    max={50000}
-                    value={inpInitCnt}
-                    onChange={(e) => setInpInitCnt(e.target.value)}
-                    className={ANTIFRAUD_INPUT}
-                  />
-                </label>
+              <div className="flex flex-col items-center gap-3 text-center">
+                <span className="font-medium text-white">Всплеск инициализаций по одной ссылке</span>
+                <div className="flex flex-wrap items-center justify-center gap-3">
+                  <label className="flex flex-col items-center gap-1">
+                    <span className="text-xs text-white/60">мин</span>
+                    <input
+                      type="number"
+                      min={1}
+                      max={10080}
+                      value={inpInitWin}
+                      onChange={(e) => setInpInitWin(e.target.value)}
+                      className={ANTIFRAUD_INPUT}
+                    />
+                  </label>
+                  <label className="flex flex-col items-center gap-1">
+                    <span className="text-xs text-white/60">созданий ≥</span>
+                    <input
+                      type="number"
+                      min={2}
+                      max={50000}
+                      value={inpInitCnt}
+                      onChange={(e) => setInpInitCnt(e.target.value)}
+                      className={ANTIFRAUD_INPUT}
+                    />
+                  </label>
+                </div>
               </div>
-              <div className="grid gap-2 sm:grid-cols-[1fr_auto_auto] sm:items-center sm:gap-3">
-                <span>Успешные оплаты с одного IP</span>
-                <label className="flex items-center gap-2 sm:justify-end">
-                  <span className="text-xs text-white/60">мин</span>
-                  <input
-                    type="number"
-                    min={1}
-                    max={10080}
-                    value={inpSuccWin}
-                    onChange={(e) => setInpSuccWin(e.target.value)}
-                    className={ANTIFRAUD_INPUT}
-                  />
-                </label>
-                <label className="flex items-center gap-2 sm:justify-end">
-                  <span className="text-xs text-white/60">успехов ≥</span>
-                  <input
-                    type="number"
-                    min={2}
-                    max={50000}
-                    value={inpSuccCnt}
-                    onChange={(e) => setInpSuccCnt(e.target.value)}
-                    className={ANTIFRAUD_INPUT}
-                  />
-                </label>
+              <div className="flex flex-col items-center gap-3 text-center">
+                <span className="font-medium text-white">Успешные оплаты с одного IP</span>
+                <div className="flex flex-wrap items-center justify-center gap-3">
+                  <label className="flex flex-col items-center gap-1">
+                    <span className="text-xs text-white/60">мин</span>
+                    <input
+                      type="number"
+                      min={1}
+                      max={10080}
+                      value={inpSuccWin}
+                      onChange={(e) => setInpSuccWin(e.target.value)}
+                      className={ANTIFRAUD_INPUT}
+                    />
+                  </label>
+                  <label className="flex flex-col items-center gap-1">
+                    <span className="text-xs text-white/60">успехов ≥</span>
+                    <input
+                      type="number"
+                      min={2}
+                      max={50000}
+                      value={inpSuccCnt}
+                      onChange={(e) => setInpSuccCnt(e.target.value)}
+                      className={ANTIFRAUD_INPUT}
+                    />
+                  </label>
+                </div>
               </div>
-              <div className="grid gap-2 sm:grid-cols-[1fr_auto] sm:items-center sm:gap-3">
-                <span>Несколько аккаунтов с одного IP (вход/регистрация)</span>
-                <label className="flex items-center gap-2 sm:justify-end">
+              <div className="flex flex-col items-center gap-3 text-center">
+                <span className="max-w-md font-medium text-white">Несколько аккаунтов с одного IP (вход/регистрация)</span>
+                <label className="flex flex-col items-center gap-1">
                   <span className="text-xs text-white/60">аккаунтов ≥</span>
                   <input
                     type="number"
@@ -537,7 +543,7 @@ export default function AdminAntifraudPage() {
                 </label>
               </div>
             </div>
-            <div className="mt-4 flex flex-wrap gap-2">
+            <div className="mt-5 flex flex-wrap justify-center gap-2">
               <button
                 type="button"
                 disabled={loadingObserveSave}
@@ -566,17 +572,17 @@ export default function AdminAntifraudPage() {
               {antifraudMessage.text}
             </p>
           )}
-          <p className="mb-4 text-xs text-white/80">
+          <p className="mb-4 text-center text-xs text-white/80">
             Текущие значения видны ниже; «—» — не задано (для массового применения или в карточке пользователя).
           </p>
           <div className="antifraud-limits-list min-w-0 space-y-4">
             <div className="antifraud-limit-rows space-y-4">
               {/* 1. Макс. сумма одной операции вывода */}
-              <div className="antifraud-limit-row flex min-w-0 flex-wrap items-center gap-2 border-0 pb-4 sm:gap-4">
-                <div className="min-w-0 flex-[1_1_100%] text-sm font-medium text-white sm:min-w-[180px] sm:flex-none sm:shrink-0">
+              <div className="antifraud-limit-row flex min-w-0 flex-col items-center gap-3 border-0 pb-4 text-center sm:flex-row sm:flex-wrap sm:justify-center sm:gap-4">
+                <div className="w-full max-w-xl text-sm font-medium text-white sm:w-auto sm:max-w-[min(100%,14rem)] sm:shrink-0">
                   1. Макс. сумма одной операции вывода
                 </div>
-                <div className="flex min-w-0 max-w-full flex-1 basis-0 justify-center overflow-hidden sm:min-w-[8rem]">
+                <div className="flex min-w-0 max-w-full justify-center overflow-hidden sm:min-w-[8rem]">
                   {editingAutoConfirm ? (
                     <input
                       type="text"
@@ -592,7 +598,7 @@ export default function AdminAntifraudPage() {
                     </span>
                   )}
                 </div>
-                <div className="shrink-0 sm:pr-2">
+                <div className="flex shrink-0 justify-center sm:pr-2">
                   {editingAutoConfirm ? (
                     <button
                       type="button"
@@ -615,11 +621,11 @@ export default function AdminAntifraudPage() {
               </div>
 
               {/* 2. Суточный лимит вывода (сумма) */}
-              <div className="antifraud-limit-row flex min-w-0 flex-wrap items-center gap-2 border-0 pb-4 sm:gap-4">
-                <div className="min-w-0 flex-[1_1_100%] text-sm font-medium text-white sm:min-w-[180px] sm:flex-none sm:shrink-0">
+              <div className="antifraud-limit-row flex min-w-0 flex-col items-center gap-3 border-0 pb-4 text-center sm:flex-row sm:flex-wrap sm:justify-center sm:gap-4">
+                <div className="w-full max-w-xl text-sm font-medium text-white sm:w-auto sm:max-w-[min(100%,14rem)] sm:shrink-0">
                   2. Суточный лимит вывода
                 </div>
-                <div className="flex min-w-0 max-w-full flex-1 basis-0 justify-center overflow-hidden sm:min-w-[8rem]">
+                <div className="flex min-w-0 max-w-full justify-center overflow-hidden sm:min-w-[8rem]">
                   {editingDailyRub ? (
                     <input
                       type="text"
@@ -635,7 +641,7 @@ export default function AdminAntifraudPage() {
                     </span>
                   )}
                 </div>
-                <div className="shrink-0 sm:pr-2">
+                <div className="flex shrink-0 justify-center sm:pr-2">
                   {editingDailyRub ? (
                     <button
                       type="button"
@@ -658,11 +664,11 @@ export default function AdminAntifraudPage() {
               </div>
 
               {/* 3. Месячный лимит вывода (сумма) */}
-              <div className="antifraud-limit-row flex min-w-0 flex-wrap items-center gap-2 border-0 pb-4 sm:gap-4">
-                <div className="min-w-0 flex-[1_1_100%] text-sm font-medium text-white sm:min-w-[180px] sm:flex-none sm:shrink-0">
+              <div className="antifraud-limit-row flex min-w-0 flex-col items-center gap-3 border-0 pb-4 text-center sm:flex-row sm:flex-wrap sm:justify-center sm:gap-4">
+                <div className="w-full max-w-xl text-sm font-medium text-white sm:w-auto sm:max-w-[min(100%,14rem)] sm:shrink-0">
                   3. Месячный лимит вывода
                 </div>
-                <div className="flex min-w-0 max-w-full flex-1 basis-0 justify-center overflow-hidden sm:min-w-[8rem]">
+                <div className="flex min-w-0 max-w-full justify-center overflow-hidden sm:min-w-[8rem]">
                   {editingMonthlyRub ? (
                     <input
                       type="text"
@@ -678,7 +684,7 @@ export default function AdminAntifraudPage() {
                     </span>
                   )}
                 </div>
-                <div className="shrink-0 sm:pr-2">
+                <div className="flex shrink-0 justify-center sm:pr-2">
                   {editingMonthlyRub ? (
                     <button
                       type="button"
@@ -701,11 +707,11 @@ export default function AdminAntifraudPage() {
               </div>
 
               {/* 4. Суточный лимит заявок */}
-              <div className="antifraud-limit-row flex min-w-0 flex-wrap items-center gap-2 border-0 pb-4 sm:gap-4">
-                <div className="min-w-0 flex-[1_1_100%] text-sm font-medium text-white sm:min-w-[180px] sm:flex-none sm:shrink-0">
+              <div className="antifraud-limit-row flex min-w-0 flex-col items-center gap-3 border-0 pb-4 text-center sm:flex-row sm:flex-wrap sm:justify-center sm:gap-4">
+                <div className="w-full max-w-xl text-sm font-medium text-white sm:w-auto sm:max-w-[min(100%,14rem)] sm:shrink-0">
                   4. Суточный лимит заявок
                 </div>
-                <div className="flex min-w-0 max-w-full flex-1 basis-0 justify-center overflow-hidden sm:min-w-[8rem]">
+                <div className="flex min-w-0 max-w-full justify-center overflow-hidden sm:min-w-[8rem]">
                   {editingDailyCount ? (
                     <input
                       type="number"
@@ -722,7 +728,7 @@ export default function AdminAntifraudPage() {
                     </span>
                   )}
                 </div>
-                <div className="shrink-0 sm:pr-2">
+                <div className="flex shrink-0 justify-center sm:pr-2">
                   {editingDailyCount ? (
                     <button
                       type="button"
@@ -745,11 +751,11 @@ export default function AdminAntifraudPage() {
               </div>
 
               {/* 5. Месячный лимит заявок */}
-              <div className="antifraud-limit-row flex min-w-0 flex-wrap items-center gap-2 border-0 pb-4 sm:gap-4">
-                <div className="min-w-0 flex-[1_1_100%] text-sm font-medium text-white sm:min-w-[180px] sm:flex-none sm:shrink-0">
+              <div className="antifraud-limit-row flex min-w-0 flex-col items-center gap-3 border-0 pb-4 text-center sm:flex-row sm:flex-wrap sm:justify-center sm:gap-4">
+                <div className="w-full max-w-xl text-sm font-medium text-white sm:w-auto sm:max-w-[min(100%,14rem)] sm:shrink-0">
                   5. Месячный лимит заявок
                 </div>
-                <div className="flex min-w-0 max-w-full flex-1 basis-0 justify-center overflow-hidden sm:min-w-[8rem]">
+                <div className="flex min-w-0 max-w-full justify-center overflow-hidden sm:min-w-[8rem]">
                   {editingMonthlyCount ? (
                     <input
                       type="number"
@@ -766,7 +772,7 @@ export default function AdminAntifraudPage() {
                     </span>
                   )}
                 </div>
-                <div className="shrink-0 sm:pr-2">
+                <div className="flex shrink-0 justify-center sm:pr-2">
                   {editingMonthlyCount ? (
                     <button
                       type="button"
@@ -790,11 +796,9 @@ export default function AdminAntifraudPage() {
             </div>
 
             {/* Тумблер Авто-вывод */}
-            <div className="flex flex-wrap items-center gap-3 pt-2">
-              <div className="min-w-[220px] text-sm font-medium text-white">
-                Авто-вывод
-              </div>
-              <label className="flex cursor-pointer items-center gap-2">
+            <div className="flex flex-col items-center gap-3 pt-2 text-center sm:flex-row sm:flex-wrap sm:justify-center">
+              <div className="text-sm font-medium text-white">Авто-вывод</div>
+              <label className="flex cursor-pointer flex-col items-center gap-2 sm:flex-row">
                 <span className="relative inline-block h-6 w-10 shrink-0 rounded-full bg-black/30 transition-colors after:absolute after:left-0.5 after:top-0.5 after:h-5 after:w-5 after:rounded-full after:bg-white after:shadow after:content-[''] after:transition-transform focus-within:ring-2 focus-within:ring-white/30 focus-within:ring-offset-2 has-[:checked]:bg-[var(--color-brand-gold)] has-[:checked]:after:translate-x-4">
                   <input
                     type="checkbox"

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback, useRef, useMemo } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import type { LucideIcon } from "lucide-react";
@@ -21,12 +21,8 @@ import { getAccessToken, fetchWithAuth, clearAccessToken } from "@/lib/auth-clie
 import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { isCabinetM5CompetitionTheme } from "@/config/cabinet-theme-logins";
-import {
-  CabinetMobileNavProvider,
-  CabinetMobileNavPortals,
-  CabinetMobileNavFixedButton,
-  type CabinetMobileNavContextValue,
-} from "@/components/cabinet/CabinetMobileNav";
+import { CabinetMobileNavProvider, CabinetMobileNavPortals, type CabinetMobileNavContextValue } from "@/components/cabinet/CabinetMobileNav";
+import { usePanelMobileMenu } from "@/components/PanelMobileMenuContext";
 const NAV: { label: string; href: string; icon: LucideIcon; iconClass: string }[] = [
   { label: "Дашборд", href: "/cabinet", icon: LayoutDashboard, iconClass: "!text-sky-400" },
   { label: "Операции", href: "/cabinet/transactions", icon: List, iconClass: "!text-emerald-400" },
@@ -39,8 +35,8 @@ const NAV: { label: string; href: string; icon: LucideIcon; iconClass: string }[
 export default function CabinetLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
+  const { sidebarOpen, setSidebarOpen, closeSidebar, menuButtonRef } = usePanelMobileMenu();
   const [mounted, setMounted] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [user, setUser] = useState<{
     login?: string;
     role?: string;
@@ -180,9 +176,6 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
     [pathname],
   );
 
-  const closeSidebar = useCallback(() => setSidebarOpen(false), []);
-  const menuButtonRef = useRef<HTMLButtonElement>(null);
-
   useEffect(() => {
     if (!sidebarOpen) return;
     const onKey = (e: KeyboardEvent) => {
@@ -233,8 +226,6 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
     ? "cabinet-nav-active cabinet-nav-active-m5 font-semibold text-[var(--color-text)]"
     : "cabinet-nav-active border border-[#0a192f]/25 bg-[#0a192f]/10 text-[#0a192f] font-semibold";
 
-  const isCabinetDashboard = pathname === "/cabinet" || pathname === "/cabinet/";
-
   const mobileNavValue = useMemo<CabinetMobileNavContextValue>(
     () => ({
       sidebarOpen,
@@ -257,7 +248,9 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
     }),
     [
       sidebarOpen,
+      setSidebarOpen,
       closeSidebar,
+      menuButtonRef,
       user,
       supportUnreadCount,
       isActive,
@@ -287,7 +280,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
     >
       {/* Левое меню: только на десктопе (lg+); на мобильном навигация в выпадающем списке под кнопкой */}
       <div
-        className={`cabinet-sidebar hidden lg:flex fixed left-0 top-0 z-40 h-full w-[min(calc(100vw-4rem),20rem)] max-w-[20rem] flex-col overflow-hidden border-0 border-r border-white/10 py-6 shadow-2xl backdrop-blur-xl transition-[transform] duration-300 ease-out lg:static lg:left-auto lg:top-auto lg:ml-0 lg:mt-3 lg:mr-0 lg:mb-0 lg:h-auto lg:max-h-[calc(100vh-2rem)] lg:w-[260px] lg:max-w-none lg:translate-x-0 lg:rounded-[10px] lg:border lg:self-start`}
+        className={`cabinet-sidebar hidden lg:flex fixed left-0 top-0 z-40 h-full w-[min(calc(100vw-4rem),20rem)] max-w-[20rem] flex-col overflow-hidden border-0 border-r border-white/10 py-6 shadow-2xl backdrop-blur-xl transition-[transform] duration-300 ease-out lg:static lg:left-auto lg:top-auto lg:ml-0 lg:mt-3 lg:mr-0 lg:mb-0 lg:h-auto lg:max-h-[calc(100vh-2rem)] lg:w-[260px] lg:max-w-none lg:translate-x-0 lg:rounded-[10px] lg:border-x lg:border-b lg:border-t-0 lg:border-white/10 lg:self-start`}
         style={sidebarStyle}
       >
         {user?.establishmentBrand?.logoUrl && (
@@ -392,7 +385,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
 
       <main className="relative min-h-screen min-w-0 flex-1 overflow-x-hidden px-0 pt-2 pb-4 lg:px-0 lg:pt-3 lg:pr-4 lg:ml-0 lg:mr-0 flex flex-col">
         <div
-          className="cabinet-main-block app-panel-main-surface relative z-10 mt-0 mr-0 mb-4 ml-0 flex min-h-0 w-full max-w-full flex-1 flex-col rounded-lg border border-white/10 backdrop-blur-xl md:rounded-[10px] lg:mr-4 lg:ml-4"
+          className="cabinet-main-block app-panel-main-surface relative z-10 mt-0 mr-0 mb-4 ml-0 flex min-h-0 w-full max-w-full flex-1 flex-col rounded-lg border-x border-b border-white/10 backdrop-blur-xl md:rounded-[10px] lg:mr-4 lg:ml-4"
           style={mainBlockStyle}
         >
           <div className="px-4 py-3 sm:px-6 md:py-6 lg:p-8" id="main-content">
@@ -401,7 +394,6 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
         </div>
       </main>
       <CabinetMobileNavPortals />
-      {!isCabinetDashboard && <CabinetMobileNavFixedButton />}
     </div>
     </CabinetMobileNavProvider>
   );

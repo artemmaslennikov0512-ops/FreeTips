@@ -172,6 +172,10 @@ export function ProfileTotpSection({
   const btnSecondaryFlex = totpSecondaryFlexClass(variant);
   const btnPrimaryFull = totpPrimaryFullClass(variant);
   const btnGhostFull = totpGhostFullClass(variant);
+  const verifyActionsRowClass =
+    variant === "cabinet"
+      ? "flex w-full flex-col gap-2 sm:flex-row"
+      : "flex w-full flex-col gap-2 sm:flex-row sm:justify-center";
 
   return (
     <div className={embedded ? undefined : v.outer}>
@@ -226,7 +230,7 @@ export function ProfileTotpSection({
                 maxLength={8}
                 value={disableCode}
                 onChange={(e) => setDisableCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
-                className={`${v.input} tracking-widest`}
+                className={v.inputOtp}
                 placeholder="000000"
               />
             </div>
@@ -258,11 +262,11 @@ export function ProfileTotpSection({
                     maxLength={8}
                     value={verifyCode}
                     onChange={(e) => setVerifyCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
-                    className={`${v.input} tracking-widest`}
+                    className={v.inputOtp}
                     placeholder="000000"
                   />
                 </div>
-                <div className="flex w-full flex-col gap-2 sm:flex-row">
+                <div className={verifyActionsRowClass}>
                   <button
                     type="button"
                     disabled={busy || verifyCode.length !== 6}
@@ -322,7 +326,7 @@ function totpPrimaryFlexClass(variant: ProfileTotpVariant): string {
   if (variant === "establishment") {
     return "flex-1 rounded-xl bg-[var(--color-brand-gold)] px-4 py-2.5 font-medium text-[#0a192f] hover:opacity-90 disabled:opacity-50";
   }
-  return `${ADMIN_BTN} ${ADMIN_BTN_PRIMARY} flex-1 justify-center py-2.5`;
+  return `${ADMIN_BTN} ${ADMIN_BTN_PRIMARY} w-full justify-center py-2.5 sm:w-auto sm:min-w-[10rem]`;
 }
 
 function totpSecondaryFlexClass(variant: ProfileTotpVariant): string {
@@ -332,7 +336,7 @@ function totpSecondaryFlexClass(variant: ProfileTotpVariant): string {
   if (variant === "establishment") {
     return "flex-1 rounded-xl border border-white/25 px-4 py-2.5 font-medium text-white hover:bg-white/10";
   }
-  return `${ADMIN_BTN} flex-1 justify-center border border-white/20 py-2.5`;
+  return `${ADMIN_BTN} w-full justify-center border border-white/20 py-2.5 sm:w-auto sm:min-w-[10rem]`;
 }
 
 function totpPrimaryFullClass(variant: ProfileTotpVariant): string {
@@ -355,6 +359,7 @@ function totpGhostFullClass(variant: ProfileTotpVariant): string {
 
 function variantStyles(variant: ProfileTotpVariant) {
   if (variant === "cabinet") {
+    const input = cabinetInputClassName(false);
     return {
       outer: "",
       pageTitle: "",
@@ -368,10 +373,13 @@ function variantStyles(variant: ProfileTotpVariant) {
       textOk: "font-medium text-green-400",
       textPending: "text-sm text-amber-200",
       label: "mb-1 block text-xs font-medium text-[var(--color-text)]",
-      input: cabinetInputClassName(false),
+      input,
+      inputOtp: `${input} text-center text-lg tracking-[0.35em]`,
     };
   }
   if (variant === "establishment") {
+    const input =
+      "w-full rounded-xl border border-white/20 bg-white/10 px-4 py-2.5 text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-[var(--color-brand-gold)]/40";
     return {
       outer: "mx-auto max-w-lg text-white",
       pageTitle: "font-[family:var(--font-playfair)] text-2xl font-semibold text-white",
@@ -385,23 +393,28 @@ function variantStyles(variant: ProfileTotpVariant) {
       textOk: "font-medium text-emerald-300",
       textPending: "text-sm text-amber-200",
       label: "mb-1 block text-xs font-medium text-white/70",
-      input:
-        "w-full rounded-xl border border-white/20 bg-white/10 px-4 py-2.5 text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-[var(--color-brand-gold)]/40",
+      input,
+      inputOtp: `${input} text-center text-lg tracking-[0.35em]`,
     };
   }
+  const input =
+    "mx-auto w-full max-w-sm rounded-lg border border-white/15 bg-[var(--color-navy)]/50 px-3 py-2 text-center text-sm text-white placeholder:text-white/40 focus:outline-none focus:border-[var(--color-brand-gold)]";
   return {
-    outer: "mx-auto max-w-lg px-4 text-[var(--color-text)]",
-    pageTitle: "font-[family:var(--font-playfair)] text-2xl font-semibold text-[var(--color-text)]",
-    pageDesc: "mt-2 text-sm text-[var(--color-text-secondary)]",
+    outer: "mx-auto w-full max-w-lg px-4 text-center text-white",
+    pageTitle: "font-[family:var(--font-playfair)] text-2xl font-semibold text-white",
+    pageDesc: "mt-2 text-sm text-white/75",
     embedTitle: "font-[family:var(--font-playfair)] text-lg font-semibold text-[var(--color-text)] mb-4",
-    card: "mt-6 rounded-[10px] border border-white/10 bg-white/[0.06] p-5 backdrop-blur-xl",
-    msgOk: "mt-4 rounded-lg border border-[var(--color-accent-emerald)]/40 bg-[var(--color-accent-emerald)]/10 p-3 text-sm text-[var(--color-accent-emerald)]",
-    msgErr: "mt-4 rounded-lg border border-[var(--color-accent-red)]/30 bg-[var(--color-accent-red)]/10 p-3 text-sm text-[var(--color-accent-red)]",
-    loadErrorWrap: "px-4 text-[var(--color-text-secondary)]",
-    textMuted: "text-sm text-[var(--color-text-secondary)]",
-    textOk: "font-medium text-[var(--color-accent-emerald)]",
+    card:
+      "mt-6 rounded-xl border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/85 p-5 text-center shadow-[var(--shadow-subtle)]",
+    msgOk:
+      "mt-4 rounded-lg border border-[var(--color-accent-emerald)]/40 bg-[var(--color-accent-emerald)]/10 p-3 text-sm text-emerald-100",
+    msgErr: "mt-4 rounded-lg border border-[var(--color-accent-red)]/30 bg-[var(--color-accent-red)]/10 p-3 text-sm text-red-100",
+    loadErrorWrap: "px-4 text-center text-white/80",
+    textMuted: "text-sm text-white/80",
+    textOk: "font-medium text-emerald-300",
     textPending: "text-sm text-amber-200/90",
-    label: "mb-1 block text-xs font-medium text-[var(--color-text-secondary)]",
-    input: "w-full rounded-lg border border-white/15 bg-[var(--color-navy)]/50 px-3 py-2 text-sm text-white placeholder:text-white/40",
+    label: "mb-1 block text-center text-xs font-medium text-white/70",
+    input,
+    inputOtp: `${input} text-lg tracking-[0.35em]`,
   };
 }

@@ -96,16 +96,14 @@ export function FraudSignalsSection() {
 
   return (
     <section className="cabinet-section-header mb-6 rounded-2xl border-0 p-4 sm:p-6">
-      <div className="fraud-signals-panel min-w-0 rounded-xl border border-rose-500/25 bg-rose-950/20 p-4 sm:p-5">
-        <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-          <div className="min-w-0 flex-1">
-            <h2 className="fraud-signals-panel-title text-base font-semibold">Подозрительная активность</h2>
-          </div>
+      <div className="fraud-signals-panel antifraud-inner cabinet-block-inner min-w-0 rounded-xl border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/85 p-4 sm:p-5">
+        <div className="mb-4 flex flex-col items-center gap-3 text-center">
+          <h2 className="fraud-signals-panel-title text-base font-semibold">Подозрительная активность</h2>
           <button
             type="button"
             onClick={() => void load()}
             disabled={loading}
-            className={`${ADMIN_BTN} ${ADMIN_BTN_PRIMARY} shrink-0 gap-2 px-4 py-2.5 text-sm disabled:opacity-50`}
+            className={`${ADMIN_BTN} ${ADMIN_BTN_PRIMARY} gap-2 px-4 py-2.5 text-sm disabled:opacity-50`}
           >
             <RefreshCw className={`h-4 w-4 shrink-0 ${loading ? "animate-spin" : ""}`} aria-hidden />
             Обновить
@@ -113,15 +111,15 @@ export function FraudSignalsSection() {
         </div>
 
         {error && (
-          <p className="mb-3 rounded-lg border border-rose-400/30 bg-rose-950/40 px-3 py-2 text-sm text-rose-100">
+          <p className="mb-3 rounded-lg border border-[var(--color-accent-red)]/35 bg-[var(--color-accent-red)]/10 px-3 py-2 text-center text-sm text-white/90">
             {error}
           </p>
         )}
 
-        {loading && !data && <p className="text-sm text-white/60">Загрузка…</p>}
+        {loading && !data && <p className="text-center text-sm text-white/60">Загрузка…</p>}
 
         {data && (
-          <p className="fraud-signals-panel-meta mb-3 text-xs leading-relaxed">
+          <p className="fraud-signals-panel-meta mb-3 text-center text-xs leading-relaxed">
             За выбранный период (до {data.days} дн.) зафиксированы сигналы по{" "}
             <span className="fraud-signals-panel-meta-num font-semibold tabular-nums">{data.distinctUserCount}</span>{" "}
             {data.distinctUserCount % 10 === 1 && data.distinctUserCount % 100 !== 11

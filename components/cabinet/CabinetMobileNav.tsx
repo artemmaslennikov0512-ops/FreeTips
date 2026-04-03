@@ -5,7 +5,7 @@ import {
   useCallback,
   useContext,
   useEffect,
-  useState,
+  useSyncExternalStore,
   type CSSProperties,
   type Dispatch,
   type ReactNode,
@@ -113,7 +113,11 @@ export function CabinetMobileNavFixedButton() {
 
 /** Затемнение + панель по центру экрана (вне stacking context карточки) */
 export function CabinetMobileNavPortals() {
-  const [mounted, setMounted] = useState(false);
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
   const {
     sidebarOpen,
     closeSidebar,
@@ -131,8 +135,6 @@ export function CabinetMobileNavPortals() {
     sidebarDisplayLabel,
     sidebarFirstName,
   } = useCabinetMobileNav();
-
-  useEffect(() => setMounted(true), []);
 
   useEffect(() => {
     if (!sidebarOpen) return;
@@ -155,7 +157,7 @@ export function CabinetMobileNavPortals() {
   return createPortal(
     <>
       <div
-        className={`fixed inset-0 z-[2000] bg-[rgba(15,23,42,0.72)] backdrop-blur-sm transition-opacity duration-300 lg:hidden ${
+        className={`cabinet-mobile-nav-overlay fixed inset-0 z-[2000] transition-opacity duration-300 lg:hidden ${
           sidebarOpen ? "opacity-100" : "pointer-events-none opacity-0"
         }`}
         onClick={onOverlayDown}

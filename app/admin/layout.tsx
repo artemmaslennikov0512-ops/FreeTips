@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import type { LucideIcon } from "lucide-react";
@@ -9,7 +9,6 @@ import {
   LayoutDashboard,
   Send,
   Users,
-  Menu,
   ShieldCheck,
   MessageCircle,
   Building2,
@@ -23,6 +22,7 @@ import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { AdminMobileNavPortal } from "@/components/admin/AdminMobileNavPortal";
 import { ADMIN_REQUESTS_COUNTS_CHANGED } from "@/lib/admin-requests-counts-sync";
 import { ADMIN_BTN, ADMIN_BTN_PRIMARY } from "@/lib/admin-button-classes";
+import { usePanelMobileMenu } from "@/components/PanelMobileMenuContext";
 
 interface User {
   id: string;
@@ -47,8 +47,8 @@ const NAV: { label: string; href: string; icon: LucideIcon; iconClass: string }[
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
+  const { sidebarOpen, closeSidebar } = usePanelMobileMenu();
   const [mounted, setMounted] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -164,9 +164,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     return pathname?.startsWith(href) ?? false;
   };
 
-  const closeSidebar = useCallback(() => setSidebarOpen(false), []);
-  const menuButtonRef = useRef<HTMLButtonElement>(null);
-
   if (!mounted || loading) {
     return <LoadingSpinner message="Загрузка…" className="min-h-[60vh]" />;
   }
@@ -269,20 +266,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
       <main className="min-h-screen min-w-0 flex-1 overflow-x-hidden px-0 pt-2 lg:pt-1 lg:pl-0 lg:pr-0 lg:ml-0 flex flex-col">
         <div className="admin-main-block cabinet-main-block app-panel-main-surface relative mt-0 mr-0 mb-4 ml-0 flex min-h-0 w-full min-w-0 max-w-full flex-1 flex-col rounded-lg border border-white/10 bg-white/[0.06] backdrop-blur-xl lg:mt-5 lg:mr-0 lg:ml-4 lg:min-h-[calc(100vh-2rem)] lg:rounded-[10px]">
-          <div className="app-panel-mobile-nav pointer-events-none absolute right-2 top-2 z-[55] sm:right-3 sm:top-3 lg:hidden">
-            <button
-              ref={menuButtonRef}
-              type="button"
-              onClick={() => setSidebarOpen((o) => !o)}
-              className={`cabinet-menu-btn pointer-events-auto ${ADMIN_BTN} flex h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center !gap-0 !p-0 active:scale-95`}
-              aria-label="Меню"
-              aria-expanded={sidebarOpen}
-              aria-haspopup="dialog"
-              aria-controls="admin-nav-dropdown"
-            >
-              <Menu className="h-5 w-5 shrink-0 pointer-events-none" strokeWidth={2} aria-hidden />
-            </button>
-          </div>
           <div className="flex min-h-0 w-full max-w-full flex-1 flex-col overflow-x-hidden px-4 py-3 sm:px-6 sm:py-4 lg:p-8" id="main-content">
             {children}
           </div>

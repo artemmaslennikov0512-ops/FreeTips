@@ -55,6 +55,57 @@ export interface RegistrationRequestRow {
   adminContactPhone?: string | null;
 }
 
+function ConnectionRequestDetails({ r, twoColumnFromSm }: { r: RegistrationRequestRow; twoColumnFromSm?: boolean }) {
+  const grid =
+    twoColumnFromSm === true ? "grid gap-2 text-sm text-white/90 sm:grid-cols-2" : "grid gap-2 text-sm text-white/90";
+  if (r.requestType === "establishment") {
+    return (
+      <div className={grid}>
+        <p className="break-words">
+          <span className="text-white/70">Компания:</span> {r.companyName ?? "—"}
+        </p>
+        <p className="break-words">
+          <span className="text-white/70">Роль в компании:</span> {r.companyRole ?? "—"}
+        </p>
+        <p>
+          <span className="text-white/70">Сотрудников:</span> {r.employeeCount ?? "—"}
+        </p>
+        <p className="break-all">
+          <span className="text-white/70">Телефон:</span> {r.phone || "—"}
+        </p>
+        <p className="break-words">
+          <span className="text-white/70">ФИО:</span> {r.fullName}
+        </p>
+        <p className="break-all">
+          <span className="text-white/70">Почта:</span> {r.email}
+        </p>
+      </div>
+    );
+  }
+  return (
+    <div className={grid}>
+      <p>
+        <span className="text-white/70">Дата рождения:</span> {r.dateOfBirth}
+      </p>
+      <p className="break-words">
+        <span className="text-white/70">Заведение:</span> {r.establishment || "—"}
+      </p>
+      <p className="break-all">
+        <span className="text-white/70">Телефон:</span> {r.phone || "—"}
+      </p>
+      <p className="break-words">
+        <span className="text-white/70">Вид деятельности:</span> {r.activityType || "—"}
+      </p>
+      <p className="break-words">
+        <span className="text-white/70">ФИО администратора:</span> {r.adminFullName ?? "—"}
+      </p>
+      <p className="break-all">
+        <span className="text-white/70">Телефон администратора:</span> {r.adminContactPhone ?? "—"}
+      </p>
+    </div>
+  );
+}
+
 type BlockProps = {
   /** Счётчики для бейджей на подвкладках «На рассмотрении / Принятые / Отклонённые». */
   connectionCounts?: { pending: number; approved: number; rejected: number };
@@ -214,6 +265,7 @@ export function AdminConnectionRequestsBlock({ connectionCounts, onAfterMutation
             {list.map((r) => {
               const linkForRow = getLinkForRequest(r.id);
               const isApproving = approvingId === r.id;
+              const isMobileExpanded = expandedId === r.id;
               return (
                 <div key={r.id} className="admin-dashboard-table cabinet-section-header rounded-2xl border-0 p-4">
                   <div className="flex flex-wrap items-center justify-between gap-2">
@@ -241,6 +293,29 @@ export function AdminConnectionRequestsBlock({ connectionCounts, onAfterMutation
                       minute: "2-digit",
                     })}
                   </p>
+                  <button
+                    type="button"
+                    onClick={() => setExpandedId(isMobileExpanded ? null : r.id)}
+                    className={`${ADMIN_BTN} admin-btn--neutral mt-3 flex w-full items-center justify-center gap-2 !rounded-xl py-2.5 text-sm`}
+                    aria-expanded={isMobileExpanded}
+                  >
+                    {isMobileExpanded ? (
+                      <>
+                        <ChevronDown className="h-4 w-4 shrink-0" />
+                        Свернуть данные заявки
+                      </>
+                    ) : (
+                      <>
+                        <ChevronRight className="h-4 w-4 shrink-0" />
+                        Все данные заявки
+                      </>
+                    )}
+                  </button>
+                  {isMobileExpanded && (
+                    <div className="mt-3 rounded-xl border border-white/10 bg-white/5 p-3">
+                      <ConnectionRequestDetails r={r} />
+                    </div>
+                  )}
                   {tab === "pending" && (
                     <div className="mt-4 flex flex-wrap gap-2 border-t border-white/10 pt-3">
                       {r.status === "PENDING" && !r.hasToken && (
@@ -489,49 +564,7 @@ export function AdminConnectionRequestsBlock({ connectionCounts, onAfterMutation
                         {isExpanded && (
                           <tr className="border-0 bg-white/10">
                             <td colSpan={7} className="p-4">
-                              {r.requestType === "establishment" ? (
-                                <div className="grid gap-2 text-white/90 sm:grid-cols-2">
-                                  <p>
-                                    <span className="text-white/70">Компания:</span> {r.companyName ?? "—"}
-                                  </p>
-                                  <p>
-                                    <span className="text-white/70">Роль в компании:</span> {r.companyRole ?? "—"}
-                                  </p>
-                                  <p>
-                                    <span className="text-white/70">Сотрудников:</span> {r.employeeCount ?? "—"}
-                                  </p>
-                                  <p>
-                                    <span className="text-white/70">Телефон:</span> {r.phone}
-                                  </p>
-                                  <p>
-                                    <span className="text-white/70">ФИО:</span> {r.fullName}
-                                  </p>
-                                  <p>
-                                    <span className="text-white/70">Почта:</span> {r.email}
-                                  </p>
-                                </div>
-                              ) : (
-                                <div className="grid gap-2 text-white/90 sm:grid-cols-2">
-                                  <p>
-                                    <span className="text-white/70">Дата рождения:</span> {r.dateOfBirth}
-                                  </p>
-                                  <p>
-                                    <span className="text-white/70">Заведение:</span> {r.establishment || "—"}
-                                  </p>
-                                  <p>
-                                    <span className="text-white/70">Телефон:</span> {r.phone}
-                                  </p>
-                                  <p>
-                                    <span className="text-white/70">Вид деятельности:</span> {r.activityType}
-                                  </p>
-                                  <p>
-                                    <span className="text-white/70">ФИО администратора:</span> {r.adminFullName ?? "—"}
-                                  </p>
-                                  <p>
-                                    <span className="text-white/70">Телефон администратора:</span> {r.adminContactPhone ?? "—"}
-                                  </p>
-                                </div>
-                              )}
+                              <ConnectionRequestDetails r={r} twoColumnFromSm />
                             </td>
                           </tr>
                         )}

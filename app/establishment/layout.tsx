@@ -3,10 +3,11 @@
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
-import { LayoutDashboard, LogOut, Users, PieChart, BarChart3, Palette, Menu, QrCode, KeyRound } from "lucide-react";
+import { LayoutDashboard, LogOut, Users, PieChart, BarChart3, Palette, QrCode, KeyRound } from "lucide-react";
 import { getAccessToken, fetchWithAuth, clearAccessToken } from "@/lib/auth-client";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
+import { usePanelMobileMenu } from "@/components/PanelMobileMenuContext";
 
 interface Profile {
   role: string;
@@ -27,12 +28,12 @@ const NAV = [
 export default function EstablishmentLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
+  const { sidebarOpen, closeSidebar } = usePanelMobileMenu();
   const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [retryTrigger, setRetryTrigger] = useState(0);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => setMounted(true), []);
 
@@ -130,7 +131,6 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
 
   const isActive = (href: string) => pathname === href || (href !== "/establishment" && pathname.startsWith(href));
   const navIcons = [LayoutDashboard, Users, QrCode, PieChart, BarChart3, Palette, KeyRound] as const;
-  const closeSidebar = () => setSidebarOpen(false);
 
   return (
     <div className="establishment-panel cabinet-premium flex min-h-screen w-full min-w-0 max-w-full overflow-x-hidden bg-[var(--color-bg)] font-[family:var(--font-inter)] text-white pt-3 lg:pt-6">
@@ -145,6 +145,7 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
 
       {/* Сайдбар выше затемнения (fixed + z); на lg остаётся в потоке */}
       <aside
+        id="establishment-mobile-nav"
         className={`cabinet-sidebar fixed left-0 top-0 z-[100] flex max-h-[100vh] w-[min(calc(100vw-4rem),20rem)] max-w-[20rem] flex-col overflow-y-auto overflow-x-hidden rounded-[10px] border border-white/10 py-6 shadow-2xl backdrop-blur-xl transition-[transform] duration-300 ease-out lg:static lg:left-auto lg:top-auto lg:ml-0 lg:mt-3 lg:mr-0 lg:mb-0 lg:max-h-none lg:z-auto lg:w-[260px] lg:max-w-none lg:translate-x-0 lg:border lg:self-start bg-white/[0.06] ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
@@ -193,17 +194,7 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
 
       <main className="min-h-0 min-w-0 flex-1 overflow-x-hidden px-0 pt-2 lg:pt-1 lg:pl-0 lg:pr-0 lg:ml-0 flex flex-col">
         <div className="cabinet-main-block app-panel-main-surface relative mt-2 mr-0 mb-4 ml-0 flex min-h-0 flex-1 flex-col rounded-lg border border-white/10 bg-white/[0.06] backdrop-blur-xl lg:mt-3 lg:mr-0 lg:ml-4 lg:rounded-[10px]">
-          <div className="app-panel-mobile-nav pointer-events-none absolute right-2 top-2 z-[55] sm:right-3 sm:top-3 lg:hidden">
-            <button
-              type="button"
-              onClick={() => setSidebarOpen(true)}
-              className="pointer-events-auto flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-xl border border-white/20 bg-white/10 text-[var(--color-brand-gold)] hover:bg-[var(--color-brand-gold)]/20 hover:border-[var(--color-brand-gold)]/40 active:scale-95"
-              aria-label="Меню"
-            >
-              <Menu className="h-5 w-5" strokeWidth={2} />
-            </button>
-          </div>
-          <div className="max-lg:pr-12 px-4 py-4 sm:px-6 lg:p-8" id="main-content">
+          <div className="px-4 py-4 sm:px-6 lg:p-8" id="main-content">
             {children}
           </div>
         </div>

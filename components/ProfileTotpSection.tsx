@@ -187,9 +187,9 @@ export function ProfileTotpSection({
 
   const formStackClass =
     variant === "admin"
-      ? "mx-auto w-full max-w-md space-y-4 text-left"
+      ? "mx-auto w-full max-w-md space-y-4 text-center"
       : variant === "establishment"
-        ? "space-y-4 text-left"
+        ? "space-y-4 text-center"
         : "space-y-4";
 
   return (
@@ -396,9 +396,10 @@ function variantStyles(variant: ProfileTotpVariant) {
     const input =
       "w-full rounded-xl border border-white/20 bg-white/10 px-4 py-2.5 text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-[var(--color-brand-gold)]/40";
     return {
-      outer: "mx-auto max-w-lg text-white",
-      pageTitle: "font-[family:var(--font-playfair)] text-2xl font-semibold text-white",
-      pageDesc: "mt-2 text-sm text-white/75",
+      outer: "mx-auto flex w-full max-w-lg flex-col items-center text-white",
+      pageTitle:
+        "w-full text-center font-[family:var(--font-playfair)] text-2xl font-semibold text-white",
+      pageDesc: "mt-2 max-w-xl text-center text-sm text-white/75",
       embedTitle: "font-[family:var(--font-playfair)] text-lg font-semibold text-white mb-4",
       card: "mt-6 rounded-[10px] border border-white/10 bg-white/[0.06] p-6 backdrop-blur-xl",
       msgOk: "mt-4 rounded-lg border border-emerald-400/40 bg-emerald-500/10 p-3 text-sm text-emerald-200",
@@ -407,24 +408,25 @@ function variantStyles(variant: ProfileTotpVariant) {
       textMuted: "text-sm text-white/80",
       textOk: "font-medium text-emerald-300",
       textPending: "text-sm text-amber-200",
-      label: "mb-1 block text-xs font-medium text-white/70",
+      label: "mb-1 block text-center text-xs font-medium text-white/70",
       input,
       inputOtp: `${input} text-center text-lg tracking-[0.35em]`,
     };
   }
   return {
-    outer: ADMIN_PANEL_PAGE_NARROW,
-    pageTitle: "font-[family:var(--font-playfair)] text-2xl font-semibold text-white",
-    pageDesc: "mx-auto mt-2 max-w-xl text-sm leading-relaxed text-white/80",
+    outer: `${ADMIN_PANEL_PAGE_NARROW} flex w-full flex-col items-center`,
+    pageTitle:
+      "w-full text-center font-[family:var(--font-playfair)] text-2xl font-semibold text-white",
+    pageDesc: "mx-auto mt-2 max-w-xl text-center text-sm leading-relaxed text-white/80",
     embedTitle: "font-[family:var(--font-playfair)] text-lg font-semibold text-white mb-4",
     card: ADMIN_PANEL_CARD_NARROW,
-    msgOk: `mt-4 ${ADMIN_PANEL_ALERT_OK}`,
-    msgErr: `mt-4 ${ADMIN_PANEL_ALERT_ERR}`,
+    msgOk: `mt-4 w-full max-w-lg ${ADMIN_PANEL_ALERT_OK}`,
+    msgErr: `mt-4 w-full max-w-lg ${ADMIN_PANEL_ALERT_ERR}`,
     loadErrorWrap: "px-4 text-center text-white/80",
     textMuted: "text-sm text-white/85",
     textOk: "font-medium text-emerald-400",
     textPending: "text-sm text-amber-200/90",
-    label: "mb-1 block text-left text-xs font-medium text-white/80",
+    label: "mb-1 block text-center text-xs font-medium text-white/80",
     input: ADMIN_PANEL_INPUT,
     inputOtp: ADMIN_PANEL_INPUT_OTP,
   };

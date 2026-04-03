@@ -39,9 +39,11 @@ function pointerToT(svg: SVGSVGElement, clientX: number, clientY: number): numbe
 type ThemeToggleProps = {
   /** M5 шапка/страница: неактивная луна — холодный акцент, не коричневый */
   variant?: "default" | "m5";
+  /** Узкая шапка (страница оплаты и т.п.): чуть уже блок, без пересечения с логотипом */
+  compact?: boolean;
 };
 
-export function ThemeToggle({ variant = "default" }: ThemeToggleProps) {
+export function ThemeToggle({ variant = "default", compact = false }: ThemeToggleProps) {
   const baseId = useId().replace(/:/g, "");
   const trackGradientId = `${baseId}-track`;
   const filterIdleId = `${baseId}-f-idle`;
@@ -136,6 +138,16 @@ export function ThemeToggle({ variant = "default" }: ThemeToggleProps) {
   const label = "Тема: ползунок слева — светлая, справа — тёмная";
   const valueText = theme === "dark" ? "Тёмная тема" : "Светлая тема";
 
+  const shellClass = compact
+    ? "min-w-[5.25rem] gap-1.5 px-2 sm:min-w-[5.5rem] sm:gap-2 sm:px-2.5"
+    : "min-w-[6.5rem] gap-2 px-3";
+
+  const trackClass = compact
+    ? "h-[1.65rem] w-[3.15rem] sm:h-[1.75rem] sm:w-[3.35rem]"
+    : "h-[1.9rem] w-[3.65rem]";
+
+  const sideIconClass = compact ? "h-3.5 w-3.5" : "h-4 w-4";
+
   return (
     <div
       role="slider"
@@ -148,10 +160,11 @@ export function ThemeToggle({ variant = "default" }: ThemeToggleProps) {
       aria-valuetext={valueText}
       onKeyDown={onKeyDown}
       data-dragging={dragging ? "true" : "false"}
-      className="theme-toggle-btn relative flex h-11 min-h-[44px] min-w-[6.5rem] shrink-0 cursor-grab touch-none select-none items-center justify-center gap-2 rounded-xl border border-[var(--color-brand-gold)]/30 bg-[var(--color-bg-sides)] px-3 outline-none hover:border-[var(--color-brand-gold)]/60 hover:bg-[var(--color-brand-gold)]/10 focus-visible:ring-2 focus-visible:ring-[var(--color-brand-gold)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-bg)] data-[dragging=true]:cursor-grabbing"
+      data-compact={compact ? "true" : "false"}
+      className={`theme-toggle-btn relative flex h-11 min-h-[44px] shrink-0 cursor-grab touch-none select-none items-center justify-center rounded-xl border border-[var(--color-brand-gold)]/30 bg-[var(--color-bg-sides)] outline-none hover:border-[var(--color-brand-gold)]/60 hover:bg-[var(--color-brand-gold)]/10 focus-visible:ring-2 focus-visible:ring-[var(--color-brand-gold)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-bg)] data-[dragging=true]:cursor-grabbing ${shellClass}`}
     >
       <Sun
-        className={`pointer-events-none h-4 w-4 shrink-0 text-[var(--color-brand-gold)] transition-opacity duration-200 ease-out ${
+        className={`pointer-events-none ${sideIconClass} shrink-0 text-[var(--color-brand-gold)] transition-opacity duration-200 ease-out ${
           previewTheme === "light" ? "opacity-[0.92]" : "opacity-40"
         }`}
         strokeWidth={2.15}
@@ -161,7 +174,7 @@ export function ThemeToggle({ variant = "default" }: ThemeToggleProps) {
         <svg
           ref={svgRef}
           viewBox={`0 0 ${VB_W} ${VB_H}`}
-          className="theme-toggle-track-svg theme-toggle-icon block h-[1.9rem] w-[3.65rem] shrink-0 text-[var(--color-brand-gold)]"
+          className={`theme-toggle-track-svg theme-toggle-icon block shrink-0 text-[var(--color-brand-gold)] ${trackClass}`}
           aria-hidden
           onPointerDown={onPointerDown}
         >
@@ -275,7 +288,7 @@ export function ThemeToggle({ variant = "default" }: ThemeToggleProps) {
         </div>
       </div>
       <Moon
-        className={`pointer-events-none h-4 w-4 shrink-0 transition-opacity duration-200 ease-out ${
+        className={`pointer-events-none ${sideIconClass} shrink-0 transition-opacity duration-200 ease-out ${
           previewTheme === "dark" ? "text-[var(--color-brand-gold)] opacity-[0.92]" : moonInactiveClass
         }`}
         strokeWidth={1.95}

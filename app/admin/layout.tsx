@@ -25,6 +25,7 @@ import { ADMIN_REQUESTS_COUNTS_CHANGED } from "@/lib/admin-requests-counts-sync"
 import { ADMIN_BTN, ADMIN_BTN_PRIMARY } from "@/lib/admin-button-classes";
 import { usePanelMobileMenu } from "@/components/PanelMobileMenuContext";
 import { LkPresenceHeartbeat } from "@/components/LkPresenceHeartbeat";
+import { PanelMobileBackButton } from "@/components/PanelMobileBackButton";
 
 interface User {
   id: string;
@@ -268,9 +269,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
       </aside>
 
-      <main className="min-h-screen min-w-0 flex-1 overflow-x-hidden px-0 pt-2 lg:pt-1 lg:pl-0 lg:pr-0 lg:ml-0 flex flex-col">
-        <div className="admin-main-block cabinet-main-block app-panel-main-surface relative mt-0 mr-0 mb-4 ml-0 flex min-h-0 w-full min-w-0 max-w-full flex-1 flex-col rounded-lg border border-white/10 bg-white/[0.06] backdrop-blur-xl lg:mt-5 lg:mr-0 lg:ml-4 lg:min-h-[calc(100vh-2rem)] lg:rounded-[10px]">
-          <div className="flex min-h-0 w-full max-w-full flex-1 flex-col overflow-x-hidden px-4 py-3 sm:px-6 sm:py-4 lg:p-8" id="main-content">
+      <main className="min-h-screen min-w-0 flex-1 overflow-x-hidden px-0 pt-2 lg:pt-1 lg:pl-0 lg:pr-4 lg:ml-0 flex flex-col">
+        <div className="admin-main-block cabinet-main-block app-panel-main-surface relative mt-0 mr-0 mb-4 ml-0 flex min-h-0 w-full min-w-0 max-w-full flex-1 flex-col rounded-lg border border-white/10 bg-white/[0.06] backdrop-blur-xl lg:mt-5 lg:mr-4 lg:ml-4 lg:min-h-[calc(100vh-2rem)] lg:rounded-[10px]">
+          <PanelMobileBackButton variant="admin" fallbackHref="/admin/dashboard" />
+          <div
+            className="flex min-h-0 w-full max-w-full flex-1 flex-col overflow-x-hidden px-4 py-3 sm:px-6 sm:py-4 lg:p-8"
+            id="main-content"
+          >
             {children}
           </div>
         </div>

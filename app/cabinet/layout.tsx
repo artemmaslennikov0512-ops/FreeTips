@@ -16,6 +16,8 @@ import {
   Building2,
   User,
   Laptop,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { CABINET_WAITER_BTN } from "@/lib/cabinet-button-classes";
 import { getAccessToken, fetchWithAuth, clearAccessToken } from "@/lib/auth-client";
@@ -25,6 +27,10 @@ import { isCabinetM5CompetitionTheme } from "@/config/cabinet-theme-logins";
 import { CabinetMobileNavProvider, CabinetMobileNavPortals, type CabinetMobileNavContextValue } from "@/components/cabinet/CabinetMobileNav";
 import { usePanelMobileMenu } from "@/components/PanelMobileMenuContext";
 import { LkPresenceHeartbeat } from "@/components/LkPresenceHeartbeat";
+import { PanelMobileBackButton } from "@/components/PanelMobileBackButton";
+
+const CABINET_LG_SIDEBAR_COLLAPSED_KEY = "cabinet-lg-sidebar-collapsed";
+
 const NAV: { label: string; href: string; icon: LucideIcon; iconClass: string }[] = [
   { label: "Дашборд", href: "/cabinet", icon: LayoutDashboard, iconClass: "!text-sky-400" },
   { label: "Операции", href: "/cabinet/transactions", icon: List, iconClass: "!text-emerald-400" },
@@ -58,8 +64,29 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
     } | null;
   } | null>(null);
   const [supportUnreadCount, setSupportUnreadCount] = useState(0);
+  const [lgSidebarCollapsed, setLgSidebarCollapsed] = useState(false);
 
   useEffect(() => setMounted(true), []);
+
+  useEffect(() => {
+    if (!mounted || typeof window === "undefined") return;
+    try {
+      if (localStorage.getItem(CABINET_LG_SIDEBAR_COLLAPSED_KEY) === "1") {
+        setLgSidebarCollapsed(true);
+      }
+    } catch {
+      /* ignore */
+    }
+  }, [mounted]);
+
+  const setSidebarCollapsedPersisted = useCallback((collapsed: boolean) => {
+    setLgSidebarCollapsed(collapsed);
+    try {
+      localStorage.setItem(CABINET_LG_SIDEBAR_COLLAPSED_KEY, collapsed ? "1" : "0");
+    } catch {
+      /* ignore */
+    }
+  }, []);
 
   useEffect(() => {
     document.body.classList.add("cabinet-page");
@@ -282,11 +309,25 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
       data-cabinet-theme={isM5Cabinet ? "m5-competition" : undefined}
       style={Object.keys(brandStyle).length ? brandStyle : undefined}
     >
-      {/* Левое меню: только на десктопе (lg+); на мобильном навигация в выпадающем списке под кнопкой */}
+      {/* Левое меню (lg+): сворачиваемая колонка; на мобильном — портал меню */}
       <div
-        className={`cabinet-sidebar hidden lg:flex fixed left-0 top-0 z-40 h-full w-[min(calc(100vw-4rem),20rem)] max-w-[20rem] flex-col overflow-hidden border-0 border-r border-white/10 py-6 shadow-2xl backdrop-blur-xl transition-[transform] duration-300 ease-out lg:static lg:left-auto lg:top-auto lg:ml-0 lg:mt-3 lg:mr-0 lg:mb-0 lg:h-auto lg:max-h-[calc(100vh-2rem)] lg:w-[260px] lg:max-w-none lg:translate-x-0 lg:rounded-[10px] lg:border-x lg:border-b lg:border-t-0 lg:border-white/10 lg:self-start`}
-        style={sidebarStyle}
+        className={`hidden shrink-0 overflow-hidden transition-[width] duration-300 ease-out lg:mt-3 lg:flex lg:self-start ${
+          lgSidebarCollapsed ? "lg:w-0 lg:pointer-events-none" : "lg:w-[260px]"
+        }`}
       >
+        <div
+          className="cabinet-sidebar relative flex h-full min-h-0 w-[260px] min-w-[260px] flex-col overflow-hidden border-0 border-r border-white/10 py-6 shadow-2xl backdrop-blur-xl lg:static lg:max-h-[calc(100vh-2rem)] lg:rounded-[10px] lg:border-x lg:border-b lg:border-t-0 lg:border-white/10"
+          style={sidebarStyle}
+        >
+        <button
+          type="button"
+          onClick={() => setSidebarCollapsedPersisted(true)}
+          className="absolute right-2 top-2 z-10 rounded-md p-1.5 text-[var(--color-text)]/30 transition-colors hover:bg-[var(--color-dark-gray)]/12 hover:text-[var(--color-text)]/55 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-gold)]/35"
+          aria-label="Скрыть боковое меню"
+          title="Скрыть меню"
+        >
+          <ChevronLeft className="h-4 w-4" strokeWidth={2} aria-hidden />
+        </button>
         {user?.establishmentBrand?.logoUrl && (
           <div className="mx-4 mb-3 flex justify-center">
             <img
@@ -385,14 +426,31 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
             <span>Выйти</span>
           </button>
         </div>
+        </div>
       </div>
+
+      {lgSidebarCollapsed && (
+        <button
+          type="button"
+          onClick={() => setSidebarCollapsedPersisted(false)}
+          className="fixed left-0 top-1/2 z-[35] hidden -translate-y-1/2 rounded-r-md border border-[var(--color-brand-gold)]/18 border-l-0 bg-[var(--color-bg-sides)]/85 px-1 py-2.5 text-[var(--color-text)]/35 shadow-sm backdrop-blur-md transition-colors hover:text-[var(--color-text)]/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-gold)]/30 lg:block"
+          aria-label="Показать боковое меню"
+          title="Меню"
+        >
+          <ChevronRight className="h-4 w-4" strokeWidth={2} aria-hidden />
+        </button>
+      )}
 
       <main className="relative min-h-screen min-w-0 flex-1 overflow-x-hidden px-0 pt-2 pb-4 lg:px-0 lg:pt-3 lg:pr-4 lg:ml-0 lg:mr-0 flex flex-col">
         <div
           className="cabinet-main-block app-panel-main-surface relative z-10 mt-0 mr-0 mb-4 ml-0 flex min-h-0 w-full max-w-full flex-1 flex-col rounded-lg border-x border-b border-white/10 backdrop-blur-xl md:rounded-[10px] lg:mr-4 lg:ml-4"
           style={mainBlockStyle}
         >
-          <div className="px-4 py-3 sm:px-6 md:py-6 lg:p-8" id="main-content">
+          <PanelMobileBackButton variant="cabinet" fallbackHref="/cabinet" />
+          <div
+            className="flex min-h-0 flex-1 flex-col overflow-x-hidden px-4 py-3 sm:px-6 md:py-6 lg:p-8"
+            id="main-content"
+          >
             {children}
           </div>
         </div>

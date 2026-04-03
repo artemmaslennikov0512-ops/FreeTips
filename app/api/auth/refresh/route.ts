@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { verifyRefreshToken, generateAccessToken, generateRefreshToken, setRefreshTokenCookie, deleteRefreshTokenCookie, getRefreshTokenCookie } from "@/lib/auth/jwt";
 import { checkRateLimitByIP, getClientIP, AUTH_RATE_LIMIT } from "@/lib/middleware/rate-limit";
+import { mergeSessionDeviceInfo, readDeviceClientIdFromRequest } from "@/lib/auth-session-metadata";
 import { logError, logSecurity } from "@/lib/logger";
 import { getRequestId } from "@/lib/security/request";
 import { internalError, rateLimit429Response } from "@/lib/api/helpers";
@@ -87,6 +88,9 @@ export async function POST(request: NextRequest) {
     const newAccessToken = await generateAccessToken(tokenPayload);
     const newRefreshToken = await generateRefreshToken(tokenPayload);
 
+    const deviceClientId = readDeviceClientIdFromRequest(request);
+    const deviceInfo = mergeSessionDeviceInfo(session.deviceInfo, request, ip, deviceClientId);
+
     // Обновляем сессию в БД
     await db.session.update({
       where: { id: session.id },
@@ -94,6 +98,7 @@ export async function POST(request: NextRequest) {
         refreshToken: newRefreshToken,
         expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // обновляем срок
         lastSeenAt: new Date(),
+        deviceInfo,
       },
     });
 

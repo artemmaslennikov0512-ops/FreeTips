@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { fetchWithAuth, clearAccessToken } from "@/lib/auth-client";
-import { ADMIN_BTN, ADMIN_BTN_DANGER_SM, ADMIN_BTN_PRIMARY } from "@/lib/admin-button-classes";
+import { ADMIN_BTN, ADMIN_BTN_PRIMARY, ADMIN_BTN_SM } from "@/lib/admin-button-classes";
 import { ADMIN_PANEL_PAGE_XL } from "@/lib/admin-surface-classes";
 import { CABINET_WAITER_BTN_INLINE } from "@/lib/cabinet-button-classes";
 
@@ -32,6 +32,19 @@ function formatDt(iso: string): string {
     });
   } catch {
     return iso;
+  }
+}
+
+/** Относительное время для строки «последняя активность» (на сервере время уже обновлено пульсом/refresh). */
+function formatRelativeLastSeen(iso: string): string {
+  try {
+    const diff = Date.now() - new Date(iso).getTime();
+    if (diff < 45_000) return "только что";
+    if (diff < 3600_000) return `${Math.max(1, Math.floor(diff / 60_000))} мин назад`;
+    if (diff < 48 * 3600_000) return `${Math.floor(diff / 3600_000)} ч назад`;
+    return `${Math.floor(diff / (24 * 3600_000))} дн. назад`;
+  } catch {
+    return "";
   }
 }
 
@@ -64,9 +77,9 @@ function shellForVariant(variant: LkSessionsVariant): { root: string; card: stri
 export function LkSessionsSection({ variant }: { variant: LkSessionsVariant }) {
   const router = useRouter();
   const shell = shellForVariant(variant);
-  /** В админке опасная кнопка — только .admin-btn (цвета из globals админки). */
-  const dangerBtnClass =
-    variant === "admin" ? `${ADMIN_BTN} ${ADMIN_BTN_DANGER_SM}` : "lk-sessions__btn--danger";
+  /** Завершение сессии — в стиле бренда (золото), без красного «danger». */
+  const sessionEndBtnClass =
+    variant === "admin" ? `${ADMIN_BTN} ${ADMIN_BTN_SM}` : "lk-sessions__btn--outline-gold";
 
   const [sessions, setSessions] = useState<SessionItem[] | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -88,6 +101,21 @@ export function LkSessionsSection({ variant }: { variant: LkSessionsVariant }) {
 
   useEffect(() => {
     void load();
+  }, [load]);
+
+  useEffect(() => {
+    const onVisible = () => {
+      if (document.visibilityState === "visible") void load();
+    };
+    const onPageShow = (e: PageTransitionEvent) => {
+      if (e.persisted) void load();
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    window.addEventListener("pageshow", onPageShow);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisible);
+      window.removeEventListener("pageshow", onPageShow);
+    };
   }, [load]);
 
   const othersCount = sessions?.filter((s) => !s.isCurrent).length ?? 0;
@@ -167,7 +195,7 @@ export function LkSessionsSection({ variant }: { variant: LkSessionsVariant }) {
               type="button"
               disabled={othersCount === 0 || revokeOthersBusy}
               onClick={() => void revokeOthers()}
-              className={dangerBtnClass}
+              className={sessionEndBtnClass}
             >
               {revokeOthersBusy ? "Завершение…" : "Завершить все, кроме текущей"}
             </button>
@@ -180,7 +208,7 @@ export function LkSessionsSection({ variant }: { variant: LkSessionsVariant }) {
                   <th className="lk-sessions__th">Устройство</th>
                   <th className="lk-sessions__th">Браузер</th>
                   <th className="lk-sessions__th">Первый вход</th>
-                  <th className="lk-sessions__th">Последняя активность</th>
+                  <th className="lk-sessions__th">Последняя активность у сессии</th>
                   <th className="lk-sessions__th" />
                 </tr>
               </thead>
@@ -189,22 +217,31 @@ export function LkSessionsSection({ variant }: { variant: LkSessionsVariant }) {
                   <tr key={s.id} className="lk-sessions__row">
                     <td className="lk-sessions__td">
                       <span className="lk-sessions__td--strong">{s.platformLabel}</span>
-                      {s.isCurrent && <span className="lk-sessions__badge--current">текущая</span>}
-                      {s.deviceClientIdPreview && (
-                        <div className="lk-sessions__muted mt-0.5 text-xs">
-                          Этот браузер: {s.deviceClientIdPreview}
-                        </div>
+                      {s.isCurrent && <span className="lk-sessions__badge--current">это устройство</span>}
+                      {!s.isCurrent && (
+                        <span className="lk-sessions__muted mt-0.5 block text-xs">другой браузер или устройство</span>
                       )}
+                      {s.deviceClientIdPreview &&
+                        !s.platformLabel.includes(s.deviceClientIdPreview) && (
+                          <div className="lk-sessions__muted mt-0.5 text-xs">
+                            ID браузера: {s.deviceClientIdPreview}
+                          </div>
+                        )}
                     </td>
                     <td className="lk-sessions__td">{s.browserLabel ?? "—"}</td>
                     <td className="lk-sessions__td">{formatDt(s.createdAt)}</td>
-                    <td className="lk-sessions__td">{formatDt(s.lastSeenAt)}</td>
+                    <td className="lk-sessions__td">
+                      <span className="block">{formatDt(s.lastSeenAt)}</span>
+                      {formatRelativeLastSeen(s.lastSeenAt) && (
+                        <span className="lk-sessions__muted text-xs">({formatRelativeLastSeen(s.lastSeenAt)})</span>
+                      )}
+                    </td>
                     <td className="lk-sessions__td text-right">
                       <button
                         type="button"
                         disabled={busyId !== null}
                         onClick={() => void revokeOne(s.id)}
-                        className={s.isCurrent ? dangerBtnClass : shell.primaryBtn}
+                        className={s.isCurrent ? sessionEndBtnClass : shell.primaryBtn}
                       >
                         {busyId === s.id ? "…" : s.isCurrent ? "Выйти здесь" : "Завершить"}
                       </button>
@@ -220,11 +257,14 @@ export function LkSessionsSection({ variant }: { variant: LkSessionsVariant }) {
               <li key={s.id} className="lk-sessions__mobile-card">
                 <div className="lk-sessions__td--strong">
                   {s.platformLabel}
-                  {s.isCurrent && <span className="lk-sessions__badge--current">текущая</span>}
+                  {s.isCurrent && <span className="lk-sessions__badge--current">это устройство</span>}
                 </div>
+                {!s.isCurrent && (
+                  <p className="lk-sessions__muted mt-1 text-xs">Другой браузер или устройство</p>
+                )}
                 <p className="lk-sessions__muted mt-1 text-sm">Браузер: {s.browserLabel ?? "—"}</p>
-                {s.deviceClientIdPreview && (
-                  <p className="lk-sessions__muted mt-1 text-xs">Этот браузер: {s.deviceClientIdPreview}</p>
+                {s.deviceClientIdPreview && !s.platformLabel.includes(s.deviceClientIdPreview) && (
+                  <p className="lk-sessions__muted mt-1 text-xs">ID браузера: {s.deviceClientIdPreview}</p>
                 )}
                 <dl className="lk-sessions__dl">
                   <div>
@@ -232,15 +272,20 @@ export function LkSessionsSection({ variant }: { variant: LkSessionsVariant }) {
                     <dd>{formatDt(s.createdAt)}</dd>
                   </div>
                   <div>
-                    <dt>Активность: </dt>
-                    <dd>{formatDt(s.lastSeenAt)}</dd>
+                    <dt>Активность сессии: </dt>
+                    <dd>
+                      {formatDt(s.lastSeenAt)}
+                      {formatRelativeLastSeen(s.lastSeenAt) && (
+                        <span className="lk-sessions__muted"> ({formatRelativeLastSeen(s.lastSeenAt)})</span>
+                      )}
+                    </dd>
                   </div>
                 </dl>
                 <button
                   type="button"
                   disabled={busyId !== null}
                   onClick={() => void revokeOne(s.id)}
-                  className={`mt-3 w-full ${s.isCurrent ? dangerBtnClass : shell.primaryBtn}`}
+                  className={`mt-3 w-full ${s.isCurrent ? sessionEndBtnClass : shell.primaryBtn}`}
                 >
                   {busyId === s.id ? "…" : s.isCurrent ? "Выйти здесь" : "Завершить сессию"}
                 </button>

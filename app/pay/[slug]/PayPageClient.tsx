@@ -421,12 +421,12 @@ export default function PayPageClient() {
           className="pay-page-outer-block relative rounded-2xl border-0 px-4 pt-5 pb-5 shadow-[var(--shadow-card)]"
         style={Object.keys(cardStyle).length ? cardStyle : undefined}
       >
-        <div className="absolute right-4 top-4">
-          <ThemeToggle variant={payM5Shell ? "m5" : "default"} />
+        <div className="absolute right-3 top-4 max-[380px]:right-2 sm:right-4">
+          <ThemeToggle variant={payM5Shell ? "m5" : "default"} compact />
         </div>
 
         {/* Логотип: только лого заведения или только FreeTips (без дублирования) */}
-        <div className="pay-page-logo-wrap flex justify-center">
+        <div className="pay-page-logo-wrap flex justify-center pr-[5.75rem] max-[380px]:pr-[5rem] sm:pr-20">
           {branding?.logoUrl ? (
             <img
               src={branding.logoUrl}

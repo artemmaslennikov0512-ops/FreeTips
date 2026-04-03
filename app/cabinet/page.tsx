@@ -565,7 +565,7 @@ export default function CabinetDashboardPage() {
                 </div>
               ) : (
                 <div className="flex flex-col items-center text-center">
-                  <div className="cabinet-goal-input cabinet-input-window mb-3 w-max min-w-[200px] max-w-full rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-center text-[14px] text-[var(--color-text)] placeholder:text-[var(--color-text)]/50 focus-within:ring-2 focus-within:ring-[var(--color-brand-gold)]/50 focus-within:outline-none">
+                  <div className="cabinet-goal-input cabinet-input-window mb-3 w-full max-w-full rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-center text-[14px] text-[var(--color-text)] placeholder:text-[var(--color-text)]/50 shadow-none ring-0 focus-within:shadow-none focus-within:ring-0 focus-within:outline-none">
                     <textarea
                       ref={goalTextareaRef}
                       value={savingForEdit}

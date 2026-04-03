@@ -70,9 +70,9 @@ function LkPresenceCell({ user }: { user: User }) {
   const title = lkPresenceTitle(user);
   if (user.activeInLk) {
     return (
-      <span className="inline-flex max-w-[9rem] items-center gap-2 text-emerald-400" title={title}>
+      <span className="inline-flex items-center justify-center text-emerald-400" title={title}>
         <LkPresenceDot online />
-        <span className="text-xs font-medium">В ЛК</span>
+        <span className="sr-only">Сейчас в личном кабинете</span>
       </span>
     );
   }
@@ -321,7 +321,7 @@ export default function AdminUsersPage() {
           <Search className="pointer-events-none absolute left-3 h-5 w-5 text-white/80" style={{top:"50%",transform:"translateY(-50%)"}} />
           <input
             type="text"
-            placeholder="Логин, email или slug (ссылка /pay/…, QR, заведение)…"
+            placeholder="Логин, email или slug"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="admin-users-search-input cabinet-section-header w-full rounded-xl border-0 py-2.5 pl-10 pr-4 text-sm text-white placeholder:text-white/70 focus:outline-none"
@@ -502,8 +502,7 @@ export default function AdminUsersPage() {
                 </Link>
                 <span className="shrink-0 text-xs font-mono text-white/70">#{user.uniqueId}</span>
               </div>
-              <div className="flex items-center justify-between gap-2 text-sm">
-                <span className="text-white/60">В ЛК</span>
+              <div className="flex items-center justify-end gap-2 text-sm">
                 <LkPresenceCell user={user} />
               </div>
               <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
@@ -545,7 +544,10 @@ export default function AdminUsersPage() {
               <th className="whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">ID</th>
               <th className="whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">Логин</th>
               <th className="whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">Slug (/pay/…)</th>
-              <th className="whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">В ЛК</th>
+              <th
+                className="w-12 whitespace-nowrap px-3 py-3 text-left text-sm font-semibold text-[#0a192f]"
+                aria-label="Присутствие в личном кабинете"
+              />
               <th className="whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">Email</th>
               <th className="whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">Роль</th>
               <th className="whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">Баланс</th>
@@ -581,7 +583,7 @@ export default function AdminUsersPage() {
                   >
                     {user.tipSlugs.length ? user.tipSlugs.join(", ") : "—"}
                   </td>
-                  <td className="min-w-[7.5rem] whitespace-nowrap px-4 py-3">
+                  <td className="w-12 whitespace-nowrap px-3 py-3">
                     <LkPresenceCell user={user} />
                   </td>
                   <td className="min-w-[140px] max-w-[180px] truncate px-4 py-3 text-sm text-white/90" title={user.email || undefined}>{user.email || "—"}</td>

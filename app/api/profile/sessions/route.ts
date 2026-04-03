@@ -10,6 +10,8 @@ import { internalError } from "@/lib/api/helpers";
 import { logError } from "@/lib/logger";
 import { getRequestId } from "@/lib/security/request";
 import { toProfileSessionListItem } from "@/lib/profile-sessions-dto";
+import { getClientIP } from "@/lib/middleware/rate-limit";
+import { mergeSessionDeviceInfo, readDeviceClientIdFromRequest } from "@/lib/auth-session-metadata";
 
 export async function GET(request: NextRequest) {
   const requestId = getRequestId(request);
@@ -19,6 +21,8 @@ export async function GET(request: NextRequest) {
 
     const now = new Date();
     const currentRefresh = await getRefreshTokenCookie();
+    const ip = getClientIP(request);
+    const deviceClientId = readDeviceClientIdFromRequest(request);
 
     const rows = await db.session.findMany({
       where: {
@@ -35,6 +39,21 @@ export async function GET(request: NextRequest) {
         refreshToken: true,
       },
     });
+
+    /** Пульс текущей сессии: при открытии/обновлении страницы «Сессии» видны актуальные UA и время. */
+    if (currentRefresh) {
+      const currentRow = rows.find((r) => r.refreshToken === currentRefresh);
+      if (currentRow) {
+        const merged = mergeSessionDeviceInfo(currentRow.deviceInfo, request, ip, deviceClientId);
+        const touchedAt = new Date();
+        await db.session.update({
+          where: { id: currentRow.id },
+          data: { lastSeenAt: touchedAt, deviceInfo: merged },
+        });
+        currentRow.deviceInfo = merged;
+        currentRow.lastSeenAt = touchedAt;
+      }
+    }
 
     const items = rows.map((r) => toProfileSessionListItem(r, currentRefresh));
 

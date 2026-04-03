@@ -8,6 +8,7 @@ import { getAccessToken, fetchWithAuth, clearAccessToken } from "@/lib/auth-clie
 import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { usePanelMobileMenu } from "@/components/PanelMobileMenuContext";
+import { PanelMobileBackButton } from "@/components/PanelMobileBackButton";
 import { LkPresenceHeartbeat } from "@/components/LkPresenceHeartbeat";
 
 interface Profile {
@@ -197,7 +198,11 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
 
       <main className="min-h-0 min-w-0 flex-1 overflow-x-hidden px-0 pt-2 lg:pt-1 lg:pl-0 lg:pr-0 lg:ml-0 flex flex-col">
         <div className="cabinet-main-block app-panel-main-surface relative mt-2 mr-0 mb-4 ml-0 flex min-h-0 flex-1 flex-col rounded-lg border border-white/10 bg-white/[0.06] backdrop-blur-xl lg:mt-3 lg:mr-0 lg:ml-4 lg:rounded-[10px]">
-          <div className="px-4 py-4 sm:px-6 lg:p-8" id="main-content">
+          <PanelMobileBackButton variant="establishment" fallbackHref="/establishment" />
+          <div
+            className="flex min-h-0 flex-1 flex-col overflow-x-hidden px-4 py-4 sm:px-6 lg:p-8"
+            id="main-content"
+          >
             {children}
           </div>
         </div>

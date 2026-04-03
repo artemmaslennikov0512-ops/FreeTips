@@ -52,7 +52,19 @@ export function toProfileSessionListItem(
   currentRefreshToken: string | null,
 ): ProfileSessionListItem {
   const { userAgent, deviceClientId } = parseStoredDeviceInfo(row.deviceInfo);
-  const { platformLabel, browserLabel } = describeSessionDevice(userAgent ?? "");
+  const devicePreview = formatDeviceClientIdPreview(deviceClientId);
+  let { platformLabel, browserLabel } = describeSessionDevice(userAgent?.trim() ? userAgent : "");
+
+  if (!userAgent?.trim()) {
+    if (devicePreview) {
+      platformLabel = `Браузер · ${devicePreview}`;
+      browserLabel = "Обновится при следующей активности (обновление страницы или срока токена)";
+    } else {
+      platformLabel = "Устройство не определено";
+      browserLabel = "Нет User-Agent (часто старая сессия). Войдите снова";
+    }
+  }
+
   return {
     id: row.id,
     createdAt: row.createdAt.toISOString(),
@@ -60,7 +72,7 @@ export function toProfileSessionListItem(
     expiresAt: row.expiresAt.toISOString(),
     platformLabel,
     browserLabel,
-    deviceClientIdPreview: formatDeviceClientIdPreview(deviceClientId),
+    deviceClientIdPreview: devicePreview,
     isCurrent: Boolean(currentRefreshToken && row.refreshToken === currentRefreshToken),
   };
 }

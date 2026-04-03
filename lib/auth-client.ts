@@ -3,7 +3,16 @@
  * Один источник правды для ключа и заголовка — меньше дублирования и проще смена схемы.
  */
 
+import { getOrCreateDeviceClientId } from "@/lib/device-client-id";
+import { DEVICE_CLIENT_ID_HEADER } from "@/lib/auth-session-metadata";
+
 const ACCESS_TOKEN_KEY = "accessToken";
+
+function withDeviceClientHeader(headers: Record<string, string>): Record<string, string> {
+  const id = getOrCreateDeviceClientId();
+  if (!id) return headers;
+  return { ...headers, [DEVICE_CLIENT_ID_HEADER]: id };
+}
 
 export function getAccessToken(): string | null {
   if (typeof window === "undefined") return null;
@@ -32,18 +41,30 @@ export async function fetchWithAuth(
   url: string,
   init?: RequestInit
 ): Promise<Response> {
-  const headers = { ...authHeaders(), ...(init?.headers as Record<string, string> | undefined) };
-  let res = await fetch(url, { ...init, headers });
+  const baseHeaders = withDeviceClientHeader({
+    ...authHeaders(),
+    ...(init?.headers as Record<string, string> | undefined),
+  });
+  let res = await fetch(url, { ...init, credentials: init?.credentials ?? "include", headers: baseHeaders });
   if (res.status === 401) {
+    const refreshHeaders = withDeviceClientHeader({});
     const refreshRes = await fetch("/api/auth/refresh", {
       method: "POST",
       credentials: "include",
+      headers: refreshHeaders,
     });
     if (refreshRes.ok) {
       const data = (await refreshRes.json()) as { accessToken?: string };
       if (data.accessToken) {
         setAccessToken(data.accessToken);
-        res = await fetch(url, { ...init, headers: { ...authHeaders(), ...(init?.headers as Record<string, string> | undefined) } });
+        res = await fetch(url, {
+          ...init,
+          credentials: init?.credentials ?? "include",
+          headers: withDeviceClientHeader({
+            ...authHeaders(),
+            ...(init?.headers as Record<string, string> | undefined),
+          }),
+        });
       }
     }
   }

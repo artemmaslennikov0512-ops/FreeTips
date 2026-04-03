@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Users, TrendingUp, Send, DollarSign, ShieldAlert, Activity } from "lucide-react";
 import { formatMoneyCompact } from "@/lib/utils";
-import { LK_PRESENCE_WINDOW_MS } from "@/lib/lk-presence";
 
 interface Stats {
   usersCount: number;
@@ -90,8 +89,6 @@ export default function AdminDashboardPage() {
       </div>
     );
   }
-
-  const presenceWinMin = Math.max(1, Math.round(LK_PRESENCE_WINDOW_MS / 60000));
 
   if (error || !stats) {
     return (
@@ -184,11 +181,6 @@ export default function AdminDashboardPage() {
                   >
                     {card.value}
                   </p>
-                  {card.onlineAccent && (
-                    <p className="mt-1 text-xs text-white/55">
-                      Активность за последние {presenceWinMin} мин — открыть список
-                    </p>
-                  )}
                 </div>
                 <div
                   className={

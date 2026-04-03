@@ -187,9 +187,9 @@ export function ProfileTotpSection({
 
   const formStackClass =
     variant === "admin"
-      ? "mx-auto w-full max-w-md space-y-4 text-center"
+      ? "mx-auto w-full max-w-md space-y-4 text-left"
       : variant === "establishment"
-        ? "space-y-4 text-center"
+        ? "space-y-4 text-left"
         : "space-y-4";
 
   return (
@@ -424,7 +424,7 @@ function variantStyles(variant: ProfileTotpVariant) {
     textMuted: "text-sm text-white/85",
     textOk: "font-medium text-emerald-400",
     textPending: "text-sm text-amber-200/90",
-    label: "mb-1 block text-center text-xs font-medium text-white/80",
+    label: "mb-1 block text-left text-xs font-medium text-white/80",
     input: ADMIN_PANEL_INPUT,
     inputOtp: ADMIN_PANEL_INPUT_OTP,
   };

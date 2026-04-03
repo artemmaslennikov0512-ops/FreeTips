@@ -124,14 +124,12 @@ export async function POST(request: NextRequest) {
 
     await setRefreshTokenCookie(refreshToken);
 
-    const meta = await buildNewSessionMetadata(request, ip);
+    const meta = buildNewSessionMetadata(request, ip, validated.deviceClientId);
     await db.session.create({
       data: {
         userId: user.id,
         refreshToken,
         deviceInfo: meta.deviceInfo,
-        geoCountry: meta.geoCountry,
-        geoCity: meta.geoCity,
         expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
       },
     });

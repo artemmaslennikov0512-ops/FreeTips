@@ -1,25 +1,22 @@
 import type { NextRequest } from "next/server";
-import { lookupIpGeoQuick } from "@/lib/ip-geo-lookup";
 import { truncateUserAgent } from "@/lib/user-agent-device-label";
 
 export type NewSessionMetadata = {
   deviceInfo: string;
-  geoCountry: string | null;
-  geoCity: string | null;
 };
 
 /**
- * Метаданные для строки Session при логине/регистрации (IP, UA, гео по IP).
+ * Метаданные для строки Session при логине/регистрации (IP, UA, опц. client device UUID).
  */
-export async function buildNewSessionMetadata(
+export function buildNewSessionMetadata(
   request: NextRequest,
   ip: string,
-): Promise<NewSessionMetadata> {
+  deviceClientId?: string | undefined,
+): NewSessionMetadata {
   const ua = truncateUserAgent(request.headers.get("user-agent"));
-  const geo = await lookupIpGeoQuick(ip, 1200);
+  const payload: Record<string, string> = { ip, userAgent: ua };
+  if (deviceClientId) payload.deviceClientId = deviceClientId;
   return {
-    deviceInfo: JSON.stringify({ ip, userAgent: ua }),
-    geoCountry: geo?.country ?? null,
-    geoCity: geo?.city ?? null,
+    deviceInfo: JSON.stringify(payload),
   };
 }

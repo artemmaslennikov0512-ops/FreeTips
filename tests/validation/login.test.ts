@@ -55,3 +55,23 @@ test("loginRequestSchema rejects missing fields", () => {
   assert.equal(loginRequestSchema.safeParse({ login: "user" }).success, false);
   assert.equal(loginRequestSchema.safeParse({ password: "Pass1" }).success, false);
 });
+
+test("loginRequestSchema accepts optional deviceClientId (UUID v4)", () => {
+  const id = "550e8400-e29b-41d4-a716-446655440000";
+  const result = loginRequestSchema.safeParse({
+    login: "user123",
+    password: "Password1",
+    deviceClientId: id,
+  });
+  assert.equal(result.success, true);
+  if (result.success) assert.equal(result.data.deviceClientId, id);
+});
+
+test("loginRequestSchema rejects invalid deviceClientId", () => {
+  const result = loginRequestSchema.safeParse({
+    login: "user123",
+    password: "Password1",
+    deviceClientId: "not-a-uuid",
+  });
+  assert.equal(result.success, false);
+});

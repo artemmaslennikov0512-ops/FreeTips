@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { fetchWithAuth, clearAccessToken } from "@/lib/auth-client";
 import { ADMIN_BTN, ADMIN_BTN_DANGER_SM, ADMIN_BTN_PRIMARY } from "@/lib/admin-button-classes";
-import { ADMIN_PANEL_PAGE_WIDE } from "@/lib/admin-surface-classes";
+import { ADMIN_PANEL_PAGE_XL } from "@/lib/admin-surface-classes";
 import { CABINET_WAITER_BTN_INLINE } from "@/lib/cabinet-button-classes";
 
 export type LkSessionsVariant = "admin" | "cabinet" | "establishment";
@@ -15,9 +15,9 @@ type SessionItem = {
   createdAt: string;
   lastSeenAt: string;
   expiresAt: string;
-  ip: string | null;
-  deviceLabel: string;
-  locationLabel: string | null;
+  platformLabel: string;
+  browserLabel: string | null;
+  deviceClientIdPreview: string | null;
   isCurrent: boolean;
 };
 
@@ -35,60 +35,39 @@ function formatDt(iso: string): string {
   }
 }
 
-function variantStyles(variant: LkSessionsVariant) {
+/** Только раскладка и оболочки карточек; цвета — в globals.css (блок .lk-sessions). */
+function shellForVariant(variant: LkSessionsVariant): { root: string; card: string; primaryBtn: string } {
   if (variant === "cabinet") {
     return {
-      outer: "",
-      title: "font-[family:var(--font-playfair)] text-xl font-semibold text-[var(--color-text)]",
-      desc: "mt-2 text-sm text-[var(--color-text-secondary)]",
-      card: "mt-6 rounded-[10px] border-0 bg-[var(--color-bg-sides)] p-4 sm:p-6 shadow-[var(--shadow-subtle)]",
-      th: "text-left text-xs font-semibold uppercase tracking-wide text-[var(--color-text)]/60",
-      td: "py-3 text-sm text-[var(--color-text)]",
-      badgeCurrent:
-        "ml-2 inline-flex rounded-full border border-emerald-500/40 bg-emerald-500/10 px-2 py-0.5 text-[11px] font-medium text-emerald-200",
-      muted: "text-[var(--color-text-secondary)]",
-      rowBorder: "border-t border-[var(--color-text)]/10",
-      dangerBtn: `${CABINET_WAITER_BTN_INLINE} border-red-500/50 text-red-200 hover:bg-red-500/10`,
-      primaryBtn: CABINET_WAITER_BTN_INLINE,
+      root: "mx-auto max-w-4xl text-center",
+      card:
+        "lk-sessions__card cabinet-card mt-6 rounded-[10px] border-0 p-4 sm:p-6 shadow-[var(--shadow-subtle)] text-left",
+      primaryBtn: `lk-sessions__btn--primary ${CABINET_WAITER_BTN_INLINE}`,
     };
   }
   if (variant === "establishment") {
     return {
-      outer: "mx-auto max-w-3xl text-white",
-      title: "font-[family:var(--font-playfair)] text-2xl font-semibold text-white",
-      desc: "mt-2 text-sm text-white/75",
-      card: "mt-6 rounded-[10px] border border-white/10 bg-white/[0.06] p-4 sm:p-6 backdrop-blur-xl",
-      th: "text-left text-xs font-semibold uppercase tracking-wide text-white/50",
-      td: "py-3 text-sm text-white/90",
-      badgeCurrent:
-        "ml-2 inline-flex rounded-full border border-emerald-400/45 bg-emerald-500/15 px-2 py-0.5 text-[11px] font-medium text-emerald-200",
-      muted: "text-white/65",
-      rowBorder: "border-t border-white/10",
-      dangerBtn:
-        "rounded-xl border border-red-400/50 bg-red-500/10 px-3 py-1.5 text-sm text-red-200 hover:bg-red-500/20",
-      primaryBtn:
-        "rounded-xl border border-[var(--color-brand-gold)]/50 bg-[var(--color-brand-gold)]/15 px-3 py-1.5 text-sm text-white hover:bg-[var(--color-brand-gold)]/25",
+      root: "mx-auto max-w-3xl text-center",
+      card:
+        "lk-sessions__card cabinet-card mt-6 rounded-[10px] border-0 bg-[var(--color-bg-sides)] p-4 sm:p-6 shadow-[var(--shadow-subtle)] text-left",
+      primaryBtn: "lk-sessions__btn--primary",
     };
   }
   return {
-    outer: ADMIN_PANEL_PAGE_WIDE,
-    title: "font-[family:var(--font-playfair)] text-2xl font-semibold text-white",
-    desc: "mx-auto mt-2 max-w-2xl text-sm text-white/80",
-    card: "cabinet-section-header mx-auto mt-6 w-full max-w-4xl rounded-2xl border-0 p-4 text-left text-white shadow-[var(--shadow-card)] sm:p-6",
-    th: "text-left text-xs font-semibold uppercase tracking-wide text-white/55",
-    td: "py-3 text-sm text-white/90",
-    badgeCurrent:
-      "ml-2 inline-flex rounded-full border border-emerald-400/45 bg-emerald-950/35 px-2 py-0.5 text-[11px] font-medium text-emerald-200",
-    muted: "text-white/70",
-    rowBorder: "border-t border-white/10",
-    dangerBtn: `${ADMIN_BTN} ${ADMIN_BTN_DANGER_SM}`,
-    primaryBtn: `${ADMIN_BTN} ${ADMIN_BTN_PRIMARY}`,
+    root: ADMIN_PANEL_PAGE_XL,
+    card:
+      "lk-sessions__card cabinet-section-header mx-auto mt-6 w-full rounded-2xl border-0 p-4 sm:p-6 text-left shadow-[var(--shadow-card)] sm:p-6",
+    primaryBtn: `lk-sessions__btn--primary ${ADMIN_BTN} ${ADMIN_BTN_PRIMARY}`,
   };
 }
 
 export function LkSessionsSection({ variant }: { variant: LkSessionsVariant }) {
   const router = useRouter();
-  const v = variantStyles(variant);
+  const shell = shellForVariant(variant);
+  /** В админке опасная кнопка — только .admin-btn (цвета из globals админки). */
+  const dangerBtnClass =
+    variant === "admin" ? `${ADMIN_BTN} ${ADMIN_BTN_DANGER_SM}` : "lk-sessions__btn--danger";
+
   const [sessions, setSessions] = useState<SessionItem[] | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
@@ -159,86 +138,73 @@ export function LkSessionsSection({ variant }: { variant: LkSessionsVariant }) {
   };
 
   return (
-    <div className={v.outer}>
-      <h1 className={v.title}>Сессии и устройства</h1>
-      <p className={v.desc}>
-        Активные входы в кабинет. Завершение сессии отзывает долгоживущий вход (refresh): на устройстве нужно
-        снова ввести пароль. Текущий браузер помечается по cookie входа. Краткоживущий access token на чужом
-        устройстве может ещё несколько часов работать без обновления — при подозрении смените пароль или
-        включите 2FA в настройках.
-      </p>
+    <div className={`lk-sessions ${shell.root}`} data-lk-sessions-variant={variant}>
+      <h1 className="lk-sessions__title">Сессии и устройства</h1>
 
-      {actionError && (
-        <div className="mt-4 rounded-xl border border-red-400/40 bg-red-500/10 px-4 py-3 text-sm text-red-200">
-          {actionError}
-        </div>
+      {actionError && <div className="lk-sessions__alert--error">{actionError}</div>}
+
+      {loadError && (
+        <p className="lk-sessions__muted mt-4" role="alert">
+          {loadError}
+        </p>
       )}
 
-      {loadError && <p className={`mt-4 ${v.muted}`}>{loadError}</p>}
-
       {sessions === null && !loadError && (
-        <div className={`mt-8 flex items-center gap-2 ${v.muted}`}>
+        <div className="lk-sessions__muted mt-8 flex items-center justify-center gap-2">
           <Loader2 className="h-5 w-5 animate-spin shrink-0" aria-hidden />
           Загрузка…
         </div>
       )}
 
       {sessions && sessions.length === 0 && !loadError && (
-        <p className={`mt-6 ${v.muted}`}>Нет активных сессий. Войдите снова.</p>
+        <p className="lk-sessions__muted mt-6">Нет активных сессий. Войдите снова.</p>
       )}
 
       {sessions && sessions.length > 0 && (
-        <div className={v.card}>
-          <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <p className={`text-sm ${v.muted}`}>
-              Сессий: <span className="font-medium text-inherit">{sessions.length}</span>
-              {othersCount > 0 && (
-                <>
-                  {" "}
-                  · других устройств:{" "}
-                  <span className="font-medium text-inherit">{othersCount}</span>
-                </>
-              )}
-            </p>
+        <div className={shell.card}>
+          <div className="lk-sessions__toolbar lk-sessions__toolbar--end">
             <button
               type="button"
               disabled={othersCount === 0 || revokeOthersBusy}
               onClick={() => void revokeOthers()}
-              className={v.dangerBtn}
+              className={dangerBtnClass}
             >
               {revokeOthersBusy ? "Завершение…" : "Завершить все, кроме текущей"}
             </button>
           </div>
 
-          <div className="hidden md:block overflow-x-auto">
-            <table className="w-full min-w-[640px] border-collapse text-left">
+          <div className="lk-sessions__table-wrap">
+            <table className="lk-sessions__table">
               <thead>
                 <tr>
-                  <th className={v.th}>Устройство</th>
-                  <th className={v.th}>IP</th>
-                  <th className={v.th}>Геолокация</th>
-                  <th className={v.th}>Первый вход</th>
-                  <th className={v.th}>Последняя активность</th>
-                  <th className={v.th} />
+                  <th className="lk-sessions__th">Устройство</th>
+                  <th className="lk-sessions__th">Браузер</th>
+                  <th className="lk-sessions__th">Первый вход</th>
+                  <th className="lk-sessions__th">Последняя активность</th>
+                  <th className="lk-sessions__th" />
                 </tr>
               </thead>
               <tbody>
                 {sessions.map((s) => (
-                  <tr key={s.id} className={v.rowBorder}>
-                    <td className={v.td}>
-                      <span className="font-medium">{s.deviceLabel}</span>
-                      {s.isCurrent && <span className={v.badgeCurrent}>текущая</span>}
+                  <tr key={s.id} className="lk-sessions__row">
+                    <td className="lk-sessions__td">
+                      <span className="lk-sessions__td--strong">{s.platformLabel}</span>
+                      {s.isCurrent && <span className="lk-sessions__badge--current">текущая</span>}
+                      {s.deviceClientIdPreview && (
+                        <div className="lk-sessions__muted mt-0.5 text-xs">
+                          Этот браузер: {s.deviceClientIdPreview}
+                        </div>
+                      )}
                     </td>
-                    <td className={v.td}>{s.ip ?? "—"}</td>
-                    <td className={v.td}>{s.locationLabel ?? "—"}</td>
-                    <td className={v.td}>{formatDt(s.createdAt)}</td>
-                    <td className={v.td}>{formatDt(s.lastSeenAt)}</td>
-                    <td className={`${v.td} text-right`}>
+                    <td className="lk-sessions__td">{s.browserLabel ?? "—"}</td>
+                    <td className="lk-sessions__td">{formatDt(s.createdAt)}</td>
+                    <td className="lk-sessions__td">{formatDt(s.lastSeenAt)}</td>
+                    <td className="lk-sessions__td text-right">
                       <button
                         type="button"
                         disabled={busyId !== null}
                         onClick={() => void revokeOne(s.id)}
-                        className={s.isCurrent ? v.dangerBtn : v.primaryBtn}
+                        className={s.isCurrent ? dangerBtnClass : shell.primaryBtn}
                       >
                         {busyId === s.id ? "…" : s.isCurrent ? "Выйти здесь" : "Завершить"}
                       </button>
@@ -249,39 +215,32 @@ export function LkSessionsSection({ variant }: { variant: LkSessionsVariant }) {
             </table>
           </div>
 
-          <ul className="md:hidden space-y-4">
+          <ul className="lk-sessions__mobile-list">
             {sessions.map((s) => (
-              <li
-                key={s.id}
-                className={`rounded-lg border border-white/10 p-4 ${variant === "cabinet" ? "border-[var(--color-text)]/15 bg-[var(--color-dark-gray)]/5" : ""}`}
-              >
-                <div className="font-medium">
-                  {s.deviceLabel}
-                  {s.isCurrent && <span className={v.badgeCurrent}>текущая</span>}
+              <li key={s.id} className="lk-sessions__mobile-card">
+                <div className="lk-sessions__td--strong">
+                  {s.platformLabel}
+                  {s.isCurrent && <span className="lk-sessions__badge--current">текущая</span>}
                 </div>
-                <dl className={`mt-2 space-y-1 text-sm ${v.muted}`}>
+                <p className="lk-sessions__muted mt-1 text-sm">Браузер: {s.browserLabel ?? "—"}</p>
+                {s.deviceClientIdPreview && (
+                  <p className="lk-sessions__muted mt-1 text-xs">Этот браузер: {s.deviceClientIdPreview}</p>
+                )}
+                <dl className="lk-sessions__dl">
                   <div>
-                    <dt className="inline text-inherit opacity-80">IP: </dt>
-                    <dd className="inline text-inherit">{s.ip ?? "—"}</dd>
+                    <dt>Первый вход: </dt>
+                    <dd>{formatDt(s.createdAt)}</dd>
                   </div>
                   <div>
-                    <dt className="inline text-inherit opacity-80">Гео: </dt>
-                    <dd className="inline text-inherit">{s.locationLabel ?? "—"}</dd>
-                  </div>
-                  <div>
-                    <dt className="inline text-inherit opacity-80">Первый вход: </dt>
-                    <dd className="inline text-inherit">{formatDt(s.createdAt)}</dd>
-                  </div>
-                  <div>
-                    <dt className="inline text-inherit opacity-80">Активность: </dt>
-                    <dd className="inline text-inherit">{formatDt(s.lastSeenAt)}</dd>
+                    <dt>Активность: </dt>
+                    <dd>{formatDt(s.lastSeenAt)}</dd>
                   </div>
                 </dl>
                 <button
                   type="button"
                   disabled={busyId !== null}
                   onClick={() => void revokeOne(s.id)}
-                  className={`mt-3 w-full ${s.isCurrent ? v.dangerBtn : v.primaryBtn}`}
+                  className={`mt-3 w-full ${s.isCurrent ? dangerBtnClass : shell.primaryBtn}`}
                 >
                   {busyId === s.id ? "…" : s.isCurrent ? "Выйти здесь" : "Завершить сессию"}
                 </button>

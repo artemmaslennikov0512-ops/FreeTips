@@ -90,15 +90,17 @@ export async function POST(request: NextRequest) {
 
     await setRefreshTokenCookie(refreshToken);
 
-    const meta = await buildNewSessionMetadata(request, ip);
-    const fromMeta = JSON.parse(meta.deviceInfo) as { ip?: string; userAgent?: string };
+    const meta = buildNewSessionMetadata(request, ip, validated.deviceClientId);
+    const fromMeta = JSON.parse(meta.deviceInfo) as {
+      ip?: string;
+      userAgent?: string;
+      deviceClientId?: string;
+    };
     await db.session.create({
       data: {
         userId: user.id,
         refreshToken,
         deviceInfo: JSON.stringify({ ...fromMeta, totp: true }),
-        geoCountry: meta.geoCountry,
-        geoCity: meta.geoCity,
         expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
       },
     });

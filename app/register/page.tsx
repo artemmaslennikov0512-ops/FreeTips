@@ -4,6 +4,7 @@ import { Suspense, useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Lock, User } from "lucide-react";
+import { getOrCreateDeviceClientId } from "@/lib/device-client-id";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { AuthPageShell } from "@/components/AuthPageShell";
 import { AUTH_CARD_CLASS, AUTH_INPUT_CLASS, AUTH_INPUT_CLASS_NO_ICON, AUTH_BTN_PRIMARY } from "@/lib/auth-form-classes";
@@ -55,10 +56,15 @@ function RegisterForm() {
     setLoading(true);
 
     try {
+      const deviceClientId = getOrCreateDeviceClientId();
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json", ...getCsrfHeader() },
-        body: JSON.stringify({ ...formData, acceptOfferAndPrivacy: true }),
+        body: JSON.stringify({
+          ...formData,
+          acceptOfferAndPrivacy: true,
+          ...(deviceClientId ? { deviceClientId } : {}),
+        }),
         credentials: "include",
       });
 

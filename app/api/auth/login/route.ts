@@ -112,15 +112,13 @@ export async function POST(request: NextRequest) {
     // Сохраняем refresh token в cookie
     await setRefreshTokenCookie(refreshToken);
 
-    const meta = await buildNewSessionMetadata(request, ip);
+    const meta = buildNewSessionMetadata(request, ip, validated.deviceClientId);
     // Создаём сессию
     await db.session.create({
       data: {
         userId: user.id,
         refreshToken,
         deviceInfo: meta.deviceInfo,
-        geoCountry: meta.geoCountry,
-        geoCity: meta.geoCity,
         expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 дней
       },
     });

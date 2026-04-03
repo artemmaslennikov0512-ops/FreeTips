@@ -72,6 +72,17 @@ export const slugSchema = z
   .max(50, "Slug не должен превышать 50 символов")
   .regex(/^[a-z0-9_-]+$/, "Slug может содержать только латиницу, цифры, дефисы и подчёркивания");
 
+/** Опциональный UUID из браузера (localStorage) для метаданных сессии */
+const deviceClientIdSchema = z.preprocess(
+  (v) =>
+    v === "" || v === null || v === undefined
+      ? undefined
+      : typeof v === "string"
+        ? v.trim() || undefined
+        : undefined,
+  z.string().uuid("Некорректный идентификатор устройства").optional(),
+);
+
 // Регистрация по одноразовой ссылке: логин, пароль, токен; email не требуется (идентификация через токен)
 export const registerSchema = z
   .object({
@@ -86,6 +97,7 @@ export const registerSchema = z
     acceptOfferAndPrivacy: z.literal(true, {
       errorMap: () => ({ message: "Необходимо принять условия Пользовательского соглашения и Политики обработки персональных данных" }),
     }),
+    deviceClientId: deviceClientIdSchema,
   })
   .refine((d) => d.password === d.passwordConfirm, {
     message: "Пароли не совпадают",
@@ -98,6 +110,7 @@ export type RegisterInput = z.infer<typeof registerSchema>;
 export const loginRequestSchema = z.object({
   login: loginSchema,
   password: z.string().min(1, "Пароль обязателен").max(PASSWORD_MAX_LENGTH, "Пароль слишком длинный"),
+  deviceClientId: deviceClientIdSchema,
 });
 
 /** Код из Google Authenticator (6 цифр) */
@@ -110,6 +123,7 @@ export const totpCodeSchema = z
 export const loginTotpSchema = z.object({
   twoFactorToken: z.string().min(10, "Некорректный токен"),
   code: totpCodeSchema,
+  deviceClientId: deviceClientIdSchema,
 });
 
 /** Отключение TOTP */

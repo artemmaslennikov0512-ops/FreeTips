@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { User, Lock, ArrowRight } from "lucide-react";
+import { getOrCreateDeviceClientId } from "@/lib/device-client-id";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { AuthPageShell } from "@/components/AuthPageShell";
 import { loginRequestSchema } from "@/lib/validations";
@@ -64,10 +65,14 @@ function LoginForm() {
 
     setLoading(true);
     try {
+      const deviceClientId = getOrCreateDeviceClientId();
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json", ...getCsrfHeader() },
-        body: JSON.stringify(parsed.data),
+        body: JSON.stringify({
+          ...parsed.data,
+          ...(deviceClientId ? { deviceClientId } : {}),
+        }),
         credentials: "include",
       });
 
@@ -113,10 +118,15 @@ function LoginForm() {
     }
     setLoading(true);
     try {
+      const deviceClientId = getOrCreateDeviceClientId();
       const res = await fetch("/api/auth/login/totp", {
         method: "POST",
         headers: { "Content-Type": "application/json", ...getCsrfHeader() },
-        body: JSON.stringify({ twoFactorToken, code: totpCode.replace(/\s/g, "") }),
+        body: JSON.stringify({
+          twoFactorToken,
+          code: totpCode.replace(/\s/g, ""),
+          ...(deviceClientId ? { deviceClientId } : {}),
+        }),
         credentials: "include",
       });
       const data = await res.json();

@@ -20,6 +20,10 @@ export const ADMIN_PANEL_PAGE_NARROW =
 export const ADMIN_PANEL_PAGE_WIDE =
   "mx-auto w-full max-w-3xl space-y-6 px-4 py-8 text-center text-white";
 
+/** Очень широкая колонка (таблицы сессий и т.п.). */
+export const ADMIN_PANEL_PAGE_XL =
+  "mx-auto w-full max-w-6xl space-y-6 px-4 py-8 text-center text-white";
+
 /** Карточка секции на всю ширину родителя (внутри PAGE_WIDE). */
 export const ADMIN_PANEL_CARD =
   "cabinet-section-header rounded-2xl border-0 p-6 text-center text-white shadow-[var(--shadow-card)]";

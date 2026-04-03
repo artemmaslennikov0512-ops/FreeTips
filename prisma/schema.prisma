@@ -125,7 +125,7 @@ model Session {
   id         String   @id @default(cuid())
   userId     String
   refreshToken String @unique @db.VarChar(512)
-  deviceInfo String?  @db.Text // JSON: {ip, userAgent, deviceId?}
+  deviceInfo String?  @db.Text // JSON: {ip, userAgent, deviceClientId?, totp?}
   /** Последняя активность по refresh (продление токена) */
   lastSeenAt DateTime @default(now())
   geoCountry String?  @db.VarChar(128)

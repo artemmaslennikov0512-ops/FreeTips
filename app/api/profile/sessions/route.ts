@@ -32,8 +32,6 @@ export async function GET(request: NextRequest) {
         lastSeenAt: true,
         expiresAt: true,
         deviceInfo: true,
-        geoCountry: true,
-        geoCity: true,
         refreshToken: true,
       },
     });

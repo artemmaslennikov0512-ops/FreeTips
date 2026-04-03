@@ -111,10 +111,28 @@ type BlockProps = {
   connectionCounts?: { pending: number; approved: number; rejected: number };
   /** Вызвать после одобрения заявки (обновить счётчики в родителе). */
   onAfterMutation?: () => void;
+  /** Родитель рисует вкладки статусов (страница «Заявки» в одном блоке с верификацией). */
+  hideStatusTabs?: boolean;
+  /** Управляемый таб статуса (вместе с onStatusTabChange). */
+  statusTab?: AdminRequestTab;
+  onStatusTabChange?: (tab: AdminRequestTab) => void;
+  /** Одна таблица с горизонтальным скроллом на всех ширинах (как «Приём по ссылкам»). */
+  compactTableLayout?: boolean;
 };
 
-export function AdminConnectionRequestsBlock({ connectionCounts, onAfterMutation }: BlockProps) {
-  const [tab, setTab] = useState<AdminRequestTab>("pending");
+export function AdminConnectionRequestsBlock({
+  connectionCounts,
+  onAfterMutation,
+  hideStatusTabs = false,
+  statusTab: controlledTab,
+  onStatusTabChange,
+  compactTableLayout = false,
+}: BlockProps) {
+  const [internalTab, setInternalTab] = useState<AdminRequestTab>("pending");
+  const controlled =
+    hideStatusTabs && controlledTab !== undefined && onStatusTabChange !== undefined;
+  const tab = controlled ? controlledTab! : internalTab;
+  const setTab = controlled ? onStatusTabChange! : setInternalTab;
   const [list, setList] = useState<RegistrationRequestRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -245,9 +263,9 @@ export function AdminConnectionRequestsBlock({ connectionCounts, onAfterMutation
       }
     : undefined;
 
-  return (
-    <section className="space-y-4">
-      <AdminStatusTabs value={tab} onChange={setTab} badges={subTabBadges} />
+  const inner = (
+    <>
+      {!hideStatusTabs && <AdminStatusTabs value={tab} onChange={setTab} badges={subTabBadges} />}
       {error && (
         <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-center text-sm text-red-200">
           {error}
@@ -261,6 +279,7 @@ export function AdminConnectionRequestsBlock({ connectionCounts, onAfterMutation
         <div className="rounded-xl border border-white/10 bg-white/5 px-6 py-8 text-center text-white/90">{emptyMessage}</div>
       ) : (
         <>
+          {!compactTableLayout && (
           <div className="space-y-4 lg:hidden">
             {list.map((r) => {
               const linkForRow = getLinkForRequest(r.id);
@@ -402,8 +421,13 @@ export function AdminConnectionRequestsBlock({ connectionCounts, onAfterMutation
               );
             })}
           </div>
+          )}
 
-          <div className="admin-dashboard-table cabinet-section-header max-lg:hidden overflow-hidden rounded-2xl border-0">
+          <div
+            className={`admin-dashboard-table cabinet-section-header overflow-hidden rounded-xl border-0 text-left ${
+              compactTableLayout ? "w-full" : "max-lg:hidden"
+            }`}
+          >
             <div className="overflow-x-auto">
               <table className="w-full min-w-[720px] text-left text-sm text-white">
                 <thead>
@@ -577,6 +601,12 @@ export function AdminConnectionRequestsBlock({ connectionCounts, onAfterMutation
           </div>
         </>
       )}
-    </section>
+    </>
+  );
+
+  return hideStatusTabs ? (
+    <div className="flex flex-col gap-4">{inner}</div>
+  ) : (
+    <section className="space-y-4">{inner}</section>
   );
 }

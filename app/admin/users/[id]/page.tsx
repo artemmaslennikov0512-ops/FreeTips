@@ -639,29 +639,33 @@ export default function AdminUserDetailsPage() {
 
   return (
     <div id="admin-user-detail" className="min-w-0 max-w-full">
-      <div className="mb-6 mx-auto flex w-full max-w-[360px] flex-col gap-3">
-        <Link
-          href="/admin/users"
-          className={`cabinet-section-header ${ADMIN_BTN} admin-btn--neutral w-fit gap-2 px-3 py-2 text-sm`}
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Назад
-        </Link>
-        <div className="cabinet-section-header flex h-[120px] w-full max-w-[360px] items-center justify-center gap-4 rounded-2xl border-0 px-4 sm:px-5">
-          <UserRound className="h-12 w-12 shrink-0 text-white" />
-          <div className="min-w-0 leading-tight">
-            <div className="text-base font-semibold uppercase tracking-wide text-white">
-              {data.user.login}
-            </div>
-            <div className="mt-1.5 text-sm text-white/80">
-              {data.user.email || "—"}
+      <div className="mb-6 mx-auto flex w-full max-w-4xl flex-col gap-3">
+        <div className="cabinet-section-header w-full max-w-[360px] rounded-2xl border-0 px-4 pb-5 pt-3 sm:px-5">
+          <div className="mb-3 flex justify-start">
+            <Link
+              href="/admin/users"
+              className={`${ADMIN_BTN} admin-btn--neutral inline-flex w-fit gap-2 px-3 py-2 text-sm`}
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Назад
+            </Link>
+          </div>
+          <div className="flex h-[120px] items-center justify-center gap-4">
+            <UserRound className="h-12 w-12 shrink-0 text-white" />
+            <div className="min-w-0 leading-tight">
+              <div className="text-base font-semibold uppercase tracking-wide text-white">
+                {data.user.login}
+              </div>
+              <div className="mt-1.5 text-sm text-white/80">
+                {data.user.email || "—"}
+              </div>
             </div>
           </div>
         </div>
         {blockError && <p className="text-sm text-white/90">{blockError}</p>}
         {verifyError && <p className="text-sm text-white/90">{verifyError}</p>}
         {cabinetViewError && <p className="text-sm text-amber-200/90">{cabinetViewError}</p>}
-        <div className="flex w-full max-w-full flex-wrap items-center justify-center gap-3">
+        <div className="flex w-full flex-row flex-wrap items-center justify-center gap-2 sm:gap-3">
           {CABINET_VIEW_ROLES.has(data.user.role) && (
             <button
               type="button"

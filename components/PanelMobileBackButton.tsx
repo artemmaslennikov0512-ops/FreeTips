@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
-import { ADMIN_BTN, ADMIN_BTN_SM } from "@/lib/admin-button-classes";
+import { ADMIN_BTN_NEUTRAL_SM } from "@/lib/admin-button-classes";
 import { CABINET_WAITER_BTN_INLINE } from "@/lib/cabinet-button-classes";
 
 export type PanelMobileBackVariant = "admin" | "cabinet" | "establishment";
@@ -27,7 +27,7 @@ export function PanelMobileBackButton({
 
   const btnClass =
     variant === "admin"
-      ? `${ADMIN_BTN} ${ADMIN_BTN_SM} gap-1.5`
+      ? `${ADMIN_BTN_NEUTRAL_SM} gap-1.5`
       : variant === "establishment"
         ? "inline-flex items-center gap-2 rounded-xl border border-[var(--color-brand-gold)]/40 bg-white/[0.08] px-3 py-2 text-sm font-medium text-white hover:bg-white/[0.12]"
         : `${CABINET_WAITER_BTN_INLINE} px-3 py-2 text-sm`;

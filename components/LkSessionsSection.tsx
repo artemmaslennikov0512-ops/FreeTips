@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { fetchWithAuth, clearAccessToken } from "@/lib/auth-client";
 import { ADMIN_BTN, ADMIN_BTN_PRIMARY, ADMIN_BTN_SM } from "@/lib/admin-button-classes";
-import { ADMIN_PANEL_PAGE_XL } from "@/lib/admin-surface-classes";
 import { CABINET_WAITER_BTN_INLINE } from "@/lib/cabinet-button-classes";
 
 export type LkSessionsVariant = "admin" | "cabinet" | "establishment";
@@ -50,26 +49,29 @@ function formatRelativeLastSeen(iso: string): string {
 
 /** Только раскладка и оболочки карточек; цвета — в globals.css (блок .lk-sessions). */
 function shellForVariant(variant: LkSessionsVariant): { root: string; card: string; primaryBtn: string } {
+  /** На всю ширину #main-content; горизонтальные отступы — у панели (px в layout), не сужаем max-w-* */
+  const rootFullWidth = "w-full min-w-0 text-center";
+
   if (variant === "cabinet") {
     return {
-      root: "mx-auto w-full max-w-6xl text-center",
+      root: rootFullWidth,
       card:
-        "lk-sessions__card cabinet-card mt-6 rounded-[10px] border-0 p-4 sm:p-6 shadow-[var(--shadow-subtle)] text-left",
+        "lk-sessions__card cabinet-card mt-6 w-full rounded-[10px] border-0 p-4 sm:p-6 shadow-[var(--shadow-subtle)] text-left",
       primaryBtn: `lk-sessions__btn--primary ${CABINET_WAITER_BTN_INLINE}`,
     };
   }
   if (variant === "establishment") {
     return {
-      root: "mx-auto w-full max-w-6xl text-center",
+      root: rootFullWidth,
       card:
-        "lk-sessions__card cabinet-card mt-6 rounded-[10px] border-0 bg-[var(--color-bg-sides)] p-4 sm:p-6 shadow-[var(--shadow-subtle)] text-left",
+        "lk-sessions__card cabinet-card mt-6 w-full rounded-[10px] border-0 bg-[var(--color-bg-sides)] p-4 sm:p-6 shadow-[var(--shadow-subtle)] text-left",
       primaryBtn: "lk-sessions__btn--primary",
     };
   }
   return {
-    root: ADMIN_PANEL_PAGE_XL,
+    root: `${rootFullWidth} space-y-6 text-white`,
     card:
-      "lk-sessions__card cabinet-section-header mx-auto mt-6 w-full rounded-2xl border-0 p-4 sm:p-6 text-left shadow-[var(--shadow-card)] sm:p-6",
+      "lk-sessions__card cabinet-section-header mt-6 w-full rounded-2xl border-0 p-4 text-left shadow-[var(--shadow-card)] sm:p-6",
     primaryBtn: `lk-sessions__btn--primary ${ADMIN_BTN} ${ADMIN_BTN_PRIMARY}`,
   };
 }

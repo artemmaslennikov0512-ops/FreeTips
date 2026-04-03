@@ -2,10 +2,10 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { Check, X, Download, Loader2 } from "lucide-react";
+import { Check, X, Download, Loader2, FileCheck } from "lucide-react";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
-import { AdminStatusTabs, AdminRequestTab, apiStatusForTab } from "./AdminStatusTabs";
-import { AdminRequestsMainTabs, AdminRequestsMainTab } from "./AdminRequestsMainTabs";
+import { apiStatusForTab, type AdminRequestTab } from "./AdminStatusTabs";
+type AdminRequestsMainTab = "verification" | "connection";
 import { AdminConnectionRequestsBlock } from "./AdminConnectionRequestsBlock";
 import { notifyAdminRequestsCountsChanged } from "@/lib/admin-requests-counts-sync";
 import {
@@ -14,6 +14,7 @@ import {
   ADMIN_BTN_NEUTRAL_SM,
   ADMIN_BTN_SUCCESS,
 } from "@/lib/admin-button-classes";
+import { ADMIN_PANEL_CARD, ADMIN_PANEL_PAGE_WIDE, ADMIN_PANEL_STATE_CENTER_COMPACT } from "@/lib/admin-surface-classes";
 import {
   mainTabNewPending,
   readMainTabAckConnection,
@@ -56,9 +57,31 @@ const DOC_LABELS: Record<string, string> = {
 
 const ZERO_COUNTS: SectionCounts = { pending: 0, approved: 0, rejected: 0 };
 
+function MainRequestsTabBadge({ n }: { n: number }) {
+  if (n <= 0) return null;
+  return (
+    <span
+      className="ml-2 inline-flex min-h-[1.35rem] min-w-[1.35rem] shrink-0 items-center justify-center rounded-full bg-[var(--color-accent-red)] px-2 text-xs font-bold leading-none text-white tabular-nums ring-2 ring-black/25"
+      title={`Новых на рассмотрении: ${n}`}
+    >
+      {n > 99 ? "99+" : n}
+    </span>
+  );
+}
+
+function StatusSubTabBadge({ n }: { n: number }) {
+  if (n <= 0) return null;
+  return (
+    <span className="ml-1.5 inline-flex min-h-[1.25rem] min-w-[1.25rem] items-center justify-center rounded-full bg-[var(--color-accent-red)] px-1.5 text-[11px] font-bold leading-none text-white tabular-nums">
+      {n > 99 ? "99+" : n}
+    </span>
+  );
+}
+
 export default function AdminVerificationRequestsPage() {
   const [mainTab, setMainTab] = useState<AdminRequestsMainTab>("verification");
   const [verificationTab, setVerificationTab] = useState<AdminRequestTab>("pending");
+  const [connectionTab, setConnectionTab] = useState<AdminRequestTab>("pending");
   const [counts, setCounts] = useState<RequestsCountsPayload | null>(null);
   const [list, setList] = useState<VerificationRequestItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -239,235 +262,209 @@ export default function AdminVerificationRequestsPage() {
   const cCounts = counts?.connection ?? ZERO_COUNTS;
   const mainTabNewVerification = mainTabNewPending(vCounts.pending, storedAckVerification);
   const mainTabNewConnection = mainTabNewPending(cCounts.pending, storedAckConnection);
-  const verificationSubBadges: Partial<Record<AdminRequestTab, number>> = {
-    pending: vCounts.pending,
-    approved: vCounts.approved,
-    rejected: vCounts.rejected,
-  };
+
+  const tabBtn = (active: boolean) =>
+    `inline-flex items-center rounded-t-lg px-4 py-2.5 text-sm font-medium transition-colors ${
+      active
+        ? "bg-white/15 text-white border border-b-0 border-white/20"
+        : "text-white/70 hover:bg-white/10 hover:text-white border border-transparent"
+    }`;
+
+  const tableWrapClass =
+    "admin-dashboard-table cabinet-section-header mt-0 w-full overflow-x-auto rounded-xl border-0 text-left";
+
+  const activeStatusTab = mainTab === "verification" ? verificationTab : connectionTab;
+  const setActiveStatusTab = mainTab === "verification" ? setVerificationTab : setConnectionTab;
+  const subCounts = mainTab === "verification" ? vCounts : cCounts;
+
+  const STATUS_TAB_ROWS: { key: AdminRequestTab; label: string }[] = [
+    { key: "pending", label: "На рассмотрении" },
+    { key: "approved", label: "Принятые" },
+    { key: "rejected", label: "Отклонённые" },
+  ];
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-col items-center gap-3 text-center">
-        <h1 className="text-center font-[family:var(--font-playfair)] text-xl font-semibold text-white sm:text-2xl">
-          Заявки
-        </h1>
-        <AdminRequestsMainTabs
-          value={mainTab}
-          onChange={setMainTab}
-          pendingVerification={mainTabNewVerification}
-          pendingConnection={mainTabNewConnection}
-          className="pt-1"
-        />
-        <div
-          role="separator"
-          aria-hidden="true"
-          className="h-px w-full max-w-2xl shrink-0 bg-[var(--color-brand-gold)]/35"
-        />
+    <div className={ADMIN_PANEL_PAGE_WIDE}>
+      <div className="flex flex-col items-center gap-3">
+        <FileCheck className="h-9 w-9 shrink-0 text-[var(--color-brand-gold)]" aria-hidden />
+        <h1 className="text-center font-[family:var(--font-playfair)] text-2xl font-semibold text-white">Заявки</h1>
       </div>
 
-      {mainTab === "verification" && (
-        <section className="space-y-4">
-          <AdminStatusTabs value={verificationTab} onChange={setVerificationTab} badges={verificationSubBadges} />
+      <div className={`${ADMIN_PANEL_CARD} !text-left`}>
+        <p className="mb-3 text-sm font-medium text-white">Текущие заявки</p>
 
-          {error && (
-            <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-center text-sm text-red-200">
-              {error}
-            </div>
-          )}
+        <div className="flex flex-wrap gap-1 border-b border-white/15 pb-px">
+          <button
+            type="button"
+            className={tabBtn(mainTab === "verification")}
+            onClick={() => setMainTab("verification")}
+          >
+            <span>Вериф. официантов</span>
+            <MainRequestsTabBadge n={mainTabNewVerification} />
+          </button>
+          <button
+            type="button"
+            className={tabBtn(mainTab === "connection")}
+            onClick={() => setMainTab("connection")}
+          >
+            <span>Заявки на подкл.</span>
+            <MainRequestsTabBadge n={mainTabNewConnection} />
+          </button>
+        </div>
 
-          {loading ? (
-            <div className="flex items-center justify-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin text-[var(--color-brand-gold)]" />
-            </div>
-          ) : list.length === 0 ? (
-            <div className="rounded-xl border border-white/10 bg-white/5 px-6 py-8 text-center text-white/90">
-              {emptyMessage}
-            </div>
-          ) : (
-            <>
-              <div className="space-y-4 lg:hidden">
-                {list.map((r) => (
-                  <div key={r.id} className="rounded-xl border border-white/10 bg-white/5 p-4">
-                    <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-                      <span className="text-xs text-white/70">{new Date(r.createdAt).toLocaleString("ru-RU")}</span>
-                      <Link
-                        href={`/admin/users/${r.userId}`}
-                        className="text-sm font-medium text-[var(--color-brand-gold)] hover:underline"
-                      >
-                        {r.login}
-                      </Link>
-                    </div>
-                    <p className="text-sm text-white">{r.fullName}</p>
-                    <p className="mt-1 text-xs text-white/80">
-                      {r.passportSeries} {r.passportNumber}, ИНН {r.inn}
-                    </p>
-                    {r.email && <p className="mt-1 truncate text-xs text-white/70">{r.email}</p>}
-                    {!isPending && r.reviewedAt && (
-                      <p className="mt-2 text-xs text-white/60">
-                        Рассмотрено: {new Date(r.reviewedAt).toLocaleString("ru-RU")}
-                      </p>
-                    )}
-                    {verificationTab === "rejected" && r.rejectionReason && (
-                      <p className="mt-2 rounded-lg bg-red-500/10 px-2 py-1.5 text-xs text-red-200/90">{r.rejectionReason}</p>
-                    )}
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      {(["passport_main", "passport_spread"] as const).map((type) => {
-                        const has = type === "passport_main" ? r.hasPassportMain : r.hasPassportSpread;
-                        const key = `${r.id}-${type}`;
-                        return (
-                          <button
-                            key={type}
-                            type="button"
-                            onClick={() => has && downloadDoc(r.id, type)}
-                            disabled={!has || downloading === key}
-                            className={`${ADMIN_BTN} ${ADMIN_BTN_NEUTRAL_SM} gap-1 font-medium disabled:opacity-50`}
-                          >
-                            {downloading === key ? <Loader2 className="h-3 w-3 animate-spin" /> : <Download className="h-3 w-3" />}
-                            {DOC_LABELS[type]}
-                          </button>
-                        );
-                      })}
-                    </div>
-                    {isPending && (
-                      <div className="mt-4 flex flex-wrap gap-2 border-t border-white/10 pt-3">
-                        <button
-                          type="button"
-                          onClick={() => handleApprove(r.id)}
-                          disabled={approvingId === r.id}
-                          className={`${ADMIN_BTN} ${ADMIN_BTN_SUCCESS} gap-1 px-3 py-2 text-sm disabled:opacity-50`}
-                        >
-                          {approvingId === r.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
-                          Подтвердить
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setRejectModal({ id: r.id, login: r.login });
-                            setRejectReason("");
-                            setRejectError(null);
-                          }}
-                          className={`${ADMIN_BTN} ${ADMIN_BTN_DANGER} gap-1 px-3 py-2 text-sm`}
-                        >
-                          <X className="h-4 w-4" />
-                          Отклонить
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                ))}
+        <div className="flex flex-wrap gap-1 border-b border-white/15 pb-px">
+          {STATUS_TAB_ROWS.map(({ key, label }) => (
+            <button
+              key={key}
+              type="button"
+              className={tabBtn(activeStatusTab === key)}
+              onClick={() => setActiveStatusTab(key)}
+            >
+              <span>{label}</span>
+              {key === "pending" && subCounts.pending > 0 && <StatusSubTabBadge n={subCounts.pending} />}
+            </button>
+          ))}
+        </div>
+
+        {mainTab === "verification" && (
+          <>
+            {error && (
+              <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-center text-sm text-red-200">
+                {error}
               </div>
-
-              <div className="max-lg:hidden overflow-x-auto rounded-xl border border-white/10">
-                <table className="w-full min-w-[760px] text-left text-sm">
+            )}
+            {loading ? (
+              <div className={`${ADMIN_PANEL_STATE_CENTER_COMPACT} py-10 text-white/60`}>
+                <Loader2 className="h-8 w-8 animate-spin" aria-hidden />
+              </div>
+            ) : (
+              <div className={tableWrapClass}>
+                <table className="w-full min-w-[760px] border-collapse text-sm">
                   <thead>
-                    <tr className="border-b border-white/10 bg-white/5">
-                      <th className="whitespace-nowrap px-4 py-3 font-semibold text-white">Дата</th>
-                      <th className="whitespace-nowrap px-4 py-3 font-semibold text-white">Пользователь</th>
-                      <th className="whitespace-nowrap px-4 py-3 font-semibold text-white">ФИО</th>
-                      <th className="whitespace-nowrap px-4 py-3 font-semibold text-white">Паспорт / ИНН</th>
-                      {!isPending && <th className="whitespace-nowrap px-4 py-3 font-semibold text-white">Рассмотрено</th>}
+                    <tr className="border-b border-white/15">
+                      <th className="px-3 py-2 text-left font-medium text-white">Дата</th>
+                      <th className="px-3 py-2 text-left font-medium text-white">Пользователь</th>
+                      <th className="px-3 py-2 text-left font-medium text-white">ФИО</th>
+                      <th className="px-3 py-2 text-left font-medium text-white">Паспорт / ИНН</th>
+                      {!isPending && <th className="px-3 py-2 text-left font-medium text-white">Рассмотрено</th>}
                       {verificationTab === "rejected" && (
-                        <th className="min-w-[140px] px-4 py-3 font-semibold text-white">Причина отказа</th>
+                        <th className="min-w-[140px] px-3 py-2 text-left font-medium text-white">Причина отказа</th>
                       )}
-                      <th className="whitespace-nowrap px-4 py-3 font-semibold text-white">Документы</th>
-                      {isPending && <th className="whitespace-nowrap px-4 py-3 font-semibold text-white">Действия</th>}
+                      <th className="px-3 py-2 text-left font-medium text-white">Документы</th>
+                      {isPending && <th className="px-3 py-2 text-left font-medium text-white">Действия</th>}
                     </tr>
                   </thead>
                   <tbody>
-                    {list.map((r) => (
-                      <tr key={r.id} className="border-b border-white/5 hover:bg-white/5">
-                        <td className="whitespace-nowrap px-4 py-3 text-white">
-                          {new Date(r.createdAt).toLocaleString("ru-RU")}
+                    {list.length === 0 ? (
+                      <tr>
+                        <td
+                          colSpan={8}
+                          className="px-3 py-6 text-center text-white/60"
+                        >
+                          {emptyMessage}
                         </td>
-                        <td className="px-4 py-3">
-                          <Link href={`/admin/users/${r.userId}`} className="text-[var(--color-brand-gold)] hover:underline">
-                            {r.login}
-                          </Link>
-                          {r.email && <div className="text-xs text-white/80">{r.email}</div>}
-                        </td>
-                        <td className="whitespace-nowrap px-4 py-3 text-white">{r.fullName}</td>
-                        <td className="whitespace-nowrap px-4 py-3 text-white">
-                          {r.passportSeries} {r.passportNumber}, ИНН {r.inn}
-                        </td>
-                        {!isPending && (
-                          <td className="whitespace-nowrap px-4 py-3 text-white/80">
-                            {r.reviewedAt ? new Date(r.reviewedAt).toLocaleString("ru-RU") : "—"}
+                      </tr>
+                    ) : (
+                      list.map((r) => (
+                        <tr key={r.id} className="border-b border-white/10">
+                          <td className="whitespace-nowrap px-3 py-2.5 text-white">
+                            {new Date(r.createdAt).toLocaleString("ru-RU")}
                           </td>
-                        )}
-                        {verificationTab === "rejected" && (
-                          <td className="max-w-[220px] px-4 py-3 text-xs text-red-200/90">{r.rejectionReason ?? "—"}</td>
-                        )}
-                        <td className="px-4 py-3">
-                          <div className="flex flex-wrap gap-2">
-                            {(["passport_main", "passport_spread"] as const).map((type) => {
-                              const has =
-                                type === "passport_main" ? r.hasPassportMain : r.hasPassportSpread;
-                              const key = `${r.id}-${type}`;
-                              return (
-                                <button
-                                  key={type}
-                                  type="button"
-                                  onClick={() => has && downloadDoc(r.id, type)}
-                                  disabled={!has || downloading === key}
-                                  className={`${ADMIN_BTN} ${ADMIN_BTN_NEUTRAL_SM} gap-1 font-medium disabled:opacity-50`}
-                                >
-                                  {downloading === key ? (
-                                    <Loader2 className="h-3 w-3 animate-spin" />
-                                  ) : (
-                                    <Download className="h-3 w-3" />
-                                  )}
-                                  {DOC_LABELS[type]}
-                                </button>
-                              );
-                            })}
-                          </div>
-                        </td>
-                        {isPending && (
-                          <td className="px-4 py-3">
-                            <div className="flex items-center gap-2">
-                              <button
-                                type="button"
-                                onClick={() => handleApprove(r.id)}
-                                disabled={approvingId === r.id}
-                                className={`${ADMIN_BTN} ${ADMIN_BTN_SUCCESS} gap-1 px-3 py-1.5 text-sm disabled:opacity-50`}
-                              >
-                                {approvingId === r.id ? (
-                                  <Loader2 className="h-4 w-4 animate-spin" />
-                                ) : (
-                                  <Check className="h-4 w-4" />
-                                )}
-                                Подтвердить
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setRejectModal({ id: r.id, login: r.login });
-                                  setRejectReason("");
-                                  setRejectError(null);
-                                }}
-                                className={`${ADMIN_BTN} ${ADMIN_BTN_DANGER} gap-1 px-3 py-1.5 text-sm`}
-                              >
-                                <X className="h-4 w-4" />
-                                Отклонить
-                              </button>
+                          <td className="px-3 py-2.5">
+                            <Link href={`/admin/users/${r.userId}`} className="text-[var(--color-brand-gold)] hover:underline">
+                              {r.login}
+                            </Link>
+                            {r.email && <div className="text-xs text-white/80">{r.email}</div>}
+                          </td>
+                          <td className="whitespace-nowrap px-3 py-2.5 text-white">{r.fullName}</td>
+                          <td className="whitespace-nowrap px-3 py-2.5 text-white">
+                            {r.passportSeries} {r.passportNumber}, ИНН {r.inn}
+                          </td>
+                          {!isPending && (
+                            <td className="whitespace-nowrap px-3 py-2.5 text-white/80">
+                              {r.reviewedAt ? new Date(r.reviewedAt).toLocaleString("ru-RU") : "—"}
+                            </td>
+                          )}
+                          {verificationTab === "rejected" && (
+                            <td className="max-w-[220px] px-3 py-2.5 text-xs text-red-200/90">{r.rejectionReason ?? "—"}</td>
+                          )}
+                          <td className="px-3 py-2.5">
+                            <div className="flex flex-wrap gap-2">
+                              {(["passport_main", "passport_spread"] as const).map((type) => {
+                                const has =
+                                  type === "passport_main" ? r.hasPassportMain : r.hasPassportSpread;
+                                const key = `${r.id}-${type}`;
+                                return (
+                                  <button
+                                    key={type}
+                                    type="button"
+                                    onClick={() => has && downloadDoc(r.id, type)}
+                                    disabled={!has || downloading === key}
+                                    className={`${ADMIN_BTN} ${ADMIN_BTN_NEUTRAL_SM} gap-1 font-medium disabled:opacity-50`}
+                                  >
+                                    {downloading === key ? (
+                                      <Loader2 className="h-3 w-3 animate-spin" />
+                                    ) : (
+                                      <Download className="h-3 w-3" />
+                                    )}
+                                    {DOC_LABELS[type]}
+                                  </button>
+                                );
+                              })}
                             </div>
                           </td>
-                        )}
-                      </tr>
-                    ))}
+                          {isPending && (
+                            <td className="px-3 py-2.5">
+                              <div className="flex flex-wrap items-center gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => handleApprove(r.id)}
+                                  disabled={approvingId === r.id}
+                                  className={`${ADMIN_BTN} ${ADMIN_BTN_SUCCESS} gap-1 px-3 py-1.5 text-sm disabled:opacity-50`}
+                                >
+                                  {approvingId === r.id ? (
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                  ) : (
+                                    <Check className="h-4 w-4" />
+                                  )}
+                                  Подтвердить
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setRejectModal({ id: r.id, login: r.login });
+                                    setRejectReason("");
+                                    setRejectError(null);
+                                  }}
+                                  className={`${ADMIN_BTN} ${ADMIN_BTN_DANGER} gap-1 px-3 py-1.5 text-sm`}
+                                >
+                                  <X className="h-4 w-4" />
+                                  Отклонить
+                                </button>
+                              </div>
+                            </td>
+                          )}
+                        </tr>
+                      ))
+                    )}
                   </tbody>
                 </table>
               </div>
-            </>
-          )}
-        </section>
-      )}
+            )}
+          </>
+        )}
 
-      {mainTab === "connection" && (
-        <section className="space-y-4">
-          <AdminConnectionRequestsBlock connectionCounts={cCounts} onAfterMutation={refreshCountsAndNotifyLayout} />
-        </section>
-      )}
+        {mainTab === "connection" && (
+          <AdminConnectionRequestsBlock
+            connectionCounts={cCounts}
+            onAfterMutation={refreshCountsAndNotifyLayout}
+            hideStatusTabs
+            statusTab={connectionTab}
+            onStatusTabChange={setConnectionTab}
+            compactTableLayout
+          />
+        )}
+      </div>
 
       {rejectModal && (
         <div

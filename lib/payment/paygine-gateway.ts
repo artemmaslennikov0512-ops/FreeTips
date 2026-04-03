@@ -14,9 +14,8 @@ import type {
 import { TransactionStatus } from "@prisma/client";
 import { broadcastBalanceUpdated } from "@/lib/ws-broadcast";
 import { logInfo } from "@/lib/logger";
-
-/** Если relocateStartedAt выставлен и процесс упал — без сброса все следующие синки получают claimed.count=0 и БД навсегда PENDING. */
-const RELOCATE_CLAIM_STALE_MS = 15 * 60 * 1000;
+import { RELOCATE_CLAIM_STALE_MS } from "@/lib/payment/relocate-constants";
+import { scheduleRelocate } from "@/lib/payment/relocate-queue";
 import { registerOrder, sdRelocateFunds } from "./paygine/client";
 import { buildPaygineSignature } from "./paygine/signature";
 import { feeKopForIncoming } from "./paygine-fee";
@@ -386,7 +385,7 @@ export class PayginePaymentGateway implements PaymentGateway {
           hint: "Кубышка заказа совпадает с кубышкой официанта — перелив не нужен.",
         });
       } else {
-        void runRelocateForTransaction(tx.id);
+        void scheduleRelocate(tx.id);
       }
     }
 

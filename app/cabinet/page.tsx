@@ -604,7 +604,7 @@ export default function CabinetDashboardPage() {
         </div>
         <div className="p-6">
           <p className="mb-4 text-[var(--color-text)]/90">
-            Скопируйте ключ и введите его в приложении FreeTips — и управляйте личным кабинетом официанта из мобильного приложения. (только для Android)
+            Скопируйте ключ и вставьте его в приложение FreeTips для Android — так вы сможете пользоваться личным кабинетом официанта с телефона.
           </p>
           <p className="mb-6 flex flex-wrap items-center gap-3">
             <span className="text-white">Приложение для Android:</span>

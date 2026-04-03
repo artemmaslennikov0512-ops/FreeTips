@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import {
   LayoutDashboard,
   List,
@@ -248,9 +249,12 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
       >
         {user?.establishmentBrand?.logoUrl && (
           <div className="mx-4 mb-3 flex justify-center">
-            <img
+            <Image
               src={user.establishmentBrand.logoUrl}
               alt=""
+              width={140}
+              height={32}
+              unoptimized
               className="h-8 w-auto max-w-[140px] object-contain"
               style={{ opacity: user.establishmentBrand.logoOpacityPercent != null ? user.establishmentBrand.logoOpacityPercent / 100 : 0.95 }}
             />
@@ -262,9 +266,12 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
         >
           <div className="flex items-center gap-3">
             {user?.employeePhotoUrl ? (
-              <img
+              <Image
                 src={user.employeePhotoUrl}
                 alt=""
+                width={56}
+                height={56}
+                unoptimized
                 className="cabinet-sidebar-avatar h-14 w-14 shrink-0 rounded-full object-cover bg-[var(--color-brand-gold)]"
               />
             ) : (
@@ -391,7 +398,14 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
                   <div className={`cabinet-sidebar-profile cabinet-block-inner mb-4 rounded-[10px] border border-[var(--color-brand-gold)]/20 px-3 py-2.5 ${!sidebarBg ? "bg-[var(--color-dark-gray)]/10" : ""}`} style={Object.keys(profileBlockStyle).length ? profileBlockStyle : undefined}>
                     <div className="flex items-center gap-2.5">
                       {user?.employeePhotoUrl ? (
-                        <img src={user.employeePhotoUrl} alt="" className="h-9 w-9 shrink-0 rounded-full object-cover bg-[var(--color-brand-gold)]" />
+                        <Image
+                          src={user.employeePhotoUrl}
+                          alt=""
+                          width={36}
+                          height={36}
+                          unoptimized
+                          className="h-9 w-9 shrink-0 rounded-full object-cover bg-[var(--color-brand-gold)]"
+                        />
                       ) : (
                         <div
                           className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--color-brand-gold)] font-semibold text-xs ${isM5Cabinet ? "text-white" : "text-[#0a192f]"}`}

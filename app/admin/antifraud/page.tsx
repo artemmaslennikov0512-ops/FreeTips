@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { ADMIN_BTN, ADMIN_BTN_PRIMARY } from "@/lib/admin-button-classes";
 import { FraudSignalsSection } from "./FraudSignalsSection";
+import { ADMIN_PANEL_STATE_CENTER } from "@/lib/admin-surface-classes";
 
 const ANTIFRAUD_INPUT =
   "antifraud-input w-36 min-w-[7rem] max-w-full shrink-0 rounded-lg border border-[rgba(197,165,114,0.25)] bg-[var(--color-bg-sides)] px-3 py-2 text-center text-sm text-[var(--color-text)] placeholder:text-[var(--color-muted)] focus:outline-none focus:border-[var(--color-brand-gold)] disabled:bg-[var(--color-light-gray)] read-only:bg-[var(--color-light-gray)]";
@@ -418,16 +419,16 @@ export default function AdminAntifraudPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="text-slate-400">Загрузка...</div>
+      <div className={ADMIN_PANEL_STATE_CENTER}>
+        <div className="text-center text-slate-400">Загрузка…</div>
       </div>
     );
   }
 
   if (loadError) {
     return (
-      <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="text-[var(--color-text-secondary)]">{loadError}</div>
+      <div className={ADMIN_PANEL_STATE_CENTER}>
+        <div className="max-w-md text-center text-[var(--color-text-secondary)]">{loadError}</div>
       </div>
     );
   }

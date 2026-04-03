@@ -5,8 +5,9 @@
  */
 
 import type { NextRequest } from "next/server";
+import { createHash } from "crypto";
 import { checkRateLimitRedis } from "@/lib/rate-limit-redis";
-import { getRedisUrl } from "@/lib/config";
+import { getRedisUrl, getWebhookRateLimitPerMinute } from "@/lib/config";
 import { cleanupWrongPasswordAttemptsExpired } from "@/lib/login-wrong-password-tracker";
 
 export type RateLimitResult = { allowed: boolean; remaining: number; resetAt: number };
@@ -44,12 +45,20 @@ export const REGISTRATION_REQUEST_RATE_LIMIT = {
   keyPrefix: "reg-request",
 } as const;
 
-/** Окно и лимит для webhook платёжного провайдера (защита от флуда) */
-export const WEBHOOK_RATE_LIMIT = {
-  windowMs: 60 * 1000,
-  maxRequests: 60,
-  keyPrefix: "webhook",
-} as const;
+type RateLimitOptions = {
+  windowMs?: number;
+  maxRequests?: number;
+  keyPrefix?: string;
+};
+
+/** Окно и лимит для webhook платёжного провайдера (защита от флуда). maxRequests — из WEBHOOK_RATE_LIMIT_MAX или 600/мин. */
+export function getWebhookRateLimitOptions(): RateLimitOptions & { keyPrefix: string } {
+  return {
+    windowMs: 60 * 1000,
+    maxRequests: getWebhookRateLimitPerMinute(),
+    keyPrefix: "webhook",
+  };
+}
 
 /** Окно и лимит для POST /api/pay/[slug] по IP (антифрод). По умолчанию 2000; в проде можно задать PAY_RATE_LIMIT_IP_MAX=60. */
 export const PAY_RATE_LIMIT_IP = {
@@ -70,12 +79,6 @@ export const PAY_RATE_LIMIT_SLUG = {
     : 2000,
   keyPrefix: "pay-slug",
 } as const;
-
-type RateLimitOptions = {
-  windowMs?: number;
-  maxRequests?: number;
-  keyPrefix?: string;
-};
 
 function resolveOptions(options?: RateLimitOptions): Required<RateLimitOptions> {
   return {
@@ -174,20 +177,42 @@ export async function checkRateLimitByUserId(
 
 /**
  * Получает IP адрес из request.
- * Если TRUST_PROXY=true|1 — используем x-forwarded-for / x-real-ip (должен выставлять доверенный прокси).
- * Иначе — только request.ip если есть (Vercel и др.), чтобы не доверять подделываемым заголовкам.
+ * Если TRUST_PROXY=true|1 — доверенные заголовки от прокси/CDN (иначе клиент может подделать их при прямом доступе к origin).
+ * Порядок: cf-connecting-ip, true-client-ip, x-forwarded-for (первый хоп), x-real-ip.
+ * Без TRUST_PROXY — только request.ip (платформа), без клиентских заголовков.
  */
 export function getClientIP(request: NextRequest): string {
   const trustProxy = process.env.TRUST_PROXY === "true" || process.env.TRUST_PROXY === "1";
   if (trustProxy) {
+    const cf = request.headers.get("cf-connecting-ip")?.trim();
+    if (cf) return cf;
+    const trueClient = request.headers.get("true-client-ip")?.trim();
+    if (trueClient) return trueClient;
     const forwarded = request.headers.get("x-forwarded-for");
-    if (forwarded) return forwarded.split(",")[0].trim();
-    const realIP = request.headers.get("x-real-ip");
+    if (forwarded) return forwarded.split(",")[0]!.trim();
+    const realIP = request.headers.get("x-real-ip")?.trim();
     if (realIP) return realIP;
   }
   const req = request as NextRequest & { ip?: string };
   if (typeof req.ip === "string" && req.ip) return req.ip;
   return "unknown";
+}
+
+/**
+ * IP для логов и ключ для rate limit за один проход по заголовкам.
+ * При неизвестном IP ключ = unknown + хеш User-Agent (не один общий bucket).
+ */
+export function getClientIpAndRateLimitKey(request: NextRequest): { ip: string; rateLimitKey: string } {
+  const ip = getClientIP(request);
+  if (ip !== "unknown") return { ip, rateLimitKey: ip };
+  const ua = request.headers.get("user-agent") ?? "";
+  const suffix = createHash("sha256").update(ua, "utf8").digest("hex").slice(0, 16);
+  return { ip, rateLimitKey: `unknown:${suffix}` };
+}
+
+/** Только ключ для лимита (когда IP для логов не нужен). */
+export function getRateLimitIpKey(request: NextRequest): string {
+  return getClientIpAndRateLimitKey(request).rateLimitKey;
 }
 
 /**

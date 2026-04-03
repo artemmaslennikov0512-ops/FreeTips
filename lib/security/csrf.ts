@@ -1,11 +1,18 @@
 import { NextRequest } from "next/server";
 import { createHash, timingSafeEqual } from "crypto";
+import {
+  CSRF_COOKIE_NAME,
+  CSRF_COOKIE_PATH,
+  CSRF_HEADER_NAME,
+  CSRF_TOKEN_TTL_SECONDS,
+} from "@/lib/security/csrf-constants";
 
-export const CSRF_COOKIE_NAME = "csrfToken";
-export const CSRF_HEADER_NAME = "x-csrf-token";
-export const CSRF_COOKIE_PATH = "/";
-const HOUR_SECONDS = 60 * 60;
-export const CSRF_TOKEN_TTL_SECONDS = 8 * HOUR_SECONDS;
+export {
+  CSRF_COOKIE_NAME,
+  CSRF_COOKIE_PATH,
+  CSRF_HEADER_NAME,
+  CSRF_TOKEN_TTL_SECONDS,
+};
 
 export function generateCsrfToken(): string {
   return crypto.randomUUID();

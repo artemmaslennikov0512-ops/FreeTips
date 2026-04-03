@@ -11,7 +11,7 @@ import { getUserRepository } from "@/lib/infrastructure/user-repository";
 import { registerSchema } from "@/lib/validations";
 import { hashPassword } from "@/lib/auth/password";
 import { generateAccessToken, generateRefreshToken, setRefreshTokenCookie } from "@/lib/auth/jwt";
-import { checkRateLimitByIP, getClientIP, AUTH_RATE_LIMIT } from "@/lib/middleware/rate-limit";
+import { checkRateLimitByIP, getClientIpAndRateLimitKey, AUTH_RATE_LIMIT } from "@/lib/middleware/rate-limit";
 import { hashRegistrationToken } from "@/lib/auth/registration-token";
 import { getWaiterPaygineSdRef } from "@/lib/payment/paygine-sd-ref";
 import { getSystemDefaultLimitsForNewUser } from "@/lib/system-default-limits";
@@ -24,9 +24,9 @@ import { buildNewSessionMetadata } from "@/lib/auth-session-metadata";
 
 export async function POST(request: NextRequest) {
   const requestId = getRequestId(request);
-  const ip = getClientIP(request);
+  const { ip, rateLimitKey } = getClientIpAndRateLimitKey(request);
   try {
-    const rateLimit = await checkRateLimitByIP(ip, AUTH_RATE_LIMIT);
+    const rateLimit = await checkRateLimitByIP(rateLimitKey, AUTH_RATE_LIMIT);
     if (!rateLimit.allowed) return rateLimit429Response(rateLimit);
     if (!verifyCsrfFromRequest(request)) {
       return jsonError(403, "Некорректный CSRF токен");

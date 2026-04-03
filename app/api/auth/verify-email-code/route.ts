@@ -5,7 +5,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { checkRateLimitByIP, getClientIP, AUTH_RATE_LIMIT } from "@/lib/middleware/rate-limit";
+import { checkRateLimitByIP, getRateLimitIpKey, AUTH_RATE_LIMIT } from "@/lib/middleware/rate-limit";
 import { parseJsonWithLimit, MAX_BODY_SIZE_AUTH, jsonError, internalError, rateLimit429Response } from "@/lib/api/helpers";
 import { verifyCsrfFromRequest } from "@/lib/security/csrf";
 import { checkAndConsumeEmailCode } from "@/lib/email-verification-store";
@@ -20,10 +20,8 @@ const schema = z.object({
 });
 
 export async function POST(request: NextRequest) {
-  const ip = getClientIP(request);
-
   try {
-    const rateLimit = await checkRateLimitByIP(ip, AUTH_RATE_LIMIT);
+    const rateLimit = await checkRateLimitByIP(getRateLimitIpKey(request), AUTH_RATE_LIMIT);
     if (!rateLimit.allowed) return rateLimit429Response(rateLimit);
     if (!verifyCsrfFromRequest(request)) {
       return NextResponse.json({ error: "Некорректный CSRF токен" }, { status: 403 });

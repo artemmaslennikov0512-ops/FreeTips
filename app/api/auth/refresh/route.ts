@@ -6,7 +6,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { verifyRefreshToken, generateAccessToken, generateRefreshToken, setRefreshTokenCookie, deleteRefreshTokenCookie, getRefreshTokenCookie } from "@/lib/auth/jwt";
-import { checkRateLimitByIP, getClientIP, AUTH_RATE_LIMIT } from "@/lib/middleware/rate-limit";
+import { checkRateLimitByIP, getClientIpAndRateLimitKey, AUTH_RATE_LIMIT } from "@/lib/middleware/rate-limit";
 import { mergeSessionDeviceInfo, readDeviceClientIdFromRequest } from "@/lib/auth-session-metadata";
 import { logError, logSecurity } from "@/lib/logger";
 import { getRequestId } from "@/lib/security/request";
@@ -14,9 +14,9 @@ import { internalError, rateLimit429Response } from "@/lib/api/helpers";
 
 export async function POST(request: NextRequest) {
   const requestId = getRequestId(request);
-  const ip = getClientIP(request);
+  const { ip, rateLimitKey } = getClientIpAndRateLimitKey(request);
   try {
-    const rateLimit = await checkRateLimitByIP(ip, AUTH_RATE_LIMIT);
+    const rateLimit = await checkRateLimitByIP(rateLimitKey, AUTH_RATE_LIMIT);
     if (!rateLimit.allowed) return rateLimit429Response(rateLimit);
 
     // Получаем refresh token из cookie

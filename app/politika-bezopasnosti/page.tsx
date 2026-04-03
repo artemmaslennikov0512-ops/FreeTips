@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { site } from "@/config/site";
 
 export const metadata: Metadata = {
@@ -18,12 +19,13 @@ export default function PolitikaBezopasnostiPage() {
   return (
     <article className="mx-auto w-full max-w-3xl px-4 py-12 sm:px-6 sm:py-16 xl:max-w-4xl 2xl:max-w-5xl">
       <div className="mb-8 flex items-center gap-3">
-        <img
+        <Image
           src={site.logo.src}
           alt={site.logo.alt}
+          width={48}
+          height={48}
+          unoptimized={site.logo.src.endsWith(".svg")}
           className="h-12 w-12"
-          loading="lazy"
-          fetchPriority="low"
         />
         <h1 className="text-3xl font-bold text-[var(--color-text)] sm:text-4xl">
           Политика безопасности платежей
@@ -32,13 +34,13 @@ export default function PolitikaBezopasnostiPage() {
 
       <div className="mb-8 flex flex-wrap items-center gap-6 rounded-xl border-0 bg-[var(--color-light-gray)] px-6 py-4">
         {PAYMENT_LOGOS.map(({ src, alt }) => (
-          <img
+          <Image
             key={alt}
             src={src}
             alt={alt}
-            className="h-10 object-contain"
-            loading="lazy"
-            fetchPriority="low"
+            width={120}
+            height={40}
+            className="h-10 w-auto max-w-[120px] object-contain"
           />
         ))}
       </div>

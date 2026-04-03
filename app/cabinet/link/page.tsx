@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { Copy, Download, Link2, Loader2 } from "lucide-react";
 import QRCode from "qrcode";
 import { getBaseUrl } from "@/lib/get-base-url";
@@ -183,12 +184,13 @@ export default function CabinetLinkPage() {
             <div className="flex flex-col items-center gap-4">
               {qrDataUrl ? (
                 <>
-                  <img
+                  <Image
                     src={qrDataUrl}
                     alt="QR-код ссылки"
-                    className="size-64 shrink-0 rounded-xl border-0 bg-[var(--color-bg-sides)] object-contain"
                     width={256}
                     height={256}
+                    unoptimized
+                    className="size-64 shrink-0 rounded-xl border-0 bg-[var(--color-bg-sides)] object-contain"
                   />
                   <a
                     href={qrDataUrl}

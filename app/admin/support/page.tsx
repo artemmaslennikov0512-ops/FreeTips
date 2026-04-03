@@ -64,22 +64,22 @@ export default function AdminSupportPage() {
   }
 
   return (
-    <div className="admin-support-page">
-      <h1 className="flex items-center justify-center gap-2 text-2xl font-bold text-white w-full">
-        <MessageCircle className="h-7 w-7 text-[var(--color-brand-gold)]" />
+    <div className="admin-support-page flex w-full flex-col items-center">
+      <h1 className="flex w-full items-center justify-center gap-2 text-center text-2xl font-bold text-white">
+        <MessageCircle className="h-7 w-7 shrink-0 text-[var(--color-brand-gold)]" aria-hidden />
         Обращения в поддержку
       </h1>
-      <p className="mt-2 text-sm text-white/90">
-        Выберите диалог и ответьте клиенту.
+      <p className="mt-2 max-w-xl text-center text-sm text-white/90">
+        Выберите диалог и ответьте пользователю.
       </p>
 
       {error && (
-        <div className="mt-4 rounded-xl border border-amber-500/50 bg-amber-500/10 px-4 py-2 text-sm text-amber-200">
+        <div className="mt-4 w-full max-w-xl rounded-xl border border-amber-500/50 bg-amber-500/10 px-4 py-2 text-center text-sm text-amber-200">
           {error}
         </div>
       )}
 
-      <div className="mt-6 space-y-2">
+      <div className="mt-6 w-full space-y-2">
         {threads.length === 0 && (
           <p className="py-8 text-center text-white/80">
             Пока нет обращений.

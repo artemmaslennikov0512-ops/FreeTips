@@ -7,7 +7,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { forgotPasswordRequestSchema } from "@/lib/validations";
-import { checkRateLimitByIP, getClientIP, AUTH_RATE_LIMIT } from "@/lib/middleware/rate-limit";
+import { checkRateLimitByIP, getClientIpAndRateLimitKey, AUTH_RATE_LIMIT } from "@/lib/middleware/rate-limit";
 import { logError, logSecurity } from "@/lib/logger";
 import { getRequestId } from "@/lib/security/request";
 import { parseJsonWithLimit, MAX_BODY_SIZE_AUTH, jsonError, internalError, rateLimit429Response } from "@/lib/api/helpers";
@@ -23,10 +23,10 @@ import { templatePasswordReset } from "@/lib/email/templates";
 
 export async function POST(request: NextRequest) {
   const requestId = getRequestId(request);
-  const ip = getClientIP(request);
+  const { ip, rateLimitKey } = getClientIpAndRateLimitKey(request);
 
   try {
-    const rateLimit = await checkRateLimitByIP(ip, AUTH_RATE_LIMIT);
+    const rateLimit = await checkRateLimitByIP(rateLimitKey, AUTH_RATE_LIMIT);
     if (!rateLimit.allowed) return rateLimit429Response(rateLimit);
     if (!verifyCsrfFromRequest(request)) {
       return NextResponse.json({ error: "Некорректный CSRF токен" }, { status: 403 });

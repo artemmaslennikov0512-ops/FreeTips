@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { checkRateLimitByIP, getClientIP } from "@/lib/middleware/rate-limit";
+import { checkRateLimitByIP, getRateLimitIpKey } from "@/lib/middleware/rate-limit";
 import { REQUEST_ID_HEADER } from "@/lib/security/request";
 import {
   CSRF_COOKIE_NAME,
@@ -160,8 +160,7 @@ function withJsonError(
 
 async function handleRateLimit(request: NextRequest, pathname: string, requestId: string): Promise<NextResponse | null> {
   if (!isApiRequest(pathname)) return null;
-  const ip = getClientIP(request);
-  const rateResult = await checkRateLimitByIP(ip, RATE_LIMIT_OPTIONS);
+  const rateResult = await checkRateLimitByIP(getRateLimitIpKey(request), RATE_LIMIT_OPTIONS);
   if (rateResult.allowed) return null;
   return withJsonError(request, 429, "Слишком много запросов. Попробуйте позже.", requestId);
 }
@@ -184,17 +183,6 @@ function handleCsrf(request: NextRequest, pathname: string, requestId: string): 
 
 export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
-  const query = request.nextUrl.search || "";
-  const method = request.method;
-  const ts = new Date().toISOString();
-  console.log(
-    JSON.stringify({
-      level: "REQUEST",
-      method,
-      path: pathname + query,
-      timestamp: ts,
-    }),
-  );
 
   const requestId = getRequestId(request);
   const requestHeaders = new Headers(request.headers);

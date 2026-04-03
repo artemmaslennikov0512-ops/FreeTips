@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import type { LucideIcon } from "lucide-react";
 import {
   LayoutDashboard,
@@ -215,12 +216,6 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
     }
   }, [router]);
 
-  const handleExitAdminCabinetView = useCallback(() => {
-    const path = endCabinetImpersonation();
-    setAdminCabinetView(false);
-    router.replace(path);
-  }, [router]);
-
   const isActive = useCallback(
     (href: string) => (href === "/cabinet" ? pathname === "/cabinet" : pathname.startsWith(href)),
     [pathname],
@@ -257,20 +252,27 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
   }
   const sidebarBg = applyEstablishmentBrand ? (brandBlocksBg ?? brandSecondary) : undefined;
   const mainBlockBg = applyEstablishmentBrand ? (brandBlocksBg ?? brandSecondary) : undefined;
-  const sidebarStyle: React.CSSProperties = isM5Cabinet
-    ? {}
-    : {
-        backgroundColor: sidebarBg ?? "rgba(255,255,255,0.06)",
-        ...(brandBorder && applyEstablishmentBrand ? { borderColor: brandBorder } : {}),
-      };
-  const mainBlockStyle: React.CSSProperties = isM5Cabinet
-    ? {}
-    : {
-        backgroundColor: mainBlockBg ?? "rgba(255,255,255,0.06)",
-        ...(brandBorder && applyEstablishmentBrand ? { borderColor: brandBorder } : {}),
-      };
-  const profileBlockStyle: React.CSSProperties =
-    !isM5Cabinet && sidebarBg ? { backgroundColor: sidebarBg } : {};
+
+  const sidebarStyle = useMemo<React.CSSProperties>(() => {
+    if (isM5Cabinet) return {};
+    return {
+      backgroundColor: sidebarBg ?? "rgba(255,255,255,0.06)",
+      ...(brandBorder && applyEstablishmentBrand ? { borderColor: brandBorder } : {}),
+    };
+  }, [isM5Cabinet, sidebarBg, brandBorder, applyEstablishmentBrand]);
+
+  const mainBlockStyle = useMemo<React.CSSProperties>(() => {
+    if (isM5Cabinet) return {};
+    return {
+      backgroundColor: mainBlockBg ?? "rgba(255,255,255,0.06)",
+      ...(brandBorder && applyEstablishmentBrand ? { borderColor: brandBorder } : {}),
+    };
+  }, [isM5Cabinet, mainBlockBg, brandBorder, applyEstablishmentBrand]);
+
+  const profileBlockStyle = useMemo<React.CSSProperties>(() => {
+    if (!isM5Cabinet && sidebarBg) return { backgroundColor: sidebarBg };
+    return {};
+  }, [isM5Cabinet, sidebarBg]);
 
   const navActiveClasses = isM5Cabinet
     ? "cabinet-nav-active cabinet-nav-active-m5 font-semibold text-[var(--color-text)]"
@@ -325,26 +327,8 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
   return (
     <CabinetMobileNavProvider value={mobileNavValue}>
     <LkPresenceHeartbeat />
-    {adminCabinetView && (
-      <div
-        className="fixed inset-x-0 top-0 z-[110] flex flex-wrap items-center justify-center gap-2 border-b border-amber-500/35 bg-amber-950/95 px-3 py-2.5 text-center text-sm text-amber-50 shadow-lg backdrop-blur-md sm:justify-between sm:px-4"
-        role="status"
-      >
-        <span className="max-w-[min(100%,42rem)] leading-snug">
-          Режим просмотра: вы в кабинете пользователя. Действия выполняются от его имени.
-        </span>
-        <button
-          type="button"
-          onClick={handleExitAdminCabinetView}
-          className={`shrink-0 ${CABINET_WAITER_BTN} gap-2 px-4 py-2 text-sm`}
-        >
-          <ChevronLeft className="h-4 w-4 text-[var(--color-brand-gold)]" aria-hidden />
-          В админку
-        </button>
-      </div>
-    )}
     <div
-      className={`cabinet-premium flex min-h-screen w-full max-w-full overflow-x-hidden font-[family:var(--font-inter)] text-[var(--color-text)] pt-3 lg:pt-5 ${adminCabinetView ? "pt-[52px] sm:pt-[48px]" : ""} ${isM5Cabinet ? "bg-transparent" : "bg-[var(--color-bg)]"}`}
+      className={`cabinet-premium flex min-h-screen w-full max-w-full overflow-x-hidden font-[family:var(--font-inter)] text-[var(--color-text)] pt-3 lg:pt-5 ${isM5Cabinet ? "bg-transparent" : "bg-[var(--color-bg)]"}`}
       data-brand-active={applyEstablishmentBrand ? "true" : undefined}
       data-cabinet-theme={isM5Cabinet ? "m5-competition" : undefined}
       style={Object.keys(brandStyle).length ? brandStyle : undefined}
@@ -370,9 +354,12 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
         </button>
         {user?.establishmentBrand?.logoUrl && (
           <div className="mx-4 mb-3 flex justify-center">
-            <img
+            <Image
               src={user.establishmentBrand.logoUrl}
               alt=""
+              width={140}
+              height={32}
+              unoptimized
               className="h-8 w-auto max-w-[140px] object-contain"
               style={{ opacity: user.establishmentBrand.logoOpacityPercent != null ? user.establishmentBrand.logoOpacityPercent / 100 : 0.95 }}
             />
@@ -384,9 +371,12 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
         >
           <div className="flex items-center gap-3">
             {user?.employeePhotoUrl ? (
-              <img
+              <Image
                 src={user.employeePhotoUrl}
                 alt=""
+                width={56}
+                height={56}
+                unoptimized
                 className="cabinet-sidebar-avatar h-14 w-14 shrink-0 rounded-full object-cover bg-[var(--color-brand-gold)]"
               />
             ) : (

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import Image from "next/image";
 import { fetchWithAuth } from "@/lib/auth-client";
 import { ADMIN_BTN, ADMIN_BTN_PRIMARY } from "@/lib/admin-button-classes";
 import {
@@ -264,8 +265,14 @@ export function ProfileTotpSection({
             {showQr && (
               <div className="flex flex-col items-center gap-3">
                 <div className="rounded-lg bg-white p-2">
-                  {/* eslint-disable-next-line @next/next/no-img-element -- data URL */}
-                  <img src={qrDataUrl} alt="QR для Google Authenticator" width={220} height={220} className="h-auto w-[220px]" />
+                  <Image
+                    src={qrDataUrl}
+                    alt="QR для Google Authenticator"
+                    width={220}
+                    height={220}
+                    unoptimized
+                    className="h-auto w-[220px]"
+                  />
                 </div>
                 <p className={`${v.textMuted} text-center text-xs`}>В приложении выберите «Добавить аккаунт» и отсканируйте код.</p>
                 <div className="w-full">

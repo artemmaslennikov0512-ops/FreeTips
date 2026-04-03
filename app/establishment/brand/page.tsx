@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import Image from "next/image";
 import { Palette, Printer, Smartphone, LayoutDashboard, FileDown, ImageIcon, X } from "lucide-react";
 import { authHeaders } from "@/lib/auth-client";
 import { CustomDropdown } from "@/components/CustomDropdown";
@@ -622,7 +623,18 @@ export default function EstablishmentBrandPage() {
                   {/* Верх: лого или название (фиксированно) */}
                   <div className="flex items-center justify-center shrink-0 py-1.5 px-2 min-h-[28px]" style={{ borderBottom: `1px solid ${borderRgba}` }}>
                     {logoUrl.trim() ? (
-                      <img src={logoUrl.trim()} alt="" className="h-5 w-auto max-w-[120px] object-contain" style={{ opacity: logoOpacityPercent != null ? logoOpacityPercent / 100 : 1 }} onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
+                      <Image
+                        src={logoUrl.trim()}
+                        alt=""
+                        width={120}
+                        height={20}
+                        unoptimized
+                        className="h-5 w-auto max-w-[120px] object-contain"
+                        style={{ opacity: logoOpacityPercent != null ? logoOpacityPercent / 100 : 1 }}
+                        onError={(e) => {
+                          e.currentTarget.style.display = "none";
+                        }}
+                      />
                     ) : (
                       <span className="font-[family:var(--font-playfair)] text-xs font-bold truncate max-w-full" style={{ color: hexOr(fontColor, "#fafafa") }}>
                         Free<span style={{ color: hexOr(primaryColor, "var(--color-brand-gold)") }}>Tips</span>
@@ -648,7 +660,14 @@ export default function EstablishmentBrandPage() {
                     {/* QR по центру блока */}
                     <div className="flex-1 flex items-center justify-center min-h-0 py-1">
                       {printPreviewQrUrl ? (
-                        <img src={printPreviewQrUrl} alt="" className="max-w-full max-h-full w-14 h-14 object-contain rounded bg-white" />
+                        <Image
+                          src={printPreviewQrUrl}
+                          alt=""
+                          width={56}
+                          height={56}
+                          unoptimized
+                          className="max-h-full max-w-full h-14 w-14 object-contain rounded bg-white"
+                        />
                       ) : (
                         <div className="w-14 h-14 rounded bg-white/20 flex items-center justify-center text-[10px] text-white/70">QR</div>
                       )}
@@ -675,7 +694,14 @@ export default function EstablishmentBrandPage() {
                       {examplePayQrUrl && (
                         <div className="flex flex-col items-center gap-1">
                           <p className="text-xs text-white/70">QR-код ссылки</p>
-                          <img src={examplePayQrUrl} alt="" className="w-32 h-32 rounded-lg bg-white p-1" />
+                          <Image
+                            src={examplePayQrUrl}
+                            alt=""
+                            width={128}
+                            height={128}
+                            unoptimized
+                            className="h-32 w-32 rounded-lg bg-white p-1"
+                          />
                         </div>
                       )}
                     </>
@@ -718,12 +744,17 @@ export default function EstablishmentBrandPage() {
                     {/* Логотип: только лого или только FreeTips */}
                     <div className="flex justify-center">
                       {logoUrl.trim() ? (
-                        <img
+                        <Image
                           src={logoUrl.trim()}
                           alt=""
+                          width={110}
+                          height={36}
+                          unoptimized
                           className="h-9 w-auto max-w-[110px] object-contain"
                           style={{ opacity: logoOpacityPercent != null ? logoOpacityPercent / 100 : 1 }}
-                          onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                          onError={(e) => {
+                            e.currentTarget.style.display = "none";
+                          }}
                         />
                       ) : (
                         <div className="flex items-center gap-2">

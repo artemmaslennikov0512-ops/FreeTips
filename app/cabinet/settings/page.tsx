@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { User, Loader2, CheckCircle2, Camera, ImageIcon } from "lucide-react";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { getAccessToken, authHeaders, clearAccessToken } from "@/lib/auth-client";
@@ -327,9 +328,12 @@ export default function CabinetSettingsPage() {
             <div className="flex flex-col items-center">
               <div className="flex items-center justify-center gap-4">
                 {user.employeePhotoUrl ? (
-                  <img
+                  <Image
                     src={user.employeePhotoUrl}
                     alt=""
+                    width={96}
+                    height={96}
+                    unoptimized
                     className="settings-photo-avatar h-24 w-24 shrink-0 rounded-full object-cover border-2 border-[var(--color-brand-gold)]/30"
                   />
                 ) : (

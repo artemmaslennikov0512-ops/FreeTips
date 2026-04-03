@@ -1450,6 +1450,32 @@ html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-compe
   color: rgba(255, 255, 255, 0.92);
 }
 
+/* Светлая тема: свернуть/развернуть сайдбар (lg) — золото, иначе белая заливка сливается с фоном */
+html:not([data-theme="dark"]) .cabinet-premium .cabinet-lg-sidebar-toggle {
+  background: linear-gradient(180deg, #ead9bb 0%, #c5a572 50%, #a8894e 100%) !important;
+  border-color: rgba(88, 68, 40, 0.55) !important;
+  color: #14110e !important;
+  box-shadow:
+    0 2px 14px rgba(197, 165, 114, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.42) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+html:not([data-theme="dark"]) .cabinet-premium .cabinet-lg-sidebar-toggle:hover {
+  background: linear-gradient(180deg, #f3e6cc 0%, #d4b882 52%, #b99558 100%) !important;
+  border-color: rgba(62, 48, 28, 0.55) !important;
+  color: #0a0908 !important;
+  box-shadow:
+    0 4px 20px rgba(197, 165, 114, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55) !important;
+}
+
+html:not([data-theme="dark"]) .cabinet-premium .cabinet-lg-sidebar-toggle svg {
+  color: inherit !important;
+  opacity: 1 !important;
+}
+
 /* Блок профиля в сайдбаре: тоньше обводка, как у карточек в блоке */
 .cabinet-premium .cabinet-sidebar-profile {
   border-width: 0.5px;
@@ -3798,6 +3824,21 @@ html:not([data-theme="dark"])
   -webkit-text-fill-color: #8e8e8e;
 }
 
+/* Светлая тема: поля ввода админки — белый фон и тёмный текст (перебивают Tailwind в admin-surface-classes) */
+html:not([data-theme="dark"]) .admin-panel input,
+html:not([data-theme="dark"]) .admin-panel textarea {
+  background: #ffffff !important;
+  color: #111111 !important;
+  border: 1px solid #b5b5b5 !important;
+  -webkit-text-fill-color: #111111;
+  caret-color: #111111;
+}
+html:not([data-theme="dark"]) .admin-panel input::placeholder,
+html:not([data-theme="dark"]) .admin-panel textarea::placeholder {
+  color: #5a5a5a !important;
+  -webkit-text-fill-color: #5a5a5a;
+}
+
 /* ЛК / админка: автозаполнение — как обычные поля (#363636), без жёлтой подложки */
 [data-theme="dark"] .cabinet-premium input:-webkit-autofill,
 [data-theme="dark"] .cabinet-premium input:-webkit-autofill:hover,
@@ -3834,7 +3875,19 @@ html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-compe
 html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) textarea:-webkit-autofill:hover,
 html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) textarea:-webkit-autofill:focus,
 html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) input:autofill,
-html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) textarea:autofill,
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) textarea:autofill {
+  background-color: #363636 !important;
+  background-image: none !important;
+  color: #ffffff !important;
+  border: 1px solid #5c5c5c !important;
+  -webkit-text-fill-color: #ffffff !important;
+  caret-color: #ffffff;
+  box-shadow: 0 0 0 1000px #363636 inset !important;
+  filter: none !important;
+  transition: background-color 99999s ease-out 0s !important;
+}
+
+/* Светлая тема: автозаполнение в админке — как белые поля ввода */
 html:not([data-theme="dark"]) .admin-panel input:-webkit-autofill,
 html:not([data-theme="dark"]) .admin-panel input:-webkit-autofill:hover,
 html:not([data-theme="dark"]) .admin-panel input:-webkit-autofill:focus,
@@ -3843,13 +3896,13 @@ html:not([data-theme="dark"]) .admin-panel textarea:-webkit-autofill:hover,
 html:not([data-theme="dark"]) .admin-panel textarea:-webkit-autofill:focus,
 html:not([data-theme="dark"]) .admin-panel input:autofill,
 html:not([data-theme="dark"]) .admin-panel textarea:autofill {
-  background-color: #363636 !important;
+  background-color: #ffffff !important;
   background-image: none !important;
-  color: #ffffff !important;
-  border: 1px solid #5c5c5c !important;
-  -webkit-text-fill-color: #ffffff !important;
-  caret-color: #ffffff;
-  box-shadow: 0 0 0 1000px #363636 inset !important;
+  color: #111111 !important;
+  border: 1px solid #b5b5b5 !important;
+  -webkit-text-fill-color: #111111 !important;
+  caret-color: #111111;
+  box-shadow: 0 0 0 1000px #ffffff inset !important;
   filter: none !important;
   transition: background-color 99999s ease-out 0s !important;
 }

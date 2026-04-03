@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useTipSettlementConfirmation } from "@/lib/hooks/use-tip-settlement-confirmation";
 import Link from "next/link";
+import Image from "next/image";
 import { CheckCircle2, XCircle, Loader2, User } from "lucide-react";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -426,9 +427,12 @@ export default function PayPageClient() {
           <span className="min-w-0" aria-hidden />
           <div className="pay-page-logo-wrap flex justify-center">
             {branding?.logoUrl ? (
-              <img
+              <Image
                 src={branding.logoUrl}
                 alt=""
+                width={120}
+                height={40}
+                unoptimized
                 className="h-10 w-auto max-w-[120px] object-contain"
                 style={{ opacity: branding?.logoOpacityPercent != null ? branding.logoOpacityPercent / 100 : 1 }}
               />
@@ -455,9 +459,12 @@ export default function PayPageClient() {
             <div className="pay-page-recipient-bordered">
               <div className="pay-page-recipient-profile">
                 {recipientPhotoUrl ? (
-                  <img
+                  <Image
                     src={recipientPhotoUrl}
                     alt=""
+                    width={56}
+                    height={56}
+                    unoptimized
                     className="pay-page-recipient-avatar h-14 w-14 shrink-0 rounded-full object-cover bg-[var(--pay-page-accent)]/15"
                   />
                 ) : (
@@ -472,7 +479,14 @@ export default function PayPageClient() {
             </div>
             {qrDataUrl && (
               <div className="pay-page-recipient-qr shrink-0 flex items-center">
-                <img src={qrDataUrl} alt="QR страницы" className="rounded-lg bg-[var(--pay-page-card-bg)] shadow-[0_2px_8px_rgba(0,0,0,0.12)]" width={64} height={64} />
+                <Image
+                  src={qrDataUrl}
+                  alt="QR страницы"
+                  width={64}
+                  height={64}
+                  unoptimized
+                  className="rounded-lg bg-[var(--pay-page-card-bg)] shadow-[0_2px_8px_rgba(0,0,0,0.12)]"
+                />
               </div>
             )}
           </div>

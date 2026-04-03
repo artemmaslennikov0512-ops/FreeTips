@@ -26,6 +26,7 @@ import { PAYOUT_MAX_AMOUNT_KOP, PAYOUT_MIN_AMOUNT_KOP } from "@/lib/payout-amoun
 import { formatDate, formatMoneyCompact } from "@/lib/utils";
 import { PremiumCard } from "@/app/cabinet/PremiumCard";
 import { ADMIN_BTN, ADMIN_BTN_DANGER, ADMIN_BTN_PRIMARY } from "@/lib/admin-button-classes";
+import { ADMIN_PANEL_STATE_CENTER } from "@/lib/admin-surface-classes";
 import { getAccessToken } from "@/lib/auth-client";
 import { beginCabinetImpersonation } from "@/lib/cabinet-impersonation";
 
@@ -622,26 +623,26 @@ export default function AdminUserDetailsPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="text-white/90">Загрузка...</div>
+      <div className={ADMIN_PANEL_STATE_CENTER}>
+        <div className="text-center text-white/90">Загрузка…</div>
       </div>
     );
   }
 
   if (error || !data) {
     return (
-      <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="text-white/90">{error || "Ошибка загрузки"}</div>
+      <div className={ADMIN_PANEL_STATE_CENTER}>
+        <div className="max-w-md text-center text-white/90">{error || "Ошибка загрузки"}</div>
       </div>
     );
   }
 
   return (
     <div id="admin-user-detail" className="min-w-0 max-w-full">
-      <div className="mb-6 flex flex-col items-center gap-3">
+      <div className="mb-6 mx-auto flex w-full max-w-[360px] flex-col gap-3">
         <Link
           href="/admin/users"
-          className={`cabinet-section-header ${ADMIN_BTN} admin-btn--neutral self-start gap-2 px-3 py-2 text-sm`}
+          className={`cabinet-section-header ${ADMIN_BTN} admin-btn--neutral w-fit gap-2 px-3 py-2 text-sm`}
         >
           <ArrowLeft className="h-4 w-4" />
           Назад
@@ -682,12 +683,12 @@ export default function AdminUserDetailsPage() {
             {data.user.isBlocked ? (
               <>
                 <Unlock className="h-4 w-4" />
-                {blockLoading ? "Загрузка..." : "Разблокировать пользователя"}
+                {blockLoading ? "Загрузка…" : "Разблокировать пользователя"}
               </>
             ) : (
               <>
                 <Lock className="h-4 w-4" />
-                {blockLoading ? "Загрузка..." : "Заблокировать пользователя"}
+                {blockLoading ? "Загрузка…" : "Заблокировать пользователя"}
               </>
             )}
           </button>

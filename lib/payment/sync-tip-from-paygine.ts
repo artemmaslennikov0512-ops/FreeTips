@@ -7,7 +7,8 @@ import { TransactionStatus } from "@prisma/client";
 import { db } from "@/lib/db";
 import { getPaygineConfig } from "@/lib/config";
 import { getOrderStatus, isPaygineOrderPaidInOrderResponse } from "@/lib/payment/paygine/client";
-import { runRelocateForTransaction } from "@/lib/payment/paygine-gateway";
+import { runRelocateQueued } from "@/lib/payment/relocate-queue";
+import { RELOCATE_CLAIM_STALE_MS } from "@/lib/payment/relocate-constants";
 import { logInfo } from "@/lib/logger";
 
 export type SyncTipFromPaygineOptions = {
@@ -109,7 +110,7 @@ export async function syncTipTransactionFromPaygine(
         paygineOrderState: orderState,
         paygineOperationState: operationState ?? null,
       });
-      await runRelocateForTransaction(txId);
+      await runRelocateQueued(txId);
       const updated = await db.transaction.findUnique({
         where: { id: txId },
         select: { status: true },
@@ -129,7 +130,7 @@ export async function syncTipTransactionFromPaygine(
           orderId,
           paygineOrderState: orderState,
           paygineOperationState: operationState ?? null,
-          hint: "Проверьте логи payment.relocate.* и payment.webhook.relocate_failed; при залипшем relocate сброс через 15 мин",
+          hint: `Проверьте логи payment.relocate.* и payment.webhook.relocate_failed; при залипшем claim сброс relocateStartedAt через ${Math.round(RELOCATE_CLAIM_STALE_MS / 60_000)} мин при следующем runRelocate`,
         });
       }
       return {

@@ -12,7 +12,7 @@ import { getBaseUrlFromRequest } from "@/lib/get-base-url";
 import { logError, logSecurity } from "@/lib/logger";
 import { getRequestId } from "@/lib/security/request";
 import {
-  getClientIP,
+  getClientIpAndRateLimitKey,
   checkRateLimitByIP,
   checkRateLimitByKey,
   PAY_RATE_LIMIT_IP,
@@ -139,7 +139,7 @@ export async function GET(request: NextRequest, { params }: Params) {
 
 export async function POST(request: NextRequest, { params }: Params) {
   const requestId = getRequestId(request);
-  const ip = getClientIP(request);
+  const { ip, rateLimitKey } = getClientIpAndRateLimitKey(request);
   const { slug } = await params;
 
   if (DEMO_SLUG && slug === DEMO_SLUG) {
@@ -149,7 +149,7 @@ export async function POST(request: NextRequest, { params }: Params) {
     );
   }
 
-  const rateLimitIp = await checkRateLimitByIP(ip, PAY_RATE_LIMIT_IP);
+  const rateLimitIp = await checkRateLimitByIP(rateLimitKey, PAY_RATE_LIMIT_IP);
   if (!rateLimitIp.allowed) {
     logSecurity("pay.init.rate_limit_ip", { requestId, ip, slug });
     return rateLimit429Response(rateLimitIp);

@@ -133,6 +133,28 @@ export function getPaygineRelocateRetryMs(): number {
   return Number.isFinite(n) && n > 0 ? n : 8_000;
 }
 
+/**
+ * Лимит POST на URL вебхука Paygine с одного IP (окно 1 мин).
+ * @see lib/middleware/rate-limit.ts
+ */
+export function getWebhookRateLimitPerMinute(): number {
+  const raw = process.env.WEBHOOK_RATE_LIMIT_MAX?.trim();
+  if (!raw) return 600;
+  const n = parseInt(raw, 10);
+  return Number.isFinite(n) && n >= 30 ? Math.min(n, 20_000) : 600;
+}
+
+/**
+ * Сколько переливов Paygine может выполняться параллельно (очередь после вебхука).
+ * С REDIS_URL — глобально между инстансами (ключ Redis).
+ */
+export function getPaygineRelocateQueueConcurrency(): number {
+  const raw = process.env.PAYGINE_RELOCATE_QUEUE_CONCURRENCY?.trim();
+  if (!raw) return 4;
+  const n = parseInt(raw, 10);
+  return Number.isFinite(n) && n >= 1 && n <= 32 ? n : 4;
+}
+
 /** Сброс кэша (для тестов). */
 export function resetConfigCache(): void {
   parsed = null;

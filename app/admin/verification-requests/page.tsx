@@ -12,7 +12,6 @@ import {
   ADMIN_BTN,
   ADMIN_BTN_DANGER,
   ADMIN_BTN_NEUTRAL_SM,
-  ADMIN_BTN_SM,
   ADMIN_BTN_SUCCESS,
 } from "@/lib/admin-button-classes";
 import {
@@ -220,7 +219,7 @@ export default function AdminVerificationRequestsPage() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `${type}.${type === "passport_main" ? "jpg" : "jpg"}`;
+      a.download = `${type}.jpg`;
       a.click();
       URL.revokeObjectURL(url);
     } finally {
@@ -249,7 +248,7 @@ export default function AdminVerificationRequestsPage() {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col items-center gap-3 text-center">
-        <h1 className="font-[family:var(--font-playfair)] text-xl font-semibold text-white">
+        <h1 className="text-center font-[family:var(--font-playfair)] text-xl font-semibold text-white sm:text-2xl">
           Заявки
         </h1>
         <AdminRequestsMainTabs

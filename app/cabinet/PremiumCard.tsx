@@ -90,15 +90,15 @@ export function PremiumCard({ fullName, balanceKop, compact, variant = "default"
         {!compact &&
           (isM5 ? (
             <>
-              <h2 className="text-xl font-bold text-[var(--color-text)]">Виртуальная карта</h2>
-              <p className="text-sm text-[var(--color-muted)] text-center max-w-[320px]">
+              <h2 className="text-center text-xl font-bold text-[var(--color-text)]">Виртуальная карта</h2>
+              <p className="max-w-[320px] text-center text-sm text-[var(--color-muted)]">
                 Виртуальная карта в стиле BMW M5 Competition
               </p>
             </>
           ) : (
             <>
-              <h2 className="text-xl font-bold text-[var(--color-on-navy)]">FreeTips Premium Service</h2>
-              <p className="text-sm text-[var(--color-muted)]">Виртуальная премиальная карта в черно-белом стиле</p>
+              <h2 className="text-center text-xl font-bold text-[var(--color-on-navy)]">FreeTips Premium Service</h2>
+              <p className="max-w-[320px] text-center text-sm text-[var(--color-muted)]">Виртуальная премиальная карта в чёрно-белом стиле</p>
             </>
           ))}
         <div className={`premium-card${isM5 ? " premium-card--m5" : ""}`}>

@@ -110,7 +110,6 @@ export function CustomDropdown({
         aria-expanded={open}
         aria-labelledby={label && id ? `${id}-label` : undefined}
         aria-describedby={describedBy}
-        aria-activedescendant={open && value ? `${id}-option-${value}` : undefined}
       >
         <span className="min-w-0 truncate">{displayLabel}</span>
         <ChevronDown className={`h-5 w-5 shrink-0 transition-transform duration-200 ${open ? "rotate-180" : ""}`} aria-hidden />

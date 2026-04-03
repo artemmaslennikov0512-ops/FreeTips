@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Users, TrendingUp, Send, DollarSign, ShieldAlert, Activity } from "lucide-react";
 import { formatMoneyCompact } from "@/lib/utils";
+import { ADMIN_PANEL_STATE_CENTER } from "@/lib/admin-surface-classes";
 
 interface Stats {
   usersCount: number;
@@ -84,16 +85,16 @@ export default function AdminDashboardPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="text-white/90">Загрузка...</div>
+      <div className={ADMIN_PANEL_STATE_CENTER}>
+        <div className="text-center text-white/90">Загрузка…</div>
       </div>
     );
   }
 
   if (error || !stats) {
     return (
-      <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="text-white/90">{error || "Ошибка загрузки"}</div>
+      <div className={ADMIN_PANEL_STATE_CENTER}>
+        <div className="max-w-md text-center text-white/90">{error || "Ошибка загрузки"}</div>
       </div>
     );
   }

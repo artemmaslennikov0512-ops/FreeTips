@@ -8,13 +8,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { getPaymentGateway } from "@/lib/payment/stub-gateway";
 import { logError, logInfo, logSecurity } from "@/lib/logger";
 import { getRequestId } from "@/lib/security/request";
-import { getClientIP, checkRateLimitByIP, WEBHOOK_RATE_LIMIT } from "@/lib/middleware/rate-limit";
+import { checkRateLimitByIP, getClientIpAndRateLimitKey, getWebhookRateLimitOptions } from "@/lib/middleware/rate-limit";
 import { readTextWithLimit, MAX_BODY_SIZE_WEBHOOK } from "@/lib/api/helpers";
 
 export async function POST(request: NextRequest) {
   const requestId = getRequestId(request);
-  const ip = getClientIP(request);
-  const rateLimit = await checkRateLimitByIP(ip, WEBHOOK_RATE_LIMIT);
+  const { ip, rateLimitKey } = getClientIpAndRateLimitKey(request);
+  const rateLimit = await checkRateLimitByIP(rateLimitKey, getWebhookRateLimitOptions());
   if (!rateLimit.allowed) {
     logSecurity("payment.webhook.rate_limit", { requestId, ip });
     return NextResponse.json({ error: "Too many requests" }, { status: 429 });

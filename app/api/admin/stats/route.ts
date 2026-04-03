@@ -9,6 +9,8 @@ import { requireRole } from "@/lib/middleware/auth";
 import { db } from "@/lib/db";
 import { LK_PRESENCE_WINDOW_MS } from "@/lib/lk-presence";
 import { PAYOUT_DAILY_LIMIT_COUNT, PAYOUT_DAILY_LIMIT_KOP } from "@/lib/payout-limits";
+import { getRelocateStuckMonitoring } from "@/lib/payment/relocate-stuck-queries";
+import { RELOCATE_CLAIM_STALE_MS, RELOCATE_CLAIM_ALERT_AFTER_MS } from "@/lib/payment/relocate-constants";
 import { z } from "zod";
 
 const periodSchema = z.enum(["all", "day", "week"]);
@@ -48,6 +50,7 @@ export async function GET(request: NextRequest) {
     sampleMonthlyLimitsUser,
     sampleAutoConfirmUser,
     fraudUsers30d,
+    relocateStuck,
   ] = await Promise.all([
     db.user.count({ where: { role: { not: "SUPERADMIN" } } }),
     db.user.count({
@@ -94,6 +97,7 @@ export async function GET(request: NextRequest) {
       by: ["userId"],
       where: { createdAt: { gte: thirtyDaysAgo } },
     }),
+    getRelocateStuckMonitoring(),
   ]);
 
   const defaults = systemDefaultLimits;
@@ -126,5 +130,9 @@ export async function GET(request: NextRequest) {
           : null,
     /** Уникальные пользователи со сигналом антифрода за 30 дней (наблюдение) */
     fraudFlaggedUsers30d: fraudUsers30d.length,
+    paymentRelocateStuckClaimCount: relocateStuck.stuckCount,
+    paymentRelocateStuckClaimSample: relocateStuck.sampleJson,
+    paymentRelocateStaleClaimResetMs: RELOCATE_CLAIM_STALE_MS,
+    paymentRelocateAlertAfterClaimMs: RELOCATE_CLAIM_ALERT_AFTER_MS,
   });
 }

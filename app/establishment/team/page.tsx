@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import Image from "next/image";
 import { Plus, Copy, RefreshCw, FileDown, Mail, Pencil, Upload, ImageIcon } from "lucide-react";
 import { authHeaders } from "@/lib/auth-client";
 
@@ -416,7 +417,14 @@ export default function EstablishmentTeamPage() {
                   <p className="text-xs text-white/70 mb-2">Показывается на странице оплаты и в сайдбаре официанта. Рекомендуемое разрешение: не менее 200×200 px. Форматы: JPEG, PNG, WebP.</p>
                   <div className="flex items-center gap-3 flex-wrap">
                     {editEmployee.photoUrl && (
-                      <img src={editEmployee.photoUrl} alt="" className="h-12 w-12 rounded-full object-cover border border-[var(--color-brand-gold)]/20" />
+                      <Image
+                        src={editEmployee.photoUrl}
+                        alt=""
+                        width={48}
+                        height={48}
+                        unoptimized
+                        className="h-12 w-12 rounded-full object-cover border border-[var(--color-brand-gold)]/20"
+                      />
                     )}
                     <label className="inline-flex items-center gap-2 rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-sm text-white cursor-pointer hover:bg-[var(--color-dark-gray)]/20">
                       <Upload className="h-4 w-4" />
@@ -440,7 +448,14 @@ export default function EstablishmentTeamPage() {
                   <p className="text-xs text-white/70 mb-2">Только для карточки при печати PDF. Рекомендуемое разрешение: не менее 150×150 px. Форматы: JPEG, PNG (WebP в PDF не выводится).</p>
                   <div className="flex items-center gap-3 flex-wrap">
                     {editEmployee.printCardPhotoUrl && (
-                      <img src={editEmployee.printCardPhotoUrl} alt="" className="h-12 w-12 rounded-full object-cover border border-[var(--color-brand-gold)]/20" />
+                      <Image
+                        src={editEmployee.printCardPhotoUrl}
+                        alt=""
+                        width={48}
+                        height={48}
+                        unoptimized
+                        className="h-12 w-12 rounded-full object-cover border border-[var(--color-brand-gold)]/20"
+                      />
                     )}
                     <label className="inline-flex items-center gap-2 rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-sm text-white cursor-pointer hover:bg-[var(--color-dark-gray)]/20">
                       <ImageIcon className="h-4 w-4" />

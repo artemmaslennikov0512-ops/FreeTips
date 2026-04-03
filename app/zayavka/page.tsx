@@ -179,7 +179,7 @@ export default function ZayavkaPage() {
         <div className="zayavka-page mx-auto flex min-h-[80vh] max-w-md flex-col justify-center overflow-visible px-4 py-16">
           <div className={`${AUTH_CARD_CLASS} zayavka-card text-center`}>
             <h1 className="text-center font-[family:var(--font-playfair)] text-2xl font-semibold text-[var(--color-text)]">
-              Спасибо за оставление заявки
+              Спасибо, заявка отправлена
             </h1>
             <p className="mt-3 text-center text-[var(--color-text-secondary)]">
               Ожидайте, с вами свяжутся в рабочие часы.
@@ -214,16 +214,16 @@ export default function ZayavkaPage() {
       <div className="zayavka-page mx-auto flex min-h-[80vh] max-w-md flex-col justify-center overflow-visible px-4 py-16">
         <div className={`${AUTH_CARD_CLASS} zayavka-card min-w-0 overflow-visible`}>
           <h1 className="font-[family:var(--font-playfair)] text-2xl font-semibold text-[var(--color-text)] text-center">Оставить заявку</h1>
-          <p className="mt-2 text-[var(--color-text-secondary)]">
+          <p className="mt-2 text-center text-[var(--color-text-secondary)]">
             {step === 1
               ? "Сначала укажите тип подключения и контактные данные."
               : "Заполните данные о заведении и контакте для подтверждения."}
           </p>
 
           {/* Индикатор шагов */}
-          <div className="mt-4 flex items-center gap-2" aria-label="Прогресс формы">
-            <span className="text-sm font-medium text-[var(--color-muted)]">Шаг {step} из 2</span>
-            <div className="flex-1 h-1.5 rounded-full bg-[var(--color-light-gray)] overflow-hidden">
+          <div className="mt-4 flex w-full flex-col items-center gap-2 sm:flex-row sm:items-center" aria-label="Прогресс формы">
+            <span className="w-full text-center text-sm font-medium text-[var(--color-muted)] sm:w-auto sm:shrink-0 sm:text-left">Шаг {step} из 2</span>
+            <div className="h-1.5 w-full min-w-0 flex-1 rounded-full bg-[var(--color-light-gray)] overflow-hidden">
               <div
                 className="h-full rounded-full bg-[var(--color-brand-gold)] transition-all duration-300"
                 style={{ width: step === 1 ? "50%" : "100%" }}
@@ -258,7 +258,6 @@ export default function ZayavkaPage() {
                         aria-expanded={requestTypeDropdownOpen}
                         aria-labelledby="zayavka-requestType-label"
                         aria-describedby="zayavka-requestType-desc"
-                        aria-activedescendant={requestTypeDropdownOpen ? `zayavka-requestType-option-${formData.requestType}` : undefined}
                       >
                         <Building2 className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--color-muted)] pointer-events-none shrink-0" aria-hidden />
                         <span className="flex-1 min-w-0">
@@ -379,7 +378,7 @@ export default function ZayavkaPage() {
                       />
                     </div>
                     {fieldErrors.email && <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{fieldErrors.email}</p>}
-                    <p className="zayavka-hint mt-1 text-center text-[var(--color-muted)]">На неё будет выслана ссылка для регистрации после одобрения заявки</p>
+                    <p className="zayavka-hint mt-1 text-center text-[var(--color-muted)]">На этот адрес мы отправим ссылку для регистрации после одобрения заявки.</p>
                   </div>
                 </section>
 
@@ -397,11 +396,11 @@ export default function ZayavkaPage() {
               <>
                 {isEstablishment ? (
                   <section className="space-y-4" aria-labelledby="zayavka-company-heading">
-                    <h2 id="zayavka-company-heading" className="text-sm font-semibold text-[var(--color-text)] border-0 pb-2">
+                    <h2 id="zayavka-company-heading" className="border-0 pb-2 text-center text-sm font-semibold text-[var(--color-text)]">
                       Данные о компании
                     </h2>
                     <div>
-                      <label htmlFor="zayavka-companyName" className="mb-1.5 block text-sm font-medium text-[var(--color-text)]">Название компании</label>
+                      <label htmlFor="zayavka-companyName" className="mb-1.5 block text-center text-sm font-medium text-[var(--color-text)]">Название компании</label>
                       <div className="relative">
                         <Building2 className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--color-muted)]" />
                         <input
@@ -416,7 +415,7 @@ export default function ZayavkaPage() {
                       {fieldErrors.companyName && <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{fieldErrors.companyName}</p>}
                     </div>
                     <div>
-                      <label htmlFor="zayavka-companyRole" className="mb-1.5 block text-sm font-medium text-[var(--color-text)]">Роль в компании (кто оставляет заявку)</label>
+                      <label htmlFor="zayavka-companyRole" className="mb-1.5 block text-center text-sm font-medium text-[var(--color-text)]">Роль в компании (кто подаёт заявку)</label>
                       <div className="relative">
                         <User className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--color-muted)]" />
                         <input
@@ -431,7 +430,7 @@ export default function ZayavkaPage() {
                       {fieldErrors.companyRole && <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{fieldErrors.companyRole}</p>}
                     </div>
                     <div>
-                      <label htmlFor="zayavka-employeeCount" className="mb-1.5 block text-sm font-medium text-[var(--color-text)]">Количество сотрудников</label>
+                      <label htmlFor="zayavka-employeeCount" className="mb-1.5 block text-center text-sm font-medium text-[var(--color-text)]">Количество сотрудников</label>
                       <div className="relative">
                         <Users className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--color-muted)]" />
                         <input

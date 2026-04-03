@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { verifyAccessToken, type TokenPayload } from "@/lib/auth/jwt";
 import { getUserRepository } from "@/lib/infrastructure/user-repository";
 import { touchUserLastSeenThrottled } from "@/lib/user-last-seen-touch";
+import { logWarn } from "@/lib/logger";
 
 /**
  * Middleware для проверки JWT access token
@@ -61,7 +62,12 @@ export async function requireAuth(
 
   // Присутствие в ЛК: любой успешный Bearer-запрос продлевает lastSeenAt (тот же троттлинг, что heartbeat).
   // Фоновые вкладки: опросы API тоже учитываются. X-API-Key здесь не проходит — только JWT.
-  await touchUserLastSeenThrottled(payload.userId).catch(() => {});
+  await touchUserLastSeenThrottled(payload.userId).catch((err) => {
+    logWarn("auth.requireAuth.last_seen_touch_failed", {
+      userId: payload.userId,
+      error: err instanceof Error ? err.message : String(err),
+    });
+  });
 
   return { user: payload };
 }

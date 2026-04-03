@@ -14,6 +14,7 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
+import Image from "next/image";
 import type { LucideIcon } from "lucide-react";
 import { LogOut, Menu, User, BadgeCheck, Building2 } from "lucide-react";
 import { CABINET_WAITER_BTN } from "@/lib/cabinet-button-classes";
@@ -185,7 +186,14 @@ export function CabinetMobileNavPortals() {
           >
             <div className="flex items-center gap-2.5">
               {user?.employeePhotoUrl ? (
-                <img src={user.employeePhotoUrl} alt="" className="h-9 w-9 shrink-0 rounded-full object-cover bg-[var(--color-brand-gold)]" />
+                <Image
+                  src={user.employeePhotoUrl}
+                  alt=""
+                  width={36}
+                  height={36}
+                  unoptimized
+                  className="h-9 w-9 shrink-0 rounded-full object-cover bg-[var(--color-brand-gold)]"
+                />
               ) : (
                 <div
                   className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--color-brand-gold)] ${isM5Cabinet ? "text-white" : "text-[#0a192f]"}`}

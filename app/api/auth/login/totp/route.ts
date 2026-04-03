@@ -7,7 +7,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { loginTotpSchema } from "@/lib/validations";
 import { generateAccessToken, generateRefreshToken, setRefreshTokenCookie, verifyTwoFactorPendingToken } from "@/lib/auth/jwt";
-import { checkRateLimitByIP, getClientIP, AUTH_TOTP_VERIFY_RATE_LIMIT } from "@/lib/middleware/rate-limit";
+import { checkRateLimitByIP, getClientIpAndRateLimitKey, AUTH_TOTP_VERIFY_RATE_LIMIT } from "@/lib/middleware/rate-limit";
 import { logError, logSecurity } from "@/lib/logger";
 import { getRequestId } from "@/lib/security/request";
 import { parseJsonWithLimit, MAX_BODY_SIZE_AUTH, jsonError, internalError, rateLimit429Response, zodErrorResponse } from "@/lib/api/helpers";
@@ -19,9 +19,9 @@ import { buildNewSessionMetadata } from "@/lib/auth-session-metadata";
 
 export async function POST(request: NextRequest) {
   const requestId = getRequestId(request);
-  const ip = getClientIP(request);
+  const { ip, rateLimitKey } = getClientIpAndRateLimitKey(request);
   try {
-    const rateLimit = await checkRateLimitByIP(ip, AUTH_TOTP_VERIFY_RATE_LIMIT);
+    const rateLimit = await checkRateLimitByIP(rateLimitKey, AUTH_TOTP_VERIFY_RATE_LIMIT);
     if (!rateLimit.allowed) return rateLimit429Response(rateLimit);
     if (!verifyCsrfFromRequest(request)) {
       return jsonError(403, "Некорректный CSRF токен");
@@ -34,6 +34,10 @@ export async function POST(request: NextRequest) {
     const pending = await verifyTwoFactorPendingToken(validated.twoFactorToken);
     if (!pending) {
       logSecurity("auth.login.totp.invalid_pending_token", { requestId, ip });
+      return jsonError(401, "Сессия подтверждения истекла. Войдите снова.");
+    }
+    if (pending.purpose !== "login_2fa_pending") {
+      logSecurity("auth.login.totp.wrong_pending_purpose", { requestId, ip, purpose: pending.purpose });
       return jsonError(401, "Сессия подтверждения истекла. Войдите снова.");
     }
 

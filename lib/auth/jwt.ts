@@ -29,9 +29,15 @@ export interface TokenPayload extends JWTPayload {
   impersonatorUserId?: string;
 }
 
-/** Одноразовый шаг после пароля, до выдачи сессии (TOTP) */
+/**
+ * Назначение одноразового JWT между паролем и выдачей сессии.
+ * `login_2fa_pending` — публичный вход (/api/auth/login → /api/auth/login/totp).
+ * `admin_2fa_pending` — зарезервировано под отдельный админский поток (не принимать на login/totp).
+ */
+export type TwoFactorPendingPurpose = "login_2fa_pending" | "admin_2fa_pending";
+
 export interface TwoFactorPendingPayload extends JWTPayload {
-  purpose: "login_2fa_pending";
+  purpose: TwoFactorPendingPurpose;
   userId: string;
   login: string;
   role: string;
@@ -124,6 +130,9 @@ export async function generateTwoFactorPendingToken(
     .sign(getJWTSecretKey());
 }
 
+/**
+ * Проверяет pending-JWT для 2FA. Допустимы оба purpose; маршрут входа в ЛК должен дополнительно требовать только `login_2fa_pending`.
+ */
 export async function verifyTwoFactorPendingToken(token: string): Promise<TwoFactorPendingPayload | null> {
   try {
     const { payload } = await jwtVerify(token, getJWTSecretKey(), { algorithms: ["HS256"] });

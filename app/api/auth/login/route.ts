@@ -14,7 +14,7 @@ import {
   generateTwoFactorPendingToken,
   setRefreshTokenCookie,
 } from "@/lib/auth/jwt";
-import { checkRateLimitByIP, getClientIP, AUTH_RATE_LIMIT } from "@/lib/middleware/rate-limit";
+import { checkRateLimitByIP, getClientIpAndRateLimitKey, AUTH_RATE_LIMIT } from "@/lib/middleware/rate-limit";
 import { logError, logSecurity } from "@/lib/logger";
 import { getRequestId } from "@/lib/security/request";
 import { parseJsonWithLimit, MAX_BODY_SIZE_AUTH, jsonError, internalError, rateLimit429Response, zodErrorResponse } from "@/lib/api/helpers";
@@ -31,9 +31,9 @@ import { buildNewSessionMetadata } from "@/lib/auth-session-metadata";
 
 export async function POST(request: NextRequest) {
   const requestId = getRequestId(request);
-  const ip = getClientIP(request);
+  const { ip, rateLimitKey } = getClientIpAndRateLimitKey(request);
   try {
-    const rateLimit = await checkRateLimitByIP(ip, AUTH_RATE_LIMIT);
+    const rateLimit = await checkRateLimitByIP(rateLimitKey, AUTH_RATE_LIMIT);
     if (!rateLimit.allowed) return rateLimit429Response(rateLimit);
     if (!verifyCsrfFromRequest(request)) {
       return jsonError(403, "Некорректный CSRF токен");

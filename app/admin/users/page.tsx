@@ -15,6 +15,7 @@ import {
   ADMIN_BTN_PRIMARY,
   ADMIN_BTN_SM,
 } from "@/lib/admin-button-classes";
+import { ADMIN_PANEL_STATE_CENTER } from "@/lib/admin-surface-classes";
 
 interface User {
   id: string;
@@ -297,14 +298,18 @@ export default function AdminUsersPage() {
 
   if (loading && users.length === 0) {
     return (
-      <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="text-[var(--color-muted)]">Загрузка...</div>
+      <div className={ADMIN_PANEL_STATE_CENTER}>
+        <div className="text-center text-[var(--color-muted)]">Загрузка…</div>
       </div>
     );
   }
 
   return (
     <div className="min-w-0 max-w-full">
+      <div className="mb-6 flex flex-col items-center gap-1 text-center sm:mb-8">
+        <h1 className="font-[family:var(--font-playfair)] text-xl font-semibold text-white sm:text-2xl">Пользователи</h1>
+        <p className="max-w-lg text-sm text-white/75">Поиск по логину, email и платёжной ссылке (slug).</p>
+      </div>
       {error && (
         <div className="mb-6 rounded-xl border-0 bg-[var(--color-light-gray)] px-4 py-3 text-sm text-[var(--color-text)]">
           {error}

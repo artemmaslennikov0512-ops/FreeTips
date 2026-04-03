@@ -6,6 +6,7 @@ import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { CustomDropdown } from "@/components/CustomDropdown";
 import { formatDate, formatMoneyCompact } from "@/lib/utils";
 import { ADMIN_BTN, ADMIN_BTN_DANGER, ADMIN_BTN_NEUTRAL_SM, ADMIN_BTN_PRIMARY, ADMIN_BTN_SM } from "@/lib/admin-button-classes";
+import { ADMIN_PANEL_STATE_CENTER } from "@/lib/admin-surface-classes";
 
 interface Payout {
   id: string;
@@ -163,23 +164,27 @@ export default function AdminPayoutsPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="text-slate-400">Загрузка...</div>
+      <div className={ADMIN_PANEL_STATE_CENTER}>
+        <div className="text-center text-slate-400">Загрузка…</div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="text-[var(--color-text)]">{error}</div>
+      <div className={ADMIN_PANEL_STATE_CENTER}>
+        <div className="max-w-md text-center text-[var(--color-text)]">{error}</div>
       </div>
     );
   }
 
   return (
     <div className="min-w-0 max-w-full">
-      <div className="mb-6 w-full max-w-xs">
+      <div className="mb-6 flex flex-col items-center gap-1 text-center sm:mb-8">
+        <h1 className="font-[family:var(--font-playfair)] text-xl font-semibold text-white sm:text-2xl">Заявки на вывод</h1>
+        <p className="max-w-lg text-sm text-white/75">Статусы, ручная отметка и отправка выплат в Paygine.</p>
+      </div>
+      <div className="mb-6 w-full max-w-xs sm:mx-0 mx-auto">
         <CustomDropdown
           id="admin-payouts-status"
           variant="admin"

@@ -34,6 +34,9 @@ export const ADMIN_PANEL_CARD_NARROW =
 
 export const ADMIN_PANEL_INPUT = `mx-auto max-w-md ${FIELD_BASE} text-left`;
 
+/** Однострочное поле на всю ширину карточки (формы со списками и т.п.). */
+export const ADMIN_PANEL_INPUT_FULL_WIDTH = `mx-auto w-full ${FIELD_BASE} text-left`;
+
 export const ADMIN_PANEL_INPUT_OTP =
   `${ADMIN_PANEL_INPUT} text-center text-lg tracking-[0.35em] pl-[0.35em]`;
 
@@ -49,3 +52,9 @@ export const ADMIN_PANEL_ALERT_ERR =
 /** Предупреждение (например сохранено с неизвестными логинами). */
 export const ADMIN_PANEL_ALERT_WARN =
   "rounded-xl border border-amber-400/50 bg-amber-950/40 px-4 py-3 text-sm text-amber-50";
+
+/** Обёртка для экранов «загрузка» / «ошибка» по центру страницы админки. */
+export const ADMIN_PANEL_STATE_CENTER = "flex min-h-[60vh] items-center justify-center px-4";
+
+/** То же, с меньшей минимальной высотой (короткие секции вроде списков настроек). */
+export const ADMIN_PANEL_STATE_CENTER_COMPACT = "flex min-h-[50vh] items-center justify-center px-4";

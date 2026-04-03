@@ -7,6 +7,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireRole } from "@/lib/middleware/auth";
 import { db } from "@/lib/db";
+import { LK_PRESENCE_WINDOW_MS } from "@/lib/lk-presence";
 import { PAYOUT_DAILY_LIMIT_COUNT, PAYOUT_DAILY_LIMIT_KOP } from "@/lib/payout-limits";
 import { z } from "zod";
 
@@ -34,9 +35,11 @@ export async function GET(request: NextRequest) {
         : {};
 
   const thirtyDaysAgo = new Date(now.getTime() - 30 * MS_PER_DAY);
+  const lkFreshAfter = new Date(now.getTime() - LK_PRESENCE_WINDOW_MS);
 
   const [
     usersCount,
+    usersActiveInLkCount,
     transactionsCount,
     transactionsSum,
     payoutsPendingCount,
@@ -47,6 +50,12 @@ export async function GET(request: NextRequest) {
     fraudUsers30d,
   ] = await Promise.all([
     db.user.count({ where: { role: { not: "SUPERADMIN" } } }),
+    db.user.count({
+      where: {
+        role: { not: "SUPERADMIN" },
+        lastSeenAt: { gt: lkFreshAfter },
+      },
+    }),
     db.transaction.count({
       where: dateFilter.gte ? { createdAt: dateFilter } : undefined,
     }),
@@ -91,6 +100,8 @@ export async function GET(request: NextRequest) {
 
   return NextResponse.json({
     usersCount,
+    /** Сейчас в ЛК: lastSeenAt свежее окна LK_PRESENCE_WINDOW_MS (без SUPERADMIN) */
+    usersActiveInLkCount,
     transactionsCount,
     transactionsSumKop: Number(transactionsSum._sum.amountKop ?? BigInt(0)),
     payoutsPendingCount,

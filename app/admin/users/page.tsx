@@ -1,12 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useState } from "react";
 import { Search, Copy, Filter, ArrowUpDown, Lock, Check, RefreshCw } from "lucide-react";
 import Link from "next/link";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { CustomDropdown } from "@/components/CustomDropdown";
 import { getBaseUrl } from "@/lib/get-base-url";
-import { formatDate, formatMoneyCompact } from "@/lib/utils";
+import { formatDate, formatMoneyCompact, formatRelativeTimeAgo } from "@/lib/utils";
+import { LK_PRESENCE_WINDOW_MS } from "@/lib/lk-presence";
 import {
   ADMIN_BTN,
   ADMIN_BTN_DANGER,
@@ -23,6 +24,9 @@ interface User {
   role: string;
   createdAt: string;
   isBlocked: boolean;
+  tipSlugs: string[];
+  lastSeenAt: string | null;
+  activeInLk: boolean;
   stats: {
     balanceKop: number;
     totalReceivedKop: number;
@@ -38,6 +42,56 @@ interface UsersResponse {
   offset: number;
 }
 
+function lkPresenceTitle(user: User): string {
+  const winMin = Math.max(1, Math.round(LK_PRESENCE_WINDOW_MS / 60000));
+  if (user.activeInLk) {
+    return `Была активность в ЛК за последние ${winMin} мин: загрузка ЛК, возврат на вкладку или запрос к API с JWT. Пока не прошло ${winMin} мин с последней записи, в БД снова не пишем. Это не сессия входа — из кабинета выход только по «Выйти».`;
+  }
+  if (user.lastSeenAt) {
+    return `За последние ${winMin} мин не было запросов к ЛК и не было захода/возврата на вкладку. Последняя активность: ${formatDate(user.lastSeenAt, { includeYear: true })} (${formatRelativeTimeAgo(user.lastSeenAt)}).`;
+  }
+  return "В ЛК ещё не заходил с включёнными пингами (старые аккаунты до обновления) или нет записи активности.";
+}
+
+function LkPresenceDot({ online }: { online: boolean }) {
+  return (
+    <span
+      className={
+        online
+          ? "h-2.5 w-2.5 shrink-0 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(34,197,94,0.55)]"
+          : "h-2.5 w-2.5 shrink-0 rounded-full bg-red-500 shadow-[0_0_6px_rgba(239,68,68,0.45)]"
+      }
+      aria-hidden
+    />
+  );
+}
+
+function LkPresenceCell({ user }: { user: User }) {
+  const title = lkPresenceTitle(user);
+  if (user.activeInLk) {
+    return (
+      <span className="inline-flex max-w-[9rem] items-center gap-2 text-emerald-400" title={title}>
+        <LkPresenceDot online />
+        <span className="text-xs font-medium">В ЛК</span>
+      </span>
+    );
+  }
+  if (user.lastSeenAt) {
+    return (
+      <span className="inline-flex max-w-[9rem] items-center gap-2 text-white/65" title={title}>
+        <LkPresenceDot online={false} />
+        <span className="truncate text-xs">{formatRelativeTimeAgo(user.lastSeenAt)}</span>
+      </span>
+    );
+  }
+  return (
+    <span className="inline-flex items-center gap-2 text-white/40" title={title}>
+      <LkPresenceDot online={false} />
+      <span className="text-xs">—</span>
+    </span>
+  );
+}
+
 export default function AdminUsersPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
@@ -45,6 +99,7 @@ export default function AdminUsersPage() {
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState("");
   const [blockedFilter, setBlockedFilter] = useState("");
+  const [lkActiveFilter, setLkActiveFilter] = useState("");
   const [sortBy, setSortBy] = useState("createdAt");
   const [sortOrder, setSortOrder] = useState("desc");
   const [updatingId, setUpdatingId] = useState<string | null>(null);
@@ -65,6 +120,7 @@ export default function AdminUsersPage() {
       if (search) qp.set("search", search);
       if (roleFilter) qp.set("role", roleFilter);
       if (blockedFilter) qp.set("blocked", blockedFilter);
+      if (lkActiveFilter === "true" || lkActiveFilter === "false") qp.set("lkActive", lkActiveFilter);
       if (sortBy) qp.set("sortBy", sortBy);
       if (sortOrder) qp.set("sortOrder", sortOrder);
       const qs = qp.toString();
@@ -85,7 +141,12 @@ export default function AdminUsersPage() {
     } finally {
       setLoading(false);
     }
-  }, [search, roleFilter, blockedFilter, sortBy, sortOrder]);
+  }, [search, roleFilter, blockedFilter, lkActiveFilter, sortBy, sortOrder]);
+
+  useLayoutEffect(() => {
+    const v = new URLSearchParams(window.location.search).get("lkActive");
+    if (v === "true" || v === "false") setLkActiveFilter(v);
+  }, []);
 
   useEffect(() => {
     const timer = setTimeout(() => void fetchUsers(), 300);
@@ -365,6 +426,20 @@ export default function AdminUsersPage() {
             ]}
           />
         </div>
+        <div className="min-w-[11rem]">
+          <CustomDropdown
+            id="admin-users-lk-active"
+            variant="admin"
+            value={lkActiveFilter}
+            onChange={setLkActiveFilter}
+            placeholder="В ЛК сейчас"
+            options={[
+              { value: "", label: "Все" },
+              { value: "true", label: "Сейчас в ЛК" },
+              { value: "false", label: "Не в ЛК" },
+            ]}
+          />
+        </div>
         <div className="flex items-center gap-2">
           <ArrowUpDown className="h-4 w-4 text-white/80" />
           <div className="min-w-[10rem]">
@@ -391,10 +466,16 @@ export default function AdminUsersPage() {
             {sortOrder === "desc" ? "↓ Убыв." : "↑ Возр."}
           </button>
         </div>
-        {(roleFilter || blockedFilter || sortBy !== "createdAt" || sortOrder !== "desc") && (
+        {(roleFilter || blockedFilter || lkActiveFilter || sortBy !== "createdAt" || sortOrder !== "desc") && (
           <button
             type="button"
-            onClick={() => { setRoleFilter(""); setBlockedFilter(""); setSortBy("createdAt"); setSortOrder("desc"); }}
+            onClick={() => {
+              setRoleFilter("");
+              setBlockedFilter("");
+              setLkActiveFilter("");
+              setSortBy("createdAt");
+              setSortOrder("desc");
+            }}
             className={`cabinet-section-header ${ADMIN_BTN} ${ADMIN_BTN_SM} admin-btn--neutral`}
           >
             Сбросить
@@ -421,7 +502,15 @@ export default function AdminUsersPage() {
                 </Link>
                 <span className="shrink-0 text-xs font-mono text-white/70">#{user.uniqueId}</span>
               </div>
+              <div className="flex items-center justify-between gap-2 text-sm">
+                <span className="text-white/60">В ЛК</span>
+                <LkPresenceCell user={user} />
+              </div>
               <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
+                <span className="text-white/60">Slug /pay/…</span>
+                <span className="min-w-0 font-mono text-xs text-white/90 break-all" title={user.tipSlugs.join(", ") || undefined}>
+                  {user.tipSlugs.length ? user.tipSlugs.join(", ") : "—"}
+                </span>
                 <span className="text-white/60">Email</span>
                 <span className="min-w-0 truncate text-white/90" title={user.email || undefined}>{user.email || "—"}</span>
                 <span className="text-white/60">Роль</span>
@@ -450,11 +539,13 @@ export default function AdminUsersPage() {
 
       {/* Десктоп: таблица с горизонтальным скроллом */}
       <div className="admin-users-table cabinet-section-header overflow-x-auto rounded-xl border-0 max-lg:hidden">
-        <table className="w-full min-w-[900px]">
+        <table className="w-full min-w-[1120px]">
           <thead className="border-0 bg-[var(--color-brand-gold)]">
             <tr>
               <th className="whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">ID</th>
               <th className="whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">Логин</th>
+              <th className="whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">Slug (/pay/…)</th>
+              <th className="whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">В ЛК</th>
               <th className="whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">Email</th>
               <th className="whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">Роль</th>
               <th className="whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">Баланс</th>
@@ -468,7 +559,7 @@ export default function AdminUsersPage() {
           <tbody>
             {sortedUsers.length === 0 ? (
               <tr>
-                <td colSpan={10} className="px-4 py-8 text-center text-white/90">
+                <td colSpan={12} className="px-4 py-8 text-center text-white/90">
                   Пользователей не найдено
                 </td>
               </tr>
@@ -483,6 +574,15 @@ export default function AdminUsersPage() {
                     >
                       {user.login}
                     </Link>
+                  </td>
+                  <td
+                    className="max-w-[200px] min-w-[100px] truncate px-4 py-3 font-mono text-sm text-white/90"
+                    title={user.tipSlugs.length ? user.tipSlugs.join(", ") : undefined}
+                  >
+                    {user.tipSlugs.length ? user.tipSlugs.join(", ") : "—"}
+                  </td>
+                  <td className="min-w-[7.5rem] whitespace-nowrap px-4 py-3">
+                    <LkPresenceCell user={user} />
                   </td>
                   <td className="min-w-[140px] max-w-[180px] truncate px-4 py-3 text-sm text-white/90" title={user.email || undefined}>{user.email || "—"}</td>
                   <td className="whitespace-nowrap px-4 py-3">{getRoleBadge(user.role)}</td>

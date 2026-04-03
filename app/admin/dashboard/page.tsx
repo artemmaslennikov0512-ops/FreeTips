@@ -2,11 +2,13 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Users, TrendingUp, Send, DollarSign, ShieldAlert } from "lucide-react";
+import { Users, TrendingUp, Send, DollarSign, ShieldAlert, Activity } from "lucide-react";
 import { formatMoneyCompact } from "@/lib/utils";
+import { LK_PRESENCE_WINDOW_MS } from "@/lib/lk-presence";
 
 interface Stats {
   usersCount: number;
+  usersActiveInLkCount: number;
   transactionsCount: number;
   transactionsSumKop: number;
   payoutsPendingCount: number;
@@ -42,8 +44,12 @@ export default function AdminDashboardPage() {
           return;
         }
 
-        const data = await res.json();
-        setStats(data);
+        const data = (await res.json()) as Stats;
+        setStats({
+          ...data,
+          usersActiveInLkCount:
+            typeof data.usersActiveInLkCount === "number" ? data.usersActiveInLkCount : 0,
+        });
       } catch {
         setError("Ошибка загрузки статистики");
       } finally {
@@ -85,6 +91,8 @@ export default function AdminDashboardPage() {
     );
   }
 
+  const presenceWinMin = Math.max(1, Math.round(LK_PRESENCE_WINDOW_MS / 60000));
+
   if (error || !stats) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
@@ -93,8 +101,23 @@ export default function AdminDashboardPage() {
     );
   }
 
-  const cards = [
+  const onlineCount = stats.usersActiveInLkCount;
+
+  const cards: {
+    title: string;
+    value: string;
+    icon: typeof Users;
+    href?: string;
+    onlineAccent?: boolean;
+  }[] = [
     { title: "Пользователей", value: stats.usersCount.toLocaleString("ru-RU"), icon: Users },
+    {
+      title: "Сейчас в ЛК",
+      value: onlineCount.toLocaleString("ru-RU"),
+      icon: Activity,
+      href: "/admin/users?lkActive=true",
+      onlineAccent: true,
+    },
     { title: "Транзакций", value: stats.transactionsCount.toLocaleString("ru-RU"), icon: TrendingUp },
     { title: "Сумма транзакций", value: formatMoneyCompact(stats.transactionsSumKop), icon: DollarSign },
     { title: "Заявок на вывод", value: stats.payoutsPendingCount.toLocaleString("ru-RU"), icon: Send },
@@ -141,20 +164,59 @@ export default function AdminDashboardPage() {
       <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
         {cards.map((card) => {
           const Icon = card.icon;
-          return (
+          const body = (
             <div
-              key={card.title}
-              className="admin-dashboard-card cabinet-section-header rounded-2xl border-0 p-6"
+              className={
+                card.onlineAccent
+                  ? "admin-dashboard-card cabinet-section-header rounded-2xl border border-emerald-500/25 bg-emerald-950/20 p-6 shadow-[0_0_24px_-8px_rgba(16,185,129,0.25)]"
+                  : "admin-dashboard-card cabinet-section-header rounded-2xl border-0 p-6"
+              }
             >
-              <div className="flex items-center justify-between">
-                <div>
+              <div className="flex items-center justify-between gap-3">
+                <div className="min-w-0">
                   <p className="text-sm font-medium text-white/90">{card.title}</p>
-                  <p className="mt-2 text-xl font-bold text-white">{card.value}</p>
+                  <p
+                    className={
+                      card.onlineAccent
+                        ? "mt-2 text-xl font-bold tabular-nums text-emerald-300"
+                        : "mt-2 text-xl font-bold text-white"
+                    }
+                  >
+                    {card.value}
+                  </p>
+                  {card.onlineAccent && (
+                    <p className="mt-1 text-xs text-white/55">
+                      Активность за последние {presenceWinMin} мин — открыть список
+                    </p>
+                  )}
                 </div>
-                <div className="rounded-xl bg-white/20 p-3">
-                  <Icon className="h-6 w-6 text-[var(--color-brand-gold)]" />
+                <div
+                  className={
+                    card.onlineAccent
+                      ? "shrink-0 rounded-xl bg-emerald-500/20 p-3 ring-1 ring-emerald-400/30"
+                      : "shrink-0 rounded-xl bg-white/20 p-3"
+                  }
+                >
+                  <Icon
+                    className={
+                      card.onlineAccent ? "h-6 w-6 text-emerald-400" : "h-6 w-6 text-[var(--color-brand-gold)]"
+                    }
+                  />
                 </div>
               </div>
+            </div>
+          );
+          return card.href ? (
+            <Link
+              key={card.title}
+              href={card.href}
+              className="block min-w-0 transition-opacity hover:opacity-95"
+            >
+              {body}
+            </Link>
+          ) : (
+            <div key={card.title} className="min-w-0">
+              {body}
             </div>
           );
         })}

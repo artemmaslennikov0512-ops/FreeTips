@@ -3,12 +3,12 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, UserRound, Wallet, TrendingUp, Send, ListChecks, Clock, Sliders, Copy, Key, RotateCw, Lock, Unlock, ShieldCheck } from "lucide-react";
+import { ArrowLeft, UserRound, Wallet, TrendingUp, Send, ListChecks, Clock, Sliders, Copy, Key, RotateCw, Lock, Unlock, ShieldCheck, ShieldOff } from "lucide-react";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { PAYOUT_MAX_AMOUNT_KOP, PAYOUT_MIN_AMOUNT_KOP } from "@/lib/payout-amount-bounds";
 import { formatDate, formatMoneyCompact } from "@/lib/utils";
 import { PremiumCard } from "@/app/cabinet/PremiumCard";
-import { ADMIN_BTN, ADMIN_BTN_PRIMARY } from "@/lib/admin-button-classes";
+import { ADMIN_BTN, ADMIN_BTN_DANGER, ADMIN_BTN_PRIMARY } from "@/lib/admin-button-classes";
 
 interface Transaction {
   id: string;
@@ -93,6 +93,7 @@ export default function AdminUserDetailsPage() {
   const [blockLoading, setBlockLoading] = useState(false);
   const [blockError, setBlockError] = useState<string | null>(null);
   const [verifyLoading, setVerifyLoading] = useState(false);
+  const [unverifyLoading, setUnverifyLoading] = useState(false);
   const [verifyError, setVerifyError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -533,6 +534,43 @@ export default function AdminUserDetailsPage() {
     }
   };
 
+  const handleUnverify = async () => {
+    if (!userId) return;
+    if (!window.confirm("Снять верификацию с этого пользователя?")) return;
+    const token = localStorage.getItem("accessToken");
+    if (!token) return;
+    setUnverifyLoading(true);
+    setVerifyError(null);
+    try {
+      const res = await fetch(`/api/admin/users/${userId}/unverify`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+          ...getCsrfHeader(),
+        },
+      });
+      const respData = await res.json();
+      if (!res.ok) {
+        setVerifyError((respData as { error?: string }).error ?? "Ошибка");
+        setUnverifyLoading(false);
+        return;
+      }
+      setData((prev) =>
+        prev
+          ? {
+              ...prev,
+              user: { ...prev.user, verificationStatus: "NONE", verificationRejectionReason: null },
+            }
+          : null,
+      );
+    } catch {
+      setVerifyError("Ошибка соединения");
+    } finally {
+      setUnverifyLoading(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
@@ -572,11 +610,11 @@ export default function AdminUserDetailsPage() {
         </div>
         {blockError && <p className="text-sm text-white/90">{blockError}</p>}
         {verifyError && <p className="text-sm text-white/90">{verifyError}</p>}
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex w-full max-w-full flex-wrap items-center justify-center gap-3">
           <button
             type="button"
             onClick={handleBlockToggle}
-            disabled={blockLoading}
+            disabled={blockLoading || unverifyLoading || verifyLoading}
             className={`${ADMIN_BTN} ${ADMIN_BTN_PRIMARY} gap-2 px-4 py-2.5 text-sm disabled:opacity-50`}
           >
             {data.user.isBlocked ? (
@@ -595,7 +633,7 @@ export default function AdminUserDetailsPage() {
             <button
               type="button"
               onClick={handleManualVerify}
-              disabled={verifyLoading}
+              disabled={verifyLoading || unverifyLoading}
               className={`${ADMIN_BTN} gap-2 px-4 py-2.5 text-sm disabled:opacity-50`}
             >
               <ShieldCheck className="h-4 w-4" />
@@ -603,10 +641,21 @@ export default function AdminUserDetailsPage() {
             </button>
           )}
           {data.user.verificationStatus === "VERIFIED" && (
-            <span className="inline-flex items-center gap-2 rounded-xl border border-green-500/50 bg-green-500/10 px-4 py-2.5 text-sm font-medium text-green-400">
-              <ShieldCheck className="h-4 w-4" />
-              Верифицирован
-            </span>
+            <>
+              <span className="inline-flex items-center gap-2 rounded-xl border border-green-500/50 bg-green-500/10 px-4 py-2.5 text-sm font-medium text-green-400">
+                <ShieldCheck className="h-4 w-4" />
+                Верифицирован
+              </span>
+              <button
+                type="button"
+                onClick={handleUnverify}
+                disabled={unverifyLoading || verifyLoading || blockLoading}
+                className={`${ADMIN_BTN} ${ADMIN_BTN_DANGER} gap-2 px-4 py-2.5 text-sm disabled:opacity-50`}
+              >
+                <ShieldOff className="h-4 w-4" />
+                {unverifyLoading ? "Сохранение..." : "Снять верификацию"}
+              </button>
+            </>
           )}
         </div>
       </div>

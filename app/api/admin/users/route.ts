@@ -1,5 +1,6 @@
 /**
  * GET /api/admin/users — список пользователей (поиск по login/email/slug).
+ * Query: lkActive=true|false — фильтр по присутствию в ЛК (lastSeenAt за окно LK_PRESENCE_WINDOW_MS).
  * Требует: Authorization: Bearer <access_token>
  * GET: роль SUPERADMIN
  */
@@ -9,6 +10,7 @@ import { requireRole } from "@/lib/middleware/auth";
 import { db } from "@/lib/db";
 import { UserRole } from "@prisma/client";
 import { parseLimitOffset } from "@/lib/api/helpers";
+import { isActiveInLk, LK_PRESENCE_WINDOW_MS } from "@/lib/lk-presence";
 
 const SEARCH_MAX_LENGTH = 100;
 
@@ -32,9 +34,12 @@ export async function GET(request: NextRequest) {
 
   const roleFilter = searchParams.get("role");
   const blockedFilter = searchParams.get("blocked");
+  const lkActiveFilter = searchParams.get("lkActive");
   const sortBy = searchParams.get("sortBy") ?? "createdAt";
   const sortOrder = searchParams.get("sortOrder") === "asc" ? "asc" : "desc";
 
+  const now = new Date();
+  const lkFreshAfter = new Date(now.getTime() - LK_PRESENCE_WINDOW_MS);
   const validRoles = ["RECIPIENT", "ADMIN", "ESTABLISHMENT_ADMIN", "EMPLOYEE"] as const;
   const baseWhere: Record<string, unknown> = { role: { not: UserRole.SUPERADMIN } };
 
@@ -46,31 +51,46 @@ export async function GET(request: NextRequest) {
   } else if (blockedFilter === "false") {
     baseWhere.isBlocked = false;
   }
+  if (lkActiveFilter === "true") {
+    baseWhere.lastSeenAt = { gt: lkFreshAfter };
+  }
 
-  const where = search
-    ? {
-        ...baseWhere,
-        OR: [
-          { login: { contains: search, mode: "insensitive" as const } },
-          { email: { contains: search, mode: "insensitive" as const } },
-          {
-            tipLinks: {
-              some: { slug: { contains: search, mode: "insensitive" as const } },
-            },
-          },
-          {
-            employeeProfile: {
-              qrCodeIdentifier: { contains: search, mode: "insensitive" as const },
-            },
-          },
-          {
-            establishmentRelation: {
-              uniqueSlug: { contains: search, mode: "insensitive" as const },
-            },
-          },
-        ],
-      }
-    : baseWhere;
+  const searchOr = [
+    { login: { contains: search, mode: "insensitive" as const } },
+    { email: { contains: search, mode: "insensitive" as const } },
+    {
+      tipLinks: {
+        some: { slug: { contains: search, mode: "insensitive" as const } },
+      },
+    },
+    {
+      employeeProfile: {
+        qrCodeIdentifier: { contains: search, mode: "insensitive" as const },
+      },
+    },
+    {
+      establishmentRelation: {
+        uniqueSlug: { contains: search, mode: "insensitive" as const },
+      },
+    },
+  ];
+
+  const lkAbsentClause = {
+    OR: [{ lastSeenAt: null }, { lastSeenAt: { lte: lkFreshAfter } }],
+  };
+
+  let where: Record<string, unknown>;
+  if (search) {
+    if (lkActiveFilter === "false") {
+      where = { ...baseWhere, AND: [{ OR: searchOr }, lkAbsentClause] };
+    } else {
+      where = { ...baseWhere, OR: searchOr };
+    }
+  } else if (lkActiveFilter === "false") {
+    where = { ...baseWhere, ...lkAbsentClause };
+  } else {
+    where = baseWhere;
+  }
 
   const [users, total, txAgg, payoutPendingAgg, payoutCompletedAgg] = await Promise.all([
     db.user.findMany({
@@ -83,6 +103,11 @@ export async function GET(request: NextRequest) {
         role: true,
         createdAt: true,
         isBlocked: true,
+        lastSeenAt: true,
+        tipLinks: {
+          select: { slug: true },
+          orderBy: { createdAt: "asc" },
+        },
       },
       orderBy: { [sortBy === "login" ? "login" : "createdAt"]: sortOrder },
       take: limit,
@@ -137,6 +162,9 @@ export async function GET(request: NextRequest) {
         role: u.role,
         isBlocked: u.isBlocked,
         createdAt: u.createdAt.toISOString(),
+        tipSlugs: u.tipLinks.map((t) => t.slug),
+        lastSeenAt: u.lastSeenAt?.toISOString() ?? null,
+        activeInLk: isActiveInLk(u.lastSeenAt, now),
         stats: {
           balanceKop: Number(balance),
           totalReceivedKop: Number(tx.receivedKop),

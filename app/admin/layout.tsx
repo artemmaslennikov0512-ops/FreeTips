@@ -15,6 +15,7 @@ import {
   FileCheck,
   CreditCard,
   KeyRound,
+  Laptop,
 } from "lucide-react";
 import { getAccessToken, fetchWithAuth, clearAccessToken } from "@/lib/auth-client";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
@@ -23,6 +24,7 @@ import { AdminMobileNavPortal } from "@/components/admin/AdminMobileNavPortal";
 import { ADMIN_REQUESTS_COUNTS_CHANGED } from "@/lib/admin-requests-counts-sync";
 import { ADMIN_BTN, ADMIN_BTN_PRIMARY } from "@/lib/admin-button-classes";
 import { usePanelMobileMenu } from "@/components/PanelMobileMenuContext";
+import { LkPresenceHeartbeat } from "@/components/LkPresenceHeartbeat";
 
 interface User {
   id: string;
@@ -42,6 +44,7 @@ const NAV: { label: string; href: string; icon: LucideIcon; iconClass: string }[
   { label: "Антифрод", href: "/admin/antifraud", icon: ShieldCheck, iconClass: "!text-rose-400" },
   { label: "Приём по ссылкам", href: "/admin/payment-accept", icon: CreditCard, iconClass: "!text-[var(--color-brand-gold)]" },
   { label: "Безопасность (2FA)", href: "/admin/security", icon: KeyRound, iconClass: "!text-amber-300" },
+  { label: "Сессии", href: "/admin/sessions", icon: Laptop, iconClass: "!text-slate-300" },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -193,6 +196,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <div className="admin-panel cabinet-premium flex min-h-screen w-full min-w-0 max-w-full bg-[var(--color-bg)] font-[family:var(--font-inter)] text-[var(--color-text)] pt-3 lg:pt-6">
+      <LkPresenceHeartbeat />
       <AdminMobileNavPortal
         sidebarOpen={sidebarOpen}
         closeSidebar={closeSidebar}

@@ -12,6 +12,22 @@ export function formatDate(iso: string, opts?: { includeYear?: boolean }): strin
   }).format(new Date(iso));
 }
 
+/** Человекочитаемое «N мин назад» для lastSeenAt в админке. */
+export function formatRelativeTimeAgo(iso: string): string {
+  const diffSec = Math.max(0, Math.floor((Date.now() - new Date(iso).getTime()) / 1000));
+  if (diffSec < 45) return "только что";
+  const rtf = new Intl.RelativeTimeFormat("ru", { numeric: "auto" });
+  const min = Math.floor(diffSec / 60);
+  if (min < 60) return rtf.format(-min, "minute");
+  const hours = Math.floor(min / 60);
+  if (hours < 36) return rtf.format(-hours, "hour");
+  const days = Math.floor(hours / 24);
+  if (days < 30) return rtf.format(-days, "day");
+  const months = Math.floor(days / 30);
+  if (months < 24) return rtf.format(-months, "month");
+  return rtf.format(-Math.floor(days / 365), "year");
+}
+
 /**
  * Значение для input[type=date] (только yyyy-mm-dd). API может отдать ISO с временем или иной формат строки.
  */

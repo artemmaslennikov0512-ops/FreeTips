@@ -15,6 +15,7 @@ import { verifyCsrfFromRequest } from "@/lib/security/csrf";
 import { z } from "zod";
 import { verifyTotpWithEncryptedSecret } from "@/lib/auth/user-totp";
 import { observeSharedAuthIp } from "@/lib/fraud-velocity-observe";
+import { buildNewSessionMetadata } from "@/lib/auth-session-metadata";
 
 export async function POST(request: NextRequest) {
   const requestId = getRequestId(request);
@@ -89,11 +90,15 @@ export async function POST(request: NextRequest) {
 
     await setRefreshTokenCookie(refreshToken);
 
+    const meta = await buildNewSessionMetadata(request, ip);
+    const fromMeta = JSON.parse(meta.deviceInfo) as { ip?: string; userAgent?: string };
     await db.session.create({
       data: {
         userId: user.id,
         refreshToken,
-        deviceInfo: JSON.stringify({ ip, totp: true }),
+        deviceInfo: JSON.stringify({ ...fromMeta, totp: true }),
+        geoCountry: meta.geoCountry,
+        geoCity: meta.geoCity,
         expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
       },
     });

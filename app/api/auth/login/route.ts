@@ -27,6 +27,7 @@ import {
   recordWrongPasswordAttempt,
   WRONG_PASSWORD_ATTEMPTS_BEFORE_SIGNAL,
 } from "@/lib/login-wrong-password-tracker";
+import { buildNewSessionMetadata } from "@/lib/auth-session-metadata";
 
 export async function POST(request: NextRequest) {
   const requestId = getRequestId(request);
@@ -111,12 +112,15 @@ export async function POST(request: NextRequest) {
     // Сохраняем refresh token в cookie
     await setRefreshTokenCookie(refreshToken);
 
+    const meta = await buildNewSessionMetadata(request, ip);
     // Создаём сессию
     await db.session.create({
       data: {
         userId: user.id,
         refreshToken,
-        deviceInfo: JSON.stringify({ ip }),
+        deviceInfo: meta.deviceInfo,
+        geoCountry: meta.geoCountry,
+        geoCity: meta.geoCity,
         expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 дней
       },
     });

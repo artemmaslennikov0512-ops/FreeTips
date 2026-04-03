@@ -1,0 +1,13 @@
+---
+description: Поверхности админки — без перекрытий темы и дублирования классов
+globs: app/admin/**/*.tsx,lib/admin-surface-classes.ts
+alwaysApply: false
+---
+
+# Админка: карточки и поля в `#main-content`
+
+- Для новых страниц в `app/admin/` используй **`@/lib/admin-surface-classes`**: `ADMIN_PANEL_PAGE_WIDE` / `ADMIN_PANEL_PAGE_NARROW`, `ADMIN_PANEL_CARD`, `ADMIN_PANEL_INPUT`, `ADMIN_PANEL_TEXTAREA`, алерты. Не копируй длинные цепочки Tailwind в каждый файл.
+- **Не задавай фон блоков** через `bg-[var(--color-navy)]` или `bg-[var(--color-dark-gray)]` внутри админского контента: в `[data-theme="dark"]` эти переменные в `:root` становятся **светлыми**, блок визуально «ломается».
+- Карточки секций — класс **`cabinet-section-header`** (уже стилизован в `globals.css` под светлую/тёмную тему сайта внутри админки).
+- Глобальные правила `.admin-panel input, textarea` с `!important` остаются; поля из `admin-surface-classes` с ними согласованы (тот же `#363636`, светлый текст). Если нужен другой вид — лучше отдельный модификатор/класс-обёртка, чем борьба `!` в JSX.
+- Кнопки — **`@/lib/admin-button-classes`** + классы из `globals` (`.admin-btn`). Для залитой деструктивной кнопки, если outline `.admin-btn--danger` не подходит, используй отдельный Tailwind-блок **без** смешения несовместимых `admin-btn--*` модификаторов.

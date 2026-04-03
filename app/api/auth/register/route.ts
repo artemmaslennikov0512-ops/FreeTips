@@ -20,6 +20,7 @@ import { getRequestId } from "@/lib/security/request";
 import { parseJsonWithLimit, MAX_BODY_SIZE_AUTH, jsonError, internalError, rateLimit429Response, zodErrorResponse } from "@/lib/api/helpers";
 import { verifyCsrfFromRequest } from "@/lib/security/csrf";
 import { observeSharedAuthIp } from "@/lib/fraud-velocity-observe";
+import { buildNewSessionMetadata } from "@/lib/auth-session-metadata";
 
 export async function POST(request: NextRequest) {
   const requestId = getRequestId(request);
@@ -123,11 +124,14 @@ export async function POST(request: NextRequest) {
 
     await setRefreshTokenCookie(refreshToken);
 
+    const meta = await buildNewSessionMetadata(request, ip);
     await db.session.create({
       data: {
         userId: user.id,
         refreshToken,
-        deviceInfo: JSON.stringify({ ip }),
+        deviceInfo: meta.deviceInfo,
+        geoCountry: meta.geoCountry,
+        geoCity: meta.geoCity,
         expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
       },
     });

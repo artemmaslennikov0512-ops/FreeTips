@@ -76,6 +76,8 @@ model User {
   /** TOTP (Google Authenticator) для любого ЛК: секрет в БД только в зашифрованном виде */
   totpEnabled    Boolean   @default(false)
   totpSecretEnc  String?   @db.Text
+  /** Последний пинг из ЛК (кабинет / админка / кабинет заведения); для админки — «сейчас в ЛК» по окну lk-presence */
+  lastSeenAt        DateTime?
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
 
@@ -101,6 +103,7 @@ model User {
   @@index([apiKeyPrefix])
   @@index([establishmentId])
   @@index([lastAuthIp])
+  @@index([lastSeenAt])
   @@map("users")
 }
 
@@ -123,6 +126,10 @@ model Session {
   userId     String
   refreshToken String @unique @db.VarChar(512)
   deviceInfo String?  @db.Text // JSON: {ip, userAgent, deviceId?}
+  /** Последняя активность по refresh (продление токена) */
+  lastSeenAt DateTime @default(now())
+  geoCountry String?  @db.VarChar(128)
+  geoCity    String?  @db.VarChar(128)
   expiresAt  DateTime
   createdAt  DateTime @default(now())
 

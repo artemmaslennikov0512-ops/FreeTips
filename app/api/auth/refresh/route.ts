@@ -93,6 +93,7 @@ export async function POST(request: NextRequest) {
       data: {
         refreshToken: newRefreshToken,
         expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // обновляем срок
+        lastSeenAt: new Date(),
       },
     });
 

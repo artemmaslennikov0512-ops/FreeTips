@@ -3,12 +3,15 @@
 import { useEffect, useState } from "react";
 import { CreditCard, Loader2 } from "lucide-react";
 import { ADMIN_BTN, ADMIN_BTN_PRIMARY } from "@/lib/admin-button-classes";
+import {
+  ADMIN_PANEL_ALERT_OK,
+  ADMIN_PANEL_ALERT_WARN,
+  ADMIN_PANEL_CARD,
+  ADMIN_PANEL_PAGE_WIDE,
+  ADMIN_PANEL_TEXTAREA,
+} from "@/lib/admin-surface-classes";
 
-const CARD =
-  "rounded-2xl border border-white/15 bg-white/[0.06] p-6 text-[var(--color-text)] shadow-[var(--shadow-card)]";
 const BTN_PRIMARY = `${ADMIN_BTN} ${ADMIN_BTN_PRIMARY} px-5 py-2.5 text-sm disabled:opacity-50`;
-const TEXTAREA =
-  "mt-2 w-full min-h-[120px] rounded-lg border border-[rgba(197,165,114,0.25)] bg-[var(--color-bg-sides)] px-3 py-2 text-sm text-[var(--color-text)] placeholder:text-[var(--color-muted)] focus:outline-none focus:border-[var(--color-brand-gold)] font-mono";
 
 export default function AdminPaymentAcceptPage() {
   const [loading, setLoading] = useState(true);
@@ -115,7 +118,7 @@ export default function AdminPaymentAcceptPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-[50vh] items-center justify-center text-slate-400">
+      <div className="flex min-h-[50vh] items-center justify-center text-white/60">
         <Loader2 className="h-8 w-8 animate-spin" aria-hidden />
       </div>
     );
@@ -123,24 +126,25 @@ export default function AdminPaymentAcceptPage() {
 
   if (loadError) {
     return (
-      <div className="flex min-h-[50vh] items-center justify-center text-[var(--color-text-secondary)]">{loadError}</div>
+      <div className="flex min-h-[50vh] items-center justify-center text-center text-white/80">{loadError}</div>
     );
   }
 
   return (
-    <div className="mx-auto max-w-3xl space-y-6 px-4 py-8">
-      <div className="flex items-start gap-3">
-        <CreditCard className="mt-1 h-8 w-8 shrink-0 text-[var(--color-brand-gold)]" aria-hidden />
-        <div>
-          <h1 className="font-[family:var(--font-playfair)] text-2xl font-semibold text-[var(--color-text)]">
+    <div className={ADMIN_PANEL_PAGE_WIDE}>
+      <div className="flex flex-col items-center gap-3">
+        <CreditCard className="h-9 w-9 shrink-0 text-[var(--color-brand-gold)]" aria-hidden />
+        <div className="max-w-2xl">
+          <h1 className="font-[family:var(--font-playfair)] text-2xl font-semibold text-white">
             Приём по платёжным ссылкам
           </h1>
-          <p className="mt-2 text-sm text-[var(--color-text-secondary)]">
-            Один переключатель отключает новые переводы по всем ссылкам <code className="text-xs">/pay/…</code>, кроме белого списка.
-            Сайт и личные кабинеты продолжают работать. Чёрный список блокирует приём, когда глобальный стоп выключен.
+          <p className="mt-2 text-sm leading-relaxed text-white/80">
+            Один переключатель отключает новые переводы по всем ссылкам{" "}
+            <code className="rounded bg-white/10 px-1 py-0.5 text-xs text-white/90">/pay/…</code>, кроме белого списка. Сайт и
+            личные кабинеты продолжают работать. Чёрный список блокирует приём, когда глобальный стоп выключен.
           </p>
           {updatedAt && (
-            <p className="mt-1 text-xs text-[var(--color-muted)]">Последнее изменение: {new Date(updatedAt).toLocaleString("ru-RU")}</p>
+            <p className="mt-2 text-xs text-white/50">Последнее изменение: {new Date(updatedAt).toLocaleString("ru-RU")}</p>
           )}
         </div>
       </div>
@@ -148,25 +152,21 @@ export default function AdminPaymentAcceptPage() {
       {message && (
         <div
           role="status"
-          className={
-            message.type === "ok"
-              ? "rounded-xl border border-emerald-500/35 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-100"
-              : "rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm text-amber-100"
-          }
+          className={message.type === "ok" ? ADMIN_PANEL_ALERT_OK : ADMIN_PANEL_ALERT_WARN}
         >
           {message.text}
         </div>
       )}
 
-      <div className={CARD}>
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className={ADMIN_PANEL_CARD}>
+        <div className="mx-auto flex max-w-xl flex-col items-center gap-4">
           <div>
-            <p className="font-medium text-[var(--color-text)]">Стоп приёма для всех</p>
-            <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+            <p className="font-medium text-white">Стоп приёма для всех</p>
+            <p className="mt-1 text-sm text-white/75">
               Пока включено — платить могут только аккаунты из белого списка ниже.
             </p>
           </div>
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex flex-wrap items-center justify-center gap-3">
             <button
               type="button"
               role="switch"
@@ -177,24 +177,24 @@ export default function AdminPaymentAcceptPage() {
                 setGlobalOff(next);
                 void save({ globalPaymentsDisabled: next });
               }}
-              className={`relative h-9 w-16 shrink-0 rounded-full transition-colors ${globalOff ? "bg-[var(--color-accent-red)]" : "bg-white/20"} disabled:opacity-50`}
+              className={`relative h-9 w-16 shrink-0 rounded-full transition-colors ${globalOff ? "bg-[var(--color-accent-red)]" : "bg-white/25"} disabled:opacity-50`}
             >
               <span
                 className={`absolute top-1 left-1 h-7 w-7 rounded-full bg-white shadow transition-transform ${globalOff ? "translate-x-7" : "translate-x-0"}`}
               />
             </button>
-            <span className="text-sm font-medium">{globalOff ? "Включён" : "Выключен"}</span>
+            <span className="text-sm font-medium text-white">{globalOff ? "Включён" : "Выключен"}</span>
           </div>
         </div>
       </div>
 
-      <div className={CARD}>
-        <label className="block text-sm font-medium text-[var(--color-text)]">Белый список (логин или id пользователя)</label>
-        <p className="mt-1 text-xs text-[var(--color-text-secondary)]">
+      <div className={ADMIN_PANEL_CARD}>
+        <label className="block text-sm font-medium text-white">Белый список (логин или id пользователя)</label>
+        <p className="mt-1 text-xs text-white/70">
           Имеет смысл при включённом стопе: эти аккаунты продолжают принимать чаевые по ссылкам. По одному на строку или через запятую.
         </p>
         <textarea
-          className={TEXTAREA}
+          className={ADMIN_PANEL_TEXTAREA}
           value={whitelistText}
           onChange={(e) => setWhitelistText(e.target.value)}
           disabled={saving}
@@ -203,13 +203,13 @@ export default function AdminPaymentAcceptPage() {
         />
       </div>
 
-      <div className={CARD}>
-        <label className="block text-sm font-medium text-[var(--color-text)]">Чёрный список (логин или id пользователя)</label>
-        <p className="mt-1 text-xs text-[var(--color-text-secondary)]">
+      <div className={ADMIN_PANEL_CARD}>
+        <label className="block text-sm font-medium text-white">Чёрный список (логин или id пользователя)</label>
+        <p className="mt-1 text-xs text-white/70">
           Когда стоп выключен — эти аккаунты не принимают платежи по ссылке (остальные работают).
         </p>
         <textarea
-          className={TEXTAREA}
+          className={ADMIN_PANEL_TEXTAREA}
           value={blacklistText}
           onChange={(e) => setBlacklistText(e.target.value)}
           disabled={saving}
@@ -218,7 +218,7 @@ export default function AdminPaymentAcceptPage() {
         />
       </div>
 
-      <div className="flex flex-wrap gap-3">
+      <div className="flex flex-wrap justify-center gap-3">
         <button type="button" className={BTN_PRIMARY} disabled={saving} onClick={() => void saveListsAndToggle()}>
           {saving ? (
             <span className="inline-flex items-center gap-2">

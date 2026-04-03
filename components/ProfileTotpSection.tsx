@@ -3,6 +3,14 @@
 import { useCallback, useEffect, useState } from "react";
 import { fetchWithAuth } from "@/lib/auth-client";
 import { ADMIN_BTN, ADMIN_BTN_PRIMARY } from "@/lib/admin-button-classes";
+import {
+  ADMIN_PANEL_ALERT_ERR,
+  ADMIN_PANEL_ALERT_OK,
+  ADMIN_PANEL_CARD_NARROW,
+  ADMIN_PANEL_INPUT,
+  ADMIN_PANEL_INPUT_OTP,
+  ADMIN_PANEL_PAGE_NARROW,
+} from "@/lib/admin-surface-classes";
 import { cabinetInputClassName } from "@/app/cabinet/shared";
 import { CABINET_WAITER_BTN_INLINE } from "@/lib/cabinet-button-classes";
 
@@ -177,6 +185,13 @@ export function ProfileTotpSection({
       ? "flex w-full flex-col gap-2 sm:flex-row"
       : "flex w-full flex-col gap-2 sm:flex-row sm:justify-center";
 
+  const formStackClass =
+    variant === "admin"
+      ? "mx-auto w-full max-w-md space-y-4 text-center"
+      : variant === "establishment"
+        ? "space-y-4 text-center"
+        : "space-y-4";
+
   return (
     <div className={embedded ? undefined : v.outer}>
       {!embedded && (
@@ -204,7 +219,7 @@ export function ProfileTotpSection({
           <h3 className={v.embedTitle}>Двухфакторная аутентификация (2FA)</h3>
         )}
         {enabled ? (
-          <div className="space-y-4">
+          <div className={formStackClass}>
             <p className={v.textMuted}>
               2FA <span className={v.textOk}>включена</span>.
             </p>
@@ -244,7 +259,7 @@ export function ProfileTotpSection({
             </button>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className={formStackClass}>
             {pending && !showQr && <p className={v.textPending}>Настройка начата, но не завершена. Нажмите «Новый QR» или отмените.</p>}
             {showQr && (
               <div className="flex flex-col items-center gap-3">
@@ -318,7 +333,7 @@ function totpDisableButtonClass(variant: ProfileTotpVariant): string {
   if (variant === "establishment") {
     return "w-full rounded-xl bg-[var(--color-brand-gold)] px-4 py-2.5 font-medium text-[#0a192f] hover:opacity-90 disabled:opacity-50";
   }
-  return `${ADMIN_BTN} ${ADMIN_BTN_PRIMARY} w-full justify-center py-2.5`;
+  return "mx-auto flex w-full max-w-md items-center justify-center rounded-full border-2 border-red-400/75 bg-red-600 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-red-500 disabled:cursor-not-allowed disabled:opacity-50";
 }
 
 function totpPrimaryFlexClass(variant: ProfileTotpVariant): string {
@@ -397,24 +412,20 @@ function variantStyles(variant: ProfileTotpVariant) {
       inputOtp: `${input} text-center text-lg tracking-[0.35em]`,
     };
   }
-  const input =
-    "mx-auto w-full max-w-sm rounded-lg border border-white/15 bg-[var(--color-navy)]/50 px-3 py-2 text-center text-sm text-white placeholder:text-white/40 focus:outline-none focus:border-[var(--color-brand-gold)]";
   return {
-    outer: "mx-auto w-full max-w-lg px-4 text-center text-white",
+    outer: ADMIN_PANEL_PAGE_NARROW,
     pageTitle: "font-[family:var(--font-playfair)] text-2xl font-semibold text-white",
-    pageDesc: "mt-2 text-sm text-white/75",
-    embedTitle: "font-[family:var(--font-playfair)] text-lg font-semibold text-[var(--color-text)] mb-4",
-    card:
-      "mt-6 rounded-xl border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/85 p-5 text-center shadow-[var(--shadow-subtle)]",
-    msgOk:
-      "mt-4 rounded-lg border border-[var(--color-accent-emerald)]/40 bg-[var(--color-accent-emerald)]/10 p-3 text-sm text-emerald-100",
-    msgErr: "mt-4 rounded-lg border border-[var(--color-accent-red)]/30 bg-[var(--color-accent-red)]/10 p-3 text-sm text-red-100",
+    pageDesc: "mx-auto mt-2 max-w-xl text-sm leading-relaxed text-white/80",
+    embedTitle: "font-[family:var(--font-playfair)] text-lg font-semibold text-white mb-4",
+    card: ADMIN_PANEL_CARD_NARROW,
+    msgOk: `mt-4 ${ADMIN_PANEL_ALERT_OK}`,
+    msgErr: `mt-4 ${ADMIN_PANEL_ALERT_ERR}`,
     loadErrorWrap: "px-4 text-center text-white/80",
-    textMuted: "text-sm text-white/80",
-    textOk: "font-medium text-emerald-300",
+    textMuted: "text-sm text-white/85",
+    textOk: "font-medium text-emerald-400",
     textPending: "text-sm text-amber-200/90",
-    label: "mb-1 block text-center text-xs font-medium text-white/70",
-    input,
-    inputOtp: `${input} text-lg tracking-[0.35em]`,
+    label: "mb-1 block text-center text-xs font-medium text-white/80",
+    input: ADMIN_PANEL_INPUT,
+    inputOtp: ADMIN_PANEL_INPUT_OTP,
   };
 }

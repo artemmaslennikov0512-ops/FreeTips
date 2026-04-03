@@ -15,6 +15,7 @@ import {
   BadgeCheck,
   Building2,
   User,
+  Laptop,
 } from "lucide-react";
 import { CABINET_WAITER_BTN } from "@/lib/cabinet-button-classes";
 import { getAccessToken, fetchWithAuth, clearAccessToken } from "@/lib/auth-client";
@@ -23,12 +24,14 @@ import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { isCabinetM5CompetitionTheme } from "@/config/cabinet-theme-logins";
 import { CabinetMobileNavProvider, CabinetMobileNavPortals, type CabinetMobileNavContextValue } from "@/components/cabinet/CabinetMobileNav";
 import { usePanelMobileMenu } from "@/components/PanelMobileMenuContext";
+import { LkPresenceHeartbeat } from "@/components/LkPresenceHeartbeat";
 const NAV: { label: string; href: string; icon: LucideIcon; iconClass: string }[] = [
   { label: "Дашборд", href: "/cabinet", icon: LayoutDashboard, iconClass: "!text-sky-400" },
   { label: "Операции", href: "/cabinet/transactions", icon: List, iconClass: "!text-emerald-400" },
   { label: "Моя ссылка", href: "/cabinet/link", icon: Link2, iconClass: "!text-amber-400" },
   { label: "Верификация", href: "/cabinet/verification", icon: ShieldCheck, iconClass: "!text-violet-400" },
   { label: "Поддержка", href: "/cabinet/support", icon: MessageCircle, iconClass: "!text-cyan-400" },
+  { label: "Сессии", href: "/cabinet/sessions", icon: Laptop, iconClass: "!text-slate-300" },
   { label: "Настройки профиля", href: "/cabinet/settings", icon: Settings, iconClass: "!text-orange-400" },
 ];
 
@@ -272,6 +275,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
 
   return (
     <CabinetMobileNavProvider value={mobileNavValue}>
+    <LkPresenceHeartbeat />
     <div
       className={`cabinet-premium flex min-h-screen w-full max-w-full overflow-x-hidden font-[family:var(--font-inter)] text-[var(--color-text)] pt-3 lg:pt-5 ${isM5Cabinet ? "bg-transparent" : "bg-[var(--color-bg)]"}`}
       data-brand-active={applyEstablishmentBrand ? "true" : undefined}

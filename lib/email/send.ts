@@ -4,6 +4,7 @@
  */
 
 import nodemailer from "nodemailer";
+import { messageFromUnknown } from "@/lib/errors";
 
 export interface SendEmailOptions {
   to: string;
@@ -86,7 +87,7 @@ async function sendViaSmtp(options: SendEmailOptions): Promise<SendEmailResult> 
 
     return { ok: true };
   } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
+    const message = messageFromUnknown(err);
     return { ok: false, error: message };
   }
 }

@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { verifyAccessToken, type TokenPayload } from "@/lib/auth/jwt";
 import { getUserRepository } from "@/lib/infrastructure/user-repository";
 import { touchUserLastSeenThrottled } from "@/lib/user-last-seen-touch";
+import { messageFromUnknown } from "@/lib/errors";
 import { logWarn } from "@/lib/logger";
 
 /**
@@ -65,7 +66,7 @@ export async function requireAuth(
   await touchUserLastSeenThrottled(payload.userId).catch((err) => {
     logWarn("auth.requireAuth.last_seen_touch_failed", {
       userId: payload.userId,
-      error: err instanceof Error ? err.message : String(err),
+      error: messageFromUnknown(err),
     });
   });
 

@@ -7,6 +7,7 @@ import { TransactionStatus } from "@prisma/client";
 import { db } from "@/lib/db";
 import { getPaygineConfig } from "@/lib/config";
 import { getOrderStatus, isPaygineOrderPaidInOrderResponse } from "@/lib/payment/paygine/client";
+import { messageFromUnknown } from "@/lib/errors";
 import { runRelocateQueued } from "@/lib/payment/relocate-queue";
 import { RELOCATE_CLAIM_STALE_MS } from "@/lib/payment/relocate-constants";
 import { logInfo } from "@/lib/logger";
@@ -110,7 +111,14 @@ export async function syncTipTransactionFromPaygine(
         paygineOrderState: orderState,
         paygineOperationState: operationState ?? null,
       });
-      await runRelocateQueued(txId);
+      try {
+        await runRelocateQueued(txId);
+      } catch (e) {
+        logInfo("payment.sync_paygine.relocate_queue_rejected", {
+          transactionId: txId,
+          error: messageFromUnknown(e),
+        });
+      }
       const updated = await db.transaction.findUnique({
         where: { id: txId },
         select: { status: true },

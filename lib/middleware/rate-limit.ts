@@ -45,7 +45,7 @@ export const REGISTRATION_REQUEST_RATE_LIMIT = {
   keyPrefix: "reg-request",
 } as const;
 
-type RateLimitOptions = {
+export type RateLimitOptions = {
   windowMs?: number;
   maxRequests?: number;
   keyPrefix?: string;

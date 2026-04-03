@@ -14,14 +14,14 @@ type Props = {
 
 const CARD_STYLES = `
 .premium-card-front:not(.premium-card-front--m5) {
-  background: radial-gradient(ellipse 120% 120% at 50% 50%, #d4b896 0%, var(--color-brand-gold) 40%, #b8985c 100%);
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.25), inset -20px -20px 40px rgba(0,0,0,0.08);
+  background: radial-gradient(ellipse 118% 118% at 50% 46%, #c4a678 0%, var(--color-brand-gold) 44%, #a68955 100%);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12), inset -14px -14px 28px rgba(0,0,0,0.14);
 }
 .premium-card-shine {
   position: absolute;
   inset: 0;
   border-radius: 10px;
-  background: linear-gradient(135deg, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0.08) 40%, transparent 60%);
+  background: linear-gradient(135deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.04) 36%, transparent 58%);
   pointer-events: none;
   z-index: 1;
 }
@@ -35,14 +35,14 @@ const CARD_STYLES = `
 .premium-glass {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(255,255,255,0.12) 0%, transparent 50%, rgba(0,0,0,0.05) 100%);
+  background: linear-gradient(180deg, rgba(255,255,255,0.055) 0%, transparent 52%, rgba(0,0,0,0.07) 100%);
   border-radius: 10px;
   z-index: 1;
 }
 .premium-logo-icon {
   width: 24px;
   height: 24px;
-  background: linear-gradient(135deg, #fff, #ccc);
+  background: linear-gradient(135deg, #ececec, #b0b0b0);
   border-radius: 6px;
   display: flex;
   align-items: center;
@@ -52,10 +52,10 @@ const CARD_STYLES = `
 }
 .premium-card-brand {
   color: #4a4a4a;
-  text-shadow: 0 1px 0 rgba(255,255,255,0.4);
+  text-shadow: 0 1px 0 rgba(255,255,255,0.22);
 }
 .premium-badge {
-  background: linear-gradient(90deg, #fff, #ccc);
+  background: linear-gradient(90deg, #f2f2f2, #c6c6c6);
   color: #000;
   padding: 2px 6px;
   border-radius: 6px;

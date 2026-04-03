@@ -16,6 +16,7 @@ import { sdGetBalance } from "@/lib/payment/paygine/client";
 import { logError, logInfo } from "@/lib/logger";
 import { getRequestId } from "@/lib/security/request";
 import { getBaseUrlFromRequest } from "@/lib/get-base-url";
+import { messageFromUnknown } from "@/lib/errors";
 
 /** Кэш баланса Paygine по userId для снижения числа запросов к ПЦ. TTL из PAYGINE_BALANCE_CACHE_TTL_SEC (по умолчанию 30 сек). */
 const PAYGINE_BALANCE_CACHE_TTL_MS =
@@ -254,7 +255,7 @@ export async function GET(request: NextRequest) {
   } catch (err) {
     const requestId = getRequestId(request);
     logError("profile.get.error", err, { requestId });
-    const devMessage = err instanceof Error ? err.message : String(err);
+    const devMessage = messageFromUnknown(err);
     // Для отладки: заголовок X-Debug-Profile-Error: 1 — вернуть реальную ошибку в ответе
     const wantDebug = request.headers.get("x-debug-profile-error") === "1";
     if (wantDebug) {

@@ -15,6 +15,7 @@ import { TransactionStatus } from "@prisma/client";
 import { broadcastBalanceUpdated } from "@/lib/ws-broadcast";
 import { logInfo } from "@/lib/logger";
 import { RELOCATE_CLAIM_STALE_MS } from "@/lib/payment/relocate-constants";
+import { messageFromUnknown } from "@/lib/errors";
 import { scheduleRelocate } from "@/lib/payment/relocate-queue";
 import { registerOrder, sdRelocateFunds } from "./paygine/client";
 import { buildPaygineSignature } from "./paygine/signature";
@@ -53,6 +54,35 @@ function createOrderSdRef(transactionId: string): string {
 
 function getConfig(): { sector: string; password: string } | null {
   return getPaygineConfig();
+}
+
+/** Сумма на официанта после удержания комиссии ЮЛ (СБП) и нужен ли перелив между кубышками. */
+function tipRelocateToWaiterPlan(tx: {
+  paymentMethod: string | null | undefined;
+  feeKop: unknown;
+  amountKop: unknown;
+  paygineOrderSdRef: string | null | undefined;
+  waiterPaygineSdRef: string | null | undefined;
+}): {
+  orderSdRef: string;
+  waiterSdRef: string | undefined;
+  toWaiterKop: number;
+  willRelocateToWaiter: boolean;
+  isSbp: boolean;
+  companySdRef: string;
+  feeKopNum: number;
+} {
+  const orderSdRef = (tx.paygineOrderSdRef ?? "").trim();
+  const w = tx.waiterPaygineSdRef?.trim();
+  const waiterSdRef = w || undefined;
+  const isSbp = (tx.paymentMethod ?? "") === "sbp";
+  const companySdRef = getPaygineSdRefLegal();
+  const feeKopNum = Number(tx.feeKop ?? 0);
+  const amountKopNum = Number(tx.amountKop);
+  const toWaiterKop = isSbp && companySdRef && feeKopNum > 0 ? amountKopNum - feeKopNum : amountKopNum;
+  const willRelocateToWaiter =
+    orderSdRef.length > 0 && !!waiterSdRef && orderSdRef !== waiterSdRef && toWaiterKop >= 1;
+  return { orderSdRef, waiterSdRef, toWaiterKop, willRelocateToWaiter, isSbp, companySdRef, feeKopNum };
 }
 
 /**
@@ -255,8 +285,8 @@ export class PayginePaymentGateway implements PaymentGateway {
         select: { id: true, userId: true },
       });
       if (payout) {
-        const state = rawBody.match(/<state>([^<]*)<\/state>/i)?.[1]?.trim().toUpperCase();
-        const orderState = rawBody.match(/<order_state>([^<]*)<\/order_state>/i)?.[1]?.trim().toUpperCase();
+        const state = stateMatch?.[1]?.trim().toUpperCase();
+        const orderState = orderStateMatch?.[1]?.trim().toUpperCase();
         const success = state === "APPROVED" || orderState === "COMPLETED";
         const codeMatch = rawBody.match(/<code>([^<]*)<\/code>/i);
         const descMatch = rawBody.match(/<description>([^<]*)<\/description>/i);
@@ -300,26 +330,20 @@ export class PayginePaymentGateway implements PaymentGateway {
     const orderState = orderStateMatch?.[1]?.trim().toUpperCase();
     const success = state === "APPROVED" || orderState === "COMPLETED";
 
-    const orderSdRef = tx.paygineOrderSdRef?.trim();
-    const recipient = orderSdRef
+    const orderSdRefTrim = tx.paygineOrderSdRef?.trim();
+    const recipient = orderSdRefTrim
       ? await db.user.findUnique({
           where: { id: tx.recipientId },
           select: { paygineSdRef: true },
         })
       : null;
-    const waiterSdRef = recipient?.paygineSdRef?.trim();
-    const willRelocateToWaiter =
-      !!orderSdRef &&
-      !!waiterSdRef &&
-      orderSdRef !== waiterSdRef &&
-      (() => {
-        const isSbp = tx.paymentMethod === "sbp";
-        const companySdRef = getPaygineSdRefLegal();
-        const feeKopNum = Number(tx.feeKop ?? 0);
-        const amountKopNum = Number(tx.amountKop);
-        const toWaiterKop = isSbp && companySdRef && feeKopNum > 0 ? amountKopNum - feeKopNum : amountKopNum;
-        return toWaiterKop >= 1;
-      })();
+    const { orderSdRef, waiterSdRef, willRelocateToWaiter } = tipRelocateToWaiterPlan({
+      paymentMethod: tx.paymentMethod,
+      feeKop: tx.feeKop,
+      amountKop: tx.amountKop,
+      paygineOrderSdRef: orderSdRefTrim,
+      waiterPaygineSdRef: recipient?.paygineSdRef,
+    });
 
     const setStatusImmediately =
       !success ? TransactionStatus.FAILED
@@ -434,19 +458,15 @@ export async function runRelocateForTransaction(txId: string): Promise<{ ok: boo
     where: { id: tx.recipientId },
     select: { paygineSdRef: true },
   });
-  const waiterSdRef = recipient?.paygineSdRef?.trim();
+  const { waiterSdRef, toWaiterKop, willRelocateToWaiter, isSbp, companySdRef, feeKopNum } = tipRelocateToWaiterPlan({
+    paymentMethod: tx.paymentMethod,
+    feeKop: tx.feeKop,
+    amountKop: tx.amountKop,
+    paygineOrderSdRef: orderSdRef,
+    waiterPaygineSdRef: recipient?.paygineSdRef,
+  });
 
-  const isSbp = tx.paymentMethod === "sbp";
-  const companySdRef = getPaygineSdRefLegal();
-  const feeKopNum = Number(tx.feeKop ?? 0);
-  const amountKopNum = Number(tx.amountKop);
-  const toWaiterKop = isSbp && companySdRef && feeKopNum > 0 ? amountKopNum - feeKopNum : amountKopNum;
-  const willRelocateToWaiter =
-    !!waiterSdRef &&
-    orderSdRef !== waiterSdRef &&
-    toWaiterKop >= 1;
-
-    if (!willRelocateToWaiter) {
+  if (!willRelocateToWaiter) {
     if (!waiterSdRef || orderSdRef === waiterSdRef) {
       await db.transaction.update({ where: { id: txId }, data: { status: TransactionStatus.SUCCESS } });
       void broadcastBalanceUpdated(tx.recipientId);
@@ -546,7 +566,7 @@ export async function runRelocateForTransaction(txId: string): Promise<{ ok: boo
   } catch (err) {
     logInfo("payment.webhook.relocate_error", {
       transactionId: txId,
-      error: err instanceof Error ? err.message : String(err),
+      error: messageFromUnknown(err),
     });
     await db.transaction.updateMany({
       where: { id: txId, status: TransactionStatus.PENDING },

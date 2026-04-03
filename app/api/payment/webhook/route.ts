@@ -1,49 +1,11 @@
 /**
  * POST /api/payment/webhook
- * Приём вебхуков от платёжного провайдера.
- * Заглушка: всегда 200. Реальная реализация — проверка подписи, маппинг статусов, обновление Transaction.
+ * Приём вебхуков от платёжного провайдера (Paygine): подпись, маппинг статусов, обновление Transaction.
  */
 
-import { NextRequest, NextResponse } from "next/server";
-import { getPaymentGateway } from "@/lib/payment/stub-gateway";
-import { logError, logInfo, logSecurity } from "@/lib/logger";
-import { getRequestId } from "@/lib/security/request";
-import { checkRateLimitByIP, getClientIpAndRateLimitKey, getWebhookRateLimitOptions } from "@/lib/middleware/rate-limit";
-import { readTextWithLimit, MAX_BODY_SIZE_WEBHOOK } from "@/lib/api/helpers";
+import { NextRequest } from "next/server";
+import { postPaygineWebhook } from "@/lib/payment/paygine-webhook-route";
 
 export async function POST(request: NextRequest) {
-  const requestId = getRequestId(request);
-  const { ip, rateLimitKey } = getClientIpAndRateLimitKey(request);
-  const rateLimit = await checkRateLimitByIP(rateLimitKey, getWebhookRateLimitOptions());
-  if (!rateLimit.allowed) {
-    logSecurity("payment.webhook.rate_limit", { requestId, ip });
-    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
-  }
-  const bodyResult = await readTextWithLimit(request, MAX_BODY_SIZE_WEBHOOK);
-  if (!bodyResult.ok) return bodyResult.response;
-  const rawBody = bodyResult.text;
-  const signature = request.headers.get("X-Webhook-Signature") ?? request.headers.get("X-Signature") ?? null;
-
-  logInfo("payment.webhook.invoke", {
-    requestId,
-    ip,
-    bodyLength: rawBody.length,
-    path: "/api/payment/webhook",
-  });
-
-  const gateway = getPaymentGateway();
-  try {
-    const { ok } = await gateway.handleWebhook(rawBody, signature);
-
-    if (!ok) {
-      logSecurity("payment.webhook.invalid_signature", { requestId, ip });
-      return NextResponse.json({ error: "Invalid webhook" }, { status: 400 });
-    }
-
-    logSecurity("payment.webhook.received", { requestId, ip });
-    return new NextResponse("ok", { status: 200, headers: { "Content-Type": "text/plain" } });
-  } catch (error) {
-    logError("payment.webhook.error", error, { requestId, ip });
-    return new NextResponse("error", { status: 503, headers: { "Content-Type": "text/plain" } });
-  }
+  return postPaygineWebhook(request, "/api/payment/webhook");
 }

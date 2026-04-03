@@ -1,11 +1,13 @@
 /**
  * Очередь переливов Paygine (после вебхука): ограничивает параллельные вызовы к ПЦ.
- * С REDIS_URL — список в Redis + глобальный семафор между инстансами.
+ * С REDIS_URL — список в Redis + глобальный семафор между инстансами (общий клиент — lib/redis-shared).
  * Без Redis — очередь и лимит только внутри процесса Node.
  */
 
-import { getPaygineRelocateQueueConcurrency, getRedisUrl } from "@/lib/config";
+import { getPaygineRelocateQueueConcurrency } from "@/lib/config";
+import { messageFromUnknown } from "@/lib/errors";
 import { logInfo } from "@/lib/logger";
+import { getSharedIoredis } from "@/lib/redis-shared";
 
 const QUEUE_KEY = "1tips:relocate:queue";
 const GLOBAL_SLOTS_KEY = "1tips:relocate:global_slots";
@@ -15,59 +17,44 @@ const pendingWaits = new Map<string, Pending>();
 
 const memoryQueue: string[] = [];
 
-let redisClient: import("ioredis").default | null = null;
-let redisInit: Promise<import("ioredis").default | null> | null = null;
-
-async function getQueueRedis(): Promise<import("ioredis").default | null> {
-  if (!getRedisUrl().trim()) return null;
-  if (redisClient) return redisClient;
-  if (redisInit) return redisInit;
-  redisInit = (async () => {
-    try {
-      const Redis = (await import("ioredis")).default;
-      const url = getRedisUrl();
-      redisClient = new Redis(url, { maxRetriesPerRequest: 2 });
-      return redisClient;
-    } catch {
-      return null;
-    }
-  })();
-  return redisInit;
-}
-
 async function enqueueRelocate(txId: string): Promise<void> {
   const trimmed = txId.trim();
   if (!trimmed) return;
-  const r = await getQueueRedis();
+  const r = await getSharedIoredis();
   if (r) {
     try {
       await r.rpush(QUEUE_KEY, trimmed);
+      return;
     } catch {
-      memoryQueue.push(trimmed);
+      /* Redis недоступен — память */
     }
-  } else {
-    memoryQueue.push(trimmed);
   }
+  memoryQueue.push(trimmed);
 }
 
 async function dequeueRelocate(): Promise<string | null> {
-  const r = await getQueueRedis();
+  const r = await getSharedIoredis();
   if (r) {
     try {
       const id = await r.lpop(QUEUE_KEY);
       if (id) return id;
     } catch {
-      /* fall through */
+      /* fall through to memory */
     }
   }
   return memoryQueue.shift() ?? null;
 }
 
-function settlePending(txId: string): void {
+/** Завершает ожидание runRelocateQueued или no-op, если вебхук без ожидания. */
+function completeRelocateJob(txId: string, error?: unknown): void {
   const w = pendingWaits.get(txId);
   if (!w) return;
   pendingWaits.delete(txId);
-  w.resolve();
+  if (error !== undefined) {
+    w.reject(error instanceof Error ? error : new Error(String(error)));
+  } else {
+    w.resolve();
+  }
 }
 
 function backoffMs(): number {
@@ -76,7 +63,7 @@ function backoffMs(): number {
 
 async function withGlobalConcurrencySlot<T>(fn: () => Promise<T>): Promise<T> {
   const cap = getPaygineRelocateQueueConcurrency();
-  const r = await getQueueRedis();
+  const r = await getSharedIoredis();
   if (!r) {
     return fn();
   }
@@ -102,13 +89,13 @@ async function relocateWorker(): Promise<void> {
       try {
         const { runRelocateForTransaction } = await import("./paygine-gateway");
         await runRelocateForTransaction(id);
+        completeRelocateJob(id);
       } catch (e) {
         logInfo("payment.relocate.queue_job_error", {
           transactionId: id,
-          error: e instanceof Error ? e.message : String(e),
+          error: messageFromUnknown(e),
         });
-      } finally {
-        settlePending(id);
+        completeRelocateJob(id, e);
       }
     });
   }
@@ -132,14 +119,14 @@ function kickDrain(): void {
           await executeDrain();
         } catch (e) {
           logInfo("payment.relocate.queue_drain_error", {
-            error: e instanceof Error ? e.message : String(e),
+            error: messageFromUnknown(e),
           });
         }
       }
     })
     .catch((e) => {
       logInfo("payment.relocate.queue_drain_fatal", {
-        error: e instanceof Error ? e.message : String(e),
+        error: messageFromUnknown(e),
       });
     });
 }
@@ -153,6 +140,7 @@ export function scheduleRelocate(txId: string): void {
 
 /**
  * Очередь + ожидание завершения (cron/sync). Разделяет лимит параллелизма с вебхуками.
+ * При выбросе исключения из перелива — Promise отклоняется.
  */
 export function runRelocateQueued(txId: string): Promise<void> {
   const trimmed = txId.trim();

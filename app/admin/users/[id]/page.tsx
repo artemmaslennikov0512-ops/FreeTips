@@ -14,6 +14,7 @@ import {
   Sliders,
   Copy,
   Key,
+  KeyRound,
   RotateCw,
   Lock,
   Unlock,
@@ -59,6 +60,8 @@ interface UserDetailsResponse {
     establishment: string | null;
     verificationStatus?: string;
     verificationRejectionReason?: string | null;
+    recoveryCodeword?: string | null;
+    recoveryCodewordHashOnly?: boolean;
   };
   stats: {
     balanceKop: number;
@@ -120,6 +123,11 @@ export default function AdminUserDetailsPage() {
   const [verifyError, setVerifyError] = useState<string | null>(null);
   const [cabinetViewLoading, setCabinetViewLoading] = useState(false);
   const [cabinetViewError, setCabinetViewError] = useState<string | null>(null);
+  const [newRecoveryCodeword, setNewRecoveryCodeword] = useState("");
+  const [newRecoveryCodewordConfirm, setNewRecoveryCodewordConfirm] = useState("");
+  const [recoveryCodewordLoading, setRecoveryCodewordLoading] = useState(false);
+  const [recoveryCodewordError, setRecoveryCodewordError] = useState<string | null>(null);
+  const [recoveryCodewordOk, setRecoveryCodewordOk] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
@@ -218,6 +226,64 @@ export default function AdminUserDetailsPage() {
       setPasswordError("Ошибка соединения");
     } finally {
       setPasswordLoading(false);
+    }
+  };
+
+  const handleRecoveryCodewordSave = async () => {
+    if (!userId) return;
+    const token = localStorage.getItem("accessToken");
+    if (!token) return;
+    if (!newRecoveryCodeword.trim() || newRecoveryCodeword !== newRecoveryCodewordConfirm) {
+      setRecoveryCodewordError("Кодовые слова не совпадают или пусты");
+      return;
+    }
+    if (newRecoveryCodeword.trim().length < 3) {
+      setRecoveryCodewordError("Минимум 3 символа");
+      return;
+    }
+    setRecoveryCodewordLoading(true);
+    setRecoveryCodewordError(null);
+    setRecoveryCodewordOk(false);
+    try {
+      const res = await fetch(`/api/admin/users/${userId}/recovery-codeword`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+          ...getCsrfHeader(),
+        },
+        body: JSON.stringify({
+          recoveryCodeword: newRecoveryCodeword.trim(),
+          recoveryCodewordConfirm: newRecoveryCodewordConfirm.trim(),
+        }),
+      });
+      const body = (await res.json()) as { error?: string; success?: boolean; recoveryCodeword?: string };
+      if (!res.ok) {
+        setRecoveryCodewordError(body.error ?? "Ошибка сохранения");
+        return;
+      }
+      if (body.success && body.recoveryCodeword != null) {
+        setData((prev) =>
+          prev
+            ? {
+                ...prev,
+                user: {
+                  ...prev.user,
+                  recoveryCodeword: body.recoveryCodeword!,
+                  recoveryCodewordHashOnly: false,
+                },
+              }
+            : prev,
+        );
+      }
+      setRecoveryCodewordOk(true);
+      setNewRecoveryCodeword("");
+      setNewRecoveryCodewordConfirm("");
+      setTimeout(() => setRecoveryCodewordOk(false), 3000);
+    } catch {
+      setRecoveryCodewordError("Ошибка соединения");
+    } finally {
+      setRecoveryCodewordLoading(false);
     }
   };
 
@@ -832,6 +898,16 @@ export default function AdminUserDetailsPage() {
               <dt className="text-white">Пароль</dt>
               <dd className="text-white/90">Скрыт (хэш)</dd>
             </div>
+            <div className="flex justify-between gap-4">
+              <dt className="text-white shrink-0">Кодовое слово</dt>
+              <dd className="max-w-[min(100%,18rem)] break-words text-right text-white/90">
+                {data.user.recoveryCodeword
+                  ? data.user.recoveryCodeword
+                  : data.user.recoveryCodewordHashOnly
+                    ? "Задано (нет копии для отображения — задайте новое ниже)"
+                    : "Не задано"}
+              </dd>
+            </div>
           </dl>
         </div>
 
@@ -866,6 +942,50 @@ export default function AdminUserDetailsPage() {
               className={`relative z-10 ${ADMIN_BTN} ${ADMIN_BTN_PRIMARY} gap-2 px-5 py-2.5 text-sm disabled:opacity-60`}
             >
               {passwordLoading ? "Сохранение..." : "Обновить пароль"}
+            </button>
+          </div>
+        </div>
+
+        <div className="cabinet-section-header min-w-0 overflow-hidden rounded-2xl border-0 p-6">
+          <div className="mb-2 flex items-center justify-center gap-2">
+            <KeyRound className="h-5 w-5 shrink-0 text-[var(--color-accent-gold)]" aria-hidden />
+            <h2 className="text-center text-base font-semibold text-white">Кодовое слово</h2>
+          </div>
+          <p className="text-center text-sm text-white/80">
+            Для сброса пароля по почте. Сохраняется в виде хеша и зашифрованной копии для списков в админке.
+          </p>
+          {recoveryCodewordError && <p className="mt-3 text-sm text-white/90">{recoveryCodewordError}</p>}
+          {recoveryCodewordOk && <p className="mt-3 text-sm text-white">Кодовое слово обновлено</p>}
+          <div className="mt-4 grid gap-3">
+            <input
+              type="password"
+              autoComplete="off"
+              maxLength={72}
+              value={newRecoveryCodeword}
+              onChange={(e) => setNewRecoveryCodeword(e.target.value)}
+              placeholder="Новое кодовое слово (от 3 символов)"
+              className="w-full rounded-xl border-0 bg-[var(--color-bg-sides)] px-4 py-2.5 text-[var(--color-text)] focus:outline-none"
+            />
+            <input
+              type="password"
+              autoComplete="off"
+              maxLength={72}
+              value={newRecoveryCodewordConfirm}
+              onChange={(e) => setNewRecoveryCodewordConfirm(e.target.value)}
+              placeholder="Повторите кодовое слово"
+              className="w-full rounded-xl border-0 bg-[var(--color-bg-sides)] px-4 py-2.5 text-[var(--color-text)] focus:outline-none"
+            />
+          </div>
+          <div className="mt-4 flex justify-center">
+            <button
+              type="button"
+              onClick={handleRecoveryCodewordSave}
+              disabled={
+                recoveryCodewordLoading || !newRecoveryCodeword.trim() || !newRecoveryCodewordConfirm.trim()
+              }
+              className={`relative z-10 ${ADMIN_BTN} ${ADMIN_BTN_PRIMARY} gap-2 px-5 py-2.5 text-sm disabled:opacity-60`}
+            >
+              {recoveryCodewordLoading ? "Сохранение..." : "Сохранить кодовое слово"}
             </button>
           </div>
         </div>

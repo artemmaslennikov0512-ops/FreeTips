@@ -10,6 +10,7 @@ import { db } from "@/lib/db";
 import { getUserRepository } from "@/lib/infrastructure/user-repository";
 import { registerSchema } from "@/lib/validations";
 import { hashPassword } from "@/lib/auth/password";
+import { encryptRecoveryCodewordForAdminDisplay } from "@/lib/auth/recovery-codeword-crypto";
 import { generateAccessToken, generateRefreshToken, setRefreshTokenCookie } from "@/lib/auth/jwt";
 import { checkRateLimitByIP, getClientIpAndRateLimitKey, AUTH_RATE_LIMIT } from "@/lib/middleware/rate-limit";
 import { hashRegistrationToken } from "@/lib/auth/registration-token";
@@ -59,6 +60,7 @@ export async function POST(request: NextRequest) {
 
     const passwordHash = await hashPassword(validated.password);
     const recoveryCodewordHash = await hashPassword(validated.recoveryCodeword);
+    const recoveryCodewordEnc = encryptRecoveryCodewordForAdminDisplay(validated.recoveryCodeword);
     const isEstablishmentAdminToken = !!regToken.establishmentId;
     const isEmployeeToken = !!regToken.employeeId;
 
@@ -89,6 +91,7 @@ export async function POST(request: NextRequest) {
           login: validated.login,
           passwordHash,
           recoveryCodewordHash,
+          recoveryCodewordEnc,
           role,
           establishmentId: establishmentId ?? undefined,
         },

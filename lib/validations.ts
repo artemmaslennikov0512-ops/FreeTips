@@ -63,6 +63,17 @@ export const recoveryCodewordSchema = z
   .min(3, "Кодовое слово — не менее 3 символов")
   .max(72, "Кодовое слово не длиннее 72 символов");
 
+/** Смена кодового слова пользователю в админке (SUPERADMIN) */
+export const adminRecoveryCodewordUpdateSchema = z
+  .object({
+    recoveryCodeword: recoveryCodewordSchema,
+    recoveryCodewordConfirm: z.string().trim().min(1, "Подтвердите кодовое слово").max(72),
+  })
+  .refine((d) => d.recoveryCodeword === d.recoveryCodewordConfirm, {
+    message: "Кодовые слова не совпадают",
+    path: ["recoveryCodewordConfirm"],
+  });
+
 // Сумма в копейках: положительное целое, верхняя граница (100 млн ₽) против злоупотреблений
 const AMOUNT_KOP_MAX = BigInt("10000000000"); // 100 000 000 руб
 export const amountKopSchema = z

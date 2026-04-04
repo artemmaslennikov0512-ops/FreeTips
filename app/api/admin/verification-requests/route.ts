@@ -8,6 +8,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { RegistrationRequestStatus } from "@prisma/client";
 import { requireRole } from "@/lib/middleware/auth";
 import { db } from "@/lib/db";
+import { decryptRecoveryCodewordForAdminDisplay } from "@/lib/auth/recovery-codeword-crypto";
 
 function parseStatus(searchParams: URLSearchParams): RegistrationRequestStatus {
   const raw = searchParams.get("status")?.toUpperCase();
@@ -48,6 +49,7 @@ export async function GET(request: NextRequest) {
           login: true,
           email: true,
           uniqueId: true,
+          recoveryCodewordEnc: true,
         },
       },
       documents: {
@@ -71,6 +73,7 @@ export async function GET(request: NextRequest) {
     login: r.user.login,
     email: r.user.email,
     uniqueId: r.user.uniqueId,
+    recoveryCodeword: decryptRecoveryCodewordForAdminDisplay(r.user.recoveryCodewordEnc),
     hasPassportMain: r.documents.some((d) => d.type === "passport_main"),
     hasPassportSpread: r.documents.some((d) => d.type === "passport_spread"),
   }));

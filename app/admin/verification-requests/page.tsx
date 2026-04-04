@@ -38,6 +38,8 @@ interface VerificationRequestItem {
   login: string;
   email: string | null;
   uniqueId: number;
+  /** Расшифровано на сервере; только для суперадмина */
+  recoveryCodeword: string | null;
   hasPassportMain: boolean;
   hasPassportSpread: boolean;
 }
@@ -325,9 +327,8 @@ export default function AdminVerificationRequestsPage() {
                         Паспорт {r.passportSeries} {r.passportNumber} · ИНН {r.inn}
                       </p>
                       {!isPending && (
-                        <p className="mt-2 text-xs text-white/60">
-                          Рассмотрено:{" "}
-                          {r.reviewedAt ? new Date(r.reviewedAt).toLocaleString("ru-RU") : "—"}
+                        <p className="mt-2 break-words text-xs text-white/80">
+                          Кодовое слово: {r.recoveryCodeword ?? "—"}
                         </p>
                       )}
                       {verificationTab === "rejected" && (
@@ -398,7 +399,7 @@ export default function AdminVerificationRequestsPage() {
                           <th className="px-3 py-2 text-left font-medium text-white">Пользователь</th>
                           <th className="px-3 py-2 text-left font-medium text-white">ФИО</th>
                           <th className="px-3 py-2 text-left font-medium text-white">Паспорт / ИНН</th>
-                          {!isPending && <th className="px-3 py-2 text-left font-medium text-white">Рассмотрено</th>}
+                          {!isPending && <th className="px-3 py-2 text-left font-medium text-white">Кодовое слово</th>}
                           {verificationTab === "rejected" && (
                             <th className="min-w-[140px] px-3 py-2 text-left font-medium text-white">Причина отказа</th>
                           )}
@@ -423,8 +424,8 @@ export default function AdminVerificationRequestsPage() {
                               {r.passportSeries} {r.passportNumber}, ИНН {r.inn}
                             </td>
                             {!isPending && (
-                              <td className="whitespace-nowrap px-3 py-2.5 text-white/80">
-                                {r.reviewedAt ? new Date(r.reviewedAt).toLocaleString("ru-RU") : "—"}
+                              <td className="max-w-[200px] break-words px-3 py-2.5 text-white/80">
+                                {r.recoveryCodeword ?? "—"}
                               </td>
                             )}
                             {verificationTab === "rejected" && (

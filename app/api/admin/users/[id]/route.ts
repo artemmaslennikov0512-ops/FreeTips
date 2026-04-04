@@ -10,6 +10,7 @@ import { db } from "@/lib/db";
 import { getBalance } from "@/lib/balance";
 import { z } from "zod";
 import { parseJsonWithLimit, MAX_BODY_SIZE_AUTH, jsonError } from "@/lib/api/helpers";
+import { decryptRecoveryCodewordForAdminDisplay } from "@/lib/auth/recovery-codeword-crypto";
 
 const updateUserSchema = z.object({
   isBlocked: z.boolean().optional(),
@@ -46,6 +47,8 @@ const USER_SELECT = {
   establishment: true,
   verificationStatus: true,
   verificationRejectionReason: true,
+  recoveryCodewordEnc: true,
+  recoveryCodewordHash: true,
 };
 
 type ListParams = {
@@ -93,7 +96,12 @@ function serializeUser(user: {
   establishment: string | null;
   verificationStatus: string;
   verificationRejectionReason: string | null;
+  recoveryCodewordEnc: string | null;
+  recoveryCodewordHash: string | null;
 }) {
+  const recoveryCodeword = decryptRecoveryCodewordForAdminDisplay(user.recoveryCodewordEnc);
+  const recoveryCodewordHashOnly =
+    !!user.recoveryCodewordHash && !user.recoveryCodewordEnc;
   return {
     id: user.id,
     login: user.login,
@@ -113,6 +121,8 @@ function serializeUser(user: {
     establishment: user.establishment,
     verificationStatus: user.verificationStatus,
     verificationRejectionReason: user.verificationRejectionReason,
+    recoveryCodeword,
+    recoveryCodewordHashOnly,
   };
 }
 

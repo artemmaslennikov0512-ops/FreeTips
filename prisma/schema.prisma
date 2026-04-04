@@ -53,6 +53,8 @@ model User {
   passwordHash      String    @db.VarChar(255)
   /** Хеш кодового слова для восстановления пароля (bcrypt); null — аккаунты до введения поля */
   recoveryCodewordHash String? @db.VarChar(255)
+  /** Зашифрованное кодовое слово для отображения суперадмину (AES-GCM); null — нет или старый аккаунт */
+  recoveryCodewordEnc  String? @db.Text
   role              UserRole  @default(RECIPIENT)
   mustChangePassword Boolean   @default(false) // обязательная смена пароля при первом входе
   isBlocked         Boolean   @default(false)

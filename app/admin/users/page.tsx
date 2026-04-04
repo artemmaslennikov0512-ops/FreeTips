@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useLayoutEffect, useMemo, useState } from "react";
-import { Search, Copy, Filter, ArrowUpDown, Lock, Check, RefreshCw } from "lucide-react";
+import { Search, Copy, Filter, ArrowUpDown, Lock, RefreshCw } from "lucide-react";
 import Link from "next/link";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { CustomDropdown } from "@/components/CustomDropdown";
@@ -106,7 +106,6 @@ export default function AdminUsersPage() {
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [tokenLoading, setTokenLoading] = useState(false);
   const [registrationLink, setRegistrationLink] = useState<string | null>(null);
-  const [linkCopied, setLinkCopied] = useState(false);
   const [blockAllLoading, setBlockAllLoading] = useState(false);
   const [blockAllError, setBlockAllError] = useState<string | null>(null);
 
@@ -262,7 +261,6 @@ export default function AdminUsersPage() {
       const data = (await res.json()) as { token: string; link?: string; expiresAt: string; validHours?: number };
       const link = data.link ?? `${getBaseUrl()}/register?token=${encodeURIComponent(data.token)}`;
       setRegistrationLink(link);
-      setLinkCopied(false);
     } catch {
       setError("Ошибка создания токена");
     } finally {
@@ -274,8 +272,6 @@ export default function AdminUsersPage() {
     if (!registrationLink) return;
     try {
       await navigator.clipboard.writeText(registrationLink);
-      setLinkCopied(true);
-      setTimeout(() => setLinkCopied(false), 2000);
     } catch {
       setError("Не удалось скопировать токен");
     }
@@ -355,19 +351,10 @@ export default function AdminUsersPage() {
               <button
                 type="button"
                 onClick={handleCopyToken}
-                className={`${ADMIN_BTN} ${ADMIN_BTN_SM} gap-1 ${linkCopied ? "admin-btn--success" : "admin-btn--neutral"}`}
+                className={`${ADMIN_BTN} ${ADMIN_BTN_SM} gap-1 admin-btn--neutral`}
               >
-                {linkCopied ? (
-                  <>
-                    <Check className="h-4 w-4" />
-                    Скопировано!
-                  </>
-                ) : (
-                  <>
-                    <Copy className="h-4 w-4" />
-                    Скопировать ссылку
-                  </>
-                )}
+                <Copy className="h-4 w-4" />
+                Скопировать ссылку
               </button>
             )}
           </div>

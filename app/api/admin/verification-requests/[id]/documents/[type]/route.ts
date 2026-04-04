@@ -1,14 +1,15 @@
 /**
  * GET /api/admin/verification-requests/[id]/documents/[type] — скачать документ верификации.
- * После выгрузки устанавливается downloadedAt; через 24 ч файлы подлежат автоудалению.
+ * После успешного чтения запись и файл удаляются — повторное скачивание невозможно.
  * Только SUPERADMIN.
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { readFileSync, existsSync } from "fs";
+import { readFileSync, existsSync, unlinkSync } from "fs";
 import { join } from "path";
 import { requireRole } from "@/lib/middleware/auth";
 import { db } from "@/lib/db";
+import { logWarn } from "@/lib/logger";
 
 const ALLOWED_TYPES = ["passport_main", "passport_spread", "selfie"] as const;
 
@@ -42,10 +43,17 @@ export async function GET(
   const mime = ext === "png" ? "image/png" : ext === "webp" ? "image/webp" : "image/jpeg";
   const disposition = `attachment; filename="${type}.${ext}"`;
 
-  await db.verificationDocument.update({
-    where: { id: doc.id },
-    data: { downloadedAt: new Date() },
-  });
+  const del = await db.verificationDocument.deleteMany({ where: { id: doc.id } });
+  if (del.count > 0) {
+    try {
+      if (existsSync(fullPath)) unlinkSync(fullPath);
+    } catch (err) {
+      logWarn("verification.document.download.unlink_failed", {
+        filePath: doc.filePath,
+        error: String(err),
+      });
+    }
+  }
 
   return new NextResponse(buf, {
     status: 200,

@@ -1,6 +1,6 @@
 /**
- * POST /api/admin/verification-cleanup — удаление документов верификации,
- * выгруженных более 24 часов назад (downloadedAt установлен при выгрузке админом).
+ * POST /api/admin/verification-cleanup — удаление записей с legacy downloadedAt
+ * (старше 24 ч). Новые выгрузки сразу удаляют запись и файл в GET documents/[type].
  * Только SUPERADMIN. Вызывать по крону раз в сутки.
  */
 

@@ -319,7 +319,7 @@ model VerificationDocument {
   requestId   String
   type        String   @db.VarChar(20) // passport_main | passport_spread | selfie (legacy)
   filePath    String   @db.VarChar(512) // относительный путь в storage/verification
-  downloadedAt DateTime? // когда админ выгрузил; через 24 ч — автоудаление файла и записи
+  downloadedAt DateTime? // legacy: раньше помечали выгрузку; cleanup удаляет такие записи старше 24 ч
   createdAt   DateTime @default(now())
 
   request VerificationRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)

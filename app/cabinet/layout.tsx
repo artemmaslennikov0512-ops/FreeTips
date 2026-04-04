@@ -35,7 +35,7 @@ import { PanelMobileBackButton } from "@/components/PanelMobileBackButton";
 const CABINET_LG_SIDEBAR_COLLAPSED_KEY = "cabinet-lg-sidebar-collapsed";
 
 const LG_SIDEBAR_COLLAPSE_BTN =
-  "cabinet-lg-sidebar-toggle cabinet-lg-sidebar-toggle--collapse absolute right-0 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 translate-x-1/2 items-center justify-center rounded-full border border-white/20 bg-white/10 text-[var(--color-text)] shadow-none transition-[color,background-color,border-color] duration-200 hover:border-white/35 hover:bg-white/[0.14] hover:text-[var(--color-text)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-gold)]/35 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent";
+  "cabinet-lg-sidebar-toggle cabinet-lg-sidebar-toggle--collapse relative z-30 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/10 text-[var(--color-text)] shadow-none transition-[color,background-color,border-color] duration-200 hover:border-white/35 hover:bg-white/[0.14] hover:text-[var(--color-text)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-gold)]/35 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent";
 
 const LG_SIDEBAR_EXPAND_BTN =
   "cabinet-lg-sidebar-toggle cabinet-lg-sidebar-toggle--expand fixed left-0 top-1/2 z-[35] hidden h-9 w-9 -translate-y-1/2 translate-x-1/2 items-center justify-center rounded-full border border-white/20 bg-[var(--color-navy)] text-[var(--color-text)] shadow-none transition-[color,background-color,border-color] duration-200 hover:border-white/35 hover:bg-white/[0.08] hover:text-[var(--color-text)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-gold)]/35 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent lg:flex";
@@ -344,11 +344,11 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
         className={`hidden shrink-0 transition-[width] duration-300 ease-out lg:mt-3 lg:flex lg:self-start ${
           lgSidebarCollapsed
             ? "lg:w-0 lg:pointer-events-none lg:overflow-hidden"
-            : "lg:w-[260px] lg:overflow-x-visible lg:overflow-y-visible"
+            : "lg:relative lg:z-10 lg:w-[260px] lg:overflow-hidden"
         }`}
       >
         <div
-          className="cabinet-sidebar relative flex h-full min-h-0 w-[260px] min-w-[260px] flex-col overflow-x-visible overflow-y-hidden border-0 border-r border-white/10 py-6 shadow-2xl backdrop-blur-xl lg:static lg:max-h-[calc(100vh-2rem)] lg:rounded-[10px] lg:border-x lg:border-b lg:border-t-0 lg:border-white/10"
+          className="cabinet-sidebar relative flex h-full min-h-0 w-[260px] min-w-[260px] flex-col overflow-hidden border-0 border-r border-white/10 py-6 shadow-2xl backdrop-blur-xl lg:static lg:max-h-[calc(100vh-2rem)] lg:rounded-[10px] lg:border-x lg:border-b lg:border-t-0 lg:border-white/10"
           style={sidebarStyle}
         >
         {user?.establishmentBrand?.logoUrl && (
@@ -405,21 +405,26 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
             </div>
           </div>
         </div>
-        <div className="cabinet-nav-block mt-6 flex min-h-0 flex-1 flex-col overflow-y-auto px-4">
-          <div className="relative -mx-4 mb-2 h-9 shrink-0">
-            <p className="cabinet-nav-label pointer-events-none absolute inset-0 flex items-center justify-center px-12 text-center text-xs font-semibold uppercase tracking-wider text-[var(--color-text)]/50">
+        <div className="mb-2 mt-6 shrink-0 px-4">
+          <div className="grid h-9 grid-cols-[2.25rem_minmax(0,1fr)_2.25rem] items-center gap-2">
+            <span className="pointer-events-none select-none" aria-hidden />
+            <p className="cabinet-nav-label min-w-0 text-center text-xs font-semibold uppercase tracking-wider text-[var(--color-text)]/50">
               Навигация
             </p>
-            <button
-              type="button"
-              onClick={() => setSidebarCollapsedPersisted(true)}
-              className={LG_SIDEBAR_COLLAPSE_BTN}
-              aria-label="Скрыть боковое меню"
-              title="Скрыть меню"
-            >
-              <ChevronLeft className="h-5 w-5 shrink-0" strokeWidth={2} aria-hidden />
-            </button>
+            <div className="flex justify-end pr-0.5">
+              <button
+                type="button"
+                onClick={() => setSidebarCollapsedPersisted(true)}
+                className={LG_SIDEBAR_COLLAPSE_BTN}
+                aria-label="Скрыть боковое меню"
+                title="Скрыть меню"
+              >
+                <ChevronLeft className="h-5 w-5 shrink-0" strokeWidth={2} aria-hidden />
+              </button>
+            </div>
           </div>
+        </div>
+        <div className="cabinet-nav-block flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto overflow-x-hidden px-4">
           <nav className="flex flex-col gap-0.5 rounded-[10px] border border-[var(--color-brand-gold)]/15 bg-[var(--color-dark-gray)]/5 p-1.5 shadow-[var(--shadow-subtle)]" aria-label="Навигация по кабинету">
             {NAV.map(({ label, href, icon: Icon, iconClass }) => (
               <Link
@@ -483,7 +488,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
 
       <main className="relative min-h-screen min-w-0 flex-1 overflow-x-hidden px-0 pt-2 pb-4 lg:px-0 lg:pt-3 lg:pr-4 lg:ml-0 lg:mr-0 flex flex-col">
         <div
-          className="cabinet-main-block app-panel-main-surface relative z-10 mt-0 mr-0 mb-4 ml-0 flex min-h-0 w-full max-w-full flex-1 flex-col rounded-lg border-x border-b border-white/10 backdrop-blur-xl md:rounded-[10px] lg:mr-4 lg:ml-4"
+          className="cabinet-main-block app-panel-main-surface relative z-10 mt-0 mr-0 mb-4 ml-0 flex min-h-0 w-full max-w-full flex-1 flex-col rounded-lg border-x border-b border-white/10 backdrop-blur-xl md:rounded-[10px] lg:z-0 lg:mr-4 lg:ml-4"
           style={mainBlockStyle}
         >
           {pathname !== "/cabinet" && (

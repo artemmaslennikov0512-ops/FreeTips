@@ -53,7 +53,7 @@ const NAV: { label: string; href: string; icon: LucideIcon; iconClass: string }[
 const ADMIN_LG_SIDEBAR_COLLAPSED_KEY = "admin-lg-sidebar-collapsed";
 
 const LG_SIDEBAR_COLLAPSE_BTN =
-  "cabinet-lg-sidebar-toggle cabinet-lg-sidebar-toggle--collapse absolute right-0 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 translate-x-1/2 items-center justify-center rounded-full border border-white/25 bg-white/10 text-white shadow-none transition-[color,background-color,border-color] duration-200 hover:border-white/40 hover:bg-white/15 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white/35 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent";
+  "cabinet-lg-sidebar-toggle cabinet-lg-sidebar-toggle--collapse relative z-30 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/25 bg-white/10 text-white shadow-none transition-[color,background-color,border-color] duration-200 hover:border-white/40 hover:bg-white/15 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white/35 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent";
 
 const LG_SIDEBAR_EXPAND_BTN =
   "cabinet-lg-sidebar-toggle cabinet-lg-sidebar-toggle--expand fixed left-0 top-1/2 z-[35] hidden h-9 w-9 -translate-y-1/2 translate-x-1/2 items-center justify-center rounded-full border border-white/25 bg-[var(--color-navy)] text-white shadow-none transition-[color,background-color,border-color] duration-200 hover:border-white/40 hover:bg-white/[0.12] hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white/35 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent lg:flex";
@@ -242,10 +242,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         className={`hidden shrink-0 transition-[width] duration-300 ease-out lg:mt-3 lg:flex lg:self-start ${
           lgSidebarCollapsed
             ? "lg:w-0 lg:pointer-events-none lg:overflow-hidden"
-            : "lg:w-[260px] lg:overflow-x-visible lg:overflow-y-visible"
+            : "lg:relative lg:z-10 lg:w-[260px] lg:overflow-hidden"
         }`}
       >
-        <aside className="admin-sidebar cabinet-sidebar relative flex h-full min-h-0 w-[260px] min-w-[260px] flex-col overflow-x-visible overflow-y-hidden rounded-[10px] border border-white/10 bg-[var(--color-navy)] py-6 shadow-sm backdrop-blur-xl lg:static lg:max-h-[calc(100vh-2rem)]">
+        <aside className="admin-sidebar cabinet-sidebar relative flex h-full min-h-0 w-[260px] min-w-[260px] flex-col overflow-hidden rounded-[10px] border border-white/10 bg-[var(--color-navy)] py-6 shadow-sm backdrop-blur-xl lg:static lg:max-h-[calc(100vh-2rem)]">
         <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
           <div className="cabinet-sidebar-profile cabinet-block-inner mx-4 mb-4 rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-4 py-3">
             <div className="flex items-center gap-3">
@@ -258,21 +258,26 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               </div>
             </div>
           </div>
-          <div className="cabinet-nav-block flex min-h-0 flex-1 flex-col overflow-y-auto px-4 py-2">
-            <div className="relative -mx-4 mb-2 h-9 shrink-0">
-              <p className="cabinet-nav-label pointer-events-none absolute inset-0 flex items-center justify-center px-12 text-center text-xs font-semibold uppercase tracking-wider text-white/50">
+          <div className="mb-2 shrink-0 px-4">
+            <div className="grid h-9 grid-cols-[2.25rem_minmax(0,1fr)_2.25rem] items-center gap-2">
+              <span className="pointer-events-none select-none" aria-hidden />
+              <p className="cabinet-nav-label min-w-0 text-center text-xs font-semibold uppercase tracking-wider text-white/50">
                 Навигация
               </p>
-              <button
-                type="button"
-                onClick={() => setSidebarCollapsedPersisted(true)}
-                className={LG_SIDEBAR_COLLAPSE_BTN}
-                aria-label="Скрыть боковое меню"
-                title="Скрыть меню"
-              >
-                <ChevronLeft className="h-5 w-5 shrink-0 text-white" strokeWidth={2} aria-hidden />
-              </button>
+              <div className="flex justify-end pr-0.5">
+                <button
+                  type="button"
+                  onClick={() => setSidebarCollapsedPersisted(true)}
+                  className={LG_SIDEBAR_COLLAPSE_BTN}
+                  aria-label="Скрыть боковое меню"
+                  title="Скрыть меню"
+                >
+                  <ChevronLeft className="h-5 w-5 shrink-0 text-white" strokeWidth={2} aria-hidden />
+                </button>
+              </div>
             </div>
+          </div>
+          <div className="cabinet-nav-block flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto overflow-x-hidden px-4 pb-2">
             <nav className="flex flex-col gap-0.5 rounded-[10px] border border-[var(--color-brand-gold)]/15 bg-white/5 p-1.5 shadow-[var(--shadow-subtle)]" aria-label="Навигация админ-панели">
               {NAV.map(({ label, href, icon: Icon, iconClass }) => {
                 const showRequestsBadge =
@@ -327,7 +332,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </button>
       )}
 
-      <main className="min-h-screen min-w-0 flex-1 overflow-x-hidden px-0 pt-2 lg:pt-3 lg:pl-0 lg:pr-4 lg:ml-0 flex flex-col">
+      <main className="min-h-screen min-w-0 flex-1 overflow-x-hidden px-0 pt-2 lg:relative lg:z-0 lg:pt-3 lg:pl-0 lg:pr-4 lg:ml-0 flex flex-col">
         <div className="admin-main-block cabinet-main-block app-panel-main-surface relative mt-0 mr-0 mb-4 ml-0 flex min-h-0 w-full min-w-0 max-w-full flex-1 flex-col rounded-lg border border-white/10 bg-white/[0.06] backdrop-blur-xl lg:mr-4 lg:ml-4 lg:min-h-[calc(100vh-2rem)] lg:rounded-[10px]">
           {pathname !== "/admin/dashboard" && (
             <PanelMobileBackButton variant="admin" fallbackHref="/admin/dashboard" />

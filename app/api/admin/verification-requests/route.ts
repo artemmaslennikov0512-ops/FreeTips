@@ -8,7 +8,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { RegistrationRequestStatus } from "@prisma/client";
 import { requireRole } from "@/lib/middleware/auth";
 import { db } from "@/lib/db";
-import { decryptRecoveryCodewordForAdminDisplay } from "@/lib/auth/recovery-codeword-crypto";
 
 function parseStatus(searchParams: URLSearchParams): RegistrationRequestStatus {
   const raw = searchParams.get("status")?.toUpperCase();
@@ -38,7 +37,6 @@ export async function GET(request: NextRequest) {
       birthDate: true,
       passportSeries: true,
       passportNumber: true,
-      inn: true,
       status: true,
       rejectionReason: true,
       reviewedAt: true,
@@ -49,7 +47,6 @@ export async function GET(request: NextRequest) {
           login: true,
           email: true,
           uniqueId: true,
-          recoveryCodewordEnc: true,
         },
       },
       documents: {
@@ -65,7 +62,6 @@ export async function GET(request: NextRequest) {
     birthDate: r.birthDate,
     passportSeries: r.passportSeries,
     passportNumber: r.passportNumber,
-    inn: r.inn,
     status: r.status,
     rejectionReason: r.rejectionReason,
     reviewedAt: r.reviewedAt?.toISOString() ?? null,
@@ -73,7 +69,6 @@ export async function GET(request: NextRequest) {
     login: r.user.login,
     email: r.user.email,
     uniqueId: r.user.uniqueId,
-    recoveryCodeword: decryptRecoveryCodewordForAdminDisplay(r.user.recoveryCodewordEnc),
     hasPassportMain: r.documents.some((d) => d.type === "passport_main"),
     hasPassportSpread: r.documents.some((d) => d.type === "passport_spread"),
   }));

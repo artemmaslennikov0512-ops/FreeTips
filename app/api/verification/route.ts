@@ -45,7 +45,6 @@ export async function GET(request: NextRequest) {
         birthDate: true,
         passportSeries: true,
         passportNumber: true,
-        inn: true,
         documents: {
           select: { type: true },
         },
@@ -66,7 +65,6 @@ export async function GET(request: NextRequest) {
             birthDate: pendingRequest.birthDate,
             passportSeries: pendingRequest.passportSeries,
             passportNumber: pendingRequest.passportNumber,
-            inn: pendingRequest.inn,
             hasPassportMain,
             hasPassportSpread,
           }
@@ -143,7 +141,6 @@ export async function POST(request: NextRequest) {
         birthDate: data.birthDate,
         passportSeries: data.passportSeries,
         passportNumber: data.passportNumber,
-        inn: data.inn,
       },
     });
     return NextResponse.json({ requestId: existingPending.id });
@@ -156,7 +153,6 @@ export async function POST(request: NextRequest) {
       birthDate: data.birthDate,
       passportSeries: data.passportSeries,
       passportNumber: data.passportNumber,
-      inn: data.inn,
       status: "PENDING",
     },
     select: { id: true },

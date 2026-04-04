@@ -1,6 +1,10 @@
-/** Снимок «просмотрено» для главных вкладок «Заявок» (sessionStorage). */
-const KEY_V = "admin_requests_main_ack_verification_pending";
-const KEY_C = "admin_requests_main_ack_connection_pending";
+/**
+ * Базовое значение pending после последнего **действия** (подтверждение/отклонение верификации,
+ * одобрение заявки на подключение). Не обновляется при простом открытии вкладки.
+ * v2 — сброс после смены семантики (раньше ack ставился при просмотре).
+ */
+const KEY_V = "admin_requests_main_ack_verification_pending_v2";
+const KEY_C = "admin_requests_main_ack_connection_pending_v2";
 
 function readKey(key: string): number | undefined {
   if (typeof window === "undefined") return undefined;
@@ -28,7 +32,10 @@ export function writeMainTabAckConnection(pending: number): void {
   sessionStorage.setItem(KEY_C, String(pending));
 }
 
-/** Сколько показать на бейдже: до первого визита — весь pending; после — только прирост относительно снимка. */
+/**
+ * Сколько показать на бейдже главной вкладки: без снимка — весь pending;
+ * после решения по заявке снимок обновляется — показывается прирост относительно него.
+ */
 export function mainTabNewPending(currentPending: number, ack: number | undefined): number {
   if (ack === undefined) return currentPending;
   return Math.max(0, currentPending - ack);

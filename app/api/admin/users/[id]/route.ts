@@ -176,14 +176,13 @@ function getTransactions(id: string, params: ListParams) {
 }
 
 async function fetchUserDetails(id: string, params: ListParams) {
-  const [user, balanceData, txCount, payoutsPendingCount, transactions] =
-    await Promise.all([
-      getUser(id),
-      getBalance(id),
-      getTransactionCount(id),
-      getPayoutPendingCount(id),
-      getTransactions(id, params),
-    ]);
+  const [user, balanceData, txCount, payoutsPendingCount, transactions] = await Promise.all([
+    getUser(id),
+    getBalance(id),
+    getTransactionCount(id),
+    getPayoutPendingCount(id),
+    getTransactions(id, params),
+  ]);
   return { user, balanceData, txCount, payoutsPendingCount, transactions };
 }
 

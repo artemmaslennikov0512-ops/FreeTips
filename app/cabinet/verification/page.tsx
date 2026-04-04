@@ -18,7 +18,6 @@ type VerificationData = {
     birthDate: string;
     passportSeries: string;
     passportNumber: string;
-    inn: string;
     hasPassportMain: boolean;
     hasPassportSpread: boolean;
   } | null;
@@ -40,7 +39,6 @@ export default function CabinetVerificationPage() {
   const [birthDate, setBirthDate] = useState("");
   const [passportSeries, setPassportSeries] = useState("");
   const [passportNumber, setPassportNumber] = useState("");
-  const [inn, setInn] = useState("");
   const [consent, setConsent] = useState(false);
   const [requestId, setRequestId] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -71,7 +69,6 @@ export default function CabinetVerificationPage() {
         setBirthDate(json.currentRequest.birthDate);
         setPassportSeries(json.currentRequest.passportSeries);
         setPassportNumber(json.currentRequest.passportNumber);
-        setInn(json.currentRequest.inn);
         setStep(2);
       }
     } catch {
@@ -93,7 +90,6 @@ export default function CabinetVerificationPage() {
       birthDate: birthDate.trim(),
       passportSeries: passportSeries.trim(),
       passportNumber: passportNumber.trim(),
-      inn: inn.trim(),
     });
     if (!parsed.success) {
       setFieldErrors(getFieldErrors(parsed.error));
@@ -162,7 +158,6 @@ export default function CabinetVerificationPage() {
       birthDate: birthDate.trim(),
       passportSeries: passportSeries.trim(),
       passportNumber: passportNumber.trim(),
-      inn: inn.trim(),
       consentPersonalData: consent,
     });
     if (!parsed.success) {
@@ -340,20 +335,6 @@ export default function CabinetVerificationPage() {
                   />
                   {fieldErrors.passportNumber && <p className="mt-1 text-sm text-red-500">{fieldErrors.passportNumber}</p>}
                 </div>
-              </div>
-              <div>
-                <label className="mb-1.5 block text-sm font-medium text-white">ИНН <span className="text-red-400">*</span></label>
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  maxLength={12}
-                  value={inn}
-                  onChange={(e) => setInn(e.target.value.replace(/\D/g, ""))}
-                  className={cabinetInputClassName(!!fieldErrors.inn)}
-                  placeholder="10 или 12 цифр"
-                  required
-                />
-                {fieldErrors.inn && <p className="mt-1 text-sm text-red-500">{fieldErrors.inn}</p>}
               </div>
               {submitError && <p className="text-sm text-red-500">{submitError}</p>}
               <button

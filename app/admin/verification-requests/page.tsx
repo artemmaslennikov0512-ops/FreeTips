@@ -30,7 +30,6 @@ interface VerificationRequestItem {
   birthDate: string;
   passportSeries: string;
   passportNumber: string;
-  inn: string;
   createdAt: string;
   status: string;
   rejectionReason: string | null;
@@ -38,8 +37,6 @@ interface VerificationRequestItem {
   login: string;
   email: string | null;
   uniqueId: number;
-  /** Расшифровано на сервере; только для суперадмина */
-  recoveryCodeword: string | null;
   hasPassportMain: boolean;
   hasPassportSpread: boolean;
 }
@@ -59,6 +56,14 @@ const DOC_LABELS: Record<string, string> = {
 
 const ZERO_COUNTS: SectionCounts = { pending: 0, approved: 0, rejected: 0 };
 
+function ruPendingRequestsWord(n: number): string {
+  const n10 = n % 10;
+  const n100 = n % 100;
+  if (n10 === 1 && n100 !== 11) return "заявка";
+  if (n10 >= 2 && n10 <= 4 && (n100 < 10 || n100 >= 20)) return "заявки";
+  return "заявок";
+}
+
 export default function AdminVerificationRequestsPage() {
   const [mainTab, setMainTab] = useState<AdminRequestsMainTab>("verification");
   const [verificationTab, setVerificationTab] = useState<AdminRequestTab>("pending");
@@ -73,29 +78,39 @@ export default function AdminVerificationRequestsPage() {
   const [rejectSubmitting, setRejectSubmitting] = useState(false);
   const [rejectError, setRejectError] = useState<string | null>(null);
   const [downloading, setDownloading] = useState<string | null>(null);
-  /** Снимок pending с момента последнего «просмотра» главной вкладки (sessionStorage + state). */
+  /** Базовый pending после последнего решения по заявке (не при открытии вкладки). */
   const [storedAckVerification, setStoredAckVerification] = useState<number | undefined>(undefined);
   const [storedAckConnection, setStoredAckConnection] = useState<number | undefined>(undefined);
 
-  const fetchCounts = useCallback(async () => {
+  const fetchCounts = useCallback(async (): Promise<RequestsCountsPayload | null> => {
     const token = localStorage.getItem("accessToken");
-    if (!token) return;
+    if (!token) return null;
     try {
       const res = await fetch("/api/admin/requests-counts", {
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (!res.ok) return;
+      if (!res.ok) return null;
       const data = (await res.json()) as RequestsCountsPayload;
       setCounts(data);
+      return data;
     } catch {
-      /* ignore */
+      return null;
     }
   }, []);
 
-  const refreshCountsAndNotifyLayout = useCallback(async () => {
-    await fetchCounts();
+  const refreshCountsAndNotifyLayout = useCallback(async (): Promise<RequestsCountsPayload | null> => {
+    const data = await fetchCounts();
     notifyAdminRequestsCountsChanged();
+    return data;
   }, [fetchCounts]);
+
+  const onAfterConnectionMutation = useCallback(async () => {
+    const data = await refreshCountsAndNotifyLayout();
+    if (data) {
+      writeMainTabAckConnection(data.connection.pending);
+      setStoredAckConnection(data.connection.pending);
+    }
+  }, [refreshCountsAndNotifyLayout]);
 
   const fetchList = useCallback(async () => {
     const token = localStorage.getItem("accessToken");
@@ -130,20 +145,6 @@ export default function AdminVerificationRequestsPage() {
   }, []);
 
   useEffect(() => {
-    if (mainTab !== "verification" || counts == null) return;
-    const p = counts.verification.pending;
-    writeMainTabAckVerification(p);
-    setStoredAckVerification(p);
-  }, [mainTab, counts]);
-
-  useEffect(() => {
-    if (mainTab !== "connection" || counts == null) return;
-    const p = counts.connection.pending;
-    writeMainTabAckConnection(p);
-    setStoredAckConnection(p);
-  }, [mainTab, counts]);
-
-  useEffect(() => {
     if (mainTab !== "verification") return;
     fetchList();
   }, [fetchList, mainTab]);
@@ -165,7 +166,11 @@ export default function AdminVerificationRequestsPage() {
       });
       if (res.ok) {
         await fetchList();
-        await refreshCountsAndNotifyLayout();
+        const data = await refreshCountsAndNotifyLayout();
+        if (data) {
+          writeMainTabAckVerification(data.verification.pending);
+          setStoredAckVerification(data.verification.pending);
+        }
       } else {
         const body = (await res.json().catch(() => ({}))) as { error?: string };
         setError(body.error ?? "Ошибка подтверждения");
@@ -198,7 +203,11 @@ export default function AdminVerificationRequestsPage() {
         setRejectModal(null);
         setRejectReason("");
         await fetchList();
-        await refreshCountsAndNotifyLayout();
+        const data = await refreshCountsAndNotifyLayout();
+        if (data) {
+          writeMainTabAckVerification(data.verification.pending);
+          setStoredAckVerification(data.verification.pending);
+        }
       } else {
         setRejectError(body.error ?? "Ошибка отклонения");
       }
@@ -293,8 +302,26 @@ export default function AdminVerificationRequestsPage() {
                 <Loader2 className="h-8 w-8 animate-spin" aria-hidden />
               </div>
             ) : list.length === 0 ? (
-              <div className="flex min-h-[min(36dvh,280px)] flex-1 flex-col items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 py-10 text-center text-sm text-white/60">
-                {emptyMessage}
+              <div className="flex min-h-[min(36dvh,280px)] flex-1 flex-col items-center justify-center gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-10 text-center text-sm text-white/60">
+                <p>{emptyMessage}</p>
+                {counts != null &&
+                  verificationTab === "pending" &&
+                  vCounts.pending === 0 &&
+                  cCounts.pending > 0 && (
+                    <p className="max-w-md text-white/75">
+                      Счётчик в меню «Заявки» учитывает и подключения заведений: сейчас на рассмотрении{" "}
+                      <span className="tabular-nums font-medium text-white">{cCounts.pending}</span>{" "}
+                      {ruPendingRequestsWord(cCounts.pending)} в разделе{" "}
+                      <button
+                        type="button"
+                        onClick={() => setMainTab("connection")}
+                        className="text-[var(--color-brand-gold)] underline decoration-[var(--color-brand-gold)]/50 underline-offset-2 hover:decoration-[var(--color-brand-gold)]"
+                      >
+                        Заявки на подключение
+                      </button>
+                      .
+                    </p>
+                  )}
               </div>
             ) : (
               <>
@@ -323,14 +350,10 @@ export default function AdminVerificationRequestsPage() {
                         {r.email && <p className="mt-0.5 break-all text-sm text-white/75">{r.email}</p>}
                       </div>
                       <p className="mt-2 break-words text-sm font-medium text-white">{r.fullName}</p>
-                      <p className="mt-1 break-words text-xs text-white/80">
-                        Паспорт {r.passportSeries} {r.passportNumber} · ИНН {r.inn}
+                      <p className="mt-1 break-words text-xs text-white/80">Дата рождения: {r.birthDate}</p>
+                      <p className="mt-0.5 break-words text-xs text-white/80">
+                        Паспорт: {r.passportSeries} {r.passportNumber}
                       </p>
-                      {!isPending && (
-                        <p className="mt-2 break-words text-xs text-white/80">
-                          Кодовое слово: {r.recoveryCodeword ?? "—"}
-                        </p>
-                      )}
                       {verificationTab === "rejected" && (
                         <p className="mt-2 rounded-lg border border-red-500/25 bg-red-500/10 p-2 text-xs leading-snug text-red-200/90">
                           {r.rejectionReason ?? "—"}
@@ -398,8 +421,7 @@ export default function AdminVerificationRequestsPage() {
                           <th className="px-3 py-2 text-left font-medium text-white">Дата</th>
                           <th className="px-3 py-2 text-left font-medium text-white">Пользователь</th>
                           <th className="px-3 py-2 text-left font-medium text-white">ФИО</th>
-                          <th className="px-3 py-2 text-left font-medium text-white">Паспорт / ИНН</th>
-                          {!isPending && <th className="px-3 py-2 text-left font-medium text-white">Кодовое слово</th>}
+                          <th className="px-3 py-2 text-left font-medium text-white">Д. рожд. / паспорт</th>
                           {verificationTab === "rejected" && (
                             <th className="min-w-[140px] px-3 py-2 text-left font-medium text-white">Причина отказа</th>
                           )}
@@ -420,14 +442,14 @@ export default function AdminVerificationRequestsPage() {
                               {r.email && <div className="text-xs text-white/80">{r.email}</div>}
                             </td>
                             <td className="whitespace-nowrap px-3 py-2.5 text-white">{r.fullName}</td>
-                            <td className="whitespace-nowrap px-3 py-2.5 text-white">
-                              {r.passportSeries} {r.passportNumber}, ИНН {r.inn}
+                            <td className="whitespace-nowrap px-3 py-2.5 text-white/90">
+                              <div className="text-xs leading-snug">
+                                <p>{r.birthDate}</p>
+                                <p className="mt-0.5">
+                                  {r.passportSeries} {r.passportNumber}
+                                </p>
+                              </div>
                             </td>
-                            {!isPending && (
-                              <td className="max-w-[200px] break-words px-3 py-2.5 text-white/80">
-                                {r.recoveryCodeword ?? "—"}
-                              </td>
-                            )}
                             {verificationTab === "rejected" && (
                               <td className="max-w-[220px] px-3 py-2.5 text-xs text-red-200/90">{r.rejectionReason ?? "—"}</td>
                             )}
@@ -502,7 +524,7 @@ export default function AdminVerificationRequestsPage() {
           <div className="flex min-h-0 w-full flex-1 flex-col">
             <AdminConnectionRequestsBlock
               connectionCounts={cCounts}
-              onAfterMutation={refreshCountsAndNotifyLayout}
+              onAfterMutation={onAfterConnectionMutation}
               hideStatusTabs
               statusTab={connectionTab}
               onStatusTabChange={setConnectionTab}

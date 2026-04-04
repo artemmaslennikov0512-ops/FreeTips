@@ -675,7 +675,7 @@ export default function AdminUserDetailsPage() {
       });
       const body = (await res.json()) as { accessToken?: string; error?: string };
       if (!res.ok || !body.accessToken) {
-        setCabinetViewError(body.error ?? "Не удалось открыть кабинет");
+        setCabinetViewError(body.error ?? "Не удалось открыть профиль");
         return;
       }
       beginCabinetImpersonation(adminToken, body.accessToken, `/admin/users/${userId}`);
@@ -705,17 +705,17 @@ export default function AdminUserDetailsPage() {
 
   return (
     <div id="admin-user-detail" className="min-w-0 max-w-full">
-      <div className="mb-6 mx-auto flex w-full max-w-4xl flex-col gap-3">
+      <div className="mb-4 flex justify-start">
+        <Link
+          href="/admin/users"
+          className={`${ADMIN_BTN} admin-btn--neutral inline-flex w-fit gap-2 px-3 py-2 text-sm`}
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Назад
+        </Link>
+      </div>
+      <div className="mb-6 mx-auto flex w-full max-w-4xl flex-col items-center gap-3">
         <div className="cabinet-section-header w-full max-w-[360px] rounded-2xl border-0 px-4 pb-5 pt-3 sm:px-5">
-          <div className="mb-3 flex justify-start">
-            <Link
-              href="/admin/users"
-              className={`${ADMIN_BTN} admin-btn--neutral inline-flex w-fit gap-2 px-3 py-2 text-sm`}
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Назад
-            </Link>
-          </div>
           <div className="flex h-[120px] items-center justify-center gap-4">
             <UserRound className="h-12 w-12 shrink-0 text-white" />
             <div className="min-w-0 leading-tight">
@@ -737,11 +737,11 @@ export default function AdminUserDetailsPage() {
               type="button"
               onClick={handleOpenUserCabinet}
               disabled={cabinetViewLoading || data.user.isBlocked}
-              title={data.user.isBlocked ? "Нельзя открыть кабинет заблокированного пользователя" : undefined}
+              title={data.user.isBlocked ? "Нельзя просмотреть профиль заблокированного пользователя" : undefined}
               className={`${ADMIN_BTN} gap-2 border border-[var(--color-brand-gold)]/35 bg-[var(--color-brand-gold)]/12 px-4 py-2.5 text-sm text-white hover:bg-[var(--color-brand-gold)]/20 disabled:opacity-50`}
             >
               <MonitorSmartphone className="h-4 w-4" />
-              {cabinetViewLoading ? "Открытие…" : "Кабинет как пользователь"}
+              {cabinetViewLoading ? "Загрузка…" : "Просмотреть профиль"}
             </button>
           )}
           <button

@@ -288,7 +288,7 @@ model RegistrationRequest {
   @@map("registration_requests")
 }
 
-// Заявка на верификацию официанта: ФИО, дата рождения, паспорт, ИНН, документы.
+// Заявка на верификацию официанта: ФИО, дата рождения, паспорт, документы.
 model VerificationRequest {
   id                String   @id @default(cuid())
   userId            String
@@ -296,7 +296,6 @@ model VerificationRequest {
   birthDate         String   @db.VarChar(20)
   passportSeries    String   @db.VarChar(10)
   passportNumber   String   @db.VarChar(20)
-  inn               String   @db.VarChar(20)
   status            RegistrationRequestStatus @default(PENDING) // PENDING | APPROVED | REJECTED
   rejectionReason   String?  @db.VarChar(1000)
   reviewedAt        DateTime?

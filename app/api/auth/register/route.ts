@@ -1,6 +1,6 @@
 /**
  * POST /api/auth/register
- * Регистрация по одноразовому токену: логин, пароль, подтверждение пароля
+ * Регистрация по одноразовому токену: логин, пароль, подтверждение пароля, кодовое слово
  * Создаёт пользователя и выдаёт токены (без SMS)
  */
 
@@ -58,6 +58,7 @@ export async function POST(request: NextRequest) {
     }
 
     const passwordHash = await hashPassword(validated.password);
+    const recoveryCodewordHash = await hashPassword(validated.recoveryCodeword);
     const isEstablishmentAdminToken = !!regToken.establishmentId;
     const isEmployeeToken = !!regToken.employeeId;
 
@@ -87,6 +88,7 @@ export async function POST(request: NextRequest) {
         data: {
           login: validated.login,
           passwordHash,
+          recoveryCodewordHash,
           role,
           establishmentId: establishmentId ?? undefined,
         },

@@ -70,9 +70,11 @@ function ConnectionRequestDetails({ r, twoColumnFromSm }: { r: RegistrationReque
         <p>
           <span className="text-white/70">Сотрудников:</span> {r.employeeCount ?? "—"}
         </p>
-        <p className="break-all">
-          <span className="text-white/70">Телефон:</span> {r.phone || "—"}
-        </p>
+        {r.phone?.trim() ? (
+          <p className="break-all">
+            <span className="text-white/70">Телефон:</span> {r.phone}
+          </p>
+        ) : null}
         <p className="break-words">
           <span className="text-white/70">ФИО:</span> {r.fullName}
         </p>
@@ -90,18 +92,24 @@ function ConnectionRequestDetails({ r, twoColumnFromSm }: { r: RegistrationReque
       <p className="break-words">
         <span className="text-white/70">Заведение:</span> {r.establishment || "—"}
       </p>
-      <p className="break-all">
-        <span className="text-white/70">Телефон:</span> {r.phone || "—"}
-      </p>
+      {r.phone?.trim() ? (
+        <p className="break-all">
+          <span className="text-white/70">Телефон:</span> {r.phone}
+        </p>
+      ) : null}
       <p className="break-words">
         <span className="text-white/70">Вид деятельности:</span> {r.activityType || "—"}
       </p>
-      <p className="break-words">
-        <span className="text-white/70">ФИО администратора:</span> {r.adminFullName ?? "—"}
-      </p>
-      <p className="break-all">
-        <span className="text-white/70">Телефон администратора:</span> {r.adminContactPhone ?? "—"}
-      </p>
+      {(r.adminFullName?.trim() || r.adminContactPhone?.trim()) ? (
+        <>
+          <p className="break-words">
+            <span className="text-white/70">ФИО администратора:</span> {r.adminFullName ?? "—"}
+          </p>
+          <p className="break-all">
+            <span className="text-white/70">Телефон администратора:</span> {r.adminContactPhone ?? "—"}
+          </p>
+        </>
+      ) : null}
     </div>
   );
 }

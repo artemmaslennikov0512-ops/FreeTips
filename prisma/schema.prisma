@@ -51,6 +51,8 @@ model User {
   login             String    @unique @db.VarChar(50)
   email             String?   @unique @db.VarChar(255)
   passwordHash      String    @db.VarChar(255)
+  /** Хеш кодового слова для восстановления пароля (bcrypt); null — аккаунты до введения поля */
+  recoveryCodewordHash String? @db.VarChar(255)
   role              UserRole  @default(RECIPIENT)
   mustChangePassword Boolean   @default(false) // обязательная смена пароля при первом входе
   isBlocked         Boolean   @default(false)

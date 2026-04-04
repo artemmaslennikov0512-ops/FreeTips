@@ -24,15 +24,14 @@ export const phoneSchema = z
         : val;
   });
 
-/** Телефон для заявки: принимаем +7…, 8…, с пробелами/скобками/дефисами, нормализуем до 10 цифр */
-const phoneRegistrationSchema = z
+/** Телефон для заявки: принимаем +7…, 8…, с пробелами/скобками/дефисами, нормализуем до 10 цифр; пусто — не собираем в форме */
+const phoneRegistrationOptionalSchema = z
   .string()
   .trim()
-  .min(1, "Укажите номер телефона")
   .max(50)
   .transform((s) => s.replace(/\D/g, ""))
   .refine(
-    (s) => s.length === 10 || (s.length === 11 && (s[0] === "7" || s[0] === "8")),
+    (s) => s.length === 0 || s.length === 10 || (s.length === 11 && (s[0] === "7" || s[0] === "8")),
     "Неверный формат телефона (10 цифр, можно с +7 или 8)",
   )
   .transform((s) => (s.length === 11 ? s.slice(1) : s));
@@ -56,6 +55,13 @@ export const loginSchema = z
   .min(3, "Логин должен быть не менее 3 символов")
   .max(50, "Логин не должен превышать 50 символов")
   .regex(/^[a-zA-Z0-9_]+$/, "Логин: только латиница, цифры и _");
+
+/** Кодовое слово при регистрации / для сброса пароля (bcrypt на сервере; до 72 байт для bcrypt) */
+export const recoveryCodewordSchema = z
+  .string()
+  .trim()
+  .min(3, "Кодовое слово — не менее 3 символов")
+  .max(72, "Кодовое слово не длиннее 72 символов");
 
 // Сумма в копейках: положительное целое, верхняя граница (100 млн ₽) против злоупотреблений
 const AMOUNT_KOP_MAX = BigInt("10000000000"); // 100 000 000 руб
@@ -89,6 +95,7 @@ export const registerSchema = z
     login: loginSchema,
     password: passwordSchema,
     passwordConfirm: z.string().min(1, "Подтвердите пароль"),
+    recoveryCodeword: recoveryCodewordSchema,
     registrationToken: z
       .string()
       .trim()
@@ -132,10 +139,14 @@ export const totpDisableSchema = z.object({
   code: totpCodeSchema,
 });
 
-// Запрос сброса пароля: только логин и email (логин без учёта регистра)
+// Запрос сброса пароля: логин, email; кодовое слово — обязательно, если оно задано в аккаунте (проверка на сервере)
 export const forgotPasswordRequestSchema = z.object({
   login: z.string().trim().min(1, "Укажите логин").max(50, "Слишком длинный логин"),
   email: z.string().trim().min(1, "Укажите email").max(255, "Слишком длинный email").email("Неверный формат email"),
+  recoveryCodeword: z
+    .string()
+    .max(72, "Кодовое слово не длиннее 72 символов")
+    .transform((s) => s.trim()),
 });
 
 // Создание ссылки
@@ -189,7 +200,7 @@ export const createRegistrationRequestSchema = z.discriminatedUnion("requestType
     fullName: z.string().trim().min(1, "Укажите ФИО").max(255),
     companyName: z.string().trim().min(1, "Укажите название компании").max(255),
     companyRole: z.string().trim().min(1, "Укажите роль в компании").max(255),
-    phone: phoneRegistrationSchema,
+    phone: phoneRegistrationOptionalSchema,
     email: emailSchema,
     employeeCount: z.coerce.number().int().min(1, "Укажите количество сотрудников").max(10000),
     consentOfferAndPolicy: consentOfferAndPolicySchema,
@@ -198,12 +209,10 @@ export const createRegistrationRequestSchema = z.discriminatedUnion("requestType
     requestType: z.literal("individual"),
     fullName: z.string().trim().min(1, "Укажите ФИО").max(255),
     dateOfBirth: z.string().trim().min(1, "Укажите дату рождения").max(20),
-    phone: phoneRegistrationSchema,
+    phone: phoneRegistrationOptionalSchema,
     email: emailSchema,
     activityType: z.string().trim().min(1, "Укажите вид деятельности").max(255),
     establishment: z.string().trim().max(255).optional().default(""),
-    adminFullName: z.string().trim().min(1, "Укажите ФИО администратора для подтверждения").max(255),
-    adminContactPhone: phoneRegistrationSchema,
     consentOfferAndPolicy: consentOfferAndPolicySchema,
   }),
 ]);

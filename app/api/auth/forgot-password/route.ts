@@ -1,12 +1,14 @@
 /**
  * POST /api/auth/forgot-password
  * Запрос сброса пароля: логин (без учёта регистра) и email должны принадлежать одному аккаунту.
- * При неверном логине или email возвращается ошибка; ссылка отправляется только при совпадении.
+ * Если в аккаунте задано кодовое слово — оно проверяется (хеш в БД).
+ * При неверных данных возвращается одна и та же ошибка; ссылка только при успехе.
  */
 
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { forgotPasswordRequestSchema } from "@/lib/validations";
+import { verifyPassword } from "@/lib/auth/password";
 import { checkRateLimitByIP, getClientIpAndRateLimitKey, AUTH_RATE_LIMIT } from "@/lib/middleware/rate-limit";
 import { logError, logSecurity } from "@/lib/logger";
 import { getRequestId } from "@/lib/security/request";
@@ -39,19 +41,29 @@ export async function POST(request: NextRequest) {
       return jsonError(400, "Заполните все поля", validated.error.issues, { hideDetailsInProduction: true });
     }
 
-    const { login, email } = validated.data;
+    const { login, email, recoveryCodeword } = validated.data;
     const emailNorm = email.trim().toLowerCase();
     const user = await db.user.findFirst({
       where: { login: { equals: login.trim(), mode: "insensitive" } },
-      select: { id: true, email: true },
+      select: { id: true, email: true, recoveryCodewordHash: true },
     });
 
     const emailMatch = user?.email && user.email.toLowerCase() === emailNorm;
     if (!user || !user.email || !emailMatch) {
       return NextResponse.json(
-        { error: "Неверный логин или email. Проверьте данные и попробуйте снова." },
+        { error: "Неверный логин, email или кодовое слово. Проверьте данные и попробуйте снова." },
         { status: 400 },
       );
+    }
+
+    if (user.recoveryCodewordHash) {
+      const codewordOk = recoveryCodeword.length > 0 && (await verifyPassword(recoveryCodeword, user.recoveryCodewordHash));
+      if (!codewordOk) {
+        return NextResponse.json(
+          { error: "Неверный логин, email или кодовое слово. Проверьте данные и попробуйте снова." },
+          { status: 400 },
+        );
+      }
     }
 
     logSecurity("auth.forgot_password.request", { requestId, ip, userId: user.id });

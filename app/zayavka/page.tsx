@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { User, Calendar, Building2, Phone, Briefcase, Mail, Users, ArrowRight, ArrowLeft, ChevronDown } from "lucide-react";
+import { User, Calendar, Building2, Briefcase, Mail, Users, ArrowRight, ArrowLeft, ChevronDown } from "lucide-react";
 import { site } from "@/config/site";
 import { AuthPageShell } from "@/components/AuthPageShell";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
@@ -17,14 +17,11 @@ const initialFormData = {
   fullName: "",
   dateOfBirth: "",
   establishment: "",
-  phone: "",
   activityType: "",
   email: "",
   companyName: "",
   companyRole: "",
   employeeCount: "",
-  adminFullName: "",
-  adminContactPhone: "",
   consentOfferAndPolicy: false,
 };
 
@@ -36,8 +33,6 @@ function validateStep1(
   const err: Record<string, string> = {};
   if (!data.fullName.trim()) err.fullName = "Укажите ФИО";
   else if (data.fullName.trim().length > 255) err.fullName = "Слишком длинное значение";
-  const digits = data.phone.replace(/\D/g, "");
-  if (digits.length !== 10) err.phone = "Укажите номер телефона (10 цифр)";
   if (!data.email.trim()) err.email = "Укажите email";
   else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email.trim())) err.email = "Неверный формат email";
   if (!isEstablishment && !data.dateOfBirth.trim()) err.dateOfBirth = "Укажите дату рождения";
@@ -73,25 +68,6 @@ export default function ZayavkaPage() {
     };
   }, [requestTypeDropdownOpen, closeRequestTypeDropdown]);
 
-  /** Форматирование национальной части: 10 цифр → (XXX) XXX-XX-XX */
-  const formatPhoneNational = (digits: string): string => {
-    const d = digits.replace(/\D/g, "").slice(0, 10);
-    if (d.length <= 3) return d ? `(${d}` : "";
-    if (d.length <= 6) return `(${d.slice(0, 3)}) ${d.slice(3)}`;
-    return `(${d.slice(0, 3)}) ${d.slice(3, 6)}-${d.slice(6, 8)}-${d.slice(8)}`;
-  };
-
-  const normalizePhoneDigits = (value: string): string => {
-    let digits = value.replace(/\D/g, "");
-    if (digits.length === 11 && (digits[0] === "7" || digits[0] === "8")) digits = digits.slice(1);
-    return digits.slice(0, 10);
-  };
-
-  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>, field: "phone" | "adminContactPhone") => {
-    const digits = normalizePhoneDigits(e.target.value);
-    setFormData((prev) => ({ ...prev, [field]: digits }));
-  };
-
   const isEstablishment = formData.requestType === "establishment";
 
   const handleNext = () => {
@@ -123,7 +99,7 @@ export default function ZayavkaPage() {
           fullName: formData.fullName.trim(),
           companyName: formData.companyName.trim(),
           companyRole: formData.companyRole.trim(),
-          phone: formData.phone ? `+7${formData.phone}` : "",
+          phone: "",
           email: formData.email.trim(),
           employeeCount: formData.employeeCount === "" ? 0 : Number(formData.employeeCount),
           consentOfferAndPolicy: formData.consentOfferAndPolicy as true,
@@ -132,12 +108,10 @@ export default function ZayavkaPage() {
           requestType: "individual" as const,
           fullName: formData.fullName.trim(),
           dateOfBirth: formData.dateOfBirth,
-          phone: formData.phone ? `+7${formData.phone}` : "",
+          phone: "",
           email: formData.email.trim(),
           activityType: formData.activityType.trim(),
           establishment: formData.establishment.trim() || undefined,
-          adminFullName: formData.adminFullName.trim(),
-          adminContactPhone: formData.adminContactPhone ? `+7${formData.adminContactPhone}` : "",
           consentOfferAndPolicy: formData.consentOfferAndPolicy as true,
         };
 
@@ -207,7 +181,6 @@ export default function ZayavkaPage() {
   }
 
   const inputBase = "w-full rounded-xl border-0 bg-[var(--color-light-gray)] py-2.5 pl-10 pr-4 text-[var(--color-text)] placeholder:text-[var(--color-muted)] caret-[var(--color-text)] focus:outline-none";
-  const phoneInputBase = "flex-1 min-w-0 py-2.5 pr-4 pl-1 text-[var(--color-text)] placeholder:text-[var(--color-muted)] caret-[var(--color-text)] focus:outline-none border-0 bg-transparent";
 
   return (
     <AuthPageShell>
@@ -217,7 +190,7 @@ export default function ZayavkaPage() {
           <p className="mt-2 text-center text-[var(--color-text-secondary)]">
             {step === 1
               ? "Сначала укажите тип подключения и контактные данные."
-              : "Заполните данные о заведении и контакте для подтверждения."}
+              : "Заполните данные о заведении и деятельности."}
           </p>
 
           {/* Индикатор шагов */}
@@ -298,7 +271,7 @@ export default function ZayavkaPage() {
                       </div>
                     </div>
                     <p id="zayavka-requestType-desc" className="zayavka-hint mt-1 text-center text-[var(--color-muted)]">
-                      {isEstablishment ? "Данные компании и контактного лица" : "Официант, курьер и т.д. — с контактом администратора для подтверждения"}
+                      {isEstablishment ? "Данные компании и контактного лица" : "Официант, курьер и т.д."}
                     </p>
                   </div>
                 </section>
@@ -342,27 +315,6 @@ export default function ZayavkaPage() {
                       {fieldErrors.dateOfBirth && <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{fieldErrors.dateOfBirth}</p>}
                     </div>
                   )}
-                  <div>
-                    <label htmlFor="zayavka-phone" className="mb-1.5 block text-center text-sm font-medium text-[var(--color-text)]">Номер телефона</label>
-                    <div className="zayavka-phone-field relative flex rounded-xl border-0 bg-[var(--color-light-gray)] overflow-hidden focus-within:ring-2 focus-within:ring-[var(--color-accent-gold)]/40 focus-within:ring-offset-2 focus-within:ring-offset-[var(--color-bg)]">
-                      <span className="flex shrink-0 items-center gap-1 pl-3 text-[var(--color-text)]" aria-hidden="true">
-                        <Phone className="zayavka-phone-prefix h-5 w-5 text-[var(--color-muted)]" />
-                        <span className="zayavka-phone-prefix font-medium text-[var(--color-text)]">+7</span>
-                      </span>
-                      <input
-                        id="zayavka-phone"
-                        type="tel"
-                        inputMode="numeric"
-                        autoComplete="tel-national"
-                        value={formatPhoneNational(formData.phone)}
-                        onChange={(e) => handlePhoneChange(e, "phone")}
-                        placeholder="(999) 123-45-67"
-                        className={`${phoneInputBase} ${fieldErrors.phone ? "placeholder:text-[var(--color-text-secondary)]" : ""}`}
-                        aria-invalid={Boolean(fieldErrors.phone)}
-                      />
-                    </div>
-                    {fieldErrors.phone && <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{fieldErrors.phone}</p>}
-                  </div>
                   <div>
                     <label htmlFor="zayavka-email" className="mb-1.5 block text-center text-sm font-medium text-[var(--color-text)]">Почта</label>
                     <div className="relative">
@@ -482,50 +434,6 @@ export default function ZayavkaPage() {
                           />
                         </div>
                         {fieldErrors.establishment && <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{fieldErrors.establishment}</p>}
-                      </div>
-                    </section>
-                    <section className="space-y-4" aria-labelledby="zayavka-admin-heading">
-                      <h2 id="zayavka-admin-heading" className="text-sm font-semibold text-[var(--color-text)] border-0 pb-2 text-center">
-                        Контакт администратора
-                      </h2>
-                      <p className="zayavka-hint mt-0.5 text-center text-[var(--color-muted)]">
-                        Для подтверждения, что вы работаете в указанном заведении.
-                      </p>
-                      <div>
-                        <label htmlFor="zayavka-adminFullName" className="mb-1.5 block text-center text-sm font-medium text-[var(--color-text)]">ФИО администратора</label>
-                        <div className="relative">
-                          <User className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--color-muted)]" />
-                          <input
-                            id="zayavka-adminFullName"
-                            type="text"
-                            value={formData.adminFullName}
-                            onChange={(e) => setFormData({ ...formData, adminFullName: e.target.value })}
-                            placeholder="Петров Пётр Петрович"
-                            className={inputBase}
-                          />
-                        </div>
-                        {fieldErrors.adminFullName && <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{fieldErrors.adminFullName}</p>}
-                      </div>
-                      <div>
-                        <label htmlFor="zayavka-adminContactPhone" className="mb-1.5 block text-center text-sm font-medium text-[var(--color-text)]">Телефон администратора</label>
-                        <div className="zayavka-phone-field relative flex rounded-xl border-0 bg-[var(--color-light-gray)] overflow-hidden focus-within:ring-2 focus-within:ring-[var(--color-accent-gold)]/40 focus-within:ring-offset-2 focus-within:ring-offset-[var(--color-bg)]">
-                          <span className="flex shrink-0 items-center gap-1 pl-3 text-[var(--color-text)]" aria-hidden="true">
-                            <Phone className="zayavka-phone-prefix h-5 w-5 text-[var(--color-muted)]" />
-                            <span className="zayavka-phone-prefix font-medium text-[var(--color-text)]">+7</span>
-                          </span>
-                          <input
-                            id="zayavka-adminContactPhone"
-                            type="tel"
-                            inputMode="numeric"
-                            autoComplete="tel-national"
-                            value={formatPhoneNational(formData.adminContactPhone)}
-                            onChange={(e) => handlePhoneChange(e, "adminContactPhone")}
-                            placeholder="(999) 123-45-67"
-                            className={`${phoneInputBase} ${fieldErrors.adminContactPhone ? "placeholder:text-[var(--color-text-secondary)]" : ""}`}
-                            aria-invalid={Boolean(fieldErrors.adminContactPhone)}
-                          />
-                        </div>
-                        {fieldErrors.adminContactPhone && <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{fieldErrors.adminContactPhone}</p>}
                       </div>
                     </section>
                   </>

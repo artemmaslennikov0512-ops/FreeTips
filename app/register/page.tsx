@@ -3,7 +3,7 @@
 import { Suspense, useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Lock, User } from "lucide-react";
+import { KeyRound, Lock, User } from "lucide-react";
 import { getOrCreateDeviceClientId } from "@/lib/device-client-id";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { AuthPageShell } from "@/components/AuthPageShell";
@@ -19,6 +19,7 @@ function RegisterForm() {
     login: "",
     password: "",
     passwordConfirm: "",
+    recoveryCodeword: "",
     registrationToken: "",
     acceptOfferAndPrivacy: false,
   });
@@ -115,7 +116,7 @@ function RegisterForm() {
         <div className={AUTH_CARD_CLASS}>
           <h1 className="font-[family:var(--font-playfair)] text-2xl font-semibold text-[var(--color-text)]">Регистрация</h1>
           <p className="mt-2 text-[var(--color-text-secondary)]">
-            Создайте аккаунт для приёма чаевых. Достаточно ссылки с токеном, логина и пароля — подтверждение почты не требуется.
+            Создайте аккаунт для приёма чаевых. Нужны ссылка с токеном, логин, пароль и кодовое слово для восстановления доступа — подтверждение почты не требуется.
           </p>
 
           {error && (
@@ -202,6 +203,30 @@ function RegisterForm() {
                   className={AUTH_INPUT_CLASS}
                 />
               </div>
+            </div>
+
+            <div>
+              <label htmlFor="recoveryCodeword" className="mb-1.5 block text-sm font-medium text-[var(--color-text)]">
+                Кодовое слово
+              </label>
+              <div className="relative">
+                <KeyRound className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--color-muted)]" />
+                <input
+                  id="recoveryCodeword"
+                  type="password"
+                  required
+                  minLength={3}
+                  maxLength={72}
+                  autoComplete="off"
+                  value={formData.recoveryCodeword}
+                  onChange={(e) => setFormData({ ...formData, recoveryCodeword: e.target.value })}
+                  placeholder="Запомните — понадобится при сбросе пароля"
+                  className={AUTH_INPUT_CLASS}
+                />
+              </div>
+              <p className="mt-1 text-xs text-[var(--color-muted)]">
+                От 3 до 72 символов. По нему мы убедимся, что это вы, когда запросите восстановление пароля.
+              </p>
             </div>
 
             <div className="rounded-xl border border-white/10 bg-[var(--color-muted)]/5 p-3">

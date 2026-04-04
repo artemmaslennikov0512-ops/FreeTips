@@ -12,6 +12,7 @@ import { getFieldErrors } from "@/lib/form-errors";
 export default function ForgotPasswordPage() {
   const [login, setLogin] = useState("");
   const [email, setEmail] = useState("");
+  const [recoveryCodeword, setRecoveryCodeword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -25,6 +26,7 @@ export default function ForgotPasswordPage() {
     const parsed = forgotPasswordRequestSchema.safeParse({
       login: login.trim(),
       email: email.trim().toLowerCase(),
+      recoveryCodeword,
     });
     if (!parsed.success) {
       setFieldErrors(getFieldErrors(parsed.error));
@@ -69,7 +71,7 @@ export default function ForgotPasswordPage() {
             <p className="forgot-password-desc mt-5 text-[var(--color-text-secondary)] max-w-md mx-auto">
               {success
                 ? "На указанный email отправлена ссылка для сброса пароля. Проверьте почту и папку «Спам»."
-                : "Укажите логин и почту — мы отправим ссылку на сброс пароля. Логин и email должны принадлежать одному аккаунту."}
+                : "Укажите логин, почту и кодовое слово с регистрации — мы отправим ссылку на сброс пароля. Если аккаунт создан до появления кодового слова, поле можно оставить пустым."}
             </p>
           </div>
 
@@ -125,6 +127,30 @@ export default function ForgotPasswordPage() {
                   </p>
                   {fieldErrors.email && (
                     <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{fieldErrors.email}</p>
+                  )}
+                </div>
+                <div>
+                  <label htmlFor="recoveryCodeword" className="mb-1.5 block text-sm font-medium text-[var(--color-text)]">
+                    Кодовое слово
+                  </label>
+                  <div className="relative">
+                    <KeyRound className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--color-muted)]" />
+                    <input
+                      id="recoveryCodeword"
+                      type="password"
+                      autoComplete="off"
+                      maxLength={72}
+                      value={recoveryCodeword}
+                      onChange={(e) => setRecoveryCodeword(e.target.value)}
+                      placeholder="Как при регистрации"
+                      className={`${AUTH_INPUT_CLASS} ${fieldErrors.recoveryCodeword ? AUTH_ERROR_BORDER : ""}`}
+                    />
+                  </div>
+                  <p className="forgot-password-tip mt-1 leading-snug text-[var(--color-text-secondary)]">
+                    Для новых аккаунтов обязательно. Для старых — оставьте пустым.
+                  </p>
+                  {fieldErrors.recoveryCodeword && (
+                    <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{fieldErrors.recoveryCodeword}</p>
                   )}
                 </div>
                 <button

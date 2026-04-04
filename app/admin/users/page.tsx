@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { Search, Copy, Filter, ArrowUpDown, Lock, RefreshCw } from "lucide-react";
+import { Search, Copy, Check, Filter, ArrowUpDown, Lock, RefreshCw } from "lucide-react";
 import Link from "next/link";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { CustomDropdown } from "@/components/CustomDropdown";
@@ -106,8 +106,8 @@ export default function AdminUsersPage() {
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [tokenLoading, setTokenLoading] = useState(false);
   const [registrationLink, setRegistrationLink] = useState<string | null>(null);
-  const [copyBanner, setCopyBanner] = useState<string | null>(null);
-  const copyBannerTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [linkJustCopied, setLinkJustCopied] = useState(false);
+  const linkCopiedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [blockAllLoading, setBlockAllLoading] = useState(false);
   const [blockAllError, setBlockAllError] = useState<string | null>(null);
 
@@ -152,7 +152,7 @@ export default function AdminUsersPage() {
 
   useEffect(() => {
     return () => {
-      if (copyBannerTimerRef.current) clearTimeout(copyBannerTimerRef.current);
+      if (linkCopiedTimerRef.current) clearTimeout(linkCopiedTimerRef.current);
     };
   }, []);
 
@@ -269,6 +269,7 @@ export default function AdminUsersPage() {
       const data = (await res.json()) as { token: string; link?: string; expiresAt: string; validHours?: number };
       const link = data.link ?? `${getBaseUrl()}/register?token=${encodeURIComponent(data.token)}`;
       setRegistrationLink(link);
+      setLinkJustCopied(false);
     } catch {
       setError("Ошибка создания токена");
     } finally {
@@ -276,26 +277,18 @@ export default function AdminUsersPage() {
     }
   };
 
-  const showCopyBanner = useCallback((message: string) => {
-    setCopyBanner(message);
-    if (copyBannerTimerRef.current) clearTimeout(copyBannerTimerRef.current);
-    copyBannerTimerRef.current = setTimeout(() => {
-      setCopyBanner(null);
-      copyBannerTimerRef.current = null;
-    }, 5000);
-  }, []);
-
   const handleCopyToken = async () => {
     if (!registrationLink) return;
     try {
       await navigator.clipboard.writeText(registrationLink);
-      const tail =
-        registrationLink.length > 72 ? `…${registrationLink.slice(-68)}` : registrationLink;
-      showCopyBanner(`Скопировано в буфер обмена: ${tail}`);
+      setLinkJustCopied(true);
+      if (linkCopiedTimerRef.current) clearTimeout(linkCopiedTimerRef.current);
+      linkCopiedTimerRef.current = setTimeout(() => {
+        setLinkJustCopied(false);
+        linkCopiedTimerRef.current = null;
+      }, 2200);
     } catch {
-      showCopyBanner(
-        "Не удалось скопировать автоматически. Выделите ссылку в поле ниже мышью и нажмите Ctrl+C (или ⌘+C).",
-      );
+      setError("Не удалось скопировать ссылку");
     }
   };
 
@@ -338,16 +331,6 @@ export default function AdminUsersPage() {
           {blockAllError}
         </div>
       )}
-      {copyBanner && (
-        <div
-          role="status"
-          aria-live="polite"
-          className="mb-6 break-words rounded-xl border border-emerald-500/40 bg-emerald-950/35 px-4 py-3 text-sm text-emerald-50"
-        >
-          {copyBanner}
-        </div>
-      )}
-
       <div className="mb-6 grid gap-4 lg:grid-cols-[1fr_auto]">
         <div className="relative flex max-w-md items-center">
           <Search className="pointer-events-none absolute left-3 h-5 w-5 text-white/80" style={{top:"50%",transform:"translateY(-50%)"}} />
@@ -381,11 +364,16 @@ export default function AdminUsersPage() {
             {registrationLink && (
               <button
                 type="button"
-                onClick={handleCopyToken}
-                className={`${ADMIN_BTN} ${ADMIN_BTN_SM} gap-1 admin-btn--neutral`}
+                onClick={() => void handleCopyToken()}
+                className={`${ADMIN_BTN} ${ADMIN_BTN_SM} gap-1 ${linkJustCopied ? "admin-btn--success" : "admin-btn--neutral"}`}
+                aria-label={linkJustCopied ? "Скопировано" : "Скопировать ссылку"}
               >
-                <Copy className="h-4 w-4" />
-                Скопировать ссылку
+                {linkJustCopied ? (
+                  <Check className="h-4 w-4 text-emerald-400" strokeWidth={2.5} aria-hidden />
+                ) : (
+                  <Copy className="h-4 w-4" aria-hidden />
+                )}
+                {linkJustCopied ? "Скопировано" : "Скопировать ссылку"}
               </button>
             )}
           </div>

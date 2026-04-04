@@ -35,6 +35,11 @@ export function toDateInputValueFromApi(raw: string | null | undefined): string 
   if (raw == null) return "";
   const s = String(raw).trim();
   if (!s) return "";
+  const dmy = /^(\d{2})\.(\d{2})\.(\d{4})$/.exec(s);
+  if (dmy) {
+    const [, dd, mm, yyyy] = dmy;
+    return `${yyyy}-${mm}-${dd}`;
+  }
   if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
   const head = s.match(/^(\d{4}-\d{2}-\d{2})/);
   if (head) return head[1]!;

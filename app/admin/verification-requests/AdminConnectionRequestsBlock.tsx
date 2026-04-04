@@ -1,8 +1,9 @@
 "use client";
 
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { ADMIN_BTN, ADMIN_BTN_NEUTRAL_SM, ADMIN_BTN_PRIMARY, ADMIN_BTN_SM } from "@/lib/admin-button-classes";
-import { ChevronDown, ChevronRight, ClipboardCheck, Copy, Send, Loader2 } from "lucide-react";
+import { Check, ChevronDown, ChevronRight, ClipboardCheck, Copy, Send, Loader2 } from "lucide-react";
 import { AdminStatusTabs, AdminRequestTab, apiStatusForTab } from "./AdminStatusTabs";
 
 const STORAGE_KEY_ISSUED_LINKS = "admin_issued_registration_links";
@@ -48,6 +49,11 @@ export interface RegistrationRequestRow {
   createdAt: string;
   hasToken: boolean;
   tokenExpiresAt: string | null;
+  /** Текущий токен заявки использован при регистрации (есть пользователь). */
+  isRegistered?: boolean;
+  registeredAt?: string | null;
+  registeredUserId?: string | null;
+  registeredLogin?: string | null;
   companyName?: string | null;
   companyRole?: string | null;
   employeeCount?: number | null;
@@ -114,6 +120,59 @@ function ConnectionRequestDetails({ r, twoColumnFromSm }: { r: RegistrationReque
   );
 }
 
+function RegistrationFollowUpLine({
+  r,
+  surface = "card",
+}: {
+  r: RegistrationRequestRow;
+  surface?: "card" | "table";
+}) {
+  const isRegistered = r.isRegistered === true;
+  const onTable = surface === "table";
+  const muted = onTable ? "text-[var(--color-text-secondary)]" : "text-white/70";
+  const dim = onTable ? "text-[var(--color-muted)]" : "text-white/55";
+  const ok = onTable ? "text-emerald-600" : "text-emerald-400";
+  const pending = onTable ? "text-amber-800/90" : "text-amber-200/85";
+
+  if (isRegistered) {
+    const dt =
+      r.registeredAt != null
+        ? new Date(r.registeredAt).toLocaleString("ru-RU", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+          })
+        : null;
+    return (
+      <div className="mt-1.5 space-y-0.5 text-xs leading-snug">
+        <p className={`font-medium ${ok}`}>Зарегистрирован</p>
+        {r.registeredLogin ? (
+          <p className={`break-all ${muted}`}>
+            Логин:{" "}
+            {r.registeredUserId ? (
+              <Link
+                href={`/admin/users/${r.registeredUserId}`}
+                className="text-[var(--color-brand-gold)] underline-offset-2 hover:underline"
+              >
+                {r.registeredLogin}
+              </Link>
+            ) : (
+              r.registeredLogin
+            )}
+          </p>
+        ) : null}
+        {dt ? <p className={dim}>{dt}</p> : null}
+      </div>
+    );
+  }
+  if (r.status === "APPROVED" && r.hasToken) {
+    return <p className={`mt-1.5 text-xs ${pending}`}>По ссылке ещё не регистрировались</p>;
+  }
+  return null;
+}
+
 type BlockProps = {
   /** Счётчики для бейджей на подвкладках «На рассмотрении / Принятые / Отклонённые». */
   connectionCounts?: { pending: number; approved: number; rejected: number };
@@ -151,17 +210,8 @@ export function AdminConnectionRequestsBlock({
   const [approvingId, setApprovingId] = useState<string | null>(null);
   const [sendingTokenId, setSendingTokenId] = useState<string | null>(null);
   const [issuedLinksByRequestId, setIssuedLinksByRequestId] = useState<Record<string, string>>({});
-  const [copyBanner, setCopyBanner] = useState<string | null>(null);
-  const copyBannerTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const showCopyBanner = useCallback((message: string) => {
-    setCopyBanner(message);
-    if (copyBannerTimerRef.current) clearTimeout(copyBannerTimerRef.current);
-    copyBannerTimerRef.current = setTimeout(() => {
-      setCopyBanner(null);
-      copyBannerTimerRef.current = null;
-    }, 5000);
-  }, []);
+  const [copiedRequestId, setCopiedRequestId] = useState<string | null>(null);
+  const copySuccessTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const valid = loadIssuedLinksFromStorage();
@@ -170,7 +220,7 @@ export function AdminConnectionRequestsBlock({
 
   useEffect(() => {
     return () => {
-      if (copyBannerTimerRef.current) clearTimeout(copyBannerTimerRef.current);
+      if (copySuccessTimerRef.current) clearTimeout(copySuccessTimerRef.current);
     };
   }, []);
 
@@ -189,7 +239,16 @@ export function AdminConnectionRequestsBlock({
         return;
       }
       const data = (await res.json()) as { requests: RegistrationRequestRow[] };
-      setList((data.requests ?? []).map((r) => ({ ...r, tokenExpiresAt: r.tokenExpiresAt ?? null })));
+      setList(
+        (data.requests ?? []).map((r) => ({
+          ...r,
+          tokenExpiresAt: r.tokenExpiresAt ?? null,
+          isRegistered: r.isRegistered === true,
+          registeredAt: r.registeredAt ?? null,
+          registeredUserId: r.registeredUserId ?? null,
+          registeredLogin: r.registeredLogin ?? null,
+        })),
+      );
     } catch {
       setError("Ошибка загрузки заявок на подключение");
     } finally {
@@ -203,20 +262,19 @@ export function AdminConnectionRequestsBlock({
 
   const getLinkForRequest = (requestId: string) => issuedLinksByRequestId[requestId];
 
-  const copyLink = async (link: string, applicantLabel?: string) => {
+  const COPY_FEEDBACK_MS = 2200;
+
+  const copyLink = async (link: string, requestId: string) => {
     try {
       await navigator.clipboard.writeText(link);
-      const tail = link.length > 72 ? `…${link.slice(-68)}` : link;
-      const who = applicantLabel?.trim();
-      showCopyBanner(
-        who
-          ? `Скопировано (заявка: ${who}). В буфере обмена: ${tail}`
-          : `Скопировано. В буфере обмена: ${tail}`,
-      );
+      setCopiedRequestId(requestId);
+      if (copySuccessTimerRef.current) clearTimeout(copySuccessTimerRef.current);
+      copySuccessTimerRef.current = setTimeout(() => {
+        setCopiedRequestId(null);
+        copySuccessTimerRef.current = null;
+      }, COPY_FEEDBACK_MS);
     } catch {
-      showCopyBanner(
-        "Не удалось скопировать автоматически. Нажмите на поле со ссылкой — текст выделится — затем Ctrl+C (или ⌘+C).",
-      );
+      setError("Не удалось скопировать ссылку");
     }
   };
 
@@ -312,15 +370,6 @@ export function AdminConnectionRequestsBlock({
           {error}
         </div>
       )}
-      {copyBanner && (
-        <div
-          role="status"
-          aria-live="polite"
-          className="break-words rounded-xl border border-emerald-500/40 bg-emerald-950/35 px-4 py-3 text-sm text-emerald-50"
-        >
-          {copyBanner}
-        </div>
-      )}
       {loading ? (
         <div
           className={`flex items-center justify-center text-[var(--color-brand-gold)] ${
@@ -344,6 +393,7 @@ export function AdminConnectionRequestsBlock({
           <div className="space-y-4 lg:hidden">
             {list.map((r) => {
               const linkForRow = getLinkForRequest(r.id);
+              const copyDone = copiedRequestId === r.id;
               const isApproving = approvingId === r.id;
               const isMobileExpanded = expandedId === r.id;
               return (
@@ -362,6 +412,7 @@ export function AdminConnectionRequestsBlock({
                       {r.status === "PENDING" ? "Ожидает" : r.status === "APPROVED" ? "Принята" : "Отклонена"}
                     </span>
                   </div>
+                  <RegistrationFollowUpLine r={r} />
                   <p className="mt-2 font-medium text-white">{r.fullName}</p>
                   <p className="truncate text-sm text-white/80">{r.email}</p>
                   <p className="mt-1 text-xs text-white/60">
@@ -413,11 +464,17 @@ export function AdminConnectionRequestsBlock({
                         <>
                           <button
                             type="button"
-                            onClick={() => void copyLink(linkForRow, r.fullName)}
-                            className={`${ADMIN_BTN} ${ADMIN_BTN_NEUTRAL_SM} gap-1`}
+                            onClick={() => void copyLink(linkForRow, r.id)}
+                            className={`${ADMIN_BTN} ${ADMIN_BTN_NEUTRAL_SM} gap-1 ${copyDone ? "admin-btn--success" : ""}`}
                             title="Копировать ссылку в буфер"
+                            aria-label={copyDone ? "Скопировано" : "Копировать ссылку"}
                           >
-                            <Copy className="h-4 w-4" /> Копировать
+                            {copyDone ? (
+                              <Check className="h-4 w-4 text-emerald-400" strokeWidth={2.5} aria-hidden />
+                            ) : (
+                              <Copy className="h-4 w-4" aria-hidden />
+                            )}
+                            {copyDone ? "Скопировано" : "Копировать"}
                           </button>
                           <button
                             type="button"
@@ -449,11 +506,17 @@ export function AdminConnectionRequestsBlock({
                         <>
                           <button
                             type="button"
-                            onClick={() => void copyLink(linkForRow, r.fullName)}
-                            className={`${ADMIN_BTN} ${ADMIN_BTN_NEUTRAL_SM} gap-1`}
+                            onClick={() => void copyLink(linkForRow, r.id)}
+                            className={`${ADMIN_BTN} ${ADMIN_BTN_NEUTRAL_SM} gap-1 ${copyDone ? "admin-btn--success" : ""}`}
                             title="Копировать ссылку в буфер"
+                            aria-label={copyDone ? "Скопировано" : "Копировать ссылку"}
                           >
-                            <Copy className="h-4 w-4" /> Копировать
+                            {copyDone ? (
+                              <Check className="h-4 w-4 text-emerald-400" strokeWidth={2.5} aria-hidden />
+                            ) : (
+                              <Copy className="h-4 w-4" aria-hidden />
+                            )}
+                            {copyDone ? "Скопировано" : "Копировать"}
                           </button>
                           <button
                             type="button"
@@ -509,6 +572,7 @@ export function AdminConnectionRequestsBlock({
                     const isExpanded = expandedId === r.id;
                     const isApproving = approvingId === r.id;
                     const linkForRow = getLinkForRequest(r.id);
+                    const copyDone = copiedRequestId === r.id;
                     return (
                       <Fragment key={r.id}>
                         <tr className="border-0 transition-colors hover:bg-white/10">
@@ -536,7 +600,7 @@ export function AdminConnectionRequestsBlock({
                               minute: "2-digit",
                             })}
                           </td>
-                          <td className="p-3">
+                          <td className="max-w-[14rem] p-3 align-top">
                             <span
                               className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${
                                 r.status === "PENDING"
@@ -548,6 +612,7 @@ export function AdminConnectionRequestsBlock({
                             >
                               {r.status === "PENDING" ? "Ожидает" : r.status === "APPROVED" ? "Принята" : "Отклонена"}
                             </span>
+                            <RegistrationFollowUpLine r={r} surface="table" />
                           </td>
                           <td className="p-3">
                             {tab === "pending" && r.status === "PENDING" && !r.hasToken && (
@@ -574,11 +639,16 @@ export function AdminConnectionRequestsBlock({
                                   />
                                   <button
                                     type="button"
-                                    onClick={() => void copyLink(linkForRow, r.fullName)}
-                                    className={`${ADMIN_BTN} admin-btn--neutral !min-h-0 !min-w-0 !rounded-lg !p-1.5`}
+                                    onClick={() => void copyLink(linkForRow, r.id)}
+                                    className={`${ADMIN_BTN} admin-btn--neutral !min-h-0 !min-w-0 !rounded-lg !p-1.5 ${copyDone ? "admin-btn--success" : ""}`}
                                     title="Копировать ссылку в буфер"
+                                    aria-label={copyDone ? "Скопировано" : "Копировать ссылку"}
                                   >
-                                    <Copy className="h-4 w-4" />
+                                    {copyDone ? (
+                                      <Check className="h-4 w-4 text-emerald-400" strokeWidth={2.5} aria-hidden />
+                                    ) : (
+                                      <Copy className="h-4 w-4" aria-hidden />
+                                    )}
                                   </button>
                                   <button
                                     type="button"
@@ -620,11 +690,16 @@ export function AdminConnectionRequestsBlock({
                                   />
                                   <button
                                     type="button"
-                                    onClick={() => void copyLink(linkForRow, r.fullName)}
-                                    className={`${ADMIN_BTN} admin-btn--neutral !min-h-0 !min-w-0 !rounded-lg !p-1.5`}
+                                    onClick={() => void copyLink(linkForRow, r.id)}
+                                    className={`${ADMIN_BTN} admin-btn--neutral !min-h-0 !min-w-0 !rounded-lg !p-1.5 ${copyDone ? "admin-btn--success" : ""}`}
                                     title="Копировать ссылку в буфер"
+                                    aria-label={copyDone ? "Скопировано" : "Копировать ссылку"}
                                   >
-                                    <Copy className="h-4 w-4" />
+                                    {copyDone ? (
+                                      <Check className="h-4 w-4 text-emerald-400" strokeWidth={2.5} aria-hidden />
+                                    ) : (
+                                      <Copy className="h-4 w-4" aria-hidden />
+                                    )}
                                   </button>
                                   <button
                                     type="button"

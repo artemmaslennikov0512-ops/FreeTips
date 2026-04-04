@@ -4,6 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
+import { RegistrationRequestStatus } from "@prisma/client";
 import { db } from "@/lib/db";
 import { createRegistrationRequestSchema } from "@/lib/validations";
 import {
@@ -29,6 +30,36 @@ export async function POST(request: NextRequest) {
 
   const data = validated.data;
   const isEstablishment = data.requestType === "establishment";
+  const emailNormalized = data.email.trim().toLowerCase();
+
+  const existingUser = await db.user.findFirst({
+    where: {
+      email: { equals: emailNormalized, mode: "insensitive" },
+    },
+    select: { id: true },
+  });
+  if (existingUser) {
+    return jsonError(
+      409,
+      "Этот email уже зарегистрирован. Войдите в аккаунт с этой почтой или укажите другой адрес.",
+      [{ path: ["email"], message: "Этот email уже используется в сервисе" }],
+    );
+  }
+
+  const openRequestSameEmail = await db.registrationRequest.findFirst({
+    where: {
+      email: { equals: emailNormalized, mode: "insensitive" },
+      status: { not: RegistrationRequestStatus.REJECTED },
+    },
+    select: { id: true },
+  });
+  if (openRequestSameEmail) {
+    return jsonError(
+      409,
+      "По этому email уже есть активная заявка на подключение. Дождитесь рассмотрения или укажите другой адрес.",
+      [{ path: ["email"], message: "Этот email уже указан в другой заявке" }],
+    );
+  }
 
   const req = await db.registrationRequest.create({
     data: {
@@ -38,7 +69,7 @@ export async function POST(request: NextRequest) {
       phone: data.phone ?? "",
       activityType: isEstablishment ? "" : data.activityType,
       establishment: isEstablishment ? "" : (data.establishment ?? ""),
-      email: data.email,
+      email: emailNormalized,
       companyName: isEstablishment ? data.companyName : null,
       companyRole: isEstablishment ? data.companyRole : null,
       employeeCount: isEstablishment ? data.employeeCount : null,

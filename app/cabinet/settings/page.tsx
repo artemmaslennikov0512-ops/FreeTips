@@ -282,11 +282,12 @@ export default function CabinetSettingsPage() {
   };
 
   const combinedFullNameForCompare = [editLastName.trim(), editFirstName.trim(), editPatronymic.trim()].filter(Boolean).join(" ");
+  const serverBirthForCompare = toDateInputValueFromApi(user?.birthDate);
   const hasProfileChanges =
     editLogin.trim() !== (user?.login ?? "") ||
     editEmail.trim() !== (user?.email ?? "") ||
     normalizeFullNameSpaced(combinedFullNameForCompare) !== normalizeFullNameSpaced(user?.fullName ?? "") ||
-    editBirthDate.trim() !== (user?.birthDate ?? "") ||
+    editBirthDate.trim() !== serverBirthForCompare ||
     editEstablishment.trim() !== (user?.establishment ?? "");
 
   if (loading) {

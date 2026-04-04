@@ -22,6 +22,7 @@ import { parseJsonWithLimit, MAX_BODY_SIZE_AUTH, jsonError, internalError, rateL
 import { verifyCsrfFromRequest } from "@/lib/security/csrf";
 import { observeSharedAuthIp } from "@/lib/fraud-velocity-observe";
 import { buildNewSessionMetadata } from "@/lib/auth-session-metadata";
+import { toDateInputValueFromApi } from "@/lib/utils";
 
 export async function POST(request: NextRequest) {
   const requestId = getRequestId(request);
@@ -51,6 +52,15 @@ export async function POST(request: NextRequest) {
       include: {
         establishment: { select: { id: true } },
         employee: { select: { id: true, establishmentId: true } },
+        registrationRequest: {
+          select: {
+            fullName: true,
+            email: true,
+            dateOfBirth: true,
+            establishment: true,
+            companyName: true,
+          },
+        },
       },
     });
     if (!regToken) {
@@ -86,6 +96,20 @@ export async function POST(request: NextRequest) {
             ? regToken!.employee.establishmentId
             : null;
 
+      const reqRow = regToken!.registrationRequest;
+      let profileEmail = reqRow?.email?.trim() || undefined;
+      if (profileEmail) {
+        const emailTaken = await tx.user.findUnique({
+          where: { email: profileEmail },
+          select: { id: true },
+        });
+        if (emailTaken) profileEmail = undefined;
+      }
+      const profileFullName = reqRow?.fullName?.trim();
+      const birthIso = reqRow?.dateOfBirth ? toDateInputValueFromApi(reqRow.dateOfBirth) : "";
+      const establishmentFree =
+        reqRow?.establishment?.trim() || reqRow?.companyName?.trim() || "";
+
       const created = await tx.user.create({
         data: {
           login: validated.login,
@@ -94,6 +118,10 @@ export async function POST(request: NextRequest) {
           recoveryCodewordEnc,
           role,
           establishmentId: establishmentId ?? undefined,
+          ...(profileEmail ? { email: profileEmail } : {}),
+          ...(profileFullName ? { fullName: profileFullName } : {}),
+          ...(birthIso ? { birthDate: birthIso } : {}),
+          ...(establishmentFree ? { establishment: establishmentFree } : {}),
         },
       });
       const defaultLimits = await getSystemDefaultLimitsForNewUser();

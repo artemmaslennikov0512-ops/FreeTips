@@ -37,29 +37,45 @@ export async function GET(request: NextRequest) {
       employeeCount: true,
       adminFullName: true,
       adminContactPhone: true,
-      registrationToken: { select: { expiresAt: true } },
+      registrationToken: {
+        select: {
+          expiresAt: true,
+          usedAt: true,
+          usedById: true,
+          usedBy: { select: { id: true, login: true } },
+        },
+      },
     },
   });
 
-  const requests = list.map((r) => ({
-    id: r.id,
-    requestType: r.requestType ?? "individual",
-    fullName: r.fullName,
-    dateOfBirth: r.dateOfBirth,
-    establishment: r.establishment,
-    phone: r.phone,
-    activityType: r.activityType,
-    email: r.email,
-    status: r.status,
-    createdAt: r.createdAt.toISOString(),
-    hasToken: !!r.registrationTokenId,
-    tokenExpiresAt: r.registrationToken?.expiresAt?.toISOString() ?? null,
-    companyName: r.companyName,
-    companyRole: r.companyRole,
-    employeeCount: r.employeeCount,
-    adminFullName: r.adminFullName,
-    adminContactPhone: r.adminContactPhone,
-  }));
+  const requests = list.map((r) => {
+    const tok = r.registrationToken;
+    const isRegistered = !!tok?.usedById;
+    return {
+      id: r.id,
+      requestType: r.requestType ?? "individual",
+      fullName: r.fullName,
+      dateOfBirth: r.dateOfBirth,
+      establishment: r.establishment,
+      phone: r.phone,
+      activityType: r.activityType,
+      email: r.email,
+      status: r.status,
+      createdAt: r.createdAt.toISOString(),
+      hasToken: !!r.registrationTokenId,
+      tokenExpiresAt: tok?.expiresAt?.toISOString() ?? null,
+      /** Одноразовая ссылка из заявки уже привела к созданию аккаунта (по текущему привязанному токену). */
+      isRegistered,
+      registeredAt: isRegistered && tok?.usedAt ? tok.usedAt.toISOString() : null,
+      registeredUserId: tok?.usedBy?.id ?? null,
+      registeredLogin: tok?.usedBy?.login ?? null,
+      companyName: r.companyName,
+      companyRole: r.companyRole,
+      employeeCount: r.employeeCount,
+      adminFullName: r.adminFullName,
+      adminContactPhone: r.adminContactPhone,
+    };
+  });
 
   return NextResponse.json({ requests });
 }

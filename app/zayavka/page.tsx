@@ -133,6 +133,15 @@ export default function ZayavkaPage() {
       const data = await res.json().catch(() => ({}));
 
       if (!res.ok) {
+        const details = data.details as Array<{ path?: (string | number)[]; message?: string }> | undefined;
+        if (Array.isArray(details)) {
+          const next: Record<string, string> = {};
+          for (const d of details) {
+            const key = d.path?.[0];
+            if (typeof key === "string" && d.message) next[key] = d.message;
+          }
+          if (Object.keys(next).length > 0) setFieldErrors((prev) => ({ ...prev, ...next }));
+        }
         setError(data.error || "Ошибка при отправке заявки");
         return;
       }

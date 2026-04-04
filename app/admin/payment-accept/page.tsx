@@ -288,56 +288,64 @@ export default function AdminPaymentAcceptPage() {
         </div>
       </div>
 
-      <div className="grid gap-6 text-left md:grid-cols-2">
-        <div className={`${ADMIN_PANEL_CARD} !text-left`}>
-          <label className="block text-sm font-medium text-white">Белый список — добавить</label>
-          <p className="mt-1 text-xs text-white/70">
+      <div className="grid gap-6 md:grid-cols-2">
+        <div className={`${ADMIN_PANEL_CARD} flex w-full min-w-0 flex-col items-center gap-3`}>
+          <label className="block w-full max-w-lg text-center text-sm font-medium text-white">
+            Белый список — добавить
+          </label>
+          <p className="w-full max-w-lg text-center text-xs leading-relaxed text-white/70">
             Логин или id. Несколько значений — через запятую, пробел или с новой строки (в поле можно вставить
             список).
           </p>
-          <input
-            type="text"
-            className={ADMIN_PANEL_INPUT_FULL_WIDTH}
-            value={whitelistDraft}
-            onChange={(e) => setWhitelistDraft(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                addToWhitelist();
-              }
-            }}
-            disabled={saving}
-            placeholder="например ivanov или clxxxxxxxx"
-            spellCheck={false}
-            autoComplete="off"
-          />
-          <button type="button" className={`${BTN_PRIMARY} mt-3`} disabled={saving} onClick={addToWhitelist}>
+          <div className="w-full max-w-lg">
+            <input
+              type="text"
+              className={ADMIN_PANEL_INPUT_FULL_WIDTH}
+              value={whitelistDraft}
+              onChange={(e) => setWhitelistDraft(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  addToWhitelist();
+                }
+              }}
+              disabled={saving}
+              placeholder="например ivanov или clxxxxxxxx"
+              spellCheck={false}
+              autoComplete="off"
+            />
+          </div>
+          <button type="button" className={BTN_PRIMARY} disabled={saving} onClick={addToWhitelist}>
             Добавить в белый список
           </button>
         </div>
 
-        <div className={`${ADMIN_PANEL_CARD} !text-left`}>
-          <label className="block text-sm font-medium text-white">Чёрный список — добавить</label>
-          <p className="mt-1 text-xs text-white/70">
+        <div className={`${ADMIN_PANEL_CARD} flex w-full min-w-0 flex-col items-center gap-3`}>
+          <label className="block w-full max-w-lg text-center text-sm font-medium text-white">
+            Чёрный список — добавить
+          </label>
+          <p className="w-full max-w-lg text-center text-xs leading-relaxed text-white/70">
             Эти аккаунты не принимают оплату по ссылке, пока глобальный стоп выключен. Формат ввода такой же.
           </p>
-          <input
-            type="text"
-            className={ADMIN_PANEL_INPUT_FULL_WIDTH}
-            value={blacklistDraft}
-            onChange={(e) => setBlacklistDraft(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                addToBlacklist();
-              }
-            }}
-            disabled={saving}
-            placeholder="логин или id"
-            spellCheck={false}
-            autoComplete="off"
-          />
-          <button type="button" className={`${BTN_PRIMARY} mt-3`} disabled={saving} onClick={addToBlacklist}>
+          <div className="w-full max-w-lg">
+            <input
+              type="text"
+              className={ADMIN_PANEL_INPUT_FULL_WIDTH}
+              value={blacklistDraft}
+              onChange={(e) => setBlacklistDraft(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  addToBlacklist();
+                }
+              }}
+              disabled={saving}
+              placeholder="логин или id"
+              spellCheck={false}
+              autoComplete="off"
+            />
+          </div>
+          <button type="button" className={BTN_PRIMARY} disabled={saving} onClick={addToBlacklist}>
             Добавить в чёрный список
           </button>
         </div>

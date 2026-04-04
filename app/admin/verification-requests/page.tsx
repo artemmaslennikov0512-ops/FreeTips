@@ -270,7 +270,7 @@ export default function AdminVerificationRequestsPage() {
       </div>
 
       <div
-        className={`${ADMIN_PANEL_CARD} !text-left flex w-full min-w-0 flex-col gap-4 min-h-[min(62dvh,680px)]`}
+        className={`${ADMIN_PANEL_CARD} !text-left flex w-full min-w-0 flex-col gap-4 min-h-0 lg:min-h-[min(62dvh,680px)]`}
       >
         <AdminStatusTabs
           align="start"
@@ -290,119 +290,209 @@ export default function AdminVerificationRequestsPage() {
               <div className="flex min-h-[min(40dvh,360px)] flex-1 flex-col items-center justify-center text-white/60">
                 <Loader2 className="h-8 w-8 animate-spin" aria-hidden />
               </div>
+            ) : list.length === 0 ? (
+              <div className="flex min-h-[min(36dvh,280px)] flex-1 flex-col items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 py-10 text-center text-sm text-white/60">
+                {emptyMessage}
+              </div>
             ) : (
-              <div className="admin-dashboard-table cabinet-section-header min-h-[min(48dvh,520px)] w-full flex-1 overflow-auto rounded-xl border-0 text-left">
-                <table className="w-full min-w-[760px] border-collapse text-sm">
-                  <thead>
-                    <tr className="border-b border-white/15">
-                      <th className="px-3 py-2 text-left font-medium text-white">Дата</th>
-                      <th className="px-3 py-2 text-left font-medium text-white">Пользователь</th>
-                      <th className="px-3 py-2 text-left font-medium text-white">ФИО</th>
-                      <th className="px-3 py-2 text-left font-medium text-white">Паспорт / ИНН</th>
-                      {!isPending && <th className="px-3 py-2 text-left font-medium text-white">Рассмотрено</th>}
-                      {verificationTab === "rejected" && (
-                        <th className="min-w-[140px] px-3 py-2 text-left font-medium text-white">Причина отказа</th>
-                      )}
-                      <th className="px-3 py-2 text-left font-medium text-white">Документы</th>
-                      {isPending && <th className="px-3 py-2 text-left font-medium text-white">Действия</th>}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {list.length === 0 ? (
-                      <tr>
-                        <td
-                          colSpan={8}
-                          className="px-3 py-6 text-center text-white/60"
+              <>
+                <div className="space-y-4 lg:hidden">
+                  {list.map((r) => (
+                    <div
+                      key={r.id}
+                      className="admin-dashboard-table cabinet-section-header rounded-2xl border-0 p-4 text-left"
+                    >
+                      <p className="text-xs text-white/60">
+                        {new Date(r.createdAt).toLocaleString("ru-RU", {
+                          day: "2-digit",
+                          month: "2-digit",
+                          year: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </p>
+                      <div className="mt-2 min-w-0">
+                        <Link
+                          href={`/admin/users/${r.userId}`}
+                          className="break-words font-medium text-[var(--color-brand-gold)] hover:underline"
                         >
-                          {emptyMessage}
-                        </td>
-                      </tr>
-                    ) : (
-                      list.map((r) => (
-                        <tr key={r.id} className="border-b border-white/10">
-                          <td className="whitespace-nowrap px-3 py-2.5 text-white">
-                            {new Date(r.createdAt).toLocaleString("ru-RU")}
-                          </td>
-                          <td className="px-3 py-2.5">
-                            <Link href={`/admin/users/${r.userId}`} className="text-[var(--color-brand-gold)] hover:underline">
-                              {r.login}
-                            </Link>
-                            {r.email && <div className="text-xs text-white/80">{r.email}</div>}
-                          </td>
-                          <td className="whitespace-nowrap px-3 py-2.5 text-white">{r.fullName}</td>
-                          <td className="whitespace-nowrap px-3 py-2.5 text-white">
-                            {r.passportSeries} {r.passportNumber}, ИНН {r.inn}
-                          </td>
-                          {!isPending && (
-                            <td className="whitespace-nowrap px-3 py-2.5 text-white/80">
-                              {r.reviewedAt ? new Date(r.reviewedAt).toLocaleString("ru-RU") : "—"}
-                            </td>
-                          )}
+                          {r.login}
+                        </Link>
+                        {r.email && <p className="mt-0.5 break-all text-sm text-white/75">{r.email}</p>}
+                      </div>
+                      <p className="mt-2 break-words text-sm font-medium text-white">{r.fullName}</p>
+                      <p className="mt-1 break-words text-xs text-white/80">
+                        Паспорт {r.passportSeries} {r.passportNumber} · ИНН {r.inn}
+                      </p>
+                      {!isPending && (
+                        <p className="mt-2 text-xs text-white/60">
+                          Рассмотрено:{" "}
+                          {r.reviewedAt ? new Date(r.reviewedAt).toLocaleString("ru-RU") : "—"}
+                        </p>
+                      )}
+                      {verificationTab === "rejected" && (
+                        <p className="mt-2 rounded-lg border border-red-500/25 bg-red-500/10 p-2 text-xs leading-snug text-red-200/90">
+                          {r.rejectionReason ?? "—"}
+                        </p>
+                      )}
+                      <div className="mt-3 flex flex-wrap gap-2 border-t border-white/10 pt-3">
+                        {(["passport_main", "passport_spread"] as const).map((type) => {
+                          const has = type === "passport_main" ? r.hasPassportMain : r.hasPassportSpread;
+                          const key = `${r.id}-${type}`;
+                          return (
+                            <button
+                              key={type}
+                              type="button"
+                              onClick={() => has && downloadDoc(r.id, type)}
+                              disabled={!has || downloading === key}
+                              className={`${ADMIN_BTN} ${ADMIN_BTN_NEUTRAL_SM} gap-1 text-xs font-medium disabled:opacity-50`}
+                            >
+                              {downloading === key ? (
+                                <Loader2 className="h-3 w-3 animate-spin" />
+                              ) : (
+                                <Download className="h-3 w-3 shrink-0" />
+                              )}
+                              {DOC_LABELS[type]}
+                            </button>
+                          );
+                        })}
+                      </div>
+                      {isPending && (
+                        <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+                          <button
+                            type="button"
+                            onClick={() => handleApprove(r.id)}
+                            disabled={approvingId === r.id}
+                            className={`${ADMIN_BTN} ${ADMIN_BTN_SUCCESS} flex w-full items-center justify-center gap-1.5 px-3 py-2.5 text-sm disabled:opacity-50 sm:w-auto sm:flex-1`}
+                          >
+                            {approvingId === r.id ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <Check className="h-4 w-4 shrink-0" />
+                            )}
+                            Подтвердить
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setRejectModal({ id: r.id, login: r.login });
+                              setRejectReason("");
+                              setRejectError(null);
+                            }}
+                            className={`${ADMIN_BTN} ${ADMIN_BTN_DANGER} flex w-full items-center justify-center gap-1.5 px-3 py-2.5 text-sm sm:w-auto sm:flex-1`}
+                          >
+                            <X className="h-4 w-4 shrink-0" />
+                            Отклонить
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                <div className="admin-dashboard-table cabinet-section-header hidden min-h-[min(48dvh,520px)] w-full min-w-0 flex-1 overflow-auto rounded-xl border-0 text-left lg:block">
+                  <div className="min-w-0 overflow-x-auto">
+                    <table className="w-full min-w-[760px] border-collapse text-sm">
+                      <thead>
+                        <tr className="border-b border-white/15">
+                          <th className="px-3 py-2 text-left font-medium text-white">Дата</th>
+                          <th className="px-3 py-2 text-left font-medium text-white">Пользователь</th>
+                          <th className="px-3 py-2 text-left font-medium text-white">ФИО</th>
+                          <th className="px-3 py-2 text-left font-medium text-white">Паспорт / ИНН</th>
+                          {!isPending && <th className="px-3 py-2 text-left font-medium text-white">Рассмотрено</th>}
                           {verificationTab === "rejected" && (
-                            <td className="max-w-[220px] px-3 py-2.5 text-xs text-red-200/90">{r.rejectionReason ?? "—"}</td>
+                            <th className="min-w-[140px] px-3 py-2 text-left font-medium text-white">Причина отказа</th>
                           )}
-                          <td className="px-3 py-2.5">
-                            <div className="flex flex-wrap gap-2">
-                              {(["passport_main", "passport_spread"] as const).map((type) => {
-                                const has =
-                                  type === "passport_main" ? r.hasPassportMain : r.hasPassportSpread;
-                                const key = `${r.id}-${type}`;
-                                return (
-                                  <button
-                                    key={type}
-                                    type="button"
-                                    onClick={() => has && downloadDoc(r.id, type)}
-                                    disabled={!has || downloading === key}
-                                    className={`${ADMIN_BTN} ${ADMIN_BTN_NEUTRAL_SM} gap-1 font-medium disabled:opacity-50`}
-                                  >
-                                    {downloading === key ? (
-                                      <Loader2 className="h-3 w-3 animate-spin" />
-                                    ) : (
-                                      <Download className="h-3 w-3" />
-                                    )}
-                                    {DOC_LABELS[type]}
-                                  </button>
-                                );
-                              })}
-                            </div>
-                          </td>
-                          {isPending && (
+                          <th className="px-3 py-2 text-left font-medium text-white">Документы</th>
+                          {isPending && <th className="px-3 py-2 text-left font-medium text-white">Действия</th>}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {list.map((r) => (
+                          <tr key={r.id} className="border-b border-white/10">
+                            <td className="whitespace-nowrap px-3 py-2.5 text-white">
+                              {new Date(r.createdAt).toLocaleString("ru-RU")}
+                            </td>
                             <td className="px-3 py-2.5">
-                              <div className="flex flex-wrap items-center gap-2">
-                                <button
-                                  type="button"
-                                  onClick={() => handleApprove(r.id)}
-                                  disabled={approvingId === r.id}
-                                  className={`${ADMIN_BTN} ${ADMIN_BTN_SUCCESS} gap-1 px-3 py-1.5 text-sm disabled:opacity-50`}
-                                >
-                                  {approvingId === r.id ? (
-                                    <Loader2 className="h-4 w-4 animate-spin" />
-                                  ) : (
-                                    <Check className="h-4 w-4" />
-                                  )}
-                                  Подтвердить
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    setRejectModal({ id: r.id, login: r.login });
-                                    setRejectReason("");
-                                    setRejectError(null);
-                                  }}
-                                  className={`${ADMIN_BTN} ${ADMIN_BTN_DANGER} gap-1 px-3 py-1.5 text-sm`}
-                                >
-                                  <X className="h-4 w-4" />
-                                  Отклонить
-                                </button>
+                              <Link href={`/admin/users/${r.userId}`} className="text-[var(--color-brand-gold)] hover:underline">
+                                {r.login}
+                              </Link>
+                              {r.email && <div className="text-xs text-white/80">{r.email}</div>}
+                            </td>
+                            <td className="whitespace-nowrap px-3 py-2.5 text-white">{r.fullName}</td>
+                            <td className="whitespace-nowrap px-3 py-2.5 text-white">
+                              {r.passportSeries} {r.passportNumber}, ИНН {r.inn}
+                            </td>
+                            {!isPending && (
+                              <td className="whitespace-nowrap px-3 py-2.5 text-white/80">
+                                {r.reviewedAt ? new Date(r.reviewedAt).toLocaleString("ru-RU") : "—"}
+                              </td>
+                            )}
+                            {verificationTab === "rejected" && (
+                              <td className="max-w-[220px] px-3 py-2.5 text-xs text-red-200/90">{r.rejectionReason ?? "—"}</td>
+                            )}
+                            <td className="px-3 py-2.5">
+                              <div className="flex flex-wrap gap-2">
+                                {(["passport_main", "passport_spread"] as const).map((type) => {
+                                  const has =
+                                    type === "passport_main" ? r.hasPassportMain : r.hasPassportSpread;
+                                  const key = `${r.id}-${type}`;
+                                  return (
+                                    <button
+                                      key={type}
+                                      type="button"
+                                      onClick={() => has && downloadDoc(r.id, type)}
+                                      disabled={!has || downloading === key}
+                                      className={`${ADMIN_BTN} ${ADMIN_BTN_NEUTRAL_SM} gap-1 font-medium disabled:opacity-50`}
+                                    >
+                                      {downloading === key ? (
+                                        <Loader2 className="h-3 w-3 animate-spin" />
+                                      ) : (
+                                        <Download className="h-3 w-3" />
+                                      )}
+                                      {DOC_LABELS[type]}
+                                    </button>
+                                  );
+                                })}
                               </div>
                             </td>
-                          )}
-                        </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
-              </div>
+                            {isPending && (
+                              <td className="px-3 py-2.5">
+                                <div className="flex flex-wrap items-center gap-2">
+                                  <button
+                                    type="button"
+                                    onClick={() => handleApprove(r.id)}
+                                    disabled={approvingId === r.id}
+                                    className={`${ADMIN_BTN} ${ADMIN_BTN_SUCCESS} gap-1 px-3 py-1.5 text-sm disabled:opacity-50`}
+                                  >
+                                    {approvingId === r.id ? (
+                                      <Loader2 className="h-4 w-4 animate-spin" />
+                                    ) : (
+                                      <Check className="h-4 w-4" />
+                                    )}
+                                    Подтвердить
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setRejectModal({ id: r.id, login: r.login });
+                                      setRejectReason("");
+                                      setRejectError(null);
+                                    }}
+                                    className={`${ADMIN_BTN} ${ADMIN_BTN_DANGER} gap-1 px-3 py-1.5 text-sm`}
+                                  >
+                                    <X className="h-4 w-4" />
+                                    Отклонить
+                                  </button>
+                                </div>
+                              </td>
+                            )}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </>
             )}
           </div>
         )}

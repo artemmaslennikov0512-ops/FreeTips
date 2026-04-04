@@ -294,7 +294,6 @@ export function AdminConnectionRequestsBlock({
         </div>
       ) : (
         <>
-          {!compactTableLayout && (
           <div className="space-y-4 lg:hidden">
             {list.map((r) => {
               const linkForRow = getLinkForRequest(r.id);
@@ -436,15 +435,12 @@ export function AdminConnectionRequestsBlock({
               );
             })}
           </div>
-          )}
 
           <div
-            className={`admin-dashboard-table cabinet-section-header rounded-xl border-0 text-left ${
-              compactTableLayout ? "w-full" : "max-lg:hidden"
-            } ${
+            className={`admin-dashboard-table cabinet-section-header hidden max-w-full rounded-xl border-0 text-left lg:block ${
               stretchTableArea && compactTableLayout
-                ? "min-h-[min(48dvh,520px)] min-w-0 flex-1 overflow-auto"
-                : "overflow-hidden"
+                ? "min-h-[min(48dvh,520px)] min-w-0 w-full flex-1 overflow-auto"
+                : "w-full overflow-hidden"
             }`}
           >
             <div className="min-w-0 overflow-x-auto">

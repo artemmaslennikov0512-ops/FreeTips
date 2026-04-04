@@ -405,23 +405,21 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
             </div>
           </div>
         </div>
-        <div className="mb-2 mt-6 shrink-0 px-4">
-          <div className="grid h-9 grid-cols-[2.25rem_minmax(0,1fr)_2.25rem] items-center gap-2">
-            <span className="pointer-events-none select-none" aria-hidden />
-            <p className="cabinet-nav-label min-w-0 text-center text-xs font-semibold uppercase tracking-wider text-[var(--color-text)]/50">
-              Навигация
-            </p>
-            <div className="flex justify-end pr-0.5">
-              <button
-                type="button"
-                onClick={() => setSidebarCollapsedPersisted(true)}
-                className={LG_SIDEBAR_COLLAPSE_BTN}
-                aria-label="Скрыть боковое меню"
-                title="Скрыть меню"
-              >
-                <ChevronLeft className="h-5 w-5 shrink-0" strokeWidth={2} aria-hidden />
-              </button>
-            </div>
+        <div className="mb-2 mt-6 flex h-9 shrink-0 items-center px-4">
+          <span className="w-9 shrink-0 select-none" aria-hidden />
+          <span className="cabinet-nav-label min-w-0 flex-1 text-center text-xs font-semibold uppercase leading-none tracking-wider text-[var(--color-text)]/50">
+            Навигация
+          </span>
+          <div className="flex h-9 w-9 shrink-0 items-center justify-end">
+            <button
+              type="button"
+              onClick={() => setSidebarCollapsedPersisted(true)}
+              className={LG_SIDEBAR_COLLAPSE_BTN}
+              aria-label="Скрыть боковое меню"
+              title="Скрыть меню"
+            >
+              <ChevronLeft className="h-5 w-5 shrink-0" strokeWidth={2} aria-hidden />
+            </button>
           </div>
         </div>
         <div className="cabinet-nav-block flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto overflow-x-hidden px-4">

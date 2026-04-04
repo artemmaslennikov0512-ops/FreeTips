@@ -1726,7 +1726,8 @@ html:not([data-theme="dark"]) .admin-panel .admin-sidebar .cabinet-nav-block nav
 }
 
 /* Блок навигации в сайдбаре — подпись «Навигация», скругление как у сайдбара */
-.cabinet-premium .cabinet-nav-block .cabinet-nav-label {
+.cabinet-premium .cabinet-nav-block .cabinet-nav-label,
+.cabinet-premium .cabinet-sidebar .cabinet-nav-label {
   font-family: var(--font-inter), system-ui, sans-serif;
 }
 /* Светлая тема: подпись «Навигация» в сайдбаре */

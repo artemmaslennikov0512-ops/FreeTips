@@ -2,10 +2,10 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { Check, X, Download, Loader2, FileCheck } from "lucide-react";
+import { Check, X, Download, Loader2 } from "lucide-react";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
-import { apiStatusForTab, type AdminRequestTab } from "./AdminStatusTabs";
-type AdminRequestsMainTab = "verification" | "connection";
+import { AdminStatusTabs, apiStatusForTab, type AdminRequestTab } from "./AdminStatusTabs";
+import { AdminRequestsMainTabs, type AdminRequestsMainTab } from "./AdminRequestsMainTabs";
 import { AdminConnectionRequestsBlock } from "./AdminConnectionRequestsBlock";
 import { notifyAdminRequestsCountsChanged } from "@/lib/admin-requests-counts-sync";
 import {
@@ -14,7 +14,7 @@ import {
   ADMIN_BTN_NEUTRAL_SM,
   ADMIN_BTN_SUCCESS,
 } from "@/lib/admin-button-classes";
-import { ADMIN_PANEL_CARD, ADMIN_PANEL_PAGE_WIDE, ADMIN_PANEL_STATE_CENTER_COMPACT } from "@/lib/admin-surface-classes";
+import { ADMIN_PANEL_CARD } from "@/lib/admin-surface-classes";
 import {
   mainTabNewPending,
   readMainTabAckConnection,
@@ -56,27 +56,6 @@ const DOC_LABELS: Record<string, string> = {
 };
 
 const ZERO_COUNTS: SectionCounts = { pending: 0, approved: 0, rejected: 0 };
-
-function MainRequestsTabBadge({ n }: { n: number }) {
-  if (n <= 0) return null;
-  return (
-    <span
-      className="ml-2 inline-flex min-h-[1.35rem] min-w-[1.35rem] shrink-0 items-center justify-center rounded-full bg-[var(--color-accent-red)] px-2 text-xs font-bold leading-none text-white tabular-nums ring-2 ring-black/25"
-      title={`Новых на рассмотрении: ${n}`}
-    >
-      {n > 99 ? "99+" : n}
-    </span>
-  );
-}
-
-function StatusSubTabBadge({ n }: { n: number }) {
-  if (n <= 0) return null;
-  return (
-    <span className="ml-1.5 inline-flex min-h-[1.25rem] min-w-[1.25rem] items-center justify-center rounded-full bg-[var(--color-accent-red)] px-1.5 text-[11px] font-bold leading-none text-white tabular-nums">
-      {n > 99 ? "99+" : n}
-    </span>
-  );
-}
 
 export default function AdminVerificationRequestsPage() {
   const [mainTab, setMainTab] = useState<AdminRequestsMainTab>("verification");
@@ -263,82 +242,56 @@ export default function AdminVerificationRequestsPage() {
   const mainTabNewVerification = mainTabNewPending(vCounts.pending, storedAckVerification);
   const mainTabNewConnection = mainTabNewPending(cCounts.pending, storedAckConnection);
 
-  const tabBtn = (active: boolean) =>
-    `inline-flex items-center rounded-t-lg px-4 py-2.5 text-sm font-medium transition-colors ${
-      active
-        ? "bg-white/15 text-white border border-b-0 border-white/20"
-        : "text-white/70 hover:bg-white/10 hover:text-white border border-transparent"
-    }`;
-
-  const tableWrapClass =
-    "admin-dashboard-table cabinet-section-header mt-0 w-full overflow-x-auto rounded-xl border-0 text-left";
-
   const activeStatusTab = mainTab === "verification" ? verificationTab : connectionTab;
   const setActiveStatusTab = mainTab === "verification" ? setVerificationTab : setConnectionTab;
-  const subCounts = mainTab === "verification" ? vCounts : cCounts;
-
-  const STATUS_TAB_ROWS: { key: AdminRequestTab; label: string }[] = [
-    { key: "pending", label: "На рассмотрении" },
-    { key: "approved", label: "Принятые" },
-    { key: "rejected", label: "Отклонённые" },
-  ];
+  const statusBadges: Partial<Record<AdminRequestTab, number>> =
+    mainTab === "verification"
+      ? { pending: vCounts.pending, approved: vCounts.approved, rejected: vCounts.rejected }
+      : { pending: cCounts.pending, approved: cCounts.approved, rejected: cCounts.rejected };
 
   return (
-    <div className={ADMIN_PANEL_PAGE_WIDE}>
-      <div className="flex flex-col items-center gap-3">
-        <FileCheck className="h-9 w-9 shrink-0 text-[var(--color-brand-gold)]" aria-hidden />
-        <h1 className="text-center font-[family:var(--font-playfair)] text-2xl font-semibold text-white">Заявки</h1>
+    <div className="w-full min-w-0 space-y-6 text-center text-white">
+      <div className="flex flex-col items-center gap-3 text-center">
+        <h1 className="text-center font-[family:var(--font-playfair)] text-xl font-semibold text-white sm:text-2xl">
+          Заявки
+        </h1>
+        <AdminRequestsMainTabs
+          value={mainTab}
+          onChange={setMainTab}
+          pendingVerification={mainTabNewVerification}
+          pendingConnection={mainTabNewConnection}
+          className="pt-1"
+        />
+        <div
+          role="separator"
+          aria-hidden="true"
+          className="h-px w-full max-w-2xl shrink-0 bg-[var(--color-brand-gold)]/35"
+        />
       </div>
 
-      <div className={`${ADMIN_PANEL_CARD} !text-left`}>
-        <p className="mb-3 text-sm font-medium text-white">Текущие заявки</p>
-
-        <div className="flex flex-wrap gap-1 border-b border-white/15 pb-px">
-          <button
-            type="button"
-            className={tabBtn(mainTab === "verification")}
-            onClick={() => setMainTab("verification")}
-          >
-            <span>Вериф. официантов</span>
-            <MainRequestsTabBadge n={mainTabNewVerification} />
-          </button>
-          <button
-            type="button"
-            className={tabBtn(mainTab === "connection")}
-            onClick={() => setMainTab("connection")}
-          >
-            <span>Заявки на подкл.</span>
-            <MainRequestsTabBadge n={mainTabNewConnection} />
-          </button>
-        </div>
-
-        <div className="flex flex-wrap gap-1 border-b border-white/15 pb-px">
-          {STATUS_TAB_ROWS.map(({ key, label }) => (
-            <button
-              key={key}
-              type="button"
-              className={tabBtn(activeStatusTab === key)}
-              onClick={() => setActiveStatusTab(key)}
-            >
-              <span>{label}</span>
-              {key === "pending" && subCounts.pending > 0 && <StatusSubTabBadge n={subCounts.pending} />}
-            </button>
-          ))}
-        </div>
+      <div
+        className={`${ADMIN_PANEL_CARD} !text-left flex w-full min-w-0 flex-col gap-4 min-h-[min(62dvh,680px)]`}
+      >
+        <AdminStatusTabs
+          align="start"
+          value={activeStatusTab}
+          onChange={setActiveStatusTab}
+          badges={statusBadges}
+        />
 
         {mainTab === "verification" && (
-          <>
+          <div className="flex min-h-0 w-full flex-1 flex-col gap-3">
             {error && (
               <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-center text-sm text-red-200">
                 {error}
               </div>
             )}
             {loading ? (
-              <div className={`${ADMIN_PANEL_STATE_CENTER_COMPACT} py-10 text-white/60`}>
+              <div className="flex min-h-[min(40dvh,360px)] flex-1 flex-col items-center justify-center text-white/60">
                 <Loader2 className="h-8 w-8 animate-spin" aria-hidden />
               </div>
             ) : (
-              <div className={tableWrapClass}>
+              <div className="admin-dashboard-table cabinet-section-header min-h-[min(48dvh,520px)] w-full flex-1 overflow-auto rounded-xl border-0 text-left">
                 <table className="w-full min-w-[760px] border-collapse text-sm">
                   <thead>
                     <tr className="border-b border-white/15">
@@ -451,18 +404,21 @@ export default function AdminVerificationRequestsPage() {
                 </table>
               </div>
             )}
-          </>
+          </div>
         )}
 
         {mainTab === "connection" && (
-          <AdminConnectionRequestsBlock
-            connectionCounts={cCounts}
-            onAfterMutation={refreshCountsAndNotifyLayout}
-            hideStatusTabs
-            statusTab={connectionTab}
-            onStatusTabChange={setConnectionTab}
-            compactTableLayout
-          />
+          <div className="flex min-h-0 w-full flex-1 flex-col">
+            <AdminConnectionRequestsBlock
+              connectionCounts={cCounts}
+              onAfterMutation={refreshCountsAndNotifyLayout}
+              hideStatusTabs
+              statusTab={connectionTab}
+              onStatusTabChange={setConnectionTab}
+              compactTableLayout
+              stretchTableArea
+            />
+          </div>
         )}
       </div>
 

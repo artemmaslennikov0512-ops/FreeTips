@@ -1450,50 +1450,26 @@ html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-compe
   color: rgba(255, 255, 255, 0.92);
 }
 
-/* Светлая тема: свернуть/развернуть сайдбар (lg) — стеклянное золото (как тёмная: blur + полупрозрачность), мягкая иконка */
+/* Светлая тема: свернуть/развернуть сайдбар (lg) — плоская кнопка на navy, без «стекла» и градиента */
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-lg-sidebar-toggle {
-  background:
-    linear-gradient(
-      155deg,
-      rgba(255, 250, 238, 0.52) 0%,
-      rgba(197, 165, 114, 0.2) 42%,
-      rgba(168, 137, 78, 0.34) 100%
-    ) !important;
-  border-color: rgba(197, 165, 114, 0.36) !important;
-  color: rgba(38, 34, 28, 0.52) !important;
-  box-shadow:
-    0 4px 20px rgba(0, 0, 0, 0.1),
-    0 0 0 0.5px rgba(255, 255, 255, 0.35) inset,
-    0 1px 0 rgba(255, 255, 255, 0.45) inset !important;
-  backdrop-filter: blur(12px) saturate(1.12) !important;
-  -webkit-backdrop-filter: blur(12px) saturate(1.12) !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.24) !important;
+  color: rgba(255, 255, 255, 0.92) !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
 
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-lg-sidebar-toggle:hover {
-  background:
-    linear-gradient(
-      155deg,
-      rgba(255, 252, 244, 0.62) 0%,
-      rgba(212, 184, 130, 0.26) 45%,
-      rgba(185, 149, 88, 0.4) 100%
-    ) !important;
-  border-color: rgba(197, 165, 114, 0.48) !important;
-  color: rgba(28, 25, 20, 0.68) !important;
-  box-shadow:
-    0 6px 24px rgba(197, 165, 114, 0.22),
-    0 0 0 0.5px rgba(255, 255, 255, 0.42) inset,
-    0 1px 0 rgba(255, 255, 255, 0.52) inset !important;
+  background: rgba(255, 255, 255, 0.14) !important;
+  border-color: rgba(255, 255, 255, 0.34) !important;
+  color: #ffffff !important;
 }
 
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-lg-sidebar-toggle svg {
   color: inherit !important;
-  opacity: 0.78 !important;
-  stroke-width: 1.85 !important;
-}
-
-/* Кнопка «скрыть» — чуть правее к краю разделителя (не трогаем transform — hover:scale из разметки) */
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-lg-sidebar-toggle--collapse {
-  right: 0.125rem !important;
+  opacity: 1 !important;
+  stroke-width: 2 !important;
 }
 
 /* Блок профиля в сайдбаре: тоньше обводка, как у карточек в блоке */

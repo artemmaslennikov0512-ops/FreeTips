@@ -118,6 +118,8 @@ type BlockProps = {
   onStatusTabChange?: (tab: AdminRequestTab) => void;
   /** Одна таблица с горизонтальным скроллом на всех ширинах (как «Приём по ссылкам»). */
   compactTableLayout?: boolean;
+  /** Вместе с hideStatusTabs: область таблицы тянется по высоте карточки родителя. */
+  stretchTableArea?: boolean;
 };
 
 export function AdminConnectionRequestsBlock({
@@ -127,6 +129,7 @@ export function AdminConnectionRequestsBlock({
   statusTab: controlledTab,
   onStatusTabChange,
   compactTableLayout = false,
+  stretchTableArea = false,
 }: BlockProps) {
   const [internalTab, setInternalTab] = useState<AdminRequestTab>("pending");
   const controlled =
@@ -272,11 +275,23 @@ export function AdminConnectionRequestsBlock({
         </div>
       )}
       {loading ? (
-        <div className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-[var(--color-brand-gold)]" />
+        <div
+          className={`flex items-center justify-center text-[var(--color-brand-gold)] ${
+            stretchTableArea && hideStatusTabs
+              ? "min-h-[min(40dvh,360px)] flex-1 py-8"
+              : "py-12"
+          }`}
+        >
+          <Loader2 className="h-8 w-8 animate-spin" aria-hidden />
         </div>
       ) : list.length === 0 ? (
-        <div className="rounded-xl border border-white/10 bg-white/5 px-6 py-8 text-center text-white/90">{emptyMessage}</div>
+        <div
+          className={`rounded-xl border border-white/10 bg-white/5 px-6 py-8 text-center text-white/90 ${
+            stretchTableArea && hideStatusTabs ? "min-h-[min(40dvh,360px)] flex flex-1 flex-col items-center justify-center" : ""
+          }`}
+        >
+          {emptyMessage}
+        </div>
       ) : (
         <>
           {!compactTableLayout && (
@@ -424,11 +439,15 @@ export function AdminConnectionRequestsBlock({
           )}
 
           <div
-            className={`admin-dashboard-table cabinet-section-header overflow-hidden rounded-xl border-0 text-left ${
+            className={`admin-dashboard-table cabinet-section-header rounded-xl border-0 text-left ${
               compactTableLayout ? "w-full" : "max-lg:hidden"
+            } ${
+              stretchTableArea && compactTableLayout
+                ? "min-h-[min(48dvh,520px)] min-w-0 flex-1 overflow-auto"
+                : "overflow-hidden"
             }`}
           >
-            <div className="overflow-x-auto">
+            <div className="min-w-0 overflow-x-auto">
               <table className="w-full min-w-[720px] text-left text-sm text-white">
                 <thead>
                   <tr className="border-0 bg-white/10">
@@ -605,7 +624,11 @@ export function AdminConnectionRequestsBlock({
   );
 
   return hideStatusTabs ? (
-    <div className="flex flex-col gap-4">{inner}</div>
+    <div
+      className={`flex flex-col gap-4 ${stretchTableArea ? "min-h-0 min-w-0 flex-1" : ""}`}
+    >
+      {inner}
+    </div>
   ) : (
     <section className="space-y-4">{inner}</section>
   );

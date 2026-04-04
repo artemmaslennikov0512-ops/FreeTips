@@ -14,6 +14,8 @@ type Props = {
   value: AdminRequestTab;
   onChange: (tab: AdminRequestTab) => void;
   className?: string;
+  /** Выравнивание ряда вкладок (по умолчанию по центру). */
+  align?: "center" | "start";
   /** Счётчик только для «На рассмотрении» — бейдж исчезает, когда очередь пуста (принятые/отклонённые без бейджа). */
   badges?: Partial<Record<AdminRequestTab, number>>;
 };
@@ -27,9 +29,11 @@ function TabBadge({ n }: { n: number }) {
   );
 }
 
-export function AdminStatusTabs({ value, onChange, className = "", badges }: Props) {
+export function AdminStatusTabs({ value, onChange, className = "", align = "center", badges }: Props) {
   return (
-    <div className={`flex flex-wrap justify-center gap-2 ${className}`.trim()}>
+    <div
+      className={`flex flex-wrap gap-2 ${align === "start" ? "justify-start" : "justify-center"} ${className}`.trim()}
+    >
       {TABS.map(({ key, label }) => {
         const count = badges?.[key];
         return (

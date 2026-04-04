@@ -52,6 +52,12 @@ const NAV: { label: string; href: string; icon: LucideIcon; iconClass: string }[
 
 const ADMIN_LG_SIDEBAR_COLLAPSED_KEY = "admin-lg-sidebar-collapsed";
 
+const LG_SIDEBAR_COLLAPSE_BTN =
+  "cabinet-lg-sidebar-toggle cabinet-lg-sidebar-toggle--collapse absolute right-0 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 translate-x-1/2 items-center justify-center rounded-full border border-white/25 bg-white/10 text-white shadow-none transition-[color,background-color,border-color] duration-200 hover:border-white/40 hover:bg-white/15 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white/35 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent";
+
+const LG_SIDEBAR_EXPAND_BTN =
+  "cabinet-lg-sidebar-toggle cabinet-lg-sidebar-toggle--expand fixed left-0 top-1/2 z-[35] hidden h-9 w-9 -translate-y-1/2 translate-x-1/2 items-center justify-center rounded-full border border-white/25 bg-[var(--color-navy)] text-white shadow-none transition-[color,background-color,border-color] duration-200 hover:border-white/40 hover:bg-white/[0.12] hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white/35 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent lg:flex";
+
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -233,21 +239,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
       {/* Боковая панель — lg+; сворачивание как в ЛК официанта; на мобильном — модалка */}
       <div
-        className={`hidden shrink-0 overflow-hidden transition-[width] duration-300 ease-out lg:mt-3 lg:flex lg:self-start ${
-          lgSidebarCollapsed ? "lg:w-0 lg:pointer-events-none" : "lg:w-[260px]"
+        className={`hidden shrink-0 transition-[width] duration-300 ease-out lg:mt-3 lg:flex lg:self-start ${
+          lgSidebarCollapsed
+            ? "lg:w-0 lg:pointer-events-none lg:overflow-hidden"
+            : "lg:w-[260px] lg:overflow-x-visible lg:overflow-y-visible"
         }`}
       >
-        <aside className="admin-sidebar cabinet-sidebar relative flex h-full min-h-0 w-[260px] min-w-[260px] flex-col overflow-hidden rounded-[10px] border border-white/10 bg-[var(--color-navy)] py-6 shadow-sm backdrop-blur-xl lg:static lg:max-h-[calc(100vh-2rem)]">
-          <button
-            type="button"
-            onClick={() => setSidebarCollapsedPersisted(true)}
-            className="cabinet-lg-sidebar-toggle cabinet-lg-sidebar-toggle--collapse absolute right-2 top-1/2 z-20 flex h-11 w-9 -translate-y-1/2 items-center justify-center rounded-xl border border-[var(--color-brand-gold)]/28 bg-[var(--color-bg-sides)]/92 text-[var(--color-text)]/65 shadow-[0_4px_20px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-md transition-[color,background-color,border-color,box-shadow,transform] duration-200 hover:scale-[1.03] hover:border-[var(--color-brand-gold)]/50 hover:bg-[var(--color-brand-gold)]/12 hover:text-[var(--color-brand-gold)] hover:shadow-[0_6px_24px_rgba(197,165,114,0.18)] active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-gold)]/45 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
-            aria-label="Скрыть боковое меню"
-            title="Скрыть меню"
-          >
-            <ChevronLeft className="h-5 w-5 shrink-0 text-white" strokeWidth={2.25} aria-hidden />
-          </button>
-        <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+        <aside className="admin-sidebar cabinet-sidebar relative flex h-full min-h-0 w-[260px] min-w-[260px] flex-col overflow-x-visible overflow-y-hidden rounded-[10px] border border-white/10 bg-[var(--color-navy)] py-6 shadow-sm backdrop-blur-xl lg:static lg:max-h-[calc(100vh-2rem)]">
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
           <div className="cabinet-sidebar-profile cabinet-block-inner mx-4 mb-4 rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-4 py-3">
             <div className="flex items-center gap-3">
               <div className="cabinet-sidebar-avatar flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--color-brand-gold)] font-semibold text-[#0a192f] text-sm">
@@ -259,10 +258,21 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               </div>
             </div>
           </div>
-          <div className="cabinet-nav-block flex-1 overflow-y-auto px-4 py-2">
-            <p className="cabinet-nav-label mb-2 px-3 text-center text-xs font-semibold uppercase tracking-wider text-white/50">
-              Навигация
-            </p>
+          <div className="cabinet-nav-block flex min-h-0 flex-1 flex-col overflow-y-auto px-4 py-2">
+            <div className="relative -mx-4 mb-2 h-9 shrink-0">
+              <p className="cabinet-nav-label pointer-events-none absolute inset-0 flex items-center justify-center px-12 text-center text-xs font-semibold uppercase tracking-wider text-white/50">
+                Навигация
+              </p>
+              <button
+                type="button"
+                onClick={() => setSidebarCollapsedPersisted(true)}
+                className={LG_SIDEBAR_COLLAPSE_BTN}
+                aria-label="Скрыть боковое меню"
+                title="Скрыть меню"
+              >
+                <ChevronLeft className="h-5 w-5 shrink-0 text-white" strokeWidth={2} aria-hidden />
+              </button>
+            </div>
             <nav className="flex flex-col gap-0.5 rounded-[10px] border border-[var(--color-brand-gold)]/15 bg-white/5 p-1.5 shadow-[var(--shadow-subtle)]" aria-label="Навигация админ-панели">
               {NAV.map(({ label, href, icon: Icon, iconClass }) => {
                 const showRequestsBadge =
@@ -309,11 +319,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <button
           type="button"
           onClick={() => setSidebarCollapsedPersisted(false)}
-          className="cabinet-lg-sidebar-toggle cabinet-lg-sidebar-toggle--expand fixed left-0 top-1/2 z-[35] hidden h-12 w-10 -translate-y-1/2 items-center justify-center rounded-r-xl border border-[var(--color-brand-gold)]/32 border-l-0 bg-[var(--color-bg-sides)]/95 text-[var(--color-text)]/70 shadow-[4px_0_28px_rgba(0,0,0,0.14),inset_0_1px_0_rgba(255,255,255,0.07)] backdrop-blur-md transition-[color,background-color,border-color,box-shadow,transform] duration-200 hover:translate-x-0.5 hover:border-[var(--color-brand-gold)]/55 hover:bg-[var(--color-brand-gold)]/14 hover:text-[var(--color-brand-gold)] hover:shadow-[6px_0_32px_rgba(197,165,114,0.22)] active:scale-[0.97] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-gold)]/45 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent lg:flex"
+          className={LG_SIDEBAR_EXPAND_BTN}
           aria-label="Показать боковое меню"
           title="Меню"
         >
-          <ChevronRight className="h-5 w-5 shrink-0 text-white" strokeWidth={2.25} aria-hidden />
+          <ChevronRight className="h-5 w-5 shrink-0 text-white" strokeWidth={2} aria-hidden />
         </button>
       )}
 

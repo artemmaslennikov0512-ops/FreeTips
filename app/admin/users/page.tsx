@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useLayoutEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Search, Copy, Filter, ArrowUpDown, Lock, RefreshCw } from "lucide-react";
 import Link from "next/link";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
@@ -106,6 +106,8 @@ export default function AdminUsersPage() {
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [tokenLoading, setTokenLoading] = useState(false);
   const [registrationLink, setRegistrationLink] = useState<string | null>(null);
+  const [copyBanner, setCopyBanner] = useState<string | null>(null);
+  const copyBannerTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [blockAllLoading, setBlockAllLoading] = useState(false);
   const [blockAllError, setBlockAllError] = useState<string | null>(null);
 
@@ -146,6 +148,12 @@ export default function AdminUsersPage() {
   useLayoutEffect(() => {
     const v = new URLSearchParams(window.location.search).get("lkActive");
     if (v === "true" || v === "false") setLkActiveFilter(v);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (copyBannerTimerRef.current) clearTimeout(copyBannerTimerRef.current);
+    };
   }, []);
 
   useEffect(() => {
@@ -268,12 +276,26 @@ export default function AdminUsersPage() {
     }
   };
 
+  const showCopyBanner = useCallback((message: string) => {
+    setCopyBanner(message);
+    if (copyBannerTimerRef.current) clearTimeout(copyBannerTimerRef.current);
+    copyBannerTimerRef.current = setTimeout(() => {
+      setCopyBanner(null);
+      copyBannerTimerRef.current = null;
+    }, 5000);
+  }, []);
+
   const handleCopyToken = async () => {
     if (!registrationLink) return;
     try {
       await navigator.clipboard.writeText(registrationLink);
+      const tail =
+        registrationLink.length > 72 ? `…${registrationLink.slice(-68)}` : registrationLink;
+      showCopyBanner(`Скопировано в буфер обмена: ${tail}`);
     } catch {
-      setError("Не удалось скопировать токен");
+      showCopyBanner(
+        "Не удалось скопировать автоматически. Выделите ссылку в поле ниже мышью и нажмите Ctrl+C (или ⌘+C).",
+      );
     }
   };
 
@@ -314,6 +336,15 @@ export default function AdminUsersPage() {
       {blockAllError && (
         <div className="mb-6 rounded-xl border-0 bg-[var(--color-light-gray)] px-4 py-3 text-sm text-[var(--color-text)]">
           {blockAllError}
+        </div>
+      )}
+      {copyBanner && (
+        <div
+          role="status"
+          aria-live="polite"
+          className="mb-6 break-words rounded-xl border border-emerald-500/40 bg-emerald-950/35 px-4 py-3 text-sm text-emerald-50"
+        >
+          {copyBanner}
         </div>
       )}
 
@@ -360,9 +391,16 @@ export default function AdminUsersPage() {
           </div>
           {registrationLink && (
             <div className="mt-3 flex items-stretch gap-2">
-              <div className="min-w-0 flex-1 rounded-lg border border-white/10 bg-black/20 px-3 py-2 font-mono text-xs text-white/90 break-all">
-                {registrationLink}
-              </div>
+              <input
+                type="text"
+                readOnly
+                value={registrationLink}
+                onFocus={(e) => e.currentTarget.select()}
+                onClick={(e) => e.currentTarget.select()}
+                title="Кликните в поле — ссылка выделится, затем Ctrl+C"
+                aria-label="Ссылка регистрации"
+                className="min-w-0 flex-1 cursor-text rounded-lg border border-white/10 bg-black/20 px-3 py-2 font-mono text-xs text-white/90 break-all outline-none focus:ring-2 focus:ring-emerald-500/50"
+              />
               <button
                 type="button"
                 onClick={() => void handleCreateToken()}

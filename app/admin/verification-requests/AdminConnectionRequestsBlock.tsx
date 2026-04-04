@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useCallback, useEffect, useState } from "react";
+import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import { ADMIN_BTN, ADMIN_BTN_NEUTRAL_SM, ADMIN_BTN_PRIMARY, ADMIN_BTN_SM } from "@/lib/admin-button-classes";
 import { ChevronDown, ChevronRight, ClipboardCheck, Copy, Send, Loader2 } from "lucide-react";
 import { AdminStatusTabs, AdminRequestTab, apiStatusForTab } from "./AdminStatusTabs";
@@ -151,10 +151,27 @@ export function AdminConnectionRequestsBlock({
   const [approvingId, setApprovingId] = useState<string | null>(null);
   const [sendingTokenId, setSendingTokenId] = useState<string | null>(null);
   const [issuedLinksByRequestId, setIssuedLinksByRequestId] = useState<Record<string, string>>({});
+  const [copyBanner, setCopyBanner] = useState<string | null>(null);
+  const copyBannerTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const showCopyBanner = useCallback((message: string) => {
+    setCopyBanner(message);
+    if (copyBannerTimerRef.current) clearTimeout(copyBannerTimerRef.current);
+    copyBannerTimerRef.current = setTimeout(() => {
+      setCopyBanner(null);
+      copyBannerTimerRef.current = null;
+    }, 5000);
+  }, []);
 
   useEffect(() => {
     const valid = loadIssuedLinksFromStorage();
     if (Object.keys(valid).length > 0) setIssuedLinksByRequestId(valid);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (copyBannerTimerRef.current) clearTimeout(copyBannerTimerRef.current);
+    };
   }, []);
 
   const fetchList = useCallback(async () => {
@@ -186,8 +203,21 @@ export function AdminConnectionRequestsBlock({
 
   const getLinkForRequest = (requestId: string) => issuedLinksByRequestId[requestId];
 
-  const copyLink = (link: string) => {
-    void navigator.clipboard.writeText(link);
+  const copyLink = async (link: string, applicantLabel?: string) => {
+    try {
+      await navigator.clipboard.writeText(link);
+      const tail = link.length > 72 ? `…${link.slice(-68)}` : link;
+      const who = applicantLabel?.trim();
+      showCopyBanner(
+        who
+          ? `Скопировано (заявка: ${who}). В буфере обмена: ${tail}`
+          : `Скопировано. В буфере обмена: ${tail}`,
+      );
+    } catch {
+      showCopyBanner(
+        "Не удалось скопировать автоматически. Нажмите на поле со ссылкой — текст выделится — затем Ctrl+C (или ⌘+C).",
+      );
+    }
   };
 
   const handleApprove = async (id: string) => {
@@ -282,6 +312,15 @@ export function AdminConnectionRequestsBlock({
           {error}
         </div>
       )}
+      {copyBanner && (
+        <div
+          role="status"
+          aria-live="polite"
+          className="break-words rounded-xl border border-emerald-500/40 bg-emerald-950/35 px-4 py-3 text-sm text-emerald-50"
+        >
+          {copyBanner}
+        </div>
+      )}
       {loading ? (
         <div
           className={`flex items-center justify-center text-[var(--color-brand-gold)] ${
@@ -374,9 +413,9 @@ export function AdminConnectionRequestsBlock({
                         <>
                           <button
                             type="button"
-                            onClick={() => copyLink(linkForRow)}
+                            onClick={() => void copyLink(linkForRow, r.fullName)}
                             className={`${ADMIN_BTN} ${ADMIN_BTN_NEUTRAL_SM} gap-1`}
-                            title="Копировать"
+                            title="Копировать ссылку в буфер"
                           >
                             <Copy className="h-4 w-4" /> Копировать
                           </button>
@@ -410,8 +449,9 @@ export function AdminConnectionRequestsBlock({
                         <>
                           <button
                             type="button"
-                            onClick={() => copyLink(linkForRow)}
+                            onClick={() => void copyLink(linkForRow, r.fullName)}
                             className={`${ADMIN_BTN} ${ADMIN_BTN_NEUTRAL_SM} gap-1`}
+                            title="Копировать ссылку в буфер"
                           >
                             <Copy className="h-4 w-4" /> Копировать
                           </button>
@@ -528,13 +568,15 @@ export function AdminConnectionRequestsBlock({
                                     type="text"
                                     readOnly
                                     value={linkForRow}
+                                    onFocus={(e) => e.currentTarget.select()}
+                                    title="Нажмите — ссылка выделится, можно Ctrl+C"
                                     className="max-w-[280px] rounded border-0 bg-[var(--color-light-gray)] px-2 py-1 text-xs text-[var(--color-text)]"
                                   />
                                   <button
                                     type="button"
-                                    onClick={() => copyLink(linkForRow)}
+                                    onClick={() => void copyLink(linkForRow, r.fullName)}
                                     className={`${ADMIN_BTN} admin-btn--neutral !min-h-0 !min-w-0 !rounded-lg !p-1.5`}
-                                    title="Копировать"
+                                    title="Копировать ссылку в буфер"
                                   >
                                     <Copy className="h-4 w-4" />
                                   </button>
@@ -572,13 +614,15 @@ export function AdminConnectionRequestsBlock({
                                     type="text"
                                     readOnly
                                     value={linkForRow}
+                                    onFocus={(e) => e.currentTarget.select()}
+                                    title="Нажмите — ссылка выделится, можно Ctrl+C"
                                     className="max-w-[280px] rounded border-0 bg-[var(--color-light-gray)] px-2 py-1 text-xs text-[var(--color-text)]"
                                   />
                                   <button
                                     type="button"
-                                    onClick={() => copyLink(linkForRow)}
+                                    onClick={() => void copyLink(linkForRow, r.fullName)}
                                     className={`${ADMIN_BTN} admin-btn--neutral !min-h-0 !min-w-0 !rounded-lg !p-1.5`}
-                                    title="Копировать"
+                                    title="Копировать ссылку в буфер"
                                   >
                                     <Copy className="h-4 w-4" />
                                   </button>

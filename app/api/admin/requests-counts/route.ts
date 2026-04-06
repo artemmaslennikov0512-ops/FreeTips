@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
       db.registrationRequest.count({ where: { status: RegistrationRequestStatus.PENDING } }),
       db.registrationRequest.count({ where: { status: RegistrationRequestStatus.APPROVED } }),
       db.registrationRequest.count({ where: { status: RegistrationRequestStatus.REJECTED } }),
-      db.payout.count({
+      db.payoutRequest.count({
         where: { status: { in: [PayoutStatus.CREATED, PayoutStatus.PROCESSING] } },
       }),
     ]);

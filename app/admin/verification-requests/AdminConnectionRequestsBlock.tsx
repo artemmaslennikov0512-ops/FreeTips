@@ -838,23 +838,26 @@ export function AdminConnectionRequestsBlock({
           aria-modal="true"
           aria-labelledby="connection-reject-modal-title"
         >
-          <div className="flex w-full max-w-md flex-col rounded-2xl border border-white/10 bg-[var(--color-navy)] p-6 text-center shadow-xl">
-            <h2 id="connection-reject-modal-title" className="mb-3 text-lg font-semibold text-white">
+          <div className="reject-modal-content flex w-full max-w-md flex-col items-center rounded-2xl border border-white/10 bg-[var(--color-navy)] p-6 shadow-xl">
+            <h2 id="connection-reject-modal-title" className="mb-3 w-full text-center text-lg font-semibold text-white">
               Отклонить заявку на подключение
             </h2>
-            <p className="mb-1 break-all text-sm text-white/85">{rejectModal.label}</p>
-            <p className="mb-4 text-sm text-white/70">
-              После отклонения заявитель сможет подать новую заявку с этой же почтой. Укажите причину для внутреннего учёта.
+            <p className="mb-1 w-full break-all text-center text-sm text-white/85">{rejectModal.label}</p>
+            <p className="mb-4 w-full text-center text-sm text-white/70">
+              После отклонения заявитель сможет подать новую заявку с этой же почтой. Укажите причину для внутреннего учёта — на
+              почту заявителя она не отправляется.
             </p>
             <textarea
               value={rejectReason}
               onChange={(e) => setRejectReason(e.target.value)}
               placeholder="Например: не отвечаете на уточняющие письма; данные заведения не подтверждены."
-              className="mb-4 w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-brand-gold)]"
+              className="reject-modal-textarea mb-4 w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-brand-gold)]"
               rows={4}
             />
-            {rejectError && <p className="mb-3 text-center text-sm text-red-400">{rejectError}</p>}
-            <div className="flex justify-center gap-3">
+            {rejectError && (
+              <p className="reject-modal-error-msg mb-3 w-full text-center text-sm text-red-400">{rejectError}</p>
+            )}
+            <div className="reject-modal-actions flex justify-center gap-3">
               <button
                 type="button"
                 onClick={() => {

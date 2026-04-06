@@ -2457,13 +2457,26 @@ html:not([data-theme="dark"]) .admin-panel .admin-payout-status {
   justify-content: center !important;
 }
 
-/* Модалка «Отклонить заявку»: в светлой теме текст ввода всегда белый, чтобы набираемый текст был виден */
-html:not([data-theme="dark"]) .reject-modal-content .reject-modal-textarea,
+/*
+ * Модалка «Отклонить заявку»: поле на тёмной карточке.
+ * В светлой теме сайта .admin-panel textarea задаёт белый фон — перебиваем, иначе белый текст нечитаем.
+ */
+html:not([data-theme="dark"]) .reject-modal-content .reject-modal-textarea {
+  background: rgba(0, 0, 0, 0.35) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  color: #fff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  caret-color: #ffffff !important;
+}
 .reject-modal-content .reject-modal-textarea {
   color: #fff !important;
 }
 .reject-modal-content .reject-modal-textarea::placeholder {
   color: rgba(255, 255, 255, 0.6) !important;
+}
+html:not([data-theme="dark"]) .reject-modal-content .reject-modal-textarea::placeholder {
+  color: rgba(255, 255, 255, 0.55) !important;
+  -webkit-text-fill-color: rgba(255, 255, 255, 0.55) !important;
 }
 
 /* Тёмная тема: модалка «Отклонить заявку» — тёмный фон и тёмное поле ввода (не светлый блок) */

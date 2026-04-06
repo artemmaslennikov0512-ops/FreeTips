@@ -22,6 +22,7 @@ import { buildPaygineSignature } from "./paygine/signature";
 import { feeKopForIncoming } from "./paygine-fee";
 import { paymentAcceptBlockedReasonForRecipient } from "@/lib/payment-accept-guard";
 import { observeTipSuccessBurstFromInitiatorIp } from "@/lib/fraud-velocity-observe";
+import { parseTipSplitFromPayerInfo, poolShareKopFromNet } from "@/lib/tip-routing";
 
 /** Базовый URL для редиректов: канонический из env, иначе из запроса (для dev). Paygine требует абсолютный URL. */
 function getBaseForRedirect(baseUrlFromRequest: string | undefined): string {
@@ -56,33 +57,98 @@ function getConfig(): { sector: string; password: string } | null {
   return getPaygineConfig();
 }
 
-/** Сумма на официанта после удержания комиссии ЮЛ (СБП) и нужен ли перелив между кубышками. */
-function tipRelocateToWaiterPlan(tx: {
-  paymentMethod: string | null | undefined;
-  feeKop: unknown;
-  amountKop: unknown;
-  paygineOrderSdRef: string | null | undefined;
-  waiterPaygineSdRef: string | null | undefined;
-}): {
+type TipRelocateExecutionPlan = {
   orderSdRef: string;
-  waiterSdRef: string | undefined;
-  toWaiterKop: number;
-  willRelocateToWaiter: boolean;
+  feeToCompanyKop: number;
   isSbp: boolean;
   companySdRef: string;
-  feeKopNum: number;
-} {
-  const orderSdRef = (tx.paygineOrderSdRef ?? "").trim();
-  const w = tx.waiterPaygineSdRef?.trim();
-  const waiterSdRef = w || undefined;
-  const isSbp = (tx.paymentMethod ?? "") === "sbp";
+  steps: { toSdRef: string; amountKop: number; desc: string }[];
+  establishmentShareKop: bigint | null;
+  poolShareRecipientId: string | null;
+  hasPendingWork: boolean;
+};
+
+/**
+ * План перелива с кубышки заказа: комиссия ЮЛ (СБП), затем доля заведения и/или официант.
+ */
+function computeTipRelocateExecutionPlan(input: {
+  amountKop: unknown;
+  feeKop: unknown;
+  paymentMethod: string | null | undefined;
+  paygineOrderSdRef: string | null | undefined;
+  recipientPaygineSdRef: string | null | undefined;
+  poolPaygineSdRef: string | null | undefined;
+  payerInfo: string | null | undefined;
+}): TipRelocateExecutionPlan | null {
+  const orderSdRef = (input.paygineOrderSdRef ?? "").trim();
+  if (!orderSdRef) return null;
+
+  const isSbp = (input.paymentMethod ?? "") === "sbp";
   const companySdRef = getPaygineSdRefLegal();
-  const feeKopNum = Number(tx.feeKop ?? 0);
-  const amountKopNum = Number(tx.amountKop);
-  const toWaiterKop = isSbp && companySdRef && feeKopNum > 0 ? amountKopNum - feeKopNum : amountKopNum;
-  const willRelocateToWaiter =
-    orderSdRef.length > 0 && !!waiterSdRef && orderSdRef !== waiterSdRef && toWaiterKop >= 1;
-  return { orderSdRef, waiterSdRef, toWaiterKop, willRelocateToWaiter, isSbp, companySdRef, feeKopNum };
+  const feeKopNum = Number(input.feeKop ?? 0);
+  const feeToCompanyKop = isSbp && companySdRef && feeKopNum > 0 ? feeKopNum : 0;
+
+  const amountNum = Number(input.amountKop);
+  const netAfterFeeNum = feeToCompanyKop > 0 ? amountNum - feeToCompanyKop : amountNum;
+  const netKop = BigInt(Math.max(0, Math.floor(netAfterFeeNum)));
+
+  const waiterSdRef = input.recipientPaygineSdRef?.trim() || undefined;
+  const poolSdRef = input.poolPaygineSdRef?.trim() || undefined;
+
+  const tipSplit = parseTipSplitFromPayerInfo(input.payerInfo ?? null);
+  let establishmentShareKop: bigint | null = null;
+  let poolShareRecipientId: string | null = null;
+  const steps: { toSdRef: string; amountKop: number; desc: string }[] = [];
+
+  if (
+    tipSplit &&
+    tipSplit.establishmentSharePercent > 0 &&
+    poolSdRef &&
+    poolSdRef !== orderSdRef
+  ) {
+    const poolKop = poolShareKopFromNet(netKop, tipSplit.establishmentSharePercent);
+    const waiterKop = netKop - poolKop;
+    if (poolKop >= BigInt(1)) {
+      steps.push({
+        toSdRef: poolSdRef,
+        amountKop: Number(poolKop),
+        desc: "Доля заведения (чаевые)",
+      });
+      establishmentShareKop = poolKop;
+      poolShareRecipientId = tipSplit.poolUserId;
+    }
+    if (waiterKop >= BigInt(1) && waiterSdRef && waiterSdRef !== orderSdRef) {
+      steps.push({
+        toSdRef: waiterSdRef,
+        amountKop: Number(waiterKop),
+        desc: `Перевод чаевых → ${waiterSdRef}`,
+      });
+    }
+  } else if (waiterSdRef && orderSdRef !== waiterSdRef) {
+    const toWaiterKop = Number(netKop);
+    if (toWaiterKop >= 1) {
+      steps.push({
+        toSdRef: waiterSdRef,
+        amountKop: toWaiterKop,
+        desc: `Перевод чаевых → ${waiterSdRef}`,
+      });
+    }
+  }
+
+  const feeWork = feeToCompanyKop >= 1 && !!companySdRef;
+  const stepWork = steps.some((s) => s.amountKop >= 1);
+  const hasPendingWork = feeWork || stepWork;
+
+  return {
+    orderSdRef,
+    feeToCompanyKop,
+    isSbp,
+    companySdRef,
+    steps,
+    establishmentShareKop,
+    poolShareRecipientId,
+    hasPendingWork,
+  };
 }
 
 /**
@@ -121,7 +187,8 @@ export class PayginePaymentGateway implements PaymentGateway {
       return { success: false, error: "Paygine не настроен" };
     }
 
-    const { linkId, recipientId, amountKop, idempotencyKey, comment, baseUrl, initiatorIp } = params;
+    const { linkId, recipientId, amountKop, idempotencyKey, comment, baseUrl, initiatorIp, tipSplit } =
+      params;
     const amount = Number(amountKop);
     if (!Number.isInteger(amount) || amount < 100) {
       return { success: false, error: "Сумма слишком мала" };
@@ -168,6 +235,16 @@ export class PayginePaymentGateway implements PaymentGateway {
     }
 
     const feeKop = feeKopForIncoming(amount, "card");
+    const payerPayload: Record<string, unknown> = {
+      comment: comment ?? undefined,
+      paygineMethod: "card",
+    };
+    if (tipSplit && tipSplit.establishmentSharePercent > 0) {
+      payerPayload.tipSplit = {
+        poolUserId: tipSplit.poolUserId,
+        establishmentSharePercent: tipSplit.establishmentSharePercent,
+      };
+    }
     const tx = await db.transaction.create({
       data: {
         linkId,
@@ -175,7 +252,7 @@ export class PayginePaymentGateway implements PaymentGateway {
         amountKop,
         feeKop: null,
         paymentMethod: "card",
-        payerInfo: JSON.stringify({ comment: comment ?? undefined, paygineMethod: "card" }),
+        payerInfo: JSON.stringify(payerPayload),
         status: TransactionStatus.PENDING,
         idempotencyKey,
         initiatorIp: initiatorIp?.trim() || null,
@@ -306,6 +383,7 @@ export class PayginePaymentGateway implements PaymentGateway {
           status: success ? "COMPLETED" : "REJECTED",
           state: state ?? null,
           orderState: orderState ?? null,
+          ...(rejectionReason ? { pcRejectionReason: rejectionReason } : {}),
         });
         void broadcastBalanceUpdated(payout.userId);
       } else {
@@ -337,17 +415,28 @@ export class PayginePaymentGateway implements PaymentGateway {
           select: { paygineSdRef: true },
         })
       : null;
-    const { orderSdRef, waiterSdRef, willRelocateToWaiter } = tipRelocateToWaiterPlan({
-      paymentMethod: tx.paymentMethod,
-      feeKop: tx.feeKop,
-      amountKop: tx.amountKop,
-      paygineOrderSdRef: orderSdRefTrim,
-      waiterPaygineSdRef: recipient?.paygineSdRef,
-    });
+    const tipSplit = parseTipSplitFromPayerInfo(tx.payerInfo);
+    const poolUserForSplit = tipSplit
+      ? await db.user.findUnique({
+          where: { id: tipSplit.poolUserId },
+          select: { paygineSdRef: true },
+        })
+      : null;
+    const relocatePlan = orderSdRefTrim
+      ? computeTipRelocateExecutionPlan({
+          amountKop: tx.amountKop,
+          feeKop: tx.feeKop,
+          paymentMethod: tx.paymentMethod,
+          paygineOrderSdRef: orderSdRefTrim,
+          recipientPaygineSdRef: recipient?.paygineSdRef,
+          poolPaygineSdRef: poolUserForSplit?.paygineSdRef,
+          payerInfo: tx.payerInfo,
+        })
+      : null;
 
     const setStatusImmediately =
       !success ? TransactionStatus.FAILED
-      : !orderSdRef || !waiterSdRef || orderSdRef === waiterSdRef || !willRelocateToWaiter
+      : !relocatePlan || !relocatePlan.hasPendingWork
         ? TransactionStatus.SUCCESS
         : TransactionStatus.PENDING;
 
@@ -388,29 +477,8 @@ export class PayginePaymentGateway implements PaymentGateway {
       observeTipSuccessBurstFromInitiatorIp(tx.id);
     }
 
-    if (success && setStatusImmediately === TransactionStatus.PENDING) {
-      if (!orderSdRef) {
-        logInfo("payment.webhook.relocate_skipped", {
-          reason: "no_paygineOrderSdRef",
-          transactionId: tx.id,
-          hint: "Транзакция создана без кубышки заказа (старый поток?).",
-        });
-      } else if (!waiterSdRef) {
-        logInfo("payment.webhook.relocate_skipped", {
-          reason: "no_waiter_paygineSdRef",
-          transactionId: tx.id,
-          recipientId: tx.recipientId,
-          hint: "У получателя не задан paygineSdRef (кубышка официанта). Заполните User.paygineSdRef или пересоздайте пользователя.",
-        });
-      } else if (orderSdRef === waiterSdRef) {
-        logInfo("payment.webhook.relocate_skipped", {
-          reason: "same_sd_ref",
-          transactionId: tx.id,
-          hint: "Кубышка заказа совпадает с кубышкой официанта — перелив не нужен.",
-        });
-      } else {
-        void scheduleRelocate(tx.id);
-      }
+    if (success && setStatusImmediately === TransactionStatus.PENDING && relocatePlan) {
+      void scheduleRelocate(tx.id);
     }
 
     return { ok: true };
@@ -436,6 +504,7 @@ export async function runRelocateForTransaction(txId: string): Promise<{ ok: boo
       feeKop: true,
       amountKop: true,
       relocateStartedAt: true,
+      payerInfo: true,
     },
   });
   if (!tx || tx.status !== TransactionStatus.PENDING || !tx.paygineOrderSdRef?.trim()) {
@@ -458,27 +527,36 @@ export async function runRelocateForTransaction(txId: string): Promise<{ ok: boo
     where: { id: tx.recipientId },
     select: { paygineSdRef: true },
   });
-  const { waiterSdRef, toWaiterKop, willRelocateToWaiter, isSbp, companySdRef, feeKopNum } = tipRelocateToWaiterPlan({
-    paymentMethod: tx.paymentMethod,
-    feeKop: tx.feeKop,
+  const tipSplitForRelocate = parseTipSplitFromPayerInfo(tx.payerInfo);
+  const poolUserForRelocate = tipSplitForRelocate
+    ? await db.user.findUnique({
+        where: { id: tipSplitForRelocate.poolUserId },
+        select: { paygineSdRef: true },
+      })
+    : null;
+  const plan = computeTipRelocateExecutionPlan({
     amountKop: tx.amountKop,
+    feeKop: tx.feeKop,
+    paymentMethod: tx.paymentMethod,
     paygineOrderSdRef: orderSdRef,
-    waiterPaygineSdRef: recipient?.paygineSdRef,
+    recipientPaygineSdRef: recipient?.paygineSdRef,
+    poolPaygineSdRef: poolUserForRelocate?.paygineSdRef,
+    payerInfo: tx.payerInfo,
   });
 
-  if (!willRelocateToWaiter) {
-    if (!waiterSdRef || orderSdRef === waiterSdRef) {
-      await db.transaction.update({ where: { id: txId }, data: { status: TransactionStatus.SUCCESS } });
-      void broadcastBalanceUpdated(tx.recipientId);
-      observeTipSuccessBurstFromInitiatorIp(txId);
-      return { ok: true };
-    }
-    if (toWaiterKop < 1) {
-      await db.transaction.update({ where: { id: txId }, data: { status: TransactionStatus.SUCCESS } });
-      void broadcastBalanceUpdated(tx.recipientId);
-      observeTipSuccessBurstFromInitiatorIp(txId);
-      return { ok: true };
-    }
+  if (!plan || !plan.hasPendingWork) {
+    await db.transaction.update({
+      where: { id: txId },
+      data: {
+        status: TransactionStatus.SUCCESS,
+        ...(plan?.establishmentShareKop != null ? { establishmentShareKop: plan.establishmentShareKop } : {}),
+        ...(plan?.poolShareRecipientId ? { poolShareRecipientId: plan.poolShareRecipientId } : {}),
+      },
+    });
+    void broadcastBalanceUpdated(tx.recipientId);
+    if (plan?.poolShareRecipientId) void broadcastBalanceUpdated(plan.poolShareRecipientId);
+    observeTipSuccessBurstFromInitiatorIp(txId);
+    return { ok: true };
   }
 
   const claimed = await db.transaction.updateMany({
@@ -526,39 +604,58 @@ export async function runRelocateForTransaction(txId: string): Promise<{ ok: boo
           };
     };
 
-    if (isSbp && companySdRef && feeKopNum > 0) {
-      const relFee = await doRelocate(feeKopNum, companySdRef, `Комиссия ЮЛ (чаевые ${txId})`);
+    if (plan.isSbp && plan.companySdRef && plan.feeToCompanyKop > 0) {
+      const relFee = await doRelocate(
+        plan.feeToCompanyKop,
+        plan.companySdRef,
+        `Комиссия ЮЛ (чаевые ${txId})`,
+      );
       if (!relFee.ok) {
         logInfo("payment.webhook.relocate_failed", {
           transactionId: txId,
           code: relFee.code,
           description: relFee.description,
-          toSdRef: companySdRef,
+          toSdRef: plan.companySdRef,
           role: "fee_legal",
           ...(relFee.debugBody && { paygineResponsePreview: relFee.debugBody }),
         });
       }
     }
 
-    if (toWaiterKop < 1) {
-      await db.transaction.update({ where: { id: txId }, data: { status: TransactionStatus.SUCCESS } });
-      void broadcastBalanceUpdated(tx.recipientId);
-      observeTipSuccessBurstFromInitiatorIp(txId);
-      return { ok: true };
+    let stepsOk = true;
+    let lastFail: { code?: string; description?: string; debugBody?: string } = {};
+    for (const step of plan.steps) {
+      const rel = await doRelocate(step.amountKop, step.toSdRef, step.desc);
+      if (!rel.ok) {
+        stepsOk = false;
+        lastFail = {
+          code: rel.code,
+          description: rel.description,
+          ...(rel.debugBody && { debugBody: rel.debugBody }),
+        };
+        break;
+      }
     }
 
-    const relWaiter = await doRelocate(toWaiterKop, waiterSdRef!, `Перевод чаевых → ${waiterSdRef}`);
-    if (relWaiter.ok) {
-      await db.transaction.update({ where: { id: txId }, data: { status: TransactionStatus.SUCCESS } });
+    if (stepsOk) {
+      await db.transaction.update({
+        where: { id: txId },
+        data: {
+          status: TransactionStatus.SUCCESS,
+          ...(plan.establishmentShareKop != null ? { establishmentShareKop: plan.establishmentShareKop } : {}),
+          ...(plan.poolShareRecipientId ? { poolShareRecipientId: plan.poolShareRecipientId } : {}),
+        },
+      });
       void broadcastBalanceUpdated(tx.recipientId);
+      if (plan.poolShareRecipientId) void broadcastBalanceUpdated(plan.poolShareRecipientId);
       observeTipSuccessBurstFromInitiatorIp(txId);
     } else {
       logInfo("payment.webhook.relocate_failed", {
         transactionId: txId,
-        code: relWaiter.code,
-        description: relWaiter.description,
+        code: lastFail.code,
+        description: lastFail.description,
         hint: "Ручной перелив: npx tsx scripts/utils/relocate-one-transaction.ts " + txId,
-        ...(relWaiter.debugBody && { paygineResponsePreview: relWaiter.debugBody }),
+        ...(lastFail.debugBody && { paygineResponsePreview: lastFail.debugBody }),
       });
       await db.transaction.update({ where: { id: txId }, data: { status: TransactionStatus.FAILED } });
     }

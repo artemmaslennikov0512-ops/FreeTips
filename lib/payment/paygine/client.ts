@@ -70,7 +70,13 @@ export type RegisterParams = {
 
 export type RegisterResult =
   | { ok: true; orderId: number }
-  | { ok: false; code?: string; description?: string };
+  | {
+      ok: false;
+      code?: string;
+      description?: string;
+      /** Первые символы тела ответа ПЦ (для логов / отладки). */
+      responsePreview?: string;
+    };
 
 /**
  * webapi/Register. Таблица 1.
@@ -116,8 +122,13 @@ export async function registerOrder(
 
   const text = await res.text();
   const trimmed = text.trim();
+  const responsePreview = text.replace(/\s+/g, " ").trim().slice(0, 1200);
   if (!res.ok) {
-    return { ok: false, description: trimmed.slice(0, 500) || `HTTP ${res.status}` };
+    return {
+      ok: false,
+      description: trimmed.slice(0, 500) || `HTTP ${res.status}`,
+      responsePreview: responsePreview || undefined,
+    };
   }
 
   // Ответ может быть: число (order id) или XML <id>...</id>
@@ -135,7 +146,12 @@ export async function registerOrder(
 
   const errCode = text.match(/<code>([^<]+)<\/code>/)?.[1];
   const errDesc = text.match(/<description>([^<]*)<\/description>/)?.[1];
-  return { ok: false, code: errCode ?? undefined, description: (errDesc ?? trimmed).slice(0, 500) };
+  return {
+    ok: false,
+    code: errCode ?? undefined,
+    description: (errDesc ?? trimmed).slice(0, 500),
+    responsePreview: responsePreview || undefined,
+  };
   });
 }
 

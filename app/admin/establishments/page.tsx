@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Plus, Copy, RefreshCw } from "lucide-react";
 import { authHeaders } from "@/lib/auth-client";
 import { ADMIN_BTN, ADMIN_BTN_NEUTRAL_SM, ADMIN_BTN_PRIMARY, ADMIN_BTN_SM } from "@/lib/admin-button-classes";
+import { ADMIN_PANEL_INPUT_FULL_WIDTH, ADMIN_PANEL_INPUT_STRETCH } from "@/lib/admin-surface-classes";
 
 interface EstablishmentRow {
   id: string;
@@ -132,15 +133,13 @@ export default function AdminEstablishmentsPage() {
   };
 
   if (loading) {
-    return (
-      <div className="text-white/90">Загрузка…</div>
-    );
+    return <div className="text-[var(--color-on-dark)]">Загрузка…</div>;
   }
 
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="font-[family:var(--font-playfair)] text-xl font-semibold text-white text-center">
+        <h1 className="text-center font-[family:var(--font-playfair)] text-xl font-semibold text-[var(--color-on-dark)] sm:text-2xl">
           Заведения
         </h1>
         <button
@@ -158,8 +157,8 @@ export default function AdminEstablishmentsPage() {
       )}
 
       {createdLink && (
-        <div className="rounded-2xl border border-white/10 bg-[#0a192f] p-4">
-          <p className="mb-2 text-white font-medium">
+        <div className="cabinet-section-header rounded-2xl border-0 p-4">
+          <p className="mb-2 font-medium text-[var(--color-on-dark)]">
             Заведение «{createdLink.name}» создано. Ссылка для регистрации управляющего:
           </p>
           <div className="flex flex-wrap items-center gap-2">
@@ -167,7 +166,7 @@ export default function AdminEstablishmentsPage() {
               type="text"
               readOnly
               value={createdLink.link}
-              className="min-w-[200px] flex-1 rounded-lg border border-white/20 bg-white/5 px-3 py-2 text-sm text-white"
+              className={`min-w-[200px] flex-1 ${ADMIN_PANEL_INPUT_STRETCH}`}
             />
             <button
               type="button"
@@ -177,7 +176,7 @@ export default function AdminEstablishmentsPage() {
               <Copy className="h-4 w-4" /> Копировать
             </button>
           </div>
-          <p className="mt-2 text-sm text-white/70">
+          <p className="mt-2 text-sm text-[var(--color-on-dark-muted)]">
             Отправьте ссылку будущему управляющему. Один токен = одна регистрация. При необходимости можно перегенерировать ссылку в таблице ниже.
           </p>
         </div>
@@ -186,24 +185,26 @@ export default function AdminEstablishmentsPage() {
       {showForm && (
         <form
           onSubmit={handleCreate}
-          className="rounded-2xl border border-white/10 bg-[#0a192f] p-6 space-y-4"
+          className="cabinet-section-header space-y-4 rounded-2xl border-0 p-6 text-left"
         >
-          <h2 className="text-lg font-medium text-white">Новое заведение</h2>
+          <h2 className="text-lg font-medium text-[var(--color-on-dark)]">Новое заведение</h2>
           {formError && (
             <p className="text-sm text-red-300">{formError}</p>
           )}
           <div>
-            <label className="block text-sm text-white/80 mb-1">Название *</label>
+            <label className="mb-1 block text-sm text-[var(--color-on-dark-muted)]">Название *</label>
             <input
               type="text"
               required
               value={form.name}
               onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-              className="w-full rounded-lg border border-white/20 bg-white/5 px-3 py-2 text-white"
+              className={ADMIN_PANEL_INPUT_FULL_WIDTH}
             />
           </div>
           <div>
-            <label className="block text-sm text-white/80 mb-1">Slug для URL * (латиница, цифры, дефис)</label>
+            <label className="mb-1 block text-sm text-[var(--color-on-dark-muted)]">
+              Slug для URL * (латиница, цифры, дефис)
+            </label>
             <input
               type="text"
               required
@@ -215,29 +216,31 @@ export default function AdminEstablishmentsPage() {
                 }))
               }
               placeholder="momo-pizza"
-              className="w-full rounded-lg border border-white/20 bg-white/5 px-3 py-2 text-white"
+              className={ADMIN_PANEL_INPUT_FULL_WIDTH}
             />
           </div>
           <div>
-            <label className="block text-sm text-white/80 mb-1">Адрес</label>
+            <label className="mb-1 block text-sm text-[var(--color-on-dark-muted)]">Адрес</label>
             <input
               type="text"
               value={form.address}
               onChange={(e) => setForm((f) => ({ ...f, address: e.target.value }))}
-              className="w-full rounded-lg border border-white/20 bg-white/5 px-3 py-2 text-white"
+              className={ADMIN_PANEL_INPUT_FULL_WIDTH}
             />
           </div>
           <div>
-            <label className="block text-sm text-white/80 mb-1">Телефон</label>
+            <label className="mb-1 block text-sm text-[var(--color-on-dark-muted)]">Телефон</label>
             <input
               type="text"
               value={form.phone}
               onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
-              className="w-full rounded-lg border border-white/20 bg-white/5 px-3 py-2 text-white"
+              className={ADMIN_PANEL_INPUT_FULL_WIDTH}
             />
           </div>
           <div>
-            <label className="block text-sm text-white/80 mb-1">Лимит сотрудников (официантов)</label>
+            <label className="mb-1 block text-sm text-[var(--color-on-dark-muted)]">
+              Лимит сотрудников (официантов)
+            </label>
             <input
               type="number"
               min={0}
@@ -249,9 +252,9 @@ export default function AdminEstablishmentsPage() {
                 }))
               }
               placeholder="Пусто = без лимита"
-              className="w-full rounded-lg border border-white/20 bg-white/5 px-3 py-2 text-white"
+              className={ADMIN_PANEL_INPUT_FULL_WIDTH}
             />
-            <p className="mt-1 text-xs text-white/60">
+            <p className="mt-1 text-xs text-[var(--color-on-dark-muted)]">
               Больше этого числа управляющий не сможет подключить официантов.
             </p>
           </div>
@@ -277,14 +280,20 @@ export default function AdminEstablishmentsPage() {
       {/* Мобильная версия: карточки */}
       <div className="space-y-4 lg:hidden">
         {list.length === 0 ? (
-          <div className="rounded-xl border border-white/10 bg-[#0a192f] p-6 text-center text-white/60">Нет заведений. Создайте первое.</div>
+          <div className="cabinet-section-header rounded-xl border-0 p-6 text-center text-[var(--color-on-dark-muted)]">
+            Нет заведений. Создайте первое.
+          </div>
         ) : (
           list.map((est) => (
-            <div key={est.id} className="rounded-xl border border-white/10 bg-[#0a192f] p-4">
-              <p className="font-medium text-white">{est.name}</p>
-              <p className="mt-1 font-mono text-sm text-white/80">{est.uniqueSlug}</p>
-              <p className="mt-2 text-sm text-white/80">Сотрудников: {est.employeesCount}{est.maxEmployeesCount != null ? ` / ${est.maxEmployeesCount}` : ""} · Управляющих: {est.adminsCount}</p>
-              <div className="mt-4 flex flex-wrap gap-2 border-t border-white/10 pt-3">
+            <div key={est.id} className="cabinet-section-header rounded-xl border-0 p-4">
+              <p className="font-medium text-[var(--color-on-dark)]">{est.name}</p>
+              <p className="mt-1 font-mono text-sm text-[var(--color-on-dark-muted)]">{est.uniqueSlug}</p>
+              <p className="mt-2 text-sm text-[var(--color-on-dark-muted)]">
+                Сотрудников: {est.employeesCount}
+                {est.maxEmployeesCount != null ? ` / ${est.maxEmployeesCount}` : ""} · Управляющих:{" "}
+                {est.adminsCount}
+              </p>
+              <div className="mt-4 flex flex-wrap gap-2 border-t border-white/15 pt-3">
                 {linkByEstId[est.id] ? (
                   <>
                     <button type="button" onClick={() => copyLink(linkByEstId[est.id])} className={`${ADMIN_BTN} ${ADMIN_BTN_NEUTRAL_SM} gap-1`}>
@@ -306,31 +315,39 @@ export default function AdminEstablishmentsPage() {
       </div>
 
       {/* Десктоп: таблица */}
-      <div className="admin-establishments-table max-lg:hidden overflow-x-auto rounded-xl border border-white/10 bg-[#0a192f]">
+      <div className="admin-establishments-table cabinet-section-header max-lg:hidden overflow-x-auto rounded-xl border-0">
         <table className="w-full min-w-[700px] text-left">
           <thead>
-            <tr className="border-b border-white/10">
-              <th className="whitespace-nowrap p-3 font-medium text-white">Название</th>
-              <th className="whitespace-nowrap p-3 font-medium text-white">Slug</th>
-              <th className="whitespace-nowrap p-3 font-medium text-white">Лимит сотрудников</th>
-              <th className="whitespace-nowrap p-3 font-medium text-white">Сотрудников</th>
-              <th className="whitespace-nowrap p-3 font-medium text-white">Управляющих</th>
-              <th className="whitespace-nowrap p-3 font-medium text-white">Ссылка для управляющего</th>
+            <tr className="border-b border-white/15">
+              <th className="whitespace-nowrap p-3 font-medium text-[var(--color-on-dark)]">Название</th>
+              <th className="whitespace-nowrap p-3 font-medium text-[var(--color-on-dark)]">Slug</th>
+              <th className="whitespace-nowrap p-3 font-medium text-[var(--color-on-dark)]">Лимит сотрудников</th>
+              <th className="whitespace-nowrap p-3 font-medium text-[var(--color-on-dark)]">Сотрудников</th>
+              <th className="whitespace-nowrap p-3 font-medium text-[var(--color-on-dark)]">Управляющих</th>
+              <th className="whitespace-nowrap p-3 font-medium text-[var(--color-on-dark)]">
+                Ссылка для управляющего
+              </th>
             </tr>
           </thead>
           <tbody>
             {list.length === 0 ? (
               <tr>
-                <td colSpan={6} className="p-6 text-center text-white/60">Нет заведений. Создайте первое.</td>
+                <td colSpan={6} className="p-6 text-center text-[var(--color-on-dark-muted)]">
+                  Нет заведений. Создайте первое.
+                </td>
               </tr>
             ) : (
               list.map((est) => (
-                <tr key={est.id} className="border-b border-white/5">
-                  <td className="whitespace-nowrap p-3 text-white">{est.name}</td>
-                  <td className="whitespace-nowrap p-3 font-mono text-sm text-white/80">{est.uniqueSlug}</td>
-                  <td className="whitespace-nowrap p-3 text-white/80">{est.maxEmployeesCount == null ? "—" : est.maxEmployeesCount}</td>
-                  <td className="whitespace-nowrap p-3 text-white/80">{est.employeesCount}</td>
-                  <td className="whitespace-nowrap p-3 text-white/80">{est.adminsCount}</td>
+                <tr key={est.id} className="border-b border-white/10">
+                  <td className="whitespace-nowrap p-3 text-[var(--color-on-dark)]">{est.name}</td>
+                  <td className="whitespace-nowrap p-3 font-mono text-sm text-[var(--color-on-dark-muted)]">
+                    {est.uniqueSlug}
+                  </td>
+                  <td className="whitespace-nowrap p-3 text-[var(--color-on-dark-muted)]">
+                    {est.maxEmployeesCount == null ? "—" : est.maxEmployeesCount}
+                  </td>
+                  <td className="whitespace-nowrap p-3 text-[var(--color-on-dark-muted)]">{est.employeesCount}</td>
+                  <td className="whitespace-nowrap p-3 text-[var(--color-on-dark-muted)]">{est.adminsCount}</td>
                   <td className="p-3">
                     {linkByEstId[est.id] ? (
                       <div className="flex flex-wrap items-center gap-2">

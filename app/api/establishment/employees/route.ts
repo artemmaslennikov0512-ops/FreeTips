@@ -14,20 +14,31 @@ import { parseJsonWithLimit, MAX_BODY_SIZE_AUTH, jsonError } from "@/lib/api/hel
 import { z } from "zod";
 import { randomBytes } from "crypto";
 import { UserRole } from "@prisma/client";
+import { getWaiterPaygineSdRef } from "@/lib/payment/paygine-sd-ref";
+import { effectiveTipRoutingMode, syncTipLinksForEstablishment } from "@/lib/tip-routing";
 
 const createEmployeeSchema = z.object({
   name: z.string().trim().min(1, "Укажите имя").max(255),
   position: z.string().trim().max(100).optional().default(""),
 });
 
-async function generateUniqueQrIdentifier(): Promise<string> {
-  for (let i = 0; i < 5; i++) {
+async function generateUniqueQrIdentifier(establishmentId: string): Promise<string> {
+  const est = await db.establishment.findUnique({
+    where: { id: establishmentId },
+    select: { uniqueSlug: true },
+  });
+  const reserved = new Set<string>();
+  const us = est?.uniqueSlug?.trim();
+  if (us) reserved.add(us);
+  for (let i = 0; i < 20; i++) {
     const slug = generateSlug();
-    const [emp, link] = await Promise.all([
+    if (reserved.has(slug)) continue;
+    const [emp, link, slugEst] = await Promise.all([
       db.employee.findUnique({ where: { qrCodeIdentifier: slug } }),
       db.tipLink.findFirst({ where: { slug } }),
+      db.establishment.findUnique({ where: { uniqueSlug: slug }, select: { id: true } }),
     ]);
-    if (!emp && !link) return slug;
+    if (!emp && !link && !slugEst) return slug;
   }
   throw new Error("Не удалось сгенерировать уникальный slug");
 }
@@ -72,8 +83,15 @@ export async function GET(request: NextRequest) {
     ]),
   );
 
+  const estMeta = await db.establishment.findUnique({
+    where: { id: auth.establishmentId },
+    select: { uniqueSlug: true, tipRoutingMode: true },
+  });
+
   const prefix = `${baseUrl.replace(/\/$/, "")}/api/establishment/employees/photo`;
   return NextResponse.json({
+    establishmentUniqueSlug: estMeta?.uniqueSlug ?? null,
+    tipRoutingMode: effectiveTipRoutingMode(estMeta?.tipRoutingMode),
     employees: employees.map((e) => {
       const rating = reviewAgg[e.id];
       return {
@@ -131,7 +149,7 @@ export async function POST(request: NextRequest) {
   }
 
   const { name, position } = parseResult.data;
-  const qrCodeIdentifier = await generateUniqueQrIdentifier();
+  const qrCodeIdentifier = await generateUniqueQrIdentifier(auth.establishmentId);
 
   let poolUserId = establishment.tipPoolUserId;
 
@@ -179,6 +197,10 @@ export async function POST(request: NextRequest) {
       },
     });
     if (poolUserId) {
+      await tx.user.updateMany({
+        where: { id: poolUserId, paygineSdRef: null },
+        data: { paygineSdRef: getWaiterPaygineSdRef(poolUserId) },
+      });
       await tx.tipLink.create({
         data: {
           userId: poolUserId,
@@ -189,6 +211,8 @@ export async function POST(request: NextRequest) {
     }
     return emp;
   });
+
+  await syncTipLinksForEstablishment(auth.establishmentId);
 
   return NextResponse.json(
     {

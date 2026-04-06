@@ -91,7 +91,7 @@ export function CustomDropdown({
   const displayLabel = selectedOption ? selectedOption.label : placeholder;
 
   return (
-    <div ref={ref} className={`custom-dropdown relative ${styles.wrap} ${className}`}>
+    <div ref={ref} className={`custom-dropdown ${styles.wrap} ${className}`}>
       {label && (
         <label
           id={id ? `${id}-label` : undefined}
@@ -101,43 +101,46 @@ export function CustomDropdown({
           {label}
         </label>
       )}
-      <button
-        type="button"
-        id={id}
-        onClick={() => setOpen((o) => !o)}
-        className={triggerClassName ?? styles.trigger}
-        aria-haspopup="listbox"
-        aria-expanded={open}
-        aria-labelledby={label && id ? `${id}-label` : undefined}
-        aria-describedby={describedBy}
-      >
-        <span className="min-w-0 truncate">{displayLabel}</span>
-        <ChevronDown className={`h-5 w-5 shrink-0 transition-transform duration-200 ${open ? "rotate-180" : ""}`} aria-hidden />
-      </button>
-      <div
-        role="listbox"
-        aria-labelledby={label && id ? `${id}-label` : undefined}
-        id={id ? `${id}-listbox` : undefined}
-        className={`${styles.panel} transition-[opacity,transform] duration-200 ${
-          open ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1 pointer-events-none invisible"
-        }`}
-      >
-        {options.map((opt) => (
-          <button
-            key={opt.value}
-            type="button"
-            role="option"
-            id={id ? `${id}-option-${opt.value}` : undefined}
-            aria-selected={value === opt.value}
-            onClick={() => {
-              onChange(opt.value);
-              close();
-            }}
-            className={`${styles.option} ${value === opt.value ? styles.optionSelected : ""}`}
-          >
-            {opt.label}
-          </button>
-        ))}
+      {/* Якорь только для кнопки + панели: иначе top-full считается от всего блока с лейблом и на части макетов визуально «плывёт» */}
+      <div className="relative z-10 min-w-0 w-full">
+        <button
+          type="button"
+          id={id}
+          onClick={() => setOpen((o) => !o)}
+          className={triggerClassName ?? styles.trigger}
+          aria-haspopup="listbox"
+          aria-expanded={open}
+          aria-labelledby={label && id ? `${id}-label` : undefined}
+          aria-describedby={describedBy}
+        >
+          <span className="min-w-0 truncate">{displayLabel}</span>
+          <ChevronDown className={`h-5 w-5 shrink-0 transition-transform duration-200 ${open ? "rotate-180" : ""}`} aria-hidden />
+        </button>
+        <div
+          role="listbox"
+          aria-labelledby={label && id ? `${id}-label` : undefined}
+          id={id ? `${id}-listbox` : undefined}
+          className={`${styles.panel} z-50 transition-[opacity,transform] duration-200 ${
+            open ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1 pointer-events-none invisible"
+          }`}
+        >
+          {options.map((opt) => (
+            <button
+              key={opt.value}
+              type="button"
+              role="option"
+              id={id ? `${id}-option-${opt.value}` : undefined}
+              aria-selected={value === opt.value}
+              onClick={() => {
+                onChange(opt.value);
+                close();
+              }}
+              className={`${styles.option} ${value === opt.value ? styles.optionSelected : ""}`}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );

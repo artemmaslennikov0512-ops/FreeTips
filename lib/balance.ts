@@ -9,19 +9,27 @@ export async function getBalance(userId: string): Promise<{
   receivedKop: bigint;
   withdrawnKop: bigint;
 }> {
-  const [txSum, payoutSum] = await Promise.all([
-    db.transaction.aggregate({
+  const [txRows, poolShareSum, payoutSum] = await Promise.all([
+    db.transaction.findMany({
       where: { recipientId: userId, status: "SUCCESS" },
-      _sum: { amountKop: true, feeKop: true },
+      select: { amountKop: true, feeKop: true, establishmentShareKop: true },
+    }),
+    db.transaction.aggregate({
+      where: { poolShareRecipientId: userId, status: "SUCCESS" },
+      _sum: { establishmentShareKop: true },
     }),
     db.payoutRequest.aggregate({
       where: { userId, status: "COMPLETED" },
       _sum: { amountKop: true, feeKop: true },
     }),
   ]);
-  const amountReceived = txSum._sum.amountKop ?? BigInt(0);
-  const feeDeduct = txSum._sum.feeKop ?? BigInt(0);
-  const received = amountReceived - feeDeduct;
+  let received = BigInt(0);
+  for (const t of txRows) {
+    const fee = t.feeKop ?? BigInt(0);
+    const share = t.establishmentShareKop ?? BigInt(0);
+    received += t.amountKop - fee - share;
+  }
+  received += poolShareSum._sum.establishmentShareKop ?? BigInt(0);
   const withdrawnAmount = payoutSum._sum.amountKop ?? BigInt(0);
   const withdrawnFee = payoutSum._sum.feeKop ?? BigInt(0);
   const withdrawn = withdrawnAmount + withdrawnFee;

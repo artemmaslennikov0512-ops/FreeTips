@@ -5,6 +5,12 @@
 
 import type { TransactionStatus } from "@prisma/client";
 
+/** Снимок для перелива: доля на пул заведения (%) с личного QR официанта. */
+export type TipSplitSnapshot = {
+  poolUserId: string;
+  establishmentSharePercent: number;
+};
+
 export type CreatePaymentParams = {
   linkId: string;
   recipientId: string;
@@ -15,6 +21,8 @@ export type CreatePaymentParams = {
   baseUrl?: string;
   /** IP инициатора (страница оплаты); для наблюдения скорости успешных оплат, без блокировок */
   initiatorIp?: string | null;
+  /** Если задано, после оплаты net сумма делится: часть на пул, остаток получателю (recipientId). */
+  tipSplit?: TipSplitSnapshot | null;
 };
 
 export type CreatePaymentResult =

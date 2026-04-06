@@ -60,6 +60,24 @@ async function fetchImageAsPng(url: string): Promise<Uint8Array | null> {
   }
 }
 
+async function embedImageBytes(doc: PDFDocument, bytes: Uint8Array) {
+  try {
+    return await doc.embedPng(bytes);
+  } catch {
+    try {
+      return await doc.embedJpg(bytes);
+    } catch {
+      return null;
+    }
+  }
+}
+
+const BLACK = rgb(0, 0, 0);
+const WHITE = rgb(1, 1, 1);
+const QR_HOLDER_BG = rgb(0.93, 0.93, 0.93);
+const QR_HOLDER_BORDER = rgb(0.72, 0.72, 0.72);
+const CARD_EDGE = rgb(0.82, 0.82, 0.82);
+
 export async function GET(request: NextRequest) {
   const auth = await requireEstablishmentAdmin(request);
   if (auth.response) return auth.response;
@@ -88,6 +106,11 @@ export async function GET(request: NextRequest) {
         printCardWidthMm: true,
         printCardHeightMm: true,
         printCardFooterColor: true,
+        printCardTemplate: true,
+        printPartnerLogoUrl: true,
+        printQrHintText: true,
+        printBannerText: true,
+        printBannerSubtext: true,
       },
     }),
   ]);
@@ -136,16 +159,25 @@ export async function GET(request: NextRequest) {
 
   let logoImage: Awaited<ReturnType<PDFDocument["embedPng"]>> | null = null;
   if (logoPng && logoPng.length > 0) {
-    try {
-      logoImage = await doc.embedPng(logoPng);
-    } catch {
-      try {
-        logoImage = await doc.embedJpg(logoPng);
-      } catch {
-        // ignore — рисуем название заведения текстом
-      }
-    }
+    logoImage = await embedImageBytes(doc, logoPng);
   }
+
+  let partnerLogoImage: Awaited<ReturnType<PDFDocument["embedPng"]>> | null = null;
+  if (establishment?.printCardTemplate === "white_pos" && establishment.printPartnerLogoUrl?.trim()) {
+    const pUrl = establishment.printPartnerLogoUrl.startsWith("http")
+      ? establishment.printPartnerLogoUrl.trim()
+      : new URL(establishment.printPartnerLogoUrl.trim(), baseUrl).toString();
+    const pBytes = await fetchImageAsPng(pUrl);
+    if (pBytes?.length) partnerLogoImage = await embedImageBytes(doc, pBytes);
+  }
+
+  const isWhitePos = establishment?.printCardTemplate === "white_pos";
+  const qrHintText =
+    establishment?.printQrHintText?.trim() ||
+    (isWhitePos ? "Отсканируйте QR-код" : "Отсканируйте для чаевых");
+  const bannerLine =
+    establishment?.printBannerText?.trim() || (establishment?.name ?? "FreeTips").slice(0, 42);
+  const bannerSub = establishment?.printBannerSubtext?.trim() || "команда ресторана";
 
   const cardWidthMm = establishment?.printCardWidthMm ?? 67;
   const cardHeightMm = establishment?.printCardHeightMm ?? 49;
@@ -172,6 +204,184 @@ export async function GET(request: NextRequest) {
     const pad = 8 * Math.min(scaleX, scaleY);
     const innerLeft = x + pad;
     const innerWidth = CARD_WIDTH - pad * 2;
+    const s = Math.min(scaleX, scaleY);
+
+    if (isWhitePos) {
+      const innerTop = cardY + CARD_HEIGHT - pad;
+      const innerBot = cardY + pad;
+
+      page.drawRectangle({
+        x,
+        y: cardY,
+        width: CARD_WIDTH,
+        height: CARD_HEIGHT,
+        color: WHITE,
+        borderColor: CARD_EDGE,
+        borderWidth: 0.55 * s,
+      });
+
+      const logoRowH = 13 * s;
+      const half = (innerWidth - 4 * s) / 2;
+      const yHeaderAnchor = innerTop - 3 * s;
+
+      if (partnerLogoImage) {
+        const lw = Math.min(partnerLogoImage.width, half - 2 * s);
+        const lh = Math.min(logoRowH, (partnerLogoImage.height / partnerLogoImage.width) * lw);
+        page.drawImage(partnerLogoImage, {
+          x: innerLeft + s,
+          y: yHeaderAnchor - lh,
+          width: lw,
+          height: lh,
+        });
+      }
+
+      if (logoImage) {
+        const rw = Math.min(logoImage.width, half - 2 * s);
+        const rh = Math.min(logoRowH, (logoImage.height / logoImage.width) * rw);
+        page.drawImage(logoImage, {
+          x: innerLeft + innerWidth - rw - s,
+          y: yHeaderAnchor - rh,
+          width: rw,
+          height: rh,
+        });
+      } else if (!partnerLogoImage) {
+        const title = (establishment?.name ?? "FreeTips").slice(0, 26);
+        const ts = 8 * s;
+        const tw = fontBold.widthOfTextAtSize(title, ts);
+        page.drawText(title, {
+          x: innerLeft + (innerWidth - tw) / 2,
+          y: yHeaderAnchor - 10 * s,
+          size: ts,
+          font: fontBold,
+          color: BLACK,
+        });
+      } else {
+        const title = (establishment?.name ?? "FreeTips").slice(0, 22);
+        const ts = 7 * s;
+        const tw = fontBold.widthOfTextAtSize(title, ts);
+        page.drawText(title, {
+          x: innerLeft + half + 2 * s + Math.max(0, (half - tw) / 2),
+          y: yHeaderAnchor - 9 * s,
+          size: ts,
+          font: fontBold,
+          color: BLACK,
+        });
+      }
+
+      const subSize = 6 * s;
+      const subW = font.widthOfTextAtSize(bannerSub, subSize);
+      page.drawText(bannerSub, {
+        x: innerLeft + (innerWidth - subW) / 2,
+        y: innerBot + 4 * s,
+        size: subSize,
+        font,
+        color: BLACK,
+      });
+      const lineY = innerBot + 11 * s;
+      page.drawLine({
+        start: { x: innerLeft + 6 * s, y: lineY },
+        end: { x: innerLeft + innerWidth - 6 * s, y: lineY },
+        thickness: 0.4 * s,
+        color: BLACK,
+      });
+      const pillTitleSize = 7.5 * s;
+      const bl = bannerLine.slice(0, 36);
+      const pillTW = fontBold.widthOfTextAtSize(bl, pillTitleSize);
+      const pillW = pillTW + 10 * s;
+      const pillH = pillTitleSize + 3.5 * s;
+      const pillX = innerLeft + (innerWidth - pillW) / 2;
+      const pillBottom = lineY + 5 * s;
+      page.drawRectangle({
+        x: pillX,
+        y: pillBottom,
+        width: pillW,
+        height: pillH,
+        borderColor: BLACK,
+        borderWidth: 0.45 * s,
+      });
+      page.drawText(bl, {
+        x: pillX + 5 * s,
+        y: pillBottom + 1.3 * s,
+        size: pillTitleSize,
+        font: fontBold,
+        color: BLACK,
+      });
+
+      const qrBoxBottom = pillBottom + pillH + 5 * s;
+      const qrBoxTop = yHeaderAnchor - logoRowH - 5 * s;
+      let boxH = qrBoxTop - qrBoxBottom;
+      if (boxH < 30 * s) boxH = 30 * s;
+
+      page.drawRectangle({
+        x: innerLeft,
+        y: qrBoxBottom,
+        width: innerWidth,
+        height: boxH,
+        color: QR_HOLDER_BG,
+        borderColor: QR_HOLDER_BORDER,
+        borderWidth: 0.5 * s,
+      });
+
+      const payUrl = `${payBase}/${emp.qrCodeIdentifier}`;
+      const dataUrlW = await QRCode.toDataURL(payUrl, { width: 140, margin: 1 });
+      const pngBytesW = Uint8Array.from(
+        Buffer.from(dataUrlW.replace(/^data:image\/png;base64,/, ""), "base64"),
+      );
+      const qrImageW = await doc.embedPng(pngBytesW);
+
+      const boxTop = qrBoxBottom + boxH;
+      let baseline = boxTop - 7 * s;
+      const nameS = 7 * s;
+      const nm = emp.name.slice(0, 22);
+      const nmW = fontBold.widthOfTextAtSize(nm, nameS);
+      page.drawText(nm, {
+        x: innerLeft + (innerWidth - nmW) / 2,
+        y: baseline,
+        size: nameS,
+        font: fontBold,
+        color: BLACK,
+      });
+      baseline -= nameS + 2 * s;
+      if (emp.position) {
+        const posS = 6 * s;
+        const ps = emp.position.slice(0, 28);
+        const pw = font.widthOfTextAtSize(ps, posS);
+        page.drawText(ps, {
+          x: innerLeft + (innerWidth - pw) / 2,
+          y: baseline,
+          size: posS,
+          font,
+          color: BLACK,
+        });
+        baseline -= posS + 3 * s;
+      } else {
+        baseline -= 2 * s;
+      }
+      const qrSz = Math.max(
+        12 * s,
+        Math.min(40 * s, baseline - qrBoxBottom - 10 * s, innerWidth - 8 * s),
+      );
+      const qrBottom = baseline - qrSz - 2 * s;
+      page.drawImage(qrImageW, {
+        x: innerLeft + (innerWidth - qrSz) / 2,
+        y: qrBottom,
+        width: qrSz,
+        height: qrSz,
+      });
+      const hintS = 5.5 * s;
+      const ht = qrHintText.slice(0, 52);
+      const hw = font.widthOfTextAtSize(ht, hintS);
+      page.drawText(ht, {
+        x: innerLeft + (innerWidth - hw) / 2,
+        y: qrBottom - 3 * s,
+        size: hintS,
+        font,
+        color: BLACK,
+      });
+
+      cardIndex++;
+      continue;
+    }
 
     const headerH = 22 * scaleY;
     const headerY = cardY + CARD_HEIGHT - pad - headerH;
@@ -296,8 +506,9 @@ export async function GET(request: NextRequest) {
     page.drawImage(qrImage, { x: qrX, y: qrY, width: qrSize, height: qrSize });
 
     const footerSize = 7 * Math.min(scaleX, scaleY);
-    page.drawText("Отсканируйте для чаевых", {
-      x: innerLeft,
+    const hintWc = font.widthOfTextAtSize(qrHintText, footerSize);
+    page.drawText(qrHintText, {
+      x: innerLeft + Math.max(0, (innerWidth - hintWc) / 2),
       y: blockY - 8 * scaleY,
       size: footerSize,
       font,

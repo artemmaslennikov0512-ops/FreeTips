@@ -13,8 +13,10 @@ import {
   getRegistrationTokenExpiresAt,
 } from "@/lib/auth/registration-token";
 import { getBaseUrlFromRequest } from "@/lib/get-base-url";
+import { classifySendEmailFailure } from "@/lib/email/classify-send-failure";
 import { sendEmail } from "@/lib/email/send";
 import { templateRegistrationLinkFromRequest } from "@/lib/email/templates";
+import { emailSchema } from "@/lib/validations";
 import { logError } from "@/lib/logger";
 import { getRequestId } from "@/lib/security/request";
 
@@ -42,6 +44,15 @@ export async function POST(request: NextRequest, { params }: Params) {
       { status: 400 },
     );
   }
+
+  const toParsed = emailSchema.safeParse(req.email?.trim() ?? "");
+  if (!toParsed.success) {
+    return NextResponse.json(
+      { error: "В заявке указан некорректный email. Исправьте заявку или выдайте ссылку вручную." },
+      { status: 400 },
+    );
+  }
+  const toEmail = toParsed.data;
 
   const token = generateRegistrationToken();
   const tokenHash = hashRegistrationToken(token);
@@ -76,20 +87,35 @@ export async function POST(request: NextRequest, { params }: Params) {
     expiresAt,
   });
 
-  const sendResult = await sendEmail({ to: req.email, subject, html });
+  const greeting = req.fullName?.trim()
+    ? `Здравствуйте, ${req.fullName.trim()}!`
+    : "Здравствуйте!";
+  const textPlain = [
+    greeting,
+    "",
+    "Ваша заявка на подключение к сервису чаевых FreeTips одобрена. Ссылка для регистрации (одноразовая):",
+    link,
+    "",
+    `Срок действия ссылки — до ${expiresAt.toLocaleString("ru-RU", { dateStyle: "long", timeStyle: "short" })}.`,
+    "",
+    "Если вы не оставляли заявку, проигнорируйте это письмо.",
+  ].join("\n");
+
+  const sendResult = await sendEmail({ to: toEmail, subject, html, text: textPlain });
   if (!sendResult.ok) {
-    // Реальная причина (SMTP/Resend) — в логах; в ответе не отдаём детали из соображений безопасности.
-    logError("admin.registration_request.send_token.failed", new Error(sendResult.error), { requestId, registrationRequestId: id });
-    return NextResponse.json(
-      { error: "Не удалось отправить письмо. Проверьте настройки почты на сервере." },
-      { status: 502 },
-    );
+    logError("admin.registration_request.send_token.failed", new Error(sendResult.error), {
+      requestId,
+      registrationRequestId: id,
+      toDomain: toEmail.split("@")[1] ?? "",
+    });
+    const { summary, detail } = classifySendEmailFailure(sendResult.error);
+    return NextResponse.json({ error: summary, detail }, { status: 502 });
   }
 
   return NextResponse.json({
     success: true,
     link,
     expiresAt: expiresAt.toISOString(),
-    message: `Ссылка отправлена на ${req.email}`,
+    message: `Ссылка отправлена на ${toEmail}`,
   });
 }

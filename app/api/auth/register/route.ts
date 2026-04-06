@@ -21,6 +21,7 @@ import { getRequestId } from "@/lib/security/request";
 import { parseJsonWithLimit, MAX_BODY_SIZE_AUTH, jsonError, internalError, rateLimit429Response, zodErrorResponse } from "@/lib/api/helpers";
 import { verifyCsrfFromRequest } from "@/lib/security/csrf";
 import { observeSharedAuthIp } from "@/lib/fraud-velocity-observe";
+import { syncTipLinksForEstablishment } from "@/lib/tip-routing";
 import { buildNewSessionMetadata } from "@/lib/auth-session-metadata";
 import { toDateInputValueFromApi } from "@/lib/utils";
 
@@ -169,6 +170,9 @@ export async function POST(request: NextRequest) {
 
     logSecurity("auth.register.success", { requestId, ip, userId: user.id });
     void observeSharedAuthIp(user.id, ip);
+    if (isEmployeeToken && regToken!.employee) {
+      await syncTipLinksForEstablishment(regToken!.employee.establishmentId);
+    }
     return NextResponse.json(
       {
         accessToken,

@@ -14,6 +14,7 @@ import { feeKopForPayout } from "@/lib/payment/paygine-fee";
 import { registerOrder, buildSDPayOutPageFormParams, getSDPayOutPageEndpoint } from "@/lib/payment/paygine/client";
 import { getBaseUrlFromRequest } from "@/lib/get-base-url";
 import { parseJsonWithLimit, MAX_BODY_SIZE_AUTH } from "@/lib/api/helpers";
+import { logInfo } from "@/lib/logger";
 const CURRENCY_RUB = 643;
 
 export async function POST(
@@ -145,6 +146,16 @@ export async function POST(
   );
 
   if (!registerResult.ok) {
+    logInfo("payment.sdpayout_page.register_fail", {
+      payoutId: payout.id,
+      targetUserId,
+      adminUserId: auth.user.userId,
+      amountKop: Number(amountBigInt),
+      feeKop,
+      code: registerResult.code ?? null,
+      pcDescription: registerResult.description ?? null,
+      responsePreview: registerResult.responsePreview ?? null,
+    });
     await db.payoutRequest.delete({ where: { id: payout.id } }).catch(() => {});
     return NextResponse.json(
       {
@@ -155,6 +166,15 @@ export async function POST(
       { status: 502 },
     );
   }
+
+  logInfo("payment.sdpayout_page.register_ok", {
+    payoutId: payout.id,
+    targetUserId,
+    adminUserId: auth.user.userId,
+    orderId: registerResult.orderId,
+    amountKop: Number(amountBigInt),
+    feeKop,
+  });
 
   await db.payoutRequest.update({
     where: { id: payout.id },

@@ -142,7 +142,7 @@ export default function PayoutRulesPage() {
       </div>
 
       {showForm && (
-        <div className="cabinet-card rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden">
+        <div className="cabinet-card rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)]">
           <form onSubmit={handleSubmit} className="p-6 space-y-4">
             <h2 className="text-lg font-medium text-white">
               {editingId ? "Редактировать правило" : "Новое правило"}

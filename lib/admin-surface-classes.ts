@@ -37,6 +37,9 @@ export const ADMIN_PANEL_INPUT = `mx-auto max-w-md ${FIELD_BASE} text-left`;
 /** Однострочное поле на всю ширину карточки (формы со списками и т.п.). */
 export const ADMIN_PANEL_INPUT_FULL_WIDTH = `mx-auto w-full ${FIELD_BASE} text-left`;
 
+/** То же, без `mx-auto` — для flex-строк (readonly-ссылка рядом с кнопкой и т.п.). */
+export const ADMIN_PANEL_INPUT_STRETCH = `${FIELD_BASE} w-full text-left`;
+
 export const ADMIN_PANEL_INPUT_OTP =
   `${ADMIN_PANEL_INPUT} text-center text-lg tracking-[0.35em] pl-[0.35em]`;
 

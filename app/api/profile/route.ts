@@ -17,6 +17,7 @@ import { logError, logInfo } from "@/lib/logger";
 import { getRequestId } from "@/lib/security/request";
 import { getBaseUrlFromRequest } from "@/lib/get-base-url";
 import { messageFromUnknown } from "@/lib/errors";
+import { getBalance } from "@/lib/balance";
 
 /** Кэш баланса Paygine по userId для снижения числа запросов к ПЦ. TTL из PAYGINE_BALANCE_CACHE_TTL_SEC (по умолчанию 30 сек). */
 const PAYGINE_BALANCE_CACHE_TTL_MS =
@@ -49,7 +50,7 @@ export async function GET(request: NextRequest) {
     const dayStart = getUtcDayStart();
     const monthStart = getUtcMonthStart();
 
-    const [profile, txSum, payoutsCompletedSum, txCount, payoutsPendingCount, limits, monthlyLimits, todayPayouts, monthPayouts, employee] =
+    const [profile, balanceRow, payoutsCompletedSum, txCount, payoutsPendingCount, limits, monthlyLimits, todayPayouts, monthPayouts, employee] =
       await Promise.all([
         db.user.findUnique({
           where: { id },
@@ -94,10 +95,7 @@ export async function GET(request: NextRequest) {
             totpSecretEnc: true,
           },
         }),
-        db.transaction.aggregate({
-          where: { recipientId: id, status: "SUCCESS" },
-          _sum: { amountKop: true },
-        }),
+        getBalance(id),
         db.payoutRequest.aggregate({
           where: { userId: id, status: "COMPLETED" },
           _sum: { amountKop: true },
@@ -136,9 +134,8 @@ export async function GET(request: NextRequest) {
       return jsonError(404, "Пользователь не найден");
     }
 
-    const received = txSum._sum.amountKop ?? BigInt(0);
-    const withdrawn = payoutsCompletedSum._sum.amountKop ?? BigInt(0);
-    const balanceCalculated = received - withdrawn;
+    const received = balanceRow.receivedKop;
+    const balanceCalculated = balanceRow.balanceKop;
     const todayCount = todayPayouts._count;
     const todaySumKop = todayPayouts._sum.amountKop ?? BigInt(0);
     const monthCount = monthPayouts._count;

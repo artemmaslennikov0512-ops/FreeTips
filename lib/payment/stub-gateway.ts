@@ -17,6 +17,7 @@ import { broadcastBalanceUpdated } from "@/lib/ws-broadcast";
 import { observeTipSuccessBurstFromInitiatorIp } from "@/lib/fraud-velocity-observe";
 import { PayginePaymentGateway } from "./paygine-gateway";
 import { paymentAcceptBlockedReasonForRecipient } from "@/lib/payment-accept-guard";
+import { poolShareKopFromNet } from "@/lib/tip-routing";
 
 const WEBHOOK_SIGNATURE_PREFIX = "sha256=";
 
@@ -42,7 +43,7 @@ function verifyWebhookSignature(rawBody: string, signature: string | null): bool
 
 export class StubPaymentGateway implements PaymentGateway {
   async createPayment(params: CreatePaymentParams): Promise<CreatePaymentResult> {
-    const { linkId, recipientId, amountKop, idempotencyKey, comment, initiatorIp } = params;
+    const { linkId, recipientId, amountKop, idempotencyKey, comment, initiatorIp, tipSplit } = params;
 
     const existing = await db.transaction.findUnique({
       where: { idempotencyKey },
@@ -61,20 +62,35 @@ export class StubPaymentGateway implements PaymentGateway {
       return { success: false, error: blockedReason };
     }
 
+    const payerPayload: Record<string, unknown> = { comment: comment ?? undefined };
+    let establishmentShareKop: bigint | null = null;
+    let poolShareRecipientId: string | null = null;
+    if (tipSplit && tipSplit.establishmentSharePercent > 0) {
+      payerPayload.tipSplit = {
+        poolUserId: tipSplit.poolUserId,
+        establishmentSharePercent: tipSplit.establishmentSharePercent,
+      };
+      establishmentShareKop = poolShareKopFromNet(amountKop, tipSplit.establishmentSharePercent);
+      poolShareRecipientId = tipSplit.poolUserId;
+    }
+
     const tx = await db.transaction.create({
       data: {
         linkId,
         recipientId,
         amountKop,
-        payerInfo: comment ? JSON.stringify({ comment }) : null,
+        payerInfo: Object.keys(payerPayload).length ? JSON.stringify(payerPayload) : null,
         status: TransactionStatus.SUCCESS,
         idempotencyKey,
         initiatorIp: initiatorIp?.trim() || null,
+        ...(establishmentShareKop != null ? { establishmentShareKop } : {}),
+        ...(poolShareRecipientId ? { poolShareRecipientId } : {}),
       },
       select: { id: true },
     });
 
     void broadcastBalanceUpdated(recipientId);
+    if (poolShareRecipientId) void broadcastBalanceUpdated(poolShareRecipientId);
     observeTipSuccessBurstFromInitiatorIp(tx.id);
 
     return { success: true, transactionId: tx.id };

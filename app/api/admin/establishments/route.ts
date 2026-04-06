@@ -18,6 +18,7 @@ import { parseJsonWithLimit, MAX_BODY_SIZE_AUTH, jsonError } from "@/lib/api/hel
 import { z } from "zod";
 import { randomBytes } from "crypto";
 import { UserRole } from "@prisma/client";
+import { getWaiterPaygineSdRef } from "@/lib/payment/paygine-sd-ref";
 
 const createEstablishmentSchema = z.object({
   name: z.string().trim().min(1, "Укажите название").max(255),
@@ -113,6 +114,10 @@ export async function POST(request: NextRequest) {
         passwordHash: poolPasswordHash,
         role: UserRole.RECIPIENT,
       },
+    });
+    await tx.user.update({
+      where: { id: poolUser.id },
+      data: { paygineSdRef: getWaiterPaygineSdRef(poolUser.id) },
     });
     await tx.establishment.update({
       where: { id: est.id },

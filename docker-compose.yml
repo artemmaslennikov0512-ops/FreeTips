@@ -1,6 +1,8 @@
 services:
   web:
     build: .
+    # Подбирает завершившиеся дочерние процессы (иначе после `node … &` возможны zombie в отчёте Docker).
+    init: true
     ports:
       - "3000:3000"
     volumes:

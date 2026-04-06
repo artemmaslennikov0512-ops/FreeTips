@@ -2239,14 +2239,14 @@ html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-compe
   border-radius: 1rem;
 }
 
-/* Светлая тема: ЛК супер-админа — дашборд: карточки и таблица заявок — белый шрифт */
+/* Светлая тема: ЛК супер-админа — дашборд: карточки и таблица на тёмном main-block — светлый шрифт */
 html:not([data-theme="dark"]) .admin-panel .admin-dashboard-card p,
 html:not([data-theme="dark"]) .admin-panel .admin-dashboard-table th,
 html:not([data-theme="dark"]) .admin-panel .admin-dashboard-table td {
   color: #fff !important;
 }
 
-/* Светлая тема: в админке убрать «коричневые окна» — заголовки таблиц и кнопка «Выдать токен» в стиле светлого стекла */
+/* Светлая тема: в админке — заголовки таблиц и кнопка «Выдать токен» в стиле светлого стекла */
 html:not([data-theme="dark"]) .admin-panel table thead {
   background: rgba(255, 255, 255, 0.2) !important;
 }
@@ -5853,6 +5853,10 @@ button {
   box-shadow: var(--cabinet-shadow-subtle);
   border: var(--cabinet-border);
   overflow: hidden;
+}
+/* CustomDropdown: панель absolute + top-full; overflow:hidden у карточки обрезает и ломает позицию */
+.cabinet-premium .cabinet-card:has(.custom-dropdown) {
+  overflow: visible;
 }
 .cabinet-premium .cabinet-card:hover {
   box-shadow: var(--cabinet-shadow-medium);

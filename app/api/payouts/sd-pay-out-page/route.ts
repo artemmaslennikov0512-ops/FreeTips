@@ -15,6 +15,7 @@ import { getBaseUrlFromRequest } from "@/lib/get-base-url";
 import { parseJsonWithLimit, MAX_BODY_SIZE_AUTH } from "@/lib/api/helpers";
 import { FRAUD_RULE, recordFraudSignal } from "@/lib/fraud-signals";
 import { observePayoutVelocityAfterCreate } from "@/lib/fraud-velocity-observe";
+import { logInfo } from "@/lib/logger";
 const CURRENCY_RUB = 643;
 
 export async function POST(request: NextRequest) {
@@ -158,6 +159,15 @@ export async function POST(request: NextRequest) {
   );
 
   if (!registerResult.ok) {
+    logInfo("payment.sdpayout_page.register_fail", {
+      payoutId: payout.id,
+      userId: auth.userId,
+      amountKop: Number(amountBigInt),
+      feeKop,
+      code: registerResult.code ?? null,
+      pcDescription: registerResult.description ?? null,
+      responsePreview: registerResult.responsePreview ?? null,
+    });
     await db.payoutRequest.delete({ where: { id: payout.id } }).catch(() => {});
     return NextResponse.json(
       {
@@ -168,6 +178,14 @@ export async function POST(request: NextRequest) {
       { status: 502 },
     );
   }
+
+  logInfo("payment.sdpayout_page.register_ok", {
+    payoutId: payout.id,
+    userId: auth.userId,
+    orderId: registerResult.orderId,
+    amountKop: Number(amountBigInt),
+    feeKop,
+  });
 
   await db.payoutRequest.update({
     where: { id: payout.id },

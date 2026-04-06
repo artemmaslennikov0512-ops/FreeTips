@@ -120,19 +120,13 @@ function ConnectionRequestDetails({ r, twoColumnFromSm }: { r: RegistrationReque
   );
 }
 
-function RegistrationFollowUpLine({
-  r,
-  surface = "card",
-}: {
-  r: RegistrationRequestRow;
-  surface?: "card" | "table";
-}) {
+function RegistrationFollowUpLine({ r }: { r: RegistrationRequestRow }) {
   const isRegistered = r.isRegistered === true;
-  const onTable = surface === "table";
-  const muted = onTable ? "text-[var(--color-text-secondary)]" : "text-white/70";
-  const dim = onTable ? "text-[var(--color-muted)]" : "text-white/55";
-  const ok = onTable ? "text-emerald-600" : "text-emerald-400";
-  const pending = onTable ? "text-amber-800/90" : "text-amber-200/85";
+  /* В светлой теме админки таблица всё равно на тёмном стекле; не использовать --color-text/--color-muted (они для светлого фона страницы). */
+  const muted = "text-[var(--color-on-dark-muted)]";
+  const dim = "text-white/55";
+  const ok = "text-emerald-400";
+  const pending = "text-amber-200/85";
 
   if (isRegistered) {
     const dt =
@@ -322,9 +316,16 @@ export function AdminConnectionRequestsBlock({
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
       });
-      const data = (await res.json().catch(() => ({}))) as { link?: string; expiresAt?: string; error?: string; message?: string };
+      const data = (await res.json().catch(() => ({}))) as {
+        link?: string;
+        expiresAt?: string;
+        error?: string;
+        message?: string;
+        detail?: string;
+      };
       if (!res.ok) {
-        alert(data.error || "Ошибка отправки");
+        const parts = [data.error, data.detail].filter((s): s is string => Boolean(s?.trim()));
+        alert(parts.length > 0 ? parts.join("\n\n") : "Ошибка отправки");
         return;
       }
       if (data.link) {
@@ -612,7 +613,7 @@ export function AdminConnectionRequestsBlock({
                             >
                               {r.status === "PENDING" ? "Ожидает" : r.status === "APPROVED" ? "Принята" : "Отклонена"}
                             </span>
-                            <RegistrationFollowUpLine r={r} surface="table" />
+                            <RegistrationFollowUpLine r={r} />
                           </td>
                           <td className="p-3">
                             {tab === "pending" && r.status === "PENDING" && !r.hasToken && (

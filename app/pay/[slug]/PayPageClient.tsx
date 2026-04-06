@@ -46,6 +46,7 @@ export default function PayPageClient() {
   } | null>(null);
   const [recipientPhotoUrl, setRecipientPhotoUrl] = useState<string | null>(null);
   const [acceptPayments, setAcceptPayments] = useState(true);
+  const [paymentUnavailableReason, setPaymentUnavailableReason] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const [amount, setAmount] = useState<number>(100);
@@ -103,6 +104,7 @@ export default function PayPageClient() {
         const data = (await res.json()) as {
           recipientName: string;
           acceptPayments?: boolean;
+          paymentUnavailableReason?: string;
           savingFor?: string;
           recipientPhotoUrl?: string;
           m5PayShell?: boolean;
@@ -119,6 +121,11 @@ export default function PayPageClient() {
         };
         setRecipientName(data.recipientName);
         setAcceptPayments(data.acceptPayments !== false);
+        setPaymentUnavailableReason(
+          typeof data.paymentUnavailableReason === "string" && data.paymentUnavailableReason.trim()
+            ? data.paymentUnavailableReason.trim()
+            : null,
+        );
         setSavingFor(data.savingFor ?? null);
         setRecipientPhotoUrl(data.recipientPhotoUrl ?? null);
         setBranding(data.branding ?? null);
@@ -500,7 +507,8 @@ export default function PayPageClient() {
           >
             <p className="pay-page-section-title text-[var(--color-text)]">Приём временно недоступен</p>
             <p className="mt-2 text-center text-sm text-[var(--color-text-secondary)]">
-              Перевод по этой ссылке сейчас отключён администратором. Страница открывается, но оплату отправить нельзя — попробуйте позже.
+              {paymentUnavailableReason ??
+                "Перевод по этой ссылке сейчас отключён администратором. Страница открывается, но оплату отправить нельзя — попробуйте позже."}
             </p>
           </div>
         )}

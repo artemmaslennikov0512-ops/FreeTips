@@ -32,6 +32,13 @@ import { getPlatformPaymentSettings } from "@/lib/platform-payment-settings";
 import { recipientCanAcceptIncomingTips } from "@/lib/payment-accept-policy";
 import { FRAUD_RULE, recordFraudSignal } from "@/lib/fraud-signals";
 import { observePayInitBurstForSlug } from "@/lib/fraud-velocity-observe";
+import {
+  establishmentForPaySlug,
+  loadTipLinkForPaySlug,
+  resolvePayInitForSlug,
+  type PaySlugEstablishment,
+} from "@/lib/pay-slug-resolve";
+import { effectiveTipRoutingMode, TIP_ROUTING_EMPLOYEE_QR } from "@/lib/tip-routing";
 
 const DEMO_SLUG = "demoPaySlug" in site && typeof site.demoPaySlug === "string" ? site.demoPaySlug : null;
 
@@ -44,88 +51,92 @@ export async function GET(request: NextRequest, { params }: Params) {
     return NextResponse.json({ recipientName: "Демо-получатель", acceptPayments: false });
   }
 
-  const [tipLink, paymentSettings] = await Promise.all([
-    db.tipLink.findUnique({
-      where: { slug },
-      select: {
-      id: true,
-      employeeId: true,
-      employee: {
-        select: {
-          id: true,
-          name: true,
-          photoUrl: true,
-          establishment: {
-            select: {
-              logoUrl: true,
-              logoOpacityPercent: true,
-              primaryColor: true,
-              secondaryColor: true,
-              mainBackgroundColor: true,
-              blocksBackgroundColor: true,
-              fontColor: true,
-              borderColor: true,
-              borderWidthPx: true,
-              borderOpacityPercent: true,
-            },
-          },
-        },
-      },
-      user: { select: { id: true, login: true, fullName: true, savingFor: true, profilePhotoUrl: true } },
-    },
-  }),
-    getPlatformPaymentSettings(),
-  ]);
+  const [tipLink, paymentSettings] = await Promise.all([loadTipLinkForPaySlug(slug), getPlatformPaymentSettings()]);
 
   if (!tipLink) {
     return NextResponse.json({ error: "Ссылка не найдена" }, { status: 404 });
   }
 
-  const fullName = tipLink.user.fullName?.trim() || "";
-  const employeeName = tipLink.employee?.name?.trim() || "";
-  const login = tipLink.user.login || "";
-  // ФИО в формате «Фамилия Имя Отчество» — на странице оплаты показываем только имя (второе слово)
-  const firstNameFromFullName =
-    fullName && fullName.length > 0
-      ? (() => {
-          const parts = fullName.split(/\s+/).filter(Boolean);
-          return parts.length >= 2 ? parts[1]! : parts[0] ?? fullName;
-        })()
-      : "";
-  const displayName = firstNameFromFullName || employeeName || login || "";
-  const recipientName = displayName ? `Официант, ${displayName}` : "Официант";
-  const brandingFromEstablishment = tipLink.employee?.establishment
+  const baseUrl = getBaseUrlFromRequest(request);
+
+  const est = await establishmentForPaySlug(
+    slug,
+    tipLink.employee?.establishment as PaySlugEstablishment | null | undefined,
+    tipLink.employeeId,
+  );
+  const routingMode = effectiveTipRoutingMode(est?.tipRoutingMode);
+  const establishmentPayUi = !tipLink.employeeId || routingMode !== TIP_ROUTING_EMPLOYEE_QR;
+
+  const brandingFromEstablishment = est
     ? {
-        logoUrl: tipLink.employee.establishment.logoUrl ?? undefined,
-        logoOpacityPercent: tipLink.employee.establishment.logoOpacityPercent ?? undefined,
-        primaryColor: tipLink.employee.establishment.primaryColor ?? undefined,
-        secondaryColor: tipLink.employee.establishment.secondaryColor ?? undefined,
-        mainBackgroundColor: tipLink.employee.establishment.mainBackgroundColor ?? undefined,
-        blocksBackgroundColor: tipLink.employee.establishment.blocksBackgroundColor ?? undefined,
-        fontColor: tipLink.employee.establishment.fontColor ?? undefined,
-        borderColor: tipLink.employee.establishment.borderColor ?? undefined,
-        borderWidthPx: tipLink.employee.establishment.borderWidthPx ?? undefined,
-        borderOpacityPercent: tipLink.employee.establishment.borderOpacityPercent ?? undefined,
+        logoUrl: est.logoUrl ?? undefined,
+        logoOpacityPercent: est.logoOpacityPercent ?? undefined,
+        primaryColor: est.primaryColor ?? undefined,
+        secondaryColor: est.secondaryColor ?? undefined,
+        mainBackgroundColor: est.mainBackgroundColor ?? undefined,
+        blocksBackgroundColor: est.blocksBackgroundColor ?? undefined,
+        fontColor: est.fontColor ?? undefined,
+        borderColor: est.borderColor ?? undefined,
+        borderWidthPx: est.borderWidthPx ?? undefined,
+        borderOpacityPercent: est.borderOpacityPercent ?? undefined,
       }
     : undefined;
+
+  const estName = (est?.name ?? "").trim() || "Заведение";
+  let recipientName: string;
+  let recipientPhotoUrl: string | undefined;
+  let savingFor: string | undefined;
+  let paymentUnavailableReason: string | undefined;
+
+  if (establishmentPayUi) {
+    recipientName = `Чаевые — «${estName}»`;
+    const logo = est?.logoUrl?.trim();
+    recipientPhotoUrl =
+      logo && /^https?:\/\//i.test(logo)
+        ? logo
+        : undefined;
+    savingFor = undefined;
+  } else {
+    const fullName = tipLink.user.fullName?.trim() || "";
+    const employeeName = tipLink.employee?.name?.trim() || "";
+    const login = tipLink.user.login || "";
+    const firstNameFromFullName =
+      fullName && fullName.length > 0
+        ? (() => {
+            const parts = fullName.split(/\s+/).filter(Boolean);
+            return parts.length >= 2 ? parts[1]! : parts[0] ?? fullName;
+          })()
+        : "";
+    const displayName = firstNameFromFullName || employeeName || login || "";
+    recipientName = displayName ? `Официант, ${displayName}` : "Официант";
+    savingFor = tipLink.user.savingFor?.trim() || undefined;
+    recipientPhotoUrl =
+      tipLink.employee?.photoUrl && tipLink.employee?.id
+        ? `${baseUrl.replace(/\/$/, "")}/api/establishment/employees/photo/${tipLink.employee.id}?type=avatar`
+        : tipLink.user.profilePhotoUrl
+          ? `${baseUrl.replace(/\/$/, "")}/api/profile/photo/${tipLink.user.id}`
+          : undefined;
+    if (!tipLink.employee?.userId) {
+      paymentUnavailableReason =
+        "Официант ещё не подключил личный кабинет — оплата на персональный счёт недоступна.";
+    }
+  }
+
   const slugNorm = slug.trim().toLowerCase();
   const slugBrandingOverride =
     PAY_PAGE_BRANDING_OVERRIDES[slug] ?? PAY_PAGE_BRANDING_OVERRIDES[slugNorm];
   let branding = mergePayPageBranding(brandingFromEstablishment, slugBrandingOverride);
   const m5Login =
-    isCabinetM5CompetitionTheme(login) && !PAY_PAGE_SLUGS_SKIP_M5_LOGIN_BRANDING.has(slugNorm);
+    isCabinetM5CompetitionTheme(tipLink.user.login || "") &&
+    !PAY_PAGE_SLUGS_SKIP_M5_LOGIN_BRANDING.has(slugNorm);
   if (m5Login) {
     branding = mergePayPageBranding(branding, PAY_PAGE_M5_COMPETITION_BRANDING);
   }
-  const savingFor = tipLink.user.savingFor?.trim() || undefined;
-  const baseUrl = getBaseUrlFromRequest(request);
-  const recipientPhotoUrl =
-    tipLink.employee?.photoUrl && tipLink.employee?.id
-      ? `${baseUrl.replace(/\/$/, "")}/api/establishment/employees/photo/${tipLink.employee.id}?type=avatar`
-      : tipLink.user.profilePhotoUrl
-        ? `${baseUrl.replace(/\/$/, "")}/api/profile/photo/${tipLink.user.id}`
-        : undefined;
-  const acceptPayments = recipientCanAcceptIncomingTips(tipLink.user.id, paymentSettings);
+
+  const acceptPayments =
+    !tipLink.user.isBlocked &&
+    !paymentUnavailableReason &&
+    recipientCanAcceptIncomingTips(tipLink.userId, paymentSettings);
 
   return NextResponse.json({
     recipientName,
@@ -133,6 +144,7 @@ export async function GET(request: NextRequest, { params }: Params) {
     ...(branding && { branding }),
     ...(savingFor && { savingFor }),
     ...(recipientPhotoUrl && { recipientPhotoUrl }),
+    ...(paymentUnavailableReason && { paymentUnavailableReason }),
     ...(m5Login && { m5PayShell: true }),
   });
 }
@@ -167,10 +179,7 @@ export async function POST(request: NextRequest, { params }: Params) {
   }
 
   const [tipLink, paymentSettings] = await Promise.all([
-    db.tipLink.findUnique({
-      where: { slug },
-      select: { id: true, userId: true, user: { select: { isBlocked: true } } },
-    }),
+    loadTipLinkForPaySlug(slug),
     getPlatformPaymentSettings(),
   ]);
 
@@ -179,10 +188,22 @@ export async function POST(request: NextRequest, { params }: Params) {
     return NextResponse.json({ error: "Ссылка не найдена" }, { status: 404 });
   }
 
-  if (tipLink.user.isBlocked) {
-    logSecurity("pay.init.recipient_blocked", { requestId, ip, slug, recipientId: tipLink.userId });
+  const resolved = await resolvePayInitForSlug(slug, tipLink);
+  if ("error" in resolved) {
+    logSecurity("pay.init.resolve_blocked", { requestId, ip, slug, reason: resolved.error });
+    return NextResponse.json({ error: resolved.error }, { status: resolved.status });
+  }
+
+  const { paymentRecipientId, tipSplit } = resolved;
+
+  const payRecipientUser = await db.user.findUnique({
+    where: { id: paymentRecipientId },
+    select: { isBlocked: true },
+  });
+  if (!payRecipientUser || payRecipientUser.isBlocked) {
+    logSecurity("pay.init.recipient_blocked", { requestId, ip, slug, recipientId: paymentRecipientId });
     void recordFraudSignal({
-      userId: tipLink.userId,
+      userId: paymentRecipientId,
       ruleCode: FRAUD_RULE.PAY_RECIPIENT_BLOCKED,
       message: "Попытка инициализации оплаты на заблокированного получателя",
       metadata: { slug },
@@ -191,10 +212,10 @@ export async function POST(request: NextRequest, { params }: Params) {
     return NextResponse.json({ error: "Приём чаевых временно недоступен" }, { status: 403 });
   }
 
-  if (!recipientCanAcceptIncomingTips(tipLink.userId, paymentSettings)) {
-    logSecurity("pay.init.policy_blocked", { requestId, ip, slug, recipientId: tipLink.userId });
+  if (!recipientCanAcceptIncomingTips(paymentRecipientId, paymentSettings)) {
+    logSecurity("pay.init.policy_blocked", { requestId, ip, slug, recipientId: paymentRecipientId });
     void recordFraudSignal({
-      userId: tipLink.userId,
+      userId: paymentRecipientId,
       ruleCode: FRAUD_RULE.PAY_POLICY_BLOCKED,
       message: "Попытка оплаты при отключённом приёме (глобальный стоп, чёрный список или не в белом списке)",
       metadata: { slug },
@@ -220,12 +241,13 @@ export async function POST(request: NextRequest, { params }: Params) {
   try {
     const result = await gateway.createPayment({
       linkId: tipLink.id,
-      recipientId: tipLink.userId,
+      recipientId: paymentRecipientId,
       amountKop: amountBigInt,
       idempotencyKey,
       comment: comment ?? null,
       baseUrl,
       initiatorIp: ip,
+      tipSplit,
     });
 
     if (!result.success) {
@@ -233,7 +255,7 @@ export async function POST(request: NextRequest, { params }: Params) {
       return NextResponse.json({ error: result.error }, { status: 400 });
     }
 
-    observePayInitBurstForSlug(tipLink.id, tipLink.userId, slug);
+    observePayInitBurstForSlug(tipLink.id, paymentRecipientId, slug);
     logSecurity("pay.init.success", { requestId, ip, slug, transactionId: result.transactionId });
     const json: { success: true; transactionId: string; redirectUrl?: string } = {
       success: true,

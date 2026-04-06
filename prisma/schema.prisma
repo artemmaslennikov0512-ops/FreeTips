@@ -194,6 +194,10 @@ model Transaction {
   idempotencyKey  String            @unique @db.VarChar(255) // для идемпотентности
   initiatorIp     String?           @db.VarChar(64) // IP клиента при создании заказа (наблюдение скорости успешных оплат)
   relocateStartedAt DateTime?       // установить при старте перелива — защита от двойного запуска (два вебхука)
+  /// При персональном QR и доле заведения: сумма (коп.), ушедшая на счёт пула заведения после оплаты
+  establishmentShareKop BigInt?
+  /// userId пула заведения для учёта establishmentShareKop в балансе пула
+  poolShareRecipientId String?      @db.VarChar(64)
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
 
@@ -203,6 +207,7 @@ model Transaction {
 
   @@index([linkId])
   @@index([recipientId])
+  @@index([poolShareRecipientId])
   @@index([status])
   @@index([externalId])
   @@index([idempotencyKey])
@@ -353,6 +358,18 @@ model Establishment {
   printCardWidthMm  Int?     // ширина карточки для печати (мм), null = 67
   printCardHeightMm Int?     // высота карточки для печати (мм), null = 49
   printCardFooterColor String? @db.VarChar(20) // цвет подписи «Отсканируйте для чаевых» (hex), null = fontColor
+  /// Шаблон печати: classic — тёмная карточка; white_pos — белая «как у терминала» (логотипы, QR в рамке, подпись внизу)
+  printCardTemplate    String?  @db.VarChar(32)
+  /// Логотип партнёра/сервиса слева вверху (URL), только для white_pos
+  printPartnerLogoUrl  String?  @db.VarChar(512)
+  /// Текст под QR внутри серой рамки (по умолчанию «Отсканируйте QR-код»)
+  printQrHintText      String?  @db.VarChar(160)
+  /// Текст в «капсуле» над подписью внизу; пусто = название заведения
+  printBannerText      String?  @db.VarChar(100)
+  /// Подзаголовок под линией (например «команда ресторана»)
+  printBannerSubtext   String?  @db.VarChar(160)
+  /// Режим QR: POOL_QR — общий счёт заведения; EMPLOYEE_QR — на ЛК официанта с опциональным срезом %
+  tipRoutingMode    String?  @db.VarChar(20)
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 

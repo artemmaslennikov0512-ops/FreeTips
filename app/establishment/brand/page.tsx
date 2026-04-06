@@ -10,7 +10,12 @@ import { getBaseUrl } from "@/lib/get-base-url";
 type BrandGroup = "print" | "pay" | "cabinet";
 
 const BRAND_GROUPS: { value: BrandGroup; label: string; description: string; icon: typeof Printer }[] = [
-  { value: "print", label: "QR-карточка для печати", description: "Фиксированная карточка: лого, рамка, QR. Без суммы и полей ввода.", icon: Printer },
+  {
+    value: "print",
+    label: "QR-карточка для печати",
+    description: "Классическая тёмная или белая карточка «как у терминала»: логотипы, QR в рамке, подписи.",
+    icon: Printer,
+  },
   { value: "pay", label: "Страница оплаты (клиент)", description: "Что видит клиент при переходе по QR: суммы, кнопка оплаты.", icon: Smartphone },
   { value: "cabinet", label: "Личный кабинет официанта", description: "Оформление раздела заведения и кабинета официанта.", icon: LayoutDashboard },
 ];
@@ -32,7 +37,16 @@ interface BrandSettings {
   printCardHeightMm: number | null;
   printCardFooterColor: string | null;
   logoOpacityPercent: number | null;
+  establishmentName?: string;
+  printCardTemplate?: string | null;
+  printPartnerLogoUrl?: string | null;
+  printQrHintText?: string | null;
+  printBannerText?: string | null;
+  printBannerSubtext?: string | null;
+  tipRoutingMode?: "POOL_QR" | "EMPLOYEE_QR";
 }
+
+type PrintCardTemplate = "classic" | "white_pos";
 
 const DEFAULT_HEX = { primary: "#c9a227", secondary: "#0a192f", mainBg: "#0a192f", blocksBg: "#1e293b", font: "#fafafa", border: "rgba(197,165,114,0.5)" };
 
@@ -56,7 +70,14 @@ export default function EstablishmentBrandPage() {
   const [printCardWidthMm, setPrintCardWidthMm] = useState(67);
   const [printCardHeightMm, setPrintCardHeightMm] = useState(49);
   const [printCardFooterColor, setPrintCardFooterColor] = useState("");
+  const [establishmentName, setEstablishmentName] = useState("");
+  const [printCardTemplate, setPrintCardTemplate] = useState<PrintCardTemplate>("classic");
+  const [printPartnerLogoUrl, setPrintPartnerLogoUrl] = useState("");
+  const [printQrHintText, setPrintQrHintText] = useState("");
+  const [printBannerText, setPrintBannerText] = useState("");
+  const [printBannerSubtext, setPrintBannerSubtext] = useState("");
   const [logoOpacityPercent, setLogoOpacityPercent] = useState(100);
+  const [tipRoutingMode, setTipRoutingMode] = useState<"POOL_QR" | "EMPLOYEE_QR">("POOL_QR");
   const [printPreviewQrUrl, setPrintPreviewQrUrl] = useState<string | null>(null);
   const [examplePaySlug, setExamplePaySlug] = useState<string | null>(null);
   const [examplePayQrUrl, setExamplePayQrUrl] = useState<string | null>(null);
@@ -99,7 +120,14 @@ export default function EstablishmentBrandPage() {
           setPrintCardWidthMm(Number(data.printCardWidthMm) || 67);
           setPrintCardHeightMm(Number(data.printCardHeightMm) || 49);
           setPrintCardFooterColor(String(data.printCardFooterColor ?? ""));
+          setEstablishmentName(String(data.establishmentName ?? ""));
+          setPrintCardTemplate(data.printCardTemplate === "white_pos" ? "white_pos" : "classic");
+          setPrintPartnerLogoUrl(String(data.printPartnerLogoUrl ?? ""));
+          setPrintQrHintText(String(data.printQrHintText ?? ""));
+          setPrintBannerText(String(data.printBannerText ?? ""));
+          setPrintBannerSubtext(String(data.printBannerSubtext ?? ""));
           setLogoOpacityPercent(Number(data.logoOpacityPercent) ?? 100);
+          setTipRoutingMode(data.tipRoutingMode === "EMPLOYEE_QR" ? "EMPLOYEE_QR" : "POOL_QR");
         }
       } finally {
         setLoading(false);
@@ -132,7 +160,13 @@ export default function EstablishmentBrandPage() {
           printCardWidthMm: printCardWidthMm,
           printCardHeightMm: printCardHeightMm,
           printCardFooterColor: printCardFooterColor.trim() || null,
+          printCardTemplate: printCardTemplate === "white_pos" ? "white_pos" : null,
+          printPartnerLogoUrl: printPartnerLogoUrl.trim() || null,
+          printQrHintText: printQrHintText.trim() || null,
+          printBannerText: printBannerText.trim() || null,
+          printBannerSubtext: printBannerSubtext.trim() || null,
           logoOpacityPercent: logoOpacityPercent === 100 ? null : logoOpacityPercent,
+          tipRoutingMode,
         }),
       });
       const data = await res.json().catch(() => ({}));
@@ -157,7 +191,14 @@ export default function EstablishmentBrandPage() {
       setPrintCardWidthMm(Number(data.printCardWidthMm) ?? 67);
       setPrintCardHeightMm(Number(data.printCardHeightMm) ?? 49);
       setPrintCardFooterColor(String(data.printCardFooterColor ?? ""));
+      setEstablishmentName(String(data.establishmentName ?? ""));
+      setPrintCardTemplate(data.printCardTemplate === "white_pos" ? "white_pos" : "classic");
+      setPrintPartnerLogoUrl(String(data.printPartnerLogoUrl ?? ""));
+      setPrintQrHintText(String(data.printQrHintText ?? ""));
+      setPrintBannerText(String(data.printBannerText ?? ""));
+      setPrintBannerSubtext(String(data.printBannerSubtext ?? ""));
       setLogoOpacityPercent(Number(data.logoOpacityPercent) ?? 100);
+      setTipRoutingMode(data.tipRoutingMode === "EMPLOYEE_QR" ? "EMPLOYEE_QR" : "POOL_QR");
       setMessage("Сохранено. Настройки применяются в личном кабинете и на странице оплаты чаевых. QR настраивается в разделе «QR и печать».");
     } catch {
       setMessage("Ошибка соединения");
@@ -198,7 +239,14 @@ export default function EstablishmentBrandPage() {
       setPrintCardWidthMm(Number(data.printCardWidthMm) ?? 67);
       setPrintCardHeightMm(Number(data.printCardHeightMm) ?? 49);
       setPrintCardFooterColor(String(data.printCardFooterColor ?? ""));
+      setEstablishmentName(String(data.establishmentName ?? ""));
+      setPrintCardTemplate(data.printCardTemplate === "white_pos" ? "white_pos" : "classic");
+      setPrintPartnerLogoUrl(String(data.printPartnerLogoUrl ?? ""));
+      setPrintQrHintText(String(data.printQrHintText ?? ""));
+      setPrintBannerText(String(data.printBannerText ?? ""));
+      setPrintBannerSubtext(String(data.printBannerSubtext ?? ""));
       setLogoOpacityPercent(Number(data.logoOpacityPercent) ?? 100);
+      setTipRoutingMode(data.tipRoutingMode === "EMPLOYEE_QR" ? "EMPLOYEE_QR" : "POOL_QR");
       setMessage("Настройки сброшены к исходным.");
     } catch {
       setMessage("Ошибка соединения");
@@ -320,6 +368,11 @@ export default function EstablishmentBrandPage() {
   const secondaryRgba = hexToRgba(secondaryColor || undefined, secondaryOpacityPercent);
 
   const isPrintOnly = activeGroup === "print";
+  const previewQrHint =
+    printQrHintText.trim() ||
+    (printCardTemplate === "white_pos" ? "Отсканируйте QR-код" : "Отсканируйте для чаевых");
+  const previewBannerLine = printBannerText.trim() || establishmentName || "Название заведения";
+  const previewBannerSub = printBannerSubtext.trim() || "команда ресторана";
 
   return (
     <div className="mx-auto max-w-6xl space-y-6">
@@ -401,6 +454,41 @@ export default function EstablishmentBrandPage() {
             </div>
             {!isPrintOnly && (
             <>
+            {activeGroup === "pay" && (
+              <div className="rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/5 p-3 space-y-3">
+                <p className="text-sm text-white/90 font-medium">Куда уходят чаевые по QR сотрудников</p>
+                <label className="flex gap-3 items-start cursor-pointer">
+                  <input
+                    type="radio"
+                    name="tipRoutingMode"
+                    checked={tipRoutingMode === "POOL_QR"}
+                    onChange={() => setTipRoutingMode("POOL_QR")}
+                    className="mt-1 accent-[var(--color-brand-gold)]"
+                  />
+                  <span>
+                    <span className="text-sm text-white block">Общий счёт заведения</span>
+                    <span className="text-xs text-white/60 block mt-1">
+                      Клиент видит страницу оплаты заведения; деньги приходят на счёт заведения — дальше администратор распределяет между официантами.
+                    </span>
+                  </span>
+                </label>
+                <label className="flex gap-3 items-start cursor-pointer">
+                  <input
+                    type="radio"
+                    name="tipRoutingMode"
+                    checked={tipRoutingMode === "EMPLOYEE_QR"}
+                    onChange={() => setTipRoutingMode("EMPLOYEE_QR")}
+                    className="mt-1 accent-[var(--color-brand-gold)]"
+                  />
+                  <span>
+                    <span className="text-sm text-white block">Персональный QR официанта</span>
+                    <span className="text-xs text-white/60 block mt-1">
+                      Оплата идёт на ЛК того, чью ссылку отсканировали. Если задана доля заведения (в разделе правил распределения), с этой суммы удерживается процент в пользу заведения, остальное — официанту.
+                    </span>
+                  </span>
+                </label>
+              </div>
+            )}
             <div>
               <label className="block text-sm text-white/90 mb-1">Доп. цвет (hex) — фон карточки оплаты, сайдбар</label>
               <div className="flex gap-2 items-center">
@@ -535,8 +623,81 @@ export default function EstablishmentBrandPage() {
             {isPrintOnly && (
               <>
                 <div>
-                  <label className="block text-sm text-white/90 mb-1">Цвет подписи под QR (hex)</label>
-                  <p className="text-xs text-white/70 mb-1">«Отсканируйте для чаевых». Если не задан — используется цвет текста.</p>
+                  <CustomDropdown
+                    id="establishment-print-template"
+                    variant="establishment"
+                    label="Шаблон карточки для печати"
+                    value={printCardTemplate}
+                    onChange={(v) => setPrintCardTemplate(v as PrintCardTemplate)}
+                    options={[
+                      { value: "classic", label: "Классическая (тёмный фон)" },
+                      { value: "white_pos", label: "Белая «как у терминала»" },
+                    ]}
+                  />
+                  <p className="mt-2 text-xs text-white/70">
+                    Белый шаблон: два логотипа вверху, QR в серой рамке, подпись под QR и блок внизу (капсула, линия, текст) —
+                    как на пластиковых табличках с QR.
+                  </p>
+                </div>
+                {printCardTemplate === "white_pos" && (
+                  <div className="space-y-3 rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/5 p-3">
+                    <div>
+                      <label className="block text-sm text-white/90 mb-1">Логотип партнёра слева (URL)</label>
+                      <p className="text-xs text-white/60 mb-1">Необязательно. Справа — логотип заведения из поля «URL логотипа» выше.</p>
+                      <input
+                        type="url"
+                        value={printPartnerLogoUrl}
+                        onChange={(e) => setPrintPartnerLogoUrl(e.target.value)}
+                        placeholder="https://…"
+                        className="cabinet-input-window w-full rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-white placeholder:text-white/50 focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-gold)]/40"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-white/90 mb-1">Текст под QR в рамке</label>
+                      <input
+                        type="text"
+                        value={printQrHintText}
+                        onChange={(e) => setPrintQrHintText(e.target.value)}
+                        placeholder="Отсканируйте QR-код"
+                        maxLength={160}
+                        className="cabinet-input-window w-full rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-white placeholder:text-white/50 focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-gold)]/40"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-white/90 mb-1">Текст в капсуле внизу</label>
+                      <p className="text-xs text-white/60 mb-1">Пусто — подставится название заведения.</p>
+                      <input
+                        type="text"
+                        value={printBannerText}
+                        onChange={(e) => setPrintBannerText(e.target.value)}
+                        placeholder={establishmentName || "Название заведения"}
+                        maxLength={100}
+                        className="cabinet-input-window w-full rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-white placeholder:text-white/50 focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-gold)]/40"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-white/90 mb-1">Подзаголовок под линией</label>
+                      <input
+                        type="text"
+                        value={printBannerSubtext}
+                        onChange={(e) => setPrintBannerSubtext(e.target.value)}
+                        placeholder="команда ресторана"
+                        maxLength={160}
+                        className="cabinet-input-window w-full rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-white placeholder:text-white/50 focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-gold)]/40"
+                      />
+                    </div>
+                    <p className="text-xs text-white/60">
+                      Для вертикальной карточки удобны размеры около 54×86 мм (пропорции визитки); можно задать ниже.
+                    </p>
+                  </div>
+                )}
+                <div>
+                  <label className="block text-sm text-white/90 mb-1">Цвет подписи под блоком QR (hex)</label>
+                  <p className="text-xs text-white/70 mb-1">
+                    {printCardTemplate === "white_pos"
+                      ? "Только для классического шаблона в PDF подпись под тёмным блоком; в белом шаблоне текст под QR чёрный."
+                      : "«Отсканируйте для чаевых» под карточкой. Если не задан — цвет текста бренда."}
+                  </p>
                   <div className="flex gap-2 items-center">
                     <input
                       type="color"
@@ -593,7 +754,10 @@ export default function EstablishmentBrandPage() {
         <div className="cabinet-card rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden order-1 lg:order-2 lg:sticky lg:top-4">
           <div className="border-b border-white/10 px-4 py-3 text-center">
             <span className="text-sm font-medium text-white/90">
-              {activeGroup === "print" && "Превью: карточка для печати (фиксированная)"}
+              {activeGroup === "print" &&
+                (printCardTemplate === "white_pos"
+                  ? "Превью: белая карточка для печати"
+                  : "Превью: классическая карточка для печати")}
               {activeGroup === "pay" && "Превью: страница оплаты (клиент)"}
               {activeGroup === "cabinet" && "Превью: личный кабинет официанта"}
             </span>
@@ -608,73 +772,173 @@ export default function EstablishmentBrandPage() {
             {activeGroup === "print" && (
               <div className="w-full flex flex-col items-center">
                 <p className="text-xs text-white/60 mb-2">Так будет выглядеть одна карточка в PDF ({printCardWidthMm}×{printCardHeightMm} мм)</p>
-                <div
-                  className="transition-colors flex flex-col overflow-hidden max-w-full"
-                  style={{
-                    width: Math.round(printCardWidthMm * 3.6),
-                    height: Math.round(printCardHeightMm * 3.6),
-                    minWidth: 120,
-                    minHeight: 90,
-                    border: `${Math.min(2, borderWidth)}px solid ${borderRgba}`,
-                    borderRadius: 4,
-                    backgroundColor: mainBgRgba ?? hexOr(mainBackgroundColor, "#0a192f"),
-                  }}
-                >
-                  {/* Верх: лого или название (фиксированно) */}
-                  <div className="flex items-center justify-center shrink-0 py-1.5 px-2 min-h-[28px]" style={{ borderBottom: `1px solid ${borderRgba}` }}>
-                    {logoUrl.trim() ? (
-                      <Image
-                        src={logoUrl.trim()}
-                        alt=""
-                        width={120}
-                        height={20}
-                        unoptimized
-                        className="h-5 w-auto max-w-[120px] object-contain"
-                        style={{ opacity: logoOpacityPercent != null ? logoOpacityPercent / 100 : 1 }}
-                        onError={(e) => {
-                          e.currentTarget.style.display = "none";
-                        }}
-                      />
-                    ) : (
-                      <span className="font-[family:var(--font-playfair)] text-xs font-bold truncate max-w-full" style={{ color: hexOr(fontColor, "#fafafa") }}>
-                        Free<span style={{ color: hexOr(primaryColor, "var(--color-brand-gold)") }}>Tips</span>
-                      </span>
-                    )}
-                  </div>
-                  {/* Блок: фон карточки; сверху фото + имя + должность, по центру QR, снизу подпись */}
+                {printCardTemplate === "white_pos" ? (
                   <div
-                    className="flex-1 flex flex-col min-h-0 rounded-b px-2 py-1.5"
+                    className="flex flex-col overflow-hidden max-w-full shadow-sm"
                     style={{
-                      backgroundColor: blocksBgRgba ?? hexOr(blocksBackgroundColor, "rgba(0.06,0.12,0.22,1)"),
-                      borderLeft: `1px solid ${borderRgba}`,
-                      borderRight: `1px solid ${borderRgba}`,
-                      borderBottom: `1px solid ${borderRgba}`,
+                      width: Math.round(printCardWidthMm * 3.6),
+                      height: Math.round(printCardHeightMm * 3.6),
+                      minWidth: 120,
+                      minHeight: 90,
+                      border: "1px solid #c4c4c4",
+                      borderRadius: 6,
+                      backgroundColor: "#ffffff",
                     }}
                   >
-                    {/* Фото (плейсхолдер в превью) */}
-                    <div className="flex justify-center shrink-0 mt-0.5">
-                      <div className="w-8 h-8 rounded-full flex items-center justify-center text-[10px] shrink-0" style={{ backgroundColor: (hex(primaryColor) || "var(--color-brand-gold)") + "30", color: hexOr(fontColor, "#fafafa") }}>👤</div>
+                    <div className="flex shrink-0 flex-row items-start justify-between gap-1 px-1.5 pt-1.5 pb-1">
+                      <div className="flex min-h-[18px] max-w-[48%] flex-1 items-start justify-start">
+                        {printPartnerLogoUrl.trim() ? (
+                          <Image
+                            src={printPartnerLogoUrl.trim()}
+                            alt=""
+                            width={80}
+                            height={24}
+                            unoptimized
+                            className="h-4 w-auto max-h-5 max-w-full object-contain object-left"
+                            onError={(e) => {
+                              e.currentTarget.style.display = "none";
+                            }}
+                          />
+                        ) : (
+                          <span className="text-[6px] leading-tight text-neutral-400">Лого партнёра</span>
+                        )}
+                      </div>
+                      <div className="flex max-w-[48%] flex-1 items-start justify-end">
+                        {logoUrl.trim() ? (
+                          <Image
+                            src={logoUrl.trim()}
+                            alt=""
+                            width={80}
+                            height={24}
+                            unoptimized
+                            className="h-4 w-auto max-h-5 max-w-full object-contain object-right"
+                            style={{ opacity: logoOpacityPercent != null ? logoOpacityPercent / 100 : 1 }}
+                            onError={(e) => {
+                              e.currentTarget.style.display = "none";
+                            }}
+                          />
+                        ) : (
+                          <span className="text-right text-[7px] font-bold leading-tight text-black truncate">{previewBannerLine}</span>
+                        )}
+                      </div>
                     </div>
-                    <p className="font-semibold text-[10px] truncate text-center mt-0.5" style={{ color: hexOr(fontColor, "#fafafa") }}>Имя официанта</p>
-                    <p className="text-[9px] opacity-90 text-center truncate" style={{ color: hexOr(fontColor, "#e2e8f0") }}>Должность</p>
-                    {/* QR по центру блока */}
-                    <div className="flex-1 flex items-center justify-center min-h-0 py-1">
-                      {printPreviewQrUrl ? (
-                        <Image
-                          src={printPreviewQrUrl}
-                          alt=""
-                          width={56}
-                          height={56}
-                          unoptimized
-                          className="max-h-full max-w-full h-14 w-14 object-contain rounded bg-white"
-                        />
-                      ) : (
-                        <div className="w-14 h-14 rounded bg-white/20 flex items-center justify-center text-[10px] text-white/70">QR</div>
-                      )}
+                    <div className="mx-1 mb-1 flex min-h-0 flex-1 flex-col rounded border border-neutral-400/60 bg-[#ececec] px-1 py-1">
+                      <p className="shrink-0 text-center text-[8px] font-bold text-black truncate">Имя официанта</p>
+                      <p className="shrink-0 text-center text-[7px] text-neutral-700 truncate">Должность</p>
+                      <div className="flex min-h-0 flex-1 items-center justify-center py-0.5">
+                        {printPreviewQrUrl ? (
+                          <Image
+                            src={printPreviewQrUrl}
+                            alt=""
+                            width={56}
+                            height={56}
+                            unoptimized
+                            className="h-12 w-12 max-h-full max-w-full rounded-sm bg-white object-contain p-0.5"
+                          />
+                        ) : (
+                          <div className="flex h-12 w-12 items-center justify-center rounded-sm bg-white text-[9px] text-neutral-500">QR</div>
+                        )}
+                      </div>
+                      <p className="shrink-0 text-center text-[6px] leading-tight text-black">{previewQrHint}</p>
+                    </div>
+                    <div className="flex shrink-0 flex-col items-center gap-0.5 px-1 pb-1.5 pt-0.5">
+                      <div className="max-w-[92%] truncate rounded-full border border-black px-2 py-px text-center text-[7px] font-bold text-black">
+                        {previewBannerLine}
+                      </div>
+                      <div className="h-px w-[78%] bg-black" />
+                      <p className="text-center text-[6px] text-black">{previewBannerSub}</p>
                     </div>
                   </div>
-                  <p className="text-[9px] px-2 py-1 text-center shrink-0" style={{ color: hexOr(printCardFooterColor || undefined, hexOr(fontColor, "rgba(250,250,250,0.85)")) }}>Отсканируйте для чаевых</p>
-                </div>
+                ) : (
+                  <div
+                    className="flex max-w-full flex-col overflow-hidden transition-colors"
+                    style={{
+                      width: Math.round(printCardWidthMm * 3.6),
+                      height: Math.round(printCardHeightMm * 3.6),
+                      minWidth: 120,
+                      minHeight: 90,
+                      border: `${Math.min(2, borderWidth)}px solid ${borderRgba}`,
+                      borderRadius: 4,
+                      backgroundColor: mainBgRgba ?? hexOr(mainBackgroundColor, "#0a192f"),
+                    }}
+                  >
+                    <div
+                      className="flex min-h-[28px] shrink-0 items-center justify-center px-2 py-1.5"
+                      style={{ borderBottom: `1px solid ${borderRgba}` }}
+                    >
+                      {logoUrl.trim() ? (
+                        <Image
+                          src={logoUrl.trim()}
+                          alt=""
+                          width={120}
+                          height={20}
+                          unoptimized
+                          className="h-5 w-auto max-w-[120px] object-contain"
+                          style={{ opacity: logoOpacityPercent != null ? logoOpacityPercent / 100 : 1 }}
+                          onError={(e) => {
+                            e.currentTarget.style.display = "none";
+                          }}
+                        />
+                      ) : (
+                        <span
+                          className="font-[family:var(--font-playfair)] max-w-full truncate text-xs font-bold"
+                          style={{ color: hexOr(fontColor, "#fafafa") }}
+                        >
+                          Free<span style={{ color: hexOr(primaryColor, "var(--color-brand-gold)") }}>Tips</span>
+                        </span>
+                      )}
+                    </div>
+                    <div
+                      className="flex min-h-0 flex-1 flex-col rounded-b px-2 py-1.5"
+                      style={{
+                        backgroundColor: blocksBgRgba ?? hexOr(blocksBackgroundColor, "rgba(0.06,0.12,0.22,1)"),
+                        borderLeft: `1px solid ${borderRgba}`,
+                        borderRight: `1px solid ${borderRgba}`,
+                        borderBottom: `1px solid ${borderRgba}`,
+                      }}
+                    >
+                      <div className="mt-0.5 flex shrink-0 justify-center">
+                        <div
+                          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[10px]"
+                          style={{
+                            backgroundColor: (hex(primaryColor) || "var(--color-brand-gold)") + "30",
+                            color: hexOr(fontColor, "#fafafa"),
+                          }}
+                        >
+                          👤
+                        </div>
+                      </div>
+                      <p className="mt-0.5 truncate text-center text-[10px] font-semibold" style={{ color: hexOr(fontColor, "#fafafa") }}>
+                        Имя официанта
+                      </p>
+                      <p className="truncate text-center text-[9px] opacity-90" style={{ color: hexOr(fontColor, "#e2e8f0") }}>
+                        Должность
+                      </p>
+                      <div className="flex min-h-0 flex-1 items-center justify-center py-1">
+                        {printPreviewQrUrl ? (
+                          <Image
+                            src={printPreviewQrUrl}
+                            alt=""
+                            width={56}
+                            height={56}
+                            unoptimized
+                            className="h-14 w-14 max-h-full max-w-full rounded bg-white object-contain"
+                          />
+                        ) : (
+                          <div className="flex h-14 w-14 items-center justify-center rounded bg-white/20 text-[10px] text-white/70">QR</div>
+                        )}
+                      </div>
+                    </div>
+                    <p
+                      className="shrink-0 px-2 py-1 text-center text-[9px]"
+                      style={{
+                        color: hexOr(printCardFooterColor || undefined, hexOr(fontColor, "rgba(250,250,250,0.85)")),
+                      }}
+                    >
+                      {previewQrHint}
+                    </p>
+                  </div>
+                )}
 
                 {/* Ссылка, QR и PDF */}
                 <div className="w-full mt-4 space-y-3 border-t border-white/10 pt-4">
@@ -771,8 +1035,14 @@ export default function EstablishmentBrandPage() {
                       <div className="min-w-0 flex items-center gap-2">
                         <div className="h-9 w-9 rounded-full shrink-0 flex items-center justify-center text-sm" style={{ backgroundColor: (hex(primaryColor) || "var(--color-brand-gold)") + "26", color: hexOr(primaryColor, "var(--color-brand-gold)") }}>👤</div>
                         <div>
-                          <p className="font-medium text-sm truncate" style={{ color: hexOr(fontColor, "#fafafa") }}>Имя официанта</p>
-                          <p className="text-xs opacity-80" style={{ color: hexOr(fontColor, "#e2e8f0") }}>Коплю на: цель</p>
+                          <p className="font-medium text-sm truncate" style={{ color: hexOr(fontColor, "#fafafa") }}>
+                            {tipRoutingMode === "POOL_QR"
+                              ? `Чаевые — «${establishmentName.trim() || "Заведение"}»`
+                              : "Имя официанта"}
+                          </p>
+                          <p className="text-xs opacity-80" style={{ color: hexOr(fontColor, "#e2e8f0") }}>
+                            {tipRoutingMode === "POOL_QR" ? "На счёт заведения" : "Коплю на: цель"}
+                          </p>
                         </div>
                       </div>
                       <div className="w-14 h-14 rounded-lg flex items-center justify-center shrink-0 bg-black/20 text-[10px] text-white/70">QR</div>

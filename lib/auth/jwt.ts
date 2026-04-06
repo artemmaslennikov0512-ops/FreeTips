@@ -60,7 +60,7 @@ export async function generateAccessToken(payload: TokenPayload): Promise<string
 
 /**
  * Access token от имени целевого пользователя для просмотра кабинета супер-админом.
- * Короче обычного access; refresh по cookie админа его не продлевает — клиент хранит бэкап токена админа.
+ * Короче обычного access; refresh по cookie админа его не продлевает — клиент хранит бэкап токена админа в localStorage.
  */
 export async function generateImpersonationAccessToken(
   target: Pick<TokenPayload, "userId" | "login" | "role">,

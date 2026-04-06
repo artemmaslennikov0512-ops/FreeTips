@@ -275,6 +275,9 @@ model RegistrationRequest {
   activityType         String                     @db.VarChar(255)
   email                String                     @db.VarChar(255)
   status               RegistrationRequestStatus @default(PENDING)
+  rejectionReason      String?                    @db.VarChar(1000)
+  reviewedAt           DateTime?
+  reviewedByUserId     String?                    @db.VarChar(64)
   registrationTokenId  String?                    @unique
   createdAt            DateTime                   @default(now())
   // Заведение: данные о компании и контактном лице

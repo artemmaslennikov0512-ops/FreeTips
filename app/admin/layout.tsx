@@ -69,6 +69,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [retryTrigger, setRetryTrigger] = useState(0);
   /** Сумма pending по верификации и подключению — бейдж у пункта «Заявки». */
   const [requestsPendingTotal, setRequestsPendingTotal] = useState<number | null>(null);
+  /** Заявки на вывод в работе — бейдж у пункта «Выводы». */
+  const [payoutsAwaitingTotal, setPayoutsAwaitingTotal] = useState<number | null>(null);
   const [lgSidebarCollapsed, setLgSidebarCollapsed] = useState(false);
 
   useEffect(() => setMounted(true), []);
@@ -159,10 +161,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) return;
-      const data = (await res.json()) as { totalPending?: number };
+      const data = (await res.json()) as { totalPending?: number; payoutsAwaitingAction?: number };
       setRequestsPendingTotal(typeof data.totalPending === "number" ? data.totalPending : 0);
+      setPayoutsAwaitingTotal(
+        typeof data.payoutsAwaitingAction === "number" ? data.payoutsAwaitingAction : 0,
+      );
     } catch {
       setRequestsPendingTotal(null);
+      setPayoutsAwaitingTotal(null);
     }
   }, [user]);
 
@@ -234,6 +240,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         NAV={NAV}
         isActive={isActive}
         requestsPendingTotal={requestsPendingTotal}
+        payoutsAwaitingTotal={payoutsAwaitingTotal}
         handleLogout={handleLogout}
       />
 
@@ -280,7 +287,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               {NAV.map(({ label, href, icon: Icon, iconClass }) => {
                 const showRequestsBadge =
                   href === "/admin/verification-requests" && requestsPendingTotal != null && requestsPendingTotal > 0;
-                const badgeN = requestsPendingTotal ?? 0;
+                const requestsBadgeN = requestsPendingTotal ?? 0;
+                const showPayoutsBadge =
+                  href === "/admin/payouts" && payoutsAwaitingTotal != null && payoutsAwaitingTotal > 0;
+                const payoutsBadgeN = payoutsAwaitingTotal ?? 0;
                 return (
                   <Link
                     key={href}
@@ -297,7 +307,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                       {label}
                       {showRequestsBadge && (
                         <span className="inline-flex min-h-[1.25rem] min-w-[1.25rem] shrink-0 items-center justify-center rounded-full bg-[var(--color-accent-red)] px-1.5 text-[11px] font-bold leading-none text-white tabular-nums">
-                          {badgeN > 99 ? "99+" : badgeN}
+                          {requestsBadgeN > 99 ? "99+" : requestsBadgeN}
+                        </span>
+                      )}
+                      {showPayoutsBadge && (
+                        <span
+                          className="inline-flex min-h-[1.25rem] min-w-[1.25rem] shrink-0 items-center justify-center rounded-full bg-amber-500 px-1.5 text-[11px] font-bold leading-none text-[#0a192f] tabular-nums ring-1 ring-amber-200/40"
+                          title="Заявки на вывод в работе"
+                        >
+                          {payoutsBadgeN > 99 ? "99+" : payoutsBadgeN}
                         </span>
                       )}
                     </span>

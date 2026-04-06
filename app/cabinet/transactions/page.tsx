@@ -11,6 +11,7 @@ import { Stats } from "../shared";
 import { PremiumCard } from "../PremiumCard";
 import { isCabinetM5CompetitionTheme } from "@/config/cabinet-theme-logins";
 import { CABINET_WAITER_BTN_INLINE } from "@/lib/cabinet-button-classes";
+import { getPayginePayoutFormTarget } from "@/lib/paygine-payout-form-target";
 
 type Operation = {
   id: string;
@@ -221,7 +222,8 @@ export default function CabinetTransactionsPage() {
       const form = document.createElement("form");
       form.method = "POST";
       form.action = data.formUrl;
-      form.target = "_blank"; // открыть страницу Paygine в новой вкладке, текущий сайт остаётся открыт
+      const formTarget = getPayginePayoutFormTarget();
+      form.target = formTarget;
       form.style.display = "none";
       for (const [name, value] of Object.entries(data.formFields)) {
         const input = document.createElement("input");
@@ -233,8 +235,10 @@ export default function CabinetTransactionsPage() {
       document.body.appendChild(form);
       form.submit();
       document.body.removeChild(form);
-      setSdPageNewTabHint(true);
-      setTimeout(() => setSdPageNewTabHint(false), 8000);
+      if (formTarget === "_blank") {
+        setSdPageNewTabHint(true);
+        setTimeout(() => setSdPageNewTabHint(false), 8000);
+      }
     } catch {
       setSdPageError("Ошибка соединения");
     } finally {

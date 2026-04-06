@@ -18,6 +18,7 @@ export function AdminMobileNavPortal({
   NAV,
   isActive,
   requestsPendingTotal,
+  payoutsAwaitingTotal,
   handleLogout,
 }: {
   sidebarOpen: boolean;
@@ -26,6 +27,7 @@ export function AdminMobileNavPortal({
   NAV: NavItem[];
   isActive: (href: string) => boolean;
   requestsPendingTotal: number | null;
+  payoutsAwaitingTotal: number | null;
   handleLogout: () => Promise<void>;
 }) {
   const mounted = useSyncExternalStore(
@@ -109,7 +111,10 @@ export function AdminMobileNavPortal({
               {NAV.map(({ label, href, icon: Icon, iconClass }) => {
                 const showRequestsBadge =
                   href === "/admin/verification-requests" && requestsPendingTotal != null && requestsPendingTotal > 0;
-                const badgeN = requestsPendingTotal ?? 0;
+                const requestsBadgeN = requestsPendingTotal ?? 0;
+                const showPayoutsBadge =
+                  href === "/admin/payouts" && payoutsAwaitingTotal != null && payoutsAwaitingTotal > 0;
+                const payoutsBadgeN = payoutsAwaitingTotal ?? 0;
                 return (
                   <Link
                     key={href}
@@ -127,7 +132,15 @@ export function AdminMobileNavPortal({
                       {label}
                       {showRequestsBadge && (
                         <span className="inline-flex min-h-[1.25rem] min-w-[1.25rem] shrink-0 items-center justify-center rounded-full bg-[var(--color-accent-red)] px-1.5 text-[10px] font-bold leading-none text-white tabular-nums">
-                          {badgeN > 99 ? "99+" : badgeN}
+                          {requestsBadgeN > 99 ? "99+" : requestsBadgeN}
+                        </span>
+                      )}
+                      {showPayoutsBadge && (
+                        <span
+                          className="inline-flex min-h-[1.25rem] min-w-[1.25rem] shrink-0 items-center justify-center rounded-full bg-amber-500 px-1.5 text-[10px] font-bold leading-none text-[#0a192f] tabular-nums ring-1 ring-amber-200/40"
+                          title="Заявки на вывод в работе"
+                        >
+                          {payoutsBadgeN > 99 ? "99+" : payoutsBadgeN}
                         </span>
                       )}
                     </span>

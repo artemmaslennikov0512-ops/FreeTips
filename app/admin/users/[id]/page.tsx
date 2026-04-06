@@ -30,6 +30,7 @@ import { ADMIN_BTN, ADMIN_BTN_DANGER, ADMIN_BTN_PRIMARY } from "@/lib/admin-butt
 import { ADMIN_PANEL_STATE_CENTER } from "@/lib/admin-surface-classes";
 import { getAccessToken } from "@/lib/auth-client";
 import { beginCabinetImpersonation } from "@/lib/cabinet-impersonation";
+import { getPayginePayoutFormTarget } from "@/lib/paygine-payout-form-target";
 
 interface Transaction {
   id: string;
@@ -495,7 +496,8 @@ export default function AdminUserDetailsPage() {
       const form = document.createElement("form");
       form.method = "POST";
       form.action = data.formUrl;
-      form.target = "_blank";
+      const formTarget = getPayginePayoutFormTarget();
+      form.target = formTarget;
       form.style.display = "none";
       for (const [name, value] of Object.entries(data.formFields)) {
         const input = document.createElement("input");
@@ -507,8 +509,10 @@ export default function AdminUserDetailsPage() {
       document.body.appendChild(form);
       form.submit();
       document.body.removeChild(form);
-      setPayoutNewTabHint(true);
-      setTimeout(() => setPayoutNewTabHint(false), 8000);
+      if (formTarget === "_blank") {
+        setPayoutNewTabHint(true);
+        setTimeout(() => setPayoutNewTabHint(false), 8000);
+      }
       setPayoutAmount("");
       const profileRes = await fetch(`/api/admin/users/${userId}`, {
         headers: { Authorization: `Bearer ${token}` },

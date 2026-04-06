@@ -1,8 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
 import { Send, CheckCircle2, XCircle } from "lucide-react";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
+import { notifyAdminRequestsCountsChanged } from "@/lib/admin-requests-counts-sync";
 import { CustomDropdown } from "@/components/CustomDropdown";
 import { formatDate, formatMoneyCompact } from "@/lib/utils";
 import { ADMIN_BTN, ADMIN_BTN_DANGER, ADMIN_BTN_NEUTRAL_SM, ADMIN_BTN_PRIMARY, ADMIN_BTN_SM } from "@/lib/admin-button-classes";
@@ -89,6 +91,7 @@ export default function AdminPayoutsPage() {
       }
 
       await fetchPayouts();
+      notifyAdminRequestsCountsChanged();
     } catch {
       alert("Ошибка обновления статуса");
     } finally {
@@ -135,6 +138,7 @@ export default function AdminPayoutsPage() {
       setPayoutIdForPanModal(null);
       setPanInput("");
       await fetchPayouts();
+      notifyAdminRequestsCountsChanged();
     } catch {
       alert("Ошибка отправки в Paygine");
     } finally {
@@ -143,24 +147,20 @@ export default function AdminPayoutsPage() {
   };
 
   const getStatusBadge = (status: Payout["status"]) => {
-    const styles = {
-      CREATED: "bg-[var(--color-light-gray)] text-[var(--color-text-secondary)]",
-      PROCESSING: "bg-[var(--color-light-gray)] text-[var(--color-text)]",
-      COMPLETED: "bg-[var(--color-light-gray)] text-[var(--color-text)]",
-      REJECTED: "bg-[var(--color-light-gray)] text-[var(--color-text-secondary)]",
-    };
     const labels = {
       CREATED: "Создана",
       PROCESSING: "В обработке",
       COMPLETED: "Выполнена",
       REJECTED: "Отклонена",
-    };
+    } as const;
+    const mod = status.toLowerCase() as "created" | "processing" | "completed" | "rejected";
     return (
-      <span className={`rounded-full px-3 py-1 text-xs font-medium ${styles[status]}`}>
-        {labels[status]}
-      </span>
+      <span className={`admin-payout-status admin-payout-status--${mod}`}>{labels[status]}</span>
     );
   };
+
+  const userLoginLinkClass =
+    "font-medium text-white underline-offset-2 transition-colors hover:text-[var(--color-brand-gold)] hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-gold)]/50 rounded-sm";
 
   if (loading) {
     return (
@@ -212,7 +212,9 @@ export default function AdminPayoutsPage() {
                 <span className="text-xs text-white/70">{payout.id.slice(0, 8)}…</span>
                 <span>{getStatusBadge(payout.status)}</span>
               </div>
-              <p className="mt-2 font-medium text-white">{payout.userLogin}</p>
+              <Link href={`/admin/users/${payout.userId}`} className={`mt-2 inline-block ${userLoginLinkClass}`}>
+                {payout.userLogin}
+              </Link>
               {payout.userEmail && <p className="truncate text-xs text-white/80">{payout.userEmail}</p>}
               <p className="mt-1 text-sm font-medium text-white">{formatMoneyCompact(payout.amountKop)}</p>
               <p className="text-sm text-white/80">{formatDate(payout.createdAt)}</p>
@@ -265,7 +267,9 @@ export default function AdminPayoutsPage() {
                   <td className="whitespace-nowrap px-4 py-3 text-sm text-white/90">{payout.id.slice(0, 8)}...</td>
                   <td className="px-4 py-3 text-sm">
                     <div>
-                      <div className="font-medium text-white">{payout.userLogin}</div>
+                      <Link href={`/admin/users/${payout.userId}`} className={userLoginLinkClass}>
+                        {payout.userLogin}
+                      </Link>
                       {payout.userEmail && <div className="text-xs text-white/80">{payout.userEmail}</div>}
                     </div>
                   </td>

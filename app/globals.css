@@ -1635,6 +1635,137 @@ html:not([data-theme="dark"]) .cabinet-mobile-nav-overlay {
   background: rgba(0, 0, 0, 0.58);
 }
 
+/*
+ * ЛК официанта: мобильное меню — createPortal на body, вне .cabinet-premium (как admin-mobile-nav-dialog).
+ * Иначе светлая тема: инлайн rgba(255,255,255,0.06) + var(--color-text) дают «стекло» и чёрный текст.
+ */
+html:not([data-theme="dark"]) .cabinet-mobile-nav-dialog:not([data-cabinet-theme="m5-competition"]) {
+  background: #1e2a3a !important;
+  color: rgba(255, 255, 255, 0.95) !important;
+  border: 0.5px solid rgba(197, 165, 114, 0.45) !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.08) !important;
+}
+html:not([data-theme="dark"]) .cabinet-mobile-nav-dialog:not([data-cabinet-theme="m5-competition"]) .cabinet-sidebar-profile {
+  background: rgba(255, 255, 255, 0.15) !important;
+  border-width: 0.5px !important;
+  border-style: solid !important;
+  border-color: rgba(197, 165, 114, 0.5) !important;
+  color: #fff !important;
+}
+html:not([data-theme="dark"]) .cabinet-mobile-nav-dialog:not([data-cabinet-theme="m5-competition"]) .cabinet-nav-label {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+html:not([data-theme="dark"]) .cabinet-mobile-nav-dialog:not([data-cabinet-theme="m5-competition"]) nav {
+  background: rgba(255, 255, 255, 0.15) !important;
+  border-width: 0.5px !important;
+  border-style: solid !important;
+  border-color: rgba(197, 165, 114, 0.5) !important;
+  box-shadow: none !important;
+}
+html:not([data-theme="dark"]) .cabinet-mobile-nav-dialog:not([data-cabinet-theme="m5-competition"]) a,
+html:not([data-theme="dark"]) .cabinet-mobile-nav-dialog:not([data-cabinet-theme="m5-competition"]) button {
+  color: rgba(255, 255, 255, 0.92) !important;
+}
+html:not([data-theme="dark"]) .cabinet-mobile-nav-dialog:not([data-cabinet-theme="m5-competition"]) .cabinet-nav-active {
+  border-color: rgba(255, 255, 255, 0.5) !important;
+  background: rgba(255, 255, 255, 0.22) !important;
+  color: #ffffff !important;
+}
+
+html:not([data-theme="dark"]) .cabinet-mobile-nav-dialog[data-cabinet-theme="m5-competition"] {
+  background:
+    linear-gradient(165deg, #14161c 0%, #0e1014 55%, #12141a 100%),
+    linear-gradient(
+      118deg,
+      transparent 0%,
+      rgba(28, 105, 212, 0.04) 22%,
+      transparent 45%,
+      rgba(229, 37, 42, 0.06) 72%,
+      transparent 100%
+    ) !important;
+  background-size: 100% 100%, 160% 160% !important;
+  background-position: 0 0, 62% 42% !important;
+  border: 1px solid rgba(28, 105, 212, 0.3) !important;
+  color: rgba(232, 234, 239, 0.95) !important;
+}
+html:not([data-theme="dark"]) .cabinet-mobile-nav-dialog[data-cabinet-theme="m5-competition"] .cabinet-sidebar-profile {
+  background: rgba(0, 0, 0, 0.22) !important;
+  border-color: rgba(28, 105, 212, 0.28) !important;
+  color: rgba(232, 234, 239, 0.95) !important;
+}
+html:not([data-theme="dark"]) .cabinet-mobile-nav-dialog[data-cabinet-theme="m5-competition"] .cabinet-nav-label {
+  color: rgba(232, 234, 239, 0.65) !important;
+}
+html:not([data-theme="dark"]) .cabinet-mobile-nav-dialog[data-cabinet-theme="m5-competition"] nav {
+  background: rgba(0, 0, 0, 0.22) !important;
+  border-color: rgba(28, 105, 212, 0.28) !important;
+  box-shadow: none !important;
+}
+html:not([data-theme="dark"]) .cabinet-mobile-nav-dialog[data-cabinet-theme="m5-competition"] a,
+html:not([data-theme="dark"]) .cabinet-mobile-nav-dialog[data-cabinet-theme="m5-competition"] button {
+  color: rgba(232, 234, 239, 0.92) !important;
+}
+
+[data-theme="dark"] .cabinet-mobile-nav-dialog:not([data-cabinet-theme="m5-competition"]) {
+  background: rgba(255, 255, 255, 0.06) !important;
+  color: #fafafa !important;
+  border: 1px solid rgba(192, 192, 192, 0.4) !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3), 0 2px 6px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(192, 192, 192, 0.08) !important;
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  isolation: isolate;
+}
+[data-theme="dark"] .cabinet-mobile-nav-dialog:not([data-cabinet-theme="m5-competition"]) a,
+[data-theme="dark"] .cabinet-mobile-nav-dialog:not([data-cabinet-theme="m5-competition"]) button {
+  color: rgba(250, 250, 250, 0.9) !important;
+}
+[data-theme="dark"] .cabinet-mobile-nav-dialog:not([data-cabinet-theme="m5-competition"]) .cabinet-nav-label {
+  color: rgba(250, 250, 250, 0.5) !important;
+}
+[data-theme="dark"] .cabinet-mobile-nav-dialog:not([data-cabinet-theme="m5-competition"]) .cabinet-sidebar-profile {
+  background: rgba(0, 0, 0, 0.25) !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+  color: #fafafa !important;
+}
+[data-theme="dark"] .cabinet-mobile-nav-dialog:not([data-cabinet-theme="m5-competition"]) .cabinet-nav-active {
+  border-color: rgba(255, 255, 255, 0.25) !important;
+  background: rgba(255, 255, 255, 0.12) !important;
+  color: #fafafa !important;
+}
+[data-theme="dark"] .cabinet-mobile-nav-dialog:not([data-cabinet-theme="m5-competition"]) nav {
+  background: rgba(0, 0, 0, 0.25) !important;
+  border-width: 0.5px !important;
+  border-style: solid !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+  box-shadow: none !important;
+}
+
+[data-theme="dark"] .cabinet-mobile-nav-dialog[data-cabinet-theme="m5-competition"] {
+  background: linear-gradient(180deg, #12141a 0%, #0d0f14 100%) !important;
+  border: 1px solid rgba(28, 105, 212, 0.34) !important;
+  color: rgba(232, 234, 239, 0.95) !important;
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  isolation: isolate;
+}
+[data-theme="dark"] .cabinet-mobile-nav-dialog[data-cabinet-theme="m5-competition"] .cabinet-sidebar-profile {
+  background: rgba(0, 0, 0, 0.28) !important;
+  border-color: rgba(28, 105, 212, 0.32) !important;
+  color: #e8eaef !important;
+}
+[data-theme="dark"] .cabinet-mobile-nav-dialog[data-cabinet-theme="m5-competition"] .cabinet-nav-label {
+  color: rgba(232, 234, 239, 0.55) !important;
+}
+[data-theme="dark"] .cabinet-mobile-nav-dialog[data-cabinet-theme="m5-competition"] nav {
+  background: rgba(0, 0, 0, 0.28) !important;
+  border-color: rgba(28, 105, 212, 0.28) !important;
+  box-shadow: none !important;
+}
+[data-theme="dark"] .cabinet-mobile-nav-dialog[data-cabinet-theme="m5-competition"] a,
+[data-theme="dark"] .cabinet-mobile-nav-dialog[data-cabinet-theme="m5-competition"] button {
+  color: rgba(232, 234, 239, 0.92) !important;
+}
+
 html:not([data-theme="dark"]) .admin-mobile-nav-dialog {
   background: #1e2a3a !important;
   color: rgba(255, 255, 255, 0.95) !important;
@@ -2259,6 +2390,58 @@ html:not([data-theme="dark"]) .admin-panel .admin-users-token-btn {
 }
 html:not([data-theme="dark"]) .admin-panel .admin-users-token-btn:hover:not(:disabled) {
   background: rgba(255, 255, 255, 0.35) !important;
+}
+
+/* Заявки на вывод: цветные статусы (не через --color-light-gray — в светлой теме он даёт «серую кашу»). */
+.admin-payout-status {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  padding: 0.2rem 0.65rem;
+  font-size: 0.75rem;
+  line-height: 1.25;
+  font-weight: 600;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+.admin-payout-status--created {
+  background: rgba(245, 158, 11, 0.28) !important;
+  color: #fef3c7 !important;
+  border-color: rgba(251, 191, 36, 0.45) !important;
+}
+.admin-payout-status--processing {
+  background: rgba(56, 189, 248, 0.22) !important;
+  color: #e0f2fe !important;
+  border-color: rgba(125, 211, 252, 0.4) !important;
+}
+.admin-payout-status--completed {
+  background: rgba(52, 211, 153, 0.24) !important;
+  color: #d1fae5 !important;
+  border-color: rgba(52, 211, 153, 0.45) !important;
+}
+.admin-payout-status--rejected {
+  background: rgba(248, 113, 113, 0.22) !important;
+  color: #fee2e2 !important;
+  border-color: rgba(252, 165, 165, 0.45) !important;
+}
+html:not([data-theme="dark"]) .admin-panel .admin-payout-status {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+[data-theme="dark"] .admin-panel .admin-payout-status--created {
+  background: rgba(217, 119, 6, 0.38) !important;
+  color: #ffedd5 !important;
+}
+[data-theme="dark"] .admin-panel .admin-payout-status--processing {
+  background: rgba(2, 132, 199, 0.38) !important;
+  color: #f0f9ff !important;
+}
+[data-theme="dark"] .admin-panel .admin-payout-status--completed {
+  background: rgba(5, 150, 105, 0.38) !important;
+  color: #ecfdf5 !important;
+}
+[data-theme="dark"] .admin-panel .admin-payout-status--rejected {
+  background: rgba(220, 38, 38, 0.34) !important;
+  color: #fecaca !important;
 }
 
 /* Модалка «Отклонить заявку»: центрирование в любой теме (светлая и тёмная) */
@@ -4261,6 +4444,17 @@ html:not([data-theme="dark"]) .cabinet-premium .cabinet-verification-status p {
 }
 .establishment-panel .cabinet-sidebar {
   margin-left: 0 !important;
+}
+/* Светлая тема: сайдбар заведения — плотный navy и белый текст (как шапка ЛК), не «стекло» на сером фоне */
+html:not([data-theme="dark"]) body.establishment-page .establishment-panel .cabinet-sidebar {
+  background: #1e2a3a !important;
+  border-color: rgba(197, 165, 114, 0.4) !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.08) !important;
+}
+html:not([data-theme="dark"]) body.establishment-page .establishment-panel .cabinet-sidebar .cabinet-nav-active {
+  border-color: rgba(255, 255, 255, 0.5) !important;
+  background: rgba(255, 255, 255, 0.22) !important;
+  color: #ffffff !important;
 }
 [data-theme="dark"] .admin-panel main {
   background: transparent;
@@ -6361,7 +6555,8 @@ html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competitio
 
 /* Запасное перекрытие активного пункта M5 (градиентная обводка) */
 html .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-sidebar a.cabinet-nav-active-m5,
-html .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-nav-dropdown a.cabinet-nav-active-m5 {
+html .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-nav-dropdown a.cabinet-nav-active-m5,
+html .cabinet-mobile-nav-dialog[data-cabinet-theme="m5-competition"] a.cabinet-nav-active-m5 {
   background:
     linear-gradient(180deg, rgba(28, 105, 212, 0.2), rgba(10, 12, 16, 0.72)) padding-box,
     linear-gradient(135deg, #e5252a 0%, #9a1a1e 28%, #1c69d4 72%, #4a9fff 100%) border-box !important;

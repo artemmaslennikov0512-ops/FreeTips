@@ -173,9 +173,10 @@ export function CabinetMobileNavPortals() {
         role="dialog"
         aria-modal="true"
         aria-label="Меню навигации"
-        className={`cabinet-nav-dropdown fixed left-1/2 top-1/2 z-[2010] w-[min(calc(100vw-1.5rem),22rem)] max-h-[min(85dvh,560px)] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-[10px] border border-[var(--color-brand-gold)]/20 shadow-[var(--shadow-card)] backdrop-blur-xl transition-[opacity,transform] duration-200 lg:hidden ${
+        className={`cabinet-mobile-nav-dialog cabinet-nav-dropdown fixed left-1/2 top-1/2 z-[2010] w-[min(calc(100vw-1.5rem),22rem)] max-h-[min(85dvh,560px)] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-[10px] border border-[var(--color-brand-gold)]/20 shadow-[var(--shadow-card)] backdrop-blur-xl transition-[opacity,transform] duration-200 lg:hidden ${
           sidebarOpen ? "scale-100 opacity-100" : "pointer-events-none scale-95 opacity-0"
         }`}
+        data-cabinet-theme={isM5Cabinet ? "m5-competition" : undefined}
         style={sidebarStyle}
         aria-hidden={!sidebarOpen}
       >

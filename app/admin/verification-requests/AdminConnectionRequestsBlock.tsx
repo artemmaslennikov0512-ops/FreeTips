@@ -2,8 +2,15 @@
 
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { ADMIN_BTN, ADMIN_BTN_NEUTRAL_SM, ADMIN_BTN_PRIMARY, ADMIN_BTN_SM } from "@/lib/admin-button-classes";
-import { Check, ChevronDown, ChevronRight, ClipboardCheck, Copy, Send, Loader2 } from "lucide-react";
+import {
+  ADMIN_BTN,
+  ADMIN_BTN_DANGER,
+  ADMIN_BTN_NEUTRAL_SM,
+  ADMIN_BTN_PRIMARY,
+  ADMIN_BTN_SM,
+} from "@/lib/admin-button-classes";
+import { getCsrfHeader } from "@/lib/security/csrf-client";
+import { Check, ChevronDown, ChevronRight, ClipboardCheck, Copy, Send, Loader2, XCircle } from "lucide-react";
 import { AdminStatusTabs, AdminRequestTab, apiStatusForTab } from "./AdminStatusTabs";
 
 const STORAGE_KEY_ISSUED_LINKS = "admin_issued_registration_links";
@@ -46,6 +53,8 @@ export interface RegistrationRequestRow {
   activityType: string;
   email: string;
   status: string;
+  rejectionReason?: string | null;
+  reviewedAt?: string | null;
   createdAt: string;
   hasToken: boolean;
   tokenExpiresAt: string | null;
@@ -206,6 +215,10 @@ export function AdminConnectionRequestsBlock({
   const [issuedLinksByRequestId, setIssuedLinksByRequestId] = useState<Record<string, string>>({});
   const [copiedRequestId, setCopiedRequestId] = useState<string | null>(null);
   const copySuccessTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [rejectModal, setRejectModal] = useState<{ id: string; label: string } | null>(null);
+  const [rejectReason, setRejectReason] = useState("");
+  const [rejectSubmitting, setRejectSubmitting] = useState(false);
+  const [rejectError, setRejectError] = useState<string | null>(null);
 
   useEffect(() => {
     const valid = loadIssuedLinksFromStorage();
@@ -236,6 +249,8 @@ export function AdminConnectionRequestsBlock({
       setList(
         (data.requests ?? []).map((r) => ({
           ...r,
+          rejectionReason: r.rejectionReason ?? null,
+          reviewedAt: r.reviewedAt ?? null,
           tokenExpiresAt: r.tokenExpiresAt ?? null,
           isRegistered: r.isRegistered === true,
           registeredAt: r.registeredAt ?? null,
@@ -269,6 +284,38 @@ export function AdminConnectionRequestsBlock({
       }, COPY_FEEDBACK_MS);
     } catch {
       setError("Не удалось скопировать ссылку");
+    }
+  };
+
+  const handleRejectSubmit = async () => {
+    if (!rejectModal || !rejectReason.trim()) return;
+    const token = localStorage.getItem("accessToken");
+    if (!token) return;
+    setRejectSubmitting(true);
+    setRejectError(null);
+    try {
+      const res = await fetch(`/api/admin/registration-requests/${rejectModal.id}/reject`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+          ...getCsrfHeader(),
+        },
+        body: JSON.stringify({ reason: rejectReason.trim() }),
+      });
+      const body = (await res.json().catch(() => ({}))) as { error?: string };
+      if (res.ok) {
+        setRejectModal(null);
+        setRejectReason("");
+        await fetchList();
+        onAfterMutation?.();
+      } else {
+        setRejectError(body.error ?? "Ошибка отклонения");
+      }
+    } catch {
+      setRejectError("Ошибка соединения");
+    } finally {
+      setRejectSubmitting(false);
     }
   };
 
@@ -414,6 +461,11 @@ export function AdminConnectionRequestsBlock({
                     </span>
                   </div>
                   <RegistrationFollowUpLine r={r} />
+                  {tab === "rejected" && r.rejectionReason?.trim() ? (
+                    <p className="mt-2 rounded-lg border border-red-500/25 bg-red-500/10 px-3 py-2 text-xs leading-snug text-red-100/95">
+                      {r.rejectionReason}
+                    </p>
+                  ) : null}
                   <p className="mt-2 font-medium text-white">{r.fullName}</p>
                   <p className="truncate text-sm text-white/80">{r.email}</p>
                   <p className="mt-1 text-xs text-white/60">
@@ -451,15 +503,29 @@ export function AdminConnectionRequestsBlock({
                   {tab === "pending" && (
                     <div className="mt-4 flex flex-wrap gap-2 border-t border-white/10 pt-3">
                       {r.status === "PENDING" && !r.hasToken && (
-                        <button
-                          type="button"
-                          disabled={isApproving}
-                          onClick={() => handleApprove(r.id)}
-                          className={`${ADMIN_BTN} ${ADMIN_BTN_PRIMARY} gap-1.5 px-3 py-2 text-sm disabled:opacity-50`}
-                        >
-                          <ClipboardCheck className="h-4 w-4" />
-                          {isApproving ? "Создание ссылки..." : "Принять подключение"}
-                        </button>
+                        <>
+                          <button
+                            type="button"
+                            disabled={isApproving}
+                            onClick={() => handleApprove(r.id)}
+                            className={`${ADMIN_BTN} ${ADMIN_BTN_PRIMARY} gap-1.5 px-3 py-2 text-sm disabled:opacity-50`}
+                          >
+                            <ClipboardCheck className="h-4 w-4" />
+                            {isApproving ? "Создание ссылки..." : "Принять подключение"}
+                          </button>
+                          <button
+                            type="button"
+                            disabled={isApproving}
+                            onClick={() => {
+                              setRejectError(null);
+                              setRejectModal({ id: r.id, label: r.email || r.fullName });
+                            }}
+                            className={`${ADMIN_BTN} ${ADMIN_BTN_DANGER} gap-1.5 px-3 py-2 text-sm disabled:opacity-50`}
+                          >
+                            <XCircle className="h-4 w-4" />
+                            Отклонить
+                          </button>
+                        </>
                       )}
                       {linkForRow && (
                         <>
@@ -565,7 +631,9 @@ export function AdminConnectionRequestsBlock({
                     <th className="whitespace-nowrap p-3 font-medium text-white">Почта</th>
                     <th className="whitespace-nowrap p-3 font-medium text-white">Дата заявки</th>
                     <th className="whitespace-nowrap p-3 font-medium text-white">Статус</th>
-                    <th className="whitespace-nowrap p-3 font-medium text-white">Действие</th>
+                    <th className="whitespace-nowrap p-3 font-medium text-white">
+                      {tab === "rejected" ? "Причина отказа" : "Действие"}
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -615,17 +683,31 @@ export function AdminConnectionRequestsBlock({
                             </span>
                             <RegistrationFollowUpLine r={r} />
                           </td>
-                          <td className="p-3">
+                          <td className="p-3 align-top">
                             {tab === "pending" && r.status === "PENDING" && !r.hasToken && (
-                              <button
-                                type="button"
-                                disabled={isApproving}
-                                onClick={() => handleApprove(r.id)}
-                                className={`${ADMIN_BTN} ${ADMIN_BTN_PRIMARY} gap-1.5 px-3 py-1.5 text-sm disabled:opacity-50`}
-                              >
-                                <ClipboardCheck className="h-4 w-4" />
-                                {isApproving ? "Создание ссылки..." : "Принять подключение"}
-                              </button>
+                              <div className="flex flex-wrap items-center gap-2">
+                                <button
+                                  type="button"
+                                  disabled={isApproving}
+                                  onClick={() => handleApprove(r.id)}
+                                  className={`${ADMIN_BTN} ${ADMIN_BTN_PRIMARY} gap-1.5 px-3 py-1.5 text-sm disabled:opacity-50`}
+                                >
+                                  <ClipboardCheck className="h-4 w-4" />
+                                  {isApproving ? "Создание ссылки..." : "Принять подключение"}
+                                </button>
+                                <button
+                                  type="button"
+                                  disabled={isApproving}
+                                  onClick={() => {
+                                    setRejectError(null);
+                                    setRejectModal({ id: r.id, label: r.email || r.fullName });
+                                  }}
+                                  className={`${ADMIN_BTN} ${ADMIN_BTN_DANGER} gap-1.5 px-3 py-1.5 text-sm disabled:opacity-50`}
+                                >
+                                  <XCircle className="h-4 w-4" />
+                                  Отклонить
+                                </button>
+                              </div>
                             )}
                             {tab === "pending" && linkForRow && (
                               <div className="flex flex-col gap-1">
@@ -725,7 +807,11 @@ export function AdminConnectionRequestsBlock({
                                 {sendingTokenId === r.id ? "Отправка…" : "Выслать токен"}
                               </button>
                             )}
-                            {tab === "rejected" && <span className="text-xs text-white/60">—</span>}
+                            {tab === "rejected" && (
+                              <p className="max-w-[280px] whitespace-pre-wrap break-words text-xs text-red-200/90">
+                                {r.rejectionReason?.trim() || "—"}
+                              </p>
+                            )}
                           </td>
                         </tr>
                         {isExpanded && (
@@ -743,6 +829,54 @@ export function AdminConnectionRequestsBlock({
             </div>
           </div>
         </>
+      )}
+
+      {rejectModal && (
+        <div
+          className="fixed inset-0 z-[2100] flex items-center justify-center bg-black/60 p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="connection-reject-modal-title"
+        >
+          <div className="flex w-full max-w-md flex-col rounded-2xl border border-white/10 bg-[var(--color-navy)] p-6 text-center shadow-xl">
+            <h2 id="connection-reject-modal-title" className="mb-3 text-lg font-semibold text-white">
+              Отклонить заявку на подключение
+            </h2>
+            <p className="mb-1 break-all text-sm text-white/85">{rejectModal.label}</p>
+            <p className="mb-4 text-sm text-white/70">
+              После отклонения заявитель сможет подать новую заявку с этой же почтой. Укажите причину для внутреннего учёта.
+            </p>
+            <textarea
+              value={rejectReason}
+              onChange={(e) => setRejectReason(e.target.value)}
+              placeholder="Например: не отвечаете на уточняющие письма; данные заведения не подтверждены."
+              className="mb-4 w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-brand-gold)]"
+              rows={4}
+            />
+            {rejectError && <p className="mb-3 text-center text-sm text-red-400">{rejectError}</p>}
+            <div className="flex justify-center gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setRejectModal(null);
+                  setRejectReason("");
+                  setRejectError(null);
+                }}
+                className={`${ADMIN_BTN} admin-btn--neutral px-4 py-2`}
+              >
+                Отмена
+              </button>
+              <button
+                type="button"
+                onClick={() => void handleRejectSubmit()}
+                disabled={!rejectReason.trim() || rejectSubmitting}
+                className={`${ADMIN_BTN} ${ADMIN_BTN_DANGER} px-4 py-2`}
+              >
+                {rejectSubmitting ? "Отправка…" : "Отклонить заявку"}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </>
   );

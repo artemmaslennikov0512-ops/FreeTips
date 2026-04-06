@@ -2,9 +2,10 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { ExternalLink, RefreshCw, ShieldAlert } from "lucide-react";
+import { ExternalLink, RefreshCw, ShieldAlert, Ban } from "lucide-react";
 import { formatDate } from "@/lib/utils";
-import { ADMIN_BTN, ADMIN_BTN_PRIMARY, ADMIN_BTN_SM } from "@/lib/admin-button-classes";
+import { getCsrfHeader } from "@/lib/security/csrf-client";
+import { ADMIN_BTN, ADMIN_BTN_DANGER, ADMIN_BTN_PRIMARY, ADMIN_BTN_SM } from "@/lib/admin-button-classes";
 
 interface FraudSignalRow {
   id: string;
@@ -29,26 +30,30 @@ interface FraudSignalsResponse {
   days: number;
 }
 
-function ruleKindBadge(ruleCode: string): { label: string; className: string } {
+/** Направление денег в сигнале: пополнение (клиент платит получателю) vs списание (вывод получателем). */
+function ruleKindBadge(ruleCode: string): { label: string; className: string; title: string } {
   if (ruleCode.startsWith("LOGIN_")) {
     return {
       label: "Вход",
       className:
         "border border-amber-400/45 bg-amber-500/25 text-amber-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]",
+      title: "Попытка входа в аккаунт, без движения средств по счёту получателя",
     };
   }
   if (ruleCode.startsWith("PAYOUT_")) {
     return {
-      label: "Вывод",
+      label: "− Списание",
       className:
-        "border border-orange-400/40 bg-orange-500/22 text-orange-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]",
+        "border border-orange-400/50 bg-orange-600/30 text-orange-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]",
+      title: "Исходящая операция: заявка на вывод средств получателем",
     };
   }
   if (ruleCode.startsWith("PAY_")) {
     return {
-      label: "Оплата",
+      label: "+ Пополнение",
       className:
-        "border border-rose-400/45 bg-rose-500/25 text-rose-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]",
+        "border border-emerald-400/50 bg-emerald-600/28 text-emerald-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]",
+      title: "Входящий платёж: инициализация или успешная оплата в пользу получателя",
     };
   }
   if (ruleCode.startsWith("ACCOUNT_")) {
@@ -56,11 +61,13 @@ function ruleKindBadge(ruleCode: string): { label: string; className: string } {
       label: "Аккаунт",
       className:
         "border border-violet-400/40 bg-violet-500/22 text-violet-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]",
+      title: "Событие уровня аккаунта (без привязки к пополнению или выводу)",
     };
   }
   return {
     label: "Другое",
     className: "border border-white/25 bg-white/10 text-white/85 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]",
+    title: "Прочий сигнал правила",
   };
 }
 
@@ -68,6 +75,7 @@ export function FraudSignalsSection() {
   const [data, setData] = useState<FraudSignalsResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [blockingUserId, setBlockingUserId] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     const token = localStorage.getItem("accessToken");
@@ -93,6 +101,52 @@ export function FraudSignalsSection() {
   useEffect(() => {
     void load();
   }, [load]);
+
+  const canShowBlock = (role: string, isBlocked: boolean) =>
+    !isBlocked && role !== "SUPERADMIN";
+
+  const handleBlockUser = async (userId: string, login: string) => {
+    if (
+      !window.confirm(
+        `Заблокировать пользователя «${login}»? Вход и операции в ЛК будут недоступны до разблокировки в карточке пользователя.`,
+      )
+    ) {
+      return;
+    }
+    const token = localStorage.getItem("accessToken");
+    if (!token) return;
+    setBlockingUserId(userId);
+    try {
+      const res = await fetch(`/api/admin/users/${userId}`, {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+          ...getCsrfHeader(),
+        },
+        body: JSON.stringify({ isBlocked: true }),
+      });
+      const body = (await res.json().catch(() => ({}))) as { error?: string };
+      if (!res.ok) {
+        alert(body.error ?? "Не удалось заблокировать");
+        return;
+      }
+      setData((prev) =>
+        prev
+          ? {
+              ...prev,
+              groups: prev.groups.map((g) =>
+                g.userId === userId ? { ...g, isBlocked: true } : g,
+              ),
+            }
+          : prev,
+      );
+    } catch {
+      alert("Ошибка соединения");
+    } finally {
+      setBlockingUserId(null);
+    }
+  };
 
   return (
     <section className="cabinet-section-header mb-6 rounded-2xl border-0 p-4 sm:p-6">
@@ -162,14 +216,18 @@ export function FraudSignalsSection() {
                     <p className="text-sm text-white/85">{formatDate(g.lastSignalAt, { includeYear: true })}</p>
                   </div>
                   <div className="mb-3 border-t border-white/10 pt-3">
-                    <p className="mb-2 text-[11px] font-medium uppercase tracking-wide text-white/50">Причины</p>
+                    <p className="mb-0.5 text-[11px] font-medium uppercase tracking-wide text-white/50">Причины</p>
+                    <p className="mb-2 text-[10px] leading-snug text-white/40">
+                      + пополнение (оплата в пользу получателя), − списание (вывод)
+                    </p>
                     <ul className="m-0 list-none space-y-3 p-0">
                       {g.signals.map((s) => {
                         const badge = ruleKindBadge(s.ruleCode);
                         return (
                           <li key={s.id} className="min-w-0">
                             <span
-                              className={`mb-1 inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${badge.className}`}
+                              title={badge.title}
+                              className={`mb-1 inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-wide ${badge.className}`}
                             >
                               {badge.label}
                             </span>
@@ -183,13 +241,26 @@ export function FraudSignalsSection() {
                       })}
                     </ul>
                   </div>
-                  <Link
-                    href={`/admin/users/${g.userId}`}
-                    className={`${ADMIN_BTN} ${ADMIN_BTN_SM} flex w-full items-center justify-center gap-1.5`}
-                  >
-                    Карточка пользователя
-                    <ExternalLink className="h-3.5 w-3.5 shrink-0 opacity-90" aria-hidden />
-                  </Link>
+                  <div className="flex w-full flex-col gap-2">
+                    {canShowBlock(g.role, g.isBlocked) && (
+                      <button
+                        type="button"
+                        disabled={blockingUserId === g.userId}
+                        onClick={() => void handleBlockUser(g.userId, g.login)}
+                        className={`${ADMIN_BTN} ${ADMIN_BTN_DANGER} ${ADMIN_BTN_SM} flex w-full items-center justify-center gap-1.5 disabled:opacity-50`}
+                      >
+                        <Ban className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                        {blockingUserId === g.userId ? "Блокируем…" : "Заблокировать"}
+                      </button>
+                    )}
+                    <Link
+                      href={`/admin/users/${g.userId}`}
+                      className={`${ADMIN_BTN} ${ADMIN_BTN_SM} flex w-full items-center justify-center gap-1.5`}
+                    >
+                      Карточка пользователя
+                      <ExternalLink className="h-3.5 w-3.5 shrink-0 opacity-90" aria-hidden />
+                    </Link>
+                  </div>
                 </li>
               ))}
             </ul>
@@ -201,8 +272,13 @@ export function FraudSignalsSection() {
                     <th className="px-3 py-2.5 font-medium">Пользователь</th>
                     <th className="px-3 py-2.5 font-medium">Статус</th>
                     <th className="px-3 py-2.5 font-medium whitespace-nowrap">Последний сигнал</th>
-                    <th className="min-w-[12rem] px-3 py-2.5 font-medium">Причины (последние)</th>
-                    <th className="fraud-signals-action-cell px-3 py-2.5 font-medium">Действие</th>
+                    <th className="min-w-[12rem] px-3 py-2.5 font-medium">
+                      <span className="block">Причины (последние)</span>
+                      <span className="mt-0.5 block text-[10px] font-normal normal-case tracking-normal text-white/45">
+                        + пополнение · − списание
+                      </span>
+                    </th>
+                    <th className="fraud-signals-action-cell px-3 py-2.5 font-medium">Действия</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -237,7 +313,8 @@ export function FraudSignalsSection() {
                                 className="flex w-full max-w-xl flex-col items-center gap-1 sm:flex-row sm:justify-center sm:gap-2"
                               >
                                 <span
-                                  className={`inline-flex shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${badge.className}`}
+                                  title={badge.title}
+                                  className={`inline-flex shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-wide ${badge.className}`}
                                 >
                                   {badge.label}
                                 </span>
@@ -252,13 +329,26 @@ export function FraudSignalsSection() {
                         </ul>
                       </td>
                       <td className="fraud-signals-action-cell px-3 py-3">
-                        <Link
-                          href={`/admin/users/${g.userId}`}
-                          className={`${ADMIN_BTN} ${ADMIN_BTN_SM} inline-flex items-center gap-1.5`}
-                        >
-                          Карточка
-                          <ExternalLink className="h-3.5 w-3.5 shrink-0 opacity-90" aria-hidden />
-                        </Link>
+                        <div className="flex flex-col items-center gap-2">
+                          {canShowBlock(g.role, g.isBlocked) && (
+                            <button
+                              type="button"
+                              disabled={blockingUserId === g.userId}
+                              onClick={() => void handleBlockUser(g.userId, g.login)}
+                              className={`${ADMIN_BTN} ${ADMIN_BTN_DANGER} ${ADMIN_BTN_SM} inline-flex items-center gap-1.5 disabled:opacity-50`}
+                            >
+                              <Ban className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                              {blockingUserId === g.userId ? "Блокируем…" : "Заблокировать"}
+                            </button>
+                          )}
+                          <Link
+                            href={`/admin/users/${g.userId}`}
+                            className={`${ADMIN_BTN} ${ADMIN_BTN_SM} inline-flex items-center gap-1.5`}
+                          >
+                            Карточка
+                            <ExternalLink className="h-3.5 w-3.5 shrink-0 opacity-90" aria-hidden />
+                          </Link>
+                        </div>
                       </td>
                     </tr>
                   ))}

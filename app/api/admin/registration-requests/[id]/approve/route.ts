@@ -32,17 +32,11 @@ export async function POST(
     return NextResponse.json({ error: "Заявка не найдена" }, { status: 404 });
   }
 
-  if (req.status === "APPROVED" && req.registrationTokenId) {
-    const existing = await db.registrationToken.findUnique({
-      where: { id: req.registrationTokenId },
-      select: { id: true },
-    });
-    if (existing) {
-      return NextResponse.json(
-        { error: "По этой заявке уже выдан токен. Создайте новый токен в разделе Пользователи при необходимости." },
-        { status: 400 },
-      );
-    }
+  if (req.status !== "PENDING") {
+    return NextResponse.json(
+      { error: "Можно одобрить только заявку в статусе «на рассмотрении»" },
+      { status: 400 },
+    );
   }
 
   const token = generateRegistrationToken();
@@ -60,7 +54,13 @@ export async function POST(
 
   await db.registrationRequest.update({
     where: { id },
-    data: { status: "APPROVED", registrationTokenId: created.id },
+    data: {
+      status: "APPROVED",
+      registrationTokenId: created.id,
+      rejectionReason: null,
+      reviewedAt: new Date(),
+      reviewedByUserId: auth.user.userId,
+    },
   });
 
   const baseUrl = getBaseUrlFromRequest(request.nextUrl.origin);

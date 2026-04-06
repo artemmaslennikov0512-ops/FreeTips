@@ -4,18 +4,27 @@
  * Подпись: sector, pan, amount, currency, sd_ref, password (Приложение №2).
  * С кубышки списывается amount + fee; на карту зачисляется amount (нетто).
  *
- * Запуск:
- *   npx tsx scripts/utils/sd-payout.ts
- *     — карта и сумма из последнего успешного пополнения (sd-topup-card-auto).
- *   npx tsx scripts/utils/sd-payout.ts <amount_kop> [fee_kop]
- *     — карта из последнего пополнения, сумма (и опционально комиссия) из аргументов.
- *   npx tsx scripts/utils/sd-payout.ts <pan> <amount_kop> [fee_kop]
- *     — явно указаны карта и сумма.
+ * Откуда списываются деньги:
+ *   Только с кубышки Paygine sd_ref в ПЦ — то же значение, что user.paygineSdRef в БД.
+ *   Баланс в интерфейсе FreeTips считается по БД; на карту уходят рубли с кубышки в Paygine.
+ *   По умолчанию sd_ref из PAYGINE_SD_REF; для реального пользователя: --sd-ref=...
  *
- * Параметры и кубышка — из scripts/.env (PAYGINE_*, PAYGINE_SD_REF).
+ * Запуск:
+ *   npx tsx scripts/utils/sd-payout.ts [--sd-ref=...] [--pan=...]
+ *     — сумма и карта из последнего пополнения; --pan= переопределяет карту.
+ *   npx tsx scripts/utils/sd-payout.ts <amount_kop> [fee_kop] [--sd-ref=...] [--pan=...]
+ *     — карта из последнего пополнения или из --pan=.
+ *   npx tsx scripts/utils/sd-payout.ts <pan> <amount_kop> [fee_kop] [--sd-ref=...]
+ *     — карта первым аргументом (или переопределение через --pan=).
+ *
+ * Для SDPayOut номер карты обязателен в запросе к ПЦ (сервер-сервер). Для сценария «форма Paygine»
+ * используйте sd-payout-page.ts — там PAN опционален.
+ *
+ * Параметры Paygine — из корневого .env (как на сервере), затем .env.local, scripts/.env.
  */
 
 import { loadScriptsEnv } from "./load-env";
+import { extractPayoutCliFlags, maskPanLast4 } from "./argv-payout-cli";
 import { loadLastTopup } from "./last-topup";
 import { createHash } from "crypto";
 
@@ -32,9 +41,10 @@ function computePaygineSignature(tagValuesInOrder: string[], password: string): 
 }
 
 async function main(): Promise<void> {
-  const arg1 = process.argv[2]?.trim();
-  const arg2 = process.argv[3]?.trim();
-  const feeArg = process.argv[4]?.trim();
+  const { rest, sdRef: sdRefFromFlag, pan: panFromFlag } = extractPayoutCliFlags(process.argv.slice(2));
+  const arg1 = rest[0]?.trim();
+  const arg2 = rest[1]?.trim();
+  const feeArg = rest[2]?.trim();
 
   const saved = loadLastTopup();
   let pan = arg1?.replace(/\s/g, "") ?? "";
@@ -47,9 +57,10 @@ async function main(): Promise<void> {
       amountKop = saved.amountKop;
       console.error("Используются данные последнего пополнения: карта ****" + pan.slice(-4) + ", " + (saved.amountKop / 100) + " ₽");
     } else {
-      console.error("Usage: npx tsx scripts/utils/sd-payout.ts [<pan>] <amount_kop> [fee_kop]");
+      console.error("Usage: npx tsx scripts/utils/sd-payout.ts [<pan>] <amount_kop> [fee_kop] [--sd-ref=КУБЫШКА]");
       console.error("  Без аргументов — карта и сумма берутся из последнего пополнения (sd-topup-card-auto).");
       console.error("  Сначала выполните пополнение, затем вывод без аргументов.");
+      console.error("  --sd-ref= — кубышка в ПЦ (как paygineSdRef в БД), иначе PAYGINE_SD_REF.");
       process.exit(1);
     }
   } else if (arg1 && !arg2) {
@@ -73,6 +84,11 @@ async function main(): Promise<void> {
     amountKop = parseInt(arg2, 10);
   }
 
+  if (panFromFlag && panFromFlag.replace(/\s/g, "").length >= 8) {
+    pan = panFromFlag.replace(/\s/g, "");
+    console.error("PAN взят из --pan=", maskPanLast4(pan));
+  }
+
   const feeKop = feeArg ? parseInt(feeArg, 10) : 0;
 
   if (!pan || pan.length < 8) {
@@ -94,21 +110,32 @@ async function main(): Promise<void> {
   const baseUrl = process.env.PAYGINE_BASE_URL?.trim().replace(/\/$/, "");
   const sector = process.env.PAYGINE_SECTOR?.trim();
   const password = process.env.PAYGINE_PASSWORD;
-  const sdRef = process.env.PAYGINE_SD_REF?.trim();
+  const sdRef = (sdRefFromFlag?.trim() || process.env.PAYGINE_SD_REF?.trim()) ?? "";
 
   const missing: string[] = [];
   if (!baseUrl) missing.push("PAYGINE_BASE_URL");
   if (!sector) missing.push("PAYGINE_SECTOR");
   if (!password) missing.push("PAYGINE_PASSWORD");
-  if (!sdRef) missing.push("PAYGINE_SD_REF");
+  if (!sdRef) missing.push("PAYGINE_SD_REF или --sd-ref=");
   if (missing.length > 0) {
-    console.error("Не задано в scripts/.env:", missing.join(", "));
+    console.error("Не задано в .env / scripts/.env:", missing.join(", "));
     process.exit(1);
   }
 
+  console.error(
+    "Источник средств: кубышка Paygine sd_ref (ПЦ). Сейчас:",
+    sdRef,
+    sdRefFromFlag ? "(из --sd-ref)" : "(из PAYGINE_SD_REF).",
+    "Списание с кубышки:",
+    (amountKop + feeKop) / 100,
+    "₽ (нетто на карту",
+    amountKop / 100,
+    "₽).",
+  );
+
   const baseUrlStr = baseUrl as string;
   const sectorStr = sector as string;
-  const sdRefStr = sdRef as string;
+  const sdRefStr = sdRef;
   const passwordStr = password as string;
   const amountStr = String(amountKop);
   const signature = computePaygineSignature([sectorStr, pan, amountStr, CURRENCY_RUB, sdRefStr], passwordStr);
@@ -147,25 +174,34 @@ async function main(): Promise<void> {
   }
   clearTimeout(timeoutId);
 
+  console.error("SDPayOut: HTTP", res.status, "URL:", fullUrl);
+
   if (!res.ok) {
-    console.error(`HTTP ${res.status}`);
+    console.error("--- Полный ответ ПЦ (HTTP не OK) ---");
     console.error(text);
+    console.error("--- конец ответа ---");
     process.exit(1);
   }
 
   const idMatch = text.match(/<id>(\d+)<\/id>/);
   const orderIdMatch = text.match(/<order_id>(\d+)<\/order_id>/);
   const externalId = idMatch?.[1] ?? orderIdMatch?.[1];
-  const errCode = text.match(/<code>\s*([^<]+)\s*<\/code>/)?.[1];
+  const errCode = text.match(/<code>\s*([^<]+)\s*<\/code>/)?.[1]?.trim();
   const errDesc = text.match(/<description>\s*([^<]*)\s*<\/description>/)?.[1]?.trim();
+  const errMessage = text.match(/<message>\s*([^<]*)\s*<\/message>/i)?.[1]?.trim();
 
   if (errCode && errCode !== "0" && errCode !== "RQ00000") {
-    console.error("Ответ ПЦ (ошибка):");
-    console.error(text.slice(0, 500));
+    console.error("Ответ ПЦ (ошибка), code:", errCode);
+    if (errDesc) console.error("description:", errDesc);
+    if (errMessage) console.error("message:", errMessage);
+    console.error("--- Полный ответ ПЦ (XML/тело) ---");
+    console.error(text);
+    console.error("--- конец ответа ---");
     console.log(JSON.stringify({
       ok: false,
       paygineCode: errCode,
       description: errDesc ?? "",
+      message: errMessage ?? "",
     }, null, 2));
     process.exit(1);
   }

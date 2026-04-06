@@ -1,55 +1,74 @@
 "use client";
 
 import Link from "next/link";
+import {
+  CircleCheck,
+  Clock,
+  Headphones,
+  QrCode,
+  CreditCard,
+  Users,
+  Smartphone,
+  User,
+  type LucideIcon,
+} from "lucide-react";
+import { resolveDemoPaySlug } from "@/lib/demo-pay-slug";
 
-const METRICS = [
+const METRICS: { value: string; label: string; benefit: string; Icon: LucideIcon }[] = [
   {
     value: "99.8%",
     label: "Успешных транзакций",
     benefit: "Гости всегда могут сказать спасибо",
-    icon: "fa-solid fa-circle-check",
+    Icon: CircleCheck,
   },
   {
-    value: "<10 c",
+    value: "<10 с",
     label: "Среднее время оплаты",
     benefit: "Не задерживаем очередь",
-    icon: "fa-solid fa-clock",
+    Icon: Clock,
   },
   {
     value: "24/7",
     label: "Поддержка клиентов",
     benefit: "Решим любой вопрос",
-    icon: "fa-solid fa-headset",
+    Icon: Headphones,
   },
-] as const;
+];
 
-const BRAND_FEATURES = [
+const BRAND_FEATURES: { Icon: LucideIcon; label: string; desc: string }[] = [
   {
-    icon: "fa-solid fa-qrcode",
+    Icon: QrCode,
     label: "Карточки под QR",
     desc: "Дизайн в фирменном стиле для печати (наклейки, меню, столы)",
   },
   {
-    icon: "fa-solid fa-credit-card",
+    Icon: CreditCard,
     label: "Страница оплаты",
     desc: "Брендированный интерфейс без лишних кнопок, гость не покидает атмосферу заведения",
   },
   {
-    icon: "fa-solid fa-users",
+    Icon: Users,
     label: "Личные кабинеты",
     desc: "Для сотрудников (баланс, история) и администрации (аналитика, настройки)",
   },
-] as const;
+];
 
-const PREVIEW_ITEMS = [
-  { label: "Карточка", icon: "fa-solid fa-qrcode" },
-  { label: "Оплата", icon: "fa-solid fa-mobile-screen" },
-  { label: "Кабинет", icon: "fa-solid fa-user" },
-] as const;
+const PREVIEW_ITEMS: { label: string; Icon: LucideIcon }[] = [
+  { label: "Карточка", Icon: QrCode },
+  { label: "Оплата", Icon: Smartphone },
+  { label: "Кабинет", Icon: User },
+];
+
+const ICON_CLASS = "text-[var(--color-accent-gold)] opacity-90 group-hover:opacity-100 transition-opacity duration-300 shrink-0";
 
 export function HeroPremium() {
+  const demoSlug = resolveDemoPaySlug();
+
   return (
-    <section className="section-dark hero-premium-section relative overflow-hidden w-full bg-[var(--color-navy)] pt-[100px] pb-[48px] sm:pt-[120px] sm:pb-[60px]">
+    <section
+      id="about"
+      className="section-dark hero-premium-section relative overflow-hidden w-full bg-[var(--color-navy)] pt-[100px] pb-[48px] sm:pt-[120px] sm:pb-[60px] scroll-mt-24"
+    >
       {/* Фон: официант с QR, гость с экраном успеха */}
       <div
         className="absolute inset-0 z-[0] bg-cover bg-center bg-no-repeat opacity-[0.25]"
@@ -89,12 +108,20 @@ export function HeroPremium() {
               >
                 Узнать больше
               </Link>
+              {demoSlug ? (
+                <Link
+                  href={`/pay/${demoSlug}`}
+                  className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl border-2 border-white/25 text-[var(--color-on-navy)] font-semibold text-[15px] bg-white/5 backdrop-blur-sm transition-all duration-300 hover:bg-white/10 hover:border-[var(--color-accent-gold)]/50 hover:-translate-y-0.5"
+                >
+                  Демо-оплата
+                </Link>
+              ) : null}
             </div>
             <div className="flex flex-wrap gap-6 sm:gap-8 lg:gap-10 mt-8 pt-6 sm:mt-10 sm:pt-8 border-t border-white/10">
-              {METRICS.map(({ value, label, benefit, icon }) => (
+              {METRICS.map(({ value, label, benefit, Icon }) => (
                 <div key={label} className="hero-metric flex flex-col group">
                   <div className="flex items-center gap-2 mb-1">
-                    <i className={`${icon} text-[var(--color-accent-gold)] text-lg opacity-90 group-hover:opacity-100 transition-opacity duration-300`} aria-hidden />
+                    <Icon className={`h-[1.125rem] w-[1.125rem] ${ICON_CLASS}`} strokeWidth={2} aria-hidden />
                     <span className="hero-premium-stat font-[family:var(--font-inter)] text-2xl sm:text-3xl lg:text-4xl font-bold text-[var(--color-on-navy)] leading-none">
                       {value}
                     </span>
@@ -104,6 +131,9 @@ export function HeroPremium() {
                 </div>
               ))}
             </div>
+            <p className="text-[11px] sm:text-xs text-[var(--color-on-dark-muted)] mt-4 max-w-[560px] leading-relaxed opacity-90">
+              Цифры в блоке выше отражают целевые ориентиры сервиса и могут различаться в зависимости от условий подключения, нагрузки и периода.
+            </p>
           </div>
 
           {/* Правая колонка: Настраивайте под свой бренд — центрирование, настройки, превью, ссылка на заявку */}
@@ -117,13 +147,13 @@ export function HeroPremium() {
               <div className="w-full mb-5">
                 <span className="text-xs font-semibold text-[var(--color-on-dark-muted)] uppercase tracking-wider">Настройки</span>
                 <ul className="space-y-3 mt-3 text-left">
-                  {BRAND_FEATURES.map(({ icon, label, desc }) => (
+                  {BRAND_FEATURES.map(({ Icon, label, desc }) => (
                     <li
                       key={label}
                       className="hero-brand-item flex items-start gap-3 rounded-xl bg-white/[0.06] border border-white/10 px-3 py-2.5 transition-all duration-300 hover:bg-white/[0.09] hover:border-white/20"
                     >
                       <span className="hero-brand-icon flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[var(--color-accent-gold)]/20 text-[var(--color-accent-gold)] mt-0.5">
-                        <i className={`${icon} text-sm`} aria-hidden />
+                        <Icon className="h-4 w-4" strokeWidth={1.75} aria-hidden />
                       </span>
                       <span className="flex flex-col min-w-0">
                         <span className="text-sm font-semibold text-[var(--color-on-navy)]">{label}</span>
@@ -137,12 +167,12 @@ export function HeroPremium() {
               <div className="w-full mb-5">
                 <span className="text-xs font-semibold text-[var(--color-on-dark-muted)] uppercase tracking-wider">Превью</span>
                 <div className="hero-preview-gallery mt-3 justify-center">
-                  {PREVIEW_ITEMS.map(({ label, icon }) => (
+                  {PREVIEW_ITEMS.map(({ label, Icon }) => (
                     <div
                       key={label}
                       className="hero-preview-card flex flex-col items-center justify-center rounded-xl border border-white/15 bg-white/[0.05] aspect-square p-2"
                     >
-                      <i className={`${icon} text-2xl text-[var(--color-accent-gold)]/80 mb-1`} aria-hidden />
+                      <Icon className="h-7 w-7 text-[var(--color-accent-gold)]/80 mb-1" strokeWidth={1.5} aria-hidden />
                       <span className="text-[11px] sm:text-xs font-medium text-[var(--color-on-dark-muted)] text-center leading-tight">
                         {label}
                       </span>

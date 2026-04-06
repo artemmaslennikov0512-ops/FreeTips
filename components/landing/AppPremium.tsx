@@ -23,7 +23,7 @@ const benefits = [
 
 export function AppPremium() {
   return (
-    <section id="app" className="relative overflow-hidden w-full py-12 sm:py-16 lg:py-[100px] bg-[var(--color-charcoal)] [&_h2]:!text-white [&_h3]:!text-white">
+    <section id="app" className="relative overflow-hidden w-full py-12 sm:py-16 lg:py-[100px] bg-[var(--color-charcoal)] [&_h2]:!text-white [&_h3]:!text-white scroll-mt-24">
       <div
         className="absolute inset-0 z-[0] bg-cover bg-center bg-no-repeat opacity-[0.18]"
         style={{ backgroundImage: "url('/images/landing-pattern-app-soft.png')" }}

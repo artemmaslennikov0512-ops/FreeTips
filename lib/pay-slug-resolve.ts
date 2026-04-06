@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 import {
-  effectiveTipRoutingMode,
   getEstablishmentSharePercent,
+  routingModeForTipLink,
   TIP_ROUTING_EMPLOYEE_QR,
   TIP_ROUTING_POOL_QR,
   type TipRoutingMode,
@@ -103,7 +103,7 @@ export async function resolvePayInitForSlug(
     tipLink.employee?.establishment as PaySlugEstablishment | undefined,
     tipLink.employeeId,
   );
-  const mode = effectiveTipRoutingMode(est?.tipRoutingMode);
+  const mode = routingModeForTipLink(tipLink, est);
   const poolId = est?.tipPoolUserId?.trim() || null;
 
   if (!tipLink.employeeId) {
@@ -140,7 +140,7 @@ export async function resolvePayInitForSlug(
   }
 
   let tipSplit: TipSplitSnapshot | null = null;
-  if (poolId) {
+  if (poolId && establishmentId) {
     const sharePct = await getEstablishmentSharePercent(establishmentId);
     if (sharePct > 0) {
       tipSplit = { poolUserId: poolId, establishmentSharePercent: sharePct };

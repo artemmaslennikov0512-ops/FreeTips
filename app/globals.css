@@ -5342,18 +5342,21 @@ html:not([data-theme="dark"]) .zayavka-page .zayavka-card .zayavka-phone-field .
   color: var(--color-brand-gold) !important;
 }
 [data-theme="dark"] .landing-page #features,
-[data-theme="dark"] .landing-page #business {
+[data-theme="dark"] .landing-page #business,
+[data-theme="dark"] .landing-page #quest {
   background: #1e2a3a !important;
   color: #fafafa;
 }
 [data-theme="dark"] .landing-page #features h2,
 [data-theme="dark"] .landing-page #features h3,
 [data-theme="dark"] .landing-page #business h2,
-[data-theme="dark"] .landing-page #business h3 {
+[data-theme="dark"] .landing-page #business h3,
+[data-theme="dark"] .landing-page #quest h2 {
   color: #fafafa;
 }
 [data-theme="dark"] .landing-page #features [class*="bg-[var(--color-white)]"],
-[data-theme="dark"] .landing-page #business [class*="bg-[var(--color-white)]"] {
+[data-theme="dark"] .landing-page #business [class*="bg-[var(--color-white)]"],
+[data-theme="dark"] .landing-page #quest [class*="bg-white/"] {
   background: #262626 !important;
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: #fafafa;
@@ -5461,13 +5464,13 @@ img, video, svg {
 }
 
 /* Лендинг: в секциях с тёмным фоном текст белый (перебивает body) */
-.landing-page :is(.section-dark, #features, #process, #business) {
+.landing-page :is(.section-dark, #about, #features, #process, #business, #quest) {
   color: #ffffff !important;
 }
-.landing-page :is(.section-dark, #features, #process, #business) :is(h1, h2, h3, h4, h5, h6, p) {
+.landing-page :is(.section-dark, #about, #features, #process, #business, #quest) :is(h1, h2, h3, h4, h5, h6, p) {
   color: #ffffff !important;
 }
-.landing-page :is(.section-dark, #features, #process, #business) .text-\[var\(--color-on-dark-muted\)\] {
+.landing-page :is(.section-dark, #about, #features, #process, #business, #quest) .text-\[var\(--color-on-dark-muted\)\] {
   color: rgba(255, 255, 255, 0.8) !important;
 }
 

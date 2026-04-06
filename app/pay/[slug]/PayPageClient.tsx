@@ -19,6 +19,29 @@ const PRESETS = [50, 100, 200, 500] as const;
 
 const PAYMENT_MAX_ERROR = "Максимальная сумма пополнения — 1 000 ₽";
 
+/** POST на прокси Paygine без промежуточной страницы `/pay/redirect`. */
+function postPayRedirectProxy(tid: string, redirectToken: string): void {
+  const form = document.createElement("form");
+  form.method = "POST";
+  form.action = "/api/pay/redirect-proxy";
+  form.style.display = "none";
+
+  const tidInput = document.createElement("input");
+  tidInput.type = "hidden";
+  tidInput.name = "tid";
+  tidInput.value = tid;
+  form.appendChild(tidInput);
+
+  const tokenInput = document.createElement("input");
+  tokenInput.type = "hidden";
+  tokenInput.name = "redirectToken";
+  tokenInput.value = redirectToken;
+  form.appendChild(tokenInput);
+
+  document.body.appendChild(form);
+  form.submit();
+}
+
 function toKopecks(rub: number): number {
   return Math.round(rub * 100);
 }
@@ -182,6 +205,7 @@ export default function PayPageClient() {
         success?: boolean;
         error?: string;
         redirectUrl?: string;
+        redirectToken?: string;
         transactionId?: string;
       };
 
@@ -191,9 +215,19 @@ export default function PayPageClient() {
         return;
       }
 
-      if (typeof data.redirectUrl === "string" && data.redirectUrl.trim()) {
+      const redirectUrl = typeof data.redirectUrl === "string" ? data.redirectUrl.trim() : "";
+      const redirectToken = typeof data.redirectToken === "string" ? data.redirectToken.trim() : "";
+      const transactionId = typeof data.transactionId === "string" ? data.transactionId.trim() : "";
+
+      if (redirectUrl && redirectToken && transactionId) {
         leaveForPaygine = true;
-        window.location.assign(data.redirectUrl.trim());
+        postPayRedirectProxy(transactionId, redirectToken);
+        return;
+      }
+
+      if (redirectUrl) {
+        leaveForPaygine = true;
+        window.location.assign(redirectUrl);
         return;
       }
 

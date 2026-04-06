@@ -28,18 +28,23 @@ export const site = {
     contacts: "/images/contacts.jpg",
   } as const,
 
+  /** Якоря совпадают с id секций на главной: about (hero), app, features, process, business, quest (FAQ). */
   nav: [
     { label: "О сервисе", href: "/#about" },
-    { label: "Как работает", href: "/#how" },
-    { label: "Адаптация", href: "/#ad" },
-    { label: "Для кого", href: "/#for" },
+    { label: "Приложение", href: "/#app" },
+    { label: "Преимущества", href: "/#features" },
+    { label: "Как работает", href: "/#process" },
+    { label: "Для бизнеса", href: "/#business" },
     { label: "Вопросы", href: "/#quest" },
     { label: "Контакты", href: "/kontakty" },
   ],
 
   cta: { label: "Войти", href: "/login" },
   register: { label: "Оставить заявку", href: "/zayavka" },
-  /** Slug для демо-страницы чаевых (лендинг: «Посмотреть, как это выглядит»). Создайте ссылку с этим slug в кабинете или оставьте пустым. */
+  /**
+   * Slug демо-страницы /pay/[slug], если не задан NEXT_PUBLIC_DEMO_PAY_SLUG.
+   * Пустая строка в NEXT_PUBLIC_DEMO_PAY_SLUG отключает демо и кнопку «Демо-оплата».
+   */
   demoPaySlug: "demo" as const,
 
   footer: {

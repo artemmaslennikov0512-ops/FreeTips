@@ -1,7 +1,7 @@
 /**
  * GET /api/pay/[slug] — данные для страницы приёма чаевых (имя получателя).
  * POST /api/pay/[slug] — инициализация платежа через PaymentGateway (заглушка или провайдер).
- * Slug "demo" (из config/site) — демо-страница без реальной ссылки в БД.
+ * Демо-slug из resolveDemoPaySlug() (config + NEXT_PUBLIC_DEMO_PAY_SLUG) — без записи в БД.
  */
 
 import { NextRequest, NextResponse } from "next/server";
@@ -20,7 +20,8 @@ import {
 } from "@/lib/middleware/rate-limit";
 import { parseJsonWithLimit, MAX_BODY_SIZE_DEFAULT, jsonError, internalError, rateLimit429Response } from "@/lib/api/helpers";
 import { verifyCsrfFromRequest } from "@/lib/security/csrf";
-import { site } from "@/config/site";
+import { resolveDemoPaySlug } from "@/lib/demo-pay-slug";
+import { createPayRedirectToken } from "@/lib/payment/redirect-token";
 import {
   PAY_PAGE_BRANDING_OVERRIDES,
   PAY_PAGE_M5_COMPETITION_BRANDING,
@@ -38,9 +39,9 @@ import {
   resolvePayInitForSlug,
   type PaySlugEstablishment,
 } from "@/lib/pay-slug-resolve";
-import { effectiveTipRoutingMode, TIP_ROUTING_EMPLOYEE_QR } from "@/lib/tip-routing";
+import { routingModeForTipLink, TIP_ROUTING_EMPLOYEE_QR } from "@/lib/tip-routing";
 
-const DEMO_SLUG = "demoPaySlug" in site && typeof site.demoPaySlug === "string" ? site.demoPaySlug : null;
+const DEMO_SLUG = resolveDemoPaySlug();
 
 type Params = { params: Promise<{ slug: string }> };
 
@@ -64,7 +65,7 @@ export async function GET(request: NextRequest, { params }: Params) {
     tipLink.employee?.establishment as PaySlugEstablishment | null | undefined,
     tipLink.employeeId,
   );
-  const routingMode = effectiveTipRoutingMode(est?.tipRoutingMode);
+  const routingMode = routingModeForTipLink(tipLink, est);
   const establishmentPayUi = !tipLink.employeeId || routingMode !== TIP_ROUTING_EMPLOYEE_QR;
 
   const brandingFromEstablishment = est
@@ -257,12 +258,22 @@ export async function POST(request: NextRequest, { params }: Params) {
 
     observePayInitBurstForSlug(tipLink.id, paymentRecipientId, slug);
     logSecurity("pay.init.success", { requestId, ip, slug, transactionId: result.transactionId });
-    const json: { success: true; transactionId: string; redirectUrl?: string } = {
+    const json: {
+      success: true;
+      transactionId: string;
+      redirectUrl?: string;
+      redirectToken?: string;
+    } = {
       success: true,
       transactionId: result.transactionId,
     };
     if ("redirectUrl" in result && result.redirectUrl) {
       json.redirectUrl = result.redirectUrl;
+      try {
+        json.redirectToken = createPayRedirectToken(result.transactionId);
+      } catch {
+        /* без токена клиент уйдёт по redirectUrl на /pay/redirect */
+      }
     }
     return NextResponse.json(json);
   } catch (error) {

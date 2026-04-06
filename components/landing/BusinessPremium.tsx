@@ -22,7 +22,7 @@ const cards = [
 
 export function BusinessPremium() {
   return (
-    <section id="business" className="relative overflow-hidden w-full py-12 sm:py-16 lg:py-[100px] bg-[var(--color-navy)]">
+    <section id="business" className="relative overflow-hidden w-full py-12 sm:py-16 lg:py-[100px] bg-[var(--color-navy)] scroll-mt-24">
       <div
         className="absolute inset-0 z-[0] bg-cover bg-center bg-no-repeat opacity-[0.18]"
         style={{ backgroundImage: "url('/images/landing-pattern-business-sectors-soft.png')" }}

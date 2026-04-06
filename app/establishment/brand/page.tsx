@@ -43,7 +43,6 @@ interface BrandSettings {
   printQrHintText?: string | null;
   printBannerText?: string | null;
   printBannerSubtext?: string | null;
-  tipRoutingMode?: "POOL_QR" | "EMPLOYEE_QR";
 }
 
 type PrintCardTemplate = "classic" | "white_pos";
@@ -77,7 +76,8 @@ export default function EstablishmentBrandPage() {
   const [printBannerText, setPrintBannerText] = useState("");
   const [printBannerSubtext, setPrintBannerSubtext] = useState("");
   const [logoOpacityPercent, setLogoOpacityPercent] = useState(100);
-  const [tipRoutingMode, setTipRoutingMode] = useState<"POOL_QR" | "EMPLOYEE_QR">("POOL_QR");
+  /** Только для превью «Страница оплаты»; правится в «Распределение». */
+  const [payPreviewTipRouting, setPayPreviewTipRouting] = useState<"POOL_QR" | "EMPLOYEE_QR">("POOL_QR");
   const [printPreviewQrUrl, setPrintPreviewQrUrl] = useState<string | null>(null);
   const [examplePaySlug, setExamplePaySlug] = useState<string | null>(null);
   const [examplePayQrUrl, setExamplePayQrUrl] = useState<string | null>(null);
@@ -127,7 +127,7 @@ export default function EstablishmentBrandPage() {
           setPrintBannerText(String(data.printBannerText ?? ""));
           setPrintBannerSubtext(String(data.printBannerSubtext ?? ""));
           setLogoOpacityPercent(Number(data.logoOpacityPercent) ?? 100);
-          setTipRoutingMode(data.tipRoutingMode === "EMPLOYEE_QR" ? "EMPLOYEE_QR" : "POOL_QR");
+          setPayPreviewTipRouting(data.tipRoutingMode === "EMPLOYEE_QR" ? "EMPLOYEE_QR" : "POOL_QR");
         }
       } finally {
         setLoading(false);
@@ -135,6 +135,18 @@ export default function EstablishmentBrandPage() {
     };
     load();
   }, []);
+
+  useEffect(() => {
+    if (activeGroup !== "pay" || typeof window === "undefined") return;
+    fetch("/api/establishment/settings", { headers: authHeaders() })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (data) {
+          setPayPreviewTipRouting(data.tipRoutingMode === "EMPLOYEE_QR" ? "EMPLOYEE_QR" : "POOL_QR");
+        }
+      })
+      .catch(() => {});
+  }, [activeGroup]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -166,7 +178,6 @@ export default function EstablishmentBrandPage() {
           printBannerText: printBannerText.trim() || null,
           printBannerSubtext: printBannerSubtext.trim() || null,
           logoOpacityPercent: logoOpacityPercent === 100 ? null : logoOpacityPercent,
-          tipRoutingMode,
         }),
       });
       const data = await res.json().catch(() => ({}));
@@ -198,7 +209,7 @@ export default function EstablishmentBrandPage() {
       setPrintBannerText(String(data.printBannerText ?? ""));
       setPrintBannerSubtext(String(data.printBannerSubtext ?? ""));
       setLogoOpacityPercent(Number(data.logoOpacityPercent) ?? 100);
-      setTipRoutingMode(data.tipRoutingMode === "EMPLOYEE_QR" ? "EMPLOYEE_QR" : "POOL_QR");
+      setPayPreviewTipRouting(data.tipRoutingMode === "EMPLOYEE_QR" ? "EMPLOYEE_QR" : "POOL_QR");
       setMessage("Сохранено. Настройки применяются в личном кабинете и на странице оплаты чаевых. QR настраивается в разделе «QR и печать».");
     } catch {
       setMessage("Ошибка соединения");
@@ -246,7 +257,7 @@ export default function EstablishmentBrandPage() {
       setPrintBannerText(String(data.printBannerText ?? ""));
       setPrintBannerSubtext(String(data.printBannerSubtext ?? ""));
       setLogoOpacityPercent(Number(data.logoOpacityPercent) ?? 100);
-      setTipRoutingMode(data.tipRoutingMode === "EMPLOYEE_QR" ? "EMPLOYEE_QR" : "POOL_QR");
+      setPayPreviewTipRouting(data.tipRoutingMode === "EMPLOYEE_QR" ? "EMPLOYEE_QR" : "POOL_QR");
       setMessage("Настройки сброшены к исходным.");
     } catch {
       setMessage("Ошибка соединения");
@@ -454,41 +465,6 @@ export default function EstablishmentBrandPage() {
             </div>
             {!isPrintOnly && (
             <>
-            {activeGroup === "pay" && (
-              <div className="rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/5 p-3 space-y-3">
-                <p className="text-sm text-white/90 font-medium">Куда уходят чаевые по QR сотрудников</p>
-                <label className="flex gap-3 items-start cursor-pointer">
-                  <input
-                    type="radio"
-                    name="tipRoutingMode"
-                    checked={tipRoutingMode === "POOL_QR"}
-                    onChange={() => setTipRoutingMode("POOL_QR")}
-                    className="mt-1 accent-[var(--color-brand-gold)]"
-                  />
-                  <span>
-                    <span className="text-sm text-white block">Общий счёт заведения</span>
-                    <span className="text-xs text-white/60 block mt-1">
-                      Клиент видит страницу оплаты заведения; деньги приходят на счёт заведения — дальше администратор распределяет между официантами.
-                    </span>
-                  </span>
-                </label>
-                <label className="flex gap-3 items-start cursor-pointer">
-                  <input
-                    type="radio"
-                    name="tipRoutingMode"
-                    checked={tipRoutingMode === "EMPLOYEE_QR"}
-                    onChange={() => setTipRoutingMode("EMPLOYEE_QR")}
-                    className="mt-1 accent-[var(--color-brand-gold)]"
-                  />
-                  <span>
-                    <span className="text-sm text-white block">Персональный QR официанта</span>
-                    <span className="text-xs text-white/60 block mt-1">
-                      Оплата идёт на ЛК того, чью ссылку отсканировали. Если задана доля заведения (в разделе правил распределения), с этой суммы удерживается процент в пользу заведения, остальное — официанту.
-                    </span>
-                  </span>
-                </label>
-              </div>
-            )}
             <div>
               <label className="block text-sm text-white/90 mb-1">Доп. цвет (hex) — фон карточки оплаты, сайдбар</label>
               <div className="flex gap-2 items-center">
@@ -1002,7 +978,9 @@ export default function EstablishmentBrandPage() {
             {/* Превью: страница оплаты (клиент) — полный макет как при сканировании QR */}
             {activeGroup === "pay" && (
               <div className="w-full max-w-[380px] mx-auto">
-                <p className="text-xs text-white/60 mb-2">Так видит страницу клиент после перехода по QR</p>
+                <p className="text-xs text-white/60 mb-2">
+                  Так видит страницу клиент после перехода по QR. Кому уходят чаевые по QR сотрудников вашего заведения — в разделе «Распределение».
+                </p>
                 <div className="rounded-2xl overflow-hidden border-0 shadow-lg transition-colors" style={{ backgroundColor: secondaryRgba ?? hexOr(secondaryColor, blocksBgRgba ?? "#1e293b"), borderWidth: borderWidth ? `${borderWidth}px` : 0, borderStyle: "solid", borderColor: borderRgba }}>
                   <div className="px-4 pt-4 pb-4 space-y-3">
                     {/* Логотип: только лого или только FreeTips */}
@@ -1036,12 +1014,12 @@ export default function EstablishmentBrandPage() {
                         <div className="h-9 w-9 rounded-full shrink-0 flex items-center justify-center text-sm" style={{ backgroundColor: (hex(primaryColor) || "var(--color-brand-gold)") + "26", color: hexOr(primaryColor, "var(--color-brand-gold)") }}>👤</div>
                         <div>
                           <p className="font-medium text-sm truncate" style={{ color: hexOr(fontColor, "#fafafa") }}>
-                            {tipRoutingMode === "POOL_QR"
+                            {payPreviewTipRouting === "POOL_QR"
                               ? `Чаевые — «${establishmentName.trim() || "Заведение"}»`
                               : "Имя официанта"}
                           </p>
                           <p className="text-xs opacity-80" style={{ color: hexOr(fontColor, "#e2e8f0") }}>
-                            {tipRoutingMode === "POOL_QR" ? "На счёт заведения" : "Коплю на: цель"}
+                            {payPreviewTipRouting === "POOL_QR" ? "На счёт заведения" : "Коплю на: цель"}
                           </p>
                         </div>
                       </div>

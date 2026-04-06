@@ -16,6 +16,21 @@ export function effectiveTipRoutingMode(raw: string | null | undefined): TipRout
   return TIP_ROUTING_POOL_QR;
 }
 
+/**
+ * Режим «общий счёт / персональный QR» из настроек заведения действует только для сотрудников,
+ * привязанных к этому заведению. У ссылки с employeeId без заведения в БД est отсутствует —
+ * тогда всегда персональная оплата на ЛК официанта.
+ */
+export function routingModeForTipLink(
+  tipLink: { employeeId: string | null },
+  est: { tipRoutingMode: string | null } | null | undefined,
+): TipRoutingMode {
+  if (tipLink.employeeId && !est) {
+    return TIP_ROUTING_EMPLOYEE_QR;
+  }
+  return effectiveTipRoutingMode(est?.tipRoutingMode);
+}
+
 export async function getEstablishmentSharePercent(establishmentId: string): Promise<number> {
   const rule = await db.payoutRule.findFirst({
     where: { establishmentId, type: "establishment_share" },

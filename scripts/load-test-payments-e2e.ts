@@ -147,11 +147,7 @@ async function openToPaygineForm(
       await payBtn.click({ force: true, timeout: 5_000 }).catch(() => {});
     }
 
-    await page.waitForURL(
-      (url) => url.pathname.includes("/pay/redirect") && url.searchParams.has("tid"),
-      { timeout: PAGE_WAIT_MS }
-    ).catch(() => {});
-
+    // Прямой POST на redirect-proxy может миновать /pay/redirect — ждём хост Paygine.
     await page.waitForURL(
       (url) => /paygine|pay\.paygine/i.test(url.href),
       { timeout: PAGE_WAIT_MS }

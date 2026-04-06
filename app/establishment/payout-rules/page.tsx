@@ -29,6 +29,9 @@ export default function PayoutRulesPage() {
   const [formValue, setFormValue] = useState("");
   const [formError, setFormError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [tipRoutingMode, setTipRoutingMode] = useState<"POOL_QR" | "EMPLOYEE_QR">("POOL_QR");
+  const [routingSaving, setRoutingSaving] = useState(false);
+  const [routingMessage, setRoutingMessage] = useState<string | null>(null);
 
   const fetchRules = async () => {
     const res = await fetch("/api/establishment/payout-rules", {
@@ -46,13 +49,50 @@ export default function PayoutRulesPage() {
     const load = async () => {
       setLoading(true);
       setError(null);
-      await fetchRules();
+      const [rulesOk, settingsRes] = await Promise.all([
+        fetch("/api/establishment/payout-rules", { headers: authHeaders() }),
+        fetch("/api/establishment/settings", { headers: authHeaders() }),
+      ]);
+      if (!rulesOk.ok) {
+        setError("Ошибка загрузки");
+        setLoading(false);
+        return;
+      }
+      const rulesData = await rulesOk.json();
+      setRules(rulesData.rules ?? []);
+      if (settingsRes.ok) {
+        const s = await settingsRes.json();
+        setTipRoutingMode(s.tipRoutingMode === "EMPLOYEE_QR" ? "EMPLOYEE_QR" : "POOL_QR");
+      }
       setLoading(false);
     };
     load();
   }, []);
 
   const hasEstablishmentShare = rules.some((r) => r.type === "establishment_share");
+
+  const handleSaveTipRouting = async () => {
+    setRoutingMessage(null);
+    setRoutingSaving(true);
+    try {
+      const res = await fetch("/api/establishment/settings", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", ...authHeaders() },
+        body: JSON.stringify({ tipRoutingMode }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setRoutingMessage(data?.error ?? "Не удалось сохранить");
+        return;
+      }
+      setTipRoutingMode(data.tipRoutingMode === "EMPLOYEE_QR" ? "EMPLOYEE_QR" : "POOL_QR");
+      setRoutingMessage("Сохранено");
+    } catch {
+      setRoutingMessage("Ошибка соединения");
+    } finally {
+      setRoutingSaving(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -139,6 +179,58 @@ export default function PayoutRulesPage() {
         <p className="text-white/90 text-sm mt-1">
           Доля заведения (процент, остающийся у заведения) и при необходимости — процент в фонд. Остаток пула распределяется между сотрудниками по коэффициентам (настраиваются в разделе «Команда»).
         </p>
+      </div>
+
+      <div className="cabinet-card rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] p-6 space-y-4">
+        <div>
+          <h2 className="text-lg font-medium text-white">Куда уходят чаевые по QR сотрудников</h2>
+          <p className="text-xs text-white/60 mt-1">
+            Действует только для официантов из раздела «Команда» этого заведения. Самостоятельно зарегистрированные получатели без привязки к заведению всегда получают оплату на личный счёт.
+          </p>
+        </div>
+        <label className="flex gap-3 items-start cursor-pointer">
+          <input
+            type="radio"
+            name="tipRoutingMode"
+            checked={tipRoutingMode === "POOL_QR"}
+            onChange={() => setTipRoutingMode("POOL_QR")}
+            className="mt-1 accent-[var(--color-brand-gold)]"
+          />
+          <span>
+            <span className="text-sm text-white block">Общий счёт заведения</span>
+            <span className="text-xs text-white/60 block mt-1">
+              Клиент видит страницу оплаты заведения; деньги приходят на счёт заведения — дальше администратор распределяет между официантами.
+            </span>
+          </span>
+        </label>
+        <label className="flex gap-3 items-start cursor-pointer">
+          <input
+            type="radio"
+            name="tipRoutingMode"
+            checked={tipRoutingMode === "EMPLOYEE_QR"}
+            onChange={() => setTipRoutingMode("EMPLOYEE_QR")}
+            className="mt-1 accent-[var(--color-brand-gold)]"
+          />
+          <span>
+            <span className="text-sm text-white block">Персональный QR официанта</span>
+            <span className="text-xs text-white/60 block mt-1">
+              Оплата идёт на личный кабинет того, чью ссылку отсканировали. Если задана доля заведения ниже, с суммы удерживается процент в пользу заведения, остальное — официанту.
+            </span>
+          </span>
+        </label>
+        {routingMessage && (
+          <p className={`text-sm ${routingMessage === "Сохранено" ? "text-emerald-300" : "text-[var(--color-accent-red)]"}`}>
+            {routingMessage}
+          </p>
+        )}
+        <button
+          type="button"
+          onClick={handleSaveTipRouting}
+          disabled={routingSaving}
+          className="rounded-[10px] bg-[var(--color-brand-gold)] px-4 py-2 font-medium text-[#0a192f] hover:opacity-90 disabled:opacity-50"
+        >
+          {routingSaving ? "Сохранение…" : "Сохранить настройку QR"}
+        </button>
       </div>
 
       {showForm && (

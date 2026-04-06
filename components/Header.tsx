@@ -144,7 +144,12 @@ export function Header() {
             <Link href="/#features" className="whitespace-nowrap rounded-xl border-0 bg-[var(--color-white)]/95 backdrop-blur-sm shadow-[var(--shadow-subtle)] px-2.5 py-2 font-medium text-[14px] text-[var(--color-navy)] transition-all hover:shadow-[var(--shadow-soft)] hover:-translate-y-0.5 xl:px-3 xl:py-2.5 2xl:px-4">Преимущества</Link>
             <Link href="/#process" className="whitespace-nowrap rounded-xl border-0 bg-[var(--color-white)]/95 backdrop-blur-sm shadow-[var(--shadow-subtle)] px-2.5 py-2 font-medium text-[14px] text-[var(--color-navy)] transition-all hover:shadow-[var(--shadow-soft)] hover:-translate-y-0.5 xl:px-3 xl:py-2.5 2xl:px-4">Как работает</Link>
             <Link href="/#business" className="whitespace-nowrap rounded-xl border-0 bg-[var(--color-white)]/95 backdrop-blur-sm shadow-[var(--shadow-subtle)] px-2.5 py-2 font-medium text-[14px] text-[var(--color-navy)] transition-all hover:shadow-[var(--shadow-soft)] hover:-translate-y-0.5 xl:px-3 xl:py-2.5 2xl:px-4">Для бизнеса</Link>
+            <Link href="/#quest" className="whitespace-nowrap rounded-xl border-0 bg-[var(--color-white)]/95 backdrop-blur-sm shadow-[var(--shadow-subtle)] px-2.5 py-2 font-medium text-[14px] text-[var(--color-navy)] transition-all hover:shadow-[var(--shadow-soft)] hover:-translate-y-0.5 xl:px-3 xl:py-2.5 2xl:px-4">Вопросы</Link>
             <Link href="/oferta" className="whitespace-nowrap rounded-xl border-0 bg-[var(--color-white)]/95 backdrop-blur-sm shadow-[var(--shadow-subtle)] px-2.5 py-2 font-medium text-[14px] text-[var(--color-navy)] transition-all hover:shadow-[var(--shadow-soft)] hover:-translate-y-0.5 xl:px-3 xl:py-2.5 2xl:px-4">Тарифы</Link>
+            <Link href="/pomoshch" className="whitespace-nowrap rounded-xl border-0 bg-[var(--color-white)]/95 backdrop-blur-sm shadow-[var(--shadow-subtle)] px-2.5 py-2 font-medium text-[14px] text-[var(--color-navy)] transition-all hover:shadow-[var(--shadow-soft)] hover:-translate-y-0.5 xl:px-3 xl:py-2.5 2xl:px-4">Помощь</Link>
+            <Link href="/en" hrefLang="en" className="whitespace-nowrap rounded-xl border-0 bg-[var(--color-white)]/95 backdrop-blur-sm shadow-[var(--shadow-subtle)] px-2.5 py-2 font-medium text-[14px] text-[var(--color-navy)] transition-all hover:shadow-[var(--shadow-soft)] hover:-translate-y-0.5 xl:px-3 xl:py-2.5 2xl:px-4">
+              EN
+            </Link>
             <Link href="/kontakty" className="whitespace-nowrap rounded-xl border-0 bg-[var(--color-white)]/95 backdrop-blur-sm shadow-[var(--shadow-subtle)] px-2.5 py-2 font-medium text-[14px] text-[var(--color-navy)] transition-all hover:shadow-[var(--shadow-soft)] hover:-translate-y-0.5 xl:px-3 xl:py-2.5 2xl:px-4">Контакты</Link>
           </nav>
           <div className="flex shrink-0 items-center gap-2 sm:gap-3 lg:gap-4">
@@ -209,7 +214,12 @@ export function Header() {
               <Link href="/#features" onClick={close} className="py-3 text-[14px] font-medium text-white hover:text-[var(--color-brand-gold)]">Преимущества</Link>
               <Link href="/#process" onClick={close} className="py-3 text-[14px] font-medium text-white hover:text-[var(--color-brand-gold)]">Как работает</Link>
               <Link href="/#business" onClick={close} className="py-3 text-[14px] font-medium text-white hover:text-[var(--color-brand-gold)]">Для бизнеса</Link>
+              <Link href="/#quest" onClick={close} className="py-3 text-[14px] font-medium text-white hover:text-[var(--color-brand-gold)]">Вопросы</Link>
               <Link href="/oferta" onClick={close} className="py-3 text-[14px] font-medium text-white hover:text-[var(--color-brand-gold)]">Тарифы</Link>
+              <Link href="/pomoshch" onClick={close} className="py-3 text-[14px] font-medium text-white hover:text-[var(--color-brand-gold)]">Помощь</Link>
+              <Link href="/en" hrefLang="en" onClick={close} className="py-3 text-[14px] font-medium text-white hover:text-[var(--color-brand-gold)]">
+                EN
+              </Link>
               <Link href="/kontakty" onClick={close} className="py-3 text-[14px] font-medium text-white hover:text-[var(--color-brand-gold)]">Контакты</Link>
               <div className="mt-6 pt-6 border-t border-white/20 flex flex-col gap-3">
                 {user ? (

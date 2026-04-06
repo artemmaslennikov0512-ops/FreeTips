@@ -542,7 +542,7 @@ export default function AdminVerificationRequestsPage() {
           aria-modal="true"
           aria-labelledby="reject-modal-title"
         >
-          <div className="reject-modal-content flex w-full max-w-md flex-col items-center rounded-2xl border border-white/10 bg-[var(--color-navy)] p-6 text-center shadow-xl">
+          <div className="reject-modal-content cabinet-section-header flex w-full max-w-md flex-col items-center rounded-2xl border-0 p-6 text-center shadow-[var(--shadow-card)]">
             <h2 id="reject-modal-title" className="mb-4 w-full text-center text-lg font-semibold text-white">
               Отклонить заявку ({rejectModal.login})
             </h2>
@@ -553,7 +553,7 @@ export default function AdminVerificationRequestsPage() {
               value={rejectReason}
               onChange={(e) => setRejectReason(e.target.value)}
               placeholder="Например: Нечитаемое фото паспорта. Загрузите чёткое изображение главной страницы."
-              className="reject-modal-textarea mb-4 w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-brand-gold)]"
+              className="mb-4 w-full min-h-[120px] rounded-xl px-4 py-3 text-left focus:outline-none focus:ring-2 focus:ring-[var(--color-brand-gold)]/40"
               rows={4}
             />
             {rejectError && <p className="reject-modal-error-msg mb-2 w-full text-center text-sm text-red-400">{rejectError}</p>}

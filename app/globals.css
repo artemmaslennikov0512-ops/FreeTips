@@ -2458,40 +2458,9 @@ html:not([data-theme="dark"]) .admin-panel .admin-payout-status {
 }
 
 /*
- * Модалка «Отклонить заявку»: поле на тёмной карточке.
- * В светлой теме сайта .admin-panel textarea задаёт белый фон — перебиваем, иначе белый текст нечитаем.
+ * Модалки отклонения в админке: разметка .reject-modal-content + .cabinet-section-header (как карточки заявок).
+ * Отдельный фон/navу не задаём — иначе ломается стык со светлой/тёмной темой и стеклом админки.
  */
-html:not([data-theme="dark"]) .reject-modal-content .reject-modal-textarea {
-  background: rgba(0, 0, 0, 0.35) !important;
-  border-color: rgba(255, 255, 255, 0.2) !important;
-  color: #fff !important;
-  -webkit-text-fill-color: #ffffff !important;
-  caret-color: #ffffff !important;
-}
-.reject-modal-content .reject-modal-textarea {
-  color: #fff !important;
-}
-.reject-modal-content .reject-modal-textarea::placeholder {
-  color: rgba(255, 255, 255, 0.6) !important;
-}
-html:not([data-theme="dark"]) .reject-modal-content .reject-modal-textarea::placeholder {
-  color: rgba(255, 255, 255, 0.55) !important;
-  -webkit-text-fill-color: rgba(255, 255, 255, 0.55) !important;
-}
-
-/* Тёмная тема: модалка «Отклонить заявку» — тёмный фон и тёмное поле ввода (не светлый блок) */
-[data-theme="dark"] .reject-modal-content {
-  background: #0a192f !important;
-  border-color: rgba(255, 255, 255, 0.12) !important;
-}
-[data-theme="dark"] .reject-modal-content .reject-modal-textarea {
-  background: rgba(0, 0, 0, 0.35) !important;
-  border-color: rgba(255, 255, 255, 0.15) !important;
-  color: #e2e8f0 !important;
-}
-[data-theme="dark"] .reject-modal-content .reject-modal-textarea::placeholder {
-  color: rgba(226, 232, 240, 0.5) !important;
-}
 
 /* Светлая тема: блок «Оставить чаевые» (/pay) — тот же стиль */
 html:not([data-theme="dark"]) .pay-block {

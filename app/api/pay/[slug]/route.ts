@@ -39,7 +39,7 @@ import {
   resolvePayInitForSlug,
   type PaySlugEstablishment,
 } from "@/lib/pay-slug-resolve";
-import { routingModeForTipLink, TIP_ROUTING_EMPLOYEE_QR } from "@/lib/tip-routing";
+import { routingModeForTipLink, TIP_ROUTING_EMPLOYEE_QR, TIP_ROUTING_POOL_QR } from "@/lib/tip-routing";
 
 const DEMO_SLUG = resolveDemoPaySlug();
 
@@ -66,7 +66,12 @@ export async function GET(request: NextRequest, { params }: Params) {
     tipLink.employeeId,
   );
   const routingMode = routingModeForTipLink(tipLink, est);
-  const establishmentPayUi = !tipLink.employeeId || routingMode !== TIP_ROUTING_EMPLOYEE_QR;
+  /** Общая ссылка заведения: slug = uniqueSlug, в TipLink нет сотрудника. */
+  const establishmentPoolPayUi = !tipLink.employeeId && est != null;
+  /** Персональный QR сотрудника заведения. */
+  const employeePayUi = !!tipLink.employeeId;
+  /** Личная ссылка получателя (не сотрудник, не пул заведения) — к настройкам заведения не относится. */
+  const personalRecipientPayUi = !tipLink.employeeId && est == null;
 
   const brandingFromEstablishment = est
     ? {
@@ -84,12 +89,12 @@ export async function GET(request: NextRequest, { params }: Params) {
     : undefined;
 
   const estName = (est?.name ?? "").trim() || "Заведение";
-  let recipientName: string;
+  let recipientName = "Чаевые";
   let recipientPhotoUrl: string | undefined;
   let savingFor: string | undefined;
   let paymentUnavailableReason: string | undefined;
 
-  if (establishmentPayUi) {
+  if (establishmentPoolPayUi) {
     recipientName = `Чаевые — «${estName}»`;
     const logo = est?.logoUrl?.trim();
     recipientPhotoUrl =
@@ -97,10 +102,11 @@ export async function GET(request: NextRequest, { params }: Params) {
         ? logo
         : undefined;
     savingFor = undefined;
-  } else {
-    const fullName = tipLink.user.fullName?.trim() || "";
+  } else if (employeePayUi) {
+    const waiterProfile = tipLink.employee?.user;
+    const fullName = waiterProfile?.fullName?.trim() || "";
     const employeeName = tipLink.employee?.name?.trim() || "";
-    const login = tipLink.user.login || "";
+    const login = waiterProfile?.login || "";
     const firstNameFromFullName =
       fullName && fullName.length > 0
         ? (() => {
@@ -110,25 +116,51 @@ export async function GET(request: NextRequest, { params }: Params) {
         : "";
     const displayName = firstNameFromFullName || employeeName || login || "";
     recipientName = displayName ? `Официант, ${displayName}` : "Официант";
-    savingFor = tipLink.user.savingFor?.trim() || undefined;
+    savingFor = waiterProfile?.savingFor?.trim() || undefined;
     recipientPhotoUrl =
       tipLink.employee?.photoUrl && tipLink.employee?.id
         ? `${baseUrl.replace(/\/$/, "")}/api/establishment/employees/photo/${tipLink.employee.id}?type=avatar`
-        : tipLink.user.profilePhotoUrl
-          ? `${baseUrl.replace(/\/$/, "")}/api/profile/photo/${tipLink.user.id}`
+        : waiterProfile?.profilePhotoUrl && waiterProfile.id
+          ? `${baseUrl.replace(/\/$/, "")}/api/profile/photo/${waiterProfile.id}`
           : undefined;
-    if (!tipLink.employee?.userId) {
+    if (routingMode === TIP_ROUTING_EMPLOYEE_QR && !tipLink.employee?.userId) {
       paymentUnavailableReason =
         "Официант ещё не подключил личный кабинет — оплата на персональный счёт недоступна.";
     }
+    if (routingMode === TIP_ROUTING_POOL_QR && !est?.tipPoolUserId?.trim()) {
+      paymentUnavailableReason = "Пул чаевых заведения не настроен";
+    }
+  } else if (personalRecipientPayUi) {
+    const u = tipLink.user;
+    const fullName = u.fullName?.trim() || "";
+    const login = u.login || "";
+    const firstNameFromFullName =
+      fullName && fullName.length > 0
+        ? (() => {
+            const parts = fullName.split(/\s+/).filter(Boolean);
+            return parts.length >= 2 ? parts[1]! : parts[0] ?? fullName;
+          })()
+        : "";
+    const displayName = firstNameFromFullName || login || "";
+    recipientName = displayName ? `Чаевые — ${displayName}` : "Чаевые";
+    savingFor = u.savingFor?.trim() || undefined;
+    recipientPhotoUrl = u.profilePhotoUrl
+      ? `${baseUrl.replace(/\/$/, "")}/api/profile/photo/${u.id}`
+      : undefined;
+  }
+
+  if (establishmentPoolPayUi && (!est?.tipPoolUserId?.trim() || !est?.id)) {
+    paymentUnavailableReason = "Приём чаевых для этого заведения не настроен";
   }
 
   const slugNorm = slug.trim().toLowerCase();
   const slugBrandingOverride =
     PAY_PAGE_BRANDING_OVERRIDES[slug] ?? PAY_PAGE_BRANDING_OVERRIDES[slugNorm];
   let branding = mergePayPageBranding(brandingFromEstablishment, slugBrandingOverride);
+  const m5LoginSubjectLogin =
+    (tipLink.employee?.user?.login || tipLink.user.login || "").trim();
   const m5Login =
-    isCabinetM5CompetitionTheme(tipLink.user.login || "") &&
+    isCabinetM5CompetitionTheme(m5LoginSubjectLogin) &&
     !PAY_PAGE_SLUGS_SKIP_M5_LOGIN_BRANDING.has(slugNorm);
   if (m5Login) {
     branding = mergePayPageBranding(branding, PAY_PAGE_M5_COMPETITION_BRANDING);

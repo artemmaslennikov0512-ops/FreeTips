@@ -57,6 +57,17 @@ export async function loadTipLinkForPaySlug(slug: string) {
           photoUrl: true,
           establishmentId: true,
           establishment: { select: estBrandingSelect },
+          /** ЛК официанта; при POOL_QR у TipLink.user — пул, не человек */
+          user: {
+            select: {
+              id: true,
+              login: true,
+              fullName: true,
+              savingFor: true,
+              profilePhotoUrl: true,
+              isBlocked: true,
+            },
+          },
         },
       },
       user: {
@@ -107,13 +118,21 @@ export async function resolvePayInitForSlug(
   const poolId = est?.tipPoolUserId?.trim() || null;
 
   if (!tipLink.employeeId) {
-    if (!poolId || !est?.id) {
-      return { error: "Приём чаевых для этого заведения не настроен", status: 403 };
+    if (est?.id) {
+      if (!poolId) {
+        return { error: "Приём чаевых для этого заведения не настроен", status: 403 };
+      }
+      return {
+        paymentRecipientId: poolId,
+        tipSplit: null,
+        mode: TIP_ROUTING_POOL_QR,
+      };
     }
+    /** Личная ссылка /pay/{slug} без Employee и без uniqueSlug заведения — только получатель tipLink.userId. */
     return {
-      paymentRecipientId: poolId,
+      paymentRecipientId: tipLink.userId,
       tipSplit: null,
-      mode: TIP_ROUTING_POOL_QR,
+      mode: TIP_ROUTING_EMPLOYEE_QR,
     };
   }
 

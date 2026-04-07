@@ -272,7 +272,7 @@ export class PayginePaymentGateway implements PaymentGateway {
         amount,
         currency: CURRENCY_RUB,
         reference: idempotencyKey,
-        /** Описание заказа в ЛК Paygine = slug из ссылки /pay/{slug} */
+        /** Описание заказа в ЛК Paygine = код официанта из пути /pay/{код} */
         description: linkSlug.slice(0, 1000),
         fee: feeKop > 0 ? feeKop : undefined,
         url: successUrl,

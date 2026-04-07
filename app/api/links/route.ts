@@ -1,6 +1,6 @@
 /**
- * GET /api/links — список своих ссылок (в MVP одна).
- * POST /api/links — создание ссылки; если уже есть — возврат существующей.
+ * GET /api/links — список своих ссылок оплаты (в MVP одна).
+ * POST /api/links — создание ссылки; slug в ответе = код официанта в /pay/{slug}. Если ссылка уже есть — возврат существующей.
  * Требует: Authorization: Bearer <access_token>
  */
 
@@ -8,10 +8,18 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireAuthOrApiKey } from "@/lib/auth-or-api-key";
 import { db } from "@/lib/db";
 import { createLinkSchema } from "@/lib/validations";
-import { generateSlug } from "@/lib/generate-slug";
+import {
+  allocatePersonalTipLinkSlug,
+  WaiterQrIdentifierExhaustedError,
+} from "@/lib/waiter-qr-identifier";
 import { parseJsonWithLimit, MAX_BODY_SIZE_DEFAULT, jsonError, internalError } from "@/lib/api/helpers";
+import { Prisma } from "@prisma/client";
 
-const MAX_SLUG_RETRIES = 3;
+const AUTO_SLUG_CREATE_ATTEMPTS = 5;
+
+function isUniqueConstraintError(e: unknown): boolean {
+  return e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2002";
+}
 
 export async function GET(request: NextRequest) {
   const auth = await requireAuthOrApiKey(request);
@@ -44,35 +52,46 @@ export async function POST(request: NextRequest) {
   if (!parsed.ok) return parsed.response;
 
   const validated = createLinkSchema.safeParse(parsed.data);
-  let slug: string;
 
   if (validated.success && typeof validated.data.slug === "string") {
-    slug = validated.data.slug.toLowerCase().trim();
+    const slug = validated.data.slug.toLowerCase().trim();
     const conflict = await db.tipLink.findUnique({ where: { slug } });
     if (conflict) {
       return NextResponse.json(
-        { error: "Ссылка с таким slug уже существует" },
+        { error: "Такой код официанта уже занят" },
         { status: 409 },
       );
     }
-  } else if (validated.success) {
-    slug = generateSlug();
-    for (let i = 0; i < MAX_SLUG_RETRIES; i++) {
-      const conflict = await db.tipLink.findUnique({ where: { slug } });
-      if (!conflict) break;
-      if (i === MAX_SLUG_RETRIES - 1) {
-        return internalError("Не удалось сгенерировать уникальный slug");
-      }
-      slug = generateSlug();
-    }
-  } else {
-    return jsonError(400, "Неверные данные", validated.error.issues);
+    const link = await db.tipLink.create({
+      data: { userId, slug },
+      select: { id: true, slug: true, createdAt: true },
+    });
+    return NextResponse.json({ link }, { status: 201 });
   }
 
-  const link = await db.tipLink.create({
-    data: { userId, slug },
-    select: { id: true, slug: true, createdAt: true },
-  });
+  if (validated.success) {
+    for (let attempt = 0; attempt < AUTO_SLUG_CREATE_ATTEMPTS; attempt++) {
+      try {
+        const link = await db.$transaction(async (tx) => {
+          const slug = await allocatePersonalTipLinkSlug(tx);
+          return tx.tipLink.create({
+            data: { userId, slug },
+            select: { id: true, slug: true, createdAt: true },
+          });
+        });
+        return NextResponse.json({ link }, { status: 201 });
+      } catch (e) {
+        if (e instanceof WaiterQrIdentifierExhaustedError) {
+          return internalError(e.message);
+        }
+        if (isUniqueConstraintError(e) && attempt < AUTO_SLUG_CREATE_ATTEMPTS - 1) {
+          continue;
+        }
+        throw e;
+      }
+    }
+    return internalError("Не удалось создать ссылку");
+  }
 
-  return NextResponse.json({ link }, { status: 201 });
+  return jsonError(400, "Неверные данные", validated.error.issues);
 }

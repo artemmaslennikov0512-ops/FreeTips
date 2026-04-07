@@ -9,8 +9,8 @@ import { requireEstablishmentAdmin } from "@/lib/middleware/auth";
 import { db } from "@/lib/db";
 import { getBaseUrlFromRequest } from "@/lib/get-base-url";
 import { hashPassword } from "@/lib/auth/password";
-import { generateSlug } from "@/lib/generate-slug";
 import { parseJsonWithLimit, MAX_BODY_SIZE_AUTH, jsonError } from "@/lib/api/helpers";
+import { allocateWaiterQrIdentifier, WaiterQrIdentifierExhaustedError } from "@/lib/waiter-qr-identifier";
 import { z } from "zod";
 import { randomBytes } from "crypto";
 import { UserRole } from "@prisma/client";
@@ -21,27 +21,6 @@ const createEmployeeSchema = z.object({
   name: z.string().trim().min(1, "Укажите имя").max(255),
   position: z.string().trim().max(100).optional().default(""),
 });
-
-async function generateUniqueQrIdentifier(establishmentId: string): Promise<string> {
-  const est = await db.establishment.findUnique({
-    where: { id: establishmentId },
-    select: { uniqueSlug: true },
-  });
-  const reserved = new Set<string>();
-  const us = est?.uniqueSlug?.trim();
-  if (us) reserved.add(us);
-  for (let i = 0; i < 20; i++) {
-    const slug = generateSlug();
-    if (reserved.has(slug)) continue;
-    const [emp, link, slugEst] = await Promise.all([
-      db.employee.findUnique({ where: { qrCodeIdentifier: slug } }),
-      db.tipLink.findFirst({ where: { slug } }),
-      db.establishment.findUnique({ where: { uniqueSlug: slug }, select: { id: true } }),
-    ]);
-    if (!emp && !link && !slugEst) return slug;
-  }
-  throw new Error("Не удалось сгенерировать уникальный slug");
-}
 
 export async function GET(request: NextRequest) {
   const auth = await requireEstablishmentAdmin(request);
@@ -149,68 +128,77 @@ export async function POST(request: NextRequest) {
   }
 
   const { name, position } = parseResult.data;
-  const qrCodeIdentifier = await generateUniqueQrIdentifier(auth.establishmentId);
 
   let poolUserId = establishment.tipPoolUserId;
 
-  const employee = await db.$transaction(async (tx) => {
-    if (!poolUserId) {
-      const est = await tx.establishment.findUnique({
-        where: { id: auth.establishmentId },
-        select: { id: true },
-      });
-      if (est) {
-        const poolLogin = `pool-${est.id}`;
-        const existingPool = await tx.user.findUnique({
-          where: { login: poolLogin },
+  let employee;
+  try {
+    employee = await db.$transaction(async (tx) => {
+      if (!poolUserId) {
+        const est = await tx.establishment.findUnique({
+          where: { id: auth.establishmentId },
           select: { id: true },
         });
-        if (existingPool) {
-          poolUserId = existingPool.id;
-          await tx.establishment.update({
-            where: { id: auth.establishmentId },
-            data: { tipPoolUserId: existingPool.id },
+        if (est) {
+          const poolLogin = `pool-${est.id}`;
+          const existingPool = await tx.user.findUnique({
+            where: { login: poolLogin },
+            select: { id: true },
           });
-        } else {
-          const poolUser = await tx.user.create({
-            data: {
-              login: poolLogin,
-              passwordHash: await hashPassword(randomBytes(32).toString("hex")),
-              role: UserRole.RECIPIENT,
-            },
-          });
-          poolUserId = poolUser.id;
-          await tx.establishment.update({
-            where: { id: auth.establishmentId },
-            data: { tipPoolUserId: poolUser.id },
-          });
+          if (existingPool) {
+            poolUserId = existingPool.id;
+            await tx.establishment.update({
+              where: { id: auth.establishmentId },
+              data: { tipPoolUserId: existingPool.id },
+            });
+          } else {
+            const poolUser = await tx.user.create({
+              data: {
+                login: poolLogin,
+                passwordHash: await hashPassword(randomBytes(32).toString("hex")),
+                role: UserRole.RECIPIENT,
+              },
+            });
+            poolUserId = poolUser.id;
+            await tx.establishment.update({
+              where: { id: auth.establishmentId },
+              data: { tipPoolUserId: poolUser.id },
+            });
+          }
         }
       }
-    }
 
-    const emp = await tx.employee.create({
-      data: {
-        establishmentId: auth.establishmentId,
-        name,
-        position: position || null,
-        qrCodeIdentifier,
-      },
-    });
-    if (poolUserId) {
-      await tx.user.updateMany({
-        where: { id: poolUserId, paygineSdRef: null },
-        data: { paygineSdRef: getWaiterPaygineSdRef(poolUserId) },
-      });
-      await tx.tipLink.create({
+      const qrCodeIdentifier = await allocateWaiterQrIdentifier(tx);
+
+      const emp = await tx.employee.create({
         data: {
-          userId: poolUserId,
-          slug: qrCodeIdentifier,
-          employeeId: emp.id,
+          establishmentId: auth.establishmentId,
+          name,
+          position: position || null,
+          qrCodeIdentifier,
         },
       });
+      if (poolUserId) {
+        await tx.user.updateMany({
+          where: { id: poolUserId, paygineSdRef: null },
+          data: { paygineSdRef: getWaiterPaygineSdRef(poolUserId) },
+        });
+        await tx.tipLink.create({
+          data: {
+            userId: poolUserId,
+            slug: qrCodeIdentifier,
+            employeeId: emp.id,
+          },
+        });
+      }
+      return emp;
+    });
+  } catch (e) {
+    if (e instanceof WaiterQrIdentifierExhaustedError) {
+      return jsonError(409, e.message);
     }
-    return emp;
-  });
+    throw e;
+  }
 
   await syncTipLinksForEstablishment(auth.establishmentId);
 

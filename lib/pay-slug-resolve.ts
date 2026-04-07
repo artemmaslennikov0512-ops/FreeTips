@@ -42,6 +42,7 @@ export type PaySlugEstablishment = {
   borderOpacityPercent?: number | null;
 };
 
+/** Загрузка TipLink по коду официанта (сегмент URL /pay/{slug}). */
 export async function loadTipLinkForPaySlug(slug: string) {
   return db.tipLink.findUnique({
     where: { slug },
@@ -84,18 +85,41 @@ export async function loadTipLinkForPaySlug(slug: string) {
   });
 }
 
-/** Подтягивает заведение по uniqueSlug, если ссылка без сотрудника. */
-export async function establishmentForPaySlug(
+type PayTipLinkShape = Pick<
+  NonNullable<Awaited<ReturnType<typeof loadTipLinkForPaySlug>>>,
+  "employeeId" | "userId" | "employee"
+>;
+
+/**
+ * Заведение «привязано» к ссылке оплаты только в двух случаях:
+ * 1) QR сотрудника — из Employee.establishment (правила распределения и бренд только здесь).
+ * 2) Общий пул — slug = uniqueSlug заведения и владелец TipLink — пользователь-пул этого заведения.
+ *
+ * Личная ссылка получателя (без employeeId, userId ≠ пул) никогда не получает контекст заведения
+ * по одному только совпадению кода в URL — не показываются ошибки про настройки заведения.
+ */
+export async function establishmentBoundForPayTipLink(
   slug: string,
-  employeeEstablishment: PaySlugEstablishment | null | undefined,
-  employeeId: string | null,
-) {
-  if (employeeEstablishment) return employeeEstablishment;
-  if (employeeId) return null;
+  tipLink: PayTipLinkShape,
+): Promise<PaySlugEstablishment | null> {
+  const s = slug.trim();
+
+  if (tipLink.employeeId) {
+    const fromEmployee = tipLink.employee?.establishment as PaySlugEstablishment | undefined;
+    return fromEmployee ?? null;
+  }
+
   const est = await db.establishment.findUnique({
-    where: { uniqueSlug: slug },
+    where: { uniqueSlug: s },
     select: estBrandingSelect,
   });
+  if (!est?.id) return null;
+
+  const poolId = est.tipPoolUserId?.trim() ?? "";
+  if (!poolId || poolId !== tipLink.userId) {
+    return null;
+  }
+
   return est;
 }
 
@@ -109,11 +133,7 @@ export async function resolvePayInitForSlug(
   slug: string,
   tipLink: NonNullable<Awaited<ReturnType<typeof loadTipLinkForPaySlug>>>,
 ): Promise<PayInitResolution | { error: string; status: number }> {
-  const est = await establishmentForPaySlug(
-    slug,
-    tipLink.employee?.establishment as PaySlugEstablishment | undefined,
-    tipLink.employeeId,
-  );
+  const est = await establishmentBoundForPayTipLink(slug, tipLink);
   const mode = routingModeForTipLink(tipLink, est);
   const poolId = est?.tipPoolUserId?.trim() || null;
 

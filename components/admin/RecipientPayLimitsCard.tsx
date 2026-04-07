@@ -203,12 +203,11 @@ export function RecipientPayLimitsCard({ className = "" }: { className?: string 
 
   return (
     <div className={`${ADMIN_PANEL_CARD} w-full min-w-0 !text-left ${className}`}>
-      <h2 className="text-center font-[family:var(--font-playfair)] text-lg font-semibold text-white">
-        Лимиты для получателя чаевых
+      <h2 className="text-center font-[family:var(--font-playfair)] text-base font-semibold text-white">
+        Лимиты приёма чаевых
       </h2>
-      <p className="mt-2 text-center text-sm text-white/75">
-        Учитывается пользователь, на чей баланс уходит оплата по этой ссылке (официант или пул). Лимит
-        незавершённых оплат — только заказы в статусе ожидания оплаты в Paygine.
+      <p className="mt-1.5 text-center text-xs text-white/75">
+        Баланс получателя по ссылке (официант или пул). «Ожидающие» — только PENDING в Paygine.
       </p>
 
       {limitsMessage && (
@@ -220,16 +219,14 @@ export function RecipientPayLimitsCard({ className = "" }: { className?: string 
         </div>
       )}
 
-      <div className="mt-6 w-full min-w-0 space-y-5 px-0 sm:px-1">
+      <div className="mt-4 w-full min-w-0 space-y-3 px-0 sm:px-1">
         <div className="w-full min-w-0">
-          <label className="block text-sm font-medium text-white" htmlFor="recipient-max-daily-incoming">
-            Макс. сумма входящих за сутки (₽, МСК)
+          <label className="block text-xs font-medium text-white" htmlFor="recipient-max-daily-incoming">
+            Макс. входящих за сутки (₽, МСК)
           </label>
-          <p className="mt-1 text-xs leading-relaxed text-white/65">
-            Пусто — без лимита. За сутки МСК: уже зачислено сегодня (SUCCESS по времени зачисления) + незавершённые,
-            созданные сегодня, + новый платёж. Гостю при срабатывании этого лимита показывается нейтральное сообщение.
-            Месячный потолок поступлений — поле «месячный лимит поступлений (чаевые)» в карточке пользователя (UTC-месяц);
-            лимит вывода в месяц на него не влияет. Если не задан — месячный лимит поступлений не действует.
+          <p className="mt-0.5 text-[11px] leading-snug text-white/60">
+            Пусто = нет лимита. Счёт: зачислено сегодня + сегодняшние ожидающие + новый платёж. Месячный потолок — в
+            карточке пользователя.
           </p>
           <input
             id="recipient-max-daily-incoming"
@@ -245,13 +242,10 @@ export function RecipientPayLimitsCard({ className = "" }: { className?: string 
           />
         </div>
         <div className="w-full min-w-0">
-          <label className="block text-sm font-medium text-white" htmlFor="recipient-max-pending">
-            Одновременно незавершённых заказов не больше (шт.)
+          <label className="block text-xs font-medium text-white" htmlFor="recipient-max-pending">
+            Одновременно ожидающих оплат (шт.)
           </label>
-          <p className="mt-1 text-xs leading-relaxed text-white/65">
-            Пусто — без лимита. Все заказы в ожидании оплаты (PENDING) у этого получателя; как только
-            оплата прошла или заказ снят, слот освобождается.
-          </p>
+          <p className="mt-0.5 text-[11px] leading-snug text-white/60">Пусто = нет лимита. Слот освобождается после оплаты или отмены.</p>
           <input
             id="recipient-max-pending"
             type="text"
@@ -266,13 +260,11 @@ export function RecipientPayLimitsCard({ className = "" }: { className?: string 
           />
         </div>
         <div className="w-full min-w-0">
-          <label className="block text-sm font-medium text-white" htmlFor="recipient-pay-interval">
-            Минимальный интервал между созданием заказов (мин.)
+          <label className="block text-xs font-medium text-white" htmlFor="recipient-pay-interval">
+            Пауза между новыми оплатами (мин.)
           </label>
-          <p className="mt-1 text-xs leading-relaxed text-white/65">
-            Пусто — без паузы. Отсчёт от времени создания предыдущего заказа для этого же получателя
-            (включая уже оплаченные). Учитывайте: при интервале несколько гостей не смогут подряд
-            инициировать чаевые на одного официанта чаще указанного срока.
+          <p className="mt-0.5 text-[11px] leading-snug text-white/60">
+            Пусто = без паузы. От предыдущего создания заказа у этого получателя.
           </p>
           <input
             id="recipient-pay-interval"
@@ -288,13 +280,11 @@ export function RecipientPayLimitsCard({ className = "" }: { className?: string 
           />
         </div>
         <div className="w-full min-w-0">
-          <label className="block text-sm font-medium text-white" htmlFor="recipient-max-pay-inits-day">
-            Успешных зачислений за сутки не больше (шт., МСК)
+          <label className="block text-xs font-medium text-white" htmlFor="recipient-max-pay-inits-day">
+            Успешных зачислений за сутки (шт., МСК)
           </label>
-          <p className="mt-1 text-xs leading-relaxed text-white/65">
-            Пусто — без лимита. Считаются только успешные зачисления (SUCCESS по времени зачисления) для этого
-            получателя с полуночи до полуночи по Москве. Гостю на странице оплаты при достижении лимита показывается
-            нейтральное сообщение (внутренняя политика).
+          <p className="mt-0.5 text-[11px] leading-snug text-white/60">
+            Пусто = нет лимита. SUCCESS с 00:00 до 00:00 МСК по времени зачисления.
           </p>
           <input
             id="recipient-max-pay-inits-day"
@@ -310,7 +300,7 @@ export function RecipientPayLimitsCard({ className = "" }: { className?: string 
           />
         </div>
       </div>
-      <div className="mt-6 flex justify-center">
+      <div className="mt-4 flex justify-center">
         <button type="button" className={BTN_PRIMARY} disabled={savingLimits} onClick={saveRecipientLimits}>
           {savingLimits ? (
             <span className="inline-flex items-center gap-2">

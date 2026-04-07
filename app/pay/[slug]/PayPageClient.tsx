@@ -368,7 +368,7 @@ export default function PayPageClient() {
   if (loading) {
     return (
       <div className={`pay-page pay-page--cards${m5c} w-full`}>
-        <div className="mx-auto w-full max-w-md px-4 lg:max-w-2xl">
+        <div className="mx-auto max-w-md px-4">
           <LoadingSpinner message="Загрузка…" className="min-h-[60vh]" />
         </div>
       </div>
@@ -457,7 +457,7 @@ export default function PayPageClient() {
       className={`pay-page pay-page--cards flex min-h-screen w-full flex-col justify-center px-4 py-8${m5c}`}
       style={wrapperStyle}
     >
-      <div className="mx-auto w-full max-w-md lg:max-w-2xl">
+      <div className="mx-auto w-full max-w-md">
         {/* Основной блок со скруглёнными краями и отступами — внутри все карточки */}
         <div
           className="pay-page-outer-block rounded-2xl border-0 px-4 pt-5 pb-5 shadow-[var(--shadow-card)]"

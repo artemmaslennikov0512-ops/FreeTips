@@ -82,12 +82,12 @@ export const amountKopSchema = z
   .max(AMOUNT_KOP_MAX, "Сумма превышает допустимый лимит")
   .or(z.number().int().positive().max(Number(AMOUNT_KOP_MAX)).transform((n) => BigInt(n)));
 
-// Slug для ссылки: 3-50 символов, только латиница, цифры, дефисы, подчёркивания
+// Код в пути /pay/{slug} (тело поля `slug` в API): 3–50 символов, латиница, цифры, дефис, _
 export const slugSchema = z
   .string()
-  .min(3, "Slug должен быть не менее 3 символов")
-  .max(50, "Slug не должен превышать 50 символов")
-  .regex(/^[a-z0-9_-]+$/, "Slug может содержать только латиницу, цифры, дефисы и подчёркивания");
+  .min(3, "Код должен быть не менее 3 символов")
+  .max(50, "Код не должен превышать 50 символов")
+  .regex(/^[a-z0-9_-]+$/, "Код может содержать только латиницу, цифры, дефисы и подчёркивания");
 
 /** Опциональный UUID из браузера (localStorage) для метаданных сессии */
 const deviceClientIdSchema = z.preprocess(
@@ -162,7 +162,7 @@ export const forgotPasswordRequestSchema = z.object({
 
 // Создание ссылки
 export const createLinkSchema = z.object({
-  slug: slugSchema.optional(), // если не указан, генерируем автоматически
+  slug: slugSchema.optional(), // код официанта в URL; если не указан — генерируем автоматически
 });
 
 // Минимальная / максимальная сумма платежа (антифрод, лимит продукта)

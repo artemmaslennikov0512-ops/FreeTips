@@ -166,7 +166,7 @@ model PasswordResetToken {
 model TipLink {
   id         String   @id @default(cuid())
   userId     String
-  slug       String   @unique @db.VarChar(50) // уникальный идентификатор для URL
+  slug       String   @unique @db.VarChar(50) // код официанта в пути /pay/{slug} (уникален глобально)
   employeeId String?  @db.VarChar(64) // если ссылка привязана к сотруднику заведения (чаевые в пул)
   createdAt  DateTime @default(now())
 
@@ -180,6 +180,14 @@ model TipLink {
   @@index([slug])
   @@index([employeeId])
   @@map("tip_links")
+}
+
+/// Глобальный порядковый счётчик кодов официанта (одна строка id = global).
+model WaiterCodeSequence {
+  id            String @id @db.VarChar(32)
+  lastAllocated Int    @default(0)
+
+  @@map("waiter_code_sequence")
 }
 
 model Transaction {
@@ -347,7 +355,7 @@ model Establishment {
   phone             String?  @db.VarChar(50)
   logoUrl           String?  @db.VarChar(512)
   logoOpacityPercent Int?    // прозрачность лого 0–100, null = 100
-  uniqueSlug        String   @unique @db.VarChar(50) // для URL и QR (например momo-pizza)
+  uniqueSlug        String   @unique @db.VarChar(50) // код заведения в /pay/{uniqueSlug} для пула; новые — из глобальной последовательности NNN-NNN
   maxEmployeesCount Int?     // лимит сотрудников (null = без лимита); задаёт суперадмин
   tipPoolUserId     String?  @unique @db.VarChar(64) // пользователь-пул для приёма чаевых по QR сотрудников
   primaryColor      String?  @db.VarChar(20) // hex для White Label (например #c9a227)
@@ -397,7 +405,7 @@ model Employee {
   position         String?  @db.VarChar(100)
   coefficient      Decimal  @default(1) @db.Decimal(10, 2) // для распределения по коэффициентам
   isActive         Boolean  @default(true)
-  qrCodeIdentifier String   @unique @db.VarChar(50) // slug для страницы оплаты (QR)
+  qrCodeIdentifier String   @unique @db.VarChar(50) // код официанта (= TipLink.slug) для /pay и QR
   userId           String?  @unique @db.VarChar(64) // привязка к User после регистрации/инвайта
   photoUrl         String?  @db.VarChar(512) // путь к фото: страница оплаты и ЛК (рекомендуется ≥200×200 px)
   printCardPhotoUrl String? @db.VarChar(512) // путь к фото для печатной карточки QR (отдельное, рекомендуется ≥150×150 px)
@@ -406,7 +414,7 @@ model Employee {
 
   establishment      Establishment      @relation(fields: [establishmentId], references: [id], onDelete: Cascade)
   user               User?              @relation(fields: [userId], references: [id], onDelete: SetNull)
-  tipLinks           TipLink[]           // ссылки приёма чаевых (slug = qrCodeIdentifier), ведут в пул заведения
+  tipLinks           TipLink[]           // приём чаевых (TipLink.slug = qrCodeIdentifier), ведут в пул заведения
   registrationTokens RegistrationToken[] // токены для регистрации официанта (1 токен = 1 сотрудник)
   reviews            EmployeeReview[]
 

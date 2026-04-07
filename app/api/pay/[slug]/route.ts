@@ -1,7 +1,7 @@
 /**
- * GET /api/pay/[slug] — данные для страницы приёма чаевых (имя получателя).
+ * GET /api/pay/[slug] — данные для страницы приёма чаевых (slug = код официанта в URL).
  * POST /api/pay/[slug] — инициализация платежа через PaymentGateway (заглушка или провайдер).
- * Демо-slug из resolveDemoPaySlug() (config + NEXT_PUBLIC_DEMO_PAY_SLUG) — без записи в БД.
+ * Демо-код из resolveDemoPaySlug() (config + NEXT_PUBLIC_DEMO_PAY_SLUG) — без записи в БД.
  */
 
 import { NextRequest, NextResponse } from "next/server";
@@ -38,10 +38,9 @@ import { recipientCanAcceptIncomingTips } from "@/lib/payment-accept-policy";
 import { FRAUD_RULE, recordFraudSignal } from "@/lib/fraud-signals";
 import { observePayInitBurstForSlug } from "@/lib/fraud-velocity-observe";
 import {
-  establishmentForPaySlug,
+  establishmentBoundForPayTipLink,
   loadTipLinkForPaySlug,
   resolvePayInitForSlug,
-  type PaySlugEstablishment,
 } from "@/lib/pay-slug-resolve";
 import { routingModeForTipLink, TIP_ROUTING_EMPLOYEE_QR, TIP_ROUTING_POOL_QR } from "@/lib/tip-routing";
 
@@ -72,17 +71,13 @@ export async function GET(request: NextRequest, { params }: Params) {
 
   const baseUrl = getBaseUrlFromRequest(request);
 
-  const est = await establishmentForPaySlug(
-    slug,
-    tipLink.employee?.establishment as PaySlugEstablishment | null | undefined,
-    tipLink.employeeId,
-  );
+  const est = await establishmentBoundForPayTipLink(slug, tipLink);
   const routingMode = routingModeForTipLink(tipLink, est);
-  /** Общая ссылка заведения: slug = uniqueSlug, в TipLink нет сотрудника. */
+  /** Пул заведения: код = uniqueSlug и TipLink принадлежит пользователю-пулу. */
   const establishmentPoolPayUi = !tipLink.employeeId && est != null;
-  /** Персональный QR сотрудника заведения. */
+  /** QR сотрудника, привязанного к заведению. */
   const employeePayUi = !!tipLink.employeeId;
-  /** Личная ссылка получателя (не сотрудник, не пул заведения) — к настройкам заведения не относится. */
+  /** Личный код официанта без заведения — правила и ошибки заведения не применяются. */
   const personalRecipientPayUi = !tipLink.employeeId && est == null;
 
   const brandingFromEstablishment = est
@@ -165,17 +160,15 @@ export async function GET(request: NextRequest, { params }: Params) {
     paymentUnavailableReason = "Приём чаевых для этого заведения не настроен";
   }
 
-  if (
-    !paymentUnavailableReason &&
-    !tipLink.user.isBlocked &&
-    recipientCanAcceptIncomingTips(tipLink.userId, paymentSettings)
-  ) {
-    const resolvedForLimits = await resolvePayInitForSlug(slug, tipLink);
-    if (!("error" in resolvedForLimits)) {
+  if (!paymentUnavailableReason && !tipLink.user.isBlocked) {
+    const resolvedPay = await resolvePayInitForSlug(slug, tipLink);
+    if ("error" in resolvedPay) {
+      paymentUnavailableReason = resolvedPay.error;
+    } else if (recipientCanAcceptIncomingTips(tipLink.userId, paymentSettings)) {
       const limitReason = await evaluateRecipientPayLimitsForPayPage(
         {
-          recipientId: resolvedForLimits.paymentRecipientId,
-          tipSplit: resolvedForLimits.tipSplit,
+          recipientId: resolvedPay.paymentRecipientId,
+          tipSplit: resolvedPay.tipSplit,
           limits: platformRow,
         },
         { obscurePlatformDailyLimits: true },
@@ -234,7 +227,7 @@ export async function POST(request: NextRequest, { params }: Params) {
   const rateLimitSlug = await checkRateLimitByKey(slug, PAY_RATE_LIMIT_SLUG);
   if (!rateLimitSlug.allowed) {
     logSecurity("pay.init.rate_limit_slug", { requestId, ip, slug });
-    return rateLimit429Response(rateLimitSlug, "Слишком много запросов на эту ссылку. Попробуйте позже.");
+    return rateLimit429Response(rateLimitSlug, "Слишком много запросов по этому коду официанта. Попробуйте позже.");
   }
 
   if (!verifyCsrfFromRequest(request)) {

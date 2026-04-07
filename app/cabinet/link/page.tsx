@@ -130,7 +130,7 @@ export default function CabinetLinkPage() {
               <Link2 className="cabinet-link-empty-icon h-8 w-8 text-[var(--color-brand-gold)]" aria-hidden />
             </div>
             <p className="cabinet-link-empty-hint max-w-md text-base leading-relaxed text-[var(--color-text-secondary)]">
-              У вас ещё нет ссылки для приёма чаевых.
+              У вас ещё нет кода официанта и ссылки для приёма чаевых.
             </p>
             <button
               type="button"
@@ -139,7 +139,7 @@ export default function CabinetLinkPage() {
               className={`${CABINET_WAITER_BTN_INLINE} px-6 py-3 text-[15px]`}
             >
               {creating ? <Loader2 className="h-5 w-5 animate-spin" /> : null}
-              Создать ссылку
+              Получить код и ссылку
             </button>
           </div>
         </div>
@@ -147,10 +147,14 @@ export default function CabinetLinkPage() {
         <div className="grid gap-8 md:grid-cols-2">
           <div id="link-payment" className="cabinet-card rounded-xl border-0 bg-[var(--color-bg-sides)] p-6 shadow-[var(--shadow-subtle)] transition-all hover:shadow-[var(--shadow-medium)]">
             <h2 className="mb-4 text-center font-[family:var(--font-playfair)] text-xl font-semibold text-[var(--color-text)]">
-              Ссылка для оплаты
+              Код официанта и оплата
             </h2>
             <div className="rounded-xl bg-[var(--color-dark-gray)]/6 p-5">
-              <div className="mb-4 font-semibold text-[var(--color-text)]">Ваша ссылка для чаевых</div>
+              <div className="mb-2 font-semibold text-[var(--color-text)]">Код официанта</div>
+              <div className="cabinet-input-window mb-4 break-all rounded-lg border border-[var(--color-brand-gold)]/20 px-4 py-3 font-mono text-base font-semibold tracking-wide text-[var(--color-text)]">
+                {link.slug}
+              </div>
+              <div className="mb-2 text-sm font-semibold text-[var(--color-text)]">Ссылка для гостей</div>
               <div className="cabinet-input-window mb-4 break-all rounded-lg border border-[var(--color-brand-gold)]/20 px-4 py-3 font-mono text-sm text-[var(--color-text)]/90">
                 {linkUrl}
               </div>
@@ -161,7 +165,7 @@ export default function CabinetLinkPage() {
                   className={`${CABINET_WAITER_BTN_INLINE} px-5 py-2.5 text-[14px]`}
                 >
                   <Copy className="h-4 w-4" />
-                  {copied ? "Скопировано" : "Копировать ссылку"}
+                  {copied ? "Скопировано" : "Копировать ссылку для гостей"}
                 </button>
                 {qrDataUrl && (
                   <a

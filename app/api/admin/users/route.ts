@@ -1,5 +1,5 @@
 /**
- * GET /api/admin/users — список пользователей (поиск по login/email/slug).
+ * GET /api/admin/users — список пользователей (поиск по login/email/коду в /pay).
  * Query: lkActive=true|false — фильтр по присутствию в ЛК (lastSeenAt за окно LK_PRESENCE_WINDOW_MS).
  * Требует: Authorization: Bearer <access_token>
  * GET: роль SUPERADMIN

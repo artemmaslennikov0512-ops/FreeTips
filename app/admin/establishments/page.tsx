@@ -23,7 +23,12 @@ export default function AdminEstablishmentsPage() {
   const [showForm, setShowForm] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
-  const [createdLink, setCreatedLink] = useState<{ id: string; name: string; link: string } | null>(null);
+  const [createdLink, setCreatedLink] = useState<{
+    id: string;
+    name: string;
+    link: string;
+    waiterCode: string;
+  } | null>(null);
   const [linkByEstId, setLinkByEstId] = useState<Record<string, string>>({});
   const [loadingTokenId, setLoadingTokenId] = useState<string | null>(null);
 
@@ -31,7 +36,6 @@ export default function AdminEstablishmentsPage() {
     name: "",
     address: "",
     phone: "",
-    uniqueSlug: "",
     maxEmployeesCount: "" as string | number,
   });
 
@@ -82,7 +86,6 @@ export default function AdminEstablishmentsPage() {
           name: form.name.trim(),
           address: form.address.trim() || undefined,
           phone: form.phone.trim() || undefined,
-          uniqueSlug: form.uniqueSlug.trim().toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, ""),
           maxEmployeesCount: max,
         }),
       });
@@ -96,9 +99,10 @@ export default function AdminEstablishmentsPage() {
         id: data.establishment.id,
         name: data.establishment.name,
         link: data.registrationLink,
+        waiterCode: data.establishment.uniqueSlug,
       });
       setLinkByEstId((prev) => ({ ...prev, [data.establishment.id]: data.registrationLink }));
-      setForm({ name: "", address: "", phone: "", uniqueSlug: "", maxEmployeesCount: "" });
+      setForm({ name: "", address: "", phone: "", maxEmployeesCount: "" });
       setShowForm(false);
       fetchList();
     } catch {
@@ -159,7 +163,11 @@ export default function AdminEstablishmentsPage() {
       {createdLink && (
         <div className="cabinet-section-header rounded-2xl border-0 p-4">
           <p className="mb-2 font-medium text-[var(--color-on-dark)]">
-            Заведение «{createdLink.name}» создано. Ссылка для регистрации управляющего:
+            Заведение «{createdLink.name}» создано. Код заведения (общий пул /pay):{" "}
+            <span className="font-mono tracking-wide">{createdLink.waiterCode}</span>
+          </p>
+          <p className="mb-2 text-sm text-[var(--color-on-dark-muted)]">
+            Ссылка для регистрации управляющего:
           </p>
           <div className="flex flex-wrap items-center gap-2">
             <input
@@ -201,24 +209,9 @@ export default function AdminEstablishmentsPage() {
               className={ADMIN_PANEL_INPUT_FULL_WIDTH}
             />
           </div>
-          <div>
-            <label className="mb-1 block text-sm text-[var(--color-on-dark-muted)]">
-              Slug для URL * (латиница, цифры, дефис)
-            </label>
-            <input
-              type="text"
-              required
-              value={form.uniqueSlug}
-              onChange={(e) =>
-                setForm((f) => ({
-                  ...f,
-                  uniqueSlug: e.target.value.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, ""),
-                }))
-              }
-              placeholder="momo-pizza"
-              className={ADMIN_PANEL_INPUT_FULL_WIDTH}
-            />
-          </div>
+          <p className="text-sm text-[var(--color-on-dark-muted)]">
+            Код заведения для оплаты (/pay/…) и общего пула назначается автоматически из общей порядковой нумерации (как у официантов).
+          </p>
           <div>
             <label className="mb-1 block text-sm text-[var(--color-on-dark-muted)]">Адрес</label>
             <input
@@ -320,7 +313,7 @@ export default function AdminEstablishmentsPage() {
           <thead>
             <tr className="border-b border-white/15">
               <th className="whitespace-nowrap p-3 font-medium text-[var(--color-on-dark)]">Название</th>
-              <th className="whitespace-nowrap p-3 font-medium text-[var(--color-on-dark)]">Slug</th>
+              <th className="whitespace-nowrap p-3 font-medium text-[var(--color-on-dark)]">Код (пул)</th>
               <th className="whitespace-nowrap p-3 font-medium text-[var(--color-on-dark)]">Лимит сотрудников</th>
               <th className="whitespace-nowrap p-3 font-medium text-[var(--color-on-dark)]">Сотрудников</th>
               <th className="whitespace-nowrap p-3 font-medium text-[var(--color-on-dark)]">Управляющих</th>

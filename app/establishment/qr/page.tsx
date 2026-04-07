@@ -136,13 +136,13 @@ export default function EstablishmentQrPage() {
 
       <div className="cabinet-card rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden flex flex-col items-center text-center">
         <div className="border-b border-white/10 px-4 py-3 w-full">
-          <span className="text-sm font-medium text-white/90">Ссылка и QR для чаевых</span>
+          <span className="text-sm font-medium text-white/90">Код официанта, ссылка и QR</span>
         </div>
         <div className="p-6 space-y-4 w-full max-w-lg flex flex-col items-center">
           {examplePayLink ? (
             <>
               <div className="flex flex-col items-center w-full">
-                <label className="block text-xs text-white/70 mb-1">Пример ссылки (один из сотрудников)</label>
+                <label className="block text-xs text-white/70 mb-1">Пример: код и ссылка (один из сотрудников)</label>
                 <a
                   href={examplePayLink}
                   target="_blank"
@@ -154,7 +154,7 @@ export default function EstablishmentQrPage() {
               </div>
               {exampleQrUrl && (
                 <div className="flex flex-col items-center gap-2">
-                  <span className="text-xs text-white/70">QR-код этой ссылки</span>
+                  <span className="text-xs text-white/70">QR на страницу оплаты</span>
                   <Image
                     src={exampleQrUrl}
                     alt=""
@@ -168,7 +168,7 @@ export default function EstablishmentQrPage() {
             </>
           ) : (
             <p className="text-sm text-white/70">
-              Нет активных сотрудников. Добавьте в разделе «Команда» и включите статус «Активен» — здесь появится пример ссылки и QR.
+              Нет активных сотрудников. Добавьте в разделе «Команда» и включите статус «Активен» — здесь появится пример кода, ссылки и QR.
             </p>
           )}
 

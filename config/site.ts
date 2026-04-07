@@ -42,7 +42,7 @@ export const site = {
   cta: { label: "Войти", href: "/login" },
   register: { label: "Оставить заявку", href: "/zayavka" },
   /**
-   * Slug демо-страницы /pay/[slug], если не задан NEXT_PUBLIC_DEMO_PAY_SLUG.
+   * Демо-код в пути /pay/[slug], если не задан NEXT_PUBLIC_DEMO_PAY_SLUG.
    * Пустая строка в NEXT_PUBLIC_DEMO_PAY_SLUG отключает демо и кнопку «Демо-оплата».
    */
   demoPaySlug: "demo" as const,

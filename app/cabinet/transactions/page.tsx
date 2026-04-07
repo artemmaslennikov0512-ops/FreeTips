@@ -22,7 +22,7 @@ type Operation = {
   rejectionReason?: string | null;
   /** URL страницы приёма чаевых (офика). Только для type "tip". */
   paymentPageUrl?: string;
-  /** Уникальный идентификатор офика (slug). Только для type "tip". */
+  /** Код официанта в /pay/{код}. Только для type "tip". */
   linkSlug?: string;
   createdAt: string;
 };

@@ -1,7 +1,7 @@
 import { site } from "@/config/site";
 
 /**
- * Slug демо-страницы оплаты (/pay/[slug]).
+ * Демо-код официанта для страницы оплаты (/pay/[slug]).
  * `NEXT_PUBLIC_DEMO_PAY_SLUG=""` — отключить демо.
  * Иначе — значение из env или `site.demoPaySlug` (по умолчанию demo).
  */

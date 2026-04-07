@@ -319,7 +319,7 @@ export default function AdminUsersPage() {
     <div className="min-w-0 max-w-full">
       <div className="mb-6 flex flex-col items-center gap-1 text-center sm:mb-8">
         <h1 className="font-[family:var(--font-playfair)] text-xl font-semibold text-white sm:text-2xl">Пользователи</h1>
-        <p className="max-w-lg text-sm text-white/75">Поиск по логину, email и платёжной ссылке (slug).</p>
+        <p className="max-w-lg text-sm text-white/75">Поиск по логину, email и коду официанта в ссылке оплаты.</p>
       </div>
       {error && (
         <div className="mb-6 rounded-xl border-0 bg-[var(--color-light-gray)] px-4 py-3 text-sm text-[var(--color-text)]">
@@ -336,7 +336,7 @@ export default function AdminUsersPage() {
           <Search className="pointer-events-none absolute left-3 h-5 w-5 text-white/80" style={{top:"50%",transform:"translateY(-50%)"}} />
           <input
             type="text"
-            placeholder="Логин, email или slug"
+            placeholder="Логин, email или код оплаты"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="admin-users-search-input cabinet-section-header w-full rounded-xl border-0 py-2.5 pl-10 pr-4 text-sm text-white placeholder:text-white/70 focus:outline-none"
@@ -524,7 +524,7 @@ export default function AdminUsersPage() {
                 <LkPresenceCell user={user} />
               </div>
               <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
-                <span className="text-white/60">Slug</span>
+                <span className="text-white/60">Код оплаты</span>
                 <div className="min-w-0 space-y-1.5 font-mono text-xs">
                   {user.tipSlugs.length ? (
                     user.tipSlugs.map((slug) => (
@@ -532,7 +532,7 @@ export default function AdminUsersPage() {
                         key={slug}
                         href={`/pay/${encodeURIComponent(slug)}`}
                         className="block break-all text-[var(--color-brand-gold)] underline-offset-2 transition-opacity hover:underline hover:opacity-90"
-                        title={`Страница оплаты /pay/${slug}`}
+                        title={`Оплата /pay/${slug}`}
                       >
                         {slug}
                       </Link>
@@ -574,7 +574,7 @@ export default function AdminUsersPage() {
             <tr>
               <th className="whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">ID</th>
               <th className="whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">Логин</th>
-              <th className="whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">Slug</th>
+              <th className="whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">Код оплаты</th>
               <th
                 className="w-12 whitespace-nowrap px-3 py-3 text-left text-sm font-semibold text-[#0a192f]"
                 aria-label="Присутствие в личном кабинете"

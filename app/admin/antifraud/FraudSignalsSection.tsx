@@ -37,23 +37,23 @@ function ruleKindBadge(ruleCode: string): { label: string; className: string; ti
       label: "Вход",
       className:
         "border border-amber-400/45 bg-amber-500/25 text-amber-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]",
-      title: "Попытка входа в аккаунт, без движения средств по счёту получателя",
+      title: "Вход в аккаунт",
     };
   }
   if (ruleCode.startsWith("PAYOUT_")) {
     return {
-      label: "− Списание",
+      label: "− Вывод",
       className:
         "border border-orange-400/50 bg-orange-600/30 text-orange-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]",
-      title: "Исходящая операция: заявка на вывод средств получателем",
+      title: "Заявка на вывод",
     };
   }
   if (ruleCode.startsWith("PAY_")) {
     return {
-      label: "+ Пополнение",
+      label: "+ Оплата",
       className:
         "border border-emerald-400/50 bg-emerald-600/28 text-emerald-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]",
-      title: "Входящий платёж: инициализация или успешная оплата в пользу получателя",
+      title: "Оплата в пользу получателя",
     };
   }
   if (ruleCode.startsWith("ACCOUNT_")) {
@@ -61,13 +61,13 @@ function ruleKindBadge(ruleCode: string): { label: string; className: string; ti
       label: "Аккаунт",
       className:
         "border border-violet-400/40 bg-violet-500/22 text-violet-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]",
-      title: "Событие уровня аккаунта (без привязки к пополнению или выводу)",
+      title: "Событие аккаунта",
     };
   }
   return {
     label: "Другое",
     className: "border border-white/25 bg-white/10 text-white/85 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]",
-    title: "Прочий сигнал правила",
+    title: "Прочее",
   };
 }
 
@@ -149,17 +149,17 @@ export function FraudSignalsSection() {
   };
 
   return (
-    <section className="cabinet-section-header mb-6 rounded-2xl border-0 p-4 sm:p-6">
-      <div className="fraud-signals-panel antifraud-inner cabinet-block-inner min-w-0 rounded-xl border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/85 p-4 sm:p-5">
-        <div className="mb-4 flex flex-col items-center gap-3 text-center">
-          <h2 className="fraud-signals-panel-title text-base font-semibold">Подозрительная активность</h2>
+    <section className="cabinet-section-header rounded-2xl border-0 p-4 sm:p-6">
+      <div className="fraud-signals-panel antifraud-inner cabinet-block-inner min-w-0 rounded-xl border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/85 p-3 sm:p-4">
+        <div className="mb-3 flex flex-col items-center gap-2 text-center sm:flex-row sm:justify-center sm:gap-4">
+          <h2 className="fraud-signals-panel-title text-sm font-semibold">Подозрительная активность</h2>
           <button
             type="button"
             onClick={() => void load()}
             disabled={loading}
-            className={`${ADMIN_BTN} ${ADMIN_BTN_PRIMARY} gap-2 px-4 py-2.5 text-sm disabled:opacity-50`}
+            className={`${ADMIN_BTN} ${ADMIN_BTN_PRIMARY} gap-1.5 px-3 py-2 text-xs disabled:opacity-50`}
           >
-            <RefreshCw className={`h-4 w-4 shrink-0 ${loading ? "animate-spin" : ""}`} aria-hidden />
+            <RefreshCw className={`h-3.5 w-3.5 shrink-0 ${loading ? "animate-spin" : ""}`} aria-hidden />
             Обновить
           </button>
         </div>
@@ -170,27 +170,27 @@ export function FraudSignalsSection() {
           </p>
         )}
 
-        {loading && !data && <p className="text-center text-sm text-white/60">Загрузка…</p>}
+        {loading && !data && <p className="text-center text-xs text-white/60">Загрузка…</p>}
 
         {data && data.groups.length === 0 && !loading && (
           <div
-            className="flex flex-col items-center justify-center gap-2 rounded-xl border border-white/10 bg-black/15 px-4 py-8 text-center"
+            className="flex flex-col items-center justify-center gap-2 rounded-lg border border-white/10 bg-black/15 px-3 py-6 text-center"
             role="status"
           >
-            <ShieldAlert className="h-10 w-10 text-emerald-400/90" aria-hidden />
-            <p className="text-sm text-white/75">Записей пока нет — сигналы появятся при срабатывании правил.</p>
+            <ShieldAlert className="h-8 w-8 text-emerald-400/90" aria-hidden />
+            <p className="text-xs text-white/75">Пока пусто — сигналы появятся при срабатывании правил.</p>
           </div>
         )}
 
         {data && data.groups.length > 0 && (
           <>
-            <ul className="min-w-0 space-y-3 lg:hidden" aria-label="Сигналы по пользователям">
+            <ul className="min-w-0 space-y-2 lg:hidden" aria-label="Сигналы по пользователям">
               {data.groups.map((g) => (
                 <li
                   key={g.userId}
-                  className="min-w-0 rounded-xl border border-white/12 bg-black/25 p-4 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]"
+                  className="min-w-0 rounded-lg border border-white/12 bg-black/25 p-3 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]"
                 >
-                  <div className="mb-3 flex flex-wrap items-start justify-between gap-2">
+                  <div className="mb-2 flex flex-wrap items-start justify-between gap-2">
                     <div className="min-w-0 flex-1">
                       <p className="text-[11px] font-medium uppercase tracking-wide text-white/50">Пользователь</p>
                       <p className="break-words font-semibold text-white">{g.login}</p>
@@ -211,16 +211,13 @@ export function FraudSignalsSection() {
                       )}
                     </div>
                   </div>
-                  <div className="mb-3 border-t border-white/10 pt-3">
-                    <p className="text-[11px] font-medium uppercase tracking-wide text-white/50">Последний сигнал</p>
-                    <p className="text-sm text-white/85">{formatDate(g.lastSignalAt, { includeYear: true })}</p>
+                  <div className="mb-2 border-t border-white/10 pt-2">
+                    <p className="text-[10px] font-medium uppercase tracking-wide text-white/50">Последний сигнал</p>
+                    <p className="text-xs text-white/85">{formatDate(g.lastSignalAt, { includeYear: true })}</p>
                   </div>
-                  <div className="mb-3 border-t border-white/10 pt-3">
-                    <p className="mb-0.5 text-[11px] font-medium uppercase tracking-wide text-white/50">Причины</p>
-                    <p className="mb-2 text-[10px] leading-snug text-white/40">
-                      + пополнение (оплата в пользу получателя), − списание (вывод)
-                    </p>
-                    <ul className="m-0 list-none space-y-3 p-0">
+                  <div className="mb-2 border-t border-white/10 pt-2">
+                    <p className="mb-1 text-[10px] font-medium uppercase tracking-wide text-white/50">Сигналы</p>
+                    <ul className="m-0 list-none space-y-2 p-0">
                       {g.signals.map((s) => {
                         const badge = ruleKindBadge(s.ruleCode);
                         return (
@@ -265,70 +262,65 @@ export function FraudSignalsSection() {
               ))}
             </ul>
 
-            <div className="admin-fraud-signals-table-wrap hidden max-h-[min(70vh,720px)] overflow-auto rounded-lg lg:block">
-              <table className="admin-fraud-signals-table w-full min-w-[680px] border-collapse text-center text-sm">
+            <div className="admin-fraud-signals-table-wrap hidden max-h-[min(65vh,560px)] overflow-auto rounded-lg lg:block">
+              <table className="admin-fraud-signals-table w-full min-w-[520px] border-collapse text-center text-xs">
                 <thead>
-                  <tr className="text-xs uppercase tracking-wide">
-                    <th className="px-3 py-2.5 font-medium">Пользователь</th>
-                    <th className="px-3 py-2.5 font-medium">Статус</th>
-                    <th className="px-3 py-2.5 font-medium whitespace-nowrap">Последний сигнал</th>
-                    <th className="min-w-[12rem] px-3 py-2.5 font-medium">
-                      <span className="block">Причины (последние)</span>
-                      <span className="mt-0.5 block text-[10px] font-normal normal-case tracking-normal text-white/45">
-                        + пополнение · − списание
-                      </span>
-                    </th>
-                    <th className="fraud-signals-action-cell px-3 py-2.5 font-medium">Действия</th>
+                  <tr className="text-[10px] uppercase tracking-wide text-white/70">
+                    <th className="px-2 py-1.5 font-medium">Пользователь</th>
+                    <th className="px-2 py-1.5 font-medium">Статус</th>
+                    <th className="px-2 py-1.5 font-medium whitespace-nowrap">Последний</th>
+                    <th className="min-w-[9rem] px-2 py-1.5 font-medium normal-case tracking-normal">Сигналы</th>
+                    <th className="fraud-signals-action-cell px-2 py-1.5 font-medium">Действия</th>
                   </tr>
                 </thead>
                 <tbody>
                   {data.groups.map((g) => (
                     <tr key={g.userId}>
-                      <td className="px-3 py-3">
+                      <td className="px-2 py-1.5 align-top">
                         <div className="font-medium text-white">{g.login}</div>
-                        {g.email && <div className="text-xs text-white/55">{g.email}</div>}
-                        <div className="text-xs text-white/45">{g.role}</div>
+                        {g.email && <div className="text-[11px] text-white/55">{g.email}</div>}
+                        <div className="text-[11px] text-white/45">{g.role}</div>
                       </td>
-                      <td className="px-3 py-3">
+                      <td className="px-2 py-1.5 align-top">
                         {g.isBlocked ? (
-                          <span className="inline-flex rounded-full border border-rose-400/35 bg-rose-500/20 px-2.5 py-0.5 text-xs font-medium text-rose-100">
+                          <span className="inline-flex rounded-full border border-rose-400/35 bg-rose-500/20 px-2 py-0.5 text-[10px] font-medium text-rose-100">
                             Заблокирован
                           </span>
                         ) : (
-                          <span className="inline-flex rounded-full border border-emerald-400/35 bg-emerald-500/15 px-2.5 py-0.5 text-xs font-medium text-emerald-100">
+                          <span className="inline-flex rounded-full border border-emerald-400/35 bg-emerald-500/15 px-2 py-0.5 text-[10px] font-medium text-emerald-100">
                             Активен
                           </span>
                         )}
                       </td>
-                      <td className="whitespace-nowrap px-3 py-3 text-xs text-white/80">
+                      <td className="whitespace-nowrap px-2 py-1.5 align-top text-[11px] text-white/80">
                         {formatDate(g.lastSignalAt, { includeYear: true })}
                       </td>
-                      <td className="px-3 py-3">
-                        <ul className="m-0 mx-auto flex max-w-xl list-none flex-col items-center space-y-2 p-0 text-center">
+                      <td className="px-2 py-1.5 align-top">
+                        <ul className="m-0 mx-auto flex max-w-md list-none flex-col items-center space-y-1 p-0 text-center">
                           {g.signals.map((s) => {
                             const badge = ruleKindBadge(s.ruleCode);
                             return (
                               <li
                                 key={s.id}
-                                className="flex w-full max-w-xl flex-col items-center gap-1 sm:flex-row sm:justify-center sm:gap-2"
+                                className="flex w-full max-w-md flex-col items-center gap-0.5 sm:flex-row sm:justify-center sm:gap-1.5"
                               >
                                 <span
                                   title={badge.title}
-                                  className={`inline-flex shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-wide ${badge.className}`}
+                                  className={`inline-flex shrink-0 rounded-full px-1.5 py-px text-[9px] font-semibold tracking-wide ${badge.className}`}
                                 >
                                   {badge.label}
                                 </span>
-                                <span className="min-w-0 text-center text-xs leading-snug">
+                                <span className="min-w-0 text-center text-[11px] leading-snug">
                                   <span className="text-white/45">{formatDate(s.createdAt, { includeYear: true })} — </span>
                                   <span className="text-white/[0.92]">{s.message}</span>
-                                  <span className="ml-1 font-mono text-[10px] text-white/35">({s.ruleCode})</span>
+                                  <span className="ml-0.5 font-mono text-[9px] text-white/35">({s.ruleCode})</span>
                                 </span>
                               </li>
                             );
                           })}
                         </ul>
                       </td>
-                      <td className="fraud-signals-action-cell px-3 py-3">
+                      <td className="fraud-signals-action-cell px-2 py-1.5 align-top">
                         <div className="flex flex-col items-center gap-2">
                           {canShowBlock(g.role, g.isBlocked) && (
                             <button

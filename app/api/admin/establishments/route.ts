@@ -19,17 +19,13 @@ import { z } from "zod";
 import { randomBytes } from "crypto";
 import { UserRole } from "@prisma/client";
 import { getWaiterPaygineSdRef } from "@/lib/payment/paygine-sd-ref";
+import { allocateNextGlobalWaiterCode, WaiterQrIdentifierExhaustedError } from "@/lib/waiter-qr-identifier";
+import { syncTipLinksForEstablishment } from "@/lib/tip-routing";
 
 const createEstablishmentSchema = z.object({
   name: z.string().trim().min(1, "Укажите название").max(255),
   address: z.string().trim().max(2000).optional().default(""),
   phone: z.string().trim().max(50).optional().default(""),
-  uniqueSlug: z
-    .string()
-    .trim()
-    .min(1, "Укажите slug для URL")
-    .max(50)
-    .regex(/^[a-z0-9-]+$/, "Только латиница в нижнем регистре, цифры и дефис"),
   maxEmployeesCount: z.number().int().min(0).nullable().optional(),
 });
 
@@ -79,15 +75,7 @@ export async function POST(request: NextRequest) {
     return jsonError(400, msg);
   }
 
-  const { name, address, phone, uniqueSlug, maxEmployeesCount } = parseResult.data;
-
-  const existing = await db.establishment.findUnique({ where: { uniqueSlug } });
-  if (existing) {
-    return NextResponse.json(
-      { error: "Заведение с таким slug уже существует" },
-      { status: 409 },
-    );
-  }
+  const { name, address, phone, maxEmployeesCount } = parseResult.data;
 
   const token = generateRegistrationToken();
   const tokenHash = hashRegistrationToken(token);
@@ -97,52 +85,58 @@ export async function POST(request: NextRequest) {
   let establishment;
   try {
     establishment = await db.$transaction(async (tx) => {
-    const est = await tx.establishment.create({
-      data: {
-        name,
-        address: address || null,
-        phone: phone || null,
-        uniqueSlug,
-        maxEmployeesCount: maxEmployeesCount ?? null,
-      },
+      const uniqueSlug = await allocateNextGlobalWaiterCode(tx);
+      const est = await tx.establishment.create({
+        data: {
+          name,
+          address: address || null,
+          phone: phone || null,
+          uniqueSlug,
+          maxEmployeesCount: maxEmployeesCount ?? null,
+        },
+      });
+      const poolLogin = `pool-${est.id}`;
+      const poolPasswordHash = await hashPassword(randomBytes(32).toString("hex"));
+      const poolUser = await tx.user.create({
+        data: {
+          login: poolLogin,
+          passwordHash: poolPasswordHash,
+          role: UserRole.RECIPIENT,
+        },
+      });
+      await tx.user.update({
+        where: { id: poolUser.id },
+        data: { paygineSdRef: getWaiterPaygineSdRef(poolUser.id) },
+      });
+      await tx.establishment.update({
+        where: { id: est.id },
+        data: { tipPoolUserId: poolUser.id },
+      });
+      await tx.registrationToken.create({
+        data: {
+          tokenHash,
+          createdById: auth.user.userId,
+          expiresAt,
+          establishmentId: est.id,
+        },
+      });
+      return { ...est, tipPoolUserId: poolUser.id };
     });
-    const poolLogin = `pool-${est.id}`;
-    const poolPasswordHash = await hashPassword(randomBytes(32).toString("hex"));
-    const poolUser = await tx.user.create({
-      data: {
-        login: poolLogin,
-        passwordHash: poolPasswordHash,
-        role: UserRole.RECIPIENT,
-      },
-    });
-    await tx.user.update({
-      where: { id: poolUser.id },
-      data: { paygineSdRef: getWaiterPaygineSdRef(poolUser.id) },
-    });
-    await tx.establishment.update({
-      where: { id: est.id },
-      data: { tipPoolUserId: poolUser.id },
-    });
-    await tx.registrationToken.create({
-      data: {
-        tokenHash,
-        createdById: auth.user.userId,
-        expiresAt,
-        establishmentId: est.id,
-      },
-    });
-    return { ...est, tipPoolUserId: poolUser.id };
-  });
   } catch (err: unknown) {
+    if (err instanceof WaiterQrIdentifierExhaustedError) {
+      return jsonError(503, err.message);
+    }
     const code = (err as { code?: string })?.code;
     if (code === "P2002") {
       return NextResponse.json(
-        { error: "Заведение с таким slug уже существует" },
+        { error: "Конфликт уникальности при создании заведения" },
         { status: 409 },
       );
     }
     throw err;
   }
+
+  await syncTipLinksForEstablishment(establishment.id);
 
   const link = `${baseUrl}/register?token=${encodeURIComponent(token)}`;
 

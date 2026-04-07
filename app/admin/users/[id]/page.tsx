@@ -1278,7 +1278,7 @@ export default function AdminUserDetailsPage() {
                   <p className="mt-1 truncate text-sm text-white/80">
                     {tx.paymentPageUrl ? (
                       <a href={tx.paymentPageUrl} target="_blank" rel="noopener noreferrer" className="text-[var(--color-brand-gold)] hover:underline">
-                        {tx.linkSlug ?? "Страница"}
+                        {tx.linkSlug ?? "Оплата"}
                       </a>
                     ) : (
                       tx.linkSlug ?? "—"
@@ -1295,7 +1295,7 @@ export default function AdminUserDetailsPage() {
                     <th className="whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-white">ID</th>
                     <th className="whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-white">Сумма</th>
                     <th className="whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-white">Статус</th>
-                    <th className="whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-white">Офик / страница</th>
+                    <th className="whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-white">Код официанта</th>
                     <th className="whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-white">Дата</th>
                   </tr>
                 </thead>

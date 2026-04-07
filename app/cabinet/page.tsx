@@ -23,7 +23,7 @@ function cabinetLimitLabelTitle(pct: number, label: string): string | undefined 
 }
 
 const QUICK_ACTIONS = [
-  { href: "/cabinet/link", icon: Link2, title: "Ссылка и QR", desc: "Скопировать ссылку для чаевых" },
+  { href: "/cabinet/link", icon: Link2, title: "Код и QR", desc: "Код официанта и ссылка для чаевых" },
   { href: "/cabinet/transactions", icon: List, title: "История операций и вывод средств", desc: "Все поступления, транзакции и вывод" },
   { href: "#api-key", icon: Key, title: "API ключ", desc: "Для интеграции с приложением" },
   { href: "/cabinet/settings", icon: Settings, title: "Настройки профиля", desc: "Редактировать данные и пароль" },
@@ -54,6 +54,7 @@ export default function CabinetDashboardPage() {
   const [incomingMonthReservedSumKop, setIncomingMonthReservedSumKop] = useState<number>(0);
   const [error, setError] = useState<string | null>(null);
   const [tipLink, setTipLink] = useState<string | null>(null);
+  const [tipWaiterCode, setTipWaiterCode] = useState<string | null>(null);
   const [linkCopied, setLinkCopied] = useState(false);
   const [verificationStatus, setVerificationStatus] = useState<string | null>(null);
   const [savingFor, setSavingFor] = useState<string | null>(null);
@@ -128,7 +129,12 @@ export default function CabinetDashboardPage() {
       if (linksRes.ok) {
         const linksData = (await linksRes.json()) as { links: { slug: string }[] };
         if (linksData.links?.length > 0) {
-          setTipLink(`${getBaseUrl()}/pay/${linksData.links[0].slug}`);
+          const code = linksData.links[0].slug;
+          setTipWaiterCode(code);
+          setTipLink(`${getBaseUrl()}/pay/${code}`);
+        } else {
+          setTipWaiterCode(null);
+          setTipLink(null);
         }
       }
     } catch {
@@ -531,8 +537,14 @@ export default function CabinetDashboardPage() {
             {tipLink && (
               <div className="cabinet-block-inner mb-6 rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 p-4">
                 <div className="mb-2 text-sm font-semibold text-[var(--color-text)]">
-                  Ваша ссылка для чаевых
+                  Код официанта
                 </div>
+                {tipWaiterCode ? (
+                  <div className="cabinet-input-window mb-3 min-w-0 max-w-full break-all rounded-lg bg-[var(--color-bg-sides)] px-3 py-2 font-mono text-sm font-semibold tracking-wide text-[var(--color-text)]">
+                    {tipWaiterCode}
+                  </div>
+                ) : null}
+                <div className="mb-1 text-xs font-medium text-[var(--color-text)]/80">Ссылка для гостей</div>
                 <div className="cabinet-input-window mb-3 min-w-0 max-w-full break-all rounded-lg bg-[var(--color-bg-sides)] px-3 py-2 font-mono text-xs text-[var(--color-text)]/90">
                   {tipLink}
                 </div>

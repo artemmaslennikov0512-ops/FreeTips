@@ -921,7 +921,7 @@ export default function EstablishmentBrandPage() {
                   {examplePaySlug ? (
                     <>
                       <div>
-                        <p className="text-xs text-white/70 mb-1">Пример ссылки для оплаты</p>
+                        <p className="text-xs text-white/70 mb-1">Пример: код официанта и ссылка</p>
                         <a
                           href={`${getBaseUrl()}/pay/${examplePaySlug}`}
                           target="_blank"
@@ -933,7 +933,7 @@ export default function EstablishmentBrandPage() {
                       </div>
                       {examplePayQrUrl && (
                         <div className="flex flex-col items-center gap-1">
-                          <p className="text-xs text-white/70">QR-код ссылки</p>
+                          <p className="text-xs text-white/70">QR на страницу оплаты</p>
                           <Image
                             src={examplePayQrUrl}
                             alt=""
@@ -946,7 +946,7 @@ export default function EstablishmentBrandPage() {
                       )}
                     </>
                   ) : (
-                    <p className="text-xs text-white/60">Добавьте сотрудников в «Команда» — появится пример ссылки и QR.</p>
+                    <p className="text-xs text-white/60">Добавьте сотрудников в «Команда» — появится пример кода, ссылки и QR.</p>
                   )}
                   <div className="flex flex-wrap gap-2 justify-center">
                     <button

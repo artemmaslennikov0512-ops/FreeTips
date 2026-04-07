@@ -83,10 +83,15 @@ export async function GET(request: NextRequest) {
         OR: [
           { payoutMonthlyLimitCount: { not: null } },
           { payoutMonthlyLimitKop: { not: null } },
+          { incomingMonthlyLimitKop: { not: null } },
         ],
       },
       orderBy: { id: "asc" },
-      select: { payoutMonthlyLimitCount: true, payoutMonthlyLimitKop: true },
+      select: {
+        payoutMonthlyLimitCount: true,
+        payoutMonthlyLimitKop: true,
+        incomingMonthlyLimitKop: true,
+      },
     }),
     db.user.findFirst({
       where: { role: { not: "SUPERADMIN" } },
@@ -120,6 +125,12 @@ export async function GET(request: NextRequest) {
         ? Number(defaults.payoutMonthlyLimitKop) / 100
         : sampleMonthlyLimitsUser?.payoutMonthlyLimitKop != null
           ? Number(sampleMonthlyLimitsUser.payoutMonthlyLimitKop) / 100
+          : null,
+    defaultIncomingMonthlyLimitKop:
+      defaults?.incomingMonthlyLimitKop != null
+        ? Number(defaults.incomingMonthlyLimitKop) / 100
+        : sampleMonthlyLimitsUser?.incomingMonthlyLimitKop != null
+          ? Number(sampleMonthlyLimitsUser.incomingMonthlyLimitKop) / 100
           : null,
     defaultAutoConfirmEnabled: defaults?.autoConfirmPayouts ?? sampleAutoConfirmUser?.autoConfirmPayouts ?? false,
     defaultAutoConfirmThresholdKop:

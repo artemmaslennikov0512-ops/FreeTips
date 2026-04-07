@@ -18,6 +18,7 @@ const updateUserSchema = z.object({
   payoutDailyLimitKop: z.number().int().min(0).nullable().optional(),
   payoutMonthlyLimitCount: z.number().int().min(0).max(3000).nullable().optional(),
   payoutMonthlyLimitKop: z.number().int().min(0).nullable().optional(),
+  incomingMonthlyLimitKop: z.number().int().min(0).nullable().optional(),
   autoConfirmPayouts: z.boolean().optional(),
   autoConfirmPayoutThresholdKop: z.number().int().min(0).nullable().optional(),
 });
@@ -39,6 +40,7 @@ const USER_SELECT = {
   payoutDailyLimitKop: true,
   payoutMonthlyLimitCount: true,
   payoutMonthlyLimitKop: true,
+  incomingMonthlyLimitKop: true,
   autoConfirmPayouts: true,
   autoConfirmPayoutThresholdKop: true,
   createdAt: true,
@@ -88,6 +90,7 @@ function serializeUser(user: {
   payoutDailyLimitKop: bigint | null;
   payoutMonthlyLimitCount: number | null;
   payoutMonthlyLimitKop: bigint | null;
+  incomingMonthlyLimitKop: bigint | null;
   autoConfirmPayouts: boolean;
   autoConfirmPayoutThresholdKop: bigint | null;
   createdAt: Date;
@@ -113,6 +116,7 @@ function serializeUser(user: {
     payoutDailyLimitKop: user.payoutDailyLimitKop != null ? Number(user.payoutDailyLimitKop) : null,
     payoutMonthlyLimitCount: user.payoutMonthlyLimitCount,
     payoutMonthlyLimitKop: user.payoutMonthlyLimitKop != null ? Number(user.payoutMonthlyLimitKop) : null,
+    incomingMonthlyLimitKop: user.incomingMonthlyLimitKop != null ? Number(user.incomingMonthlyLimitKop) : null,
     autoConfirmPayouts: user.autoConfirmPayouts,
     autoConfirmPayoutThresholdKop: user.autoConfirmPayoutThresholdKop != null ? Number(user.autoConfirmPayoutThresholdKop) : null,
     createdAt: user.createdAt.toISOString(),
@@ -234,6 +238,7 @@ async function handlePatch(
     ...(p.payoutDailyLimitKop !== undefined && { payoutDailyLimitKop: toBigInt(p.payoutDailyLimitKop) }),
     ...(p.payoutMonthlyLimitCount !== undefined && { payoutMonthlyLimitCount: p.payoutMonthlyLimitCount }),
     ...(p.payoutMonthlyLimitKop !== undefined && { payoutMonthlyLimitKop: toBigInt(p.payoutMonthlyLimitKop) }),
+    ...(p.incomingMonthlyLimitKop !== undefined && { incomingMonthlyLimitKop: toBigInt(p.incomingMonthlyLimitKop) }),
     ...(p.autoConfirmPayouts !== undefined && { autoConfirmPayouts: p.autoConfirmPayouts }),
     ...(p.autoConfirmPayoutThresholdKop !== undefined && { autoConfirmPayoutThresholdKop: toBigInt(p.autoConfirmPayoutThresholdKop) }),
   };

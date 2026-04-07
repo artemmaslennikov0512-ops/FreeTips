@@ -8,6 +8,7 @@ export const metadata: Metadata = {
 };
 
 export default function DlyaZavedenijPage() {
+  const { operator } = site.footer;
   return (
     <article className="mx-auto w-full max-w-3xl px-4 py-12 sm:px-6 sm:py-16 xl:max-w-4xl 2xl:max-w-5xl">
       <h1 className="text-3xl font-bold text-[var(--color-text)] sm:text-4xl">
@@ -68,7 +69,9 @@ export default function DlyaZavedenijPage() {
               <li>Телефон: {site.footer.support.phone}</li>
               <li>Telegram: <a href={site.footer.support.telegram} target="_blank" rel="noopener noreferrer" className="text-[var(--color-accent-gold)] hover:opacity-90 hover:underline">Поддержка FreeTips</a></li>
             </ul>
-            <p>Подробные реквизиты Оператора размещены в разделе <Link href="/kontakty" className="text-[var(--color-accent-gold)] hover:opacity-90 hover:underline">Контакты</Link>.</p>
+            <p className="mt-2">
+              Реквизиты Оператора: {operator.name}, ИНН {operator.inn}, ОГРНИП {operator.ogrn}; р/с {operator.rs} в {operator.bank}, БИК {operator.bik}, к/с {operator.ks}.
+            </p>
           </div>
         </section>
 
@@ -83,9 +86,6 @@ export default function DlyaZavedenijPage() {
       <div className="mt-12 flex flex-wrap gap-4">
         <Link href="/zayavka" className="text-[var(--color-accent-gold)] font-medium hover:opacity-90 hover:underline">
           Оставить заявку на подключение
-        </Link>
-        <Link href="/kontakty" className="text-[var(--color-accent-gold)] font-medium hover:opacity-90 hover:underline">
-          Контакты
         </Link>
         <Link href="/" className="text-[var(--color-accent-gold)] font-medium hover:opacity-90 hover:underline">
           ← На главную

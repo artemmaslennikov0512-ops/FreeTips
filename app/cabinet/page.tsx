@@ -50,6 +50,8 @@ export default function CabinetDashboardPage() {
   } | null>(null);
   const [payoutUsageToday, setPayoutUsageToday] = useState<{ count: number; sumKop: number } | null>(null);
   const [payoutUsageMonth, setPayoutUsageMonth] = useState<{ count: number; sumKop: number } | null>(null);
+  const [incomingMonthlyLimitKop, setIncomingMonthlyLimitKop] = useState<number | null>(null);
+  const [incomingMonthReservedSumKop, setIncomingMonthReservedSumKop] = useState<number>(0);
   const [error, setError] = useState<string | null>(null);
   const [tipLink, setTipLink] = useState<string | null>(null);
   const [linkCopied, setLinkCopied] = useState(false);
@@ -99,6 +101,8 @@ export default function CabinetDashboardPage() {
         payoutLimits?: { dailyLimitCount: number; dailyLimitKop: number; monthlyLimitCount?: number; monthlyLimitKop?: number };
         payoutUsageToday?: { count: number; sumKop: number };
         payoutUsageMonth?: { count: number; sumKop: number };
+        incomingMonthlyLimitKop?: number | null;
+        incomingMonthReservedSumKop?: number;
         verificationStatus?: string;
       };
       setStats(profile.stats ?? null);
@@ -111,6 +115,14 @@ export default function CabinetDashboardPage() {
       setPayoutLimits(profile.payoutLimits ?? null);
       setPayoutUsageToday(profile.payoutUsageToday ?? null);
       setPayoutUsageMonth(profile.payoutUsageMonth ?? null);
+      setIncomingMonthlyLimitKop(
+        typeof profile.incomingMonthlyLimitKop === "number" && profile.incomingMonthlyLimitKop > 0
+          ? profile.incomingMonthlyLimitKop
+          : null,
+      );
+      setIncomingMonthReservedSumKop(
+        typeof profile.incomingMonthReservedSumKop === "number" ? profile.incomingMonthReservedSumKop : 0,
+      );
       setVerificationStatus(profile.verificationStatus ?? null);
       const linksRes = await fetch("/api/links", { headers: { Authorization: `Bearer ${token}` } });
       if (linksRes.ok) {
@@ -283,6 +295,10 @@ export default function CabinetDashboardPage() {
             typeof payoutLimits.monthlyLimitKop === "number" && payoutLimits.monthlyLimitKop > 0
               ? Math.min(100, (Number(payoutUsageMonth?.sumKop ?? 0) / payoutLimits.monthlyLimitKop) * 100)
               : 0,
+          incomingMonthSum:
+            typeof incomingMonthlyLimitKop === "number" && incomingMonthlyLimitKop > 0
+              ? Math.min(100, (incomingMonthReservedSumKop / incomingMonthlyLimitKop) * 100)
+              : 0,
         }
       : null;
 
@@ -425,6 +441,35 @@ export default function CabinetDashboardPage() {
                       />
                     </div>
                   </div>
+                  {incomingMonthlyLimitKop != null && incomingMonthlyLimitKop > 0 && (
+                    <div>
+                      <div className="mb-1 flex justify-between text-sm">
+                        <span
+                          className="cabinet-limits-label text-[var(--color-text-secondary)]"
+                          title={cabinetLimitLabelTitle(limitPcts?.incomingMonthSum ?? 0, "Поступления за месяц")}
+                        >
+                          Поступления за месяц
+                        </span>
+                        <span className="font-medium text-[var(--color-text)]">
+                          {formatMoney(BigInt(incomingMonthReservedSumKop))} из{" "}
+                          {formatMoney(BigInt(incomingMonthlyLimitKop))}
+                        </span>
+                      </div>
+                      <div className="cabinet-limits-track h-2.5 w-full overflow-hidden rounded-full bg-[var(--color-dark-gray)]/20">
+                        <div
+                          className={cabinetLimitsFillClass()}
+                          style={{
+                            width: `${Math.min(
+                              100,
+                              incomingMonthlyLimitKop > 0
+                                ? (incomingMonthReservedSumKop / incomingMonthlyLimitKop) * 100
+                                : 0,
+                            )}%`,
+                          }}
+                        />
+                      </div>
+                    </div>
+                  )}
                   {typeof payoutLimits.monthlyLimitCount === "number" && typeof payoutLimits.monthlyLimitKop === "number" && (
                     <>
                       <div>

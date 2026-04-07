@@ -1,6 +1,6 @@
 /**
  * Дефолтные лимиты для новых пользователей (из блока антифрода админки).
- * При "Применить" в антифроде значения сохраняются сюда; при регистрации — подставляются новому пользователю.
+ * При "Применить" в антифроде значения сохраняются сюда; при регистрации — читается.
  */
 
 import { db } from "@/lib/db";
@@ -13,6 +13,7 @@ export type SystemDefaultLimitsData = {
   payoutDailyLimitKop: bigint | null;
   payoutMonthlyLimitCount: number | null;
   payoutMonthlyLimitKop: bigint | null;
+  incomingMonthlyLimitKop: bigint | null;
   autoConfirmPayouts: boolean;
   autoConfirmPayoutThresholdKop: bigint | null;
 };
@@ -23,6 +24,7 @@ export type SystemDefaultLimitsUpdateData = {
   payoutDailyLimitKop?: bigint | null;
   payoutMonthlyLimitCount?: number | null;
   payoutMonthlyLimitKop?: bigint | null;
+  incomingMonthlyLimitKop?: bigint | null;
   autoConfirmPayouts?: boolean;
   autoConfirmPayoutThresholdKop?: bigint | null;
 };
@@ -41,6 +43,7 @@ export async function getSystemDefaultLimitsForNewUser(): Promise<Record<string,
     payoutDailyLimitKop: row?.payoutDailyLimitKop ?? PAYOUT_DAILY_LIMIT_KOP,
     payoutMonthlyLimitCount: row?.payoutMonthlyLimitCount ?? null,
     payoutMonthlyLimitKop: row?.payoutMonthlyLimitKop ?? null,
+    incomingMonthlyLimitKop: row?.incomingMonthlyLimitKop ?? null,
     autoConfirmPayouts: row?.autoConfirmPayouts ?? false,
     autoConfirmPayoutThresholdKop: row?.autoConfirmPayoutThresholdKop ?? null,
   };
@@ -58,6 +61,7 @@ export async function saveSystemDefaultLimits(partial: SystemDefaultLimitsUpdate
     payoutDailyLimitKop?: bigint | null;
     payoutMonthlyLimitCount?: number | null;
     payoutMonthlyLimitKop?: bigint | null;
+    incomingMonthlyLimitKop?: bigint | null;
     autoConfirmPayouts?: boolean;
     autoConfirmPayoutThresholdKop?: bigint | null;
   } = {};
@@ -65,8 +69,10 @@ export async function saveSystemDefaultLimits(partial: SystemDefaultLimitsUpdate
   if (partial.payoutDailyLimitKop !== undefined) update.payoutDailyLimitKop = partial.payoutDailyLimitKop;
   if (partial.payoutMonthlyLimitCount !== undefined) update.payoutMonthlyLimitCount = partial.payoutMonthlyLimitCount;
   if (partial.payoutMonthlyLimitKop !== undefined) update.payoutMonthlyLimitKop = partial.payoutMonthlyLimitKop;
+  if (partial.incomingMonthlyLimitKop !== undefined) update.incomingMonthlyLimitKop = partial.incomingMonthlyLimitKop;
   if (partial.autoConfirmPayouts !== undefined) update.autoConfirmPayouts = partial.autoConfirmPayouts;
-  if (partial.autoConfirmPayoutThresholdKop !== undefined) update.autoConfirmPayoutThresholdKop = partial.autoConfirmPayoutThresholdKop;
+  if (partial.autoConfirmPayoutThresholdKop !== undefined)
+    update.autoConfirmPayoutThresholdKop = partial.autoConfirmPayoutThresholdKop;
 
   if (Object.keys(update).length === 0) return;
 
@@ -84,6 +90,7 @@ export async function saveSystemDefaultLimits(partial: SystemDefaultLimitsUpdate
         payoutDailyLimitKop: update.payoutDailyLimitKop ?? null,
         payoutMonthlyLimitCount: update.payoutMonthlyLimitCount ?? null,
         payoutMonthlyLimitKop: update.payoutMonthlyLimitKop ?? null,
+        incomingMonthlyLimitKop: update.incomingMonthlyLimitKop ?? null,
         autoConfirmPayouts: update.autoConfirmPayouts ?? false,
         autoConfirmPayoutThresholdKop: update.autoConfirmPayoutThresholdKop ?? null,
       },

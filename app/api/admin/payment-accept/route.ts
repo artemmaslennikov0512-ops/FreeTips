@@ -28,7 +28,16 @@ const patchSchema = z.object({
   globalPaymentsDisabled: z.boolean().optional(),
   whitelistText: z.string().nullable().optional(),
   blacklistText: z.string().nullable().optional(),
+  /** null — снять лимит; не передавать поле — не менять. */
+  recipientMaxDailyIncomingRubles: z.union([z.number().finite().min(0).max(999_999_999), z.null()]).optional(),
+  recipientMaxConcurrentPendingPayments: z.union([z.number().int().min(1).max(100), z.null()]).optional(),
+  recipientMinMinutesBetweenPayInits: z.union([z.number().int().min(1).max(10080), z.null()]).optional(),
+  recipientMaxPayInitsPerDay: z.union([z.number().int().min(1).max(50_000), z.null()]).optional(),
 });
+
+function rublesToBalanceKop(rub: number): bigint {
+  return BigInt(Math.round(rub * 100));
+}
 
 export async function GET(request: NextRequest) {
   const auth = await requireRole(["SUPERADMIN"])(request);
@@ -45,6 +54,11 @@ export async function GET(request: NextRequest) {
     paymentBlacklistUserIds: row.paymentBlacklistUserIds,
     whitelistText: whitelistLines,
     blacklistText: blacklistLines,
+    recipientMaxDailyIncomingRubles:
+      row.recipientMaxIncomingKopPerMskDay == null ? null : Number(row.recipientMaxIncomingKopPerMskDay) / 100,
+    recipientMaxConcurrentPendingPayments: row.recipientMaxConcurrentPendingPayments,
+    recipientMinMinutesBetweenPayInits: row.recipientMinMinutesBetweenPayInits,
+    recipientMaxPayInitsPerDay: row.recipientMaxPayInitsPerDay,
     updatedAt: row.updatedAt.toISOString(),
   });
 }
@@ -61,11 +75,23 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ error: "Неверные данные", issues: parsed.error.issues }, { status: 400 });
   }
 
-  const { globalPaymentsDisabled, whitelistText, blacklistText } = parsed.data;
+  const {
+    globalPaymentsDisabled,
+    whitelistText,
+    blacklistText,
+    recipientMaxDailyIncomingRubles,
+    recipientMaxConcurrentPendingPayments,
+    recipientMinMinutesBetweenPayInits,
+    recipientMaxPayInitsPerDay,
+  } = parsed.data;
   if (
     globalPaymentsDisabled === undefined &&
     whitelistText === undefined &&
-    blacklistText === undefined
+    blacklistText === undefined &&
+    recipientMaxDailyIncomingRubles === undefined &&
+    recipientMaxConcurrentPendingPayments === undefined &&
+    recipientMinMinutesBetweenPayInits === undefined &&
+    recipientMaxPayInitsPerDay === undefined
   ) {
     return NextResponse.json({ error: "Нет полей для обновления" }, { status: 400 });
   }
@@ -74,6 +100,10 @@ export async function PATCH(request: NextRequest) {
     globalPaymentsDisabled?: boolean;
     paymentWhitelistUserIds?: string[];
     paymentBlacklistUserIds?: string[];
+    recipientMaxIncomingKopPerMskDay?: bigint | null;
+    recipientMaxConcurrentPendingPayments?: number | null;
+    recipientMinMinutesBetweenPayInits?: number | null;
+    recipientMaxPayInitsPerDay?: number | null;
   } = {};
 
   if (globalPaymentsDisabled !== undefined) {
@@ -97,6 +127,20 @@ export async function PATCH(request: NextRequest) {
     blacklistUnknown = resolved.unknownTokens;
   }
 
+  if (recipientMaxDailyIncomingRubles !== undefined) {
+    updatePayload.recipientMaxIncomingKopPerMskDay =
+      recipientMaxDailyIncomingRubles == null ? null : rublesToBalanceKop(recipientMaxDailyIncomingRubles);
+  }
+  if (recipientMaxConcurrentPendingPayments !== undefined) {
+    updatePayload.recipientMaxConcurrentPendingPayments = recipientMaxConcurrentPendingPayments;
+  }
+  if (recipientMinMinutesBetweenPayInits !== undefined) {
+    updatePayload.recipientMinMinutesBetweenPayInits = recipientMinMinutesBetweenPayInits;
+  }
+  if (recipientMaxPayInitsPerDay !== undefined) {
+    updatePayload.recipientMaxPayInitsPerDay = recipientMaxPayInitsPerDay;
+  }
+
   const row = await updatePlatformPaymentSettings(updatePayload);
 
   const [whitelistLines, blacklistLines] = await Promise.all([
@@ -110,6 +154,11 @@ export async function PATCH(request: NextRequest) {
     paymentBlacklistUserIds: row.paymentBlacklistUserIds,
     whitelistText: whitelistLines,
     blacklistText: blacklistLines,
+    recipientMaxDailyIncomingRubles:
+      row.recipientMaxIncomingKopPerMskDay == null ? null : Number(row.recipientMaxIncomingKopPerMskDay) / 100,
+    recipientMaxConcurrentPendingPayments: row.recipientMaxConcurrentPendingPayments,
+    recipientMinMinutesBetweenPayInits: row.recipientMinMinutesBetweenPayInits,
+    recipientMaxPayInitsPerDay: row.recipientMaxPayInitsPerDay,
     updatedAt: row.updatedAt.toISOString(),
     ...(whitelistUnknown !== undefined && whitelistUnknown.length > 0 ? { whitelistUnknownTokens: whitelistUnknown } : {}),
     ...(blacklistUnknown !== undefined && blacklistUnknown.length > 0 ? { blacklistUnknownTokens: blacklistUnknown } : {}),

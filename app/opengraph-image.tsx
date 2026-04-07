@@ -42,17 +42,19 @@ export default function Image() {
               maxWidth: 900,
             }}
           >
-            Сервис чаевых для профессионалов
+            Сервис онлайн чаевых по QR - коду
           </div>
           <div
             style={{
-              fontSize: 22,
+              fontSize: 20,
               color: "rgba(255,255,255,0.65)",
               marginTop: 16,
               textAlign: "center",
+              maxWidth: 920,
+              lineHeight: 1.35,
             }}
           >
-            Оплата картой и Apple Pay / Google Pay
+            Быстро и удобно. Возможность оплаты картой получателя. Без комиссии для бизнеса.
           </div>
         </div>
       </div>

@@ -14,6 +14,20 @@ export function getUtcDayStart(): Date {
   return d;
 }
 
+/**
+ * Начало текущих календарных суток по Europe/Moscow (00:00).
+ * В РФ постоянный UTC+3 (без перехода на летнее время).
+ */
+export function getMoscowDayStart(now: Date = new Date()): Date {
+  const ymd = new Intl.DateTimeFormat("sv-SE", {
+    timeZone: "Europe/Moscow",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(now);
+  return new Date(`${ymd}T00:00:00+03:00`);
+}
+
 /** Начало текущего месяца по UTC. */
 export function getUtcMonthStart(): Date {
   const d = new Date();
@@ -50,4 +64,15 @@ export async function getEffectiveMonthlyPayoutLimits(userId: string): Promise<{
     count: user?.payoutMonthlyLimitCount ?? null,
     kop: user?.payoutMonthlyLimitKop ?? null,
   };
+}
+
+/** Месячный лимит суммы поступлений (чаевые), коп — отдельно от лимита вывода; null — без лимита. */
+export async function getEffectiveIncomingMonthlyLimitKop(userId: string): Promise<bigint | null> {
+  const user = await db.user.findUnique({
+    where: { id: userId },
+    select: { incomingMonthlyLimitKop: true },
+  });
+  const k = user?.incomingMonthlyLimitKop;
+  if (k == null || k <= BigInt(0)) return null;
+  return k;
 }

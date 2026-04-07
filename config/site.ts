@@ -56,7 +56,6 @@ export const site = {
       { label: "Правила использования сервиса", href: "/pravila-ispolzovaniya" },
       { label: "Для заведений", href: "/dlya-zavedenij" },
       { label: "Оплата, доставка и возврат", href: "/oplata-dostavka-vozvrat" },
-      { label: "Контакты", href: "/kontakty" },
     ],
     operator: {
       name: "ИП ЕРЁМИН ДМИТРИЙ РОМАНОВИЧ",

@@ -7,6 +7,7 @@
  *   DEFAULT_RECIPIENT_AUTO_CONFIRM_PAYOUTS=true
  *   DEFAULT_RECIPIENT_PAYOUT_DAILY_LIMIT_COUNT=10
  *   DEFAULT_RECIPIENT_PAYOUT_DAILY_LIMIT_KOP=500000
+ *   DEFAULT_RECIPIENT_INCOMING_MONTHLY_LIMIT_KOP=5000000
  */
 
 export type DefaultRecipientSettings = {
@@ -16,6 +17,7 @@ export type DefaultRecipientSettings = {
   payoutDailyLimitKop: bigint | null;
   payoutMonthlyLimitCount: number | null;
   payoutMonthlyLimitKop: bigint | null;
+  incomingMonthlyLimitKop: bigint | null;
 };
 
 function parseBool(val: string | undefined): boolean {
@@ -45,6 +47,7 @@ export function getDefaultRecipientSettings(): DefaultRecipientSettings {
     payoutDailyLimitKop: parsePositiveBigInt(process.env.DEFAULT_RECIPIENT_PAYOUT_DAILY_LIMIT_KOP),
     payoutMonthlyLimitCount: parsePositiveInt(process.env.DEFAULT_RECIPIENT_PAYOUT_MONTHLY_LIMIT_COUNT),
     payoutMonthlyLimitKop: parsePositiveBigInt(process.env.DEFAULT_RECIPIENT_PAYOUT_MONTHLY_LIMIT_KOP),
+    incomingMonthlyLimitKop: parsePositiveBigInt(process.env.DEFAULT_RECIPIENT_INCOMING_MONTHLY_LIMIT_KOP),
   };
 }
 
@@ -58,5 +61,6 @@ export function getDefaultRecipientUpdateData(): Record<string, unknown> {
   if (s.payoutDailyLimitKop !== null) data.payoutDailyLimitKop = s.payoutDailyLimitKop;
   if (s.payoutMonthlyLimitCount !== null) data.payoutMonthlyLimitCount = s.payoutMonthlyLimitCount;
   if (s.payoutMonthlyLimitKop !== null) data.payoutMonthlyLimitKop = s.payoutMonthlyLimitKop;
+  if (s.incomingMonthlyLimitKop !== null) data.incomingMonthlyLimitKop = s.incomingMonthlyLimitKop;
   return data;
 }

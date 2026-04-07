@@ -24,6 +24,7 @@ interface StatsDefaults {
   defaultPayoutDailyLimitKop?: number;
   defaultPayoutMonthlyLimitCount?: number | null;
   defaultPayoutMonthlyLimitKop?: number | null;
+  defaultIncomingMonthlyLimitKop?: number | null;
   defaultAutoConfirmEnabled?: boolean;
   defaultAutoConfirmThresholdKop?: number | null;
 }
@@ -55,6 +56,10 @@ export default function AdminAntifraudPage() {
   const [editingMonthlyRub, setEditingMonthlyRub] = useState(false);
   const [inputMonthlyRub, setInputMonthlyRub] = useState("");
   const [loadingMonthlyRub, setLoadingMonthlyRub] = useState(false);
+  const [appliedIncomingMonthlyRub, setAppliedIncomingMonthlyRub] = useState<string | null>(null);
+  const [editingIncomingMonthlyRub, setEditingIncomingMonthlyRub] = useState(false);
+  const [inputIncomingMonthlyRub, setInputIncomingMonthlyRub] = useState("");
+  const [loadingIncomingMonthlyRub, setLoadingIncomingMonthlyRub] = useState(false);
   const [appliedDailyCount, setAppliedDailyCount] = useState<string | null>(null);
   const [editingDailyCount, setEditingDailyCount] = useState(false);
   const [inputDailyCount, setInputDailyCount] = useState("");
@@ -110,6 +115,10 @@ export default function AdminAntifraudPage() {
         if (data.defaultPayoutMonthlyLimitKop != null) {
           setAppliedMonthlyRub(String(Math.round(data.defaultPayoutMonthlyLimitKop)));
           setInputMonthlyRub(String(Math.round(data.defaultPayoutMonthlyLimitKop)));
+        }
+        if (data.defaultIncomingMonthlyLimitKop != null) {
+          setAppliedIncomingMonthlyRub(String(Math.round(data.defaultIncomingMonthlyLimitKop)));
+          setInputIncomingMonthlyRub(String(Math.round(data.defaultIncomingMonthlyLimitKop)));
         }
         if (data.defaultAutoConfirmEnabled !== undefined) setAutoConfirmEnabled(data.defaultAutoConfirmEnabled);
         if (data.defaultAutoConfirmThresholdKop != null) {
@@ -312,6 +321,43 @@ export default function AdminAntifraudPage() {
       setAntifraudMessage({ type: "err", text: "Ошибка соединения" });
     } finally {
       setLoadingDailyRub(false);
+    }
+  };
+
+  const applyIncomingMonthlyRub = async () => {
+    const token = localStorage.getItem("accessToken");
+    if (!token) return;
+    setLoadingIncomingMonthlyRub(true);
+    setAntifraudMessage(null);
+    try {
+      const rub =
+        inputIncomingMonthlyRub.trim() === "" ? null : parseFloat(inputIncomingMonthlyRub.trim().replace(",", "."));
+      if (inputIncomingMonthlyRub.trim() !== "" && (Number.isNaN(rub!) || (rub ?? 0) < 0)) {
+        setAntifraudMessage({ type: "err", text: "Введите корректную сумму (₽)" });
+        setLoadingIncomingMonthlyRub(false);
+        return;
+      }
+      const res = await fetch("/api/admin/users/limits-bulk", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          incomingMonthlyLimitKop: rub != null && !Number.isNaN(rub) ? Math.round(rub * 100) : null,
+        }),
+      });
+      const data = (await res.json()) as { error?: string; updated?: number; message?: string };
+      if (!res.ok) {
+        setAntifraudMessage({ type: "err", text: data.error ?? "Ошибка" });
+        return;
+      }
+      const applied = inputIncomingMonthlyRub.trim() !== "" ? inputIncomingMonthlyRub.trim() : null;
+      setAppliedIncomingMonthlyRub(applied);
+      setInputIncomingMonthlyRub(applied ?? "");
+      setEditingIncomingMonthlyRub(false);
+      setAntifraudMessage({ type: "ok", text: data.message ?? `Обновлено пользователей: ${data.updated ?? 0}` });
+    } catch {
+      setAntifraudMessage({ type: "err", text: "Ошибка соединения" });
+    } finally {
+      setLoadingIncomingMonthlyRub(false);
     }
   };
 
@@ -660,10 +706,53 @@ export default function AdminAntifraudPage() {
                 </div>
               </div>
 
-              {/* 3. Месячный лимит вывода (сумма) */}
+              {/* 3. Месячный лимит поступлений (чаевые) */}
               <div className="antifraud-limit-row flex min-w-0 flex-col items-center gap-3 border-0 pb-4 text-center sm:flex-row sm:flex-wrap sm:justify-center sm:gap-4">
                 <div className="w-full max-w-xl text-sm font-medium text-white sm:w-auto sm:max-w-[min(100%,14rem)] sm:shrink-0">
-                  3. Месячный лимит вывода
+                  3. Месячный лимит поступлений
+                </div>
+                <div className="flex min-w-0 max-w-full justify-center overflow-hidden sm:min-w-[8rem]">
+                  {editingIncomingMonthlyRub ? (
+                    <input
+                      type="text"
+                      inputMode="decimal"
+                      value={inputIncomingMonthlyRub}
+                      onChange={(e) => setInputIncomingMonthlyRub(e.target.value)}
+                      placeholder="сумма (₽)"
+                      className={ANTIFRAUD_INPUT}
+                    />
+                  ) : (
+                    <span className="antifraud-value text-base font-semibold text-white" aria-label="Текущий лимит">
+                      {formatLimitDisplay(appliedIncomingMonthlyRub, "rub")}
+                    </span>
+                  )}
+                </div>
+                <div className="flex shrink-0 justify-center sm:pr-2">
+                  {editingIncomingMonthlyRub ? (
+                    <button
+                      type="button"
+                      onClick={applyIncomingMonthlyRub}
+                      disabled={loadingIncomingMonthlyRub}
+                      className={ANTIFRAUD_BTN_APPLY}
+                    >
+                      {loadingIncomingMonthlyRub ? "Применяем…" : "Применить"}
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setEditingIncomingMonthlyRub(true)}
+                      className={ANTIFRAUD_BTN_EDIT}
+                    >
+                      Изменить
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* 4. Месячный лимит вывода (сумма) */}
+              <div className="antifraud-limit-row flex min-w-0 flex-col items-center gap-3 border-0 pb-4 text-center sm:flex-row sm:flex-wrap sm:justify-center sm:gap-4">
+                <div className="w-full max-w-xl text-sm font-medium text-white sm:w-auto sm:max-w-[min(100%,14rem)] sm:shrink-0">
+                  4. Месячный лимит вывода
                 </div>
                 <div className="flex min-w-0 max-w-full justify-center overflow-hidden sm:min-w-[8rem]">
                   {editingMonthlyRub ? (
@@ -703,10 +792,10 @@ export default function AdminAntifraudPage() {
                 </div>
               </div>
 
-              {/* 4. Суточный лимит заявок */}
+              {/* 5. Суточный лимит заявок */}
               <div className="antifraud-limit-row flex min-w-0 flex-col items-center gap-3 border-0 pb-4 text-center sm:flex-row sm:flex-wrap sm:justify-center sm:gap-4">
                 <div className="w-full max-w-xl text-sm font-medium text-white sm:w-auto sm:max-w-[min(100%,14rem)] sm:shrink-0">
-                  4. Суточный лимит заявок
+                  5. Суточный лимит заявок
                 </div>
                 <div className="flex min-w-0 max-w-full justify-center overflow-hidden sm:min-w-[8rem]">
                   {editingDailyCount ? (
@@ -747,10 +836,10 @@ export default function AdminAntifraudPage() {
                 </div>
               </div>
 
-              {/* 5. Месячный лимит заявок */}
+              {/* 6. Месячный лимит заявок */}
               <div className="antifraud-limit-row flex min-w-0 flex-col items-center gap-3 border-0 pb-4 text-center sm:flex-row sm:flex-wrap sm:justify-center sm:gap-4">
                 <div className="w-full max-w-xl text-sm font-medium text-white sm:w-auto sm:max-w-[min(100%,14rem)] sm:shrink-0">
-                  5. Месячный лимит заявок
+                  6. Месячный лимит заявок
                 </div>
                 <div className="flex min-w-0 max-w-full justify-center overflow-hidden sm:min-w-[8rem]">
                   {editingMonthlyCount ? (

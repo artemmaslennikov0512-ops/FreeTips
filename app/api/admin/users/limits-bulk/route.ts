@@ -16,7 +16,10 @@ const bodySchema = z.object({
   dailyLimitCount: z.number().int().min(0).max(100).nullable().optional(),
   dailyLimitKop: z.number().int().min(0).nullable().optional(),
   monthlyLimitCount: z.number().int().min(0).max(3000).nullable().optional(),
+  /** Месячный лимит суммы вывода, коп */
   monthlyLimitKop: z.number().int().min(0).nullable().optional(),
+  /** Месячный лимит суммы поступлений (чаевые), коп */
+  incomingMonthlyLimitKop: z.number().int().min(0).nullable().optional(),
 });
 
 export async function POST(request: NextRequest) {
@@ -39,11 +42,16 @@ export async function POST(request: NextRequest) {
     payoutDailyLimitKop?: bigint | null;
     payoutMonthlyLimitCount?: number | null;
     payoutMonthlyLimitKop?: bigint | null;
+    incomingMonthlyLimitKop?: bigint | null;
   } = {};
   if (parsed.data.dailyLimitCount !== undefined) data.payoutDailyLimitCount = parsed.data.dailyLimitCount;
   if (parsed.data.dailyLimitKop !== undefined) data.payoutDailyLimitKop = parsed.data.dailyLimitKop != null ? BigInt(parsed.data.dailyLimitKop) : null;
   if (parsed.data.monthlyLimitCount !== undefined) data.payoutMonthlyLimitCount = parsed.data.monthlyLimitCount;
   if (parsed.data.monthlyLimitKop !== undefined) data.payoutMonthlyLimitKop = parsed.data.monthlyLimitKop != null ? BigInt(parsed.data.monthlyLimitKop) : null;
+  if (parsed.data.incomingMonthlyLimitKop !== undefined) {
+    data.incomingMonthlyLimitKop =
+      parsed.data.incomingMonthlyLimitKop != null ? BigInt(parsed.data.incomingMonthlyLimitKop) : null;
+  }
 
   if (Object.keys(data).length === 0) {
     return NextResponse.json({ error: "Не указаны лимиты для обновления" }, { status: 400 });

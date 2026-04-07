@@ -29,7 +29,11 @@ import {
 } from "@/config/pay-branding-overrides";
 import { mergePayPageBranding } from "@/lib/pay-branding-merge";
 import { isCabinetM5CompetitionTheme } from "@/config/cabinet-theme-logins";
-import { getPlatformPaymentSettings } from "@/lib/platform-payment-settings";
+import { getPlatformPaymentSettingsRow } from "@/lib/platform-payment-settings";
+import {
+  evaluateRecipientPayLimits,
+  evaluateRecipientPayLimitsForPayPage,
+} from "@/lib/recipient-pay-limits";
 import { recipientCanAcceptIncomingTips } from "@/lib/payment-accept-policy";
 import { FRAUD_RULE, recordFraudSignal } from "@/lib/fraud-signals";
 import { observePayInitBurstForSlug } from "@/lib/fraud-velocity-observe";
@@ -52,7 +56,15 @@ export async function GET(request: NextRequest, { params }: Params) {
     return NextResponse.json({ recipientName: "Демо-получатель", acceptPayments: false });
   }
 
-  const [tipLink, paymentSettings] = await Promise.all([loadTipLinkForPaySlug(slug), getPlatformPaymentSettings()]);
+  const [tipLink, platformRow] = await Promise.all([
+    loadTipLinkForPaySlug(slug),
+    getPlatformPaymentSettingsRow(),
+  ]);
+  const paymentSettings = {
+    globalPaymentsDisabled: platformRow.globalPaymentsDisabled,
+    paymentWhitelistUserIds: platformRow.paymentWhitelistUserIds,
+    paymentBlacklistUserIds: platformRow.paymentBlacklistUserIds,
+  };
 
   if (!tipLink) {
     return NextResponse.json({ error: "Ссылка не найдена" }, { status: 404 });
@@ -89,7 +101,7 @@ export async function GET(request: NextRequest, { params }: Params) {
     : undefined;
 
   const estName = (est?.name ?? "").trim() || "Заведение";
-  let recipientName = "Чаевые";
+  let recipientName = "Официант";
   let recipientPhotoUrl: string | undefined;
   let savingFor: string | undefined;
   let paymentUnavailableReason: string | undefined;
@@ -142,7 +154,7 @@ export async function GET(request: NextRequest, { params }: Params) {
           })()
         : "";
     const displayName = firstNameFromFullName || login || "";
-    recipientName = displayName ? `Чаевые — ${displayName}` : "Чаевые";
+    recipientName = displayName ? `Официант, ${displayName}` : "Официант";
     savingFor = u.savingFor?.trim() || undefined;
     recipientPhotoUrl = u.profilePhotoUrl
       ? `${baseUrl.replace(/\/$/, "")}/api/profile/photo/${u.id}`
@@ -151,6 +163,25 @@ export async function GET(request: NextRequest, { params }: Params) {
 
   if (establishmentPoolPayUi && (!est?.tipPoolUserId?.trim() || !est?.id)) {
     paymentUnavailableReason = "Приём чаевых для этого заведения не настроен";
+  }
+
+  if (
+    !paymentUnavailableReason &&
+    !tipLink.user.isBlocked &&
+    recipientCanAcceptIncomingTips(tipLink.userId, paymentSettings)
+  ) {
+    const resolvedForLimits = await resolvePayInitForSlug(slug, tipLink);
+    if (!("error" in resolvedForLimits)) {
+      const limitReason = await evaluateRecipientPayLimitsForPayPage(
+        {
+          recipientId: resolvedForLimits.paymentRecipientId,
+          tipSplit: resolvedForLimits.tipSplit,
+          limits: platformRow,
+        },
+        { obscurePlatformDailyLimits: true },
+      );
+      if (limitReason) paymentUnavailableReason = limitReason;
+    }
   }
 
   const slugNorm = slug.trim().toLowerCase();
@@ -211,10 +242,15 @@ export async function POST(request: NextRequest, { params }: Params) {
     return NextResponse.json({ error: "Некорректный запрос. Обновите страницу и попробуйте снова." }, { status: 403 });
   }
 
-  const [tipLink, paymentSettings] = await Promise.all([
+  const [tipLink, platformRow] = await Promise.all([
     loadTipLinkForPaySlug(slug),
-    getPlatformPaymentSettings(),
+    getPlatformPaymentSettingsRow(),
   ]);
+  const paymentSettings = {
+    globalPaymentsDisabled: platformRow.globalPaymentsDisabled,
+    paymentWhitelistUserIds: platformRow.paymentWhitelistUserIds,
+    paymentBlacklistUserIds: platformRow.paymentBlacklistUserIds,
+  };
 
   if (!tipLink) {
     logSecurity("pay.init.not_found", { requestId, ip, slug });
@@ -269,6 +305,26 @@ export async function POST(request: NextRequest, { params }: Params) {
   const { amountKop, comment, idempotencyKey } = validated.data;
   const amountBigInt = typeof amountKop === "number" ? BigInt(amountKop) : amountKop;
   const baseUrl = getBaseUrlFromRequest(request);
+
+  const recipientLimitMessage = await evaluateRecipientPayLimits(
+    {
+      recipientId: paymentRecipientId,
+      amountKop: amountBigInt,
+      tipSplit,
+      limits: platformRow,
+      idempotencyKey,
+    },
+    { obscurePlatformDailyLimits: true },
+  );
+  if (recipientLimitMessage) {
+    logSecurity("pay.init.recipient_limit", {
+      requestId,
+      ip,
+      slug,
+      recipientId: paymentRecipientId,
+    });
+    return NextResponse.json({ error: recipientLimitMessage }, { status: 400 });
+  }
 
   const gateway = getPaymentGateway();
   try {

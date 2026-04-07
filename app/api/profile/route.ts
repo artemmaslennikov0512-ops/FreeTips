@@ -12,6 +12,7 @@ import { getPaygineConfig } from "@/lib/config";
 import { patchProfileSchema } from "@/lib/validations";
 import { parseJsonWithLimit, MAX_BODY_SIZE_AUTH, jsonError, internalError } from "@/lib/api/helpers";
 import { getEffectivePayoutLimits, getEffectiveMonthlyPayoutLimits, getUtcDayStart, getUtcMonthStart } from "@/lib/payout-limits";
+import { sumIncomingReservedNetKopUtcMonth } from "@/lib/recipient-pay-limits";
 import { sdGetBalance } from "@/lib/payment/paygine/client";
 import { logError, logInfo } from "@/lib/logger";
 import { getRequestId } from "@/lib/security/request";
@@ -49,8 +50,7 @@ export async function GET(request: NextRequest) {
 
     const dayStart = getUtcDayStart();
     const monthStart = getUtcMonthStart();
-
-    const [profile, balanceRow, payoutsCompletedSum, txCount, payoutsPendingCount, limits, monthlyLimits, todayPayouts, monthPayouts, employee] =
+    const [profile, balanceRow, payoutsCompletedSum, txCount, payoutsPendingCount, limits, monthlyLimits, todayPayouts, monthPayouts, incomingMonthReservedKop, employee] =
       await Promise.all([
         db.user.findUnique({
           where: { id },
@@ -93,6 +93,7 @@ export async function GET(request: NextRequest) {
             profilePhotoUrl: true,
             totpEnabled: true,
             totpSecretEnc: true,
+            incomingMonthlyLimitKop: true,
           },
         }),
         getBalance(id),
@@ -124,6 +125,7 @@ export async function GET(request: NextRequest) {
           _count: true,
           _sum: { amountKop: true },
         }),
+        sumIncomingReservedNetKopUtcMonth(id, monthStart),
         db.employee.findFirst({
           where: { userId: id },
           select: { id: true, photoUrl: true },
@@ -222,6 +224,9 @@ export async function GET(request: NextRequest) {
         monthlyLimitCount: monthlyLimits.count != null ? Number(monthlyLimits.count) : null,
         monthlyLimitKop: monthlyLimits.kop != null ? Number(monthlyLimits.kop) : null,
       },
+      incomingMonthlyLimitKop:
+        profile.incomingMonthlyLimitKop != null ? Number(profile.incomingMonthlyLimitKop) : null,
+      incomingMonthReservedSumKop: Number(incomingMonthReservedKop),
       payoutUsageToday: {
         count: Number(todayCount),
         sumKop: Number(todaySumKop),

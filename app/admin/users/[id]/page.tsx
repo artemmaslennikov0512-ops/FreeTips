@@ -53,6 +53,7 @@ interface UserDetailsResponse {
     payoutDailyLimitKop: number | null;
     payoutMonthlyLimitCount: number | null;
     payoutMonthlyLimitKop: number | null;
+    incomingMonthlyLimitKop: number | null;
     autoConfirmPayouts: boolean;
     autoConfirmPayoutThresholdKop: number | null;
     createdAt: string;
@@ -105,6 +106,10 @@ export default function AdminUserDetailsPage() {
   const [editingMonthlyRub, setEditingMonthlyRub] = useState(false);
   const [inputMonthlyRub, setInputMonthlyRub] = useState("");
   const [loadingMonthlyRub, setLoadingMonthlyRub] = useState(false);
+  const [appliedIncomingMonthlyRub, setAppliedIncomingMonthlyRub] = useState<string | null>(null);
+  const [editingIncomingMonthlyRub, setEditingIncomingMonthlyRub] = useState(false);
+  const [inputIncomingMonthlyRub, setInputIncomingMonthlyRub] = useState("");
+  const [loadingIncomingMonthlyRub, setLoadingIncomingMonthlyRub] = useState(false);
   const [appliedDailyCount, setAppliedDailyCount] = useState<string | null>(null);
   const [editingDailyCount, setEditingDailyCount] = useState(false);
   const [inputDailyCount, setInputDailyCount] = useState("");
@@ -166,6 +171,14 @@ export default function AdminUserDetailsPage() {
         } else {
           setAppliedMonthlyRub(null);
           setInputMonthlyRub("");
+        }
+        if (u.incomingMonthlyLimitKop != null) {
+          const irub = String(Math.round(Number(u.incomingMonthlyLimitKop) / 100));
+          setAppliedIncomingMonthlyRub(irub);
+          setInputIncomingMonthlyRub(irub);
+        } else {
+          setAppliedIncomingMonthlyRub(null);
+          setInputIncomingMonthlyRub("");
         }
         if (u.payoutDailyLimitCount != null) {
           setAppliedDailyCount(String(u.payoutDailyLimitCount));
@@ -356,6 +369,32 @@ export default function AdminUserDetailsPage() {
       setLimitsMessage({ type: "ok", text: "Сохранено" });
     }
     setLoadingDailyRub(false);
+  };
+
+  const applyIncomingMonthlyRub = async () => {
+    if (!userId) return;
+    setLoadingIncomingMonthlyRub(true);
+    setLimitsMessage(null);
+    const rub =
+      inputIncomingMonthlyRub.trim() === "" ? null : parseFloat(inputIncomingMonthlyRub.trim().replace(",", "."));
+    if (inputIncomingMonthlyRub.trim() !== "" && (Number.isNaN(rub!) || (rub ?? 0) < 0)) {
+      setLimitsMessage({ type: "err", text: "Введите корректную сумму (₽)" });
+      setLoadingIncomingMonthlyRub(false);
+      return;
+    }
+    const err = await patchUser({
+      incomingMonthlyLimitKop: rub != null && !Number.isNaN(rub) ? Math.round(rub * 100) : null,
+    });
+    if (err) {
+      setLimitsMessage({ type: "err", text: err });
+    } else {
+      const applied = inputIncomingMonthlyRub.trim() !== "" ? inputIncomingMonthlyRub.trim() : null;
+      setAppliedIncomingMonthlyRub(applied);
+      setInputIncomingMonthlyRub(applied ?? "");
+      setEditingIncomingMonthlyRub(false);
+      setLimitsMessage({ type: "ok", text: "Сохранено" });
+    }
+    setLoadingIncomingMonthlyRub(false);
   };
 
   const applyMonthlyRub = async () => {
@@ -1033,7 +1072,20 @@ export default function AdminUserDetailsPage() {
                 onEdit: () => setEditingDailyRub(true),
               },
               {
-                label: "3. Месячный лимит вывода",
+                label: "3. Месячный лимит поступлений (чаевые)",
+                value: editingIncomingMonthlyRub ? inputIncomingMonthlyRub : (appliedIncomingMonthlyRub ?? ""),
+                onChange: setInputIncomingMonthlyRub,
+                readOnly: !editingIncomingMonthlyRub,
+                placeholder: "сумма (₽)",
+                inputType: "text",
+                inputMode: "decimal",
+                editing: editingIncomingMonthlyRub,
+                loading: loadingIncomingMonthlyRub,
+                onApply: applyIncomingMonthlyRub,
+                onEdit: () => setEditingIncomingMonthlyRub(true),
+              },
+              {
+                label: "4. Месячный лимит вывода",
                 value: editingMonthlyRub ? inputMonthlyRub : (appliedMonthlyRub ?? ""),
                 onChange: setInputMonthlyRub,
                 readOnly: !editingMonthlyRub,
@@ -1046,7 +1098,7 @@ export default function AdminUserDetailsPage() {
                 onEdit: () => setEditingMonthlyRub(true),
               },
               {
-                label: "4. Суточный лимит заявок",
+                label: "5. Суточный лимит заявок",
                 value: editingDailyCount ? inputDailyCount : (appliedDailyCount ?? ""),
                 onChange: setInputDailyCount,
                 readOnly: !editingDailyCount,
@@ -1059,7 +1111,7 @@ export default function AdminUserDetailsPage() {
                 onEdit: () => setEditingDailyCount(true),
               },
               {
-                label: "5. Месячный лимит заявок",
+                label: "6. Месячный лимит заявок",
                 value: editingMonthlyCount ? inputMonthlyCount : (appliedMonthlyCount ?? ""),
                 onChange: setInputMonthlyCount,
                 readOnly: !editingMonthlyCount,
@@ -1085,7 +1137,7 @@ export default function AdminUserDetailsPage() {
                     onChange={(e) => row.onChange(e.target.value)}
                     placeholder={row.placeholder}
                     min={row.inputType === "number" ? 0 : undefined}
-                    max={row.inputType === "number" ? (idx === 3 ? 100 : 3000) : undefined}
+                    max={row.inputType === "number" ? (idx === 4 ? 100 : 3000) : undefined}
                     className="w-full rounded-lg border-0 bg-[var(--color-light-gray)] px-3 py-2 text-sm text-[var(--color-text)] placeholder:text-[var(--color-muted)] focus:outline-none focus:bg-[var(--color-bg-sides)] disabled:bg-[var(--color-light-gray)] read-only:bg-[var(--color-light-gray)]"
                   />
                 </div>

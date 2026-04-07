@@ -10,7 +10,11 @@ const nextConfig: NextConfig = {
     proxyClientMaxBodySize: "10mb",
   },
   async redirects() {
-    return [{ source: "/favicon.ico", destination: "/icon-32x32", permanent: false }];
+    return [
+      { source: "/favicon.ico", destination: "/icon-32x32", permanent: false },
+      // Нет страницы /preload; иногда в обходе появляется из‑за старых ссылок или шума вокруг HSTS preload
+      { source: "/preload", destination: "/", permanent: true },
+    ];
   },
   images: {
     remotePatterns: [

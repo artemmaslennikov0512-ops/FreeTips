@@ -68,7 +68,9 @@ model User {
   payoutDailyLimitCount Int?   // лимит заявок в сутки (null = глобальный)
   payoutDailyLimitKop   BigInt? // лимит суммы в сутки, коп (null = глобальный)
   payoutMonthlyLimitCount Int?  // лимит заявок в месяц (null = 30 × суточный)
-  payoutMonthlyLimitKop   BigInt? // лимит суммы в месяц, коп (null = 30 × суточный)
+  payoutMonthlyLimitKop   BigInt? // лимит суммы вывода в месяц, коп (null = 30 × суточный)
+  /// Месячный лимит суммы поступлений (чаевые) на счёт, коп; UTC-месяц. Отдельно от лимита вывода.
+  incomingMonthlyLimitKop BigInt?
   autoConfirmPayouts    Boolean @default(false) // автоподтверждение выводов
   autoConfirmPayoutThresholdKop BigInt? // порог в коп: заявки до этой суммы подтверждаются автоматически (null = любая сумма при включённом флаге)
   paygineSdRef       String?   @db.VarChar(128) // кубышка официанта (присваивается при регистрации, в Paygine создаётся при первом зачислении)
@@ -213,6 +215,7 @@ model Transaction {
   @@index([idempotencyKey])
   @@index([createdAt])
   @@index([initiatorIp, status, updatedAt])
+  @@index([recipientId, status, createdAt])
   @@map("transactions")
 }
 
@@ -481,6 +484,7 @@ model SystemDefaultLimits {
   payoutDailyLimitKop           BigInt?
   payoutMonthlyLimitCount      Int?
   payoutMonthlyLimitKop        BigInt?
+  incomingMonthlyLimitKop      BigInt?
   autoConfirmPayouts           Boolean  @default(false)
   autoConfirmPayoutThresholdKop BigInt?
   /** Пороги наблюдения (сигналы без блокировок); null = встроенные дефолты в коде */
@@ -503,6 +507,14 @@ model PlatformPaymentSettings {
   globalPaymentsDisabled  Boolean  @default(false)
   paymentWhitelistUserIds String[] @default([])
   paymentBlacklistUserIds String[] @default([])
+  /// Макс. сумма входящих на получателя за календарные сутки МСК (коп.): успешные зачисления + незавершённые за сегодня + новый платёж. null — без лимита.
+  recipientMaxIncomingKopPerMskDay BigInt?
+  /// Максимум одновременных незавершённых (PENDING) заказов на одного получателя. null — без лимита.
+  recipientMaxConcurrentPendingPayments Int?
+  /// Минимальный интервал между созданием заказов (мин.) для одного получателя. null — без ограничения.
+  recipientMinMinutesBetweenPayInits Int?
+  /// Макс. число успешных зачислений на получателя за календарные сутки МСК (по времени зачисления). null — без лимита.
+  recipientMaxPayInitsPerDay Int?
   updatedAt               DateTime @updatedAt
 
   @@map("platform_payment_settings")

@@ -144,7 +144,7 @@ export default function LeaveEstablishmentPage() {
   const pending = requests.find((r) => r.status === "PENDING");
 
   return (
-    <div className="cabinet-form-surface mx-auto w-full max-w-xl space-y-8 pb-2">
+    <div className="cabinet-form-surface cabinet-leave-establishment mx-auto w-full max-w-xl space-y-8 pb-2">
       <div className="text-center">
         <h1 className="font-[family:var(--font-playfair)] text-xl font-semibold text-[var(--color-text)] sm:text-2xl">
           Покинуть заведение

@@ -4175,6 +4175,30 @@ html:not([data-theme="dark"])
   -webkit-text-fill-color: #8e8e8e;
 }
 
+/*
+ * Обычный ЛК (не M5), светлая тема сайта: явные тёмные переменные на карточке «подключиться / покинуть заведение».
+ * Иначе после правок выше или бренда текст мог оказаться светлым на светлой карточке.
+ */
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-join-establishment.cabinet-form-surface,
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-leave-establishment.cabinet-form-surface {
+  --color-text: #0a192f;
+  --color-text-secondary: #475569;
+}
+
+/* Поля: цвет из переменных поверхности (перебивает глобальный .cabinet-premium input { #0a192f }) */
+.cabinet-premium .cabinet-form-surface input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="hidden"]),
+.cabinet-premium .cabinet-form-surface textarea {
+  color: var(--color-text) !important;
+  -webkit-text-fill-color: var(--color-text) !important;
+  caret-color: var(--color-text);
+}
+.cabinet-premium .cabinet-form-surface input::placeholder,
+.cabinet-premium .cabinet-form-surface textarea::placeholder {
+  color: var(--color-text-secondary) !important;
+  opacity: 0.88;
+  -webkit-text-fill-color: var(--color-text-secondary) !important;
+}
+
 /* Светлая тема: поля ввода админки — белый фон и тёмный текст (перебивают Tailwind в admin-surface-classes) */
 html:not([data-theme="dark"]) .admin-panel input,
 html:not([data-theme="dark"]) .admin-panel textarea {

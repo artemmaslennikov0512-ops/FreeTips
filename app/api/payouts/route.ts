@@ -19,6 +19,7 @@ import { getRequestId } from "@/lib/security/request";
 import { getClientIP } from "@/lib/middleware/rate-limit";
 import { FRAUD_RULE, recordFraudSignal } from "@/lib/fraud-signals";
 import { observePayoutVelocityAfterCreate } from "@/lib/fraud-velocity-observe";
+import { payoutSelfServiceVerificationError } from "@/lib/payout-verification-guard";
 
 export async function GET(request: NextRequest) {
   const auth = await requireAuthOrApiKey(request);
@@ -50,6 +51,9 @@ export async function POST(request: NextRequest) {
 
   const auth = await requireAuthOrApiKey(request);
   if ("response" in auth) return auth.response;
+
+  const verificationBlock = await payoutSelfServiceVerificationError(auth.userId);
+  if (verificationBlock) return verificationBlock;
 
   const bodyResult = await parseJsonWithLimit(request, MAX_BODY_SIZE_AUTH);
   if (!bodyResult.ok) return bodyResult.response;

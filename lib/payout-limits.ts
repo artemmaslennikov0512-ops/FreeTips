@@ -3,6 +3,7 @@
  */
 
 import { db } from "@/lib/db";
+import { PAYOUT_MAX_AMOUNT_KOP } from "@/lib/payout-amount-bounds";
 
 export const PAYOUT_DAILY_LIMIT_COUNT = 5;
 export const PAYOUT_DAILY_LIMIT_KOP = BigInt("20000000"); // 200 000 ₽
@@ -75,4 +76,39 @@ export async function getEffectiveIncomingMonthlyLimitKop(userId: string): Promi
   const k = user?.incomingMonthlyLimitKop;
   if (k == null || k <= BigInt(0)) return null;
   return k;
+}
+
+/**
+ * Верхняя граница суммы одной заявки на вывод (коп) для подсказки в ЛК и клиентской валидации.
+ * Совпадает с ограничениями POST /api/payouts и sd-pay-out-page: глобальный макс, порог автоподтверждения,
+ * остаток по суточному и (если задан) месячному лимиту суммы.
+ */
+export function computeEffectiveMaxPayoutPerRequestKop(params: {
+  autoConfirmPayoutThresholdKop: bigint | null;
+  dailyLimitKop: bigint;
+  todayCompletedSumKop: bigint;
+  monthlyLimitKop: bigint | null;
+  monthCompletedSumKop: bigint;
+}): bigint {
+  const globalMax = BigInt(PAYOUT_MAX_AMOUNT_KOP);
+  let max = globalMax;
+
+  const th = params.autoConfirmPayoutThresholdKop;
+  if (th != null && th > BigInt(0) && th < max) {
+    max = th;
+  }
+
+  const dailyLeft = params.dailyLimitKop - params.todayCompletedSumKop;
+  const dailyCap = dailyLeft > BigInt(0) ? dailyLeft : BigInt(0);
+  max = max < dailyCap ? max : dailyCap;
+
+  if (params.monthlyLimitKop != null) {
+    const monthLeft = params.monthlyLimitKop - params.monthCompletedSumKop;
+    const monthCap = monthLeft > BigInt(0) ? monthLeft : BigInt(0);
+    max = max < monthCap ? max : monthCap;
+  }
+
+  if (max < BigInt(0)) return BigInt(0);
+  if (max > globalMax) return globalMax;
+  return max;
 }

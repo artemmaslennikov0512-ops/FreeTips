@@ -16,11 +16,15 @@ import { parseJsonWithLimit, MAX_BODY_SIZE_AUTH } from "@/lib/api/helpers";
 import { FRAUD_RULE, recordFraudSignal } from "@/lib/fraud-signals";
 import { observePayoutVelocityAfterCreate } from "@/lib/fraud-velocity-observe";
 import { logInfo } from "@/lib/logger";
+import { payoutSelfServiceVerificationError } from "@/lib/payout-verification-guard";
 const CURRENCY_RUB = 643;
 
 export async function POST(request: NextRequest) {
   const auth = await requireAuthOrApiKey(request);
   if ("response" in auth) return auth.response;
+
+  const verificationBlock = await payoutSelfServiceVerificationError(auth.userId);
+  if (verificationBlock) return verificationBlock;
 
   const bodyResult = await parseJsonWithLimit(request, MAX_BODY_SIZE_AUTH);
   if (!bodyResult.ok) return bodyResult.response;

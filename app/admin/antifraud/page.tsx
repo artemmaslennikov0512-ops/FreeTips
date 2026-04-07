@@ -69,6 +69,7 @@ export default function AdminAntifraudPage() {
   const [editingMonthlyCount, setEditingMonthlyCount] = useState(false);
   const [inputMonthlyCount, setInputMonthlyCount] = useState("");
   const [loadingMonthlyCount, setLoadingMonthlyCount] = useState(false);
+  const [loadingPushAllLimits, setLoadingPushAllLimits] = useState(false);
 
   const [observeEffective, setObserveEffective] = useState<FraudObserveEffective | null>(null);
   const [inpPayoutWin, setInpPayoutWin] = useState("");
@@ -461,6 +462,104 @@ export default function AdminAntifraudPage() {
       setAntifraudMessage({ type: "err", text: "Ошибка соединения" });
     } finally {
       setLoadingMonthlyCount(false);
+    }
+  };
+
+  /** Текущие значения п. 1–6 и авто-вывод (учитывает режим «Изменить») → один запрос на всех пользователей. */
+  const applyPushAllLimits = async () => {
+    const token = localStorage.getItem("accessToken");
+    if (!token) return;
+
+    const autoRubRaw = (editingAutoConfirm ? inputAutoConfirmRub : appliedAutoConfirmRub ?? "").trim();
+    const dailyRubRaw = (editingDailyRub ? inputDailyRub : appliedDailyRub ?? "").trim();
+    const incomingRubRaw = (editingIncomingMonthlyRub ? inputIncomingMonthlyRub : appliedIncomingMonthlyRub ?? "").trim();
+    const monthlyRubRaw = (editingMonthlyRub ? inputMonthlyRub : appliedMonthlyRub ?? "").trim();
+    const dailyCountRaw = (editingDailyCount ? inputDailyCount : appliedDailyCount ?? "").trim();
+    const monthlyCountRaw = (editingMonthlyCount ? inputMonthlyCount : appliedMonthlyCount ?? "").trim();
+
+    const parseRubKop = (raw: string): number | null | "bad" => {
+      if (raw === "") return null;
+      const rub = parseFloat(raw.replace(",", "."));
+      if (Number.isNaN(rub) || rub < 0) return "bad";
+      return Math.round(rub * 100);
+    };
+    const autoKop = parseRubKop(autoRubRaw);
+    const dailyKop = parseRubKop(dailyRubRaw);
+    const incomingKop = parseRubKop(incomingRubRaw);
+    const monthlyKop = parseRubKop(monthlyRubRaw);
+    if (autoKop === "bad" || dailyKop === "bad" || incomingKop === "bad" || monthlyKop === "bad") {
+      setAntifraudMessage({ type: "err", text: "Проверьте суммы в ₽ (п. 1–4)" });
+      return;
+    }
+
+    const dailyCount =
+      dailyCountRaw === "" ? null : Number.parseInt(dailyCountRaw, 10);
+    if (dailyCountRaw !== "" && (Number.isNaN(dailyCount) || dailyCount < 0 || dailyCount > 100)) {
+      setAntifraudMessage({ type: "err", text: "П. 5: число заявок от 0 до 100 или пусто" });
+      return;
+    }
+
+    const monthlyCount =
+      monthlyCountRaw === "" ? null : Number.parseInt(monthlyCountRaw, 10);
+    if (monthlyCountRaw !== "" && (Number.isNaN(monthlyCount) || monthlyCount < 0 || monthlyCount > 3000)) {
+      setAntifraudMessage({ type: "err", text: "П. 6: число заявок от 0 до 3000 или пусто" });
+      return;
+    }
+
+    const ok = window.confirm(
+      "Подтвердите: выставить всем пользователям (кроме суперадмина) лимиты п. 1–6 и авто-вывод в том виде, как сейчас на экране? Точечные лимиты в карточках пользователей будут перезаписаны.",
+    );
+    if (!ok) return;
+
+    setLoadingPushAllLimits(true);
+    setAntifraudMessage(null);
+    try {
+      const res = await fetch("/api/admin/users/limits-push-all", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          dailyLimitCount: dailyCount,
+          dailyLimitKop: dailyKop,
+          monthlyLimitCount: monthlyCount,
+          monthlyLimitKop: monthlyKop,
+          incomingMonthlyLimitKop: incomingKop,
+          autoConfirmPayouts: autoConfirmEnabled,
+          autoConfirmThresholdKop: autoKop,
+        }),
+      });
+      const data = (await res.json()) as { error?: string; updated?: number; message?: string };
+      if (!res.ok) {
+        setAntifraudMessage({ type: "err", text: data.error ?? "Ошибка" });
+        return;
+      }
+
+      setAppliedAutoConfirmRub(autoRubRaw === "" ? null : autoRubRaw);
+      setInputAutoConfirmRub(autoRubRaw === "" ? "" : autoRubRaw);
+      setEditingAutoConfirm(false);
+      setAppliedDailyRub(dailyRubRaw === "" ? null : dailyRubRaw);
+      setInputDailyRub(dailyRubRaw === "" ? "" : dailyRubRaw);
+      setEditingDailyRub(false);
+      setAppliedIncomingMonthlyRub(incomingRubRaw === "" ? null : incomingRubRaw);
+      setInputIncomingMonthlyRub(incomingRubRaw === "" ? "" : incomingRubRaw);
+      setEditingIncomingMonthlyRub(false);
+      setAppliedMonthlyRub(monthlyRubRaw === "" ? null : monthlyRubRaw);
+      setInputMonthlyRub(monthlyRubRaw === "" ? "" : monthlyRubRaw);
+      setEditingMonthlyRub(false);
+      setAppliedDailyCount(dailyCountRaw === "" ? null : dailyCountRaw);
+      setInputDailyCount(dailyCountRaw === "" ? "" : dailyCountRaw);
+      setEditingDailyCount(false);
+      setAppliedMonthlyCount(monthlyCountRaw === "" ? null : monthlyCountRaw);
+      setInputMonthlyCount(monthlyCountRaw === "" ? "" : monthlyCountRaw);
+      setEditingMonthlyCount(false);
+
+      setAntifraudMessage({
+        type: "ok",
+        text: data.message ?? `Обновлено пользователей: ${data.updated ?? 0}`,
+      });
+    } catch {
+      setAntifraudMessage({ type: "err", text: "Ошибка соединения" });
+    } finally {
+      setLoadingPushAllLimits(false);
     }
   };
 
@@ -899,6 +998,28 @@ export default function AdminAntifraudPage() {
                 </span>
                 <span className="max-w-md text-xs text-white/85">До макс. суммы за одну операцию (п. 1)</span>
               </label>
+            </div>
+
+            <div className="mt-4 flex w-full max-w-full flex-col items-center gap-2 border-t border-white/10 pt-4 text-center">
+              <button
+                type="button"
+                onClick={() => void applyPushAllLimits()}
+                disabled={
+                  loadingPushAllLimits ||
+                  loadingAutoConfirm ||
+                  loadingDailyRub ||
+                  loadingIncomingMonthlyRub ||
+                  loadingMonthlyRub ||
+                  loadingDailyCount ||
+                  loadingMonthlyCount
+                }
+                className={`${ANTIFRAUD_BTN_APPLY} w-full max-w-md sm:w-auto`}
+              >
+                {loadingPushAllLimits ? "Применяем ко всем…" : "Применить ко всем пользователям"}
+              </button>
+              <p className="max-w-lg text-[11px] leading-snug text-white/70">
+                Одной кнопкой: п. 1–6 и авто-вывод выше — на все аккаунты (кроме суперадмина). Перезаписывает точечные лимиты из карточек пользователей.
+              </p>
             </div>
           </div>
         </div>

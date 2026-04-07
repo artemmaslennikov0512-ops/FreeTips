@@ -11,7 +11,13 @@ import { db } from "@/lib/db";
 import { getPaygineConfig } from "@/lib/config";
 import { patchProfileSchema } from "@/lib/validations";
 import { parseJsonWithLimit, MAX_BODY_SIZE_AUTH, jsonError, internalError } from "@/lib/api/helpers";
-import { getEffectivePayoutLimits, getEffectiveMonthlyPayoutLimits, getUtcDayStart, getUtcMonthStart } from "@/lib/payout-limits";
+import {
+  getEffectivePayoutLimits,
+  getEffectiveMonthlyPayoutLimits,
+  getUtcDayStart,
+  getUtcMonthStart,
+  computeEffectiveMaxPayoutPerRequestKop,
+} from "@/lib/payout-limits";
 import { sumIncomingSuccessNetKopUtcMonth } from "@/lib/recipient-pay-limits";
 import { sdGetBalance } from "@/lib/payment/paygine/client";
 import { logError, logInfo } from "@/lib/logger";
@@ -172,6 +178,16 @@ export async function GET(request: NextRequest) {
       transactionsCount: txCount,
     });
 
+    const maxPayoutPerRequestKop = Number(
+      computeEffectiveMaxPayoutPerRequestKop({
+        autoConfirmPayoutThresholdKop: profile.autoConfirmPayoutThresholdKop ?? null,
+        dailyLimitKop: limits.kop,
+        todayCompletedSumKop: todaySumKop,
+        monthlyLimitKop: monthlyLimits.kop,
+        monthCompletedSumKop: monthSumKop,
+      }),
+    );
+
     // Ответ только примитивами — гарантированная сериализация без BigInt
     const body = {
       id: String(profile.id),
@@ -232,10 +248,7 @@ export async function GET(request: NextRequest) {
         sumKop: Number(monthSumKop),
       },
       /** Максимальная сумма одной заявки на вывод (коп); для подсказки и валидации на клиенте */
-      maxPayoutPerRequestKop:
-        profile.autoConfirmPayoutThresholdKop != null
-          ? Number(profile.autoConfirmPayoutThresholdKop)
-          : 10_000_000, // 100 000 ₽ по умолчанию
+      maxPayoutPerRequestKop,
       verificationStatus: String(profile.verificationStatus),
       verificationRejectionReason: profile.verificationRejectionReason != null ? String(profile.verificationRejectionReason) : null,
       savingFor: profile.savingFor != null ? String(profile.savingFor) : null,

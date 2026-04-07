@@ -75,6 +75,13 @@ function formatDayLabel(isoDateKey: string): string {
   }).format(new Date(isoDateKey + "T12:00:00"));
 }
 
+/** Парсинг суммы в ₽ из поля ввода → копейки; пусто/мусор → null. */
+function parsePayoutRubInputToKop(raw: string): number | null {
+  const v = parseFloat(String(raw).trim().replace(",", "."));
+  if (!Number.isFinite(v)) return null;
+  return Math.round(v * 100);
+}
+
 export default function CabinetTransactionsPage() {
   const router = useRouter();
   useSearchParams(); // subscribe to URL updates
@@ -89,8 +96,15 @@ export default function CabinetTransactionsPage() {
   const [sdPageError, setSdPageError] = useState<string | null>(null);
   const [sdPageNewTabHint, setSdPageNewTabHint] = useState(false);
   const [maxPayoutPerRequestKop, setMaxPayoutPerRequestKop] = useState<number>(10_000_000);
+  /** После ответа /api/profile — чтобы не отправлять вывод с дефолтным 100k до прихода лимитов. */
+  const [payoutLimitsFromProfile, setPayoutLimitsFromProfile] = useState(false);
   const [verificationStatus, setVerificationStatus] = useState<string | null>(null);
   const [login, setLogin] = useState<string | null>(null);
+
+  const maxPayoutRub = maxPayoutPerRequestKop / 100;
+  const enteredPayoutKop = parsePayoutRubInputToKop(sdPageAmount);
+  const payoutExceedsMax = enteredPayoutKop != null && enteredPayoutKop > maxPayoutPerRequestKop;
+  const canWithdrawByLimit = maxPayoutPerRequestKop >= PAYOUT_MIN_AMOUNT_KOP;
 
   const totalPages = Math.max(1, Math.ceil(list.length / PER_PAGE));
   const paginatedList = useMemo(
@@ -143,10 +157,17 @@ export default function CabinetTransactionsPage() {
         };
         setLogin(profile.login ?? null);
         setStats(profile.stats ?? null);
-        if (typeof profile.maxPayoutPerRequestKop === "number" && profile.maxPayoutPerRequestKop > 0) {
+        if (
+          typeof profile.maxPayoutPerRequestKop === "number" &&
+          Number.isFinite(profile.maxPayoutPerRequestKop) &&
+          profile.maxPayoutPerRequestKop >= 0
+        ) {
           setMaxPayoutPerRequestKop(profile.maxPayoutPerRequestKop);
         }
         setVerificationStatus(profile.verificationStatus ?? null);
+        setPayoutLimitsFromProfile(true);
+      } else {
+        setPayoutLimitsFromProfile(true);
       }
     } catch {
       setError("Ошибка соединения");
@@ -178,12 +199,15 @@ export default function CabinetTransactionsPage() {
   const handleSDPayOutPage = async () => {
     const token = localStorage.getItem("accessToken");
     if (!token) return;
-    const rub = parseFloat(sdPageAmount);
-    if (!rub || rub <= 0) {
+    if (!payoutLimitsFromProfile) {
+      setSdPageError("Подождите загрузки лимитов или обновите страницу");
+      return;
+    }
+    const amountKop = parsePayoutRubInputToKop(sdPageAmount);
+    if (amountKop == null || amountKop <= 0) {
       setSdPageError("Введите корректную сумму");
       return;
     }
-    const amountKop = Math.round(rub * 100);
     if (amountKop < PAYOUT_MIN_AMOUNT_KOP) {
       setSdPageError(`Минимальная сумма вывода ${(PAYOUT_MIN_AMOUNT_KOP / 100).toLocaleString("ru-RU")} ₽`);
       return;
@@ -269,20 +293,36 @@ export default function CabinetTransactionsPage() {
                 <PremiumCard balanceKop={stats.balanceKop} compact hideButtons variant={isM5Cabinet ? "m5" : "default"} />
               </div>
               <div className="mt-8 flex flex-col items-center gap-4">
-                <p className="text-center text-sm text-[var(--color-text)]">
-                  Введите сумму не больше {(maxPayoutPerRequestKop / 100).toLocaleString("ru-RU")} ₽
+                <p className="max-w-md text-center text-sm text-[var(--color-text)]">
+                  {canWithdrawByLimit ? (
+                    <>
+                      Сейчас за одну операцию доступно не больше{" "}
+                      <span className="font-semibold">{maxPayoutRub.toLocaleString("ru-RU")} ₽</span> — с учётом лимита
+                      на одну операцию и остатка суточного (при задании — месячного) лимита.
+                    </>
+                  ) : (
+                    <>
+                      Сейчас вывод по лимитам недоступен: суточный или месячный лимит исчерпан, либо остаток меньше
+                      минимума {(PAYOUT_MIN_AMOUNT_KOP / 100).toLocaleString("ru-RU")} ₽.
+                    </>
+                  )}
                 </p>
                 <div className="flex flex-wrap items-center justify-center gap-3">
                   <input
                     type="number"
                     step="0.01"
-                    min="100"
-                    max={maxPayoutPerRequestKop / 100}
+                    min={canWithdrawByLimit ? PAYOUT_MIN_AMOUNT_KOP / 100 : undefined}
+                    max={canWithdrawByLimit ? maxPayoutRub : undefined}
                     value={sdPageAmount}
                     onChange={(e) => { setSdPageAmount(e.target.value); setSdPageError(null); }}
-                    placeholder={`От 100 до ${(maxPayoutPerRequestKop / 100).toLocaleString("ru-RU")} ₽`}
-                    className={`min-w-[240px] max-w-full rounded-xl border bg-white px-5 py-3 text-[#0a192f] placeholder:text-[var(--color-text-secondary)]/70 focus:outline-none focus:ring-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none overflow-hidden ${
-                      sdPageAmount && parseFloat(sdPageAmount) > maxPayoutPerRequestKop / 100
+                    disabled={verificationStatus !== "VERIFIED" || !canWithdrawByLimit}
+                    placeholder={
+                      canWithdrawByLimit
+                        ? `От ${(PAYOUT_MIN_AMOUNT_KOP / 100).toLocaleString("ru-RU")} до ${maxPayoutRub.toLocaleString("ru-RU")} ₽`
+                        : "Лимит исчерпан"
+                    }
+                    className={`min-w-[240px] max-w-full rounded-xl border bg-white px-5 py-3 text-[#0a192f] placeholder:text-[var(--color-text-secondary)]/70 focus:outline-none focus:ring-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none overflow-hidden disabled:cursor-not-allowed disabled:opacity-60 ${
+                      payoutExceedsMax
                         ? "border-red-500 focus:ring-red-500/40"
                         : "border-[var(--color-brand-gold)]/30 focus:ring-[var(--color-brand-gold)]/40"
                     }`}
@@ -292,10 +332,13 @@ export default function CabinetTransactionsPage() {
                     onClick={handleSDPayOutPage}
                     disabled={
                       verificationStatus !== "VERIFIED" ||
+                      !payoutLimitsFromProfile ||
+                      !canWithdrawByLimit ||
                       sdPageLoading ||
                       !sdPageAmount ||
-                      parseFloat(sdPageAmount) < 100 ||
-                      Math.round(parseFloat(sdPageAmount) * 100) > maxPayoutPerRequestKop
+                      enteredPayoutKop == null ||
+                      enteredPayoutKop < PAYOUT_MIN_AMOUNT_KOP ||
+                      enteredPayoutKop > maxPayoutPerRequestKop
                     }
                     className={`w-auto ${CABINET_WAITER_BTN_INLINE} px-6 py-3 text-[14px] disabled:pointer-events-none`}
                     title={verificationStatus !== "VERIFIED" ? "Вывод доступен после прохождения верификации" : undefined}
@@ -308,14 +351,18 @@ export default function CabinetTransactionsPage() {
                     Вывод доступен после прохождения верификации в разделе профиля.
                   </p>
                 )}
-                {sdPageAmount && parseFloat(sdPageAmount) > 0 && Math.round(parseFloat(sdPageAmount) * 100) > maxPayoutPerRequestKop && (
+                {payoutExceedsMax && (
                   <p className="text-center text-sm font-medium text-red-600" role="alert">
-                    Сумма превышает лимит (макс. {(maxPayoutPerRequestKop / 100).toLocaleString("ru-RU")} ₽)
+                    Сумма превышает доступный сейчас максимум: не больше {maxPayoutRub.toLocaleString("ru-RU")} ₽ за эту
+                    операцию (с учётом суточного и месячного лимита).
                   </p>
                 )}
                 {(() => {
-                  const hasValidAmount = sdPageAmount && parseFloat(sdPageAmount) > 0 && Math.round(parseFloat(sdPageAmount) * 100) <= maxPayoutPerRequestKop;
-                  const amountKop = hasValidAmount && sdPageAmount ? Math.round(parseFloat(sdPageAmount) * 100) : 0;
+                  const hasValidAmount =
+                    enteredPayoutKop != null &&
+                    enteredPayoutKop >= PAYOUT_MIN_AMOUNT_KOP &&
+                    enteredPayoutKop <= maxPayoutPerRequestKop;
+                  const amountKop = hasValidAmount && enteredPayoutKop != null ? enteredPayoutKop : 0;
                   const feeKop = hasValidAmount ? feeKopForPayout(amountKop) : 0;
                   const totalKop = amountKop + feeKop;
                   return (

@@ -6764,3 +6764,26 @@ html .cabinet-mobile-nav-dialog[data-cabinet-theme="m5-competition"] a.cabinet-n
   color: var(--color-accent-red) !important;
   -webkit-text-fill-color: var(--color-accent-red) !important;
 }
+
+/*
+ * Светлая тема сайта (data-theme=light) + M5: утилиты .text-[var(--color-text*)] тянут значения с :root (#24313f).
+ * color-mix(/80) усиливает проблему; -webkit-text-fill-color у части WebKit не совпадает с color.
+ * Тот же приём, что у .cabinet-block-inner (~950): явный цвет + fill. #establishment-code — отдельные правила выше.
+ */
+html:not([data-theme="dark"])
+  .cabinet-premium[data-cabinet-theme="m5-competition"]
+  #main-content
+  .cabinet-join-establishment
+  [class*="text-[var(--color-text)]"]:not(#establishment-code) {
+  color: rgba(232, 234, 239, 0.97) !important;
+  -webkit-text-fill-color: rgba(232, 234, 239, 0.97) !important;
+}
+
+html:not([data-theme="dark"])
+  .cabinet-premium[data-cabinet-theme="m5-competition"]
+  #main-content
+  .cabinet-join-establishment
+  [class*="text-[var(--color-text-secondary)]"] {
+  color: rgba(232, 234, 239, 0.88) !important;
+  -webkit-text-fill-color: rgba(232, 234, 239, 0.88) !important;
+}

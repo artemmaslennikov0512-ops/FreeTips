@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { CreditCard, Loader2, X } from "lucide-react";
 import { ADMIN_BTN, ADMIN_BTN_PRIMARY } from "@/lib/admin-button-classes";
 import {
@@ -47,11 +48,6 @@ export default function AdminPaymentAcceptPage() {
   const [listTab, setListTab] = useState<"white" | "black">("white");
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ type: "ok" | "err"; text: string } | null>(null);
-  const [recipientMaxDailyIncomingRubles, setRecipientMaxDailyIncomingRubles] = useState("");
-  const [recipientMaxConcurrentPending, setRecipientMaxConcurrentPending] = useState("");
-  const [recipientMinMinutesBetweenPayInits, setRecipientMinMinutesBetweenPayInits] = useState("");
-  const [recipientMaxPayInitsPerDay, setRecipientMaxPayInitsPerDay] = useState("");
-  const [savingLimits, setSavingLimits] = useState(false);
 
   const applyServerLists = useCallback(
     (data: {
@@ -88,42 +84,9 @@ export default function AdminPaymentAcceptPage() {
           paymentBlacklistUserIds?: string[];
           whitelistText?: string;
           blacklistText?: string;
-          recipientMaxDailyIncomingRubles?: number | null;
-          recipientMaxConcurrentPendingPayments?: number | null;
-          recipientMinMinutesBetweenPayInits?: number | null;
-          recipientMaxPayInitsPerDay?: number | null;
         };
         setGlobalOff(data.globalPaymentsDisabled);
         applyServerLists(data);
-        if (data.recipientMaxDailyIncomingRubles != null && Number.isFinite(data.recipientMaxDailyIncomingRubles)) {
-          setRecipientMaxDailyIncomingRubles(String(data.recipientMaxDailyIncomingRubles));
-        } else {
-          setRecipientMaxDailyIncomingRubles("");
-        }
-        if (
-          data.recipientMaxConcurrentPendingPayments != null &&
-          Number.isFinite(data.recipientMaxConcurrentPendingPayments)
-        ) {
-          setRecipientMaxConcurrentPending(String(data.recipientMaxConcurrentPendingPayments));
-        } else {
-          setRecipientMaxConcurrentPending("");
-        }
-        if (
-          data.recipientMinMinutesBetweenPayInits != null &&
-          Number.isFinite(data.recipientMinMinutesBetweenPayInits)
-        ) {
-          setRecipientMinMinutesBetweenPayInits(String(data.recipientMinMinutesBetweenPayInits));
-        } else {
-          setRecipientMinMinutesBetweenPayInits("");
-        }
-        if (
-          data.recipientMaxPayInitsPerDay != null &&
-          Number.isFinite(data.recipientMaxPayInitsPerDay)
-        ) {
-          setRecipientMaxPayInitsPerDay(String(data.recipientMaxPayInitsPerDay));
-        } else {
-          setRecipientMaxPayInitsPerDay("");
-        }
       } catch {
         setLoadError("Ошибка соединения");
       } finally {
@@ -197,139 +160,6 @@ export default function AdminPaymentAcceptPage() {
       whitelistText: listsToText(whitelistEntries),
       blacklistText: listsToText(blacklistEntries),
     });
-  };
-
-  const saveRecipientLimits = () => {
-    const balRaw = recipientMaxDailyIncomingRubles.trim().replace(",", ".");
-    let recipientMaxDailyIncomingRublesPayload: number | null;
-    if (balRaw === "") {
-      recipientMaxDailyIncomingRublesPayload = null;
-    } else {
-      const n = Number(balRaw);
-      if (!Number.isFinite(n) || n < 0) {
-        setMessage({
-          type: "err",
-          text: "Суточная сумма входящих: введите неотрицательное число рублей или оставьте пустым.",
-        });
-        return;
-      }
-      recipientMaxDailyIncomingRublesPayload = n;
-    }
-
-    const concRaw = recipientMaxConcurrentPending.trim();
-    let recipientMaxConcurrentPendingPayments: number | null;
-    if (concRaw === "") {
-      recipientMaxConcurrentPendingPayments = null;
-    } else {
-      const c = parseInt(concRaw, 10);
-      if (!Number.isFinite(c) || c < 1 || c > 100) {
-        setMessage({ type: "err", text: "Незавершённые оплаты: целое число от 1 до 100 или пусто (без лимита)." });
-        return;
-      }
-      recipientMaxConcurrentPendingPayments = c;
-    }
-
-    const intervalRaw = recipientMinMinutesBetweenPayInits.trim();
-    let recipientMinMinutesBetweenPayInitsPayload: number | null;
-    if (intervalRaw === "") {
-      recipientMinMinutesBetweenPayInitsPayload = null;
-    } else {
-      const w = parseInt(intervalRaw, 10);
-      if (!Number.isFinite(w) || w < 1 || w > 10080) {
-        setMessage({
-          type: "err",
-          text: "Интервал: целое число минут от 1 до 10080 или пусто (без паузы между заказами).",
-        });
-        return;
-      }
-      recipientMinMinutesBetweenPayInitsPayload = w;
-    }
-
-    const dailyRaw = recipientMaxPayInitsPerDay.trim();
-    let recipientMaxPayInitsPerDayPayload: number | null;
-    if (dailyRaw === "") {
-      recipientMaxPayInitsPerDayPayload = null;
-    } else {
-      const d = parseInt(dailyRaw, 10);
-      if (!Number.isFinite(d) || d < 1 || d > 50_000) {
-        setMessage({
-          type: "err",
-          text: "Входящих за сутки: целое число от 1 до 50 000 или пусто (без лимита).",
-        });
-        return;
-      }
-      recipientMaxPayInitsPerDayPayload = d;
-    }
-
-    setSavingLimits(true);
-    setMessage(null);
-    const token = localStorage.getItem("accessToken");
-    if (!token) {
-      setSavingLimits(false);
-      return;
-    }
-    void (async () => {
-      try {
-        const res = await fetch("/api/admin/payment-accept", {
-          method: "PATCH",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            recipientMaxDailyIncomingRubles: recipientMaxDailyIncomingRublesPayload,
-            recipientMaxConcurrentPendingPayments,
-            recipientMinMinutesBetweenPayInits: recipientMinMinutesBetweenPayInitsPayload,
-            recipientMaxPayInitsPerDay: recipientMaxPayInitsPerDayPayload,
-          }),
-        });
-        const data = (await res.json()) as {
-          error?: string;
-          recipientMaxDailyIncomingRubles?: number | null;
-          recipientMaxConcurrentPendingPayments?: number | null;
-          recipientMinMinutesBetweenPayInits?: number | null;
-          recipientMaxPayInitsPerDay?: number | null;
-        };
-        if (!res.ok) {
-          setMessage({ type: "err", text: data.error ?? "Ошибка сохранения лимитов" });
-          return;
-        }
-        if (data.recipientMaxDailyIncomingRubles != null && Number.isFinite(data.recipientMaxDailyIncomingRubles)) {
-          setRecipientMaxDailyIncomingRubles(String(data.recipientMaxDailyIncomingRubles));
-        } else {
-          setRecipientMaxDailyIncomingRubles("");
-        }
-        if (
-          data.recipientMaxConcurrentPendingPayments != null &&
-          Number.isFinite(data.recipientMaxConcurrentPendingPayments)
-        ) {
-          setRecipientMaxConcurrentPending(String(data.recipientMaxConcurrentPendingPayments));
-        } else {
-          setRecipientMaxConcurrentPending("");
-        }
-        if (
-          data.recipientMinMinutesBetweenPayInits != null &&
-          Number.isFinite(data.recipientMinMinutesBetweenPayInits)
-        ) {
-          setRecipientMinMinutesBetweenPayInits(String(data.recipientMinMinutesBetweenPayInits));
-        } else {
-          setRecipientMinMinutesBetweenPayInits("");
-        }
-        if (
-          data.recipientMaxPayInitsPerDay != null &&
-          Number.isFinite(data.recipientMaxPayInitsPerDay)
-        ) {
-          setRecipientMaxPayInitsPerDay(String(data.recipientMaxPayInitsPerDay));
-        } else {
-          setRecipientMaxPayInitsPerDay("");
-        }
-        setMessage({ type: "ok", text: "Лимиты получателя сохранены." });
-      } catch {
-        setMessage({ type: "err", text: "Ошибка соединения" });
-      } finally {
-        setSavingLimits(false);
-      }
-    })();
   };
 
   const addToWhitelist = () => {
@@ -459,122 +289,17 @@ export default function AdminPaymentAcceptPage() {
         </div>
       </div>
 
-      <div className={`${ADMIN_PANEL_CARD} mx-auto w-full max-w-2xl`}>
-        <h2 className="text-center font-[family:var(--font-playfair)] text-lg font-semibold text-white">
-          Лимиты для получателя чаевых
-        </h2>
-        <p className="mt-2 text-center text-sm text-white/75">
-          Учитывается пользователь, на чей баланс уходит оплата по этой ссылке (официант или пул). Лимит
-          незавершённых оплат — только заказы в статусе ожидания оплаты в Paygine.
-        </p>
-        <div className="mt-6 grid gap-4 sm:grid-cols-1">
-          <div>
-            <label className="block text-sm font-medium text-white" htmlFor="recipient-max-daily-incoming">
-              Макс. сумма входящих за сутки (₽, МСК)
-            </label>
-            <p className="mt-1 text-xs text-white/65">
-              Пусто — без лимита. За сутки МСК: уже зачислено сегодня (SUCCESS по времени зачисления) + незавершённые,
-              созданные сегодня, + новый платёж. Гостю при срабатывании этого лимита показывается нейтральное сообщение.
-              Месячный потолок поступлений — поле «месячный лимит поступлений (чаевые)» в карточке пользователя (UTC-месяц);
-              лимит вывода в месяц на него не влияет. Если не задан — месячный лимит поступлений не действует.
-            </p>
-            <input
-              id="recipient-max-daily-incoming"
-              type="text"
-              inputMode="decimal"
-              className={`${ADMIN_PANEL_INPUT_FULL_WIDTH} mt-2`}
-              value={recipientMaxDailyIncomingRubles}
-              onChange={(e) => setRecipientMaxDailyIncomingRubles(e.target.value)}
-              disabled={saving || savingLimits}
-              placeholder="например 5000"
-              spellCheck={false}
-              autoComplete="off"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-white" htmlFor="recipient-max-pending">
-              Одновременно незавершённых заказов не больше (шт.)
-            </label>
-            <p className="mt-1 text-xs text-white/65">
-              Пусто — без лимита. Все заказы в ожидании оплаты (PENDING) у этого получателя; как только
-              оплата прошла или заказ снят, слот освобождается.
-            </p>
-            <input
-              id="recipient-max-pending"
-              type="text"
-              inputMode="numeric"
-              className={`${ADMIN_PANEL_INPUT_FULL_WIDTH} mt-2`}
-              value={recipientMaxConcurrentPending}
-              onChange={(e) => setRecipientMaxConcurrentPending(e.target.value)}
-              disabled={saving || savingLimits}
-              placeholder="например 2"
-              spellCheck={false}
-              autoComplete="off"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-white" htmlFor="recipient-pay-interval">
-              Минимальный интервал между созданием заказов (мин.)
-            </label>
-            <p className="mt-1 text-xs text-white/65">
-              Пусто — без паузы. Отсчёт от времени создания предыдущего заказа для этого же получателя
-              (включая уже оплаченные). Учитывайте: при интервале несколько гостей не смогут подряд
-              инициировать чаевые на одного официанта чаще указанного срока.
-            </p>
-            <input
-              id="recipient-pay-interval"
-              type="text"
-              inputMode="numeric"
-              className={`${ADMIN_PANEL_INPUT_FULL_WIDTH} mt-2`}
-              value={recipientMinMinutesBetweenPayInits}
-              onChange={(e) => setRecipientMinMinutesBetweenPayInits(e.target.value)}
-              disabled={saving || savingLimits}
-              placeholder="например 5"
-              spellCheck={false}
-              autoComplete="off"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-white" htmlFor="recipient-max-pay-inits-day">
-              Успешных зачислений за сутки не больше (шт., МСК)
-            </label>
-            <p className="mt-1 text-xs text-white/65">
-              Пусто — без лимита. Считаются только успешные зачисления (SUCCESS по времени зачисления) для этого
-              получателя с полуночи до полуночи по Москве. Гостю на странице оплаты при достижении лимита показывается
-              нейтральное сообщение (внутренняя политика).
-            </p>
-            <input
-              id="recipient-max-pay-inits-day"
-              type="text"
-              inputMode="numeric"
-              className={`${ADMIN_PANEL_INPUT_FULL_WIDTH} mt-2`}
-              value={recipientMaxPayInitsPerDay}
-              onChange={(e) => setRecipientMaxPayInitsPerDay(e.target.value)}
-              disabled={saving || savingLimits}
-              placeholder="например 20"
-              spellCheck={false}
-              autoComplete="off"
-            />
-          </div>
-        </div>
-        <div className="mt-6 flex justify-center">
-          <button
-            type="button"
-            className={BTN_PRIMARY}
-            disabled={saving || savingLimits}
-            onClick={saveRecipientLimits}
-          >
-            {savingLimits ? (
-              <span className="inline-flex items-center gap-2">
-                <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
-                Сохранение…
-              </span>
-            ) : (
-              "Сохранить лимиты"
-            )}
-          </button>
-        </div>
-      </div>
+      <p className="mx-auto w-full max-w-2xl text-center text-sm leading-relaxed text-white/70">
+        Лимиты на приём чаевых одному получателю (суточная сумма, незавершённые заказы, пауза между заказами, число
+        успешных зачислений за сутки) настраиваются в разделе{" "}
+        <Link
+          href="/admin/antifraud"
+          className="font-medium text-[var(--color-brand-gold)] underline-offset-2 hover:underline"
+        >
+          Антифрод
+        </Link>
+        .
+      </p>
 
       <div className="grid gap-6 md:grid-cols-2">
         <div className={`${ADMIN_PANEL_CARD} flex w-full min-w-0 flex-col items-center gap-3`}>

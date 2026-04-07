@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { ADMIN_BTN, ADMIN_BTN_PRIMARY } from "@/lib/admin-button-classes";
+import { RecipientPayLimitsCard } from "@/components/admin/RecipientPayLimitsCard";
 import { FraudSignalsSection } from "./FraudSignalsSection";
 import { ADMIN_PANEL_STATE_CENTER } from "@/lib/admin-surface-classes";
 
@@ -480,8 +481,10 @@ export default function AdminAntifraudPage() {
   }
 
   return (
-    <div className="min-w-0 max-w-full">
-      <h1 className="antifraud-page-title mb-6 text-xl font-semibold text-white text-center">Антифрод и лимиты</h1>
+    <div className="min-w-0 max-w-full space-y-6">
+      <h1 className="antifraud-page-title text-xl font-semibold text-white text-center">Антифрод и лимиты</h1>
+
+      <RecipientPayLimitsCard />
 
       <FraudSignalsSection />
 

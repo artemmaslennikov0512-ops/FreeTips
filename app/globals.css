@@ -2687,6 +2687,9 @@ html:not([data-theme="dark"]) .pay-page:not(.pay-page--m5-competition) .pay-page
 .pay-page .pay-page-logo-wrap {
   margin-bottom: 1.75rem;
 }
+.pay-page .pay-page-header-row .pay-page-logo-wrap {
+  margin-bottom: 0;
+}
 
 /* Логотип FT на странице оплаты — общий класс + тень */
 .pay-page .pay-page-logo-ft {
@@ -3126,6 +3129,56 @@ html:not([data-theme="dark"]) .pay-page:not(.pay-page--m5-competition) .pay-page
 }
 [data-theme="dark"] .pay-page:not(.pay-page--m5-competition) .pay-page-card.card .info-block {
   background: rgba(255, 255, 255, 0.06);
+}
+
+/*
+ * Блок «Приём временно недоступен»: красная схема для заметности.
+ * Не подмешиваем брендированный inline-фон карточки — он перекрывал фон и ломал контраст текста.
+ */
+.pay-page .pay-page-unavailable-alert.pay-page-card.card {
+  border-width: 1px;
+  border-style: solid;
+}
+html:not([data-theme="dark"]) .pay-page .pay-page-unavailable-alert.pay-page-card.card {
+  border-color: rgba(220, 38, 38, 0.55) !important;
+  background: rgba(254, 226, 226, 0.92) !important;
+  box-shadow: 0 2px 14px rgba(185, 28, 28, 0.18) !important;
+}
+html:not([data-theme="dark"]) .pay-page .pay-page-unavailable-alert.pay-page-card.card .pay-page-unavailable-alert-title,
+html:not([data-theme="dark"]) .pay-page .pay-page-unavailable-alert.pay-page-card.card .pay-page-section-title.pay-page-unavailable-alert-title,
+html:not([data-theme="dark"]) .pay-page .pay-page-unavailable-alert.pay-page-card.card .pay-page-unavailable-alert-body {
+  color: #991b1b !important;
+}
+[data-theme="dark"] .pay-page .pay-page-unavailable-alert.pay-page-card.card {
+  border-color: rgba(248, 113, 113, 0.55) !important;
+  background: rgba(127, 29, 29, 0.58) !important;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.35) !important;
+}
+[data-theme="dark"] .pay-page .pay-page-unavailable-alert.pay-page-card.card .pay-page-unavailable-alert-title,
+[data-theme="dark"] .pay-page .pay-page-unavailable-alert.pay-page-card.card .pay-page-section-title.pay-page-unavailable-alert-title,
+[data-theme="dark"] .pay-page .pay-page-unavailable-alert.pay-page-card.card .pay-page-unavailable-alert-body {
+  color: #fecaca !important;
+}
+html:not([data-theme="dark"]) .pay-page.pay-page--m5-competition .pay-page-unavailable-alert.pay-page-card.card {
+  border-color: rgba(248, 113, 113, 0.65) !important;
+  background: rgba(127, 29, 29, 0.62) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(254, 202, 202, 0.1),
+    0 2px 16px rgba(0, 0, 0, 0.45) !important;
+}
+html:not([data-theme="dark"]) .pay-page.pay-page--m5-competition .pay-page-unavailable-alert.pay-page-card.card .pay-page-unavailable-alert-title,
+html:not([data-theme="dark"]) .pay-page.pay-page--m5-competition .pay-page-unavailable-alert.pay-page-card.card .pay-page-section-title.pay-page-unavailable-alert-title,
+html:not([data-theme="dark"]) .pay-page.pay-page--m5-competition .pay-page-unavailable-alert.pay-page-card.card .pay-page-unavailable-alert-body {
+  color: #fecaca !important;
+}
+[data-theme="dark"] .pay-page.pay-page--m5-competition .pay-page-unavailable-alert.pay-page-card.card {
+  border-color: rgba(248, 113, 113, 0.6) !important;
+  background: rgba(153, 27, 27, 0.52) !important;
+}
+[data-theme="dark"] .pay-page.pay-page--m5-competition .pay-page-unavailable-alert.pay-page-card.card .pay-page-unavailable-alert-title,
+[data-theme="dark"] .pay-page.pay-page--m5-competition .pay-page-unavailable-alert.pay-page-card.card .pay-page-section-title.pay-page-unavailable-alert-title,
+[data-theme="dark"] .pay-page.pay-page--m5-competition .pay-page-unavailable-alert.pay-page-card.card .pay-page-unavailable-alert-body {
+  color: #fecaca !important;
 }
 
 /* M5: общие отступы/скругление карточек (без золотой «стеклянной» подложки) */
@@ -3594,6 +3647,12 @@ html:not([data-theme="dark"]) .pay-page:not(.pay-page--m5-competition) .pay-page
   max-width: 22rem;
   text-align: center;
   text-wrap: balance;
+}
+@media (min-width: 1024px) {
+  .pay-page .pay-support-callout h2,
+  .pay-page .pay-support-callout p {
+    max-width: min(42rem, 100%);
+  }
 }
 [data-theme="dark"] .pay-page:not(.pay-page--m5-competition) .pay-support-callout {
   background: #2d3748;

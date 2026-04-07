@@ -368,7 +368,7 @@ export default function PayPageClient() {
   if (loading) {
     return (
       <div className={`pay-page pay-page--cards${m5c} w-full`}>
-        <div className="mx-auto max-w-md px-4">
+        <div className="mx-auto w-full max-w-md px-4 lg:max-w-2xl">
           <LoadingSpinner message="Загрузка…" className="min-h-[60vh]" />
         </div>
       </div>
@@ -457,14 +457,14 @@ export default function PayPageClient() {
       className={`pay-page pay-page--cards flex min-h-screen w-full flex-col justify-center px-4 py-8${m5c}`}
       style={wrapperStyle}
     >
-      <div className="mx-auto w-full max-w-md">
+      <div className="mx-auto w-full max-w-md lg:max-w-2xl">
         {/* Основной блок со скруглёнными краями и отступами — внутри все карточки */}
         <div
           className="pay-page-outer-block rounded-2xl border-0 px-4 pt-5 pb-5 shadow-[var(--shadow-card)]"
         style={Object.keys(cardStyle).length ? cardStyle : undefined}
       >
         {/* Центр логотипа — середина блока; тема — в правой колонке (сетка 1fr / auto / 1fr) */}
-        <div className="pay-page-header-row mb-1 grid grid-cols-[1fr_auto_1fr] items-center gap-x-2 sm:gap-x-3">
+        <div className="pay-page-header-row mb-7 grid grid-cols-[1fr_auto_1fr] items-center gap-x-2 sm:gap-x-3">
           <span className="min-w-0" aria-hidden />
           <div className="pay-page-logo-wrap flex justify-center">
             {branding?.logoUrl ? (
@@ -534,13 +534,9 @@ export default function PayPageClient() {
         </div>
 
         {!acceptPayments && (
-          <div
-            className="pay-page-card card border-amber-500/50 bg-amber-500/10"
-            role="alert"
-            style={Object.keys(cardStyle).length ? cardStyle : undefined}
-          >
-            <p className="pay-page-section-title text-[var(--color-text)]">Приём временно недоступен</p>
-            <p className="mt-2 text-center text-sm text-[var(--color-text-secondary)]">
+          <div className="pay-page-unavailable-alert pay-page-card card" role="alert">
+            <p className="pay-page-section-title pay-page-unavailable-alert-title">Приём временно недоступен</p>
+            <p className="pay-page-unavailable-alert-body mt-2 text-center text-sm">
               {paymentUnavailableReason ??
                 "Перевод по этой ссылке сейчас отключён администратором. Страница открывается, но оплату отправить нельзя — попробуйте позже."}
             </p>
@@ -618,23 +614,25 @@ export default function PayPageClient() {
           </p>
         )}
 
-        <button
-          type="button"
-          onClick={handlePay}
-          disabled={!acceptPayments || paying || kop < PAYMENT_MIN_AMOUNT_KOP || kop > PAYMENT_MAX_AMOUNT_KOP}
-          className="pay-button pay-page-submit"
-        >
-          {paying ? (
-            <span className="inline-flex items-center justify-center gap-2">
-              <Loader2 className="h-5 w-5 animate-spin" />
-              Отправка…
-            </span>
-          ) : (
-            `Оплатить ${rub.toFixed(rub >= 1 ? 0 : 2)} ₽`
-          )}
-        </button>
+        <div className="flex flex-col">
+          <button
+            type="button"
+            onClick={handlePay}
+            disabled={!acceptPayments || paying || kop < PAYMENT_MIN_AMOUNT_KOP || kop > PAYMENT_MAX_AMOUNT_KOP}
+            className="order-1 pay-button pay-page-submit lg:order-2"
+          >
+            {paying ? (
+              <span className="inline-flex items-center justify-center gap-2">
+                <Loader2 className="h-5 w-5 animate-spin" />
+                Отправка…
+              </span>
+            ) : (
+              `Оплатить ${rub.toFixed(rub >= 1 ? 0 : 2)} ₽`
+            )}
+          </button>
 
-        <PayTelegramSupportBlock />
+          <PayTelegramSupportBlock className="order-2 lg:order-1" />
+        </div>
       </div>
       </div>
     </div>

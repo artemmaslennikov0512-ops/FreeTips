@@ -248,7 +248,7 @@ export async function evaluateRecipientPayLimits(
   if (maxConcurrent != null) {
     const n = await countAllPending(recipientId);
     if (n >= maxConcurrent) {
-      return `Уже открыто максимум незавершённых оплат (${maxConcurrent}). Завершите оплату в банке или подождите истечения заказа.`;
+      return "Превышен лимит одновременных заявок на оплату. Пожалуйста, повторите попытку позже. Если платёж уже начат — завершите его в приложении банка.";
     }
   }
 
@@ -260,7 +260,7 @@ export async function evaluateRecipientPayLimits(
       const needMs = minGapMin * 60 * 1000;
       if (elapsedMs < needMs) {
         const waitMin = Math.max(1, Math.ceil((needMs - elapsedMs) / 60_000));
-        return `Новый заказ можно создать примерно через ${waitMin} мин.`;
+        return `Следующую оплату можно начать примерно через ${waitMin} мин.`;
       }
     }
   }

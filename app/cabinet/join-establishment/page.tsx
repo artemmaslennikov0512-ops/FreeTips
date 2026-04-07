@@ -184,14 +184,13 @@ export default function JoinEstablishmentPage() {
       : "border-[var(--color-brand-gold)]/25 focus:border-[var(--color-brand-gold)]/40 focus:ring-[var(--color-brand-gold)]/20");
 
   return (
-    <div className="mx-auto w-full max-w-xl space-y-8 pb-2">
+    <div className="cabinet-form-surface mx-auto w-full max-w-xl space-y-8 pb-2">
       <div className="text-center">
         <h1 className="font-[family:var(--font-playfair)] text-xl font-semibold text-[var(--color-text)] sm:text-2xl">
           Подключиться к заведению
         </h1>
         <p className="mt-2 text-sm leading-relaxed text-[var(--color-text-secondary)]">
-          Введите код заведения (тот же, что в ссылке на общий пул <span className="font-mono text-[var(--color-text)]/90">/pay/…</span>).
-          Код можно получить у администратора заведения.
+          Введите код заведения. Его можно получить у администратора заведения.
         </p>
       </div>
 
@@ -267,12 +266,12 @@ export default function JoinEstablishmentPage() {
         )}
       </div>
 
-      <div className="text-center">
-        <h2 className="mb-3 text-lg font-semibold text-[var(--color-text)]">Мои заявки</h2>
+      <div className="flex w-full flex-col items-center text-center">
+        <h2 className="mb-3 w-full text-lg font-semibold text-[var(--color-text)]">Мои заявки</h2>
         {requests.length === 0 ? (
-          <p className="text-sm text-[var(--color-text-secondary)]">Пока нет заявок.</p>
+          <p className="w-full max-w-md text-center text-sm text-[var(--color-text-secondary)]">Пока нет заявок.</p>
         ) : (
-          <ul className="space-y-3 text-start">
+          <ul className="w-full space-y-3 text-start">
             {requests.map((r) => (
               <li
                 key={r.id}

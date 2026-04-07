@@ -592,7 +592,10 @@ export default function PayPageClient() {
         </div>
 
         {/* Карточка: отзыв */}
-        <div className="pay-page-card card" style={Object.keys(cardStyle).length ? cardStyle : undefined}>
+        <div
+          className="pay-page-card pay-page-card--review card"
+          style={Object.keys(cardStyle).length ? cardStyle : undefined}
+        >
           <p className="pay-page-section-title">Отзыв (необязательно)</p>
           <div className="pay-page-input-wrap">
             <textarea
@@ -614,7 +617,7 @@ export default function PayPageClient() {
           </p>
         )}
 
-        <div className="flex flex-col">
+        <div className="pay-page-pay-footer flex flex-col gap-3">
           <button
             type="button"
             onClick={handlePay}

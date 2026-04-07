@@ -144,7 +144,7 @@ export default function LeaveEstablishmentPage() {
   const pending = requests.find((r) => r.status === "PENDING");
 
   return (
-    <div className="mx-auto w-full max-w-xl space-y-8 pb-2">
+    <div className="cabinet-form-surface mx-auto w-full max-w-xl space-y-8 pb-2">
       <div className="text-center">
         <h1 className="font-[family:var(--font-playfair)] text-xl font-semibold text-[var(--color-text)] sm:text-2xl">
           Покинуть заведение
@@ -191,12 +191,12 @@ export default function LeaveEstablishmentPage() {
         {actionError && <FieldError>{actionError}</FieldError>}
       </div>
 
-      <div className="text-center">
-        <h2 className="mb-3 text-lg font-semibold text-[var(--color-text)]">История заявок</h2>
+      <div className="flex w-full flex-col items-center text-center">
+        <h2 className="mb-3 w-full text-lg font-semibold text-[var(--color-text)]">История заявок</h2>
         {requests.length === 0 ? (
-          <p className="text-sm text-[var(--color-text-secondary)]">Пока нет заявок.</p>
+          <p className="w-full max-w-md text-center text-sm text-[var(--color-text-secondary)]">Пока нет заявок.</p>
         ) : (
-          <ul className="space-y-3 text-start">
+          <ul className="w-full space-y-3 text-start">
             {requests.map((r) => (
               <li
                 key={r.id}

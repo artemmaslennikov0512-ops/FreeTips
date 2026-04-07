@@ -618,11 +618,12 @@ export default function PayPageClient() {
         )}
 
         <div className="pay-page-pay-footer flex flex-col gap-3">
+          <PayTelegramSupportBlock />
           <button
             type="button"
             onClick={handlePay}
             disabled={!acceptPayments || paying || kop < PAYMENT_MIN_AMOUNT_KOP || kop > PAYMENT_MAX_AMOUNT_KOP}
-            className="order-1 pay-button pay-page-submit lg:order-2"
+            className="pay-button pay-page-submit"
           >
             {paying ? (
               <span className="inline-flex items-center justify-center gap-2">
@@ -633,8 +634,6 @@ export default function PayPageClient() {
               `Оплатить ${rub.toFixed(rub >= 1 ? 0 : 2)} ₽`
             )}
           </button>
-
-          <PayTelegramSupportBlock className="order-2 lg:order-1" />
         </div>
       </div>
       </div>

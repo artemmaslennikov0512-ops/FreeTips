@@ -184,7 +184,7 @@ export default function JoinEstablishmentPage() {
       : "border-[var(--color-brand-gold)]/25 focus:border-[var(--color-brand-gold)]/40 focus:ring-[var(--color-brand-gold)]/20");
 
   return (
-    <div className="cabinet-form-surface mx-auto w-full max-w-xl space-y-8 pb-2">
+    <div className="cabinet-form-surface cabinet-join-establishment mx-auto w-full max-w-xl space-y-8 pb-2">
       <div className="text-center">
         <h1 className="font-[family:var(--font-playfair)] text-xl font-semibold text-[var(--color-text)] sm:text-2xl">
           Подключиться к заведению
@@ -286,7 +286,10 @@ export default function JoinEstablishmentPage() {
                   </div>
                 )}
                 {r.status === "APPROVED" && (
-                  <p className="mt-3 rounded-lg border border-emerald-600/25 bg-emerald-600/10 px-3 py-2 text-sm text-emerald-900 dark:border-emerald-400/25 dark:bg-emerald-400/10 dark:text-emerald-100">
+                  <p
+                    data-join-approved-hint
+                    className="mt-3 rounded-lg border border-emerald-600/25 bg-emerald-600/10 px-3 py-2 text-sm text-emerald-900 dark:border-emerald-400/25 dark:bg-emerald-400/10 dark:text-emerald-100"
+                  >
                     Выйдите из аккаунта и войдите снова, чтобы обновилась роль в системе.
                   </p>
                 )}

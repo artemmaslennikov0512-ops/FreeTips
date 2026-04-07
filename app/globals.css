@@ -6712,3 +6712,55 @@ html .cabinet-mobile-nav-dialog[data-cabinet-theme="m5-competition"] a.cabinet-n
   color: #f2f5fa !important;
   box-shadow: 0 0 26px rgba(28, 105, 212, 0.18) !important;
 }
+
+/*
+ * Подключение к заведению (M5): при data-theme=light на сайте Tailwind text-[var(--color-text)] и бренд на корне
+ * могут оставлять тёмный кегль на тёмной панели. Якорь .cabinet-join-establishment + конец файла = гарантированный контраст.
+ */
+.cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-join-establishment.cabinet-form-surface {
+  --color-text: #ffffff !important;
+  --color-text-secondary: rgba(255, 255, 255, 0.84) !important;
+  color: #ffffff !important;
+}
+
+.cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-join-establishment :is(h1, h2) {
+  color: #ffffff !important;
+}
+
+.cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-join-establishment label[for="establishment-code"],
+.cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-join-establishment #establishment-code-hint,
+.cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-join-establishment > .text-center > p {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-join-establishment #establishment-code-hint .font-mono {
+  color: rgba(255, 255, 255, 0.92) !important;
+  text-shadow: none !important;
+}
+
+.cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-join-establishment #establishment-code {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  caret-color: #ffffff;
+}
+
+.cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-join-establishment #establishment-code::placeholder {
+  color: rgba(255, 255, 255, 0.55) !important;
+  opacity: 1 !important;
+}
+
+.cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-join-establishment .cabinet-card p,
+.cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-join-establishment .cabinet-card li p,
+.cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-join-establishment .flex.w-full.flex-col > p {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-join-establishment p[data-join-approved-hint] {
+  color: rgba(209, 250, 229, 0.96) !important;
+  -webkit-text-fill-color: rgba(209, 250, 229, 0.96) !important;
+}
+
+.cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-join-establishment [role="alert"] {
+  color: var(--color-accent-red) !important;
+  -webkit-text-fill-color: var(--color-accent-red) !important;
+}

@@ -15,10 +15,12 @@ export type PendingTxCreditRow = {
 };
 
 function feeForTx(row: PendingTxCreditRow): bigint {
+  if (row.feeKop != null) return row.feeKop;
+  // Карта: комиссия у плательщика поверх суммы заказа в Paygine; amountKop — сумма к распределению, не уменьшаем на оценку.
+  if (row.paymentMethod !== "sbp") return BigInt(0);
   const amountNum = Number(row.amountKop);
   if (!Number.isFinite(amountNum) || amountNum <= 0) return BigInt(0);
-  const method = row.paymentMethod === "sbp" ? "sbp" : "card";
-  return row.feeKop ?? BigInt(feeKopForIncoming(amountNum, method));
+  return BigInt(feeKopForIncoming(amountNum, "sbp"));
 }
 
 /** Сколько копеек получит recipientId этого Transaction при успешной оплате (оценка для PENDING). */
@@ -43,11 +45,9 @@ export function projectedNetCreditForNewTipKop(input: {
   tipSplit: { establishmentSharePercent: number } | null;
 }): bigint {
   const amountNum = Number(input.amountKop);
-  const fee = BigInt(feeKopForIncoming(amountNum, "card"));
-  const netAfterFee = input.amountKop - fee;
-  if (netAfterFee <= BigInt(0)) return BigInt(0);
+  if (!Number.isFinite(amountNum) || amountNum <= 0) return BigInt(0);
   const split = input.tipSplit;
-  if (!split || split.establishmentSharePercent <= 0) return netAfterFee;
-  const share = poolShareKopFromNet(netAfterFee, split.establishmentSharePercent);
-  return netAfterFee - share;
+  if (!split || split.establishmentSharePercent <= 0) return input.amountKop;
+  const share = poolShareKopFromNet(input.amountKop, split.establishmentSharePercent);
+  return input.amountKop - share;
 }

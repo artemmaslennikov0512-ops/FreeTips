@@ -108,20 +108,36 @@ export async function POST(request: NextRequest) {
 
   const [todayCount, todaySum, monthCount, monthSum] = await Promise.all([
     db.payoutRequest.count({
-      where: { userId: auth.userId, createdAt: { gte: dayStart } },
+      where: {
+        userId: auth.userId,
+        status: "COMPLETED",
+        updatedAt: { gte: dayStart },
+      },
     }),
     db.payoutRequest.aggregate({
-      where: { userId: auth.userId, createdAt: { gte: dayStart } },
+      where: {
+        userId: auth.userId,
+        status: "COMPLETED",
+        updatedAt: { gte: dayStart },
+      },
       _sum: { amountKop: true },
     }),
     monthlyLimits.count != null
       ? db.payoutRequest.count({
-          where: { userId: auth.userId, createdAt: { gte: monthStart } },
+          where: {
+            userId: auth.userId,
+            status: "COMPLETED",
+            updatedAt: { gte: monthStart },
+          },
         })
       : Promise.resolve(0),
     monthlyLimits.kop != null
       ? db.payoutRequest.aggregate({
-          where: { userId: auth.userId, createdAt: { gte: monthStart } },
+          where: {
+            userId: auth.userId,
+            status: "COMPLETED",
+            updatedAt: { gte: monthStart },
+          },
           _sum: { amountKop: true },
         })
       : Promise.resolve({ _sum: { amountKop: null as bigint | null } }),

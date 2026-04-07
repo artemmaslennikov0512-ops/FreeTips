@@ -16,6 +16,8 @@ import {
   BadgeCheck,
   Building2,
   User,
+  UserPlus,
+  UserMinus,
   Laptop,
   ChevronLeft,
   ChevronRight,
@@ -40,10 +42,31 @@ const LG_SIDEBAR_COLLAPSE_BTN =
 const LG_SIDEBAR_EXPAND_BTN =
   "cabinet-lg-sidebar-toggle cabinet-lg-sidebar-toggle--expand fixed left-0 top-1/2 z-[35] hidden h-9 w-9 -translate-y-1/2 translate-x-1/2 items-center justify-center rounded-full border border-white/20 bg-[var(--color-navy)] text-[var(--color-text)] shadow-none transition-[color,background-color,border-color] duration-200 hover:border-white/35 hover:bg-white/[0.08] hover:text-[var(--color-text)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-gold)]/35 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent lg:flex";
 
-const NAV: { label: string; href: string; icon: LucideIcon; iconClass: string }[] = [
+const NAV: {
+  label: string;
+  href: string;
+  icon: LucideIcon;
+  iconClass: string;
+  recipientOnly?: boolean;
+  employeeOnly?: boolean;
+}[] = [
   { label: "Дашборд", href: "/cabinet", icon: LayoutDashboard, iconClass: "!text-sky-400" },
   { label: "Операции", href: "/cabinet/transactions", icon: List, iconClass: "!text-emerald-400" },
   { label: "Моя ссылка", href: "/cabinet/link", icon: Link2, iconClass: "!text-amber-400" },
+  {
+    label: "Подключиться к заведению",
+    href: "/cabinet/join-establishment",
+    icon: UserPlus,
+    iconClass: "!text-rose-400",
+    recipientOnly: true,
+  },
+  {
+    label: "Покинуть заведение",
+    href: "/cabinet/leave-establishment",
+    icon: UserMinus,
+    iconClass: "!text-orange-400",
+    employeeOnly: true,
+  },
   { label: "Верификация", href: "/cabinet/verification", icon: ShieldCheck, iconClass: "!text-violet-400" },
   { label: "Поддержка", href: "/cabinet/support", icon: MessageCircle, iconClass: "!text-cyan-400" },
   { label: "Сессии", href: "/cabinet/sessions", icon: Laptop, iconClass: "!text-slate-300" },
@@ -284,6 +307,16 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
     ? "cabinet-nav-active cabinet-nav-active-m5 font-semibold text-[var(--color-text)]"
     : "cabinet-nav-active border border-[#0a192f]/25 bg-[#0a192f]/10 text-[#0a192f] font-semibold";
 
+  const visibleNav = useMemo(
+    () =>
+      NAV.filter((item) => {
+        if (item.recipientOnly && user?.role !== "RECIPIENT") return false;
+        if (item.employeeOnly && user?.role !== "EMPLOYEE") return false;
+        return true;
+      }),
+    [user?.role],
+  );
+
   const mobileNavValue = useMemo<CabinetMobileNavContextValue>(
     () => ({
       sidebarOpen,
@@ -292,7 +325,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
       menuButtonRef,
       user,
       supportUnreadCount,
-      NAV,
+      NAV: visibleNav,
       isActive,
       navActiveClasses,
       handleLogout,
@@ -312,6 +345,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
       menuButtonRef,
       user,
       supportUnreadCount,
+      visibleNav,
       isActive,
       navActiveClasses,
       handleLogout,
@@ -424,7 +458,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
         </div>
         <div className="cabinet-nav-block flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto overflow-x-hidden px-4">
           <nav className="flex flex-col gap-0.5 rounded-[10px] border border-[var(--color-brand-gold)]/15 bg-[var(--color-dark-gray)]/5 p-1.5 shadow-[var(--shadow-subtle)]" aria-label="Навигация по кабинету">
-            {NAV.map(({ label, href, icon: Icon, iconClass }) => (
+            {visibleNav.map(({ label, href, icon: Icon, iconClass }) => (
               <Link
                 key={href}
                 href={href}

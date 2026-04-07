@@ -51,7 +51,7 @@ export default function CabinetDashboardPage() {
   const [payoutUsageToday, setPayoutUsageToday] = useState<{ count: number; sumKop: number } | null>(null);
   const [payoutUsageMonth, setPayoutUsageMonth] = useState<{ count: number; sumKop: number } | null>(null);
   const [incomingMonthlyLimitKop, setIncomingMonthlyLimitKop] = useState<number | null>(null);
-  const [incomingMonthReservedSumKop, setIncomingMonthReservedSumKop] = useState<number>(0);
+  const [incomingMonthSuccessSumKop, setIncomingMonthSuccessSumKop] = useState<number>(0);
   const [error, setError] = useState<string | null>(null);
   const [tipLink, setTipLink] = useState<string | null>(null);
   const [tipWaiterCode, setTipWaiterCode] = useState<string | null>(null);
@@ -103,7 +103,7 @@ export default function CabinetDashboardPage() {
         payoutUsageToday?: { count: number; sumKop: number };
         payoutUsageMonth?: { count: number; sumKop: number };
         incomingMonthlyLimitKop?: number | null;
-        incomingMonthReservedSumKop?: number;
+        incomingMonthSuccessSumKop?: number;
         verificationStatus?: string;
       };
       setStats(profile.stats ?? null);
@@ -121,8 +121,8 @@ export default function CabinetDashboardPage() {
           ? profile.incomingMonthlyLimitKop
           : null,
       );
-      setIncomingMonthReservedSumKop(
-        typeof profile.incomingMonthReservedSumKop === "number" ? profile.incomingMonthReservedSumKop : 0,
+      setIncomingMonthSuccessSumKop(
+        typeof profile.incomingMonthSuccessSumKop === "number" ? profile.incomingMonthSuccessSumKop : 0,
       );
       setVerificationStatus(profile.verificationStatus ?? null);
       const linksRes = await fetch("/api/links", { headers: { Authorization: `Bearer ${token}` } });
@@ -303,7 +303,7 @@ export default function CabinetDashboardPage() {
               : 0,
           incomingMonthSum:
             typeof incomingMonthlyLimitKop === "number" && incomingMonthlyLimitKop > 0
-              ? Math.min(100, (incomingMonthReservedSumKop / incomingMonthlyLimitKop) * 100)
+              ? Math.min(100, (incomingMonthSuccessSumKop / incomingMonthlyLimitKop) * 100)
               : 0,
         }
       : null;
@@ -457,7 +457,7 @@ export default function CabinetDashboardPage() {
                           Поступления за месяц
                         </span>
                         <span className="font-medium text-[var(--color-text)]">
-                          {formatMoney(BigInt(incomingMonthReservedSumKop))} из{" "}
+                          {formatMoney(BigInt(incomingMonthSuccessSumKop))} из{" "}
                           {formatMoney(BigInt(incomingMonthlyLimitKop))}
                         </span>
                       </div>
@@ -468,7 +468,7 @@ export default function CabinetDashboardPage() {
                             width: `${Math.min(
                               100,
                               incomingMonthlyLimitKop > 0
-                                ? (incomingMonthReservedSumKop / incomingMonthlyLimitKop) * 100
+                                ? (incomingMonthSuccessSumKop / incomingMonthlyLimitKop) * 100
                                 : 0,
                             )}%`,
                           }}

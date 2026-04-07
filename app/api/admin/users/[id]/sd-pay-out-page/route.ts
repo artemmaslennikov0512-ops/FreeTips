@@ -83,10 +83,18 @@ export async function POST(
 
   const [todayCount, todaySum] = await Promise.all([
     db.payoutRequest.count({
-      where: { userId: targetUserId, createdAt: { gte: dayStart } },
+      where: {
+        userId: targetUserId,
+        status: "COMPLETED",
+        updatedAt: { gte: dayStart },
+      },
     }),
     db.payoutRequest.aggregate({
-      where: { userId: targetUserId, createdAt: { gte: dayStart } },
+      where: {
+        userId: targetUserId,
+        status: "COMPLETED",
+        updatedAt: { gte: dayStart },
+      },
       _sum: { amountKop: true },
     }),
   ]);

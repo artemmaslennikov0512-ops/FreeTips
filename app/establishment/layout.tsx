@@ -3,7 +3,19 @@
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
-import { LayoutDashboard, LogOut, Users, PieChart, BarChart3, Palette, QrCode, KeyRound, Laptop } from "lucide-react";
+import {
+  LayoutDashboard,
+  LogOut,
+  Users,
+  UserPlus,
+  UserMinus,
+  PieChart,
+  BarChart3,
+  Palette,
+  QrCode,
+  KeyRound,
+  Laptop,
+} from "lucide-react";
 import { getAccessToken, fetchWithAuth, clearAccessToken } from "@/lib/auth-client";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
@@ -20,6 +32,8 @@ interface Profile {
 const NAV = [
   { label: "Дашборд", href: "/establishment" },
   { label: "Команда", href: "/establishment/team" },
+  { label: "Подключение сотрудников", href: "/establishment/join-requests" },
+  { label: "Заявки на выход", href: "/establishment/leave-requests" },
   { label: "QR и печать", href: "/establishment/qr" },
   { label: "Распределение", href: "/establishment/payout-rules" },
   { label: "Аналитика", href: "/establishment/analytics" },
@@ -133,7 +147,7 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
   }
 
   const isActive = (href: string) => pathname === href || (href !== "/establishment" && pathname.startsWith(href));
-  const navIcons = [LayoutDashboard, Users, QrCode, PieChart, BarChart3, Palette, Laptop, KeyRound] as const;
+  const navIcons = [LayoutDashboard, Users, UserPlus, UserMinus, QrCode, PieChart, BarChart3, Palette, Laptop, KeyRound] as const;
 
   return (
     <div className="establishment-panel cabinet-premium flex min-h-screen w-full min-w-0 max-w-full overflow-x-hidden bg-[var(--color-bg)] font-[family:var(--font-inter)] text-white pt-3 lg:pt-6">

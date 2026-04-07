@@ -1,8 +1,8 @@
 /**
  * Лимиты приёма на получателя:
- * — суточная сумма входящих (МСК) из настроек платформы (внутренний антиотмывочный потолок);
- * — месячная сумма поступлений по полю incomingMonthlyLimitKop в профиле (UTC-месяц);
- * — число успешных зачислений за сутки МСК, одновременные PENDING, интервал от последнего создания заказа.
+ * — суточная сумма (МСК): SUCCESS за сегодня + только «свежие» PENDING (см. pendingCreatedLowerBound);
+ * — месячная сумма: только SUCCESS за UTC-месяц;
+ * — успешные зачисления за сутки МСК, одновременные свежие PENDING, интервал между созданиями.
  */
 
 import { db } from "@/lib/db";
@@ -76,16 +76,38 @@ export function effectiveMaxPayInitsPerDay(settings: RecipientPayLimitSettings):
   return Math.min(i, 50_000);
 }
 
+/** Сколько минут PENDING считается «активным» для суточной суммы и слотов: интервал из настроек или 5. */
+export function pendingFreshnessMinutesForLimits(settings: RecipientPayLimitSettings): number {
+  return effectiveMinMinutesBetweenPayInits(settings) ?? 5;
+}
+
 /**
- * Сумма поступлений за календарные сутки МСК: SUCCESS с updatedAt с полуночи МСК (факт зачисления) +
- * PENDING, созданные сегодня (резерв).
+ * Нижняя граница createdAt для PENDING: не старше freshness от now и не раньше полуночи МСК (сутки).
  */
-async function sumIncomingNetKopMskDay(recipientId: string, dayStart: Date): Promise<bigint> {
+export function pendingCreatedLowerBound(
+  moscowDayStart: Date,
+  settings: RecipientPayLimitSettings,
+  now: Date = new Date(),
+): Date {
+  const min = pendingFreshnessMinutesForLimits(settings);
+  const freshLine = new Date(now.getTime() - min * 60_000);
+  return freshLine > moscowDayStart ? freshLine : moscowDayStart;
+}
+
+/**
+ * Сумма за сутки МСК: SUCCESS с updatedAt с полуночи МСК + PENDING с createdAt ≥ pendingCreatedSince
+ * (неоплаченные дольше окна «свежести» не резервируют суточный лимит и не занимают слоты).
+ */
+async function sumIncomingNetKopMskDay(
+  recipientId: string,
+  dayStart: Date,
+  pendingCreatedSince: Date,
+): Promise<bigint> {
   const rows = await db.transaction.findMany({
     where: {
       recipientId,
       OR: [
-        { status: TransactionStatus.PENDING, createdAt: { gte: dayStart } },
+        { status: TransactionStatus.PENDING, createdAt: { gte: pendingCreatedSince } },
         { status: TransactionStatus.SUCCESS, updatedAt: { gte: dayStart } },
       ],
     },
@@ -110,44 +132,39 @@ async function sumIncomingNetKopMskDay(recipientId: string, dayStart: Date): Pro
 }
 
 /**
- * Учёт месячного лимита поступлений (UTC-месяц):
- * SUCCESS с updatedAt в месяце + PENDING, созданные в этом месяце.
+ * Сумма успешно зачисленных чаевых за UTC-месяц (по времени зачисления) — нетто получателю, как в балансе.
+ * Месячный лимит поступлений и прогресс в ЛК считаются только по SUCCESS, без резерва по PENDING.
  */
-export async function sumIncomingReservedNetKopUtcMonth(
+export async function sumIncomingSuccessNetKopUtcMonth(
   recipientId: string,
   monthStartUtc: Date,
 ): Promise<bigint> {
   const rows = await db.transaction.findMany({
     where: {
       recipientId,
-      OR: [
-        { status: TransactionStatus.PENDING, createdAt: { gte: monthStartUtc } },
-        { status: TransactionStatus.SUCCESS, updatedAt: { gte: monthStartUtc } },
-      ],
+      status: TransactionStatus.SUCCESS,
+      updatedAt: { gte: monthStartUtc },
     },
     select: {
-      status: true,
       amountKop: true,
       feeKop: true,
       establishmentShareKop: true,
-      paymentMethod: true,
-      payerInfo: true,
     },
   });
   let sum = BigInt(0);
   for (const r of rows) {
-    if (r.status === TransactionStatus.PENDING) {
-      sum += pendingNetCreditToRecipientKop(r as PendingTxCreditRow);
-    } else {
-      sum += successNetToRecipientKop(r);
-    }
+    sum += successNetToRecipientKop(r);
   }
   return sum;
 }
 
-async function countAllPending(recipientId: string): Promise<number> {
+async function countFreshPending(recipientId: string, pendingCreatedSince: Date): Promise<number> {
   return db.transaction.count({
-    where: { recipientId, status: TransactionStatus.PENDING },
+    where: {
+      recipientId,
+      status: TransactionStatus.PENDING,
+      createdAt: { gte: pendingCreatedSince },
+    },
   });
 }
 
@@ -223,13 +240,15 @@ export async function evaluateRecipientPayLimits(
   const needDaily = dailyKopCap != null;
   const needMonthly = monthlyKopCap != null;
 
+  const moscowDayStart = getMoscowDayStart();
+  const pendingCreatedSince = pendingCreatedLowerBound(moscowDayStart, limits);
+
   if (needDaily || needMonthly) {
-    const moscowDayStart = getMoscowDayStart();
     const monthStartUtc = getUtcMonthStart();
     const [daySum, monthSum] = await Promise.all([
-      needDaily ? sumIncomingNetKopMskDay(recipientId, moscowDayStart) : Promise.resolve(BigInt(0)),
+      needDaily ? sumIncomingNetKopMskDay(recipientId, moscowDayStart, pendingCreatedSince) : Promise.resolve(BigInt(0)),
       needMonthly
-        ? sumIncomingReservedNetKopUtcMonth(recipientId, monthStartUtc)
+        ? sumIncomingSuccessNetKopUtcMonth(recipientId, monthStartUtc)
         : Promise.resolve(BigInt(0)),
     ]);
 
@@ -246,7 +265,7 @@ export async function evaluateRecipientPayLimits(
 
   const maxConcurrent = effectiveMaxConcurrentPendingPayments(limits);
   if (maxConcurrent != null) {
-    const n = await countAllPending(recipientId);
+    const n = await countFreshPending(recipientId, pendingCreatedSince);
     if (n >= maxConcurrent) {
       return "Превышен лимит одновременных заявок на оплату. Пожалуйста, повторите попытку позже. Если платёж уже начат — завершите его в приложении банка.";
     }

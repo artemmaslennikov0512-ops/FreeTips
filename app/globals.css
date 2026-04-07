@@ -3643,7 +3643,7 @@ html:not([data-theme="dark"]) .pay-page:not(.pay-page--m5-competition) .pay-page
   max-width: 22rem;
   /* Inter вместо Playfair на мелком кегле — без «ореола» и размытия засечек */
   font-family: var(--font-inter), system-ui, -apple-system, "Segoe UI", sans-serif;
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   font-weight: 600;
   line-height: 1.35;
   letter-spacing: 0.03em;
@@ -3669,12 +3669,16 @@ html:not([data-theme="dark"]) .pay-page:not(.pay-page--m5-competition) .pay-page
   text-align: center;
   text-wrap: balance;
 }
+.pay-page .pay-support-callout p.pay-support-callout-body {
+  font-size: 10px;
+  line-height: 1.45;
+}
 .pay-page .pay-support-callout .pay-support-telegram-btn {
   margin-top: 0.65rem;
-  min-height: 40px;
-  padding: 8px 12px;
+  min-height: 38px;
+  padding: 7px 12px;
   border-radius: 10px;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
   box-shadow: 0 2px 8px rgba(34, 158, 217, 0.28);
 }
@@ -3718,7 +3722,7 @@ html:not([data-theme="dark"]) .pay-page:not(.pay-page--m5-competition) .pay-page
   margin: 0 auto;
   max-width: 22rem;
   font-family: var(--font-inter), system-ui, -apple-system, "Segoe UI", sans-serif;
-  font-size: 1rem;
+  font-size: 1.0625rem;
   font-weight: 600;
   line-height: 1.35;
   letter-spacing: 0.02em;
@@ -3739,11 +3743,13 @@ html:not([data-theme="dark"]) .pay-page:not(.pay-page--m5-competition) .pay-page
   margin-left: auto;
   margin-right: auto;
   max-width: 22rem;
-  font-size: 0.8125rem;
-  line-height: 1.6;
   color: #2d3748;
   text-align: center;
   text-wrap: balance;
+}
+.pay-support-result-box p.pay-support-callout-body {
+  font-size: 0.75rem;
+  line-height: 1.55;
 }
 
 .pay-support-telegram-btn {
@@ -3752,13 +3758,13 @@ html:not([data-theme="dark"]) .pay-page:not(.pay-page--m5-competition) .pay-page
   align-items: center;
   justify-content: center;
   width: 100%;
-  min-height: 48px;
-  padding: 12px 16px;
+  min-height: 44px;
+  padding: 10px 14px;
   border-radius: 12px;
   background: #229ed9;
   color: #ffffff !important;
   font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 600;
   line-height: 1.2;
   text-decoration: none;

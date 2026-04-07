@@ -2,8 +2,9 @@
 
 import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
-import { Plus, Copy, RefreshCw, FileDown, Mail, Pencil, Upload, ImageIcon } from "lucide-react";
+import { Plus, Copy, RefreshCw, FileDown, Mail, Pencil, Upload, ImageIcon, UserMinus } from "lucide-react";
 import { authHeaders } from "@/lib/auth-client";
+import { getCsrfHeader } from "@/lib/security/csrf-client";
 
 interface EstablishmentInfo {
   id: string;
@@ -50,6 +51,7 @@ export default function EstablishmentTeamPage() {
   const [editError, setEditError] = useState<string | null>(null);
   const [savingEdit, setSavingEdit] = useState(false);
   const [uploadingPhotoId, setUploadingPhotoId] = useState<string | null>(null);
+  const [disconnectingId, setDisconnectingId] = useState<string | null>(null);
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const printInputRef = useRef<HTMLInputElement>(null);
 
@@ -204,6 +206,37 @@ export default function EstablishmentTeamPage() {
       alert("Ошибка соединения");
     } finally {
       setTogglingId(null);
+    }
+  };
+
+  const disconnectUser = async (emp: EmployeeRow) => {
+    if (
+      !window.confirm(
+        "Отвязать личный аккаунт от этой карточки? Официант снова станет самостоятельным получателем; QR заведения останется. Потребуется повторный вход в аккаунт.",
+      )
+    ) {
+      return;
+    }
+    setDisconnectingId(emp.id);
+    try {
+      const res = await fetch(`/api/establishment/employees/${emp.id}/disconnect`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...authHeaders(), ...getCsrfHeader() },
+        body: "{}",
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        alert(data?.error ?? "Ошибка");
+        return;
+      }
+      if (data?.message) {
+        alert(data.message);
+      }
+      fetchData();
+    } catch {
+      alert("Ошибка соединения");
+    } finally {
+      setDisconnectingId(null);
     }
   };
 
@@ -514,7 +547,20 @@ export default function EstablishmentTeamPage() {
                 <button type="button" onClick={() => toggleActive(emp)} disabled={togglingId === emp.id} className="rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-xs text-white hover:bg-[var(--color-dark-gray)]/20 disabled:opacity-50">
                   {togglingId === emp.id ? "…" : emp.isActive ? "Деактивировать" : "Активировать"}
                 </button>
-                {emp.hasUser && <span className="py-2 text-sm text-white/80">Уже зарегистрирован</span>}
+                {emp.hasUser && (
+                  <div className="flex w-full flex-col gap-2">
+                    <span className="text-center text-sm text-white/80">Уже зарегистрирован</span>
+                    <button
+                      type="button"
+                      onClick={() => void disconnectUser(emp)}
+                      disabled={disconnectingId === emp.id}
+                      className="inline-flex items-center justify-center gap-1 rounded-lg border border-amber-500/35 bg-amber-500/10 px-3 py-2 text-xs text-amber-100 hover:bg-amber-500/15 disabled:opacity-50"
+                    >
+                      <UserMinus className="h-3 w-3" />
+                      {disconnectingId === emp.id ? "…" : "Отвязать аккаунт"}
+                    </button>
+                  </div>
+                )}
                 {!emp.hasUser && linkByEmpId[emp.id] && (
                   <>
                     <button type="button" onClick={() => copyLink(linkByEmpId[emp.id])} className="inline-flex items-center gap-1 rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-xs text-white hover:bg-[var(--color-dark-gray)]/20">
@@ -580,7 +626,18 @@ export default function EstablishmentTeamPage() {
                     <td className="establishment-team-table-cell establishment-team-table-cell-linked whitespace-nowrap p-3 text-white/90 text-center">{emp.hasUser ? "Да" : "Нет"}</td>
                     <td className="establishment-team-table-cell establishment-team-table-cell-link p-3 text-center">
                       {emp.hasUser ? (
-                        <span className="text-sm text-white/90">Уже зарегистрирован</span>
+                        <div className="flex flex-col items-center gap-2">
+                          <span className="text-sm text-white/90">Уже зарегистрирован</span>
+                          <button
+                            type="button"
+                            onClick={() => void disconnectUser(emp)}
+                            disabled={disconnectingId === emp.id}
+                            className="inline-flex items-center gap-1 rounded-lg border border-amber-500/35 bg-amber-500/10 px-2 py-1.5 text-xs text-amber-100 hover:bg-amber-500/15 disabled:opacity-50"
+                          >
+                            <UserMinus className="h-3 w-3" />
+                            {disconnectingId === emp.id ? "…" : "Отвязать"}
+                          </button>
+                        </div>
                       ) : linkByEmpId[emp.id] ? (
                         <div className="flex flex-wrap items-center justify-center gap-2">
                           <button type="button" onClick={() => copyLink(linkByEmpId[emp.id])} className="inline-flex items-center gap-1 rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-2 py-1.5 text-xs text-white hover:bg-[var(--color-dark-gray)]/20">

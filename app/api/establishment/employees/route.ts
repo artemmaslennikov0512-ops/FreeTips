@@ -8,13 +8,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireEstablishmentAdmin } from "@/lib/middleware/auth";
 import { db } from "@/lib/db";
 import { getBaseUrlFromRequest } from "@/lib/get-base-url";
-import { hashPassword } from "@/lib/auth/password";
 import { parseJsonWithLimit, MAX_BODY_SIZE_AUTH, jsonError } from "@/lib/api/helpers";
-import { allocateWaiterQrIdentifier, WaiterQrIdentifierExhaustedError } from "@/lib/waiter-qr-identifier";
+import {
+  createEstablishmentEmployeeInTransaction,
+  WaiterQrIdentifierExhaustedError,
+} from "@/lib/establishment-create-employee-tx";
 import { z } from "zod";
-import { randomBytes } from "crypto";
-import { UserRole } from "@prisma/client";
-import { getWaiterPaygineSdRef } from "@/lib/payment/paygine-sd-ref";
 import { effectiveTipRoutingMode, syncTipLinksForEstablishment } from "@/lib/tip-routing";
 
 const createEmployeeSchema = z.object({
@@ -129,73 +128,20 @@ export async function POST(request: NextRequest) {
 
   const { name, position } = parseResult.data;
 
-  let poolUserId = establishment.tipPoolUserId;
-
   let employee;
   try {
-    employee = await db.$transaction(async (tx) => {
-      if (!poolUserId) {
-        const est = await tx.establishment.findUnique({
-          where: { id: auth.establishmentId },
-          select: { id: true },
-        });
-        if (est) {
-          const poolLogin = `pool-${est.id}`;
-          const existingPool = await tx.user.findUnique({
-            where: { login: poolLogin },
-            select: { id: true },
-          });
-          if (existingPool) {
-            poolUserId = existingPool.id;
-            await tx.establishment.update({
-              where: { id: auth.establishmentId },
-              data: { tipPoolUserId: existingPool.id },
-            });
-          } else {
-            const poolUser = await tx.user.create({
-              data: {
-                login: poolLogin,
-                passwordHash: await hashPassword(randomBytes(32).toString("hex")),
-                role: UserRole.RECIPIENT,
-              },
-            });
-            poolUserId = poolUser.id;
-            await tx.establishment.update({
-              where: { id: auth.establishmentId },
-              data: { tipPoolUserId: poolUser.id },
-            });
-          }
-        }
-      }
-
-      const qrCodeIdentifier = await allocateWaiterQrIdentifier(tx);
-
-      const emp = await tx.employee.create({
-        data: {
-          establishmentId: auth.establishmentId,
-          name,
-          position: position || null,
-          qrCodeIdentifier,
-        },
-      });
-      if (poolUserId) {
-        await tx.user.updateMany({
-          where: { id: poolUserId, paygineSdRef: null },
-          data: { paygineSdRef: getWaiterPaygineSdRef(poolUserId) },
-        });
-        await tx.tipLink.create({
-          data: {
-            userId: poolUserId,
-            slug: qrCodeIdentifier,
-            employeeId: emp.id,
-          },
-        });
-      }
-      return emp;
-    });
+    employee = await db.$transaction(async (tx) =>
+      createEstablishmentEmployeeInTransaction(tx, auth.establishmentId, {
+        name,
+        position: position || null,
+      }),
+    );
   } catch (e) {
     if (e instanceof WaiterQrIdentifierExhaustedError) {
       return jsonError(409, e.message);
+    }
+    if (e instanceof Error && e.message === "ESTABLISHMENT_NOT_FOUND") {
+      return NextResponse.json({ error: "Заведение не найдено" }, { status: 404 });
     }
     throw e;
   }

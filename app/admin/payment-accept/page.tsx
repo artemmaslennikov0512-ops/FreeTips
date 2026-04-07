@@ -290,8 +290,8 @@ export default function AdminPaymentAcceptPage() {
       </div>
 
       <p className="mx-auto w-full max-w-2xl text-center text-sm leading-relaxed text-white/70">
-        Лимиты на приём чаевых одному получателю (суточная сумма, незавершённые заказы, пауза между заказами, число
-        успешных зачислений за сутки) настраиваются в разделе{" "}
+        Лимиты на приём чаевых одному получателю (суточная сумма с учётом только «свежих» неоплаченных заказов, лимит
+        одновременных таких же, пауза между заказами, число успешных зачислений за сутки) задаются в разделе{" "}
         <Link
           href="/admin/antifraud"
           className="font-medium text-[var(--color-brand-gold)] underline-offset-2 hover:underline"

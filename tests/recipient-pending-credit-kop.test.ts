@@ -5,22 +5,32 @@ import {
   projectedNetCreditForNewTipKop,
 } from "../lib/recipient-pending-credit-kop";
 
-test("projectedNetCreditForNewTipKop: card fee and no split", () => {
+test("projectedNetCreditForNewTipKop: no split — сумма заказа без вычета комиссии (комиссия у плательщика сверху)", () => {
   const net = projectedNetCreditForNewTipKop({
     amountKop: BigInt(10_000),
     tipSplit: null,
   });
-  assert.equal(net, BigInt(10_000 - 250));
+  assert.equal(net, BigInt(10_000));
 });
 
-test("projectedNetCreditForNewTipKop: with establishment share on net after fee", () => {
+test("projectedNetCreditForNewTipKop: доля заведения от полной суммы заказа", () => {
   const net = projectedNetCreditForNewTipKop({
     amountKop: BigInt(10_000),
     tipSplit: { establishmentSharePercent: 10 },
   });
-  const afterFee = BigInt(10_000 - 250);
-  const share = (afterFee * BigInt(1000)) / BigInt(10_000);
-  assert.equal(net, afterFee - share);
+  const share = (BigInt(10_000) * BigInt(1000)) / BigInt(10_000);
+  assert.equal(net, BigInt(10_000) - share);
+});
+
+test("pendingNetCreditToRecipientKop: карта, feeKop null — не вычитаем оценочную комиссию", () => {
+  const net = pendingNetCreditToRecipientKop({
+    amountKop: BigInt(5000),
+    feeKop: null,
+    establishmentShareKop: null,
+    paymentMethod: "card",
+    payerInfo: null,
+  });
+  assert.equal(net, BigInt(5000));
 });
 
 test("pendingNetCreditToRecipientKop: uses stored fee and share", () => {

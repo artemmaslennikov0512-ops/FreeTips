@@ -103,6 +103,8 @@ model User {
   supportMessagesAuthored   SupportMessage[] @relation("SupportMessageAuthor")
   verificationRequests     VerificationRequest[]
   fraudSignals             FraudSignal[]
+  employeeJoinRequests   EmployeeJoinRequest[]
+  employeeLeaveRequests  EmployeeLeaveRequest[]
 
   @@index([login])
   @@index([email])
@@ -392,9 +394,51 @@ model Establishment {
   employees          Employee[]
   payoutRules        PayoutRule[]
   registrationTokens RegistrationToken[] // токены для регистрации управляющего
+  employeeJoinRequests EmployeeJoinRequest[]
+  employeeLeaveRequests EmployeeLeaveRequest[]
 
   @@index([uniqueSlug])
   @@map("establishments")
+}
+
+/// Заявка официанта (RECIPIENT) на подключение к заведению по коду точки.
+model EmployeeJoinRequest {
+  id                String                    @id @default(cuid())
+  establishmentId   String
+  userId            String
+  status            RegistrationRequestStatus @default(PENDING)
+  rejectionReason   String?                   @db.VarChar(1000)
+  reviewedAt        DateTime?
+  reviewedByUserId  String?                   @db.VarChar(64)
+  createdAt         DateTime                  @default(now())
+  updatedAt         DateTime                  @updatedAt
+
+  establishment Establishment @relation(fields: [establishmentId], references: [id], onDelete: Cascade)
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([establishmentId, status])
+  @@index([userId, status])
+  @@map("employee_join_requests")
+}
+
+/// Заявка официанта (EMPLOYEE) на выход из заведения — исполняется после одобрения администратора.
+model EmployeeLeaveRequest {
+  id                String                    @id @default(cuid())
+  establishmentId   String
+  userId            String
+  status            RegistrationRequestStatus @default(PENDING)
+  rejectionReason   String?                   @db.VarChar(1000)
+  reviewedAt        DateTime?
+  reviewedByUserId  String?                   @db.VarChar(64)
+  createdAt         DateTime                  @default(now())
+  updatedAt         DateTime                  @updatedAt
+
+  establishment Establishment @relation(fields: [establishmentId], references: [id], onDelete: Cascade)
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([establishmentId, status])
+  @@index([userId, status])
+  @@map("employee_leave_requests")
 }
 
 // Сотрудник заведения (официант): может быть без привязки к User до регистрации/инвайта.
@@ -515,11 +559,11 @@ model PlatformPaymentSettings {
   globalPaymentsDisabled  Boolean  @default(false)
   paymentWhitelistUserIds String[] @default([])
   paymentBlacklistUserIds String[] @default([])
-  /// Макс. сумма входящих на получателя за календарные сутки МСК (коп.): успешные зачисления + незавершённые за сегодня + новый платёж. null — без лимита.
+  /// Макс. сумма входящих за сутки МСК (коп.): SUCCESS за сегодня + только PENDING с createdAt не старше окна «свежести» (интервал ниже или 5 мин) + новый платёж. null — без лимита.
   recipientMaxIncomingKopPerMskDay BigInt?
-  /// Максимум одновременных незавершённых (PENDING) заказов на одного получателя. null — без лимита.
+  /// Макс. одновременных PENDING с тем же окном свежести (старые неоплаченные не занимают слот). null — без лимита.
   recipientMaxConcurrentPendingPayments Int?
-  /// Минимальный интервал между созданием заказов (мин.) для одного получателя. null — без ограничения.
+  /// Интервал между созданием заказов (мин.); также длительность окна, в течение которого PENDING учитывается в суточной сумме и в лимите одновременных. null — для окна свежести используется 5 мин.
   recipientMinMinutesBetweenPayInits Int?
   /// Макс. число успешных зачислений на получателя за календарные сутки МСК (по времени зачисления). null — без лимита.
   recipientMaxPayInitsPerDay Int?

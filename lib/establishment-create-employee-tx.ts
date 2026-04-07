@@ -76,7 +76,7 @@ export async function createEstablishmentEmployeeInTransaction(
     throw new Error("ESTABLISHMENT_NOT_FOUND");
   }
 
-  let poolUserId = await ensureEstablishmentPoolUserId(tx, establishmentId, est.tipPoolUserId);
+  const poolUserId = await ensureEstablishmentPoolUserId(tx, establishmentId, est.tipPoolUserId);
 
   const qrCodeIdentifier = await allocateWaiterQrIdentifier(tx);
 

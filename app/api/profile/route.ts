@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
 
     const dayStart = getUtcDayStart();
     const monthStart = getUtcMonthStart();
-    const [profile, balanceRow, payoutsCompletedSum, txCount, payoutsPendingCount, limits, monthlyLimits, todayPayouts, monthPayouts, incomingMonthSuccessKop, employee] =
+    const [profile, balanceRow, txCount, payoutsPendingCount, limits, monthlyLimits, todayPayouts, monthPayouts, incomingMonthSuccessKop, employee] =
       await Promise.all([
         db.user.findUnique({
           where: { id },
@@ -97,10 +97,6 @@ export async function GET(request: NextRequest) {
           },
         }),
         getBalance(id),
-        db.payoutRequest.aggregate({
-          where: { userId: id, status: "COMPLETED" },
-          _sum: { amountKop: true },
-        }),
         db.transaction.count({ where: { recipientId: id, status: "SUCCESS" } }),
         db.payoutRequest.count({
           where: { userId: id, status: { in: ["CREATED", "PROCESSING"] } },

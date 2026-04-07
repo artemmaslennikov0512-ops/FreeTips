@@ -492,18 +492,24 @@ export default function AdminAntifraudPage() {
       return;
     }
 
-    const dailyCount =
-      dailyCountRaw === "" ? null : Number.parseInt(dailyCountRaw, 10);
-    if (dailyCountRaw !== "" && (Number.isNaN(dailyCount) || dailyCount < 0 || dailyCount > 100)) {
-      setAntifraudMessage({ type: "err", text: "П. 5: число заявок от 0 до 100 или пусто" });
-      return;
+    let dailyCount: number | null = null;
+    if (dailyCountRaw !== "") {
+      const parsedDaily = Number.parseInt(dailyCountRaw, 10);
+      if (Number.isNaN(parsedDaily) || parsedDaily < 0 || parsedDaily > 100) {
+        setAntifraudMessage({ type: "err", text: "П. 5: число заявок от 0 до 100 или пусто" });
+        return;
+      }
+      dailyCount = parsedDaily;
     }
 
-    const monthlyCount =
-      monthlyCountRaw === "" ? null : Number.parseInt(monthlyCountRaw, 10);
-    if (monthlyCountRaw !== "" && (Number.isNaN(monthlyCount) || monthlyCount < 0 || monthlyCount > 3000)) {
-      setAntifraudMessage({ type: "err", text: "П. 6: число заявок от 0 до 3000 или пусто" });
-      return;
+    let monthlyCount: number | null = null;
+    if (monthlyCountRaw !== "") {
+      const parsedMonthly = Number.parseInt(monthlyCountRaw, 10);
+      if (Number.isNaN(parsedMonthly) || parsedMonthly < 0 || parsedMonthly > 3000) {
+        setAntifraudMessage({ type: "err", text: "П. 6: число заявок от 0 до 3000 или пусто" });
+        return;
+      }
+      monthlyCount = parsedMonthly;
     }
 
     const ok = window.confirm(

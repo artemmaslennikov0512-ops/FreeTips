@@ -46,11 +46,24 @@ function toKopecks(rub: number): number {
   return Math.round(rub * 100);
 }
 
+/** Сумма из `?amount=` в рублях; только если в допустимых границах платежа. */
+function parseLockedAmountKopFromSearch(searchParams: URLSearchParams): number | null {
+  const raw = searchParams.get("amount");
+  if (raw == null || !String(raw).trim()) return null;
+  const n = parseFloat(String(raw).trim().replace(",", "."));
+  if (!Number.isFinite(n) || n <= 0) return null;
+  const kop = Math.round(n * 100);
+  if (kop < PAYMENT_MIN_AMOUNT_KOP || kop > PAYMENT_MAX_AMOUNT_KOP) return null;
+  return kop;
+}
+
 export default function PayPageClient() {
   const params = useParams();
   const router = useRouter();
   const searchParams = useSearchParams();
   const slug = typeof params.slug === "string" ? params.slug : "";
+
+  const lockedAmountKop = parseLockedAmountKopFromSearch(searchParams);
 
   const [payM5Shell, setPayM5Shell] = useState(() => isPayPageM5ShellSlug(slug));
 
@@ -162,13 +175,14 @@ export default function PayPageClient() {
   }, [slug]);
 
   const amountKop = useCallback((): number => {
+    if (lockedAmountKop != null) return lockedAmountKop;
     const custom = customAmount.trim();
     if (custom) {
       const n = parseFloat(custom.replace(",", "."));
       return !isNaN(n) && n > 0 ? toKopecks(n) : 0;
     }
     return toKopecks(amount);
-  }, [amount, customAmount]);
+  }, [lockedAmountKop, amount, customAmount]);
 
   const handlePay = async () => {
     const kop = amountKop();
@@ -552,42 +566,61 @@ export default function PayPageClient() {
 
         {/* Карточка: сумма чаевых */}
         <div className="pay-page-card card" style={Object.keys(cardStyle).length ? cardStyle : undefined}>
-          <div className="pay-page-amounts">
-            {PRESETS.map((r) => {
-              const numCustom = customAmount.trim() ? Number(customAmount.replace(",", ".")) : null;
-              const isSelected = (numCustom != null && !Number.isNaN(numCustom) && numCustom === r) || (numCustom == null && amount === r);
-              return (
-                <button
-                  key={r}
-                  type="button"
+          {lockedAmountKop != null ? (
+            <>
+              <p className="pay-page-section-title text-center" style={{ color: fontClr ?? undefined }}>
+                Сумма чаевых
+              </p>
+              <p
+                className="mt-3 text-center text-2xl font-semibold tabular-nums"
+                style={{ color: fontClr ?? undefined }}
+              >
+                {rub.toFixed(rub % 1 === 0 ? 0 : 2)} ₽
+              </p>
+              <p className="pay-page-label mt-3 text-center">Сумма задана в ссылке и не меняется</p>
+            </>
+          ) : (
+            <>
+              <div className="pay-page-amounts">
+                {PRESETS.map((r) => {
+                  const numCustom = customAmount.trim() ? Number(customAmount.replace(",", ".")) : null;
+                  const isSelected =
+                    (numCustom != null && !Number.isNaN(numCustom) && numCustom === r) ||
+                    (numCustom == null && amount === r);
+                  return (
+                    <button
+                      key={r}
+                      type="button"
+                      disabled={!acceptPayments}
+                      onClick={() => {
+                        setAmount(r);
+                        setCustomAmount(String(r));
+                      }}
+                      className={`pay-page-amount-btn amount-btn ${isSelected ? "is-active active" : ""}`}
+                    >
+                      {r} ₽
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="pay-page-label">Выберите сумму или введите свою (не больше 1 000 ₽)</p>
+              <div className="pay-page-input-wrap custom-amount pay-page-custom-amount-row">
+                <input
+                  type="text"
+                  inputMode="decimal"
+                  placeholder="100"
+                  value={customAmount}
+                  onChange={(e) => setCustomAmount(e.target.value)}
                   disabled={!acceptPayments}
-                  onClick={() => {
-                    setAmount(r);
-                    setCustomAmount(String(r));
-                  }}
-                  className={`pay-page-amount-btn amount-btn ${isSelected ? "is-active active" : ""}`}
-                >
-                  {r} ₽
-                </button>
-              );
-            })}
-          </div>
-          <p className="pay-page-label">Выберите сумму или введите свою (не больше 1 000 ₽)</p>
-          <div className="pay-page-input-wrap custom-amount pay-page-custom-amount-row">
-            <input
-              type="text"
-              inputMode="decimal"
-              placeholder="100"
-              value={customAmount}
-              onChange={(e) => setCustomAmount(e.target.value)}
-              disabled={!acceptPayments}
-              aria-label="Своя сумма в рублях, не больше 1 000"
-            />
-          </div>
-          {kop > PAYMENT_MAX_AMOUNT_KOP && (
-            <p className="mt-2 text-center text-sm text-[var(--color-accent-red)]" role="alert">
-              {PAYMENT_MAX_ERROR}
-            </p>
+                  aria-label="Своя сумма в рублях, не больше 1 000"
+                />
+              </div>
+              {kop > PAYMENT_MAX_AMOUNT_KOP && (
+                <p className="mt-2 text-center text-sm text-[var(--color-accent-red)]" role="alert">
+                  {PAYMENT_MAX_ERROR}
+                </p>
+              )}
+            </>
           )}
         </div>
 

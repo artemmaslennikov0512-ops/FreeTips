@@ -297,8 +297,7 @@ export default function CabinetTransactionsPage() {
                   {canWithdrawByLimit ? (
                     <>
                       Сейчас за одну операцию доступно не больше{" "}
-                      <span className="font-semibold">{maxPayoutRub.toLocaleString("ru-RU")} ₽</span> — с учётом лимита
-                      на одну операцию и остатка суточного (при задании — месячного) лимита.
+                      <span className="font-semibold">{maxPayoutRub.toLocaleString("ru-RU")} ₽</span>.
                     </>
                   ) : (
                     <>
@@ -354,7 +353,7 @@ export default function CabinetTransactionsPage() {
                 {payoutExceedsMax && (
                   <p className="text-center text-sm font-medium text-red-600" role="alert">
                     Сумма превышает доступный сейчас максимум: не больше {maxPayoutRub.toLocaleString("ru-RU")} ₽ за эту
-                    операцию (с учётом суточного и месячного лимита).
+                    операцию.
                   </p>
                 )}
                 {(() => {

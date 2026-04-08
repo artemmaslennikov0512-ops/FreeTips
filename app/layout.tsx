@@ -33,8 +33,7 @@ const inter = Inter({
 
 const siteName = "FreeTips";
 const defaultTitle = `${siteName} | Сервис онлайн чаевых по QR - коду`;
-const defaultDescription =
-  "Быстро и удобно. Возможность оплаты картой получателя. Без комиссии для бизнеса.";
+const defaultDescription = "Быстро и удобно. Возможность оплаты картой получателя.";
 const baseUrl = (process.env.NEXT_PUBLIC_APP_URL ?? "").replace(/\/$/, "") || "https://free-tips.ru";
 
 export const metadata: Metadata = {

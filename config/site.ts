@@ -54,7 +54,6 @@ export const site = {
       { label: "Политика безопасности платежей", href: "/politika-bezopasnosti" },
       { label: "Политика возврата", href: "/politika-vozvrata" },
       { label: "Правила использования сервиса", href: "/pravila-ispolzovaniya" },
-      { label: "Для заведений", href: "/dlya-zavedenij" },
       { label: "Оплата, доставка и возврат", href: "/oplata-dostavka-vozvrat" },
     ],
     operator: {

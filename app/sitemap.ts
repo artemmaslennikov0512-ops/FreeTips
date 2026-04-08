@@ -11,7 +11,6 @@ const routes: { path: string; priority: number; changeFrequency: "weekly" | "mon
   { path: "/pomoshch/podklyuchenie", priority: 0.55, changeFrequency: "monthly" },
   { path: "/pomoshch/bezopasnost-platezhey", priority: 0.55, changeFrequency: "monthly" },
   { path: "/pomoshch/mobilnoe-prilozhenie", priority: 0.55, changeFrequency: "monthly" },
-  { path: "/dlya-zavedenij", priority: 0.6, changeFrequency: "monthly" },
   { path: "/oferta", priority: 0.5, changeFrequency: "yearly" },
   { path: "/politika", priority: 0.5, changeFrequency: "yearly" },
   { path: "/politika-bezopasnosti", priority: 0.5, changeFrequency: "yearly" },

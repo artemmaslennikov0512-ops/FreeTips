@@ -14,6 +14,7 @@ const nextConfig: NextConfig = {
       { source: "/favicon.ico", destination: "/icon-32x32", permanent: false },
       // Нет страницы /preload; иногда в обходе появляется из‑за старых ссылок или шума вокруг HSTS preload
       { source: "/preload", destination: "/", permanent: true },
+      { source: "/dlya-zavedenij", destination: "/", permanent: true },
     ];
   },
   images: {

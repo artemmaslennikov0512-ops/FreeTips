@@ -6788,13 +6788,31 @@ html .cabinet-mobile-nav-dialog[data-cabinet-theme="m5-competition"] a.cabinet-n
   opacity: 1 !important;
 }
 
-.cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-join-establishment .cabinet-card p,
-.cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-join-establishment .cabinet-card li p,
-.cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-join-establishment .flex.w-full.flex-col > p {
+/* Только тёмная тема сайта: карточки с тёмным фоном — светлый текст.
+   При светлой теме карточки bg --color-bg-sides белые; светлый кегль здесь нечитаем. */
+[data-theme="dark"]
+  .cabinet-premium[data-cabinet-theme="m5-competition"]
+  .cabinet-join-establishment
+  .cabinet-card
+  p,
+[data-theme="dark"]
+  .cabinet-premium[data-cabinet-theme="m5-competition"]
+  .cabinet-join-establishment
+  .cabinet-card
+  li
+  p,
+[data-theme="dark"]
+  .cabinet-premium[data-cabinet-theme="m5-competition"]
+  .cabinet-join-establishment
+  .flex.w-full.flex-col
+  > p {
   color: rgba(255, 255, 255, 0.9) !important;
 }
 
-.cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-join-establishment p[data-join-approved-hint] {
+[data-theme="dark"]
+  .cabinet-premium[data-cabinet-theme="m5-competition"]
+  .cabinet-join-establishment
+  p[data-join-approved-hint] {
   color: rgba(209, 250, 229, 0.96) !important;
   -webkit-text-fill-color: rgba(209, 250, 229, 0.96) !important;
 }
@@ -6805,14 +6823,14 @@ html .cabinet-mobile-nav-dialog[data-cabinet-theme="m5-competition"] a.cabinet-n
 }
 
 /*
- * Светлая тема сайта (data-theme=light) + M5: утилиты .text-[var(--color-text*)] тянут значения с :root (#24313f).
- * color-mix(/80) усиливает проблему; -webkit-text-fill-color у части WebKit не совпадает с color.
- * Тот же приём, что у .cabinet-block-inner (~950): явный цвет + fill. #establishment-code — отдельные правила выше.
+ * Светлая тема сайта + M5: на тёмном main утилиты тянут тёмный кегль с :root — подсветить только текст **вне**
+ * белых .cabinet-card (подпись под заголовком, пустое «Мои заявки»). Внутри карточек оставляем тёмные --color-text*.
  */
 html:not([data-theme="dark"])
   .cabinet-premium[data-cabinet-theme="m5-competition"]
   #main-content
   .cabinet-join-establishment
+  > .text-center
   [class*="text-[var(--color-text)]"]:not(#establishment-code) {
   color: rgba(232, 234, 239, 0.97) !important;
   -webkit-text-fill-color: rgba(232, 234, 239, 0.97) !important;
@@ -6822,7 +6840,110 @@ html:not([data-theme="dark"])
   .cabinet-premium[data-cabinet-theme="m5-competition"]
   #main-content
   .cabinet-join-establishment
+  > .text-center
   [class*="text-[var(--color-text-secondary)]"] {
   color: rgba(232, 234, 239, 0.88) !important;
   -webkit-text-fill-color: rgba(232, 234, 239, 0.88) !important;
+}
+
+html:not([data-theme="dark"])
+  .cabinet-premium[data-cabinet-theme="m5-competition"]
+  #main-content
+  .cabinet-join-establishment
+  > .flex.w-full.flex-col
+  > h2[class*="text-[var(--color-text)]"] {
+  color: rgba(232, 234, 239, 0.97) !important;
+  -webkit-text-fill-color: rgba(232, 234, 239, 0.97) !important;
+}
+
+html:not([data-theme="dark"])
+  .cabinet-premium[data-cabinet-theme="m5-competition"]
+  #main-content
+  .cabinet-join-establishment
+  > .flex.w-full.flex-col
+  > p[class*="text-[var(--color-text-secondary)]"] {
+  color: rgba(232, 234, 239, 0.88) !important;
+  -webkit-text-fill-color: rgba(232, 234, 239, 0.88) !important;
+}
+
+/* Светлая тема + M5: белые карточки форм — тёмные переменные и кегль (перебивает .cabinet-form-surface M5). */
+html:not([data-theme="dark"])
+  .cabinet-premium[data-cabinet-theme="m5-competition"]
+  .cabinet-join-establishment
+  .cabinet-card,
+html:not([data-theme="dark"])
+  .cabinet-premium[data-cabinet-theme="m5-competition"]
+  .cabinet-leave-establishment
+  .cabinet-card {
+  --color-text: #0a192f !important;
+  --color-text-secondary: #475569 !important;
+  color: var(--color-text) !important;
+  -webkit-text-fill-color: var(--color-text) !important;
+}
+
+html:not([data-theme="dark"])
+  .cabinet-premium[data-cabinet-theme="m5-competition"]
+  .cabinet-join-establishment
+  .cabinet-card
+  .font-mono,
+html:not([data-theme="dark"])
+  .cabinet-premium[data-cabinet-theme="m5-competition"]
+  .cabinet-leave-establishment
+  .cabinet-card
+  .font-mono {
+  color: var(--color-text-secondary) !important;
+  -webkit-text-fill-color: var(--color-text-secondary) !important;
+  text-shadow: none !important;
+}
+
+html:not([data-theme="dark"])
+  .cabinet-premium[data-cabinet-theme="m5-competition"]
+  #main-content
+  .cabinet-join-establishment
+  .cabinet-card
+  label[for="establishment-code"] {
+  color: var(--color-text) !important;
+  -webkit-text-fill-color: var(--color-text) !important;
+}
+
+html:not([data-theme="dark"])
+  .cabinet-premium[data-cabinet-theme="m5-competition"]
+  #main-content
+  .cabinet-join-establishment
+  .cabinet-card
+  #establishment-code-hint {
+  color: var(--color-text-secondary) !important;
+  -webkit-text-fill-color: var(--color-text-secondary) !important;
+}
+
+html:not([data-theme="dark"])
+  .cabinet-premium[data-cabinet-theme="m5-competition"]
+  #main-content
+  .cabinet-join-establishment
+  .cabinet-card
+  #establishment-code-hint
+  .font-mono {
+  color: var(--color-text-secondary) !important;
+  -webkit-text-fill-color: var(--color-text-secondary) !important;
+  text-shadow: none !important;
+}
+
+html:not([data-theme="dark"])
+  .cabinet-premium[data-cabinet-theme="m5-competition"]
+  .cabinet-join-establishment
+  .cabinet-card
+  #establishment-code {
+  color: var(--color-text) !important;
+  -webkit-text-fill-color: var(--color-text) !important;
+  caret-color: var(--color-text);
+}
+
+html:not([data-theme="dark"])
+  .cabinet-premium[data-cabinet-theme="m5-competition"]
+  .cabinet-join-establishment
+  .cabinet-card
+  #establishment-code::placeholder {
+  color: var(--color-text-secondary) !important;
+  -webkit-text-fill-color: var(--color-text-secondary) !important;
+  opacity: 0.88;
 }

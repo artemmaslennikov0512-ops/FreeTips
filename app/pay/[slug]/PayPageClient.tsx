@@ -568,16 +568,10 @@ export default function PayPageClient() {
         <div className="pay-page-card card" style={Object.keys(cardStyle).length ? cardStyle : undefined}>
           {lockedAmountKop != null ? (
             <>
-              <p className="pay-page-section-title text-center" style={{ color: fontClr ?? undefined }}>
-                Сумма чаевых
-              </p>
-              <p
-                className="mt-3 text-center text-2xl font-semibold tabular-nums"
-                style={{ color: fontClr ?? undefined }}
-              >
+              <p className="pay-page-section-title text-center">Сумма чаевых</p>
+              <p className="pay-page-locked-amount-value text-center tabular-nums">
                 {rub.toFixed(rub % 1 === 0 ? 0 : 2)} ₽
               </p>
-              <p className="pay-page-label mt-3 text-center">Сумма задана в ссылке и не меняется</p>
             </>
           ) : (
             <>

@@ -1,0 +1,44 @@
+/* Альтернативный макет лендинга (превью) — изолирован от .hero-premium и т.д. */
+.test-preview-landing-alt {
+  --tpa-bg: #f3f0ea;
+  --tpa-surface: #ffffff;
+  --tpa-text: #0b1220;
+  --tpa-muted: #5a6478;
+  --tpa-accent: #0d9488;
+  --tpa-accent-hover: #0f766e;
+  --tpa-ink: #042f2e;
+  --tpa-border: rgba(11, 18, 32, 0.1);
+  --tpa-mesh-1: rgba(13, 148, 136, 0.14);
+  --tpa-mesh-2: rgba(59, 130, 246, 0.08);
+}
+
+html[data-theme="dark"] .test-preview-landing-alt {
+  --tpa-bg: #0e1114;
+  --tpa-surface: #161b22;
+  --tpa-text: #e8edf4;
+  --tpa-muted: #9aa3b5;
+  --tpa-accent: #2dd4bf;
+  --tpa-accent-hover: #5eead4;
+  --tpa-ink: #042f2e;
+  --tpa-border: rgba(232, 237, 244, 0.12);
+  --tpa-mesh-1: rgba(45, 212, 191, 0.12);
+  --tpa-mesh-2: rgba(96, 165, 250, 0.08);
+}
+
+.test-preview-landing-alt .tpa-mesh-bg {
+  background-color: var(--tpa-bg);
+  background-image:
+    radial-gradient(ellipse 120% 80% at 0% 0%, var(--tpa-mesh-1), transparent 55%),
+    radial-gradient(ellipse 100% 60% at 100% 20%, var(--tpa-mesh-2), transparent 50%);
+}
+
+.test-preview-landing-alt .tpa-card {
+  background: var(--tpa-surface);
+  border: 1px solid var(--tpa-border);
+  border-radius: 1.25rem;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) inset;
+}
+
+html[data-theme="dark"] .test-preview-landing-alt .tpa-card {
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.04) inset;
+}

@@ -13,6 +13,7 @@ import {
   Laptop,
   Settings,
   Building2,
+  Radio,
 } from "lucide-react";
 
 export const TEST_LK_BASE = "/test-lk-mock";
@@ -28,6 +29,11 @@ export const TEST_LK_NAV_HALL_MOCK: TestLkNavItem[] = [
   { label: "Брони", href: `${TEST_LK_BASE}/bookings`, icon: Calendar },
   { label: "Зал / смена", href: `${TEST_LK_BASE}/floor`, icon: UtensilsCrossed },
   { label: "Гости", href: `${TEST_LK_BASE}/guests`, icon: Users },
+];
+
+/** Донаты стримера — макет; публичная страница ведёт на /test-preview/donate/… */
+export const TEST_LK_NAV_STREAMER_MOCK: TestLkNavItem[] = [
+  { label: "Донаты (стример)", href: `${TEST_LK_BASE}/streamer`, icon: Radio },
 ];
 
 /** Пункты как в `app/cabinet/layout.tsx` → `NAV`. */
@@ -49,7 +55,12 @@ export const TEST_LK_NAV_DASHBOARD: TestLkNavItem = {
 };
 
 /** Полный список для активного состояния и мобильного меню. */
-export const TEST_LK_NAV: TestLkNavItem[] = [TEST_LK_NAV_DASHBOARD, ...TEST_LK_NAV_HALL_MOCK, ...TEST_LK_NAV_CABINET_LIKE];
+export const TEST_LK_NAV: TestLkNavItem[] = [
+  TEST_LK_NAV_DASHBOARD,
+  ...TEST_LK_NAV_HALL_MOCK,
+  ...TEST_LK_NAV_STREAMER_MOCK,
+  ...TEST_LK_NAV_CABINET_LIKE,
+];
 
 export const TEST_LK_NAV_EXTRA: TestLkNavItem = {
   label: "Кабинет заведения",

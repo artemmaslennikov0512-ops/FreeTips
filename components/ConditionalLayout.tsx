@@ -7,7 +7,8 @@ import { PanelMobileMenuProvider } from "@/components/PanelMobileMenuContext";
 
 export function ConditionalLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname() ?? "";
-  const isLanding = pathname === "/";
+  const isLanding = pathname === "/" || pathname === "/test-preview/landing";
+  const isTestPreviewDonate = pathname.startsWith("/test-preview/donate");
   const isCabinet = pathname.startsWith("/cabinet");
   const isAdmin = pathname.startsWith("/admin");
   const isEstablishment = pathname.startsWith("/establishment");
@@ -20,13 +21,12 @@ export function ConditionalLayout({ children }: { children: React.ReactNode }) {
     pathname.startsWith("/forgot-password") ||
     pathname.startsWith("/change-password") ||
     pathname.startsWith("/reset-password");
-  const isPayPage = pathname.startsWith("/pay");
+  const isPayPage = pathname.startsWith("/pay") || isTestPreviewDonate;
   const isTestLkMock = pathname.startsWith("/test-lk-mock");
   const isZayavka = pathname === "/zayavka";
   const isLoginPage = pathname === "/login" || pathname.startsWith("/login/");
   const isForgotPassword = pathname.startsWith("/forgot-password");
-  const hideHeader =
-    isPayPage || isZayavka || isLoginPage || isForgotPassword || isTestLkMock;
+  const hideHeader = isPayPage || isZayavka || isLoginPage || isForgotPassword || isTestLkMock;
   const widthClass =
     isCabinet || isAdmin || isEstablishment
       ? "max-w-none bg-transparent"

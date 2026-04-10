@@ -532,6 +532,135 @@ export function TestLkMockGuestsView() {
   );
 }
 
+const MOCK_STREAM_DONATIONS = [
+  { when: "11.04 19:02", amount: "500 ₽", from: "viewer_12", msg: "Классный стрим!" },
+  { when: "11.04 18:40", amount: "100 ₽", from: "Аноним", msg: "—" },
+  { when: "10.04 22:15", amount: "1 000 ₽", from: "mod_team", msg: "На оборудование" },
+];
+
+export function TestLkMockStreamerView() {
+  const origin = useSyncExternalStore(subscribeOrigin, () => getBaseUrl(), () => "");
+  const donatePath = "/test-preview/donate/demo";
+  const donateFull = origin ? `${origin.replace(/\/$/, "")}${donatePath}` : donatePath;
+
+  return (
+    <TestLkMockPageBody>
+      <TestLkBreadcrumb segment="Донаты (стример)" />
+      <h1 className="mb-2 text-2xl font-semibold" style={{ color: "var(--tlk-text)" }}>
+        Донаты (стример)
+      </h1>
+      <p className="mb-6 text-sm" style={{ color: "var(--tlk-text-secondary)" }}>
+        Макет раздела для стримера: публичная страница доната — на превью-сборке{" "}
+        <Link href="/test-preview" className="font-medium no-underline hover:underline" style={{ color: "var(--tlk-primary)" }}>
+          /test-preview
+        </Link>
+        , оплата заглушка.
+      </p>
+
+      <div className="mb-6 grid gap-4 lg:grid-cols-3">
+        <div className="tlk-transition rounded-xl border p-5 lg:col-span-2" style={testLkCardStyle()}>
+          <h2 className="text-base font-semibold" style={{ color: "var(--tlk-text)" }}>
+            Публичная ссылка на донат
+          </h2>
+          <p className="mt-2 text-sm leading-relaxed" style={{ color: "var(--tlk-text-secondary)" }}>
+            Для зрителя открывается тот же визуальный сценарий, что и у гостя при чаевых: сумма, сообщение, кнопка оплаты (здесь без реального списания).
+          </p>
+          <div className="mt-4">
+            <FieldLabel>Ссылка (демо)</FieldLabel>
+            <InputLike value={donateFull || "Загрузка…"} />
+          </div>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <Link
+              href={donatePath}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white no-underline outline-none focus-visible:ring-2"
+              style={{ backgroundColor: "var(--tlk-primary)", ["--tw-ring-color" as string]: "var(--tlk-focus)" } as CSSProperties}
+            >
+              Открыть страницу доната
+              <ExternalLink className="h-4 w-4" aria-hidden />
+            </Link>
+          </div>
+        </div>
+        <div className="tlk-transition rounded-xl border p-5" style={testLkCardStyle()}>
+          <h2 className="text-base font-semibold" style={{ color: "var(--tlk-text)" }}>
+            Настройки (макет)
+          </h2>
+          <ul className="mt-4 space-y-3 text-sm" style={{ color: "var(--tlk-text-secondary)" }}>
+            <li className="flex items-center justify-between gap-2">
+              <span>Приём донатов</span>
+              <span className="rounded-full px-2 py-0.5 text-xs font-medium text-white" style={{ backgroundColor: "var(--tlk-primary)" }}>
+                Вкл
+              </span>
+            </li>
+            <li className="flex items-center justify-between gap-2">
+              <span>Показывать сообщения</span>
+              <span className="rounded-full px-2 py-0.5 text-xs font-medium" style={{ backgroundColor: "var(--tlk-border)", color: "var(--tlk-text)" }}>
+                Вкл
+              </span>
+            </li>
+            <li className="flex items-center justify-between gap-2">
+              <span>Мин. сумма</span>
+              <span style={{ color: "var(--tlk-text)" }}>50 ₽</span>
+            </li>
+          </ul>
+          <p className="mt-4 text-xs leading-relaxed" style={{ color: "var(--tlk-text-secondary)" }}>
+            Переключатели не сохраняются — только демонстрация интерфейса.
+          </p>
+        </div>
+      </div>
+
+      <div className="tlk-transition rounded-xl border" style={testLkCardStyle()}>
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b px-5 py-4" style={{ borderColor: "var(--tlk-border)" }}>
+          <h2 className="text-base font-semibold" style={{ color: "var(--tlk-text)" }}>
+            Последние донаты (макет)
+          </h2>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[520px] text-left text-sm">
+            <thead>
+              <tr className="border-b" style={{ borderColor: "var(--tlk-border)", backgroundColor: "var(--tlk-bg-app)" }}>
+                <th className="px-5 py-3 font-medium" style={{ color: "var(--tlk-text-secondary)" }}>
+                  Когда
+                </th>
+                <th className="px-3 py-3 font-medium" style={{ color: "var(--tlk-text-secondary)" }}>
+                  Сумма
+                </th>
+                <th className="px-3 py-3 font-medium" style={{ color: "var(--tlk-text-secondary)" }}>
+                  От
+                </th>
+                <th className="px-5 py-3 font-medium" style={{ color: "var(--tlk-text-secondary)" }}>
+                  Сообщение
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {MOCK_STREAM_DONATIONS.map((row) => (
+                <tr key={row.when + row.amount} className="border-b last:border-0" style={{ borderColor: "var(--tlk-border)" }}>
+                  <td className="tlk-tabular px-5 py-3" style={{ color: "var(--tlk-text-secondary)" }}>
+                    {row.when}
+                  </td>
+                  <td className="tlk-tabular px-3 py-3 font-medium" style={{ color: "var(--tlk-text)" }}>
+                    {row.amount}
+                  </td>
+                  <td className="px-3 py-3" style={{ color: "var(--tlk-text)" }}>
+                    {row.from}
+                  </td>
+                  <td className="px-5 py-3" style={{ color: "var(--tlk-text-secondary)" }}>
+                    {row.msg}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <TestLkBackToSite />
+    </TestLkMockPageBody>
+  );
+}
+
 export function TestLkMockSettingsView() {
   return (
     <TestLkMockPageBody>

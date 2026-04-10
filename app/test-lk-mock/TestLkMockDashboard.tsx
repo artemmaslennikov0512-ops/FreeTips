@@ -45,6 +45,20 @@ export function TestLkMockDashboard() {
             Моя ссылка и оплата
           </Link>
           <Link
+            href={`${TEST_LK_BASE}/streamer`}
+            className="tlk-transition inline-flex items-center justify-center rounded-xl border px-4 py-2.5 text-sm font-medium outline-none focus-visible:ring-2 no-underline"
+            style={
+              {
+                borderColor: "var(--tlk-border)",
+                backgroundColor: "var(--tlk-surface)",
+                color: "var(--tlk-text)",
+                ["--tw-ring-color" as string]: "var(--tlk-focus)",
+              } as CSSProperties
+            }
+          >
+            Донаты стримера
+          </Link>
+          <Link
             href={`${TEST_LK_BASE}/transactions`}
             className="tlk-transition inline-flex items-center justify-center rounded-xl border px-4 py-2.5 text-sm font-medium outline-none focus-visible:ring-2 no-underline"
             style={
@@ -223,6 +237,15 @@ export function TestLkMockDashboard() {
                 style={{ borderColor: "var(--tlk-border)", color: "var(--tlk-text)", backgroundColor: "var(--tlk-bg-app)" }}
               >
                 Поддержка
+              </Link>
+              <Link
+                href="/test-preview/landing"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="tlk-transition w-full rounded-lg border px-3 py-2.5 text-left text-sm font-medium no-underline hover:opacity-95"
+                style={{ borderColor: "var(--tlk-border)", color: "var(--tlk-text)", backgroundColor: "var(--tlk-bg-app)" }}
+              >
+                Превью лендинга (новая вкладка)
               </Link>
             </div>
           </div>

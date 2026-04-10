@@ -11,6 +11,7 @@ export function ConditionalFooter() {
     pathname.startsWith("/admin") ||
     pathname.startsWith("/establishment") ||
     pathname.startsWith("/pay") ||
+    pathname.startsWith("/test-preview/donate") ||
     pathname.startsWith("/test-lk-mock") ||
     pathname === "/login" ||
     pathname === "/register" ||

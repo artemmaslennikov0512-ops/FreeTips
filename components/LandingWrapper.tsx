@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 
 export function LandingWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname() ?? "";
-  const isLanding = pathname === "/";
+  const isLanding = pathname === "/" || pathname === "/test-preview/landing";
   const isZayavka = pathname === "/zayavka";
   const isLoginPage = pathname === "/login" || pathname.startsWith("/login/");
 

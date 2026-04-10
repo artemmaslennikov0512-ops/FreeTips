@@ -22,6 +22,7 @@ import {
   TEST_LK_NAV_DASHBOARD,
   TEST_LK_NAV_EXTRA,
   TEST_LK_NAV_HALL_MOCK,
+  TEST_LK_NAV_STREAMER_MOCK,
   testLkIsNavActive,
 } from "./test-lk-nav";
 import { TestLkMockThemeProvider, useTestLkMockTheme, type ThemeChoice } from "./TestLkMockThemeContext";
@@ -194,6 +195,9 @@ function Shell({ children }: { children: ReactNode }) {
                 <Link href="/" className="flex items-center gap-2 px-3 py-2 text-sm no-underline hover:opacity-90" style={{ color: "var(--tlk-text)" }}>
                   На сайт
                 </Link>
+                <Link href="/test-preview" className="flex items-center gap-2 px-3 py-2 text-sm no-underline hover:opacity-90" style={{ color: "var(--tlk-text)" }}>
+                  Хаб тестовых страниц
+                </Link>
                 <Link href="/cabinet" className="flex items-center gap-2 px-3 py-2 text-sm no-underline hover:opacity-90" style={{ color: "var(--tlk-text)" }}>
                   Боевой /cabinet
                 </Link>
@@ -271,6 +275,29 @@ function Shell({ children }: { children: ReactNode }) {
               ) : null}
               <ul className="space-y-0.5">
                 {TEST_LK_NAV_HALL_MOCK.map(({ label, href, icon: Icon }) => {
+                  const active = testLkIsNavActive(pathname, href);
+                  return (
+                    <li key={href}>
+                      <Link
+                        href={href}
+                        className="tlk-transition flex items-center gap-3 rounded-lg py-2 text-left text-sm outline-none focus-visible:ring-2"
+                        style={{ ...navLinkStyle(active, sidebarCollapsed), ["--tw-ring-color" as string]: "var(--tlk-focus)" } as CSSProperties}
+                        title={sidebarCollapsed ? label : undefined}
+                      >
+                        <Icon className="h-5 w-5 shrink-0" style={{ color: active ? "var(--tlk-primary)" : "var(--tlk-text-secondary)" }} aria-hidden />
+                        {!sidebarCollapsed ? <span className="truncate">{label}</span> : null}
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+              {!sidebarCollapsed ? (
+                <div className="px-2 text-[10px] font-semibold uppercase tracking-wide" style={{ color: "var(--tlk-text-secondary)" }}>
+                  Стримеры (макет)
+                </div>
+              ) : null}
+              <ul className="space-y-0.5">
+                {TEST_LK_NAV_STREAMER_MOCK.map(({ label, href, icon: Icon }) => {
                   const active = testLkIsNavActive(pathname, href);
                   return (
                     <li key={href}>

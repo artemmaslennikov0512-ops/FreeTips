@@ -15,7 +15,15 @@ import {
   Sun,
   Monitor,
 } from "lucide-react";
-import { TEST_LK_BASE, TEST_LK_NAV, TEST_LK_NAV_EXTRA, testLkIsNavActive } from "./test-lk-nav";
+import {
+  TEST_LK_BASE,
+  TEST_LK_NAV,
+  TEST_LK_NAV_CABINET_LIKE,
+  TEST_LK_NAV_DASHBOARD,
+  TEST_LK_NAV_EXTRA,
+  TEST_LK_NAV_HALL_MOCK,
+  testLkIsNavActive,
+} from "./test-lk-nav";
 import { TestLkMockThemeProvider, useTestLkMockTheme, type ThemeChoice } from "./TestLkMockThemeContext";
 import "./test-lk-mock.css";
 
@@ -236,36 +244,85 @@ function Shell({ children }: { children: ReactNode }) {
                 Навигация
               </div>
             ) : null}
-            <ul className="space-y-0.5">
-              {TEST_LK_NAV.map(({ label, href, icon: Icon }) => {
-                const active = testLkIsNavActive(pathname, href);
-                return (
-                  <li key={href}>
-                    <Link
-                      href={href}
-                      className="tlk-transition flex items-center gap-3 rounded-lg py-2 text-left text-sm outline-none focus-visible:ring-2"
-                      style={{ ...navLinkStyle(active, sidebarCollapsed), ["--tw-ring-color" as string]: "var(--tlk-focus)" } as CSSProperties}
-                      title={sidebarCollapsed ? label : undefined}
-                    >
-                      <Icon className="h-5 w-5 shrink-0" style={{ color: active ? "var(--tlk-primary)" : "var(--tlk-text-secondary)" }} aria-hidden />
-                      {!sidebarCollapsed ? (
-                        <span className="flex min-w-0 flex-1 items-center gap-2">
-                          <span className="truncate">{label}</span>
-                          {href === `${TEST_LK_BASE}/support` ? (
-                            <span
-                              className="ml-auto flex h-5 min-w-[20px] shrink-0 items-center justify-center rounded-full px-1.5 text-[10px] font-semibold text-white"
-                              style={{ backgroundColor: "var(--tlk-danger)" }}
-                            >
-                              2
-                            </span>
-                          ) : null}
-                        </span>
-                      ) : null}
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
+            <div className="flex flex-col gap-2">
+              <ul className="space-y-0.5">
+                {(() => {
+                  const { label, href, icon: Icon } = TEST_LK_NAV_DASHBOARD;
+                  const active = testLkIsNavActive(pathname, href);
+                  return (
+                    <li key={href}>
+                      <Link
+                        href={href}
+                        className="tlk-transition flex items-center gap-3 rounded-lg py-2 text-left text-sm outline-none focus-visible:ring-2"
+                        style={{ ...navLinkStyle(active, sidebarCollapsed), ["--tw-ring-color" as string]: "var(--tlk-focus)" } as CSSProperties}
+                        title={sidebarCollapsed ? label : undefined}
+                      >
+                        <Icon className="h-5 w-5 shrink-0" style={{ color: active ? "var(--tlk-primary)" : "var(--tlk-text-secondary)" }} aria-hidden />
+                        {!sidebarCollapsed ? <span className="truncate">{label}</span> : null}
+                      </Link>
+                    </li>
+                  );
+                })()}
+              </ul>
+              {!sidebarCollapsed ? (
+                <div className="px-2 text-[10px] font-semibold uppercase tracking-wide" style={{ color: "var(--tlk-text-secondary)" }}>
+                  Сценарий зала (макет)
+                </div>
+              ) : null}
+              <ul className="space-y-0.5">
+                {TEST_LK_NAV_HALL_MOCK.map(({ label, href, icon: Icon }) => {
+                  const active = testLkIsNavActive(pathname, href);
+                  return (
+                    <li key={href}>
+                      <Link
+                        href={href}
+                        className="tlk-transition flex items-center gap-3 rounded-lg py-2 text-left text-sm outline-none focus-visible:ring-2"
+                        style={{ ...navLinkStyle(active, sidebarCollapsed), ["--tw-ring-color" as string]: "var(--tlk-focus)" } as CSSProperties}
+                        title={sidebarCollapsed ? label : undefined}
+                      >
+                        <Icon className="h-5 w-5 shrink-0" style={{ color: active ? "var(--tlk-primary)" : "var(--tlk-text-secondary)" }} aria-hidden />
+                        {!sidebarCollapsed ? <span className="truncate">{label}</span> : null}
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+              {!sidebarCollapsed ? (
+                <div className="px-2 text-[10px] font-semibold uppercase tracking-wide" style={{ color: "var(--tlk-text-secondary)" }}>
+                  Как в /cabinet
+                </div>
+              ) : null}
+              <ul className="space-y-0.5">
+                {TEST_LK_NAV_CABINET_LIKE.map(({ label, href, icon: Icon }) => {
+                  const active = testLkIsNavActive(pathname, href);
+                  return (
+                    <li key={href}>
+                      <Link
+                        href={href}
+                        className="tlk-transition flex items-center gap-3 rounded-lg py-2 text-left text-sm outline-none focus-visible:ring-2"
+                        style={{ ...navLinkStyle(active, sidebarCollapsed), ["--tw-ring-color" as string]: "var(--tlk-focus)" } as CSSProperties}
+                        title={sidebarCollapsed ? label : undefined}
+                      >
+                        <Icon className="h-5 w-5 shrink-0" style={{ color: active ? "var(--tlk-primary)" : "var(--tlk-text-secondary)" }} aria-hidden />
+                        {!sidebarCollapsed ? (
+                          <span className="flex min-w-0 flex-1 items-center gap-2">
+                            <span className="truncate">{label}</span>
+                            {href === `${TEST_LK_BASE}/support` ? (
+                              <span
+                                className="ml-auto flex h-5 min-w-[20px] shrink-0 items-center justify-center rounded-full px-1.5 text-[10px] font-semibold text-white"
+                                style={{ backgroundColor: "var(--tlk-danger)" }}
+                              >
+                                2
+                              </span>
+                            ) : null}
+                          </span>
+                        ) : null}
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
             {!sidebarCollapsed ? (
               <div className="mt-4 border-t pt-3" style={{ borderColor: "var(--tlk-border)" }}>
                 <div className="mb-1 px-2 text-[10px] font-semibold uppercase tracking-wide" style={{ color: "var(--tlk-text-secondary)" }}>

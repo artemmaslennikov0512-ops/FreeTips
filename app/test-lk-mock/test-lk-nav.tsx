@@ -1,6 +1,9 @@
 import type { LucideIcon } from "lucide-react";
 import {
   LayoutDashboard,
+  Calendar,
+  UtensilsCrossed,
+  Users,
   List,
   Link2,
   UserPlus,
@@ -20,9 +23,15 @@ export type TestLkNavItem = {
   icon: LucideIcon;
 };
 
-/** Те же пункты, что в `app/cabinet/layout.tsx` → `NAV` (без фильтра по ролям — всё видно в макете). */
-export const TEST_LK_NAV: TestLkNavItem[] = [
-  { label: "Дашборд", href: TEST_LK_BASE, icon: LayoutDashboard },
+/** Сценарий «зал / ресторан» — только в тестовом макете, в боевом /cabinet этих пунктов нет. */
+export const TEST_LK_NAV_HALL_MOCK: TestLkNavItem[] = [
+  { label: "Брони", href: `${TEST_LK_BASE}/bookings`, icon: Calendar },
+  { label: "Зал / смена", href: `${TEST_LK_BASE}/floor`, icon: UtensilsCrossed },
+  { label: "Гости", href: `${TEST_LK_BASE}/guests`, icon: Users },
+];
+
+/** Пункты как в `app/cabinet/layout.tsx` → `NAV`. */
+export const TEST_LK_NAV_CABINET_LIKE: TestLkNavItem[] = [
   { label: "Операции", href: `${TEST_LK_BASE}/transactions`, icon: List },
   { label: "Моя ссылка", href: `${TEST_LK_BASE}/link`, icon: Link2 },
   { label: "Подключиться к заведению", href: `${TEST_LK_BASE}/join-establishment`, icon: UserPlus },
@@ -32,6 +41,15 @@ export const TEST_LK_NAV: TestLkNavItem[] = [
   { label: "Сессии", href: `${TEST_LK_BASE}/sessions`, icon: Laptop },
   { label: "Настройки профиля", href: `${TEST_LK_BASE}/settings`, icon: Settings },
 ];
+
+export const TEST_LK_NAV_DASHBOARD: TestLkNavItem = {
+  label: "Дашборд",
+  href: TEST_LK_BASE,
+  icon: LayoutDashboard,
+};
+
+/** Полный список для активного состояния и мобильного меню. */
+export const TEST_LK_NAV: TestLkNavItem[] = [TEST_LK_NAV_DASHBOARD, ...TEST_LK_NAV_HALL_MOCK, ...TEST_LK_NAV_CABINET_LIKE];
 
 export const TEST_LK_NAV_EXTRA: TestLkNavItem = {
   label: "Кабинет заведения",

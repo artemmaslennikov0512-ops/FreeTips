@@ -61,80 +61,60 @@ export function TestLkMockDashboard() {
         </div>
       </div>
 
-      <div className="mb-6 w-full max-w-[20rem] sm:max-w-[22rem]">
+      {/* Градиентная карта (как раньше в макете), компактнее; без номера и без Mir */}
+      <div className="mb-6 w-full max-w-[17.5rem] sm:max-w-[18rem]">
         <div
-          className="tlk-transition flex flex-col gap-3 rounded-xl p-3 sm:flex-row sm:items-center sm:gap-3"
+          className="tlk-transition relative overflow-hidden rounded-xl p-3.5 text-white"
           style={{
-            borderWidth: 1,
-            borderStyle: "solid",
-            borderColor: "var(--tlk-border)",
-            borderLeftWidth: 3,
-            borderLeftColor: "var(--tlk-primary)",
-            backgroundColor: "var(--tlk-surface)",
+            minHeight: 132,
+            maxWidth: "100%",
+            wordBreak: "normal",
+            overflowWrap: "normal",
+            background: `linear-gradient(145deg, var(--tlk-card-deep) 0%, var(--tlk-card-mid) 55%, #0d281f 100%)`,
+            boxShadow: effective === "dark" ? "inset 0 0 0 1px rgba(255,255,255,0.08)" : "0 1px 2px rgba(0,0,0,0.08)",
           }}
         >
-          <div className="flex min-w-0 flex-1 items-center gap-3">
-            <div
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-xs font-bold text-white"
-              style={{ background: "linear-gradient(135deg, var(--tlk-card-deep), var(--tlk-primary))" }}
-              aria-hidden
-            >
-              D
+          <div
+            className="pointer-events-none absolute inset-0 opacity-25"
+            style={{
+              background: "linear-gradient(115deg, transparent 40%, var(--tlk-card-glass) 50%, transparent 60%)",
+            }}
+          />
+          <div className="relative flex flex-col gap-2">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0 flex-1" style={{ minWidth: "12rem" }}>
+                <p className="whitespace-nowrap text-[10px] font-semibold uppercase tracking-wider text-white/80">Виртуальная карта</p>
+                <p className="mt-0.5 whitespace-nowrap text-xs text-white/70">Доступно</p>
+                <p className="tlk-tabular mt-1 text-[1.35rem] font-semibold leading-tight tracking-tight sm:text-2xl">124 580 ₽</p>
+              </div>
+              <div
+                className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-[10px] font-bold text-white"
+                style={{ background: "rgba(255,255,255,0.2)" }}
+                aria-hidden
+              >
+                D
+              </div>
             </div>
-            <div className="min-w-0">
-              <p className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: "var(--tlk-text-secondary)" }}>
-                Баланс в сервисе
-              </p>
-              <p className="tlk-tabular mt-0.5 text-xl font-semibold leading-none tracking-tight" style={{ color: "var(--tlk-text)" }}>
-                124 580 ₽
-              </p>
-              <p className="mt-1 text-[10px] font-normal leading-snug" style={{ color: "var(--tlk-text-secondary)" }}>
-                Доступно к выплатам
-                <span className="mx-1 opacity-50" aria-hidden>
-                  ·
-                </span>
-                <span className="whitespace-nowrap">обновлено сегодня</span>
-              </p>
+            <p className="text-[10px] leading-snug text-white/65">Доступно к выплатам · обновлено сегодня</p>
+            <div className="flex flex-wrap gap-1.5 pt-0.5">
+              <button type="button" className="rounded-md bg-white/20 px-2 py-1 text-[10px] font-medium backdrop-blur-sm hover:bg-white/30">
+                Пополнить
+              </button>
+              <Link
+                href={`${TEST_LK_BASE}/transactions`}
+                className="inline-flex items-center rounded-md bg-white/10 px-2 py-1 text-[10px] font-medium no-underline text-white hover:bg-white/20"
+              >
+                Операции
+              </Link>
+              <button type="button" className="rounded-md bg-white/10 px-2 py-1 text-[10px] font-medium text-white/90 hover:bg-white/20">
+                Лимиты
+              </button>
             </div>
-          </div>
-          <div className="flex shrink-0 flex-wrap gap-1.5 sm:flex-nowrap sm:justify-end">
-            <button
-              type="button"
-              className="tlk-transition rounded-md px-2.5 py-1.5 text-[11px] font-medium text-white outline-none focus-visible:ring-2"
-              style={{ backgroundColor: "var(--tlk-primary)", ["--tw-ring-color" as string]: "var(--tlk-focus)" } as CSSProperties}
-            >
-              Пополнить
-            </button>
-            <Link
-              href={`${TEST_LK_BASE}/transactions`}
-              className="tlk-transition inline-flex items-center rounded-md border px-2.5 py-1.5 text-[11px] font-medium no-underline outline-none focus-visible:ring-2"
-              style={
-                {
-                  borderColor: "var(--tlk-border)",
-                  backgroundColor: "var(--tlk-bg-app)",
-                  color: "var(--tlk-text)",
-                  ["--tw-ring-color" as string]: "var(--tlk-focus)",
-                } as CSSProperties
-              }
-            >
-              Операции
-            </Link>
-            <button
-              type="button"
-              className="tlk-transition rounded-md border px-2.5 py-1.5 text-[11px] font-medium outline-none focus-visible:ring-2"
-              style={
-                {
-                  borderColor: "var(--tlk-border)",
-                  backgroundColor: "transparent",
-                  color: "var(--tlk-text-secondary)",
-                  ["--tw-ring-color" as string]: "var(--tlk-focus)",
-                } as CSSProperties
-              }
-            >
-              Лимиты
-            </button>
           </div>
         </div>
+        <p className="mt-1.5 text-[10px] leading-snug" style={{ color: "var(--tlk-text-secondary)" }}>
+          Макет: без номера карты и платёжной системы.
+        </p>
       </div>
 
       <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

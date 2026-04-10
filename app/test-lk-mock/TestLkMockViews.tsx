@@ -321,6 +321,217 @@ export function TestLkMockSessionsView() {
   );
 }
 
+const MOCK_BOOKINGS = [
+  { time: "19:00", zone: "Веранда", guests: 4, name: "Иванова А.", phone: "+7 ··· 42-11", status: "Подтверждено", src: "Сайт" },
+  { time: "19:30", zone: "Зал", guests: 2, name: "Петров П.", phone: "+7 ··· 88-90", status: "Новая", src: "Телефон" },
+  { time: "20:00", zone: "Бар", guests: 3, name: "Сидорова Е.", phone: "+7 ··· 15-33", status: "Подтверждено", src: "Сайт" },
+];
+
+export function TestLkMockBookingsView() {
+  return (
+    <TestLkMockPageBody>
+      <TestLkBreadcrumb segment="Брони" />
+      <h1 className="mb-2 text-2xl font-semibold" style={{ color: "var(--tlk-text)" }}>
+        Брони
+      </h1>
+      <p className="mb-6 text-sm" style={{ color: "var(--tlk-text-secondary)" }}>
+        Тестовый раздел «как в ресторане» — только в /test-lk-mock, в боевом /cabinet нет.
+      </p>
+      <div className="tlk-transition rounded-xl border" style={testLkCardStyle()}>
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b px-5 py-4" style={{ borderColor: "var(--tlk-border)" }}>
+          <h2 className="text-base font-semibold" style={{ color: "var(--tlk-text)" }}>
+            Сегодня
+          </h2>
+          <div className="flex flex-wrap gap-2">
+            {["Сегодня", "Завтра", "Неделя"].map((t, i) => (
+              <button
+                key={t}
+                type="button"
+                className="tlk-transition rounded-lg border px-3 py-1.5 text-xs font-medium"
+                style={{
+                  borderColor: "var(--tlk-border)",
+                  backgroundColor: i === 0 ? "var(--tlk-sidebar-active-bg)" : "transparent",
+                  color: "var(--tlk-text)",
+                }}
+              >
+                {t}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[560px] text-left text-sm">
+            <thead>
+              <tr className="border-b" style={{ borderColor: "var(--tlk-border)", backgroundColor: "var(--tlk-bg-app)" }}>
+                <th className="px-5 py-3 font-medium" style={{ color: "var(--tlk-text-secondary)" }}>
+                  Время
+                </th>
+                <th className="px-3 py-3 font-medium" style={{ color: "var(--tlk-text-secondary)" }}>
+                  Зона
+                </th>
+                <th className="px-3 py-3 font-medium" style={{ color: "var(--tlk-text-secondary)" }}>
+                  Гости
+                </th>
+                <th className="px-3 py-3 font-medium" style={{ color: "var(--tlk-text-secondary)" }}>
+                  Имя
+                </th>
+                <th className="px-3 py-3 font-medium" style={{ color: "var(--tlk-text-secondary)" }}>
+                  Телефон
+                </th>
+                <th className="px-3 py-3 font-medium" style={{ color: "var(--tlk-text-secondary)" }}>
+                  Статус
+                </th>
+                <th className="px-5 py-3 font-medium" style={{ color: "var(--tlk-text-secondary)" }}>
+                  Источник
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {MOCK_BOOKINGS.map((b) => (
+                <tr key={b.time + b.name} className="border-b last:border-0" style={{ borderColor: "var(--tlk-border)" }}>
+                  <td className="tlk-tabular px-5 py-3 font-medium" style={{ color: "var(--tlk-text)" }}>
+                    {b.time}
+                  </td>
+                  <td className="px-3 py-3" style={{ color: "var(--tlk-text)" }}>
+                    {b.zone}
+                  </td>
+                  <td className="tlk-tabular px-3 py-3" style={{ color: "var(--tlk-text)" }}>
+                    {b.guests}
+                  </td>
+                  <td className="px-3 py-3" style={{ color: "var(--tlk-text)" }}>
+                    {b.name}
+                  </td>
+                  <td className="tlk-tabular px-3 py-3" style={{ color: "var(--tlk-text-secondary)" }}>
+                    {b.phone}
+                  </td>
+                  <td className="px-3 py-3">
+                    <span
+                      className="inline-flex rounded-full px-2 py-0.5 text-xs font-medium"
+                      style={{
+                        backgroundColor: b.status === "Новая" ? "rgba(37, 99, 235, 0.12)" : "var(--tlk-sidebar-active-bg)",
+                        color: b.status === "Новая" ? "var(--tlk-focus)" : "var(--tlk-text)",
+                      }}
+                    >
+                      {b.status}
+                    </span>
+                  </td>
+                  <td className="px-5 py-3" style={{ color: "var(--tlk-text-secondary)" }}>
+                    {b.src}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <TestLkBackToSite />
+    </TestLkMockPageBody>
+  );
+}
+
+export function TestLkMockFloorView() {
+  const tables = [
+    { id: "1", name: "Стол 1 · зал", guests: "2 / 4", status: "Свободен" },
+    { id: "2", name: "Стол 4 · веранда", guests: "4 / 4", status: "Занят" },
+    { id: "3", name: "Бар 2", guests: "1 / 2", status: "Скоро приход" },
+  ];
+  return (
+    <TestLkMockPageBody>
+      <TestLkBreadcrumb segment="Зал / смена" />
+      <h1 className="mb-2 text-2xl font-semibold" style={{ color: "var(--tlk-text)" }}>
+        Зал / смена
+      </h1>
+      <p className="mb-6 text-sm" style={{ color: "var(--tlk-text-secondary)" }}>
+        Макет экрана смены: статусы столов и быстрые действия (данные вымышленные).
+      </p>
+      <div className="mb-6 grid gap-4 lg:grid-cols-3">
+        <div className="tlk-transition rounded-xl border p-4 lg:col-span-2" style={testLkCardStyle()}>
+          <h2 className="text-base font-semibold" style={{ color: "var(--tlk-text)" }}>
+            Столы
+          </h2>
+          <ul className="mt-3 space-y-2">
+            {tables.map((t) => (
+              <li key={t.id} className="flex flex-wrap items-center justify-between gap-2 rounded-lg border px-3 py-2.5" style={{ borderColor: "var(--tlk-border)" }}>
+                <span className="font-medium" style={{ color: "var(--tlk-text)" }}>
+                  {t.name}
+                </span>
+                <span className="tlk-tabular text-sm" style={{ color: "var(--tlk-text-secondary)" }}>
+                  {t.guests}
+                </span>
+                <span className="rounded-full px-2 py-0.5 text-xs font-medium" style={{ backgroundColor: "var(--tlk-sidebar-active-bg)", color: "var(--tlk-text)" }}>
+                  {t.status}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div className="tlk-transition space-y-2 rounded-xl border p-4" style={testLkCardStyle()}>
+          <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: "var(--tlk-text-secondary)" }}>
+            Смена
+          </p>
+          <p className="text-sm" style={{ color: "var(--tlk-text)" }}>
+            Пятница, 18:00–23:00
+          </p>
+          <p className="text-xs" style={{ color: "var(--tlk-text-secondary)" }}>
+            Официант: макет
+          </p>
+          <div className="mt-3 flex flex-col gap-2">
+            {["Отметить приход", "Сообщить на кухню", "Открыть схему зала"].map((a) => (
+              <button
+                key={a}
+                type="button"
+                className="tlk-transition w-full rounded-lg border px-3 py-2 text-left text-sm font-medium"
+                style={{ borderColor: "var(--tlk-border)", color: "var(--tlk-text)", backgroundColor: "var(--tlk-bg-app)" }}
+              >
+                {a}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+      <TestLkBackToSite />
+    </TestLkMockPageBody>
+  );
+}
+
+export function TestLkMockGuestsView() {
+  const guests = [
+    { name: "Иванова А.", tag: "День рождения", allergy: "—", table: "Веранда 2" },
+    { name: "Петров П.", tag: "—", allergy: "Орехи", table: "Зал 1" },
+    { name: "Ким С.", tag: "Детское меню", allergy: "Лактоза", table: "Бар" },
+  ];
+  return (
+    <TestLkMockPageBody>
+      <TestLkBreadcrumb segment="Гости" />
+      <h1 className="mb-2 text-2xl font-semibold" style={{ color: "var(--tlk-text)" }}>
+        Гости
+      </h1>
+      <p className="mb-6 text-sm" style={{ color: "var(--tlk-text-secondary)" }}>
+        Макет карточек гостей: пометки, аллергены, стол (без связи с реальными данными).
+      </p>
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {guests.map((g) => (
+          <div key={g.name} className="tlk-transition rounded-xl border p-4" style={testLkCardStyle()}>
+            <p className="font-semibold" style={{ color: "var(--tlk-text)" }}>
+              {g.name}
+            </p>
+            <p className="mt-2 text-sm" style={{ color: "var(--tlk-text-secondary)" }}>
+              Стол: <span style={{ color: "var(--tlk-text)" }}>{g.table}</span>
+            </p>
+            <p className="mt-1 text-sm" style={{ color: "var(--tlk-text-secondary)" }}>
+              Событие: <span style={{ color: "var(--tlk-text)" }}>{g.tag}</span>
+            </p>
+            <p className="mt-1 text-sm" style={{ color: "var(--tlk-text-secondary)" }}>
+              Аллергены: <span style={{ color: "var(--tlk-text)" }}>{g.allergy}</span>
+            </p>
+          </div>
+        ))}
+      </div>
+      <TestLkBackToSite />
+    </TestLkMockPageBody>
+  );
+}
+
 export function TestLkMockSettingsView() {
   return (
     <TestLkMockPageBody>

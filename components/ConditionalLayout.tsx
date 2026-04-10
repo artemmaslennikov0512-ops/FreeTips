@@ -21,18 +21,21 @@ export function ConditionalLayout({ children }: { children: React.ReactNode }) {
     pathname.startsWith("/change-password") ||
     pathname.startsWith("/reset-password");
   const isPayPage = pathname.startsWith("/pay");
+  const isTestLkMock = pathname.startsWith("/test-lk-mock");
   const isZayavka = pathname === "/zayavka";
   const isLoginPage = pathname === "/login" || pathname.startsWith("/login/");
   const isForgotPassword = pathname.startsWith("/forgot-password");
   const hideHeader =
-    isPayPage || isZayavka || isLoginPage || isForgotPassword;
+    isPayPage || isZayavka || isLoginPage || isForgotPassword || isTestLkMock;
   const widthClass =
     isCabinet || isAdmin || isEstablishment
       ? "max-w-none bg-transparent"
-      : isLanding
-        ? "max-w-none bg-[var(--color-bg)]"
-        : isPayPage
+      : isTestLkMock
+        ? "max-w-none bg-transparent"
+        : isLanding
           ? "max-w-none bg-[var(--color-bg)]"
+          : isPayPage
+            ? "max-w-none bg-[var(--color-bg)]"
           : isZayavka || isLoginPage
             ? "mx-auto max-w-6xl xl:max-w-7xl 2xl:max-w-screen-2xl"
             : "mx-auto max-w-6xl xl:max-w-7xl 2xl:max-w-screen-2xl bg-[var(--color-bg)]";

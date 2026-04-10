@@ -1,0 +1,50 @@
+/* Изолированная тема только внутри .test-lk-mock-scope — не трогает глобальные токены ЛК */
+
+.test-lk-mock-scope {
+  --tlk-bg-app: #f4f4f5;
+  --tlk-surface: #ffffff;
+  --tlk-border: #e4e4e7;
+  --tlk-text: #18181b;
+  --tlk-text-secondary: #71717a;
+  --tlk-primary: #1e3a2f;
+  --tlk-primary-hover: #2d5a4a;
+  --tlk-focus: #2563eb;
+  --tlk-danger: #dc2626;
+  --tlk-sidebar-active-bg: #f3f4f6;
+  --tlk-card-mid: #2d5a4a;
+  --tlk-card-deep: #1e3a2f;
+  --tlk-card-glass: rgba(255, 255, 255, 0.1);
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+}
+
+.test-lk-mock-scope[data-tlk-theme="dark"] {
+  --tlk-bg-app: #0c0e12;
+  --tlk-surface: #14181f;
+  --tlk-border: #272b36;
+  --tlk-text: #f4f4f5;
+  --tlk-text-secondary: #a1a1aa;
+  --tlk-primary: #3d8f73;
+  --tlk-primary-hover: #4fa386;
+  --tlk-focus: #60a5fa;
+  --tlk-danger: #f87171;
+  --tlk-sidebar-active-bg: #1f2937;
+  --tlk-card-mid: #1a4034;
+  --tlk-card-deep: #0f241c;
+  --tlk-card-glass: rgba(255, 255, 255, 0.06);
+}
+
+.test-lk-mock-scope *,
+.test-lk-mock-scope *::before,
+.test-lk-mock-scope *::after {
+  box-sizing: border-box;
+}
+
+.test-lk-mock-scope .tlk-tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .test-lk-mock-scope .tlk-transition {
+    transition: none !important;
+  }
+}

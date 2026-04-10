@@ -7,7 +7,7 @@ import {
   Calendar,
   ChevronDown,
   ChevronLeft,
-  CreditCard,
+  Wallet,
   LayoutDashboard,
   LogOut,
   Menu,
@@ -367,48 +367,79 @@ export function TestLkMockClient() {
               </div>
             </div>
 
-            {/* Виртуальная карта */}
-            <div className="mb-8 max-w-md">
+            {/* Виджет баланса сервиса (не метафора банковской карты) */}
+            <div className="mb-6 max-w-4xl">
               <div
-                className="tlk-transition relative overflow-hidden rounded-2xl p-5 text-white shadow-none ring-1"
+                className="tlk-transition flex min-h-[88px] flex-col gap-4 rounded-xl p-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6"
                 style={{
-                  minHeight: 200,
-                  background: `linear-gradient(145deg, var(--tlk-card-deep) 0%, var(--tlk-card-mid) 55%, #0d281f 100%)`,
-                  boxShadow: effective === "dark" ? "inset 0 0 0 1px rgba(255,255,255,0.08)" : "0 1px 2px rgba(0,0,0,0.08)",
+                  borderWidth: 1,
+                  borderStyle: "solid",
+                  borderColor: "var(--tlk-border)",
+                  borderLeftWidth: 4,
+                  borderLeftColor: "var(--tlk-primary)",
+                  backgroundColor: "var(--tlk-surface)",
                 }}
               >
-                <div
-                  className="pointer-events-none absolute inset-0 opacity-30"
-                  style={{
-                    background: "linear-gradient(115deg, transparent 40%, var(--tlk-card-glass) 50%, transparent 60%)",
-                  }}
-                />
-                <div className="relative flex items-start justify-between">
-                  <div>
-                    <p className="text-xs font-medium uppercase tracking-wider text-white/80">Виртуальная карта</p>
-                    <p className="mt-1 text-sm text-white/70">Доступно</p>
-                    <p className="tlk-tabular mt-1 text-3xl font-semibold tracking-tight">124 580 ₽</p>
+                <div className="flex min-w-0 flex-1 items-center gap-4">
+                  <div
+                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-sm font-bold text-white"
+                    style={{ background: "linear-gradient(135deg, var(--tlk-card-deep), var(--tlk-primary))" }}
+                    aria-hidden
+                  >
+                    D
                   </div>
-                  <div className="flex flex-col items-end gap-2">
-                    <span className="h-6 w-8 rounded-md bg-white/85 shadow-sm" aria-hidden />
-                    <span className="rounded bg-white/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide">Mir</span>
+                  <div className="min-w-0">
+                    <p className="text-[11px] font-semibold uppercase tracking-wide" style={{ color: "var(--tlk-text-secondary)" }}>
+                      Баланс в сервисе
+                    </p>
+                    <p className="tlk-tabular truncate text-2xl font-semibold leading-tight sm:text-[1.65rem]" style={{ color: "var(--tlk-text)" }}>
+                      124 580 ₽
+                    </p>
+                    <p className="mt-0.5 text-xs" style={{ color: "var(--tlk-text-secondary)" }}>
+                      Доступно к выплатам · обновлено сегодня
+                    </p>
                   </div>
                 </div>
-                <p className="tlk-tabular relative mt-6 text-lg tracking-[0.2em] text-white/95">•••• •••• •••• 4821</p>
-                <div className="relative mt-5 flex flex-wrap gap-2">
-                  <button type="button" className="rounded-lg bg-white/20 px-3 py-1.5 text-xs font-medium backdrop-blur-sm hover:bg-white/30">
+                <div className="flex flex-wrap gap-2 sm:justify-end">
+                  <button
+                    type="button"
+                    className="tlk-transition rounded-lg px-3 py-2 text-xs font-medium text-white outline-none focus-visible:ring-2"
+                    style={{ backgroundColor: "var(--tlk-primary)", ["--tw-ring-color" as string]: "var(--tlk-focus)" } as CSSProperties}
+                  >
                     Пополнить
                   </button>
-                  <button type="button" className="rounded-lg bg-white/10 px-3 py-1.5 text-xs font-medium hover:bg-white/20">
+                  <button
+                    type="button"
+                    className="tlk-transition rounded-lg border px-3 py-2 text-xs font-medium outline-none focus-visible:ring-2"
+                    style={
+                      {
+                        borderColor: "var(--tlk-border)",
+                        backgroundColor: "var(--tlk-bg-app)",
+                        color: "var(--tlk-text)",
+                        ["--tw-ring-color" as string]: "var(--tlk-focus)",
+                      } as CSSProperties
+                    }
+                  >
                     Операции
                   </button>
-                  <button type="button" className="rounded-lg bg-white/10 px-3 py-1.5 text-xs font-medium hover:bg-white/20">
+                  <button
+                    type="button"
+                    className="tlk-transition rounded-lg border px-3 py-2 text-xs font-medium outline-none focus-visible:ring-2"
+                    style={
+                      {
+                        borderColor: "var(--tlk-border)",
+                        backgroundColor: "transparent",
+                        color: "var(--tlk-text-secondary)",
+                        ["--tw-ring-color" as string]: "var(--tlk-focus)",
+                      } as CSSProperties
+                    }
+                  >
                     Лимиты
                   </button>
                 </div>
               </div>
               <p className="mt-2 text-xs" style={{ color: "var(--tlk-text-secondary)" }}>
-                Макет: без реальных платежей и номеров. Состояния «загрузка / нет карты» можно добавить отдельно.
+                Макет: внутренний баланс сервиса, без имитации пластиковой карты и платёжных систем.
               </p>
             </div>
 
@@ -552,7 +583,7 @@ export function TestLkMockClient() {
                   </div>
                 </div>
                 <div className="tlk-transition flex gap-3 rounded-xl border p-4" style={{ borderColor: "var(--tlk-border)", backgroundColor: "var(--tlk-surface)" }}>
-                  <CreditCard className="h-10 w-10 shrink-0" style={{ color: "var(--tlk-primary)" }} />
+                  <Wallet className="h-10 w-10 shrink-0" style={{ color: "var(--tlk-primary)" }} />
                   <div>
                     <p className="text-sm font-medium" style={{ color: "var(--tlk-text)" }}>
                       Подсказка

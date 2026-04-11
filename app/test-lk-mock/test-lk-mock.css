@@ -1,56 +1,80 @@
-/* Изолированная тема только внутри .test-lk-mock-scope — не трогает глобальные токены ЛК */
+/* Тестовый ЛК: полностью изолированная тема внутри .test-lk-mock-root — не использует токены боевого .cabinet-premium */
 
-.test-lk-mock-scope {
+.test-lk-mock-root[data-tlk-theme="light"] {
+  --tlk-shell-bg: #e5e9e7;
+  --tlk-panel-bg: rgba(255, 255, 255, 0.55);
+  --tlk-panel-border: rgba(11, 18, 32, 0.1);
+  --tlk-nav-wrap-bg: rgba(255, 255, 255, 0.4);
+  --tlk-nav-wrap-border: rgba(13, 148, 136, 0.18);
+  --tlk-profile-bg: rgba(13, 148, 136, 0.08);
+  --tlk-profile-border: rgba(13, 148, 136, 0.22);
+  --tlk-accent: #0d9488;
+  --tlk-accent-soft: rgba(13, 148, 136, 0.14);
   --tlk-bg-app: #f4f4f5;
   --tlk-surface: #ffffff;
   --tlk-border: #e4e4e7;
   --tlk-text: #18181b;
   --tlk-text-secondary: #71717a;
-  --tlk-primary: #1e3a2f;
-  --tlk-primary-hover: #2d5a4a;
-  --tlk-focus: #2563eb;
+  --tlk-primary: #0d9488;
+  --tlk-primary-hover: #0f766e;
+  --tlk-focus: #0d9488;
   --tlk-danger: #dc2626;
-  --tlk-sidebar-active-bg: #f3f4f6;
-  --tlk-card-mid: #2d5a4a;
-  --tlk-card-deep: #1e3a2f;
-  --tlk-card-glass: rgba(255, 255, 255, 0.1);
+  --tlk-sidebar-active-bg: rgba(13, 148, 136, 0.14);
+  --tlk-unread-badge: #e11d48;
+  --tlk-card-mid: #14b8a6;
+  --tlk-card-deep: #0f766e;
+  --tlk-card-glass: rgba(255, 255, 255, 0.14);
+  --tlk-mobile-scrim: rgba(0, 0, 0, 0.45);
+  --tlk-expand-fab-bg: #0b1220;
   font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 }
 
-.test-lk-mock-scope[data-tlk-theme="dark"] {
-  --tlk-bg-app: #0c0e12;
+.test-lk-mock-root[data-tlk-theme="dark"] {
+  --tlk-shell-bg: #0c0f0e;
+  --tlk-panel-bg: rgba(255, 255, 255, 0.06);
+  --tlk-panel-border: rgba(238, 244, 242, 0.12);
+  --tlk-nav-wrap-bg: rgba(255, 255, 255, 0.04);
+  --tlk-nav-wrap-border: rgba(45, 212, 191, 0.2);
+  --tlk-profile-bg: rgba(45, 212, 191, 0.08);
+  --tlk-profile-border: rgba(45, 212, 191, 0.22);
+  --tlk-accent: #2dd4bf;
+  --tlk-accent-soft: rgba(45, 212, 191, 0.12);
+  --tlk-bg-app: #14181f;
   --tlk-surface: #14181f;
   --tlk-border: #272b36;
   --tlk-text: #f4f4f5;
   --tlk-text-secondary: #a1a1aa;
-  --tlk-primary: #3d8f73;
-  --tlk-primary-hover: #4fa386;
-  --tlk-focus: #60a5fa;
+  --tlk-primary: #2dd4bf;
+  --tlk-primary-hover: #5eead4;
+  --tlk-focus: #5eead4;
   --tlk-danger: #f87171;
-  --tlk-sidebar-active-bg: #1f2937;
-  --tlk-card-mid: #1a4034;
-  --tlk-card-deep: #0f241c;
-  --tlk-card-glass: rgba(255, 255, 255, 0.06);
+  --tlk-sidebar-active-bg: rgba(45, 212, 191, 0.12);
+  --tlk-unread-badge: #fb7185;
+  --tlk-card-mid: #115e59;
+  --tlk-card-deep: #134e4a;
+  --tlk-card-glass: rgba(255, 255, 255, 0.08);
+  --tlk-mobile-scrim: rgba(0, 0, 0, 0.55);
+  --tlk-expand-fab-bg: #0f172a;
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 }
 
-.test-lk-mock-scope *,
-.test-lk-mock-scope *::before,
-.test-lk-mock-scope *::after {
+.test-lk-mock-root *,
+.test-lk-mock-root *::before,
+.test-lk-mock-root *::after {
   box-sizing: border-box;
 }
 
-:is(.test-lk-mock-scope, .test-lk-as-cabinet.cabinet-premium .test-lk-inner-main) .tlk-tabular {
+.test-lk-mock-root .tlk-tabular {
   font-variant-numeric: tabular-nums;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  :is(.test-lk-mock-scope, .test-lk-as-cabinet.cabinet-premium .test-lk-inner-main) .tlk-transition {
+  .test-lk-mock-root .tlk-transition {
     transition: none !important;
   }
 }
 
-/* Спека форм (макет ЛК) */
-:is(.test-lk-mock-scope, .test-lk-as-cabinet.cabinet-premium .test-lk-inner-main) .tlk-field-label {
+.test-lk-mock-root .tlk-field-label {
   display: block;
   font-size: 0.8125rem;
   font-weight: 600;
@@ -58,15 +82,15 @@
   margin-bottom: 0.375rem;
 }
 
-:is(.test-lk-mock-scope, .test-lk-as-cabinet.cabinet-premium .test-lk-inner-main) .tlk-field-hint {
+.test-lk-mock-root .tlk-field-hint {
   font-size: 0.75rem;
   color: var(--tlk-text-secondary);
   margin-top: 0.25rem;
 }
 
-:is(.test-lk-mock-scope, .test-lk-as-cabinet.cabinet-premium .test-lk-inner-main) .tlk-field-input,
-:is(.test-lk-mock-scope, .test-lk-as-cabinet.cabinet-premium .test-lk-inner-main) .tlk-field-textarea,
-:is(.test-lk-mock-scope, .test-lk-as-cabinet.cabinet-premium .test-lk-inner-main) .tlk-field-select {
+.test-lk-mock-root .tlk-field-input,
+.test-lk-mock-root .tlk-field-textarea,
+.test-lk-mock-root .tlk-field-select {
   width: 100%;
   border-radius: 0.75rem;
   border: 1px solid var(--tlk-border);
@@ -78,27 +102,27 @@
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-:is(.test-lk-mock-scope, .test-lk-as-cabinet.cabinet-premium .test-lk-inner-main) .tlk-field-input::placeholder,
-:is(.test-lk-mock-scope, .test-lk-as-cabinet.cabinet-premium .test-lk-inner-main) .tlk-field-textarea::placeholder {
+.test-lk-mock-root .tlk-field-input::placeholder,
+.test-lk-mock-root .tlk-field-textarea::placeholder {
   color: var(--tlk-text-secondary);
   opacity: 0.85;
 }
 
-:is(.test-lk-mock-scope, .test-lk-as-cabinet.cabinet-premium .test-lk-inner-main) .tlk-field-input:hover,
-:is(.test-lk-mock-scope, .test-lk-as-cabinet.cabinet-premium .test-lk-inner-main) .tlk-field-textarea:hover,
-:is(.test-lk-mock-scope, .test-lk-as-cabinet.cabinet-premium .test-lk-inner-main) .tlk-field-select:hover {
+.test-lk-mock-root .tlk-field-input:hover,
+.test-lk-mock-root .tlk-field-textarea:hover,
+.test-lk-mock-root .tlk-field-select:hover {
   border-color: color-mix(in srgb, var(--tlk-primary) 35%, var(--tlk-border));
 }
 
-:is(.test-lk-mock-scope, .test-lk-as-cabinet.cabinet-premium .test-lk-inner-main) .tlk-field-input:focus-visible,
-:is(.test-lk-mock-scope, .test-lk-as-cabinet.cabinet-premium .test-lk-inner-main) .tlk-field-textarea:focus-visible,
-:is(.test-lk-mock-scope, .test-lk-as-cabinet.cabinet-premium .test-lk-inner-main) .tlk-field-select:focus-visible {
+.test-lk-mock-root .tlk-field-input:focus-visible,
+.test-lk-mock-root .tlk-field-textarea:focus-visible,
+.test-lk-mock-root .tlk-field-select:focus-visible {
   outline: none;
   border-color: var(--tlk-primary);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--tlk-focus) 35%, transparent);
 }
 
-:is(.test-lk-mock-scope, .test-lk-as-cabinet.cabinet-premium .test-lk-inner-main) .tlk-field-check {
+.test-lk-mock-root .tlk-field-check {
   display: flex;
   align-items: flex-start;
   gap: 0.5rem;
@@ -106,9 +130,29 @@
   color: var(--tlk-text-secondary);
 }
 
-:is(.test-lk-mock-scope, .test-lk-as-cabinet.cabinet-premium .test-lk-inner-main) .tlk-field-check input {
+.test-lk-mock-root .tlk-field-check input {
   margin-top: 0.2rem;
   accent-color: var(--tlk-primary);
   width: 1rem;
   height: 1rem;
+}
+
+/* Виртуальная карта макета: пропорции как у .premium-card-inner (320×192) */
+.test-lk-mock-root .tlk-mock-card-inner {
+  width: 100%;
+  aspect-ratio: 320 / 192;
+  max-height: 192px;
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow:
+    0 18px 40px -14px rgba(0, 0, 0, 0.14),
+    0 8px 18px -10px rgba(0, 0, 0, 0.09),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+@media (max-width: 400px) {
+  .test-lk-mock-root .tlk-mock-card-inner {
+    max-height: 160px;
+  }
 }

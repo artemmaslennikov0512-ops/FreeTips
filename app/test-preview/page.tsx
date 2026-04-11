@@ -4,20 +4,26 @@ import { ArrowRight, LayoutDashboard, Palette, Radio, Sparkles } from "lucide-re
 const cards = [
   {
     title: "Визуал: палитра, формы, сетка (лендинг)",
-    description: "Конкретные HEX, переменные CSS, пример формы, шаги отступов, 12-колоночная сетка — макет B.",
+    description: "Конкретные HEX, переменные CSS, пример формы, шаги отступов — макет B.",
     href: "/test-preview/visual",
     icon: Palette,
   },
   {
     title: "Лендинг (новый макет)",
-    description: "Отдельное оформление: типографика Syne, бирюзовый акцент, блоки «для кого» с потоком для стримеров, шаги, FAQ, CTA — сравните с главной /.",
+    description: "Тот же продуктовый смысл, фото как на главной, блоки про стрим и новые сценарии — сравните с /.",
     href: "/test-preview/landing",
     icon: Sparkles,
   },
   {
-    title: "Тестовый личный кабинет",
-    description: "Макет /cabinet: операции, ссылка, верификация, поддержка, сессии, настройки; плюс зал и донаты стримера.",
+    title: "Тестовый ЛК — новая палитра",
+    description: "Сетка как в /cabinet, изолированные цвета, сценарии зала/стрима помечены «в разработке».",
     href: "/test-lk-mock",
+    icon: LayoutDashboard,
+  },
+  {
+    title: "Тестовый ЛК — меню как в /cabinet",
+    description: "Те же цвета превью, порядок пунктов как в боевом кабинете; макетные разделы — внизу.",
+    href: "/test-lk-mock/cabinet-nav",
     icon: LayoutDashboard,
   },
   {

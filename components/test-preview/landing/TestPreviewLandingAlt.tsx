@@ -28,6 +28,10 @@ const FAQ = [
     q: "Чем донаты стримера отличаются от чаевых?",
     a: "Тот же безопасный сценарий оплаты: зритель выбирает сумму и может оставить сообщение. На тестовой странице списания нет.",
   },
+  {
+    q: "Планируется ли интеграция со стримом (OBS и т.п.)?",
+    a: "В превью заложены сценарии: оповещения о донатах, цели сбора, публичная страница — в продукте часть функций ещё в разработке.",
+  },
 ];
 
 export function TestPreviewLandingAlt() {
@@ -46,8 +50,8 @@ export function TestPreviewLandingAlt() {
             Гость или зритель платит привычным способом. Получатель видит операции в личном кабинете. Этот экран — отдельное оформление, чтобы вы могли сравнить с текущим сайтом.
           </p>
           <p className="mt-4 text-sm font-medium">
-            <Link href="/test-preview/visual" className="inline-flex items-center gap-1.5 no-underline hover:underline" style={{ color: "var(--tpa-accent)" }}>
-              Палитра, формы и сетка этого макета
+            <Link href="/test-lk-mock" className="inline-flex items-center gap-1.5 no-underline hover:underline" style={{ color: "var(--tpa-accent)" }}>
+              Тестовый ЛК в новой палитре (превью)
               <ArrowRight className="h-4 w-4" aria-hidden />
             </Link>
           </p>
@@ -74,6 +78,57 @@ export function TestPreviewLandingAlt() {
             >
               Текущий сайт
             </Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-t px-4 py-14 sm:px-6 sm:py-20" style={{ borderColor: "var(--tpa-border)", backgroundColor: "var(--tpa-surface)" }}>
+        <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-2 lg:items-center">
+          <div className="min-w-0">
+            <p className="text-xs font-bold uppercase tracking-wider" style={{ color: "var(--tpa-accent)" }}>
+              Как на главной
+            </p>
+            <h2 className="mt-2 font-[family-name:var(--font-syne)] text-2xl font-bold tracking-tight sm:text-3xl" style={{ color: "var(--tpa-text)" }}>
+              Тот же визуальный якорь: гость, QR и экран оплаты
+            </h2>
+            <p className="mt-3 text-base leading-relaxed" style={{ color: "var(--tpa-muted)" }}>
+              Фото с текущего лендинга — здесь оно показывает преемственность; оформление блоков и акценты — в стиле превью (бирюза, Syne).
+            </p>
+            <ul className="mt-6 space-y-3 text-sm" style={{ color: "var(--tpa-muted)" }}>
+              <li className="flex gap-2">
+                <Radio className="mt-0.5 h-4 w-4 shrink-0" style={{ color: "var(--tpa-accent)" }} aria-hidden />
+                <span>
+                  <strong style={{ color: "var(--tpa-text)" }}>Стрим:</strong> публичная страница доната, сообщение зрителя, учёт в кабинете — в макете ЛК помечено «в разработке».
+                </span>
+              </li>
+              <li className="flex gap-2">
+                <Sparkles className="mt-0.5 h-4 w-4 shrink-0" style={{ color: "var(--tpa-accent)" }} aria-hidden />
+                <span>
+                  <strong style={{ color: "var(--tpa-text)" }}>В планах продукта:</strong> цели сбора на экране, оповещения для эфира, сценарии зала (брони, смена) — без обещания сроков на этом превью.
+                </span>
+              </li>
+            </ul>
+            <Link
+              href="/"
+              className="mt-6 inline-flex items-center gap-2 text-sm font-semibold no-underline hover:underline"
+              style={{ color: "var(--tpa-accent)" }}
+            >
+              Открыть текущий сайт
+              <ArrowRight className="h-4 w-4" aria-hidden />
+            </Link>
+          </div>
+          <div
+            className="relative min-h-[220px] overflow-hidden rounded-2xl border shadow-sm sm:min-h-[280px] lg:min-h-[320px]"
+            style={{
+              borderColor: "var(--tpa-border)",
+              backgroundImage: "url('/images/waiter-qr-guest-success-freetips-ui.png')",
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }}
+            role="img"
+            aria-label="Иллюстрация: официант с QR и гость с экраном успешной оплаты"
+          >
+            <div className="absolute inset-0 bg-gradient-to-tr from-[var(--tpa-ink)]/45 via-transparent to-transparent" aria-hidden />
           </div>
         </div>
       </section>
@@ -116,8 +171,12 @@ export function TestPreviewLandingAlt() {
               <p className="mt-2 text-sm leading-relaxed" style={{ color: "var(--tpa-muted)" }}>
                 Публичная страница доната, сообщение от зрителя, учёт в кабинете (на превью — макеты и заглушка оплаты).
               </p>
-              <Link href="/test-lk-mock/streamer" className="mt-4 inline-flex items-center gap-1 text-sm font-semibold no-underline hover:underline" style={{ color: "var(--tpa-accent)" }}>
-                Макет раздела в ЛК
+              <Link
+                href="/test-lk-mock/cabinet-nav/streamer"
+                className="mt-4 inline-flex items-center gap-1 text-sm font-semibold no-underline hover:underline"
+                style={{ color: "var(--tpa-accent)" }}
+              >
+                Макет раздела в ЛК (в разработке)
                 <ArrowRight className="h-4 w-4" aria-hidden />
               </Link>
             </div>

@@ -3,7 +3,8 @@ import { TestLkMockLayoutClient } from "./TestLkMockLayoutClient";
 
 export const metadata: Metadata = {
   title: "Тестовый ЛК",
-  description: "Изолированный макет кабинета с теми же разделами, что /cabinet. Без входа и без ваших данных.",
+  description:
+    "Превью кабинета: /test-lk-mock — новая палитра; /test-lk-mock/cabinet-nav — меню как в /cabinet. Без входа и без ваших данных.",
   robots: { index: false, follow: false },
 };
 

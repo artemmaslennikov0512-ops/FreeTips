@@ -3,16 +3,17 @@
 import type { CSSProperties } from "react";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
-import { TEST_LK_BASE } from "./test-lk-nav";
+import { useTestLkMockRoute } from "./TestLkMockRouteContext";
 
 export function TestLkMockPageBody({ children }: { children: React.ReactNode }) {
   return <div className="mx-auto max-w-[1280px]">{children}</div>;
 }
 
 export function TestLkBreadcrumb({ segment }: { segment: string }) {
+  const { basePath } = useTestLkMockRoute();
   return (
     <nav className="mb-4 flex flex-wrap items-center gap-1 text-sm" style={{ color: "var(--tlk-text-secondary)" }} aria-label="Хлебные крошки">
-      <Link href={TEST_LK_BASE} className="no-underline hover:underline" style={{ color: "var(--tlk-text-secondary)" }}>
+      <Link href={basePath} className="no-underline hover:underline" style={{ color: "var(--tlk-text-secondary)" }}>
         Тестовый ЛК
       </Link>
       <span aria-hidden>/</span>

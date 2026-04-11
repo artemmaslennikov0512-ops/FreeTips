@@ -42,3 +42,68 @@ html[data-theme="dark"] .test-preview-landing-alt {
 html[data-theme="dark"] .test-preview-landing-alt .tpa-card {
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.04) inset;
 }
+
+/* Формы (макет B) */
+.test-preview-landing-alt .tpa-label {
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--tpa-text);
+  margin-bottom: 0.375rem;
+}
+
+.test-preview-landing-alt .tpa-hint {
+  font-size: 0.75rem;
+  color: var(--tpa-muted);
+  margin-top: 0.25rem;
+}
+
+.test-preview-landing-alt .tpa-input,
+.test-preview-landing-alt .tpa-textarea,
+.test-preview-landing-alt .tpa-select {
+  width: 100%;
+  border-radius: 0.75rem;
+  border: 1px solid var(--tpa-border);
+  background: var(--tpa-surface);
+  color: var(--tpa-text);
+  padding: 0.625rem 0.875rem;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.test-preview-landing-alt .tpa-input::placeholder,
+.test-preview-landing-alt .tpa-textarea::placeholder {
+  color: var(--tpa-muted);
+  opacity: 0.85;
+}
+
+.test-preview-landing-alt .tpa-input:hover,
+.test-preview-landing-alt .tpa-textarea:hover,
+.test-preview-landing-alt .tpa-select:hover {
+  border-color: color-mix(in srgb, var(--tpa-accent) 35%, var(--tpa-border));
+}
+
+.test-preview-landing-alt .tpa-input:focus-visible,
+.test-preview-landing-alt .tpa-textarea:focus-visible,
+.test-preview-landing-alt .tpa-select:focus-visible {
+  outline: none;
+  border-color: var(--tpa-accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--tpa-accent) 28%, transparent);
+}
+
+.test-preview-landing-alt .tpa-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--tpa-muted);
+}
+
+.test-preview-landing-alt .tpa-check input[type="checkbox"] {
+  margin-top: 0.2rem;
+  accent-color: var(--tpa-accent);
+  width: 1rem;
+  height: 1rem;
+}

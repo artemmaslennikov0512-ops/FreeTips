@@ -247,6 +247,22 @@ export function TestLkMockDashboard() {
               >
                 Превью лендинга (новая вкладка)
               </Link>
+              <Link
+                href={`${TEST_LK_BASE}/visual`}
+                className="tlk-transition w-full rounded-lg border px-3 py-2.5 text-left text-sm font-medium no-underline hover:opacity-95"
+                style={{ borderColor: "var(--tlk-border)", color: "var(--tlk-text)", backgroundColor: "var(--tlk-bg-app)" }}
+              >
+                Визуальная спека ЛК (цвета, формы)
+              </Link>
+              <Link
+                href="/test-preview/visual"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="tlk-transition w-full rounded-lg border px-3 py-2.5 text-left text-sm font-medium no-underline hover:opacity-95"
+                style={{ borderColor: "var(--tlk-border)", color: "var(--tlk-text)", backgroundColor: "var(--tlk-bg-app)" }}
+              >
+                Спека лендинга макета B
+              </Link>
             </div>
           </div>
           <div className="tlk-transition flex gap-3 rounded-xl border p-4" style={testLkCardStyle()}>

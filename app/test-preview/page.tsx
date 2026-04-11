@@ -1,7 +1,13 @@
 import Link from "next/link";
-import { ArrowRight, LayoutDashboard, Radio, Sparkles } from "lucide-react";
+import { ArrowRight, LayoutDashboard, Palette, Radio, Sparkles } from "lucide-react";
 
 const cards = [
+  {
+    title: "Визуал: палитра, формы, сетка (лендинг)",
+    description: "Конкретные HEX, переменные CSS, пример формы, шаги отступов, 12-колоночная сетка — макет B.",
+    href: "/test-preview/visual",
+    icon: Palette,
+  },
   {
     title: "Лендинг (новый макет)",
     description: "Отдельное оформление: типографика Syne, бирюзовый акцент, блоки «для кого» с потоком для стримеров, шаги, FAQ, CTA — сравните с главной /.",

@@ -14,6 +14,7 @@ import {
   Settings,
   Building2,
   Radio,
+  Palette,
 } from "lucide-react";
 
 export const TEST_LK_BASE = "/test-lk-mock";
@@ -34,6 +35,11 @@ export const TEST_LK_NAV_HALL_MOCK: TestLkNavItem[] = [
 /** Донаты стримера — макет; публичная страница ведёт на /test-preview/donate/… */
 export const TEST_LK_NAV_STREAMER_MOCK: TestLkNavItem[] = [
   { label: "Донаты (стример)", href: `${TEST_LK_BASE}/streamer`, icon: Radio },
+];
+
+/** Палитра, сетка, формы макета ЛК — не в боевом /cabinet. */
+export const TEST_LK_NAV_REFERENCE: TestLkNavItem[] = [
+  { label: "Визуальная спека", href: `${TEST_LK_BASE}/visual`, icon: Palette },
 ];
 
 /** Пункты как в `app/cabinet/layout.tsx` → `NAV`. */
@@ -59,6 +65,7 @@ export const TEST_LK_NAV: TestLkNavItem[] = [
   TEST_LK_NAV_DASHBOARD,
   ...TEST_LK_NAV_HALL_MOCK,
   ...TEST_LK_NAV_STREAMER_MOCK,
+  ...TEST_LK_NAV_REFERENCE,
   ...TEST_LK_NAV_CABINET_LIKE,
 ];
 

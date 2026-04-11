@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Wallet } from "lucide-react";
 import type { CSSProperties } from "react";
-import { useTestLkMockTheme } from "./TestLkMockThemeContext";
+import { useTheme } from "@/lib/theme-context";
 import { TestLkBackToSite, TestLkBreadcrumb, TestLkMockPageBody, testLkCardStyle } from "./TestLkMockChrome";
 import { TEST_LK_BASE } from "./test-lk-nav";
 
@@ -21,7 +21,8 @@ const LAST_OPS = [
 ];
 
 export function TestLkMockDashboard() {
-  const { effective } = useTestLkMockTheme();
+  const { theme } = useTheme();
+  const effective = theme === "dark" ? "dark" : "light";
 
   return (
     <TestLkMockPageBody>

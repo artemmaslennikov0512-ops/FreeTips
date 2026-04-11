@@ -22,7 +22,8 @@ function isThemeScope(pathname: string | null): boolean {
     pathname.startsWith("/cabinet") ||
     pathname.startsWith("/admin") ||
     pathname.startsWith("/establishment") ||
-    pathname.startsWith("/pay")
+    pathname.startsWith("/pay") ||
+    pathname.startsWith("/test-lk-mock")
   );
 }
 

@@ -9,7 +9,7 @@ import { TestLkBackToSite, TestLkBreadcrumb, TestLkMockPageBody, testLkCardStyle
 const PAY_SLUG = (process.env.NEXT_PUBLIC_TEST_LK_PAY_SLUG ?? "").trim();
 
 function FieldLabel({ children }: { children: ReactNode }) {
-  return <label className="mb-1 block text-sm font-medium" style={{ color: "var(--tlk-text)" }}>{children}</label>;
+  return <label className="tlk-field-label mb-1">{children}</label>;
 }
 
 function InputLike({ value, placeholder, className }: { value?: string; placeholder?: string; className?: string }) {
@@ -59,15 +59,15 @@ export function TestLkMockTransactionsView() {
   return (
     <TestLkMockPageBody>
       <TestLkBreadcrumb segment="Операции" />
-      <h1 className="mb-2 text-2xl font-semibold" style={{ color: "var(--tlk-text)" }}>
+      <h1 className="tlk-type-page-title mb-2">
         Операции
       </h1>
-      <p className="mb-6 text-sm" style={{ color: "var(--tlk-text-secondary)" }}>
+      <p className="tlk-type-lead mb-6">
         Макет таблицы как в разделе «История операций» боевого кабинета.
       </p>
       <div className="tlk-transition overflow-hidden rounded-xl border" style={testLkCardStyle()}>
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[520px] text-left text-sm">
+          <table className="tlk-type-table w-full min-w-[520px] text-left">
             <thead>
               <tr className="border-b" style={{ borderColor: "var(--tlk-border)", backgroundColor: "var(--tlk-bg-app)" }}>
                 <th className="px-4 py-3 font-medium" style={{ color: "var(--tlk-text-secondary)" }}>
@@ -123,16 +123,16 @@ export function TestLkMockLinkPage() {
   return (
     <TestLkMockPageBody>
       <TestLkBreadcrumb segment="Моя ссылка" />
-      <h1 className="mb-2 text-2xl font-semibold" style={{ color: "var(--tlk-text)" }}>
+      <h1 className="tlk-type-page-title mb-2">
         Моя ссылка
       </h1>
-      <p className="mb-6 text-sm" style={{ color: "var(--tlk-text-secondary)" }}>
+      <p className="tlk-type-lead mb-6">
         Здесь в боевом ЛК показываются код и ссылка для чаевых. Ниже — переход на настоящую страницу оплаты этого сайта.
       </p>
 
       <div className="mb-6 grid gap-4 lg:grid-cols-2">
         <div className="tlk-transition rounded-xl border p-5" style={testLkCardStyle()}>
-          <h2 className="text-base font-semibold" style={{ color: "var(--tlk-text)" }}>
+          <h2 className="tlk-type-section-title">
             Ссылка и QR (макет)
           </h2>
           <div className="mt-4 space-y-3">
@@ -147,7 +147,7 @@ export function TestLkMockLinkPage() {
           </div>
         </div>
         <div className="tlk-transition flex flex-col justify-center rounded-xl border p-5" style={testLkCardStyle()}>
-          <h2 className="text-base font-semibold" style={{ color: "var(--tlk-text)" }}>
+          <h2 className="tlk-type-section-title">
             Страница оплаты
           </h2>
           <p className="mt-2 text-sm leading-relaxed" style={{ color: "var(--tlk-text-secondary)" }}>
@@ -188,10 +188,10 @@ export function TestLkMockJoinEstablishmentView() {
   return (
     <TestLkMockPageBody>
       <TestLkBreadcrumb segment="Подключиться к заведению" />
-      <h1 className="mb-2 text-2xl font-semibold" style={{ color: "var(--tlk-text)" }}>
+      <h1 className="tlk-type-page-title mb-2">
         Подключиться к заведению
       </h1>
-      <p className="mb-6 text-sm" style={{ color: "var(--tlk-text-secondary)" }}>
+      <p className="tlk-type-lead mb-6">
         Макет формы запроса на вступление (как в боевом разделе).
       </p>
       <div className="tlk-transition max-w-lg space-y-4 rounded-xl border p-5" style={testLkCardStyle()}>
@@ -216,10 +216,10 @@ export function TestLkMockLeaveEstablishmentView() {
   return (
     <TestLkMockPageBody>
       <TestLkBreadcrumb segment="Покинуть заведение" />
-      <h1 className="mb-2 text-2xl font-semibold" style={{ color: "var(--tlk-text)" }}>
+      <h1 className="tlk-type-page-title mb-2">
         Покинуть заведение
       </h1>
-      <p className="mb-6 text-sm" style={{ color: "var(--tlk-text-secondary)" }}>
+      <p className="tlk-type-lead mb-6">
         Макет сценария выхода из состава заведения.
       </p>
       <div className="tlk-transition max-w-lg rounded-xl border p-5" style={testLkCardStyle()}>
@@ -239,10 +239,10 @@ export function TestLkMockVerificationView() {
   return (
     <TestLkMockPageBody>
       <TestLkBreadcrumb segment="Верификация" />
-      <h1 className="mb-2 text-2xl font-semibold" style={{ color: "var(--tlk-text)" }}>
+      <h1 className="tlk-type-page-title mb-2">
         Верификация
       </h1>
-      <p className="mb-6 text-sm" style={{ color: "var(--tlk-text-secondary)" }}>
+      <p className="tlk-type-lead mb-6">
         Макет шагов проверки личности.
       </p>
       <ol className="tlk-transition max-w-lg list-decimal space-y-3 rounded-xl border p-5 pl-8 text-sm" style={testLkCardStyle()}>
@@ -259,10 +259,10 @@ export function TestLkMockSupportView() {
   return (
     <TestLkMockPageBody>
       <TestLkBreadcrumb segment="Поддержка" />
-      <h1 className="mb-2 text-2xl font-semibold" style={{ color: "var(--tlk-text)" }}>
+      <h1 className="tlk-type-page-title mb-2">
         Поддержка
       </h1>
-      <p className="mb-6 text-sm" style={{ color: "var(--tlk-text-secondary)" }}>
+      <p className="tlk-type-lead mb-6">
         Макет обращения в поддержку (чат/тикеты в бою).
       </p>
       <div className="tlk-transition max-w-2xl space-y-4 rounded-xl border p-5" style={testLkCardStyle()}>
@@ -291,10 +291,10 @@ export function TestLkMockSessionsView() {
   return (
     <TestLkMockPageBody>
       <TestLkBreadcrumb segment="Сессии" />
-      <h1 className="mb-2 text-2xl font-semibold" style={{ color: "var(--tlk-text)" }}>
+      <h1 className="tlk-type-page-title mb-2">
         Сессии
       </h1>
-      <p className="mb-6 text-sm" style={{ color: "var(--tlk-text-secondary)" }}>
+      <p className="tlk-type-lead mb-6">
         Макет списка активных входов.
       </p>
       <ul className="space-y-2">
@@ -331,15 +331,15 @@ export function TestLkMockBookingsView() {
   return (
     <TestLkMockPageBody>
       <TestLkBreadcrumb segment="Брони" />
-      <h1 className="mb-2 text-2xl font-semibold" style={{ color: "var(--tlk-text)" }}>
+      <h1 className="tlk-type-page-title mb-2">
         Брони
       </h1>
-      <p className="mb-6 text-sm" style={{ color: "var(--tlk-text-secondary)" }}>
+      <p className="tlk-type-lead mb-6">
         Тестовый раздел «как в ресторане» — только в /test-lk-mock, в боевом /cabinet нет.
       </p>
       <div className="tlk-transition rounded-xl border" style={testLkCardStyle()}>
         <div className="flex flex-wrap items-center justify-between gap-3 border-b px-5 py-4" style={{ borderColor: "var(--tlk-border)" }}>
-          <h2 className="text-base font-semibold" style={{ color: "var(--tlk-text)" }}>
+          <h2 className="tlk-type-section-title">
             Сегодня
           </h2>
           <div className="flex flex-wrap gap-2">
@@ -360,7 +360,7 @@ export function TestLkMockBookingsView() {
           </div>
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[560px] text-left text-sm">
+          <table className="tlk-type-table w-full min-w-[560px] text-left">
             <thead>
               <tr className="border-b" style={{ borderColor: "var(--tlk-border)", backgroundColor: "var(--tlk-bg-app)" }}>
                 <th className="px-5 py-3 font-medium" style={{ color: "var(--tlk-text-secondary)" }}>
@@ -438,15 +438,15 @@ export function TestLkMockFloorView() {
   return (
     <TestLkMockPageBody>
       <TestLkBreadcrumb segment="Зал / смена" />
-      <h1 className="mb-2 text-2xl font-semibold" style={{ color: "var(--tlk-text)" }}>
+      <h1 className="tlk-type-page-title mb-2">
         Зал / смена
       </h1>
-      <p className="mb-6 text-sm" style={{ color: "var(--tlk-text-secondary)" }}>
+      <p className="tlk-type-lead mb-6">
         Макет экрана смены: статусы столов и быстрые действия (данные вымышленные).
       </p>
       <div className="mb-6 grid gap-4 lg:grid-cols-3">
         <div className="tlk-transition rounded-xl border p-4 lg:col-span-2" style={testLkCardStyle()}>
-          <h2 className="text-base font-semibold" style={{ color: "var(--tlk-text)" }}>
+          <h2 className="tlk-type-section-title">
             Столы
           </h2>
           <ul className="mt-3 space-y-2">
@@ -503,10 +503,10 @@ export function TestLkMockGuestsView() {
   return (
     <TestLkMockPageBody>
       <TestLkBreadcrumb segment="Гости" />
-      <h1 className="mb-2 text-2xl font-semibold" style={{ color: "var(--tlk-text)" }}>
+      <h1 className="tlk-type-page-title mb-2">
         Гости
       </h1>
-      <p className="mb-6 text-sm" style={{ color: "var(--tlk-text-secondary)" }}>
+      <p className="tlk-type-lead mb-6">
         Макет карточек гостей: пометки, аллергены, стол (без связи с реальными данными).
       </p>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -546,10 +546,10 @@ export function TestLkMockStreamerView() {
   return (
     <TestLkMockPageBody>
       <TestLkBreadcrumb segment="Донаты (стример)" />
-      <h1 className="mb-2 text-2xl font-semibold" style={{ color: "var(--tlk-text)" }}>
+      <h1 className="tlk-type-page-title mb-2">
         Донаты (стример)
       </h1>
-      <p className="mb-6 text-sm" style={{ color: "var(--tlk-text-secondary)" }}>
+      <p className="tlk-type-lead mb-6">
         Макет раздела для стримера: публичная страница доната — на превью-сборке{" "}
         <Link href="/test-preview" className="font-medium no-underline hover:underline" style={{ color: "var(--tlk-primary)" }}>
           /test-preview
@@ -559,7 +559,7 @@ export function TestLkMockStreamerView() {
 
       <div className="mb-6 grid gap-4 lg:grid-cols-3">
         <div className="tlk-transition rounded-xl border p-5 lg:col-span-2" style={testLkCardStyle()}>
-          <h2 className="text-base font-semibold" style={{ color: "var(--tlk-text)" }}>
+          <h2 className="tlk-type-section-title">
             Публичная ссылка на донат
           </h2>
           <p className="mt-2 text-sm leading-relaxed" style={{ color: "var(--tlk-text-secondary)" }}>
@@ -583,7 +583,7 @@ export function TestLkMockStreamerView() {
           </div>
         </div>
         <div className="tlk-transition rounded-xl border p-5" style={testLkCardStyle()}>
-          <h2 className="text-base font-semibold" style={{ color: "var(--tlk-text)" }}>
+          <h2 className="tlk-type-section-title">
             Настройки (макет)
           </h2>
           <ul className="mt-4 space-y-3 text-sm" style={{ color: "var(--tlk-text-secondary)" }}>
@@ -612,12 +612,12 @@ export function TestLkMockStreamerView() {
 
       <div className="tlk-transition rounded-xl border" style={testLkCardStyle()}>
         <div className="flex flex-wrap items-center justify-between gap-3 border-b px-5 py-4" style={{ borderColor: "var(--tlk-border)" }}>
-          <h2 className="text-base font-semibold" style={{ color: "var(--tlk-text)" }}>
+          <h2 className="tlk-type-section-title">
             Последние донаты (макет)
           </h2>
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[520px] text-left text-sm">
+          <table className="tlk-type-table w-full min-w-[520px] text-left">
             <thead>
               <tr className="border-b" style={{ borderColor: "var(--tlk-border)", backgroundColor: "var(--tlk-bg-app)" }}>
                 <th className="px-5 py-3 font-medium" style={{ color: "var(--tlk-text-secondary)" }}>
@@ -665,10 +665,10 @@ export function TestLkMockSettingsView() {
   return (
     <TestLkMockPageBody>
       <TestLkBreadcrumb segment="Настройки профиля" />
-      <h1 className="mb-2 text-2xl font-semibold" style={{ color: "var(--tlk-text)" }}>
+      <h1 className="tlk-type-page-title mb-2">
         Настройки профиля
       </h1>
-      <p className="mb-6 text-sm" style={{ color: "var(--tlk-text-secondary)" }}>
+      <p className="tlk-type-lead mb-6">
         Макет полей профиля и безопасности.
       </p>
       <div className="tlk-transition max-w-lg space-y-4 rounded-xl border p-5" style={testLkCardStyle()}>

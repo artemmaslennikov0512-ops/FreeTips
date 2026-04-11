@@ -4,7 +4,6 @@ import Link from "next/link";
 import { Link2, List, Radio, Settings, Wallet } from "lucide-react";
 import type { CSSProperties } from "react";
 import { TestLkBackToSite, TestLkBreadcrumb, TestLkMockPageBody, testLkCardStyle } from "./TestLkMockChrome";
-import { TEST_LK_CABINET_NAV_BASE } from "./test-lk-nav";
 import { useTestLkMockRoute } from "./TestLkMockRouteContext";
 import { useTestLkMockShellTheme } from "./TestLkMockShellThemeContext";
 
@@ -23,7 +22,7 @@ const LAST_OPS = [
 ];
 
 export function TestLkMockDashboard() {
-  const { basePath, navMode } = useTestLkMockRoute();
+  const { basePath } = useTestLkMockRoute();
   const { shellTheme } = useTestLkMockShellTheme();
 
   const heroPanelStyle: CSSProperties = {
@@ -45,25 +44,22 @@ export function TestLkMockDashboard() {
 
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight md:text-[1.5rem] md:leading-8" style={{ color: "var(--tlk-text)" }}>
-            Дашборд
-          </h1>
-          <p className="mt-1 text-sm" style={{ color: "var(--tlk-text-secondary)" }}>
-            Сетка как в /cabinet · палитра только превью ·{" "}
-            {navMode === "cabinet" ? "меню совпадает с боевым" : `ещё: ${TEST_LK_CABINET_NAV_BASE}`}
+          <h1 className="tlk-type-page-title">Дашборд</h1>
+          <p className="tlk-type-lead mt-1">
+            Новая палитра превью · сетка и названия разделов как в /cabinet · макетные сценарии внизу меню
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
           <Link
             href={`${basePath}/link`}
-            className="tlk-transition inline-flex items-center justify-center rounded-xl px-4 py-2.5 text-sm font-medium text-white outline-none focus-visible:ring-2 focus-visible:ring-offset-2 no-underline"
+            className="tlk-type-body tlk-transition inline-flex items-center justify-center rounded-xl px-4 py-2.5 font-medium text-white outline-none focus-visible:ring-2 focus-visible:ring-offset-2 no-underline"
             style={{ backgroundColor: "var(--tlk-primary)", ["--tw-ring-color" as string]: "var(--tlk-focus)" } as CSSProperties}
           >
             Моя ссылка и оплата
           </Link>
           <Link
             href={`${basePath}/streamer`}
-            className="tlk-transition inline-flex items-center justify-center rounded-xl border px-4 py-2.5 text-sm font-medium outline-none focus-visible:ring-2 no-underline"
+            className="tlk-type-body tlk-transition inline-flex items-center justify-center rounded-xl border px-4 py-2.5 font-medium outline-none focus-visible:ring-2 no-underline"
             style={
               {
                 borderColor: "var(--tlk-border)",
@@ -77,7 +73,7 @@ export function TestLkMockDashboard() {
           </Link>
           <Link
             href={`${basePath}/transactions`}
-            className="tlk-transition inline-flex items-center justify-center rounded-xl border px-4 py-2.5 text-sm font-medium outline-none focus-visible:ring-2 no-underline"
+            className="tlk-type-body tlk-transition inline-flex items-center justify-center rounded-xl border px-4 py-2.5 font-medium outline-none focus-visible:ring-2 no-underline"
             style={
               {
                 borderColor: "var(--tlk-border)",
@@ -101,9 +97,7 @@ export function TestLkMockDashboard() {
                   className="inline-flex max-w-full justify-center rounded-full border px-5 py-2.5 shadow-sm"
                   style={{ borderColor: "var(--tlk-border)", backgroundColor: "var(--tlk-surface)" }}
                 >
-                  <p className="truncate text-base font-semibold md:text-lg" style={{ color: "var(--tlk-text)" }}>
-                    Екатерина Смирнова
-                  </p>
+                  <p className="tlk-type-hero-name truncate">Екатерина Смирнова</p>
                 </div>
               </div>
               <div className="flex w-full max-w-[320px] shrink-0 flex-col items-center justify-center overflow-visible">
@@ -128,8 +122,8 @@ export function TestLkMockDashboard() {
                     <div className="relative flex h-full flex-col justify-between p-3">
                       <div className="flex items-start justify-between gap-2">
                         <div>
-                          <p className="text-[10px] font-semibold uppercase tracking-wider text-white/85">Виртуальная карта</p>
-                          <p className="mt-0.5 text-xs text-white/75">VIRTUAL</p>
+                          <p className="tlk-type-card-eyebrow text-white/85">Виртуальная карта</p>
+                          <p className="tlk-type-card-micro mt-0.5 text-white/75">VIRTUAL</p>
                         </div>
                         <div
                           className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-[10px] font-bold"
@@ -140,15 +134,15 @@ export function TestLkMockDashboard() {
                         </div>
                       </div>
                       <div className="flex items-end justify-between gap-2 pt-4">
-                        <span className="text-xs font-extrabold tracking-tight text-white/95">FreeTips</span>
-                        <p className="tlk-tabular m-0 text-right text-[12px] font-semibold leading-none text-white">
+                        <span className="tlk-type-body font-extrabold tracking-tight text-white/95">FreeTips</span>
+                        <p className="tlk-tabular tlk-type-body m-0 text-right font-semibold leading-none text-white">
                           124 580 ₽
                         </p>
                       </div>
                     </div>
                   </div>
                 </div>
-                <p className="mt-2 max-w-[320px] text-center text-[10px] leading-snug" style={{ color: "var(--tlk-text-secondary)" }}>
+                <p className="tlk-type-meta mt-2 max-w-[320px] text-center leading-snug" style={{ color: "var(--tlk-text-secondary)" }}>
                   Пропорции 320×192 как у боевой карты · без номера и платёжной системы
                 </p>
               </div>
@@ -158,9 +152,7 @@ export function TestLkMockDashboard() {
 
         <div className="flex min-h-0 min-w-0 flex-col overflow-hidden rounded-[10px] border lg:h-full" style={heroPanelStyle}>
           <div className="flex min-h-0 flex-1 flex-col p-6">
-            <h3 className="mb-4 text-center text-lg font-semibold" style={{ color: "var(--tlk-text)" }}>
-              Быстрые действия
-            </h3>
+            <h3 className="tlk-type-section-title mb-4 text-center">Быстрые действия</h3>
             <div className="grid min-w-0 grid-cols-2 gap-4">
               {quick.map(({ href, icon: Icon, title, desc }) => (
                 <Link
@@ -178,10 +170,10 @@ export function TestLkMockDashboard() {
                   >
                     <Icon className="h-5 w-5" strokeWidth={2} aria-hidden />
                   </div>
-                  <div className="text-sm font-semibold" style={{ color: "var(--tlk-text)" }}>
+                  <div className="tlk-type-body font-semibold" style={{ color: "var(--tlk-text)" }}>
                     {title}
                   </div>
-                  <div className="mt-1 text-xs leading-snug" style={{ color: "var(--tlk-text-secondary)" }}>
+                  <div className="tlk-type-meta mt-1 leading-snug" style={{ color: "var(--tlk-text-secondary)" }}>
                     {desc}
                   </div>
                 </Link>
@@ -194,14 +186,10 @@ export function TestLkMockDashboard() {
       <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {KPI.map((k) => (
           <div key={k.title} className="tlk-transition rounded-xl border p-5" style={testLkCardStyle()}>
-            <p className="text-sm" style={{ color: "var(--tlk-text-secondary)" }}>
-              {k.title}
-            </p>
-            <p className="tlk-tabular mt-2 text-[1.65rem] font-semibold leading-none" style={{ color: "var(--tlk-text)" }}>
-              {k.value}
-            </p>
+            <p className="tlk-type-kpi-label">{k.title}</p>
+            <p className="tlk-tabular tlk-type-kpi-value mt-2">{k.value}</p>
             <p
-              className="mt-2 text-sm"
+              className="tlk-type-body-muted mt-2"
               style={{
                 color:
                   k.up && k.delta.startsWith("+")
@@ -221,30 +209,32 @@ export function TestLkMockDashboard() {
         <div className="lg:col-span-2">
           <div className="tlk-transition rounded-xl border" style={testLkCardStyle()}>
             <div className="flex flex-wrap items-center justify-between gap-3 border-b px-5 py-4" style={{ borderColor: "var(--tlk-border)" }}>
-              <h2 className="text-base font-semibold" style={{ color: "var(--tlk-text)" }}>
-                Последние операции (макет)
-              </h2>
-              <Link href={`${basePath}/transactions`} className="text-sm font-medium no-underline hover:underline" style={{ color: "var(--tlk-primary)" }}>
+              <h2 className="tlk-type-section-title">Последние операции (макет)</h2>
+              <Link
+                href={`${basePath}/transactions`}
+                className="tlk-type-body font-medium no-underline hover:underline"
+                style={{ color: "var(--tlk-primary)" }}
+              >
                 Все операции
               </Link>
             </div>
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[560px] text-left text-sm">
+              <table className="tlk-type-table w-full min-w-[560px] text-left">
                 <thead>
                   <tr className="border-b" style={{ borderColor: "var(--tlk-border)", backgroundColor: "var(--tlk-bg-app)" }}>
-                    <th className="px-5 py-3 font-medium" style={{ color: "var(--tlk-text-secondary)" }}>
+                    <th className="px-5 py-3" style={{ color: "var(--tlk-text-secondary)" }}>
                       Дата
                     </th>
-                    <th className="px-3 py-3 font-medium" style={{ color: "var(--tlk-text-secondary)" }}>
+                    <th className="px-3 py-3" style={{ color: "var(--tlk-text-secondary)" }}>
                       Сумма
                     </th>
-                    <th className="px-3 py-3 font-medium" style={{ color: "var(--tlk-text-secondary)" }}>
+                    <th className="px-3 py-3" style={{ color: "var(--tlk-text-secondary)" }}>
                       Откуда
                     </th>
-                    <th className="px-3 py-3 font-medium" style={{ color: "var(--tlk-text-secondary)" }}>
+                    <th className="px-3 py-3" style={{ color: "var(--tlk-text-secondary)" }}>
                       Канал
                     </th>
-                    <th className="px-5 py-3 font-medium" style={{ color: "var(--tlk-text-secondary)" }}>
+                    <th className="px-5 py-3" style={{ color: "var(--tlk-text-secondary)" }}>
                       Статус
                     </th>
                   </tr>
@@ -263,7 +253,7 @@ export function TestLkMockDashboard() {
                       </td>
                       <td className="px-3 py-3">
                         <span
-                          className="inline-flex rounded-full px-2 py-0.5 text-xs font-medium"
+                          className="tlk-type-meta inline-flex rounded-full px-2 py-0.5 font-medium"
                           style={{
                             backgroundColor: "var(--tlk-sidebar-active-bg)",
                             color: "var(--tlk-text)",
@@ -274,7 +264,7 @@ export function TestLkMockDashboard() {
                       </td>
                       <td className="px-5 py-3">
                         <span
-                          className="inline-flex rounded-full px-2 py-0.5 text-xs font-medium"
+                          className="tlk-type-meta inline-flex rounded-full px-2 py-0.5 font-medium"
                           style={{ backgroundColor: "var(--tlk-sidebar-active-bg)", color: "var(--tlk-text)" }}
                         >
                           {row.status}
@@ -290,43 +280,34 @@ export function TestLkMockDashboard() {
 
         <div className="space-y-4">
           <div className="tlk-transition rounded-xl border p-5" style={testLkCardStyle()}>
-            <h2 className="text-base font-semibold" style={{ color: "var(--tlk-text)" }}>
-              Быстрые ссылки
-            </h2>
+            <h2 className="tlk-type-section-title">Быстрые ссылки</h2>
             <div className="mt-4 flex flex-col gap-2">
               <Link
                 href={`${basePath}/link`}
-                className="tlk-transition w-full rounded-lg border px-3 py-2.5 text-left text-sm font-medium no-underline hover:opacity-95"
+                className="tlk-type-body tlk-transition w-full rounded-lg border px-3 py-2.5 text-left font-medium no-underline hover:opacity-95"
                 style={{ borderColor: "var(--tlk-border)", color: "var(--tlk-text)", backgroundColor: "var(--tlk-bg-app)" }}
               >
                 Моя ссылка → страница оплаты
               </Link>
               <Link
                 href={`${basePath}/settings`}
-                className="tlk-transition w-full rounded-lg border px-3 py-2.5 text-left text-sm font-medium no-underline hover:opacity-95"
+                className="tlk-type-body tlk-transition w-full rounded-lg border px-3 py-2.5 text-left font-medium no-underline hover:opacity-95"
                 style={{ borderColor: "var(--tlk-border)", color: "var(--tlk-text)", backgroundColor: "var(--tlk-bg-app)" }}
               >
                 Настройки профиля
               </Link>
               <Link
                 href={`${basePath}/support`}
-                className="tlk-transition w-full rounded-lg border px-3 py-2.5 text-left text-sm font-medium no-underline hover:opacity-95"
+                className="tlk-type-body tlk-transition w-full rounded-lg border px-3 py-2.5 text-left font-medium no-underline hover:opacity-95"
                 style={{ borderColor: "var(--tlk-border)", color: "var(--tlk-text)", backgroundColor: "var(--tlk-bg-app)" }}
               >
                 Поддержка
               </Link>
               <Link
-                href={navMode === "cabinet" ? "/test-lk-mock" : TEST_LK_CABINET_NAV_BASE}
-                className="tlk-transition w-full rounded-lg border px-3 py-2.5 text-left text-sm font-medium no-underline hover:opacity-95"
-                style={{ borderColor: "var(--tlk-border)", color: "var(--tlk-text)", backgroundColor: "var(--tlk-bg-app)" }}
-              >
-                {navMode === "cabinet" ? "Макет: только новая палитра" : "Макет: навигация как в /cabinet"}
-              </Link>
-              <Link
                 href="/test-preview/landing"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="tlk-transition w-full rounded-lg border px-3 py-2.5 text-left text-sm font-medium no-underline hover:opacity-95"
+                className="tlk-type-body tlk-transition w-full rounded-lg border px-3 py-2.5 text-left font-medium no-underline hover:opacity-95"
                 style={{ borderColor: "var(--tlk-border)", color: "var(--tlk-text)", backgroundColor: "var(--tlk-bg-app)" }}
               >
                 Превью лендинга (новая вкладка)
@@ -336,10 +317,10 @@ export function TestLkMockDashboard() {
           <div className="tlk-transition flex gap-3 rounded-xl border p-4" style={testLkCardStyle()}>
             <Wallet className="h-10 w-10 shrink-0" style={{ color: "var(--tlk-primary)" }} aria-hidden />
             <div>
-              <p className="text-sm font-medium" style={{ color: "var(--tlk-text)" }}>
+              <p className="tlk-type-body font-medium" style={{ color: "var(--tlk-text)" }}>
                 Изолированный макет
               </p>
-              <p className="mt-1 text-sm leading-relaxed" style={{ color: "var(--tlk-text-secondary)" }}>
+              <p className="tlk-type-body-muted mt-1 leading-relaxed">
                 Цвета и тема не зависят от глобального сайта: переключатель «Тема макета» в боковой панели. Реальные данные не
                 подставляются.
               </p>

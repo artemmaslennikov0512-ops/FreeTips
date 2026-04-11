@@ -172,7 +172,7 @@ export function TestPreviewLandingAlt() {
                 Публичная страница доната, сообщение от зрителя, учёт в кабинете (на превью — макеты и заглушка оплаты).
               </p>
               <Link
-                href="/test-lk-mock/cabinet-nav/streamer"
+                href="/test-lk-mock/streamer"
                 className="mt-4 inline-flex items-center gap-1 text-sm font-semibold no-underline hover:underline"
                 style={{ color: "var(--tpa-accent)" }}
               >

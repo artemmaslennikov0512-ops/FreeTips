@@ -62,18 +62,18 @@ function NavLinkRow({
       }
     >
       <Icon className={`h-5 w-5 shrink-0 ${iconClass}`} aria-hidden />
-      <span className="min-w-0 flex-1 leading-snug">{label}</span>
+      <span className="tlk-type-body min-w-0 flex-1 leading-snug font-medium">{label}</span>
       {inDevelopment ? (
         <span
-          className="shrink-0 rounded-md px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide"
-          style={{ backgroundColor: "var(--tlk-bg-app)", color: "var(--tlk-text-secondary)", border: "1px solid var(--tlk-border)" }}
+          className="tlk-type-nav-section shrink-0 rounded-md border px-1.5 py-0.5"
+          style={{ backgroundColor: "var(--tlk-bg-app)", color: "var(--tlk-text-secondary)", borderColor: "var(--tlk-border)" }}
         >
           в разработке
         </span>
       ) : null}
       {badge != null && badge > 0 ? (
         <span
-          className="cabinet-support-unread-badge ml-auto flex h-5 min-w-[20px] items-center justify-center rounded-full px-1.5 text-xs font-semibold text-white"
+          className="tlk-type-meta ml-auto flex h-5 min-w-[20px] items-center justify-center rounded-full px-1.5 font-semibold text-white"
           style={{ backgroundColor: "var(--tlk-unread-badge)" }}
           aria-label={`Непрочитанных: ${badge}`}
         >
@@ -86,13 +86,13 @@ function NavLinkRow({
 
 function ShellInner({ children }: { children: ReactNode }) {
   const pathname = usePathname() ?? "";
-  const { basePath, navMode } = useTestLkMockRoute();
+  const { basePath } = useTestLkMockRoute();
   const { shellTheme } = useTestLkMockShellTheme();
   const mounted = useSyncExternalStore(subscribeNoop, () => true, () => false);
   const [lgSidebarCollapsed, setLgSidebarCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  const navSections = useMemo(() => buildTestLkNavSections(basePath, navMode), [basePath, navMode]);
+  const navSections = useMemo(() => buildTestLkNavSections(basePath), [basePath]);
   const flatNav = useMemo(() => flattenTestLkNavSections(navSections), [navSections]);
 
   useEffect(() => {
@@ -141,9 +141,7 @@ function ShellInner({ children }: { children: ReactNode }) {
         className="test-lk-mock-root flex min-h-screen items-center justify-center font-[family:var(--font-inter)]"
         data-tlk-theme={shellTheme}
       >
-        <p className="text-sm" style={{ color: "var(--tlk-text-secondary)" }}>
-          Загрузка макета…
-        </p>
+        <p className="tlk-type-body-muted">Загрузка макета…</p>
       </div>
     );
   }
@@ -169,28 +167,22 @@ function ShellInner({ children }: { children: ReactNode }) {
           >
             <div className="flex items-center gap-3">
               <div
-                className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-sm font-bold"
+                className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full"
                 style={{ backgroundColor: "var(--tlk-accent)", color: "var(--tlk-expand-fab-bg)" }}
                 aria-hidden
               >
                 <User className="h-7 w-7" strokeWidth={2} />
               </div>
               <div className="min-w-0 flex-1">
-                <span className="truncate font-semibold" style={{ color: "var(--tlk-text)" }}>
-                  Макет пользователя
-                </span>
-                <div className="text-sm" style={{ color: "var(--tlk-text-secondary)" }}>
-                  {navMode === "cabinet" ? "Навигация как в /cabinet" : "Новая палитра · превью"}
-                </div>
+                <span className="tlk-type-profile-name block truncate">Макет пользователя</span>
+                <div className="tlk-type-profile-meta mt-0.5">Новый стиль · разделы как в /cabinet</div>
               </div>
             </div>
           </div>
 
           <div className="mb-2 mt-6 flex h-9 shrink-0 items-center px-4">
             <span className="w-9 shrink-0 select-none" aria-hidden />
-            <span className="min-w-0 flex-1 text-center text-xs font-semibold uppercase leading-none tracking-wider" style={{ color: "var(--tlk-text-secondary)" }}>
-              Навигация
-            </span>
+            <span className="tlk-type-nav-heading min-w-0 flex-1 text-center">Навигация</span>
             <div className="flex h-9 w-9 shrink-0 items-center justify-end">
               <button
                 type="button"
@@ -213,11 +205,7 @@ function ShellInner({ children }: { children: ReactNode }) {
             >
               {navSections.map(({ title, items }) => (
                 <div key={title ?? items[0]?.href ?? "nav"}>
-                  {title ? (
-                    <p className="mb-1 px-2 text-[10px] font-semibold uppercase tracking-wide" style={{ color: "var(--tlk-text-secondary)" }}>
-                      {title}
-                    </p>
-                  ) : null}
+                  {title ? <p className="tlk-type-nav-section mb-1 px-2">{title}</p> : null}
                   <div className="flex flex-col gap-0.5">
                     {items.map((item) => (
                       <NavLinkRow
@@ -235,9 +223,7 @@ function ShellInner({ children }: { children: ReactNode }) {
                 </div>
               ))}
               <div className="border-t pt-2" style={{ borderColor: "var(--tlk-panel-border)" }}>
-                <p className="mb-1 px-2 text-[10px] font-semibold uppercase tracking-wide" style={{ color: "var(--tlk-text-secondary)" }}>
-                  Вне макета
-                </p>
+                <p className="tlk-type-nav-section mb-1 px-2">Вне макета</p>
                 <NavLinkRow
                   label={TEST_LK_NAV_EXTRA.label}
                   href={TEST_LK_NAV_EXTRA.href}
@@ -245,32 +231,22 @@ function ShellInner({ children }: { children: ReactNode }) {
                   iconClass={TEST_LK_NAV_EXTRA.iconClass}
                   active={false}
                 />
-                <p className="mt-1 px-2 text-[10px] leading-snug" style={{ color: "var(--tlk-text-secondary)" }}>
+                <p className="tlk-type-meta mt-1 px-2 leading-snug" style={{ color: "var(--tlk-text-secondary)" }}>
                   Боевой раздел, нужен вход
                 </p>
               </div>
             </nav>
 
             <div className="mt-4 flex items-center justify-between gap-2 px-1">
-              <span className="text-xs" style={{ color: "var(--tlk-text-secondary)" }}>
+              <span className="tlk-type-meta" style={{ color: "var(--tlk-text-secondary)" }}>
                 Тема макета
               </span>
               <TestLkMockShellThemeToggle compact />
             </div>
 
-            <div className="mt-2 space-y-2">
-              <Link
-                href={navMode === "cabinet" ? "/test-lk-mock" : "/test-lk-mock/cabinet-nav"}
-                className="tlk-transition block w-full rounded-lg border px-3 py-2 text-center text-xs font-semibold no-underline"
-                style={{ borderColor: "var(--tlk-border)", color: "var(--tlk-primary)", backgroundColor: "var(--tlk-bg-app)" }}
-              >
-                {navMode === "cabinet" ? "← Макет: новая палитра" : "Вариант: меню как в /cabinet →"}
-              </Link>
-            </div>
-
             <button
               type="button"
-              className="tlk-transition mt-3 flex w-full items-center justify-center gap-3 rounded-lg border px-4 py-3 text-sm font-medium"
+              className="tlk-type-body tlk-transition mt-3 flex w-full items-center justify-center gap-3 rounded-lg border px-4 py-3 font-medium"
               style={{ borderColor: "var(--tlk-border)", color: "var(--tlk-text)", backgroundColor: "var(--tlk-nav-wrap-bg)" }}
             >
               <LogOut className="h-4 w-4 shrink-0" style={{ color: "var(--tlk-accent)" }} aria-hidden />
@@ -313,7 +289,7 @@ function ShellInner({ children }: { children: ReactNode }) {
             >
               <Menu className="h-5 w-5 shrink-0" strokeWidth={2} aria-hidden />
             </button>
-            <span className="min-w-0 flex-1 truncate text-center text-sm font-semibold" style={{ color: "var(--tlk-text)" }}>
+            <span className="tlk-type-section-title min-w-0 flex-1 truncate text-center" style={{ color: "var(--tlk-text)" }}>
               Тестовый ЛК
             </span>
             <div className="shrink-0">
@@ -322,7 +298,7 @@ function ShellInner({ children }: { children: ReactNode }) {
           </div>
 
           {pathname !== basePath && pathname !== `${basePath}/` ? (
-            <PanelMobileBackButton variant="cabinet" fallbackHref={basePath} />
+            <PanelMobileBackButton variant="testLkMock" fallbackHref={basePath} />
           ) : null}
 
           <div className="test-lk-inner-main flex min-h-0 flex-1 flex-col overflow-x-hidden px-4 py-3 sm:px-6 md:py-6 lg:p-8">
@@ -360,12 +336,8 @@ function ShellInner({ children }: { children: ReactNode }) {
                   <User className="h-6 w-6" strokeWidth={2} />
                 </div>
                 <div className="min-w-0">
-                  <div className="truncate font-semibold" style={{ color: "var(--tlk-text)" }}>
-                    Макет пользователя
-                  </div>
-                  <div className="text-xs" style={{ color: "var(--tlk-text-secondary)" }}>
-                    Превью · без входа
-                  </div>
+                  <div className="tlk-type-profile-name truncate">Макет пользователя</div>
+                  <div className="tlk-type-profile-meta mt-0.5">Превью · без входа</div>
                 </div>
               </div>
             </div>
@@ -396,7 +368,7 @@ function ShellInner({ children }: { children: ReactNode }) {
             </nav>
             <div className="mt-auto border-t px-4 pt-4" style={{ borderColor: "var(--tlk-panel-border)" }}>
               <div className="flex items-center justify-between">
-                <span className="text-xs" style={{ color: "var(--tlk-text-secondary)" }}>
+                <span className="tlk-type-meta" style={{ color: "var(--tlk-text-secondary)" }}>
                   Тема макета
                 </span>
                 <TestLkMockShellThemeToggle compact />
@@ -404,7 +376,7 @@ function ShellInner({ children }: { children: ReactNode }) {
               <Link
                 href="/test-preview"
                 onClick={closeMobile}
-                className="mt-3 block text-center text-sm font-semibold underline-offset-2 hover:underline"
+                className="tlk-type-body mt-3 block text-center font-semibold underline-offset-2 hover:underline"
                 style={{ color: "var(--tlk-primary)" }}
               >
                 Хаб превью

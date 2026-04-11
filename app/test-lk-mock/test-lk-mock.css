@@ -1,5 +1,44 @@
 /* Тестовый ЛК: полностью изолированная тема внутри .test-lk-mock-root — не использует токены боевого .cabinet-premium */
 
+/* Типографика превью (rem): независима от глобальной шкалы h1–p в globals.css */
+.test-lk-mock-root[data-tlk-theme="light"],
+.test-lk-mock-root[data-tlk-theme="dark"] {
+  --tlk-type-page-title-size: 1.5rem;
+  --tlk-type-page-title-weight: 600;
+  --tlk-type-page-title-leading: 1.25;
+  --tlk-type-page-title-tracking: -0.02em;
+  --tlk-type-lead-size: 0.875rem;
+  --tlk-type-lead-leading: 1.5;
+  --tlk-type-section-size: 1.125rem;
+  --tlk-type-section-weight: 600;
+  --tlk-type-section-leading: 1.35;
+  --tlk-type-body-size: 0.875rem;
+  --tlk-type-body-leading: 1.5;
+  --tlk-type-small-size: 0.8125rem;
+  --tlk-type-small-leading: 1.45;
+  --tlk-type-meta-size: 0.75rem;
+  --tlk-type-meta-leading: 1.4;
+  --tlk-type-nav-label-size: 0.625rem;
+  --tlk-type-nav-label-tracking: 0.08em;
+  --tlk-type-nav-section-size: 0.625rem;
+  --tlk-type-nav-item-size: 0.875rem;
+  --tlk-type-table-size: 0.875rem;
+  --tlk-type-table-header-weight: 500;
+  --tlk-type-kpi-value-size: 1.65rem;
+  --tlk-type-kpi-value-leading: 1;
+  --tlk-type-hero-name-size: 1rem;
+  --tlk-type-hero-name-size-md: 1.125rem;
+}
+
+@media (max-width: 768px) {
+  .test-lk-mock-root[data-tlk-theme="light"],
+  .test-lk-mock-root[data-tlk-theme="dark"] {
+    --tlk-type-page-title-size: 1.375rem;
+    --tlk-type-section-size: 1.0625rem;
+    --tlk-type-kpi-value-size: 1.5rem;
+  }
+}
+
 .test-lk-mock-root[data-tlk-theme="light"] {
   --tlk-shell-bg: #e5e9e7;
   --tlk-panel-bg: rgba(255, 255, 255, 0.55);
@@ -66,6 +105,135 @@
 
 .test-lk-mock-root .tlk-tabular {
   font-variant-numeric: tabular-nums;
+}
+
+/* Сброс глобальных h1–p (36px/28px/… из globals) внутри контента макета */
+.test-lk-mock-root .test-lk-inner-main :where(h1, h2, h3, h4, h5, h6, p) {
+  margin: 0;
+  font-family: inherit;
+}
+
+.test-lk-mock-root .tlk-type-page-title {
+  font-size: var(--tlk-type-page-title-size);
+  font-weight: var(--tlk-type-page-title-weight);
+  line-height: var(--tlk-type-page-title-leading);
+  letter-spacing: var(--tlk-type-page-title-tracking);
+  color: var(--tlk-text);
+}
+
+.test-lk-mock-root .tlk-type-lead {
+  font-size: var(--tlk-type-lead-size);
+  line-height: var(--tlk-type-lead-leading);
+  color: var(--tlk-text-secondary);
+}
+
+.test-lk-mock-root .tlk-type-section-title {
+  font-size: var(--tlk-type-section-size);
+  font-weight: var(--tlk-type-section-weight);
+  line-height: var(--tlk-type-section-leading);
+  color: var(--tlk-text);
+}
+
+.test-lk-mock-root .tlk-type-body {
+  font-size: var(--tlk-type-body-size);
+  line-height: var(--tlk-type-body-leading);
+  color: var(--tlk-text);
+}
+
+.test-lk-mock-root .tlk-type-body-muted {
+  font-size: var(--tlk-type-body-size);
+  line-height: var(--tlk-type-body-leading);
+  color: var(--tlk-text-secondary);
+}
+
+.test-lk-mock-root .tlk-type-small {
+  font-size: var(--tlk-type-small-size);
+  line-height: var(--tlk-type-small-leading);
+}
+
+.test-lk-mock-root .tlk-type-meta {
+  font-size: var(--tlk-type-meta-size);
+  line-height: var(--tlk-type-meta-leading);
+}
+
+.test-lk-mock-root .tlk-type-nav-heading {
+  font-size: var(--tlk-type-nav-label-size);
+  font-weight: 600;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: var(--tlk-type-nav-label-tracking);
+  color: var(--tlk-text-secondary);
+}
+
+.test-lk-mock-root .tlk-type-nav-section {
+  font-size: var(--tlk-type-nav-section-size);
+  font-weight: 600;
+  line-height: 1.2;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--tlk-text-secondary);
+}
+
+.test-lk-mock-root .tlk-type-profile-name {
+  font-size: var(--tlk-type-body-size);
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--tlk-text);
+}
+
+.test-lk-mock-root .tlk-type-profile-meta {
+  font-size: var(--tlk-type-small-size);
+  line-height: var(--tlk-type-small-leading);
+  color: var(--tlk-text-secondary);
+}
+
+.test-lk-mock-root .tlk-type-table {
+  font-size: var(--tlk-type-table-size);
+  line-height: var(--tlk-type-body-leading);
+}
+
+.test-lk-mock-root .tlk-type-table th {
+  font-weight: var(--tlk-type-table-header-weight);
+}
+
+.test-lk-mock-root .tlk-type-kpi-label {
+  font-size: var(--tlk-type-body-size);
+  line-height: var(--tlk-type-body-leading);
+  color: var(--tlk-text-secondary);
+}
+
+.test-lk-mock-root .tlk-type-kpi-value {
+  font-size: var(--tlk-type-kpi-value-size);
+  font-weight: 600;
+  line-height: var(--tlk-type-kpi-value-leading);
+  color: var(--tlk-text);
+}
+
+.test-lk-mock-root .tlk-type-hero-name {
+  font-size: var(--tlk-type-hero-name-size);
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--tlk-text);
+}
+
+@media (min-width: 768px) {
+  .test-lk-mock-root .tlk-type-hero-name {
+    font-size: var(--tlk-type-hero-name-size-md);
+  }
+}
+
+/* Подписи на градиентной карте макета */
+.test-lk-mock-root .tlk-type-card-eyebrow {
+  font-size: var(--tlk-type-nav-section-size);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.test-lk-mock-root .tlk-type-card-micro {
+  font-size: var(--tlk-type-meta-size);
+  line-height: 1.35;
 }
 
 @media (prefers-reduced-motion: reduce) {

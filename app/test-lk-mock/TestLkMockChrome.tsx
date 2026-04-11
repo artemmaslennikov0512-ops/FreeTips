@@ -12,21 +12,23 @@ export function TestLkMockPageBody({ children }: { children: React.ReactNode }) 
 export function TestLkBreadcrumb({ segment }: { segment: string }) {
   const { basePath } = useTestLkMockRoute();
   return (
-    <nav className="mb-4 flex flex-wrap items-center gap-1 text-sm" style={{ color: "var(--tlk-text-secondary)" }} aria-label="Хлебные крошки">
-      <Link href={basePath} className="no-underline hover:underline" style={{ color: "var(--tlk-text-secondary)" }}>
+    <nav className="tlk-type-body-muted mb-4 flex flex-wrap items-center gap-1" aria-label="Хлебные крошки">
+      <Link href={basePath} className="tlk-type-body-muted no-underline hover:underline">
         Тестовый ЛК
       </Link>
       <span aria-hidden>/</span>
-      <span style={{ color: "var(--tlk-text)" }}>{segment}</span>
+      <span className="tlk-type-body" style={{ color: "var(--tlk-text)" }}>
+        {segment}
+      </span>
     </nav>
   );
 }
 
 export function TestLkBackToSite() {
   return (
-    <p className="mt-10 flex flex-wrap items-center gap-2 text-sm" style={{ color: "var(--tlk-text-secondary)" }}>
+    <p className="tlk-type-body-muted mt-10 flex flex-wrap items-center gap-2">
       <ChevronLeft className="h-4 w-4" aria-hidden />
-      <Link href="/" className="underline-offset-2 hover:underline" style={{ color: "var(--tlk-primary)" }}>
+      <Link href="/" className="tlk-type-body font-medium underline-offset-2 hover:underline" style={{ color: "var(--tlk-primary)" }}>
         На главную сайта
       </Link>
     </p>

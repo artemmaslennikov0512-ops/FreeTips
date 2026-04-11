@@ -15,15 +15,10 @@ const cards = [
     icon: Sparkles,
   },
   {
-    title: "Тестовый ЛК — новая палитра",
-    description: "Сетка как в /cabinet, изолированные цвета, сценарии зала/стрима помечены «в разработке».",
+    title: "Тестовый ЛК (новый стиль)",
+    description:
+      "Изолированная бирюзовая тема: названия и порядок как в /cabinet, макетные разделы внизу. Тот же интерфейс по адресу /test-lk-mock/cabinet-nav/…",
     href: "/test-lk-mock",
-    icon: LayoutDashboard,
-  },
-  {
-    title: "Тестовый ЛК — меню как в /cabinet",
-    description: "Те же цвета превью, порядок пунктов как в боевом кабинете; макетные разделы — внизу.",
-    href: "/test-lk-mock/cabinet-nav",
     icon: LayoutDashboard,
   },
   {

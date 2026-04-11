@@ -15,9 +15,9 @@ import {
   Building2,
   Radio,
 } from "lucide-react";
-import type { TestLkNavMode } from "./TestLkMockRouteContext";
 
 export const TEST_LK_BASE = "/test-lk-mock";
+/** Тот же макет и меню, что у `/test-lk-mock`; другой префикс URL для закладок и встраивания. */
 export const TEST_LK_CABINET_NAV_BASE = "/test-lk-mock/cabinet-nav";
 
 export type TestLkNavItem = {
@@ -52,12 +52,12 @@ function cabinetLikeItems(basePath: string): TestLkNavItem[] {
     { label: "Покинуть заведение", href: hrefFor(basePath, "/leave-establishment"), icon: UserMinus, iconClass: "!text-orange-400" },
     { label: "Верификация", href: hrefFor(basePath, "/verification"), icon: ShieldCheck, iconClass: "!text-violet-400" },
     { label: "Поддержка", href: hrefFor(basePath, "/support"), icon: MessageCircle, iconClass: "!text-cyan-400" },
-    { label: "Сессии", href: hrefFor(basePath, "/sessions"), icon: Laptop, iconClass: "!text-slate-400" },
+    { label: "Сессии", href: hrefFor(basePath, "/sessions"), icon: Laptop, iconClass: "!text-slate-300" },
     { label: "Настройки профиля", href: hrefFor(basePath, "/settings"), icon: Settings, iconClass: "!text-orange-400" },
   ];
 }
 
-const DASHBOARD = (basePath: string): TestLkNavItem => ({
+const dashboardItem = (basePath: string): TestLkNavItem => ({
   label: "Дашборд",
   href: basePath,
   icon: LayoutDashboard,
@@ -73,25 +73,15 @@ export const TEST_LK_NAV_EXTRA: TestLkNavItem = {
 
 export type TestLkNavSection = { title: string | null; items: TestLkNavItem[] };
 
-/** Макет «новый визуал»: сначала сценарии в разработке, затем блок как у кабинета. */
-export function buildTestLkNavSectionsDesign(basePath: string): TestLkNavSection[] {
+/**
+ * Новый визуал (--tlk-*) для всего тестового ЛК.
+ * Порядок и названия разделов — как в боевом меню; макетные сценарии — внизу с пометкой «в разработке».
+ */
+export function buildTestLkNavSections(basePath: string): TestLkNavSection[] {
   return [
-    { title: null, items: [DASHBOARD(basePath)] },
-    { title: "В разработке", items: devItems(basePath) },
-    { title: "Разделы кабинета", items: cabinetLikeItems(basePath) },
-  ];
-}
-
-/** Те же цвета и сетка; порядок пунктов как в боевом меню, затем макетные сценарии. */
-export function buildTestLkNavSectionsCabinet(basePath: string): TestLkNavSection[] {
-  return [
-    { title: null, items: [DASHBOARD(basePath), ...cabinetLikeItems(basePath)] },
+    { title: null, items: [dashboardItem(basePath), ...cabinetLikeItems(basePath)] },
     { title: "В разработке", items: devItems(basePath) },
   ];
-}
-
-export function buildTestLkNavSections(basePath: string, mode: TestLkNavMode): TestLkNavSection[] {
-  return mode === "cabinet" ? buildTestLkNavSectionsCabinet(basePath) : buildTestLkNavSectionsDesign(basePath);
 }
 
 export function flattenTestLkNavSections(sections: TestLkNavSection[]): TestLkNavItem[] {

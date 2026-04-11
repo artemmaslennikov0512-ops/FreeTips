@@ -24,12 +24,10 @@ import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { AdminMobileNavPortal } from "@/components/admin/AdminMobileNavPortal";
 import { ADMIN_REQUESTS_COUNTS_CHANGED } from "@/lib/admin-requests-counts-sync";
+import { ADMIN_BTN, ADMIN_BTN_PRIMARY } from "@/lib/admin-button-classes";
 import { usePanelMobileMenu } from "@/components/PanelMobileMenuContext";
 import { LkPresenceHeartbeat } from "@/components/LkPresenceHeartbeat";
 import { PanelMobileBackButton } from "@/components/PanelMobileBackButton";
-import { AdminShellThemeProvider, useAdminShellTheme } from "./AdminShellThemeContext";
-import { AdminShellThemeToggle } from "./AdminShellThemeToggle";
-import "../test-lk-mock/test-lk-mock.css";
 
 interface User {
   id: string;
@@ -39,32 +37,39 @@ interface User {
   mustChangePassword?: boolean;
 }
 
-const NAV: { label: string; href: string; icon: LucideIcon }[] = [
-  { label: "Дашборд", href: "/admin/dashboard", icon: LayoutDashboard },
-  { label: "Заведения", href: "/admin/establishments", icon: Building2 },
-  { label: "Выводы", href: "/admin/payouts", icon: Send },
-  { label: "Пользователи", href: "/admin/users", icon: Users },
-  { label: "Заявки", href: "/admin/verification-requests", icon: FileCheck },
-  { label: "Поддержка", href: "/admin/support", icon: MessageCircle },
-  { label: "Антифрод", href: "/admin/antifraud", icon: ShieldCheck },
-  { label: "Приём по ссылкам", href: "/admin/payment-accept", icon: CreditCard },
-  { label: "Безопасность (2FA)", href: "/admin/security", icon: KeyRound },
-  { label: "Сессии", href: "/admin/sessions", icon: Laptop },
+const NAV: { label: string; href: string; icon: LucideIcon; iconClass: string }[] = [
+  { label: "Дашборд", href: "/admin/dashboard", icon: LayoutDashboard, iconClass: "!text-sky-400" },
+  { label: "Заведения", href: "/admin/establishments", icon: Building2, iconClass: "!text-amber-400" },
+  { label: "Выводы", href: "/admin/payouts", icon: Send, iconClass: "!text-emerald-400" },
+  { label: "Пользователи", href: "/admin/users", icon: Users, iconClass: "!text-violet-400" },
+  { label: "Заявки", href: "/admin/verification-requests", icon: FileCheck, iconClass: "!text-blue-400" },
+  { label: "Поддержка", href: "/admin/support", icon: MessageCircle, iconClass: "!text-cyan-400" },
+  { label: "Антифрод", href: "/admin/antifraud", icon: ShieldCheck, iconClass: "!text-rose-400" },
+  { label: "Приём по ссылкам", href: "/admin/payment-accept", icon: CreditCard, iconClass: "!text-[var(--color-brand-gold)]" },
+  { label: "Безопасность (2FA)", href: "/admin/security", icon: KeyRound, iconClass: "!text-amber-300" },
+  { label: "Сессии", href: "/admin/sessions", icon: Laptop, iconClass: "!text-slate-300" },
 ];
 
 const ADMIN_LG_SIDEBAR_COLLAPSED_KEY = "admin-lg-sidebar-collapsed";
 
-function AdminLayoutInner({ children }: { children: React.ReactNode }) {
+const LG_SIDEBAR_COLLAPSE_BTN =
+  "cabinet-lg-sidebar-toggle cabinet-lg-sidebar-toggle--collapse relative z-30 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/25 bg-white/10 text-white shadow-none transition-[color,background-color,border-color] duration-200 hover:border-white/40 hover:bg-white/15 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white/35 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent";
+
+const LG_SIDEBAR_EXPAND_BTN =
+  "cabinet-lg-sidebar-toggle cabinet-lg-sidebar-toggle--expand fixed left-0 top-1/2 z-[35] hidden h-9 w-9 -translate-y-1/2 translate-x-1/2 items-center justify-center rounded-full border border-white/25 bg-[var(--color-navy)] text-white shadow-none transition-[color,background-color,border-color] duration-200 hover:border-white/40 hover:bg-white/[0.12] hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white/35 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent lg:flex";
+
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const { sidebarOpen, closeSidebar } = usePanelMobileMenu();
-  const { shellTheme } = useAdminShellTheme();
   const [mounted, setMounted] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [retryTrigger, setRetryTrigger] = useState(0);
+  /** Сумма pending по верификации и подключению — бейдж у пункта «Заявки». */
   const [requestsPendingTotal, setRequestsPendingTotal] = useState<number | null>(null);
+  /** Заявки на вывод в работе — бейдж у пункта «Выводы». */
   const [payoutsAwaitingTotal, setPayoutsAwaitingTotal] = useState<number | null>(null);
   const [lgSidebarCollapsed, setLgSidebarCollapsed] = useState(false);
 
@@ -198,22 +203,14 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
     return pathname?.startsWith(href) ?? false;
   };
 
-  const collapseBtn =
-    "relative z-30 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border text-[var(--tlk-text)] shadow-none transition-[color,background-color,border-color] duration-200 outline-none focus-visible:ring-2 focus-visible:ring-[var(--tlk-accent)]/35 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent";
-  const expandBtnClass =
-    "fixed left-0 top-1/2 z-[35] hidden h-9 w-9 -translate-y-1/2 translate-x-1/2 items-center justify-center rounded-full border shadow-none transition-[color,background-color,border-color] duration-200 outline-none focus-visible:ring-2 focus-visible:ring-[var(--tlk-accent)]/35 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent lg:flex";
-
   if (!mounted || loading) {
     return <LoadingSpinner message="Загрузка…" className="min-h-[60vh]" />;
   }
 
   if (loadError) {
     return (
-      <div
-        className="test-lk-mock-root flex min-h-[60vh] flex-col items-center justify-center gap-4 px-4 font-[family:var(--font-inter)]"
-        data-tlk-theme="light"
-      >
-        <p className="tlk-type-body-muted text-center">{loadError}</p>
+      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 px-4 text-[var(--color-text)]">
+        <p className="text-center text-[var(--color-text-secondary)]">{loadError}</p>
         <button
           type="button"
           onClick={() => {
@@ -221,11 +218,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
             setLoading(true);
             setRetryTrigger((t) => t + 1);
           }}
-          className="tlk-transition rounded-lg px-6 py-2.5 text-sm font-semibold outline-none focus-visible:ring-2 focus-visible:ring-[var(--tlk-accent)]/40"
-          style={{
-            backgroundColor: "var(--tlk-primary)",
-            color: "var(--tlk-expand-fab-bg)",
-          }}
+          className={`${ADMIN_BTN} ${ADMIN_BTN_PRIMARY} px-6 py-2.5 font-medium`}
         >
           Повторить
         </button>
@@ -238,11 +231,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div
-      className="test-lk-mock-root admin-panel flex min-h-screen w-full min-w-0 max-w-full overflow-x-hidden pt-3 font-[family:var(--font-inter)] lg:pt-5"
-      data-tlk-theme={shellTheme}
-      style={{ backgroundColor: "var(--tlk-shell-bg)", color: "var(--tlk-text)" }}
-    >
+    <div className="admin-panel cabinet-premium flex min-h-screen w-full min-w-0 max-w-full bg-[var(--color-bg)] font-[family:var(--font-inter)] text-[var(--color-text)] pt-3 lg:pt-5">
       <LkPresenceHeartbeat />
       <AdminMobileNavPortal
         sidebarOpen={sidebarOpen}
@@ -253,9 +242,9 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
         requestsPendingTotal={requestsPendingTotal}
         payoutsAwaitingTotal={payoutsAwaitingTotal}
         handleLogout={handleLogout}
-        shellTheme={shellTheme}
       />
 
+      {/* Боковая панель — lg+; сворачивание как в ЛК официанта; на мобильном — модалка */}
       <div
         className={`hidden shrink-0 transition-[width] duration-300 ease-out lg:mt-3 lg:flex lg:self-start ${
           lgSidebarCollapsed
@@ -263,159 +252,109 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
             : "lg:relative lg:z-10 lg:w-[260px] lg:overflow-hidden"
         }`}
       >
-        <aside
-          className="relative flex w-[260px] min-w-[260px] flex-col overflow-hidden border-r py-4 lg:static lg:max-h-[min(100vh-1.5rem,900px)] lg:pt-2"
-          style={{ borderColor: "var(--tlk-panel-border)" }}
-        >
-          <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-            <div className="mx-4 border-b px-0 pb-3" style={{ borderColor: "var(--tlk-panel-border)" }}>
-              <div className="flex items-center gap-3">
-                <div
-                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-sm font-semibold"
-                  style={{ backgroundColor: "var(--tlk-accent)", color: "var(--tlk-expand-fab-bg)" }}
-                  aria-hidden
-                >
-                  {(user.login || "A").charAt(0).toUpperCase()}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <span className="tlk-type-profile-name block truncate">{user.login}</span>
-                  <div className="tlk-type-profile-meta mt-0.5">Суперадмин</div>
-                </div>
+        <aside className="admin-sidebar cabinet-sidebar relative flex h-full min-h-0 w-[260px] min-w-[260px] flex-col overflow-hidden rounded-[10px] border border-white/10 bg-[var(--color-navy)] py-6 shadow-sm backdrop-blur-xl lg:static lg:max-h-[calc(100vh-2rem)]">
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+          <div className="cabinet-sidebar-profile cabinet-block-inner mx-4 mb-4 rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-4 py-3">
+            <div className="flex items-center gap-3">
+              <div className="cabinet-sidebar-avatar flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--color-brand-gold)] font-semibold text-[#0a192f] text-sm">
+                {(user.login || "A").charAt(0).toUpperCase()}
               </div>
-            </div>
-
-            <div className="mb-1 mt-3 flex h-8 shrink-0 items-center px-4">
-              <span className="w-9 shrink-0 select-none" aria-hidden />
-              <span className="tlk-type-nav-heading min-w-0 flex-1 text-center">Навигация</span>
-              <div className="flex h-8 w-9 shrink-0 items-center justify-end">
-                <button
-                  type="button"
-                  onClick={() => setSidebarCollapsedPersisted(true)}
-                  className={collapseBtn}
-                  style={{ borderColor: "var(--tlk-panel-border)", backgroundColor: "var(--tlk-nav-wrap-bg)" }}
-                  aria-label="Скрыть боковое меню"
-                  title="Скрыть меню"
-                >
-                  <ChevronLeft className="h-5 w-5 shrink-0" strokeWidth={2} aria-hidden />
-                </button>
-              </div>
-            </div>
-
-            <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden px-3">
-              <nav
-                className="flex min-h-0 flex-1 flex-col justify-center gap-0.5 overflow-hidden py-1"
-                aria-label="Навигация админ-панели"
-              >
-                {NAV.map(({ label, href, icon: Icon }) => {
-                  const active = isActive(href);
-                  const showRequestsBadge =
-                    href === "/admin/verification-requests" &&
-                    requestsPendingTotal != null &&
-                    requestsPendingTotal > 0;
-                  const requestsBadgeN = requestsPendingTotal ?? 0;
-                  const showPayoutsBadge =
-                    href === "/admin/payouts" && payoutsAwaitingTotal != null && payoutsAwaitingTotal > 0;
-                  const payoutsBadgeN = payoutsAwaitingTotal ?? 0;
-                  return (
-                    <Link
-                      key={href}
-                      href={href}
-                      onClick={closeSidebar}
-                      className={`tlk-transition flex shrink-0 items-center gap-2 rounded-lg px-2.5 py-1.5 font-medium ${
-                        active
-                          ? "border font-semibold shadow-sm"
-                          : "border border-transparent text-[var(--tlk-text)]/85 hover:bg-[var(--tlk-sidebar-active-bg)] hover:text-[var(--tlk-text)]"
-                      }`}
-                      style={
-                        active
-                          ? {
-                              borderColor: "color-mix(in srgb, var(--tlk-accent) 35%, transparent)",
-                              backgroundColor: "var(--tlk-accent-soft)",
-                              color: "var(--tlk-text)",
-                            }
-                          : undefined
-                      }
-                    >
-                      <Icon className="h-4 w-4 shrink-0" style={{ color: "var(--tlk-primary)" }} aria-hidden />
-                      <span className="tlk-type-body flex min-w-0 flex-1 items-center gap-2 leading-snug font-medium">
-                        <span className="min-w-0 break-words">{label}</span>
-                        {showRequestsBadge && (
-                          <span
-                            className="inline-flex h-4 min-w-[1rem] shrink-0 items-center justify-center rounded-full px-1 text-[10px] font-bold leading-none text-white tabular-nums"
-                            style={{ backgroundColor: "var(--tlk-unread-badge)" }}
-                          >
-                            {requestsBadgeN > 99 ? "99+" : requestsBadgeN}
-                          </span>
-                        )}
-                        {showPayoutsBadge && (
-                          <span
-                            className="inline-flex h-4 min-w-[1rem] shrink-0 items-center justify-center rounded-full px-1 text-[10px] font-bold leading-none tabular-nums ring-1"
-                            style={{
-                              backgroundColor: "var(--tlk-accent-soft)",
-                              color: "var(--tlk-text)",
-                              borderColor: "var(--tlk-border)",
-                            }}
-                            title="Заявки на вывод в работе"
-                          >
-                            {payoutsBadgeN > 99 ? "99+" : payoutsBadgeN}
-                          </span>
-                        )}
-                      </span>
-                    </Link>
-                  );
-                })}
-              </nav>
-
-              <div className="shrink-0 space-y-2 border-t pt-2 pb-1" style={{ borderColor: "var(--tlk-panel-border)" }}>
-                <div className="flex items-center justify-between gap-2 px-1">
-                  <span className="tlk-type-meta" style={{ color: "var(--tlk-text-secondary)" }}>
-                    Тема
-                  </span>
-                  <AdminShellThemeToggle compact />
-                </div>
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  className="tlk-type-body tlk-transition flex w-full items-center justify-center gap-2 rounded-lg border px-3 py-2 font-medium"
-                  style={{
-                    borderColor: "var(--tlk-border)",
-                    color: "var(--tlk-text)",
-                    backgroundColor: "var(--tlk-nav-wrap-bg)",
-                  }}
-                >
-                  <LogOut className="h-4 w-4 shrink-0" style={{ color: "var(--tlk-accent)" }} aria-hidden />
-                  <span>Выйти</span>
-                </button>
+              <div className="min-w-0 flex-1">
+                <div className="truncate font-semibold text-white">{user.login}</div>
+                <div className="text-sm text-white/80">Админ</div>
               </div>
             </div>
           </div>
+          <div className="mb-2 flex h-9 shrink-0 items-center px-4">
+            <span className="w-9 shrink-0 select-none" aria-hidden />
+            <span className="cabinet-nav-label min-w-0 flex-1 text-center text-xs font-semibold uppercase leading-none tracking-wider text-white/50">
+              Навигация
+            </span>
+            <div className="flex h-9 w-9 shrink-0 items-center justify-end">
+              <button
+                type="button"
+                onClick={() => setSidebarCollapsedPersisted(true)}
+                className={LG_SIDEBAR_COLLAPSE_BTN}
+                aria-label="Скрыть боковое меню"
+                title="Скрыть меню"
+              >
+                <ChevronLeft className="h-5 w-5 shrink-0 text-white" strokeWidth={2} aria-hidden />
+              </button>
+            </div>
+          </div>
+          <div className="cabinet-nav-block flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto overflow-x-hidden px-4 pb-2">
+            <nav className="flex flex-col gap-0.5 rounded-[10px] border border-[var(--color-brand-gold)]/15 bg-white/5 p-1.5 shadow-[var(--shadow-subtle)]" aria-label="Навигация админ-панели">
+              {NAV.map(({ label, href, icon: Icon, iconClass }) => {
+                const showRequestsBadge =
+                  href === "/admin/verification-requests" && requestsPendingTotal != null && requestsPendingTotal > 0;
+                const requestsBadgeN = requestsPendingTotal ?? 0;
+                const showPayoutsBadge =
+                  href === "/admin/payouts" && payoutsAwaitingTotal != null && payoutsAwaitingTotal > 0;
+                const payoutsBadgeN = payoutsAwaitingTotal ?? 0;
+                return (
+                  <Link
+                    key={href}
+                    href={href}
+                    onClick={closeSidebar}
+                    className={`flex items-center gap-3 rounded-lg px-3 py-3 font-medium transition-colors ${
+                      isActive(href)
+                        ? "cabinet-nav-active border border-[#0a192f]/25 bg-[#0a192f]/10 text-[#0a192f] font-semibold"
+                        : "border border-transparent text-white/80 hover:bg-[var(--color-dark-gray)]/10 hover:text-white"
+                    }`}
+                  >
+                    <Icon className={`h-5 w-5 shrink-0 ${iconClass}`} aria-hidden />
+                    <span className="flex min-w-0 flex-1 items-center gap-2 break-words">
+                      {label}
+                      {showRequestsBadge && (
+                        <span className="inline-flex min-h-[1.25rem] min-w-[1.25rem] shrink-0 items-center justify-center rounded-full bg-[var(--color-accent-red)] px-1.5 text-[11px] font-bold leading-none text-white tabular-nums">
+                          {requestsBadgeN > 99 ? "99+" : requestsBadgeN}
+                        </span>
+                      )}
+                      {showPayoutsBadge && (
+                        <span
+                          className="inline-flex min-h-[1.25rem] min-w-[1.25rem] shrink-0 items-center justify-center rounded-full bg-amber-500 px-1.5 text-[11px] font-bold leading-none text-[#0a192f] tabular-nums ring-1 ring-amber-200/40"
+                          title="Заявки на вывод в работе"
+                        >
+                          {payoutsBadgeN > 99 ? "99+" : payoutsBadgeN}
+                        </span>
+                      )}
+                    </span>
+                  </Link>
+                );
+              })}
+            </nav>
+            <button
+              type="button"
+              onClick={handleLogout}
+              className={`mt-4 ${ADMIN_BTN} w-full !justify-center gap-3 px-4 py-3 text-sm`}
+            >
+              <LogOut className="h-4 w-4 shrink-0 text-[var(--color-brand-gold)]" aria-hidden />
+              <span>Выйти</span>
+            </button>
+          </div>
+        </div>
         </aside>
       </div>
 
-      {lgSidebarCollapsed ? (
+      {lgSidebarCollapsed && (
         <button
           type="button"
           onClick={() => setSidebarCollapsedPersisted(false)}
-          className={expandBtnClass}
-          style={{
-            borderColor: "var(--tlk-panel-border)",
-            backgroundColor: "var(--tlk-expand-fab-bg)",
-            color: "var(--tlk-text)",
-          }}
+          className={LG_SIDEBAR_EXPAND_BTN}
           aria-label="Показать боковое меню"
           title="Меню"
         >
-          <ChevronRight className="h-5 w-5 shrink-0" strokeWidth={2} aria-hidden />
+          <ChevronRight className="h-5 w-5 shrink-0 text-white" strokeWidth={2} aria-hidden />
         </button>
-      ) : null}
+      )}
 
-      <main className="relative flex min-h-screen min-w-0 flex-1 flex-col overflow-x-hidden px-0 pt-2 pb-4 lg:px-4 lg:pt-3 lg:pb-8">
-        <div className="relative z-10 flex min-h-0 w-full max-w-full flex-1 flex-col lg:z-0">
-          {pathname !== "/admin/dashboard" && pathname !== "/admin" && (
-            <PanelMobileBackButton variant="adminTlk" fallbackHref="/admin/dashboard" />
+      <main className="min-h-screen min-w-0 flex-1 overflow-x-hidden px-0 pt-2 lg:relative lg:z-0 lg:pt-3 lg:pl-0 lg:pr-4 lg:ml-0 flex flex-col">
+        <div className="admin-main-block cabinet-main-block app-panel-main-surface relative mt-0 mr-0 mb-4 ml-0 flex min-h-0 w-full min-w-0 max-w-full flex-1 flex-col rounded-lg border border-white/10 bg-white/[0.06] backdrop-blur-xl lg:mr-4 lg:ml-4 lg:min-h-[calc(100vh-2rem)] lg:rounded-[10px]">
+          {pathname !== "/admin/dashboard" && (
+            <PanelMobileBackButton variant="admin" fallbackHref="/admin/dashboard" />
           )}
           <div
-            className="test-lk-inner-main flex min-h-0 flex-1 flex-col overflow-x-hidden px-4 py-3 sm:px-6 md:py-6 lg:px-2 lg:py-2"
+            className="flex min-h-0 w-full max-w-full flex-1 flex-col overflow-x-hidden px-4 py-3 sm:px-6 sm:py-4 lg:p-8"
             id="main-content"
           >
             {children}
@@ -423,13 +362,5 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
         </div>
       </main>
     </div>
-  );
-}
-
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <AdminShellThemeProvider>
-      <AdminLayoutInner>{children}</AdminLayoutInner>
-    </AdminShellThemeProvider>
   );
 }

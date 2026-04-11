@@ -5,8 +5,9 @@ import { createPortal } from "react-dom";
 import Link from "next/link";
 import type { LucideIcon } from "lucide-react";
 import { LogOut } from "lucide-react";
+import { ADMIN_BTN } from "@/lib/admin-button-classes";
 
-type NavItem = { label: string; href: string; icon: LucideIcon };
+type NavItem = { label: string; href: string; icon: LucideIcon; iconClass: string };
 
 type User = { login: string };
 
@@ -19,7 +20,6 @@ export function AdminMobileNavPortal({
   requestsPendingTotal,
   payoutsAwaitingTotal,
   handleLogout,
-  shellTheme,
 }: {
   sidebarOpen: boolean;
   closeSidebar: () => void;
@@ -29,7 +29,6 @@ export function AdminMobileNavPortal({
   requestsPendingTotal: number | null;
   payoutsAwaitingTotal: number | null;
   handleLogout: () => Promise<void>;
-  shellTheme: "light" | "dark";
 }) {
   const mounted = useSyncExternalStore(
     () => () => {},
@@ -66,15 +65,13 @@ export function AdminMobileNavPortal({
 
   return createPortal(
     <div
-      className={`test-lk-mock-root fixed inset-0 z-[2000] font-[family:var(--font-inter)] lg:hidden ${sidebarOpen ? "" : "pointer-events-none"}`}
-      data-tlk-theme={shellTheme}
+      className={`admin-mobile-nav-root fixed inset-0 z-[2000] lg:hidden ${sidebarOpen ? "" : "pointer-events-none"}`}
       aria-hidden={!sidebarOpen}
     >
       <div
-        className={`absolute inset-0 transition-opacity duration-300 ${
+        className={`admin-mobile-nav-overlay absolute inset-0 transition-opacity duration-300 ${
           sidebarOpen ? "opacity-100" : "pointer-events-none opacity-0"
         }`}
-        style={{ backgroundColor: "var(--tlk-mobile-scrim)" }}
         onClick={onOverlayDown}
         role="presentation"
       />
@@ -90,83 +87,57 @@ export function AdminMobileNavPortal({
           role="dialog"
           aria-modal="true"
           aria-label="Меню навигации"
-          className={`pointer-events-auto w-[min(calc(100vw-1.5rem),22rem)] shrink-0 rounded-xl border shadow-lg transition-[opacity,transform] duration-200 ${
+          className={`admin-mobile-nav-dialog cabinet-nav-dropdown admin-nav-dropdown pointer-events-auto w-[min(calc(100vw-1.5rem),22rem)] shrink-0 rounded-xl border border-[var(--color-brand-gold)]/20 shadow-[var(--shadow-card)] transition-[opacity,transform] duration-200 ${
             sidebarOpen ? "scale-100 opacity-100" : "pointer-events-none scale-95 opacity-0"
           }`}
-          style={{
-            borderColor: "var(--tlk-panel-border)",
-            backgroundColor: "var(--tlk-panel-bg)",
-            color: "var(--tlk-text)",
-            backdropFilter: "blur(12px)",
-          }}
           aria-hidden={!sidebarOpen}
         >
           <div className="rounded-xl p-3">
-            <div
-              className="mb-3 rounded-lg border px-3 py-2.5"
-              style={{ borderColor: "var(--tlk-profile-border)", backgroundColor: "var(--tlk-profile-bg)" }}
-            >
+            <div className="cabinet-sidebar-profile cabinet-block-inner mb-3 rounded-lg border border-[var(--color-brand-gold)]/20 px-3 py-2.5">
               <div className="flex items-center gap-2.5">
-                <div
-                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-semibold"
-                  style={{ backgroundColor: "var(--tlk-accent)", color: "var(--tlk-expand-fab-bg)" }}
-                >
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--color-brand-gold)] font-semibold text-[#0a192f] text-sm">
                   {(user.login || "A").charAt(0).toUpperCase()}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <div className="tlk-type-profile-name truncate">{user.login}</div>
-                  <div className="tlk-type-profile-meta mt-0.5">Суперадмин</div>
+                  <div className="truncate font-semibold text-sm">{user.login}</div>
+                  <div className="text-xs opacity-80">Админ</div>
                 </div>
               </div>
             </div>
-            <p className="tlk-type-nav-heading mb-1.5 px-2 text-center">Навигация</p>
-            <nav className="flex flex-col gap-0.5 rounded-lg border p-1" style={{ borderColor: "var(--tlk-border)" }} role="none">
-              {NAV.map(({ label, href, icon: Icon }) => {
+            <p className="cabinet-nav-label mb-1.5 px-2 text-center text-[10px] font-semibold uppercase tracking-wider opacity-60">
+              Навигация
+            </p>
+            <nav className="flex flex-col gap-0.5 rounded-lg border border-[var(--color-brand-gold)]/15 p-1" role="none">
+              {NAV.map(({ label, href, icon: Icon, iconClass }) => {
                 const showRequestsBadge =
                   href === "/admin/verification-requests" && requestsPendingTotal != null && requestsPendingTotal > 0;
                 const requestsBadgeN = requestsPendingTotal ?? 0;
                 const showPayoutsBadge =
                   href === "/admin/payouts" && payoutsAwaitingTotal != null && payoutsAwaitingTotal > 0;
                 const payoutsBadgeN = payoutsAwaitingTotal ?? 0;
-                const active = isActive(href);
                 return (
                   <Link
                     key={href}
                     href={href}
                     onClick={closeSidebar}
                     role="menuitem"
-                    className={`tlk-transition flex items-center gap-2.5 rounded-md px-2.5 py-2 font-medium ${
-                      active ? "border font-semibold shadow-sm" : "border border-transparent hover:bg-[var(--tlk-sidebar-active-bg)]"
+                    className={`flex items-center gap-2.5 rounded-md px-2.5 py-2.5 text-sm font-medium transition-colors ${
+                      isActive(href)
+                        ? "cabinet-nav-active font-semibold"
+                        : "border border-transparent hover:bg-white/10"
                     }`}
-                    style={
-                      active
-                        ? {
-                            borderColor: "color-mix(in srgb, var(--tlk-accent) 35%, transparent)",
-                            backgroundColor: "var(--tlk-accent-soft)",
-                            color: "var(--tlk-text)",
-                          }
-                        : { color: "var(--tlk-text)" }
-                    }
                   >
-                    <Icon className="h-4 w-4 shrink-0" style={{ color: "var(--tlk-primary)" }} aria-hidden />
-                    <span className="tlk-type-body flex min-w-0 flex-1 items-center gap-2 leading-snug">
+                    <Icon className={`h-4 w-4 shrink-0 ${iconClass}`} aria-hidden />
+                    <span className="flex flex-1 items-center gap-2">
                       {label}
                       {showRequestsBadge && (
-                        <span
-                          className="inline-flex min-h-[1.25rem] min-w-[1.25rem] shrink-0 items-center justify-center rounded-full px-1.5 text-[11px] font-bold leading-none text-white tabular-nums"
-                          style={{ backgroundColor: "var(--tlk-unread-badge)" }}
-                        >
+                        <span className="inline-flex min-h-[1.25rem] min-w-[1.25rem] shrink-0 items-center justify-center rounded-full bg-[var(--color-accent-red)] px-1.5 text-[10px] font-bold leading-none text-white tabular-nums">
                           {requestsBadgeN > 99 ? "99+" : requestsBadgeN}
                         </span>
                       )}
                       {showPayoutsBadge && (
                         <span
-                          className="inline-flex min-h-[1.25rem] min-w-[1.25rem] shrink-0 items-center justify-center rounded-full px-1.5 text-[11px] font-bold leading-none tabular-nums ring-1"
-                          style={{
-                            backgroundColor: "var(--tlk-accent-soft)",
-                            color: "var(--tlk-text)",
-                            borderColor: "var(--tlk-border)",
-                          }}
+                          className="inline-flex min-h-[1.25rem] min-w-[1.25rem] shrink-0 items-center justify-center rounded-full bg-amber-500 px-1.5 text-[10px] font-bold leading-none text-[#0a192f] tabular-nums ring-1 ring-amber-200/40"
                           title="Заявки на вывод в работе"
                         >
                           {payoutsBadgeN > 99 ? "99+" : payoutsBadgeN}
@@ -183,15 +154,10 @@ export function AdminMobileNavPortal({
                 closeSidebar();
                 void handleLogout();
               }}
-              className="tlk-type-body tlk-transition mt-3 flex w-full items-center justify-center gap-2.5 rounded-lg border px-2.5 py-2.5 font-medium"
-              style={{
-                borderColor: "var(--tlk-border)",
-                color: "var(--tlk-text)",
-                backgroundColor: "var(--tlk-nav-wrap-bg)",
-              }}
+              className={`mt-3 ${ADMIN_BTN} w-full !justify-center gap-2.5 px-2.5 py-2.5 text-sm`}
               role="menuitem"
             >
-              <LogOut className="h-4 w-4 shrink-0" style={{ color: "var(--tlk-accent)" }} aria-hidden />
+              <LogOut className="h-4 w-4 shrink-0 text-[var(--color-brand-gold)]" aria-hidden />
               <span>Выйти</span>
             </button>
           </div>

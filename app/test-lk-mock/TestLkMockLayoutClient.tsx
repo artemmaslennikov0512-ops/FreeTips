@@ -157,14 +157,8 @@ function ShellInner({ children }: { children: ReactNode }) {
           lgSidebarCollapsed ? "lg:w-0 lg:pointer-events-none lg:overflow-hidden" : "lg:relative lg:z-10 lg:w-[260px] lg:overflow-hidden"
         }`}
       >
-        <div
-          className="relative flex h-full min-h-0 w-[260px] min-w-[260px] flex-col overflow-hidden border-0 border-r py-6 shadow-2xl backdrop-blur-xl lg:static lg:max-h-[calc(100vh-2rem)] lg:rounded-[10px] lg:border lg:border-[var(--tlk-panel-border)]"
-          style={panelStyle}
-        >
-          <div
-            className="mx-4 rounded-[10px] border px-4 py-3"
-            style={{ borderColor: "var(--tlk-profile-border)", backgroundColor: "var(--tlk-profile-bg)" }}
-          >
+        <div className="relative flex h-full min-h-0 w-[260px] min-w-[260px] flex-col overflow-hidden border-r py-6 lg:static lg:max-h-[calc(100vh-2rem)] lg:pt-2" style={{ borderColor: "var(--tlk-panel-border)" }}>
+          <div className="mx-4 border-b px-0 pb-4" style={{ borderColor: "var(--tlk-panel-border)" }}>
             <div className="flex items-center gap-3">
               <div
                 className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full"
@@ -198,11 +192,7 @@ function ShellInner({ children }: { children: ReactNode }) {
           </div>
 
           <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto overflow-x-hidden px-4">
-            <nav
-              className="flex flex-col gap-3 rounded-[10px] border p-1.5 shadow-sm"
-              style={{ borderColor: "var(--tlk-nav-wrap-border)", backgroundColor: "var(--tlk-nav-wrap-bg)" }}
-              aria-label="Навигация по тестовому кабинету"
-            >
+            <nav className="flex flex-col gap-3 py-2" aria-label="Навигация по тестовому кабинету">
               {navSections.map(({ title, items }) => (
                 <div key={title ?? items[0]?.href ?? "nav"}>
                   {title ? <p className="tlk-type-nav-section mb-1 px-2">{title}</p> : null}
@@ -273,11 +263,8 @@ function ShellInner({ children }: { children: ReactNode }) {
         </button>
       ) : null}
 
-      <main className="relative flex min-h-screen min-w-0 flex-1 flex-col overflow-x-hidden px-0 pt-2 pb-4 lg:ml-0 lg:mr-0 lg:px-0 lg:pr-4 lg:pt-3">
-        <div
-          className="relative z-10 mb-4 ml-0 mr-0 mt-0 flex min-h-0 w-full max-w-full flex-1 flex-col rounded-lg border-x border-b backdrop-blur-xl md:rounded-[10px] lg:z-0 lg:mr-4 lg:ml-4"
-          style={panelStyle}
-        >
+      <main className="relative flex min-h-screen min-w-0 flex-1 flex-col overflow-x-hidden px-0 pt-2 pb-4 lg:px-4 lg:pt-3 lg:pb-8">
+        <div className="relative z-10 flex min-h-0 w-full max-w-full flex-1 flex-col lg:z-0">
           <div className="flex items-center justify-between gap-2 border-b px-4 py-2.5 lg:hidden" style={{ borderColor: "var(--tlk-panel-border)" }}>
             <button
               type="button"
@@ -301,7 +288,7 @@ function ShellInner({ children }: { children: ReactNode }) {
             <PanelMobileBackButton variant="testLkMock" fallbackHref={basePath} />
           ) : null}
 
-          <div className="test-lk-inner-main flex min-h-0 flex-1 flex-col overflow-x-hidden px-4 py-3 sm:px-6 md:py-6 lg:p-8">
+          <div className="test-lk-inner-main flex min-h-0 flex-1 flex-col overflow-x-hidden px-4 py-3 sm:px-6 md:py-6 lg:px-2 lg:py-2">
             {children}
           </div>
         </div>

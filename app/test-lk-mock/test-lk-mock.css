@@ -65,6 +65,8 @@
   --tlk-card-glass: rgba(255, 255, 255, 0.14);
   --tlk-mobile-scrim: rgba(0, 0, 0, 0.45);
   --tlk-expand-fab-bg: #0b1220;
+  /* Внутри карточек: шапка таблицы, строки списков — не «серый app», а смесь accent + surface */
+  --tlk-inset-surface: color-mix(in srgb, var(--tlk-accent) 9%, var(--tlk-surface));
   font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 }
 
@@ -94,6 +96,7 @@
   --tlk-card-glass: rgba(255, 255, 255, 0.08);
   --tlk-mobile-scrim: rgba(0, 0, 0, 0.55);
   --tlk-expand-fab-bg: #0f172a;
+  --tlk-inset-surface: color-mix(in srgb, var(--tlk-accent) 16%, var(--tlk-surface));
   font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 }
 
@@ -194,6 +197,23 @@
 
 .test-lk-mock-root .tlk-type-table th {
   font-weight: var(--tlk-type-table-header-weight);
+}
+
+.test-lk-mock-root .tlk-type-table thead tr {
+  background-color: var(--tlk-inset-surface);
+  border-bottom: 1px solid var(--tlk-border);
+}
+
+/* Кнопки/ссылки внутри карточек — тот же приглушённый слой, что у шапки таблицы */
+.test-lk-mock-root .tlk-inset-control {
+  background-color: var(--tlk-inset-surface);
+  border-color: var(--tlk-border);
+  color: var(--tlk-text);
+}
+
+.test-lk-mock-root .tlk-inset-surface {
+  background-color: var(--tlk-inset-surface);
+  border-color: var(--tlk-border);
 }
 
 .test-lk-mock-root .tlk-type-kpi-label {

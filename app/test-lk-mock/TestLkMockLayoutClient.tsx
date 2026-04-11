@@ -65,8 +65,8 @@ function NavLinkRow({
       <span className="tlk-type-body min-w-0 flex-1 leading-snug font-medium">{label}</span>
       {inDevelopment ? (
         <span
-          className="tlk-type-nav-section shrink-0 rounded-md border px-1.5 py-0.5"
-          style={{ backgroundColor: "var(--tlk-bg-app)", color: "var(--tlk-text-secondary)", borderColor: "var(--tlk-border)" }}
+          className="tlk-inset-surface tlk-type-nav-section shrink-0 rounded-md border border-solid px-1.5 py-0.5"
+          style={{ color: "var(--tlk-text-secondary)" }}
         >
           в разработке
         </span>

@@ -221,7 +221,7 @@ export function TestLkMockDashboard() {
             <div className="overflow-x-auto">
               <table className="tlk-type-table w-full min-w-[560px] text-left">
                 <thead>
-                  <tr className="border-b" style={{ borderColor: "var(--tlk-border)", backgroundColor: "var(--tlk-bg-app)" }}>
+                  <tr>
                     <th className="px-5 py-3" style={{ color: "var(--tlk-text-secondary)" }}>
                       Дата
                     </th>
@@ -284,22 +284,19 @@ export function TestLkMockDashboard() {
             <div className="mt-4 flex flex-col gap-2">
               <Link
                 href={`${basePath}/link`}
-                className="tlk-type-body tlk-transition w-full rounded-lg border px-3 py-2.5 text-left font-medium no-underline hover:opacity-95"
-                style={{ borderColor: "var(--tlk-border)", color: "var(--tlk-text)", backgroundColor: "var(--tlk-bg-app)" }}
+                className="tlk-inset-control tlk-type-body tlk-transition w-full rounded-lg border px-3 py-2.5 text-left font-medium no-underline hover:opacity-95"
               >
                 Моя ссылка → страница оплаты
               </Link>
               <Link
                 href={`${basePath}/settings`}
-                className="tlk-type-body tlk-transition w-full rounded-lg border px-3 py-2.5 text-left font-medium no-underline hover:opacity-95"
-                style={{ borderColor: "var(--tlk-border)", color: "var(--tlk-text)", backgroundColor: "var(--tlk-bg-app)" }}
+                className="tlk-inset-control tlk-type-body tlk-transition w-full rounded-lg border px-3 py-2.5 text-left font-medium no-underline hover:opacity-95"
               >
                 Настройки профиля
               </Link>
               <Link
                 href={`${basePath}/support`}
-                className="tlk-type-body tlk-transition w-full rounded-lg border px-3 py-2.5 text-left font-medium no-underline hover:opacity-95"
-                style={{ borderColor: "var(--tlk-border)", color: "var(--tlk-text)", backgroundColor: "var(--tlk-bg-app)" }}
+                className="tlk-inset-control tlk-type-body tlk-transition w-full rounded-lg border px-3 py-2.5 text-left font-medium no-underline hover:opacity-95"
               >
                 Поддержка
               </Link>
@@ -307,8 +304,7 @@ export function TestLkMockDashboard() {
                 href="/test-preview/landing"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="tlk-type-body tlk-transition w-full rounded-lg border px-3 py-2.5 text-left font-medium no-underline hover:opacity-95"
-                style={{ borderColor: "var(--tlk-border)", color: "var(--tlk-text)", backgroundColor: "var(--tlk-bg-app)" }}
+                className="tlk-inset-control tlk-type-body tlk-transition w-full rounded-lg border px-3 py-2.5 text-left font-medium no-underline hover:opacity-95"
               >
                 Превью лендинга (новая вкладка)
               </Link>

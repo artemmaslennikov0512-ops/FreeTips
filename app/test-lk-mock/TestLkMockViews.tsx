@@ -69,7 +69,7 @@ export function TestLkMockTransactionsView() {
         <div className="overflow-x-auto">
           <table className="tlk-type-table w-full min-w-[520px] text-left">
             <thead>
-              <tr className="border-b" style={{ borderColor: "var(--tlk-border)", backgroundColor: "var(--tlk-bg-app)" }}>
+              <tr>
                 <th className="px-4 py-3 font-medium" style={{ color: "var(--tlk-text-secondary)" }}>
                   Дата
                 </th>
@@ -362,7 +362,7 @@ export function TestLkMockBookingsView() {
         <div className="overflow-x-auto">
           <table className="tlk-type-table w-full min-w-[560px] text-left">
             <thead>
-              <tr className="border-b" style={{ borderColor: "var(--tlk-border)", backgroundColor: "var(--tlk-bg-app)" }}>
+              <tr>
                 <th className="px-5 py-3 font-medium" style={{ color: "var(--tlk-text-secondary)" }}>
                   Время
                 </th>
@@ -480,8 +480,7 @@ export function TestLkMockFloorView() {
               <button
                 key={a}
                 type="button"
-                className="tlk-transition w-full rounded-lg border px-3 py-2 text-left text-sm font-medium"
-                style={{ borderColor: "var(--tlk-border)", color: "var(--tlk-text)", backgroundColor: "var(--tlk-bg-app)" }}
+                className="tlk-inset-control tlk-transition w-full rounded-lg border px-3 py-2 text-left text-sm font-medium"
               >
                 {a}
               </button>
@@ -619,7 +618,7 @@ export function TestLkMockStreamerView() {
         <div className="overflow-x-auto">
           <table className="tlk-type-table w-full min-w-[520px] text-left">
             <thead>
-              <tr className="border-b" style={{ borderColor: "var(--tlk-border)", backgroundColor: "var(--tlk-bg-app)" }}>
+              <tr>
                 <th className="px-5 py-3 font-medium" style={{ color: "var(--tlk-text-secondary)" }}>
                   Когда
                 </th>

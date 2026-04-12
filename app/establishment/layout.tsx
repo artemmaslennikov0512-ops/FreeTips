@@ -181,9 +181,9 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
                 key={href}
                 href={href}
                 onClick={closeSidebar}
-                className={`flex items-center gap-3 rounded-[10px] px-4 py-3.5 font-medium transition-colors ${
+                className={`flex items-center gap-3 rounded-[10px] px-4 py-3.5 font-normal transition-colors ${
                   isActive(href)
-                    ? "cabinet-nav-active border border-[#0a192f]/35 bg-[#0a192f]/12 text-[#0a192f] font-semibold"
+                    ? "cabinet-nav-active border border-[#0a192f]/35 bg-[#0a192f]/12 text-[#0a192f] font-medium"
                     : "border border-transparent text-white/80 hover:bg-[var(--color-dark-gray)]/10 hover:text-white"
                 }`}
               >
@@ -195,7 +195,7 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
           <Link
             href="/cabinet"
             onClick={closeSidebar}
-            className="mt-2 flex items-center gap-3 rounded-[10px] px-4 py-3.5 font-medium text-white/80 transition-colors hover:bg-[var(--color-dark-gray)]/10 hover:text-white"
+            className="mt-2 flex items-center gap-3 rounded-[10px] px-4 py-3.5 font-normal text-white/80 transition-colors hover:bg-[var(--color-dark-gray)]/10 hover:text-white"
           >
             Личный кабинет
           </Link>

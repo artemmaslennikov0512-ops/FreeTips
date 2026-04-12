@@ -304,8 +304,8 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
   }, [isM5Cabinet, sidebarBg]);
 
   const navActiveClasses = isM5Cabinet
-    ? "cabinet-nav-active cabinet-nav-active-m5 font-semibold text-[var(--color-text)]"
-    : "cabinet-nav-active border border-[#0a192f]/25 bg-[#0a192f]/10 text-[#0a192f] font-semibold";
+    ? "cabinet-nav-active cabinet-nav-active-m5 font-medium text-[var(--color-text)]"
+    : "cabinet-nav-active border border-[#0a192f]/25 bg-[#0a192f]/10 text-[#0a192f] font-medium";
 
   const visibleNav = useMemo(
     () =>
@@ -423,7 +423,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-1.5">
                 <span
-                  className={`truncate font-semibold ${isM5Cabinet && sidebarFirstName ? "text-[#8ec5ff]" : "text-[var(--color-text)]"}`}
+                  className={`truncate font-medium ${isM5Cabinet && sidebarFirstName ? "text-[#8ec5ff]" : "text-[var(--color-text)]"}`}
                   style={!isM5Cabinet || !sidebarFirstName ? (brandFont ? { color: brandFont } : undefined) : undefined}
                 >
                   {sidebarDisplayLabel}
@@ -441,7 +441,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
         </div>
         <div className="mb-2 mt-4 flex h-9 shrink-0 items-center px-3">
           <span className="w-9 shrink-0 select-none" aria-hidden />
-          <span className="cabinet-nav-label min-w-0 flex-1 text-center text-xs font-semibold uppercase leading-none tracking-wider text-[var(--color-text)]/50">
+          <span className="cabinet-nav-label min-w-0 flex-1 text-center text-xs font-medium uppercase leading-none tracking-wider text-[var(--color-text)]/50">
             Навигация
           </span>
           <div className="flex h-9 w-9 shrink-0 items-center justify-end">
@@ -463,7 +463,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
                 key={href}
                 href={href}
                 onClick={closeSidebar}
-                className={`flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[0.9375rem] font-medium transition-colors ${
+                className={`flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[0.9375rem] font-normal transition-colors ${
                   isActive(href)
                     ? navActiveClasses
                     : "border border-transparent text-[var(--color-text)]/80 hover:bg-[var(--color-dark-gray)]/10 hover:text-[var(--color-text)]"
@@ -486,7 +486,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
               <Link
                 href="/establishment"
                 onClick={closeSidebar}
-                className="flex items-center gap-2.5 rounded-lg border border-transparent px-2.5 py-2 text-[0.9375rem] font-medium text-[var(--color-text)]/80 transition-colors hover:bg-[var(--color-dark-gray)]/10 hover:text-[var(--color-text)]"
+                className="flex items-center gap-2.5 rounded-lg border border-transparent px-2.5 py-2 text-[0.9375rem] font-normal text-[var(--color-text)]/80 transition-colors hover:bg-[var(--color-dark-gray)]/10 hover:text-[var(--color-text)]"
                 style={brandFont ? { color: `${brandFont}cc` } : undefined}
               >
                 <Building2 className="h-[18px] w-[18px] shrink-0 !text-amber-400" aria-hidden />

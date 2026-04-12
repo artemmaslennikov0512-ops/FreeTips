@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useEffect, useLayoutEffect, useState, useCallback, useMemo } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -33,6 +33,7 @@ import { CabinetMobileNavProvider, CabinetMobileNavPortals, type CabinetMobileNa
 import { usePanelMobileMenu } from "@/components/PanelMobileMenuContext";
 import { LkPresenceHeartbeat } from "@/components/LkPresenceHeartbeat";
 import { PanelMobileBackButton } from "@/components/PanelMobileBackButton";
+import { readCabinetNavRoleCache, writeCabinetNavRoleCache } from "@/lib/cabinet-nav-role-cache";
 
 const CABINET_LG_SIDEBAR_COLLAPSED_KEY = "cabinet-lg-sidebar-collapsed";
 
@@ -92,11 +93,18 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
       borderColor: string | null;
     } | null;
   } | null>(null);
+  /** Подхват роли из sessionStorage до paint, чтобы «Подключиться к заведению» не пропадал на время запроса профиля. */
+  const [cachedNavRole, setCachedNavRole] = useState<string | null>(null);
   const [supportUnreadCount, setSupportUnreadCount] = useState(0);
   const [lgSidebarCollapsed, setLgSidebarCollapsed] = useState(false);
   const [adminCabinetView, setAdminCabinetView] = useState(false);
 
   useEffect(() => setMounted(true), []);
+
+  useLayoutEffect(() => {
+    const r = readCabinetNavRoleCache();
+    if (r) setCachedNavRole(r);
+  }, []);
 
   useEffect(() => {
     if (!mounted || typeof window === "undefined") return;
@@ -174,21 +182,26 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
       })
       .then((data) => {
         if (data?.role === "ADMIN" || data?.role === "SUPERADMIN") {
+          writeCabinetNavRoleCache(data.role);
           router.replace("/admin/dashboard");
           return;
         }
         if (data?.mustChangePassword) {
+          if (data.role) writeCabinetNavRoleCache(data.role);
           router.replace("/change-password");
           return;
         }
-        if (data) setUser({
-          login: data.login,
-          role: data.role,
-          fullName: data.fullName,
-          verificationStatus: data.verificationStatus,
-          employeePhotoUrl: data.employeePhotoUrl ?? null,
-          establishmentBrand: data.establishmentBrand ?? null,
-        });
+        if (data) {
+          if (data.role) writeCabinetNavRoleCache(data.role);
+          setUser({
+            login: data.login,
+            role: data.role,
+            fullName: data.fullName,
+            verificationStatus: data.verificationStatus,
+            employeePhotoUrl: data.employeePhotoUrl ?? null,
+            establishmentBrand: data.establishmentBrand ?? null,
+          });
+        }
       })
       .catch(() => {});
   }, [mounted, router]);
@@ -304,14 +317,15 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
     ? "cabinet-nav-active cabinet-nav-active-m5 font-medium text-[var(--color-text)]"
     : "cabinet-nav-active border font-medium";
 
+  const effectiveNavRole = user?.role ?? cachedNavRole;
   const visibleNav = useMemo(
     () =>
       NAV.filter((item) => {
-        if (item.recipientOnly && user?.role !== "RECIPIENT") return false;
-        if (item.employeeOnly && user?.role !== "EMPLOYEE") return false;
+        if (item.recipientOnly && effectiveNavRole !== "RECIPIENT") return false;
+        if (item.employeeOnly && effectiveNavRole !== "EMPLOYEE") return false;
         return true;
       }),
-    [user?.role],
+    [effectiveNavRole],
   );
 
   const mobileNavValue = useMemo<CabinetMobileNavContextValue>(

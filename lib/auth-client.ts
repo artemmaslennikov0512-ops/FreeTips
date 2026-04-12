@@ -6,6 +6,7 @@
 import { getOrCreateDeviceClientId } from "@/lib/device-client-id";
 import { DEVICE_CLIENT_ID_HEADER } from "@/lib/auth-session-metadata";
 import { isCabinetImpersonating, drainImpersonationState } from "@/lib/cabinet-impersonation-state";
+import { clearCabinetNavRoleCache } from "@/lib/cabinet-nav-role-cache";
 
 const ACCESS_TOKEN_KEY = "accessToken";
 
@@ -31,7 +32,9 @@ export function setAccessToken(token: string): void {
 }
 
 export function clearAccessToken(): void {
-  if (typeof window !== "undefined") localStorage.removeItem(ACCESS_TOKEN_KEY);
+  if (typeof window === "undefined") return;
+  localStorage.removeItem(ACCESS_TOKEN_KEY);
+  clearCabinetNavRoleCache();
 }
 
 /**

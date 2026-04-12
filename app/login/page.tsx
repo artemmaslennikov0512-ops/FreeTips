@@ -17,6 +17,8 @@ import {
   AUTH_BTN_PRIMARY,
 } from "@/lib/auth-form-classes";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
+import { writeCabinetNavRoleCache } from "@/lib/cabinet-nav-role-cache";
+import { clearAccessToken } from "@/lib/auth-client";
 
 function LoginForm() {
   const router = useRouter();
@@ -46,7 +48,7 @@ function LoginForm() {
           router.replace("/cabinet");
           return;
         }
-        if (res.status === 401) localStorage.removeItem("accessToken");
+        if (res.status === 401) clearAccessToken();
         setCheckingAuth(false);
       })
       .catch(() => setCheckingAuth(false));
@@ -92,6 +94,7 @@ function LoginForm() {
 
       if (data.accessToken) {
         localStorage.setItem("accessToken", data.accessToken);
+        writeCabinetNavRoleCache(data.user?.role);
         if (data.mustChangePassword) {
           router.push("/change-password");
         } else if (data.user?.role === "ADMIN" || data.user?.role === "SUPERADMIN") {
@@ -136,6 +139,7 @@ function LoginForm() {
       }
       if (data.accessToken) {
         localStorage.setItem("accessToken", data.accessToken);
+        writeCabinetNavRoleCache(data.user?.role);
         if (data.mustChangePassword) {
           router.push("/change-password");
         } else if (data.user?.role === "ESTABLISHMENT_ADMIN") {

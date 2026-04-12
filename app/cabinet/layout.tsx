@@ -302,7 +302,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
 
   const navActiveClasses = isM5Cabinet
     ? "cabinet-nav-active cabinet-nav-active-m5 font-medium text-[var(--color-text)]"
-    : "cabinet-nav-active border border-[#0a192f]/25 bg-[#0a192f]/10 text-[#0a192f] font-medium";
+    : "cabinet-nav-active border font-medium";
 
   const visibleNav = useMemo(
     () =>
@@ -494,7 +494,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
           <button
             type="button"
             onClick={handleLogout}
-            className={`mt-3 flex ${CABINET_WAITER_BTN} w-full !justify-center gap-2.5 px-3 py-2 text-sm`}
+            className={`mt-8 flex shrink-0 ${CABINET_WAITER_BTN} w-full !justify-center gap-2.5 px-3 py-2 text-sm`}
           >
             <LogOut className="h-4 w-4 shrink-0 text-[var(--color-brand-gold)]" aria-hidden />
             <span>{adminCabinetView ? "Выйти из просмотра" : "Выйти"}</span>

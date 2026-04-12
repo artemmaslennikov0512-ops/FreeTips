@@ -315,15 +315,6 @@ export default function CabinetDashboardPage() {
           <div className="cabinet-card flex min-h-0 min-w-0 flex-col rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden lg:flex-1">
             <div className="flex min-h-0 flex-1 flex-col px-4 py-4 sm:px-5 sm:py-5">
               <div className="flex flex-col items-center gap-5">
-                <div className="cabinet-dashboard-balance-wrap flex w-full max-w-[320px] shrink-0 flex-col items-center justify-center overflow-visible">
-                  <PremiumCard
-                    fullName={fullName}
-                    uniqueId={uniqueId}
-                    balanceKop={stats?.balanceKop ?? undefined}
-                    compact
-                    variant={isM5Cabinet ? "m5" : "default"}
-                  />
-                </div>
                 <div
                   className={`cabinet-dashboard-name-hero w-full min-w-0 px-0 ${isM5Cabinet ? "cabinet-dashboard-name-hero--m5" : ""}`}
                 >
@@ -345,6 +336,15 @@ export default function CabinetDashboardPage() {
                       )}
                     </p>
                   </div>
+                </div>
+                <div className="cabinet-dashboard-balance-wrap flex w-full max-w-[320px] shrink-0 flex-col items-center justify-center overflow-visible">
+                  <PremiumCard
+                    fullName={fullName}
+                    uniqueId={uniqueId}
+                    balanceKop={stats?.balanceKop ?? undefined}
+                    compact
+                    variant={isM5Cabinet ? "m5" : "default"}
+                  />
                 </div>
                 <div className="grid w-full max-w-[320px] grid-cols-1 gap-3 sm:grid-cols-2">
                   <Link
@@ -377,7 +377,7 @@ export default function CabinetDashboardPage() {
 
           {(Boolean(verificationStatus && verificationStatus !== "VERIFIED") || Boolean(payoutLimits)) && (
             <div className="cabinet-card flex min-h-0 min-w-0 flex-col rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden lg:flex-1">
-              <div className="flex min-h-0 flex-1 flex-col px-4 py-4 sm:px-5 sm:py-5">
+              <div className="flex min-h-0 min-w-0 flex-1 flex-col justify-center overflow-y-auto px-4 py-4 sm:px-5 sm:py-5">
                 {verificationStatus && verificationStatus !== "VERIFIED" && (
                   <div
                     className="cabinet-limits-block cabinet-verification-status w-full min-w-0 max-w-full rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-3 sm:px-4 sm:py-3.5 flex flex-col items-center text-center"

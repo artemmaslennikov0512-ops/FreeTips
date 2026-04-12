@@ -314,39 +314,41 @@ export default function CabinetDashboardPage() {
         <div className="flex min-h-0 min-w-0 flex-col gap-6 lg:h-full">
           <div className="cabinet-card flex min-h-0 min-w-0 flex-col rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden lg:flex-1">
             <div className="flex min-h-0 flex-1 flex-col px-4 py-4 sm:px-5 sm:py-5">
-              <div className="flex flex-col items-center gap-5">
-                <div
-                  className={`cabinet-dashboard-name-hero w-full min-w-0 px-0 ${isM5Cabinet ? "cabinet-dashboard-name-hero--m5" : ""}`}
-                >
-                  <div className="cabinet-dashboard-name-hero__pill">
-                    <p
-                      className={`cabinet-dashboard-name-hero__text ${isM5Cabinet ? "cabinet-dashboard-name-hero__text--m5" : ""}`}
-                    >
-                      {m5DashName ? (
-                        m5DashName.rest != null ? (
-                          <>
-                            <span className="text-[#8ec5ff]">{m5DashName.first}</span>{" "}
-                            <span className="text-[#e5252a]">{m5DashName.rest}</span>
-                          </>
+              <div className="flex min-h-0 w-full flex-1 flex-col items-center justify-between gap-4">
+                <div className="flex w-full shrink-0 flex-col items-center gap-8">
+                  <div
+                    className={`cabinet-dashboard-name-hero w-full min-w-0 px-0 ${isM5Cabinet ? "cabinet-dashboard-name-hero--m5" : ""}`}
+                  >
+                    <div className="cabinet-dashboard-name-hero__pill">
+                      <p
+                        className={`cabinet-dashboard-name-hero__text ${isM5Cabinet ? "cabinet-dashboard-name-hero__text--m5" : ""}`}
+                      >
+                        {m5DashName ? (
+                          m5DashName.rest != null ? (
+                            <>
+                              <span className="text-[#8ec5ff]">{m5DashName.first}</span>{" "}
+                              <span className="text-[#e5252a]">{m5DashName.rest}</span>
+                            </>
+                          ) : (
+                            <span className="text-[#8ec5ff]">{m5DashName.first}</span>
+                          )
                         ) : (
-                          <span className="text-[#8ec5ff]">{m5DashName.first}</span>
-                        )
-                      ) : (
-                        dashName
-                      )}
-                    </p>
+                          dashName
+                        )}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="cabinet-dashboard-balance-wrap flex w-full max-w-[320px] shrink-0 flex-col items-center justify-center overflow-visible">
+                    <PremiumCard
+                      fullName={fullName}
+                      uniqueId={uniqueId}
+                      balanceKop={stats?.balanceKop ?? undefined}
+                      compact
+                      variant={isM5Cabinet ? "m5" : "default"}
+                    />
                   </div>
                 </div>
-                <div className="cabinet-dashboard-balance-wrap flex w-full max-w-[320px] shrink-0 flex-col items-center justify-center overflow-visible">
-                  <PremiumCard
-                    fullName={fullName}
-                    uniqueId={uniqueId}
-                    balanceKop={stats?.balanceKop ?? undefined}
-                    compact
-                    variant={isM5Cabinet ? "m5" : "default"}
-                  />
-                </div>
-                <div className="grid w-full max-w-[320px] grid-cols-1 gap-3 sm:grid-cols-2">
+                <div className="grid w-full max-w-[320px] shrink-0 grid-cols-1 gap-3 sm:grid-cols-2">
                   <Link
                     href="/cabinet/transactions#operations-history"
                     className={

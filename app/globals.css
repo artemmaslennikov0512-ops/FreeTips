@@ -771,7 +771,7 @@ body.cabinet-page:has(.cabinet-premium[data-cabinet-theme="m5-competition"])
   min-width: 0;
   text-align: center;
   font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  font-size: clamp(0.8125rem, 2.1vw, 0.9375rem);
+  font-size: clamp(0.75rem, 1.85vw, 0.875rem);
   font-weight: 500;
   letter-spacing: 0.01em;
   line-height: 1.35;

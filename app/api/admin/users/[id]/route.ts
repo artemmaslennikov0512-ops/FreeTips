@@ -1,6 +1,6 @@
 /**
  * GET /api/admin/users/[id] — профиль, статистика, история пополнений.
- * PATCH /api/admin/users/[id] — блокировка/разблокировка.
+ * PATCH /api/admin/users/[id] — блокировка, лимиты, ФИО и дата рождения (анкета).
  * Требует: Authorization: Bearer <access_token>, роль SUPERADMIN
  */
 
@@ -11,17 +11,25 @@ import { getBalance } from "@/lib/balance";
 import { z } from "zod";
 import { parseJsonWithLimit, MAX_BODY_SIZE_AUTH, jsonError } from "@/lib/api/helpers";
 import { decryptRecoveryCodewordForAdminDisplay } from "@/lib/auth/recovery-codeword-crypto";
+import { patchProfileSchema } from "@/lib/validations";
+import { logSecurity } from "@/lib/logger";
+import { getRequestId } from "@/lib/security/request";
 
-const updateUserSchema = z.object({
-  isBlocked: z.boolean().optional(),
-  payoutDailyLimitCount: z.number().int().min(0).max(100).nullable().optional(),
-  payoutDailyLimitKop: z.number().int().min(0).nullable().optional(),
-  payoutMonthlyLimitCount: z.number().int().min(0).max(3000).nullable().optional(),
-  payoutMonthlyLimitKop: z.number().int().min(0).nullable().optional(),
-  incomingMonthlyLimitKop: z.number().int().min(0).nullable().optional(),
-  autoConfirmPayouts: z.boolean().optional(),
-  autoConfirmPayoutThresholdKop: z.number().int().min(0).nullable().optional(),
-});
+const updateUserSchema = z
+  .object({
+    isBlocked: z.boolean().optional(),
+    payoutDailyLimitCount: z.number().int().min(0).max(100).nullable().optional(),
+    payoutDailyLimitKop: z.number().int().min(0).nullable().optional(),
+    payoutMonthlyLimitCount: z.number().int().min(0).max(3000).nullable().optional(),
+    payoutMonthlyLimitKop: z.number().int().min(0).nullable().optional(),
+    incomingMonthlyLimitKop: z.number().int().min(0).nullable().optional(),
+    autoConfirmPayouts: z.boolean().optional(),
+    autoConfirmPayoutThresholdKop: z.number().int().min(0).nullable().optional(),
+  })
+  .extend({
+    fullName: patchProfileSchema.shape.fullName,
+    birthDate: patchProfileSchema.shape.birthDate,
+  });
 
 const STATUS_VALUES = ["PENDING", "SUCCESS", "FAILED", "CANCELLED"] as const;
 const statusSchema = z.enum(STATUS_VALUES);
@@ -227,12 +235,29 @@ async function handlePatch(
   if (!bodyResult.ok) return bodyResult.response;
   const parsed = updateUserSchema.safeParse(bodyResult.data);
   if (!parsed.success) return jsonError(400, "Неверные данные", parsed.error.issues);
-  const existing = await db.user.findUnique({ where: { id }, select: { id: true } });
+  const existing = await db.user.findUnique({ where: { id }, select: { id: true, role: true } });
   if (!existing) return jsonError(404, "Пользователь не найден");
+  if (existing.role === "SUPERADMIN") return jsonError(400, "Нельзя изменять профиль суперадмина");
   if (id === actorId && parsed.data.isBlocked === true) return jsonError(400, "Нельзя заблокировать самого себя");
   const p = parsed.data;
   const toBigInt = (v: number | null) => (v != null ? BigInt(v) : null);
+  const identityPatch =
+    p.fullName !== undefined || p.birthDate !== undefined
+      ? {
+          ...(p.fullName !== undefined && { fullName: p.fullName }),
+          ...(p.birthDate !== undefined && { birthDate: p.birthDate }),
+        }
+      : {};
+  if (Object.keys(identityPatch).length > 0) {
+    logSecurity("admin.user.identity_updated", {
+      requestId: getRequestId(request),
+      targetUserId: id,
+      adminId: actorId,
+      keys: Object.keys(identityPatch),
+    });
+  }
   const data = {
+    ...identityPatch,
     ...(p.isBlocked !== undefined && { isBlocked: p.isBlocked }),
     ...(p.payoutDailyLimitCount !== undefined && { payoutDailyLimitCount: p.payoutDailyLimitCount }),
     ...(p.payoutDailyLimitKop !== undefined && { payoutDailyLimitKop: toBigInt(p.payoutDailyLimitKop) }),
@@ -242,6 +267,9 @@ async function handlePatch(
     ...(p.autoConfirmPayouts !== undefined && { autoConfirmPayouts: p.autoConfirmPayouts }),
     ...(p.autoConfirmPayoutThresholdKop !== undefined && { autoConfirmPayoutThresholdKop: toBigInt(p.autoConfirmPayoutThresholdKop) }),
   };
+  if (Object.keys(data).length === 0) {
+    return jsonError(400, "Нечего обновлять");
+  }
   const updated = await db.user.update({
     where: { id },
     data,

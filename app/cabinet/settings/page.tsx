@@ -29,6 +29,7 @@ type Profile = {
   establishment?: string | null;
   role: string;
   employeePhotoUrl?: string | null;
+  verificationStatus?: string;
   stats: import("../shared").Stats;
 };
 
@@ -74,6 +75,8 @@ export default function CabinetSettingsPage() {
     setEditBirthDate(toDateInputValueFromApi(data.birthDate));
     setEditEstablishment(data.establishment ?? "");
   }, []);
+
+  const identityLocked = (user?.verificationStatus ?? "").toUpperCase() === "VERIFIED";
 
   useEffect(() => {
     const token = getAccessToken();
@@ -133,12 +136,14 @@ export default function CabinetSettingsPage() {
     const payload: Record<string, unknown> = {};
     if (editLogin.trim() !== user.login) payload.login = editLogin.trim();
     if (editEmail.trim() !== (user.email ?? "")) payload.email = editEmail.trim() || "";
-    if (normalizeFullNameSpaced(combinedFullName) !== normalizeFullNameSpaced(user.fullName ?? "")) {
-      payload.fullName = combinedFullName || "";
-    }
-    const serverBirthInput = toDateInputValueFromApi(user.birthDate);
-    if (editBirthDate.trim() !== serverBirthInput) {
-      payload.birthDate = editBirthDate.trim() || "";
+    if (!identityLocked) {
+      if (normalizeFullNameSpaced(combinedFullName) !== normalizeFullNameSpaced(user.fullName ?? "")) {
+        payload.fullName = combinedFullName || "";
+      }
+      const serverBirthInput = toDateInputValueFromApi(user.birthDate);
+      if (editBirthDate.trim() !== serverBirthInput) {
+        payload.birthDate = editBirthDate.trim() || "";
+      }
     }
     if (editEstablishment.trim() !== (user.establishment ?? "").trim()) {
       payload.establishment = editEstablishment.trim() || "";
@@ -286,8 +291,9 @@ export default function CabinetSettingsPage() {
   const hasProfileChanges =
     editLogin.trim() !== (user?.login ?? "") ||
     editEmail.trim() !== (user?.email ?? "") ||
-    normalizeFullNameSpaced(combinedFullNameForCompare) !== normalizeFullNameSpaced(user?.fullName ?? "") ||
-    editBirthDate.trim() !== serverBirthForCompare ||
+    (!identityLocked &&
+      (normalizeFullNameSpaced(combinedFullNameForCompare) !== normalizeFullNameSpaced(user?.fullName ?? "") ||
+        editBirthDate.trim() !== serverBirthForCompare)) ||
     editEstablishment.trim() !== (user?.establishment ?? "");
 
   if (loading) {
@@ -443,6 +449,11 @@ export default function CabinetSettingsPage() {
 
         <div className="mt-6">
           <h3 className="text-sm font-semibold text-[var(--color-text)]">Анкета</h3>
+          {identityLocked && (
+            <p className="mt-2 text-sm text-[var(--color-text-secondary)]">
+              ФИО и дата рождения совпадают с данными верификации и недоступны для самостоятельного изменения. Правки вносит администратор сервиса.
+            </p>
+          )}
           <div className="mt-3 grid gap-4 sm:grid-cols-2">
             <div>
               <label htmlFor="settings-lastName" className="mb-1 block text-sm font-medium text-[var(--color-text)]">Фамилия</label>
@@ -450,12 +461,14 @@ export default function CabinetSettingsPage() {
                 id="settings-lastName"
                 type="text"
                 value={editLastName}
+                readOnly={identityLocked}
+                disabled={identityLocked}
                 onChange={(e) => {
                   profileFormTouchedRef.current = true;
                   setEditLastName(e.target.value);
                 }}
                 placeholder="Иванов"
-                className={cabinetInputClassName(!!profileFieldErrors.fullName)}
+                className={`${cabinetInputClassName(!!profileFieldErrors.fullName)} ${identityLocked ? "cursor-not-allowed opacity-80" : ""}`}
               />
               {profileFieldErrors.fullName && <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{profileFieldErrors.fullName}</p>}
             </div>
@@ -465,12 +478,14 @@ export default function CabinetSettingsPage() {
                 id="settings-firstName"
                 type="text"
                 value={editFirstName}
+                readOnly={identityLocked}
+                disabled={identityLocked}
                 onChange={(e) => {
                   profileFormTouchedRef.current = true;
                   setEditFirstName(e.target.value);
                 }}
                 placeholder="Иван"
-                className={cabinetInputClassName(false)}
+                className={`${cabinetInputClassName(false)} ${identityLocked ? "cursor-not-allowed opacity-80" : ""}`}
               />
             </div>
             <div className="sm:col-span-2">
@@ -479,12 +494,14 @@ export default function CabinetSettingsPage() {
                 id="settings-patronymic"
                 type="text"
                 value={editPatronymic}
+                readOnly={identityLocked}
+                disabled={identityLocked}
                 onChange={(e) => {
                   profileFormTouchedRef.current = true;
                   setEditPatronymic(e.target.value);
                 }}
                 placeholder="Иванович"
-                className={cabinetInputClassName(false)}
+                className={`${cabinetInputClassName(false)} ${identityLocked ? "cursor-not-allowed opacity-80" : ""}`}
               />
             </div>
             <div>
@@ -493,11 +510,13 @@ export default function CabinetSettingsPage() {
                 id="settings-birthDate"
                 type="date"
                 value={editBirthDate}
+                readOnly={identityLocked}
+                disabled={identityLocked}
                 onChange={(e) => {
                   profileFormTouchedRef.current = true;
                   setEditBirthDate(e.target.value);
                 }}
-                className={cabinetInputClassName(!!profileFieldErrors.birthDate)}
+                className={`${cabinetInputClassName(!!profileFieldErrors.birthDate)} ${identityLocked ? "cursor-not-allowed opacity-80" : ""}`}
               />
               {profileFieldErrors.birthDate && <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{profileFieldErrors.birthDate}</p>}
             </div>

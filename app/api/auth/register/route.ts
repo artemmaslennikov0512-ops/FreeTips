@@ -23,7 +23,6 @@ import { verifyCsrfFromRequest } from "@/lib/security/csrf";
 import { observeSharedAuthIp } from "@/lib/fraud-velocity-observe";
 import { syncTipLinksForEstablishment } from "@/lib/tip-routing";
 import { buildNewSessionMetadata } from "@/lib/auth-session-metadata";
-import { toDateInputValueFromApi } from "@/lib/utils";
 
 export async function POST(request: NextRequest) {
   const requestId = getRequestId(request);
@@ -53,14 +52,9 @@ export async function POST(request: NextRequest) {
       include: {
         establishment: { select: { id: true } },
         employee: { select: { id: true, establishmentId: true } },
+        /** Заявка на подключение: только контакты; ФИО и дата рождения — после верификации из VerificationRequest */
         registrationRequest: {
-          select: {
-            fullName: true,
-            email: true,
-            dateOfBirth: true,
-            establishment: true,
-            companyName: true,
-          },
+          select: { email: true },
         },
       },
     });
@@ -106,10 +100,6 @@ export async function POST(request: NextRequest) {
         });
         if (emailTaken) profileEmail = undefined;
       }
-      const profileFullName = reqRow?.fullName?.trim();
-      const birthIso = reqRow?.dateOfBirth ? toDateInputValueFromApi(reqRow.dateOfBirth) : "";
-      const establishmentFree =
-        reqRow?.establishment?.trim() || reqRow?.companyName?.trim() || "";
 
       const created = await tx.user.create({
         data: {
@@ -120,9 +110,6 @@ export async function POST(request: NextRequest) {
           role,
           establishmentId: establishmentId ?? undefined,
           ...(profileEmail ? { email: profileEmail } : {}),
-          ...(profileFullName ? { fullName: profileFullName } : {}),
-          ...(birthIso ? { birthDate: birthIso } : {}),
-          ...(establishmentFree ? { establishment: establishmentFree } : {}),
         },
       });
       const defaultLimits = await getSystemDefaultLimitsForNewUser();

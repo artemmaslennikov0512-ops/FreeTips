@@ -24,7 +24,7 @@ import {
 } from "lucide-react";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { PAYOUT_MAX_AMOUNT_KOP, PAYOUT_MIN_AMOUNT_KOP } from "@/lib/payout-amount-bounds";
-import { formatDate, formatMoneyCompact } from "@/lib/utils";
+import { formatDate, formatMoneyCompact, toDateInputValueFromApi } from "@/lib/utils";
 import { PremiumCard } from "@/app/cabinet/PremiumCard";
 import { ADMIN_BTN, ADMIN_BTN_DANGER, ADMIN_BTN_PRIMARY } from "@/lib/admin-button-classes";
 import { ADMIN_PANEL_STATE_CENTER } from "@/lib/admin-surface-classes";
@@ -134,6 +134,11 @@ export default function AdminUserDetailsPage() {
   const [recoveryCodewordLoading, setRecoveryCodewordLoading] = useState(false);
   const [recoveryCodewordError, setRecoveryCodewordError] = useState<string | null>(null);
   const [recoveryCodewordOk, setRecoveryCodewordOk] = useState(false);
+  const [adminEditFullName, setAdminEditFullName] = useState("");
+  const [adminEditBirthDate, setAdminEditBirthDate] = useState("");
+  const [identitySaving, setIdentitySaving] = useState(false);
+  const [identityError, setIdentityError] = useState<string | null>(null);
+  const [identityOk, setIdentityOk] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
@@ -198,6 +203,12 @@ export default function AdminUserDetailsPage() {
       .catch(() => setError("Ошибка загрузки"))
       .finally(() => setLoading(false));
   }, [userId]);
+
+  useEffect(() => {
+    if (!data?.user) return;
+    setAdminEditFullName(data.user.fullName ?? "");
+    setAdminEditBirthDate(toDateInputValueFromApi(data.user.birthDate));
+  }, [data?.user.id, data?.user.fullName, data?.user.birthDate]);
 
   const statusLabels: Record<string, string> = {
     PENDING: "В ожидании",
@@ -320,6 +331,29 @@ export default function AdminUserDetailsPage() {
       setData((prev) => (prev ? { ...prev, user: respData as UserDetailsResponse["user"] } : null));
     }
     return null;
+  };
+
+  const serverIdentityFullName = (data?.user.fullName ?? "").trim();
+  const serverIdentityBirth = toDateInputValueFromApi(data?.user.birthDate);
+  const hasAdminIdentityChanges =
+    adminEditFullName.trim() !== serverIdentityFullName || adminEditBirthDate.trim() !== serverIdentityBirth;
+
+  const handleSaveAdminIdentity = async () => {
+    if (!userId || !hasAdminIdentityChanges) return;
+    setIdentitySaving(true);
+    setIdentityError(null);
+    setIdentityOk(false);
+    const err = await patchUser({
+      fullName: adminEditFullName.trim() || null,
+      birthDate: adminEditBirthDate.trim() || null,
+    });
+    if (err) {
+      setIdentityError(err);
+    } else {
+      setIdentityOk(true);
+      setTimeout(() => setIdentityOk(false), 3000);
+    }
+    setIdentitySaving(false);
   };
 
   const applyMaxPerOp = async () => {
@@ -882,6 +916,9 @@ export default function AdminUserDetailsPage() {
       <div className="mb-8 grid min-w-0 grid-cols-1 gap-6 lg:grid-cols-2">
         <div className="cabinet-section-header min-w-0 overflow-hidden rounded-2xl border-0 p-6">
           <h2 className="text-center text-base font-semibold text-white">Анкета</h2>
+          <p className="mt-3 text-center text-xs text-white/55">
+            После верификации ФИО и дату рождения пользователь в ЛК не редактирует — правки только здесь.
+          </p>
           <dl className="mt-4 grid gap-3 text-sm text-white/90">
             <div className="flex justify-between gap-4">
               <dt className="text-white">Логин</dt>
@@ -891,14 +928,46 @@ export default function AdminUserDetailsPage() {
               <dt className="text-white">Email</dt>
               <dd className="text-white/90">{data.user.email || "—"}</dd>
             </div>
-            <div className="flex justify-between gap-4">
-              <dt className="text-white">ФИО</dt>
-              <dd className="text-white/90">{data.user.fullName || "—"}</dd>
+          </dl>
+          <div className="mt-4 space-y-3 rounded-xl border border-white/10 bg-white/[0.04] p-4">
+            <div>
+              <label className="mb-1 block text-xs font-medium text-white" htmlFor="admin-user-fullName">
+                ФИО (как в анкете)
+              </label>
+              <input
+                id="admin-user-fullName"
+                type="text"
+                value={adminEditFullName}
+                onChange={(e) => setAdminEditFullName(e.target.value)}
+                className="w-full rounded-xl border-0 bg-[var(--color-bg-sides)] px-4 py-2.5 text-[var(--color-text)] placeholder:text-[var(--color-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-brand-gold)]/35"
+                placeholder="Фамилия Имя Отчество"
+                autoComplete="name"
+              />
             </div>
-            <div className="flex justify-between gap-4">
-              <dt className="text-white">Дата рождения</dt>
-              <dd className="text-white/90">{data.user.birthDate || "—"}</dd>
+            <div>
+              <label className="mb-1 block text-xs font-medium text-white" htmlFor="admin-user-birthDate">
+                Дата рождения
+              </label>
+              <input
+                id="admin-user-birthDate"
+                type="date"
+                value={adminEditBirthDate}
+                onChange={(e) => setAdminEditBirthDate(e.target.value)}
+                className="w-full rounded-xl border-0 bg-[var(--color-bg-sides)] px-4 py-2.5 text-[var(--color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--color-brand-gold)]/35"
+              />
             </div>
+            {identityError && <p className="text-sm text-rose-300" role="alert">{identityError}</p>}
+            {identityOk && <p className="text-sm text-emerald-300">Сохранено</p>}
+            <button
+              type="button"
+              onClick={handleSaveAdminIdentity}
+              disabled={identitySaving || !hasAdminIdentityChanges}
+              className={`${ADMIN_BTN} ${ADMIN_BTN_PRIMARY} w-full justify-center gap-2 px-4 py-2.5 text-sm disabled:opacity-50`}
+            >
+              {identitySaving ? "Сохранение…" : "Сохранить ФИО и дату рождения"}
+            </button>
+          </div>
+          <dl className="mt-4 grid gap-3 text-sm text-white/90">
             <div className="flex justify-between gap-4">
               <dt className="text-white">Заведение</dt>
               <dd className="text-white/90">{data.user.establishment || "—"}</dd>

@@ -93,7 +93,7 @@ export default function EstablishmentPage() {
       : `${employeesCount}`;
 
   return (
-    <div className="cabinet-card mx-auto flex min-h-0 min-w-0 max-w-5xl flex-col rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden lg:min-h-[min(56vh,560px)]">
+    <div className="cabinet-card flex min-h-0 min-w-0 w-full max-w-full flex-col rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden lg:min-h-[min(56vh,560px)]">
       <div className="flex min-h-0 flex-1 flex-col px-4 py-4 sm:px-5 sm:py-5">
         <div className="flex min-h-0 w-full flex-1 flex-col items-center justify-between gap-6">
           <div className="flex w-full shrink-0 flex-col items-center gap-8">
@@ -104,7 +104,7 @@ export default function EstablishmentPage() {
             </div>
             <p className="text-center text-sm text-[var(--color-text-secondary)]">Сводка и быстрые действия</p>
 
-            <div className="grid w-full max-w-4xl gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid w-full gap-4 sm:grid-cols-2 lg:grid-cols-3">
               <Link
                 href="/establishment/team"
                 className="cabinet-block-inner flex flex-col rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 p-6 transition-all hover:bg-[var(--color-accent-gold)]/15 hover:-translate-y-1 shadow-[var(--shadow-subtle)]"
@@ -155,7 +155,7 @@ export default function EstablishmentPage() {
             </div>
           </div>
 
-          <div id="quick-actions" className="w-full max-w-4xl shrink-0 border-t border-[var(--color-brand-gold)]/15 pt-6">
+          <div id="quick-actions" className="w-full shrink-0 border-t border-[var(--color-brand-gold)]/15 pt-6">
             <h3 className="mb-4 text-center font-[family:var(--font-playfair)] text-lg font-semibold text-[var(--color-text)]">
               Быстрые действия
             </h3>

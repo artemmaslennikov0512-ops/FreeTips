@@ -134,7 +134,7 @@ export default function AdminDashboardPage() {
             : null;
 
   return (
-    <div className="cabinet-card mx-auto flex min-h-0 min-w-0 max-w-5xl flex-col rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden lg:min-h-[min(56vh,560px)]">
+    <div className="cabinet-card flex min-h-0 min-w-0 w-full max-w-full flex-col rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden lg:min-h-[min(56vh,560px)]">
       <div className="flex min-h-0 flex-1 flex-col px-4 py-4 sm:px-5 sm:py-5">
         <div className="flex min-h-0 w-full flex-1 flex-col items-center justify-between gap-6">
           <div className="flex w-full shrink-0 flex-col items-center gap-8">
@@ -150,7 +150,7 @@ export default function AdminDashboardPage() {
             {stats.fraudFlaggedUsers30d != null && stats.fraudFlaggedUsers30d > 0 && (
               <Link
                 href="/admin/antifraud"
-                className="flex w-full max-w-4xl items-center justify-center gap-2 rounded-2xl border border-rose-500/40 bg-rose-950/30 px-4 py-3 text-center text-sm text-rose-100 transition-colors hover:bg-rose-950/45"
+                className="flex w-full items-center justify-center gap-2 rounded-2xl border border-rose-500/40 bg-rose-950/30 px-4 py-3 text-center text-sm text-rose-100 transition-colors hover:bg-rose-950/45"
               >
                 <ShieldAlert className="h-4 w-4 shrink-0 text-rose-300" aria-hidden />
                 <span>
@@ -169,7 +169,7 @@ export default function AdminDashboardPage() {
             {pendingRequestsTotal != null && pendingRequestsTotal > 0 && (
               <Link
                 href="/admin/verification-requests"
-                className="block w-full max-w-4xl rounded-2xl border border-amber-500/45 bg-amber-500/15 px-4 py-3 text-center text-sm text-amber-100 transition-colors hover:bg-amber-500/25"
+                className="block w-full rounded-2xl border border-amber-500/45 bg-amber-500/15 px-4 py-3 text-center text-sm text-amber-100 transition-colors hover:bg-amber-500/25"
               >
                 <span className="font-semibold tabular-nums text-amber-50">{pendingRequestsTotal}</span>{" "}
                 {pendingRequestsTotal % 10 === 1 && pendingRequestsTotal % 100 !== 11
@@ -183,7 +183,7 @@ export default function AdminDashboardPage() {
               </Link>
             )}
 
-            <div className="grid min-w-0 w-full max-w-4xl grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
+            <div className="grid min-w-0 w-full grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
               {cards.map((card) => {
                 const Icon = card.icon;
                 const body = (
@@ -240,7 +240,7 @@ export default function AdminDashboardPage() {
             </div>
           </div>
 
-          <div className="w-full max-w-4xl shrink-0 border-t border-[var(--color-brand-gold)]/15 pt-6">
+          <div className="w-full shrink-0 border-t border-[var(--color-brand-gold)]/15 pt-6">
             <h3 className="mb-4 text-center font-[family:var(--font-playfair)] text-lg font-semibold text-[var(--color-text)]">
               Быстрые действия
             </h3>

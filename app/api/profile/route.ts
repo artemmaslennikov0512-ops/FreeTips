@@ -6,6 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
+import { VerificationStatus } from "@prisma/client";
 import { requireAuthOrApiKey } from "@/lib/auth-or-api-key";
 import { db } from "@/lib/db";
 import { getPaygineConfig } from "@/lib/config";
@@ -304,6 +305,30 @@ export async function PATCH(request: NextRequest) {
   const update = Object.fromEntries(
     allowedKeys.filter((k) => data[k] !== undefined).map((k) => [k, data[k]])
   ) as { login?: string; email?: string | null; fullName?: string | null; birthDate?: string | null; establishment?: string | null; savingFor?: string | null };
+
+  const identityTouched = data.fullName !== undefined || data.birthDate !== undefined;
+  if (identityTouched) {
+    const me = await db.user.findUnique({
+      where: { id: auth.userId },
+      select: { verificationStatus: true },
+    });
+    if (me?.verificationStatus === VerificationStatus.VERIFIED) {
+      delete update.fullName;
+      delete update.birthDate;
+      logInfo("profile.patch.identity_blocked_verified", {
+        userId: auth.userId,
+        hadFullName: data.fullName !== undefined,
+        hadBirthDate: data.birthDate !== undefined,
+      });
+      if (Object.keys(update).length === 0) {
+        return jsonError(
+          403,
+          "После верификации ФИО и дату рождения может изменить только администратор. Остальные поля профиля доступны для редактирования.",
+        );
+      }
+    }
+  }
+
   if (Object.keys(update).length === 0) {
     logInfo("profile.patch.nothing_to_update", { userId: auth.userId });
     return jsonError(400, "Нечего обновлять");

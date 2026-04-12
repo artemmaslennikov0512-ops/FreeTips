@@ -231,7 +231,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   return (
-    <div className="admin-panel cabinet-premium flex min-h-screen w-full min-w-0 max-w-full bg-[var(--color-bg)] font-[family:var(--font-inter)] text-[var(--color-text)] pt-3 lg:pt-5">
+    <div className="admin-panel cabinet-premium flex min-h-screen w-full min-w-0 max-w-full bg-[var(--color-bg)] font-[family:var(--font-inter)] text-[var(--color-text)] pt-2 lg:pt-4">
       <LkPresenceHeartbeat />
       <AdminMobileNavPortal
         sidebarOpen={sidebarOpen}
@@ -246,15 +246,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
       {/* Боковая панель — lg+; сворачивание как в ЛК официанта; на мобильном — модалка */}
       <div
-        className={`hidden shrink-0 transition-[width] duration-300 ease-out lg:mt-3 lg:flex lg:self-start ${
+        className={`hidden shrink-0 transition-[width] duration-300 ease-out lg:mt-2 lg:flex lg:self-start ${
           lgSidebarCollapsed
             ? "lg:w-0 lg:pointer-events-none lg:overflow-hidden"
-            : "lg:relative lg:z-10 lg:w-[260px] lg:overflow-hidden"
+            : "lg:relative lg:z-10 lg:w-[236px] lg:overflow-hidden"
         }`}
       >
-        <aside className="admin-sidebar cabinet-sidebar relative flex h-full min-h-0 w-[260px] min-w-[260px] flex-col overflow-hidden rounded-[10px] border border-white/10 bg-[var(--color-navy)] py-6 shadow-sm backdrop-blur-xl lg:static lg:max-h-[calc(100vh-2rem)]">
+        <aside className="admin-sidebar cabinet-sidebar relative flex h-full min-h-0 w-[236px] min-w-[236px] flex-col overflow-hidden rounded-[10px] border border-white/10 bg-[var(--color-navy)] py-4 shadow-sm backdrop-blur-xl lg:static lg:max-h-[calc(100vh-2rem)]">
         <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
-          <div className="cabinet-sidebar-profile cabinet-block-inner mx-4 mb-4 rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-4 py-3">
+          <div className="cabinet-sidebar-profile cabinet-block-inner mx-3 mb-3 rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2.5">
             <div className="flex items-center gap-3">
               <div className="cabinet-sidebar-avatar flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--color-brand-gold)] font-semibold text-[#0a192f] text-sm">
                 {(user.login || "A").charAt(0).toUpperCase()}
@@ -265,9 +265,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               </div>
             </div>
           </div>
-          <div className="mb-2 flex h-9 shrink-0 items-center px-4">
+          <div className="mb-2 flex h-9 shrink-0 items-center px-3">
             <span className="w-9 shrink-0 select-none" aria-hidden />
-            <span className="cabinet-nav-label min-w-0 flex-1 text-center text-xs font-semibold uppercase leading-none tracking-wider text-white/50">
+            <span className="cabinet-nav-label min-w-0 flex-1 text-center text-xs font-medium uppercase leading-none tracking-wider text-white/50">
               Навигация
             </span>
             <div className="flex h-9 w-9 shrink-0 items-center justify-end">
@@ -282,7 +282,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               </button>
             </div>
           </div>
-          <div className="cabinet-nav-block flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto overflow-x-hidden px-4 pb-2">
+          <div className="cabinet-nav-block flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto overflow-x-hidden px-3 pb-2">
             <nav className="flex flex-col gap-0.5 rounded-[10px] border border-[var(--color-brand-gold)]/15 bg-white/5 p-1.5 shadow-[var(--shadow-subtle)]" aria-label="Навигация админ-панели">
               {NAV.map(({ label, href, icon: Icon, iconClass }) => {
                 const showRequestsBadge =
@@ -296,13 +296,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     key={href}
                     href={href}
                     onClick={closeSidebar}
-                    className={`flex items-center gap-3 rounded-lg px-3 py-3 font-medium transition-colors ${
+                    className={`flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[0.9375rem] font-normal transition-colors ${
                       isActive(href)
-                        ? "cabinet-nav-active border border-[#0a192f]/25 bg-[#0a192f]/10 text-[#0a192f] font-semibold"
+                        ? "cabinet-nav-active border border-[#0a192f]/25 bg-[#0a192f]/10 text-[#0a192f] font-medium"
                         : "border border-transparent text-white/80 hover:bg-[var(--color-dark-gray)]/10 hover:text-white"
                     }`}
                   >
-                    <Icon className={`h-5 w-5 shrink-0 ${iconClass}`} aria-hidden />
+                    <Icon className={`cabinet-nav-item-icon h-[18px] w-[18px] shrink-0 ${iconClass}`} aria-hidden />
                     <span className="flex min-w-0 flex-1 items-center gap-2 break-words">
                       {label}
                       {showRequestsBadge && (
@@ -326,7 +326,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <button
               type="button"
               onClick={handleLogout}
-              className={`mt-4 ${ADMIN_BTN} w-full !justify-center gap-3 px-4 py-3 text-sm`}
+              className={`mt-8 ${ADMIN_BTN} w-full !justify-center gap-2.5 px-3 py-2 text-sm`}
             >
               <LogOut className="h-4 w-4 shrink-0 text-[var(--color-brand-gold)]" aria-hidden />
               <span>Выйти</span>
@@ -348,13 +348,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </button>
       )}
 
-      <main className="min-h-screen min-w-0 flex-1 overflow-x-hidden px-0 pt-2 lg:relative lg:z-0 lg:pt-3 lg:pl-0 lg:pr-4 lg:ml-0 flex flex-col">
-        <div className="admin-main-block cabinet-main-block app-panel-main-surface relative mt-0 mr-0 mb-4 ml-0 flex min-h-0 w-full min-w-0 max-w-full flex-1 flex-col rounded-lg border border-white/10 bg-white/[0.06] backdrop-blur-xl lg:mr-4 lg:ml-4 lg:min-h-[calc(100vh-2rem)] lg:rounded-[10px]">
+      <main className="relative min-h-screen min-w-0 flex-1 overflow-x-hidden px-0 pt-1.5 pb-3 lg:relative lg:z-0 lg:pt-2 lg:pl-0 lg:pr-3 lg:ml-0 lg:mr-0 flex flex-col">
+        <div className="admin-main-block cabinet-main-block app-panel-main-surface relative z-10 mt-0 mr-0 mb-3 ml-0 flex min-h-0 w-full min-w-0 max-w-full flex-1 flex-col rounded-lg border-x border-b border-white/10 bg-white/[0.06] backdrop-blur-xl md:rounded-[10px] lg:z-0 lg:mr-3 lg:ml-3 lg:rounded-[10px]">
           {pathname !== "/admin/dashboard" && (
             <PanelMobileBackButton variant="admin" fallbackHref="/admin/dashboard" />
           )}
           <div
-            className="flex min-h-0 w-full max-w-full flex-1 flex-col overflow-x-hidden px-4 py-3 sm:px-6 sm:py-4 lg:p-8"
+            className="flex min-h-0 w-full max-w-full flex-1 flex-col overflow-x-hidden px-4 py-3 sm:px-6 md:py-6 lg:p-8"
             id="main-content"
           >
             {children}

@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState } from "react";
 import Link from "next/link";
-import { User, Calendar, Building2, Briefcase, Mail, Users, ArrowRight, ArrowLeft, ChevronDown } from "lucide-react";
+import { Mail, Phone } from "lucide-react";
 import { site } from "@/config/site";
 import { AuthPageShell } from "@/components/AuthPageShell";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
@@ -10,34 +10,11 @@ import { createRegistrationRequestSchema } from "@/lib/validations";
 import { getFieldErrors } from "@/lib/form-errors";
 import { AUTH_CARD_CLASS } from "@/lib/auth-form-classes";
 
-type RequestType = "establishment" | "individual";
-
 const initialFormData = {
-  requestType: "individual" as RequestType,
-  fullName: "",
-  dateOfBirth: "",
-  establishment: "",
-  activityType: "",
   email: "",
-  companyName: "",
-  companyRole: "",
-  employeeCount: "",
+  phone: "",
   consentOfferAndPolicy: false,
 };
-
-/** Валидация только полей шага 1 (личные данные) */
-function validateStep1(
-  data: typeof initialFormData,
-  isEstablishment: boolean,
-): Record<string, string> {
-  const err: Record<string, string> = {};
-  if (!data.fullName.trim()) err.fullName = "Укажите ФИО";
-  else if (data.fullName.trim().length > 255) err.fullName = "Слишком длинное значение";
-  if (!data.email.trim()) err.email = "Укажите email";
-  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email.trim())) err.email = "Неверный формат email";
-  if (!isEstablishment && !data.dateOfBirth.trim()) err.dateOfBirth = "Укажите дату рождения";
-  return err;
-}
 
 export default function ZayavkaPage() {
   const [loading, setLoading] = useState(false);
@@ -45,75 +22,17 @@ export default function ZayavkaPage() {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [success, setSuccess] = useState(false);
   const [formData, setFormData] = useState(initialFormData);
-  const [step, setStep] = useState<1 | 2>(1);
-  const [requestTypeDropdownOpen, setRequestTypeDropdownOpen] = useState(false);
-  const requestTypeDropdownRef = useRef<HTMLDivElement>(null);
-
-  const closeRequestTypeDropdown = useCallback(() => setRequestTypeDropdownOpen(false), []);
-  useEffect(() => {
-    if (!requestTypeDropdownOpen) return;
-    const handleClickOutside = (e: MouseEvent) => {
-      if (requestTypeDropdownRef.current && !requestTypeDropdownRef.current.contains(e.target as Node)) {
-        closeRequestTypeDropdown();
-      }
-    };
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape") closeRequestTypeDropdown();
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    document.addEventListener("keydown", handleEscape);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("keydown", handleEscape);
-    };
-  }, [requestTypeDropdownOpen, closeRequestTypeDropdown]);
-
-  const isEstablishment = formData.requestType === "establishment";
-
-  const handleNext = () => {
-    setError(null);
-    const step1Errors = validateStep1(formData, isEstablishment);
-    if (Object.keys(step1Errors).length > 0) {
-      setFieldErrors(step1Errors);
-      return;
-    }
-    setFieldErrors({});
-    setStep(2);
-  };
-
-  const handleBack = () => {
-    setError(null);
-    setFieldErrors({});
-    setStep(1);
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setFieldErrors({});
 
-    const isEstablishment = formData.requestType === "establishment";
-    const payload = isEstablishment
-      ? {
-          requestType: "establishment" as const,
-          fullName: formData.fullName.trim(),
-          companyName: formData.companyName.trim(),
-          companyRole: formData.companyRole.trim(),
-          phone: "",
-          email: formData.email.trim(),
-          employeeCount: formData.employeeCount === "" ? 0 : Number(formData.employeeCount),
-          consentOfferAndPolicy: formData.consentOfferAndPolicy as true,
-        }
-      : {
-          requestType: "individual" as const,
-          fullName: formData.fullName.trim(),
-          dateOfBirth: formData.dateOfBirth,
-          phone: "",
-          email: formData.email.trim(),
-          activityType: formData.activityType.trim(),
-          establishment: formData.establishment.trim() || undefined,
-          consentOfferAndPolicy: formData.consentOfferAndPolicy as true,
-        };
+    const payload = {
+      email: formData.email.trim(),
+      phone: formData.phone.trim(),
+      consentOfferAndPolicy: formData.consentOfferAndPolicy as true,
+    };
 
     const parsed = createRegistrationRequestSchema.safeParse(payload);
     if (!parsed.success) {
@@ -189,29 +108,14 @@ export default function ZayavkaPage() {
     );
   }
 
-  const inputBase = "w-full rounded-xl border-0 bg-[var(--color-light-gray)] py-2.5 pl-10 pr-4 text-[var(--color-text)] placeholder:text-[var(--color-muted)] caret-[var(--color-text)] focus:outline-none";
+  const inputBase =
+    "w-full rounded-xl border-0 bg-[var(--color-light-gray)] py-2.5 pl-10 pr-4 text-[var(--color-text)] placeholder:text-[var(--color-muted)] caret-[var(--color-text)] focus:outline-none";
 
   return (
     <AuthPageShell>
       <div className="zayavka-page mx-auto flex min-h-[80vh] max-w-md flex-col justify-center overflow-visible px-4 py-16">
         <div className={`${AUTH_CARD_CLASS} zayavka-card min-w-0 overflow-visible`}>
-          <h1 className="font-[family:var(--font-playfair)] text-2xl font-semibold text-[var(--color-text)] text-center">Оставить заявку</h1>
-          <p className="mt-2 text-center text-[var(--color-text-secondary)]">
-            {step === 1
-              ? "Сначала укажите тип подключения и контактные данные."
-              : "Заполните данные о заведении и деятельности."}
-          </p>
-
-          {/* Индикатор шагов */}
-          <div className="mt-4 flex w-full flex-col items-center gap-2 sm:flex-row sm:items-center" aria-label="Прогресс формы">
-            <span className="w-full text-center text-sm font-medium text-[var(--color-muted)] sm:w-auto sm:shrink-0 sm:text-left">Шаг {step} из 2</span>
-            <div className="h-1.5 w-full min-w-0 flex-1 rounded-full bg-[var(--color-light-gray)] overflow-hidden">
-              <div
-                className="h-full rounded-full bg-[var(--color-brand-gold)] transition-all duration-300"
-                style={{ width: step === 1 ? "50%" : "100%" }}
-              />
-            </div>
-          </div>
+          <h1 className="text-center font-[family:var(--font-playfair)] text-2xl font-semibold text-[var(--color-text)]">Оставить заявку</h1>
 
           {error && (
             <div className="mt-4 rounded-xl border-0 bg-[var(--color-muted)]/10 p-3 text-sm text-[var(--color-accent-red)]" role="alert">
@@ -219,282 +123,91 @@ export default function ZayavkaPage() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="mt-6 min-w-0 space-y-6">
-            {step === 1 && (
-              <>
-                <section className="space-y-4" aria-labelledby="zayavka-type-heading">
-                  <h2 id="zayavka-type-heading" className="text-sm font-semibold text-[var(--color-text)] border-0 pb-2 text-center">
-                    Тип подключения
-                  </h2>
-                  <div>
-                    <label id="zayavka-requestType-label" className="mb-1.5 block text-center text-sm font-medium text-[var(--color-text)]">
-                      Подключается
-                    </label>
-                    <div ref={requestTypeDropdownRef} className="zayavka-select-wrap zayavka-custom-dropdown relative rounded-xl border border-[var(--color-brand-gold)]/25 bg-[var(--color-light-gray)] focus-within:border-[var(--color-brand-gold)]/50 focus-within:ring-2 focus-within:ring-[var(--color-brand-gold)]/30 focus-within:ring-offset-2 focus-within:ring-offset-[var(--color-bg)]">
-                      <button
-                        type="button"
-                        id="zayavka-requestType"
-                        onClick={() => setRequestTypeDropdownOpen((o) => !o)}
-                        className="zayavka-select zayavka-custom-dropdown-trigger flex w-full items-center gap-2 rounded-xl border-0 bg-transparent py-2.5 pl-10 pr-10 text-left text-[var(--color-text)] cursor-pointer focus:outline-none font-[family:var(--font-inter)] text-base"
-                        aria-haspopup="listbox"
-                        aria-expanded={requestTypeDropdownOpen}
-                        aria-labelledby="zayavka-requestType-label"
-                        aria-describedby="zayavka-requestType-desc"
-                      >
-                        <Building2 className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--color-muted)] pointer-events-none shrink-0" aria-hidden />
-                        <span className="flex-1 min-w-0">
-                          {formData.requestType === "establishment" ? "Заведение" : "Получатель чаевых"}
-                        </span>
-                        <ChevronDown className={`absolute right-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--color-muted)] shrink-0 transition-transform duration-200 pointer-events-none ${requestTypeDropdownOpen ? "rotate-180" : ""}`} aria-hidden />
-                      </button>
-                      <div
-                        role="listbox"
-                        aria-labelledby="zayavka-requestType-label"
-                        id="zayavka-requestType-listbox"
-                        className={`zayavka-custom-dropdown-panel absolute left-0 right-0 top-full z-20 mt-1 overflow-hidden rounded-xl border border-[var(--color-brand-gold)]/20 bg-[var(--color-bg-sides)] shadow-[var(--shadow-card)] transition-[opacity,transform] duration-200 ${
-                          requestTypeDropdownOpen ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1 pointer-events-none invisible"
-                        }`}
-                      >
-                        {(["establishment", "individual"] as const).map((value) => (
-                          <button
-                            key={value}
-                            type="button"
-                            role="option"
-                            id={`zayavka-requestType-option-${value}`}
-                            aria-selected={formData.requestType === value}
-                            onClick={() => {
-                              setFormData((prev) => ({ ...prev, requestType: value }));
-                              setFieldErrors({});
-                              setStep(1);
-                              setRequestTypeDropdownOpen(false);
-                            }}
-                            className={`zayavka-custom-dropdown-option w-full flex items-center gap-2 px-4 py-3 text-left text-sm font-medium transition-colors ${
-                              formData.requestType === value
-                                ? "bg-[var(--color-navy)] text-white"
-                                : "text-[var(--color-text)] hover:bg-[var(--color-light-gray)]"
-                            }`}
-                          >
-                            {value === "establishment" ? "Заведение" : "Получатель чаевых"}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                    <p id="zayavka-requestType-desc" className="zayavka-hint mt-1 text-center text-[var(--color-muted)]">
-                      {isEstablishment ? "Данные компании и контактного лица" : "Официант, курьер и т.д."}
-                    </p>
-                  </div>
-                </section>
+          <form onSubmit={handleSubmit} className="mt-6 min-w-0 space-y-5">
+            <div>
+              <label htmlFor="zayavka-phone" className="mb-1.5 block text-center text-sm font-medium text-[var(--color-text)]">
+                Телефон
+              </label>
+              <div className="relative">
+                <Phone className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--color-muted)]" aria-hidden />
+                <input
+                  id="zayavka-phone"
+                  type="tel"
+                  value={formData.phone}
+                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  placeholder="+7 900 000-00-00"
+                  className={inputBase}
+                  autoComplete="tel"
+                />
+              </div>
+              {fieldErrors.phone && (
+                <p className="mt-1 text-center text-xs text-[var(--color-accent-red)]" role="alert">
+                  {fieldErrors.phone}
+                </p>
+              )}
+            </div>
 
-                <section className="space-y-4" aria-labelledby="zayavka-personal-heading">
-                  <h2 id="zayavka-personal-heading" className="text-sm font-semibold text-[var(--color-text)] border-0 pb-2 text-center">
-                    Личные данные
-                  </h2>
-                  <div>
-                    <label htmlFor="zayavka-fullName" className="mb-1.5 block text-center text-sm font-medium text-[var(--color-text)]">ФИО</label>
-                    <div className="relative">
-                      <User className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--color-muted)]" />
-                      <input
-                        id="zayavka-fullName"
-                        type="text"
-                        value={formData.fullName}
-                        onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                        placeholder="Иванов Иван Иванович"
-                        className={inputBase}
-                        autoComplete="name"
-                      />
-                    </div>
-                    {fieldErrors.fullName && <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{fieldErrors.fullName}</p>}
-                  </div>
-                  {!isEstablishment && (
-                    <div className="min-w-0">
-                      <label htmlFor="zayavka-dateOfBirth" className="mb-1.5 block text-center text-sm font-medium text-[var(--color-text)]">Дата рождения</label>
-                      <div className="relative z-0 min-w-0 overflow-hidden rounded-xl focus-within:ring-2 focus-within:ring-[var(--color-accent-gold)]/40 focus-within:ring-offset-2 focus-within:ring-offset-[var(--color-bg)]">
-                        <Calendar
-                          className="pointer-events-none absolute left-3 top-1/2 z-0 h-5 w-5 shrink-0 -translate-y-1/2 text-[var(--color-muted)]"
-                          aria-hidden
-                        />
-                        <input
-                          id="zayavka-dateOfBirth"
-                          type="date"
-                          value={formData.dateOfBirth}
-                          onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
-                          className={`zayavka-date-input relative z-[1] min-h-[2.75rem] min-w-0 max-w-full box-border w-full rounded-xl border-0 bg-[var(--color-light-gray)] py-2.5 pl-12 pr-4 text-[var(--color-text)] caret-[var(--color-text)] focus:outline-none ${!formData.dateOfBirth ? "zayavka-date-input--empty" : ""}`}
-                        />
-                      </div>
-                      {fieldErrors.dateOfBirth && <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{fieldErrors.dateOfBirth}</p>}
-                    </div>
-                  )}
-                  <div>
-                    <label htmlFor="zayavka-email" className="mb-1.5 block text-center text-sm font-medium text-[var(--color-text)]">Почта</label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--color-muted)]" />
-                      <input
-                        id="zayavka-email"
-                        type="email"
-                        value={formData.email}
-                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        placeholder="email@example.com"
-                        className={inputBase}
-                        autoComplete="email"
-                      />
-                    </div>
-                    {fieldErrors.email && <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{fieldErrors.email}</p>}
-                    <p className="zayavka-hint mt-1 text-center text-[var(--color-muted)]">На этот адрес мы отправим ссылку для регистрации после одобрения заявки.</p>
-                  </div>
-                </section>
+            <div>
+              <label htmlFor="zayavka-email" className="mb-1.5 block text-center text-sm font-medium text-[var(--color-text)]">
+                Почта
+              </label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--color-muted)]" aria-hidden />
+                <input
+                  id="zayavka-email"
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  placeholder="email@example.com"
+                  className={inputBase}
+                  autoComplete="email"
+                />
+              </div>
+              {fieldErrors.email && (
+                <p className="mt-1 text-center text-xs text-[var(--color-accent-red)]" role="alert">
+                  {fieldErrors.email}
+                </p>
+              )}
+            </div>
 
-                <button
-                  type="button"
-                  onClick={handleNext}
-                  className="auth-btn-primary flex w-full items-center justify-center gap-2 rounded-xl bg-[var(--color-brand-gold)] px-4 py-3 text-[14px] font-semibold text-[#0a192f] shadow-[var(--shadow-card)] hover:opacity-90 hover:-translate-y-0.5 transition-all duration-200"
-                >
-                  Далее <ArrowRight className="h-5 w-5" />
-                </button>
-              </>
-            )}
+            <div className="rounded-xl border border-white/10 bg-[var(--color-muted)]/5 p-3">
+              <label className="flex cursor-pointer items-start gap-3">
+                <input
+                  type="checkbox"
+                  checked={formData.consentOfferAndPolicy}
+                  onChange={(e) => setFormData({ ...formData, consentOfferAndPolicy: e.target.checked })}
+                  className="mt-1 h-4 w-4 shrink-0 rounded border-[var(--color-muted)] text-[var(--color-brand-gold)] focus:ring-[var(--color-brand-gold)]/50"
+                />
+                <span className="text-sm leading-snug text-[var(--color-text-secondary)]">
+                  <span className="text-red-400">*</span> Согласен(на) на обработку персональных данных —{" "}
+                  <Link href="/politika" className="text-[var(--color-accent-gold)] hover:opacity-90 hover:underline" target="_blank" rel="noopener noreferrer">
+                    политика ПДн
+                  </Link>
+                  ,{" "}
+                  <Link href="/oferta" className="text-[var(--color-accent-gold)] hover:opacity-90 hover:underline" target="_blank" rel="noopener noreferrer">
+                    оферта
+                  </Link>
+                  ,{" "}
+                  <Link href="/politika-bezopasnosti" className="text-[var(--color-accent-gold)] hover:opacity-90 hover:underline" target="_blank" rel="noopener noreferrer">
+                    платежи
+                  </Link>
+                  .
+                </span>
+              </label>
+              {fieldErrors.consentOfferAndPolicy && (
+                <p className="mt-1 text-sm text-[var(--color-accent-red)]" role="alert">
+                  {fieldErrors.consentOfferAndPolicy}
+                </p>
+              )}
+            </div>
 
-            {step === 2 && (
-              <>
-                {isEstablishment ? (
-                  <section className="space-y-4" aria-labelledby="zayavka-company-heading">
-                    <h2 id="zayavka-company-heading" className="border-0 pb-2 text-center text-sm font-semibold text-[var(--color-text)]">
-                      Данные о компании
-                    </h2>
-                    <div>
-                      <label htmlFor="zayavka-companyName" className="mb-1.5 block text-center text-sm font-medium text-[var(--color-text)]">Название компании</label>
-                      <div className="relative">
-                        <Building2 className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--color-muted)]" />
-                        <input
-                          id="zayavka-companyName"
-                          type="text"
-                          value={formData.companyName}
-                          onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
-                          placeholder="Кафе «Пушкин»"
-                          className={inputBase}
-                        />
-                      </div>
-                      {fieldErrors.companyName && <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{fieldErrors.companyName}</p>}
-                    </div>
-                    <div>
-                      <label htmlFor="zayavka-companyRole" className="mb-1.5 block text-center text-sm font-medium text-[var(--color-text)]">Роль в компании (кто подаёт заявку)</label>
-                      <div className="relative">
-                        <User className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--color-muted)]" />
-                        <input
-                          id="zayavka-companyRole"
-                          type="text"
-                          value={formData.companyRole}
-                          onChange={(e) => setFormData({ ...formData, companyRole: e.target.value })}
-                          placeholder="Директор, менеджер"
-                          className={inputBase}
-                        />
-                      </div>
-                      {fieldErrors.companyRole && <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{fieldErrors.companyRole}</p>}
-                    </div>
-                    <div>
-                      <label htmlFor="zayavka-employeeCount" className="mb-1.5 block text-center text-sm font-medium text-[var(--color-text)]">Количество сотрудников</label>
-                      <div className="relative">
-                        <Users className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--color-muted)]" />
-                        <input
-                          id="zayavka-employeeCount"
-                          type="number"
-                          min={1}
-                          max={10000}
-                          value={formData.employeeCount}
-                          onChange={(e) => setFormData({ ...formData, employeeCount: e.target.value })}
-                          placeholder="10"
-                          className={inputBase}
-                        />
-                      </div>
-                      {fieldErrors.employeeCount && <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{fieldErrors.employeeCount}</p>}
-                    </div>
-                  </section>
-                ) : (
-                  <>
-                    <section className="space-y-4" aria-labelledby="zayavka-activity-heading">
-                      <h2 id="zayavka-activity-heading" className="text-sm font-semibold text-[var(--color-text)] border-0 pb-2 text-center">
-                        Информация о заведении и деятельности
-                      </h2>
-                      <div>
-                        <label htmlFor="zayavka-activityType" className="mb-1.5 block text-center text-sm font-medium text-[var(--color-text)]">Вид деятельности</label>
-                        <div className="relative">
-                          <Briefcase className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--color-muted)]" />
-                          <input
-                            id="zayavka-activityType"
-                            type="text"
-                            value={formData.activityType}
-                            onChange={(e) => setFormData({ ...formData, activityType: e.target.value })}
-                            placeholder="Официант, курьер, мастер"
-                            className={inputBase}
-                          />
-                        </div>
-                        {fieldErrors.activityType && <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{fieldErrors.activityType}</p>}
-                      </div>
-                      <div>
-                        <label htmlFor="zayavka-establishment" className="mb-1.5 block text-center text-sm font-medium text-[var(--color-text)]">Заведение (если есть)</label>
-                        <div className="relative">
-                          <Building2 className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--color-muted)]" />
-                          <input
-                            id="zayavka-establishment"
-                            type="text"
-                            value={formData.establishment}
-                            onChange={(e) => setFormData({ ...formData, establishment: e.target.value })}
-                            placeholder="Название кафе, ресторана"
-                            className={inputBase}
-                          />
-                        </div>
-                        {fieldErrors.establishment && <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{fieldErrors.establishment}</p>}
-                      </div>
-                    </section>
-                  </>
-                )}
-
-                <div className="rounded-xl border border-white/10 bg-[var(--color-muted)]/5 p-3">
-                  <label className="flex cursor-pointer items-start gap-3">
-                    <input
-                      type="checkbox"
-                      checked={formData.consentOfferAndPolicy}
-                      onChange={(e) => setFormData({ ...formData, consentOfferAndPolicy: e.target.checked })}
-                      className="mt-1 h-4 w-4 shrink-0 rounded border-[var(--color-muted)] text-[var(--color-brand-gold)] focus:ring-[var(--color-brand-gold)]/50"
-                    />
-                    <span className="text-sm text-[var(--color-text-secondary)]">
-                      Я принимаю условия{" "}
-                      <Link href="/politika" className="text-[var(--color-accent-gold)] hover:opacity-90 hover:underline" target="_blank" rel="noopener noreferrer">
-                        Политики обработки персональных данных
-                      </Link>
-                      ,{" "}
-                      <Link href="/oferta" className="text-[var(--color-accent-gold)] hover:opacity-90 hover:underline" target="_blank" rel="noopener noreferrer">
-                        Пользовательского соглашения (оферты)
-                      </Link>
-                      {" "}и{" "}
-                      <Link href="/politika-bezopasnosti" className="text-[var(--color-accent-gold)] hover:opacity-90 hover:underline" target="_blank" rel="noopener noreferrer">
-                        Политики безопасности платежей
-                      </Link>
-                      . Отправка заявки возможна только при согласии.
-                    </span>
-                  </label>
-                  {fieldErrors.consentOfferAndPolicy && (
-                    <p className="mt-1 text-sm text-[var(--color-accent-red)]" role="alert">{fieldErrors.consentOfferAndPolicy}</p>
-                  )}
-                </div>
-
-                <div className="flex gap-3">
-                  <button
-                    type="button"
-                    onClick={handleBack}
-                    className="zayavka-btn-back flex flex-1 items-center justify-center gap-2 rounded-xl border-0 bg-white px-4 py-3 text-[14px] font-semibold text-[#0a192f] shadow-[var(--shadow-card)] hover:opacity-90 transition-opacity"
-                  >
-                    <ArrowLeft className="h-5 w-5" /> Назад
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="auth-btn-primary flex flex-1 items-center justify-center rounded-xl bg-[var(--color-brand-gold)] px-4 py-3 text-[14px] font-semibold text-[#0a192f] shadow-[var(--shadow-card)] hover:opacity-90 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
-                  >
-                    {loading ? "Отправка..." : "Оставить заявку"}
-                  </button>
-                </div>
-              </>
-            )}
+            <button
+              type="submit"
+              disabled={loading || !formData.consentOfferAndPolicy}
+              className="auth-btn-primary w-full rounded-xl bg-[var(--color-brand-gold)] px-4 py-3 text-[14px] font-semibold text-[#0a192f] shadow-[var(--shadow-card)] hover:opacity-90 hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-200"
+            >
+              {loading ? "Отправка..." : "Оставить заявку"}
+            </button>
           </form>
 
           <div className="mt-6 text-center text-sm text-white">

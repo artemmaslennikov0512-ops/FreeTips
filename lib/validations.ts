@@ -24,14 +24,15 @@ export const phoneSchema = z
         : val;
   });
 
-/** Телефон для заявки: принимаем +7…, 8…, с пробелами/скобками/дефисами, нормализуем до 10 цифр; пусто — не собираем в форме */
-const phoneRegistrationOptionalSchema = z
+/** Телефон для заявки «оставить заявку»: обязательный, +7/8/10 цифр, в БД — 10 цифр */
+export const phoneRegistrationRequiredSchema = z
   .string()
   .trim()
+  .min(1, "Укажите телефон")
   .max(50)
   .transform((s) => s.replace(/\D/g, ""))
   .refine(
-    (s) => s.length === 0 || s.length === 10 || (s.length === 11 && (s[0] === "7" || s[0] === "8")),
+    (s) => s.length === 10 || (s.length === 11 && (s[0] === "7" || s[0] === "8")),
     "Неверный формат телефона (10 цифр, можно с +7 или 8)",
   )
   .transform((s) => (s.length === 11 ? s.slice(1) : s));
@@ -204,29 +205,12 @@ const consentOfferAndPolicySchema = z.literal(true, {
   errorMap: () => ({ message: "Необходимо принять условия оферты, политики ПДн и политики безопасности платежей" }),
 });
 
-// Заявка на подключение (оставить заявку): заведение или отдельный получатель чаевых
-export const createRegistrationRequestSchema = z.discriminatedUnion("requestType", [
-  z.object({
-    requestType: z.literal("establishment"),
-    fullName: z.string().trim().min(1, "Укажите ФИО").max(255),
-    companyName: z.string().trim().min(1, "Укажите название компании").max(255),
-    companyRole: z.string().trim().min(1, "Укажите роль в компании").max(255),
-    phone: phoneRegistrationOptionalSchema,
-    email: emailSchema,
-    employeeCount: z.coerce.number().int().min(1, "Укажите количество сотрудников").max(10000),
-    consentOfferAndPolicy: consentOfferAndPolicySchema,
-  }),
-  z.object({
-    requestType: z.literal("individual"),
-    fullName: z.string().trim().min(1, "Укажите ФИО").max(255),
-    dateOfBirth: z.string().trim().min(1, "Укажите дату рождения").max(20),
-    phone: phoneRegistrationOptionalSchema,
-    email: emailSchema,
-    activityType: z.string().trim().min(1, "Укажите вид деятельности").max(255),
-    establishment: z.string().trim().max(255).optional().default(""),
-    consentOfferAndPolicy: consentOfferAndPolicySchema,
-  }),
-]);
+// Заявка на подключение (оставить заявку): только телефон и почта + согласие с документами
+export const createRegistrationRequestSchema = z.object({
+  email: z.string().trim().email("Неверный формат email").transform((s) => s.toLowerCase()),
+  phone: phoneRegistrationRequiredSchema,
+  consentOfferAndPolicy: consentOfferAndPolicySchema,
+});
 
 // PATCH /api/profile — обновление логина, email, анкеты (частичное)
 export const patchProfileSchema = z.object({
@@ -274,12 +258,20 @@ export const supportMessageSchema = z.object({
     .max(4000, "Сообщение не должно превышать 4000 символов"),
 });
 
-// Верификация: этап 1 — ФИО, дата рождения, серия/номер паспорта
+/** ИНН РФ: 10 цифр (юрлицо) или 12 (физлицо / ИП). Ввод с пробелами — нормализуем до цифр. */
+export const verificationInnSchema = z
+  .string()
+  .trim()
+  .transform((s) => s.replace(/\D/g, ""))
+  .refine((s) => s.length === 10 || s.length === 12, "ИНН: укажите 10 или 12 цифр");
+
+// Верификация: этап 1 — ФИО, дата рождения, серия/номер паспорта, ИНН
 export const verificationStep1Schema = z.object({
   fullName: z.string().trim().min(1, "Укажите ФИО").max(255),
   birthDate: z.string().trim().min(1, "Укажите дату рождения").max(20),
   passportSeries: z.string().trim().min(2, "Серия паспорта: 2–4 цифры").max(4).regex(/^\d{2,4}$/, "Серия: только цифры"),
   passportNumber: z.string().trim().min(6, "Номер паспорта: 6 цифр").max(6).regex(/^\d{6}$/, "Номер: 6 цифр"),
+  inn: verificationInnSchema,
 });
 
 // Верификация: отправка заявки (согласие на обработку ПД)

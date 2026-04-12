@@ -150,7 +150,7 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
   const navIcons = [LayoutDashboard, Users, UserPlus, UserMinus, QrCode, PieChart, BarChart3, Palette, Laptop, KeyRound] as const;
 
   return (
-    <div className="establishment-panel cabinet-premium flex min-h-screen w-full min-w-0 max-w-full overflow-x-hidden bg-[var(--color-bg)] font-[family:var(--font-inter)] text-white pt-3 lg:pt-6">
+    <div className="establishment-panel cabinet-premium flex min-h-screen w-full min-w-0 max-w-full overflow-x-hidden bg-[var(--color-bg)] font-[family:var(--font-inter)] text-white pt-2 lg:pt-4">
       <LkPresenceHeartbeat />
       {/* Шторка на мобильном */}
       <div
@@ -164,59 +164,64 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
       {/* Сайдбар выше затемнения (fixed + z); на lg остаётся в потоке */}
       <aside
         id="establishment-mobile-nav"
-        className={`cabinet-sidebar fixed left-0 top-0 z-[100] flex max-h-[100vh] w-[min(calc(100vw-4rem),20rem)] max-w-[20rem] flex-col overflow-y-auto overflow-x-hidden rounded-[10px] border border-white/10 py-6 shadow-2xl backdrop-blur-xl transition-[transform] duration-300 ease-out lg:static lg:left-auto lg:top-auto lg:ml-0 lg:mt-3 lg:mr-0 lg:mb-0 lg:max-h-none lg:z-auto lg:w-[260px] lg:max-w-none lg:translate-x-0 lg:border lg:self-start bg-white/[0.06] ${
+        className={`cabinet-sidebar fixed left-0 top-0 z-[100] flex max-h-[100vh] w-[min(calc(100vw-4rem),20rem)] max-w-[20rem] flex-col overflow-y-auto overflow-x-hidden rounded-[10px] border border-white/10 py-4 shadow-2xl backdrop-blur-xl transition-[transform] duration-300 ease-out lg:static lg:left-auto lg:top-auto lg:ml-0 lg:mt-2 lg:mr-0 lg:mb-0 lg:max-h-none lg:z-auto lg:w-[236px] lg:max-w-none lg:translate-x-0 lg:border lg:self-start bg-white/[0.06] ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <div className="pl-4 pr-4 mb-6 shrink-0">
-          <span className="font-[family:var(--font-playfair)] font-bold text-white">
+        <div className="px-3 mb-4 shrink-0">
+          <span className="font-[family:var(--font-playfair)] text-lg font-bold text-white">
             Кабинет заведения
           </span>
         </div>
-        <nav className="mt-2 flex flex-col gap-1 px-4 shrink-0">
-          {NAV.map(({ label, href }, i) => {
-            const Icon = navIcons[i];
-            return (
-              <Link
-                key={href}
-                href={href}
-                onClick={closeSidebar}
-                className={`flex items-center gap-3 rounded-[10px] px-4 py-3.5 font-normal transition-colors ${
-                  isActive(href)
-                    ? "cabinet-nav-active border border-[#0a192f]/35 bg-[#0a192f]/12 text-[#0a192f] font-medium"
-                    : "border border-transparent text-white/80 hover:bg-[var(--color-dark-gray)]/10 hover:text-white"
-                }`}
-              >
-                <Icon className="h-5 w-5 shrink-0" />
-                <span className="min-w-0 break-words">{label}</span>
-              </Link>
-            );
-          })}
+        <div className="cabinet-nav-block flex min-h-0 flex-1 flex-col overflow-y-auto overflow-x-hidden px-3 pb-2">
+          <nav
+            className="flex flex-col gap-0.5 rounded-[10px] border border-[var(--color-brand-gold)]/15 bg-[var(--color-dark-gray)]/5 p-1.5 shadow-[var(--shadow-subtle)]"
+            aria-label="Навигация по кабинету заведения"
+          >
+            {NAV.map(({ label, href }, i) => {
+              const Icon = navIcons[i];
+              return (
+                <Link
+                  key={href}
+                  href={href}
+                  onClick={closeSidebar}
+                  className={`flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[0.9375rem] font-normal transition-colors ${
+                    isActive(href)
+                      ? "cabinet-nav-active border border-[#0a192f]/35 bg-[#0a192f]/12 text-[#0a192f] font-medium"
+                      : "border border-transparent text-white/80 hover:bg-[var(--color-dark-gray)]/10 hover:text-white"
+                  }`}
+                >
+                  <Icon className="cabinet-nav-item-icon h-[18px] w-[18px] shrink-0" aria-hidden />
+                  <span className="min-w-0 break-words">{label}</span>
+                </Link>
+              );
+            })}
+          </nav>
           <Link
             href="/cabinet"
             onClick={closeSidebar}
-            className="mt-2 flex items-center gap-3 rounded-[10px] px-4 py-3.5 font-normal text-white/80 transition-colors hover:bg-[var(--color-dark-gray)]/10 hover:text-white"
+            className="mt-4 flex items-center gap-2.5 rounded-lg border border-transparent px-2.5 py-2 text-[0.9375rem] font-normal text-white/80 transition-colors hover:bg-[var(--color-dark-gray)]/10 hover:text-white"
           >
             Личный кабинет
           </Link>
           <button
             type="button"
             onClick={handleLogout}
-            className="mt-2 flex w-full items-center justify-center gap-3 rounded-[10px] px-4 py-3 text-sm font-medium text-white/80 transition-colors hover:bg-[var(--color-dark-gray)]/10 hover:text-white"
+            className="mt-3 flex w-full items-center justify-center gap-2.5 rounded-lg px-2.5 py-2 text-sm font-medium text-white/80 transition-colors hover:bg-[var(--color-dark-gray)]/10 hover:text-white"
           >
             <LogOut className="h-4 w-4 shrink-0" />
             <span>Выйти</span>
           </button>
-        </nav>
+        </div>
       </aside>
 
-      <main className="min-h-0 min-w-0 flex-1 overflow-x-hidden px-0 pt-2 lg:pt-1 lg:pl-0 lg:pr-0 lg:ml-0 flex flex-col">
-        <div className="cabinet-main-block app-panel-main-surface relative mt-2 mr-0 mb-4 ml-0 flex min-h-0 flex-1 flex-col rounded-lg border border-white/10 bg-white/[0.06] backdrop-blur-xl lg:mt-3 lg:mr-0 lg:ml-4 lg:rounded-[10px]">
+      <main className="relative min-h-0 min-w-0 flex-1 overflow-x-hidden px-0 pt-1.5 pb-3 lg:pt-2 lg:pl-0 lg:pr-3 lg:ml-0 flex flex-col">
+        <div className="cabinet-main-block app-panel-main-surface relative z-10 mt-0 mr-0 mb-3 ml-0 flex min-h-0 flex-1 flex-col rounded-lg border-x border-b border-white/10 bg-white/[0.06] backdrop-blur-xl md:rounded-[10px] lg:z-0 lg:mr-3 lg:ml-3 lg:rounded-[10px]">
           {pathname !== "/establishment" && (
             <PanelMobileBackButton variant="establishment" fallbackHref="/establishment" />
           )}
           <div
-            className="flex min-h-0 flex-1 flex-col overflow-x-hidden px-4 py-4 sm:px-6 lg:p-8"
+            className="flex min-h-0 flex-1 flex-col overflow-x-hidden px-4 py-3 sm:px-6 md:py-6 lg:p-8"
             id="main-content"
           >
             {children}

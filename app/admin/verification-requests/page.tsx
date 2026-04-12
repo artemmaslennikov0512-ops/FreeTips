@@ -30,6 +30,7 @@ interface VerificationRequestItem {
   birthDate: string;
   passportSeries: string;
   passportNumber: string;
+  inn: string;
   createdAt: string;
   status: string;
   rejectionReason: string | null;
@@ -37,8 +38,8 @@ interface VerificationRequestItem {
   login: string;
   email: string | null;
   uniqueId: number;
-  hasPassportMain: boolean;
   hasPassportSpread: boolean;
+  hasSelfie: boolean;
 }
 
 type SectionCounts = { pending: number; approved: number; rejected: number };
@@ -50,8 +51,8 @@ type RequestsCountsPayload = {
 };
 
 const DOC_LABELS: Record<string, string> = {
-  passport_main: "Главное фото паспорта",
-  passport_spread: "Разворот",
+  passport_spread: "Паспорт (разворот)",
+  selfie: "Селфи",
 };
 
 const ZERO_COUNTS: SectionCounts = { pending: 0, approved: 0, rejected: 0 };
@@ -354,14 +355,17 @@ export default function AdminVerificationRequestsPage() {
                       <p className="mt-0.5 break-words text-xs text-white/80">
                         Паспорт: {r.passportSeries} {r.passportNumber}
                       </p>
+                      {r.inn ? (
+                        <p className="mt-0.5 break-words text-xs text-white/80">ИНН: {r.inn}</p>
+                      ) : null}
                       {verificationTab === "rejected" && (
                         <p className="mt-2 rounded-lg border border-red-500/25 bg-red-500/10 p-2 text-xs leading-snug text-red-200/90">
                           {r.rejectionReason ?? "—"}
                         </p>
                       )}
                       <div className="mt-3 flex flex-wrap gap-2 border-t border-white/10 pt-3">
-                        {(["passport_main", "passport_spread"] as const).map((type) => {
-                          const has = type === "passport_main" ? r.hasPassportMain : r.hasPassportSpread;
+                        {(["passport_spread", "selfie"] as const).map((type) => {
+                          const has = type === "passport_spread" ? r.hasPassportSpread : r.hasSelfie;
                           const key = `${r.id}-${type}`;
                           return (
                             <button
@@ -421,7 +425,7 @@ export default function AdminVerificationRequestsPage() {
                           <th className="px-3 py-2 text-left font-medium text-white">Дата</th>
                           <th className="px-3 py-2 text-left font-medium text-white">Пользователь</th>
                           <th className="px-3 py-2 text-left font-medium text-white">ФИО</th>
-                          <th className="px-3 py-2 text-left font-medium text-white">Д. рожд. / паспорт</th>
+                          <th className="px-3 py-2 text-left font-medium text-white">Д. рожд. / паспорт / ИНН</th>
                           {verificationTab === "rejected" && (
                             <th className="min-w-[140px] px-3 py-2 text-left font-medium text-white">Причина отказа</th>
                           )}
@@ -448,6 +452,7 @@ export default function AdminVerificationRequestsPage() {
                                 <p className="mt-0.5">
                                   {r.passportSeries} {r.passportNumber}
                                 </p>
+                                {r.inn ? <p className="mt-0.5">ИНН: {r.inn}</p> : null}
                               </div>
                             </td>
                             {verificationTab === "rejected" && (
@@ -455,9 +460,8 @@ export default function AdminVerificationRequestsPage() {
                             )}
                             <td className="px-3 py-2.5">
                               <div className="flex flex-wrap gap-2">
-                                {(["passport_main", "passport_spread"] as const).map((type) => {
-                                  const has =
-                                    type === "passport_main" ? r.hasPassportMain : r.hasPassportSpread;
+                                {(["passport_spread", "selfie"] as const).map((type) => {
+                                  const has = type === "passport_spread" ? r.hasPassportSpread : r.hasSelfie;
                                   const key = `${r.id}-${type}`;
                                   return (
                                     <button

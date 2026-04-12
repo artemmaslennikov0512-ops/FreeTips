@@ -101,6 +101,9 @@ function ConnectionRequestDetails({ r, twoColumnFromSm }: { r: RegistrationReque
   }
   return (
     <div className={grid}>
+      <p className="break-all">
+        <span className="text-white/70">Почта:</span> {r.email}
+      </p>
       <p>
         <span className="text-white/70">Дата рождения:</span> {r.dateOfBirth}
       </p>

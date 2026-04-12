@@ -45,6 +45,7 @@ export async function GET(request: NextRequest) {
         birthDate: true,
         passportSeries: true,
         passportNumber: true,
+        inn: true,
         documents: {
           select: { type: true },
         },
@@ -52,8 +53,8 @@ export async function GET(request: NextRequest) {
     });
 
     const docs = pendingRequest?.documents ?? [];
-    const hasPassportMain = docs.some((d) => d.type === "passport_main");
     const hasPassportSpread = docs.some((d) => d.type === "passport_spread");
+    const hasSelfie = docs.some((d) => d.type === "selfie");
 
     return NextResponse.json({
       verificationStatus: user.verificationStatus,
@@ -65,8 +66,9 @@ export async function GET(request: NextRequest) {
             birthDate: pendingRequest.birthDate,
             passportSeries: pendingRequest.passportSeries,
             passportNumber: pendingRequest.passportNumber,
-            hasPassportMain,
+            inn: pendingRequest.inn,
             hasPassportSpread,
+            hasSelfie,
           }
         : null,
     });
@@ -99,8 +101,8 @@ export async function POST(request: NextRequest) {
       return jsonError(400, "Сначала заполните данные и загрузите документы (этап 1 и 2)");
     }
     const types = new Set(req.documents.map((d) => d.type));
-    if (!types.has("passport_main") || !types.has("passport_spread")) {
-      return jsonError(400, "Загрузите все документы: главное фото паспорта и разворот");
+    if (!types.has("passport_spread") || !types.has("selfie")) {
+      return jsonError(400, "Загрузите фото главного разворота паспорта и селфи");
     }
     await db.user.update({
       where: { id: userId },
@@ -141,6 +143,7 @@ export async function POST(request: NextRequest) {
         birthDate: data.birthDate,
         passportSeries: data.passportSeries,
         passportNumber: data.passportNumber,
+        inn: data.inn,
       },
     });
     return NextResponse.json({ requestId: existingPending.id });
@@ -153,6 +156,7 @@ export async function POST(request: NextRequest) {
       birthDate: data.birthDate,
       passportSeries: data.passportSeries,
       passportNumber: data.passportNumber,
+      inn: data.inn,
       status: "PENDING",
     },
     select: { id: true },

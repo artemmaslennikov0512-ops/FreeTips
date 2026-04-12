@@ -19,7 +19,14 @@ export async function POST(
 
   const verificationRequest = await db.verificationRequest.findUnique({
     where: { id },
-    select: { id: true, userId: true, status: true, fullName: true, birthDate: true },
+    select: {
+      id: true,
+      userId: true,
+      status: true,
+      fullName: true,
+      birthDate: true,
+      documents: { select: { type: true } },
+    },
   });
 
   if (!verificationRequest) {
@@ -27,6 +34,15 @@ export async function POST(
   }
   if (verificationRequest.status !== "PENDING") {
     return NextResponse.json({ error: "Заявка уже рассмотрена" }, { status: 400 });
+  }
+  const docTypes = new Set(verificationRequest.documents.map((d) => d.type));
+  const hasNewPair = docTypes.has("passport_spread") && docTypes.has("selfie");
+  const hasLegacyPair = docTypes.has("passport_spread") && docTypes.has("passport_main");
+  if (!hasNewPair && !hasLegacyPair) {
+    return NextResponse.json(
+      { error: "Нельзя подтвердить: нужны фото разворота паспорта и селфи (или полный комплект по старой схеме)" },
+      { status: 400 },
+    );
   }
 
   const userUpdate: { verificationStatus: VerificationStatus; verificationRejectionReason: null; fullName?: string; birthDate?: string | null } = {

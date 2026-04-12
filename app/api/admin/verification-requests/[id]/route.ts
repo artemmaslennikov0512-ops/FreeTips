@@ -46,6 +46,7 @@ export async function GET(
     birthDate: req.birthDate,
     passportSeries: req.passportSeries,
     passportNumber: req.passportNumber,
+    inn: req.inn,
     status: req.status,
     rejectionReason: req.rejectionReason,
     reviewedAt: req.reviewedAt?.toISOString() ?? null,

@@ -309,7 +309,7 @@ model RegistrationRequest {
   @@map("registration_requests")
 }
 
-// Заявка на верификацию официанта: ФИО, дата рождения, паспорт, документы.
+// Заявка на верификацию официанта: ФИО, дата рождения, паспорт, ИНН, документы.
 model VerificationRequest {
   id                String   @id @default(cuid())
   userId            String
@@ -317,6 +317,7 @@ model VerificationRequest {
   birthDate         String   @db.VarChar(20)
   passportSeries    String   @db.VarChar(10)
   passportNumber   String   @db.VarChar(20)
+  inn               String   @default("") @db.VarChar(14)
   status            RegistrationRequestStatus @default(PENDING) // PENDING | APPROVED | REJECTED
   rejectionReason   String?  @db.VarChar(1000)
   reviewedAt        DateTime?
@@ -333,11 +334,11 @@ model VerificationRequest {
   @@map("verification_requests")
 }
 
-// Документы верификации: главное фото паспорта и разворот (в БД могут остаться старые записи selfie).
+// Документы верификации: разворот паспорта (главный), селфи; в БД могут быть legacy passport_main.
 model VerificationDocument {
   id          String   @id @default(cuid())
   requestId   String
-  type        String   @db.VarChar(20) // passport_main | passport_spread | selfie (legacy)
+  type        String   @db.VarChar(20) // passport_spread | selfie | passport_main (legacy)
   filePath    String   @db.VarChar(512) // относительный путь в storage/verification
   downloadedAt DateTime? // legacy: раньше помечали выгрузку; cleanup удаляет такие записи старше 24 ч
   createdAt   DateTime @default(now())

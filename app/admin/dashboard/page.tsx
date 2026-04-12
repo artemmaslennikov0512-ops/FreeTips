@@ -122,97 +122,153 @@ export default function AdminDashboardPage() {
     { title: "Сумма заявок", value: formatMoneyCompact(stats.payoutsPendingSumKop), icon: DollarSign },
   ];
 
+  const periodLabel =
+    stats.period === "day"
+      ? "за сутки"
+      : stats.period === "week"
+        ? "за 7 дней"
+        : stats.period === "all"
+          ? "за всё время"
+          : stats.period
+            ? `период: ${stats.period}`
+            : null;
+
   return (
-    <div className="min-w-0 max-w-full">
-      {stats.fraudFlaggedUsers30d != null && stats.fraudFlaggedUsers30d > 0 && (
-        <Link
-          href="/admin/antifraud"
-          className="mb-4 flex items-center justify-center gap-2 rounded-2xl border border-rose-500/40 bg-rose-950/30 px-4 py-3 text-center text-sm text-rose-100 transition-colors hover:bg-rose-950/45"
-        >
-          <ShieldAlert className="h-4 w-4 shrink-0 text-rose-300" aria-hidden />
-          <span>
-            <span className="font-semibold tabular-nums text-rose-50">{stats.fraudFlaggedUsers30d}</span>{" "}
-            {stats.fraudFlaggedUsers30d % 10 === 1 && stats.fraudFlaggedUsers30d % 100 !== 11
-              ? "аккаунт"
-              : stats.fraudFlaggedUsers30d % 10 >= 2 &&
-                  stats.fraudFlaggedUsers30d % 10 <= 4 &&
-                  (stats.fraudFlaggedUsers30d % 100 < 10 || stats.fraudFlaggedUsers30d % 100 >= 20)
-                ? "аккаунта"
-                : "аккаунтов"}{" "}
-            со сигналами антифрода за 30 дней — открыть «Антифрод»
-          </span>
-        </Link>
-      )}
-      {pendingRequestsTotal != null && pendingRequestsTotal > 0 && (
-        <Link
-          href="/admin/verification-requests"
-          className="mb-6 block rounded-2xl border border-amber-500/45 bg-amber-500/15 px-4 py-3 text-center text-sm text-amber-100 transition-colors hover:bg-amber-500/25"
-        >
-          <span className="font-semibold tabular-nums text-amber-50">{pendingRequestsTotal}</span>{" "}
-          {pendingRequestsTotal % 10 === 1 && pendingRequestsTotal % 100 !== 11
-            ? "новая заявка"
-            : pendingRequestsTotal % 10 >= 2 &&
-                pendingRequestsTotal % 10 <= 4 &&
-                (pendingRequestsTotal % 100 < 10 || pendingRequestsTotal % 100 >= 20)
-              ? "новые заявки"
-              : "новых заявок"}{" "}
-          на рассмотрении — открыть раздел «Заявки»
-        </Link>
-      )}
-      <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
-        {cards.map((card) => {
-          const Icon = card.icon;
-          const body = (
-            <div
-              className={
-                card.onlineAccent
-                  ? "admin-dashboard-card cabinet-section-header rounded-2xl border border-emerald-500/25 bg-emerald-950/20 p-6 shadow-[0_0_24px_-8px_rgba(16,185,129,0.25)]"
-                  : "admin-dashboard-card cabinet-section-header rounded-2xl border-0 p-6"
-              }
-            >
-              <div className="flex items-center justify-between gap-3">
-                <div className="min-w-0">
-                  <p className="text-sm font-medium text-white/90">{card.title}</p>
-                  <p
-                    className={
-                      card.onlineAccent
-                        ? "mt-2 text-xl font-bold tabular-nums text-emerald-300"
-                        : "mt-2 text-xl font-bold text-white"
-                    }
-                  >
-                    {card.value}
-                  </p>
-                </div>
-                <div
-                  className={
-                    card.onlineAccent
-                      ? "shrink-0 rounded-xl bg-emerald-500/20 p-3 ring-1 ring-emerald-400/30"
-                      : "shrink-0 rounded-xl bg-white/20 p-3"
-                  }
-                >
-                  <Icon
-                    className={
-                      card.onlineAccent ? "h-6 w-6 text-emerald-400" : "h-6 w-6 text-[var(--color-brand-gold)]"
-                    }
-                  />
-                </div>
+    <div className="cabinet-card mx-auto flex min-h-0 min-w-0 max-w-5xl flex-col rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden lg:min-h-[min(56vh,560px)]">
+      <div className="flex min-h-0 flex-1 flex-col px-4 py-4 sm:px-5 sm:py-5">
+        <div className="flex min-h-0 w-full flex-1 flex-col items-center justify-between gap-6">
+          <div className="flex w-full shrink-0 flex-col items-center gap-8">
+            <div className="cabinet-dashboard-name-hero w-full min-w-0 px-0">
+              <div className="cabinet-dashboard-name-hero__pill">
+                <p className="cabinet-dashboard-name-hero__text">Панель администратора</p>
               </div>
             </div>
-          );
-          return card.href ? (
-            <Link
-              key={card.title}
-              href={card.href}
-              className="block min-w-0 transition-opacity hover:opacity-95"
-            >
-              {body}
-            </Link>
-          ) : (
-            <div key={card.title} className="min-w-0">
-              {body}
+            {periodLabel != null && (
+              <p className="text-center text-sm text-[var(--color-text-secondary)]">Сводка {periodLabel}</p>
+            )}
+
+            {stats.fraudFlaggedUsers30d != null && stats.fraudFlaggedUsers30d > 0 && (
+              <Link
+                href="/admin/antifraud"
+                className="flex w-full max-w-4xl items-center justify-center gap-2 rounded-2xl border border-rose-500/40 bg-rose-950/30 px-4 py-3 text-center text-sm text-rose-100 transition-colors hover:bg-rose-950/45"
+              >
+                <ShieldAlert className="h-4 w-4 shrink-0 text-rose-300" aria-hidden />
+                <span>
+                  <span className="font-semibold tabular-nums text-rose-50">{stats.fraudFlaggedUsers30d}</span>{" "}
+                  {stats.fraudFlaggedUsers30d % 10 === 1 && stats.fraudFlaggedUsers30d % 100 !== 11
+                    ? "аккаунт"
+                    : stats.fraudFlaggedUsers30d % 10 >= 2 &&
+                        stats.fraudFlaggedUsers30d % 10 <= 4 &&
+                        (stats.fraudFlaggedUsers30d % 100 < 10 || stats.fraudFlaggedUsers30d % 100 >= 20)
+                      ? "аккаунта"
+                      : "аккаунтов"}{" "}
+                  со сигналами антифрода за 30 дней — открыть «Антифрод»
+                </span>
+              </Link>
+            )}
+            {pendingRequestsTotal != null && pendingRequestsTotal > 0 && (
+              <Link
+                href="/admin/verification-requests"
+                className="block w-full max-w-4xl rounded-2xl border border-amber-500/45 bg-amber-500/15 px-4 py-3 text-center text-sm text-amber-100 transition-colors hover:bg-amber-500/25"
+              >
+                <span className="font-semibold tabular-nums text-amber-50">{pendingRequestsTotal}</span>{" "}
+                {pendingRequestsTotal % 10 === 1 && pendingRequestsTotal % 100 !== 11
+                  ? "новая заявка"
+                  : pendingRequestsTotal % 10 >= 2 &&
+                      pendingRequestsTotal % 10 <= 4 &&
+                      (pendingRequestsTotal % 100 < 10 || pendingRequestsTotal % 100 >= 20)
+                    ? "новые заявки"
+                    : "новых заявок"}{" "}
+                на рассмотрении — открыть раздел «Заявки»
+              </Link>
+            )}
+
+            <div className="grid min-w-0 w-full max-w-4xl grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
+              {cards.map((card) => {
+                const Icon = card.icon;
+                const body = (
+                  <div
+                    className={
+                      card.onlineAccent
+                        ? "admin-dashboard-card cabinet-section-header rounded-2xl border border-emerald-500/25 bg-emerald-950/20 p-6 shadow-[0_0_24px_-8px_rgba(16,185,129,0.25)]"
+                        : "admin-dashboard-card cabinet-section-header rounded-2xl border-0 p-6"
+                    }
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-white/90">{card.title}</p>
+                        <p
+                          className={
+                            card.onlineAccent
+                              ? "mt-2 text-xl font-bold tabular-nums text-emerald-300"
+                              : "mt-2 text-xl font-bold text-white"
+                          }
+                        >
+                          {card.value}
+                        </p>
+                      </div>
+                      <div
+                        className={
+                          card.onlineAccent
+                            ? "shrink-0 rounded-xl bg-emerald-500/20 p-3 ring-1 ring-emerald-400/30"
+                            : "shrink-0 rounded-xl bg-white/20 p-3"
+                        }
+                      >
+                        <Icon
+                          className={
+                            card.onlineAccent ? "h-6 w-6 text-emerald-400" : "h-6 w-6 text-[var(--color-brand-gold)]"
+                          }
+                        />
+                      </div>
+                    </div>
+                  </div>
+                );
+                return card.href ? (
+                  <Link
+                    key={card.title}
+                    href={card.href}
+                    className="block min-w-0 transition-opacity hover:opacity-95"
+                  >
+                    {body}
+                  </Link>
+                ) : (
+                  <div key={card.title} className="min-w-0">
+                    {body}
+                  </div>
+                );
+              })}
             </div>
-          );
-        })}
+          </div>
+
+          <div className="w-full max-w-4xl shrink-0 border-t border-[var(--color-brand-gold)]/15 pt-6">
+            <h3 className="mb-4 text-center font-[family:var(--font-playfair)] text-lg font-semibold text-[var(--color-text)]">
+              Быстрые действия
+            </h3>
+            <div className="flex flex-wrap items-center justify-center gap-3">
+              <Link
+                href="/admin/users"
+                className="inline-flex items-center gap-2 rounded-[10px] bg-[var(--color-brand-gold)] px-4 py-2.5 text-sm font-medium text-[#0a192f] hover:opacity-90"
+              >
+                <Users className="h-4 w-4" />
+                Пользователи
+              </Link>
+              <Link
+                href="/admin/payouts"
+                className="inline-flex items-center gap-2 rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-4 py-2.5 text-sm font-medium text-[var(--color-text)] hover:bg-[var(--color-dark-gray)]/20"
+              >
+                <Send className="h-4 w-4" />
+                Выводы
+              </Link>
+              <Link
+                href="/admin/verification-requests"
+                className="inline-flex items-center gap-2 rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-4 py-2.5 text-sm font-medium text-[var(--color-text)] hover:bg-[var(--color-dark-gray)]/20"
+              >
+                <ShieldAlert className="h-4 w-4" />
+                Заявки
+              </Link>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

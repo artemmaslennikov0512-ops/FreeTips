@@ -29,8 +29,7 @@ export async function POST(request: NextRequest) {
   }
 
   const data = validated.data;
-  const isEstablishment = data.requestType === "establishment";
-  const emailNormalized = data.email.trim().toLowerCase();
+  const emailNormalized = data.email;
 
   const existingUser = await db.user.findFirst({
     where: {
@@ -63,16 +62,16 @@ export async function POST(request: NextRequest) {
 
   const req = await db.registrationRequest.create({
     data: {
-      requestType: data.requestType,
-      fullName: data.fullName,
-      dateOfBirth: isEstablishment ? "" : data.dateOfBirth,
-      phone: data.phone ?? "",
-      activityType: isEstablishment ? "" : data.activityType,
-      establishment: isEstablishment ? "" : (data.establishment ?? ""),
+      requestType: "individual",
+      fullName: "—",
+      dateOfBirth: "—",
+      phone: data.phone,
+      activityType: "—",
+      establishment: "",
       email: emailNormalized,
-      companyName: isEstablishment ? data.companyName : null,
-      companyRole: isEstablishment ? data.companyRole : null,
-      employeeCount: isEstablishment ? data.employeeCount : null,
+      companyName: null,
+      companyRole: null,
+      employeeCount: null,
       adminFullName: null,
       adminContactPhone: null,
     },

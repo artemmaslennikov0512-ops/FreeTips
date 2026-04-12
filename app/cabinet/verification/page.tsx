@@ -18,14 +18,15 @@ type VerificationData = {
     birthDate: string;
     passportSeries: string;
     passportNumber: string;
-    hasPassportMain: boolean;
+    inn: string;
     hasPassportSpread: boolean;
+    hasSelfie: boolean;
   } | null;
 };
 
 const DOC_LABELS: Record<string, string> = {
-  passport_main: "Главное фото паспорта",
-  passport_spread: "Разворот паспорта",
+  passport_spread: "Фото паспорта (главный разворот)",
+  selfie: "Селфи с паспортом",
 };
 
 export default function CabinetVerificationPage() {
@@ -39,6 +40,7 @@ export default function CabinetVerificationPage() {
   const [birthDate, setBirthDate] = useState("");
   const [passportSeries, setPassportSeries] = useState("");
   const [passportNumber, setPassportNumber] = useState("");
+  const [inn, setInn] = useState("");
   const [consent, setConsent] = useState(false);
   const [requestId, setRequestId] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -69,6 +71,7 @@ export default function CabinetVerificationPage() {
         setBirthDate(json.currentRequest.birthDate);
         setPassportSeries(json.currentRequest.passportSeries);
         setPassportNumber(json.currentRequest.passportNumber);
+        setInn(json.currentRequest.inn ?? "");
         setStep(2);
       }
     } catch {
@@ -90,6 +93,7 @@ export default function CabinetVerificationPage() {
       birthDate: birthDate.trim(),
       passportSeries: passportSeries.trim(),
       passportNumber: passportNumber.trim(),
+      inn: inn.trim(),
     });
     if (!parsed.success) {
       setFieldErrors(getFieldErrors(parsed.error));
@@ -158,6 +162,7 @@ export default function CabinetVerificationPage() {
       birthDate: birthDate.trim(),
       passportSeries: passportSeries.trim(),
       passportNumber: passportNumber.trim(),
+      inn: inn.trim(),
       consentPersonalData: consent,
     });
     if (!parsed.success) {
@@ -234,8 +239,8 @@ export default function CabinetVerificationPage() {
   const pendingWithAllDocs =
     data?.verificationStatus === "PENDING" &&
     data.currentRequest &&
-    data.currentRequest.hasPassportMain &&
-    data.currentRequest.hasPassportSpread;
+    data.currentRequest.hasPassportSpread &&
+    data.currentRequest.hasSelfie;
 
   if (pendingWithAllDocs) {
     return (
@@ -336,6 +341,22 @@ export default function CabinetVerificationPage() {
                   {fieldErrors.passportNumber && <p className="mt-1 text-sm text-red-500">{fieldErrors.passportNumber}</p>}
                 </div>
               </div>
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-white">ИНН <span className="text-red-400">*</span></label>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  maxLength={14}
+                  value={inn}
+                  onChange={(e) => setInn(e.target.value.replace(/\D/g, "").slice(0, 12))}
+                  className={cabinetInputClassName(!!fieldErrors.inn)}
+                  placeholder="12 или 10 цифр"
+                  required
+                  autoComplete="off"
+                />
+                {fieldErrors.inn && <p className="mt-1 text-sm text-red-500">{fieldErrors.inn}</p>}
+                <p className="mt-1 text-xs text-white/60">ИНН физлица — 12 цифр; при необходимости можно указать 10-значный ИНН организации.</p>
+              </div>
               {submitError && <p className="text-sm text-red-500">{submitError}</p>}
               <button
                 type="button"
@@ -351,22 +372,22 @@ export default function CabinetVerificationPage() {
           {step === 2 && (
             <div className="space-y-6">
               <p className="text-sm text-white/90">
-                Загрузите фото документов (JPEG, PNG или WebP, до 10 МБ каждое).
+                Загрузите фото главного разворота паспорта и селфи с паспортом (JPEG, PNG или WebP, до 10 МБ каждое).
               </p>
               {uploadError && (
                 <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
                   {uploadError}
                 </div>
               )}
-              {(["passport_main", "passport_spread"] as const).map((type) => (
+              {(["passport_spread", "selfie"] as const).map((type) => (
                 <div key={type} className="rounded-xl border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/5 p-4">
                   <div className="mb-2 flex items-center gap-2">
                     <FileImage className="h-5 w-5 text-[var(--color-brand-gold)]" />
                     <span className="font-medium text-white">{DOC_LABELS[type]}</span>
                     {data?.currentRequest &&
-                      (type === "passport_main"
-                        ? data.currentRequest.hasPassportMain
-                        : data.currentRequest.hasPassportSpread) && (
+                      (type === "passport_spread"
+                        ? data.currentRequest.hasPassportSpread
+                        : data.currentRequest.hasSelfie) && (
                       <CheckCircle2 className="h-5 w-5 text-green-500" />
                     )}
                   </div>
@@ -415,7 +436,7 @@ export default function CabinetVerificationPage() {
                 <p className="text-sm font-medium text-green-600">Заявка отправлена на рассмотрение.</p>
               )}
               <p className="text-xs text-white/70">
-                Для отправки заявки необходимо загрузить оба фото паспорта и принять соглашение выше.
+                Для отправки заявки загрузите оба фото и примите соглашение выше.
               </p>
               <div className="flex gap-3">
                 <button
@@ -431,8 +452,8 @@ export default function CabinetVerificationPage() {
                   disabled={
                     saving ||
                     !consent ||
-                    !data?.currentRequest?.hasPassportMain ||
-                    !data?.currentRequest?.hasPassportSpread
+                    !data?.currentRequest?.hasPassportSpread ||
+                    !data?.currentRequest?.hasSelfie
                   }
                   className={`${CABINET_WAITER_BTN_INLINE} px-5 py-2.5 text-[14px]`}
                 >

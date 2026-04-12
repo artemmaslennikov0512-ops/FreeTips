@@ -180,7 +180,7 @@ export function CabinetMobileNavPortals() {
         style={sidebarStyle}
         aria-hidden={!sidebarOpen}
       >
-        <div className="cabinet-nav-dropdown-inner overflow-hidden rounded-[10px] px-4 py-4">
+        <div className="cabinet-nav-dropdown-inner overflow-hidden rounded-[10px] px-3 py-3">
           <div
             className={`cabinet-sidebar-profile cabinet-block-inner mb-4 rounded-[10px] border border-[var(--color-brand-gold)]/20 px-3 py-2.5 ${!sidebarBg ? "bg-[var(--color-dark-gray)]/10" : ""}`}
             style={Object.keys(profileBlockStyle).length ? profileBlockStyle : undefined}
@@ -229,12 +229,12 @@ export function CabinetMobileNavPortals() {
                 href={href}
                 onClick={closeSidebar}
                 role="menuitem"
-                className={`flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium transition-colors ${
+                className={`flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm font-medium transition-colors ${
                   isActive(href) ? navActiveClasses : "border border-transparent text-[var(--color-text)]/80 hover:bg-[var(--color-dark-gray)]/10 hover:text-[var(--color-text)]"
                 }`}
                 style={!isActive(href) && brandFont ? { color: `${brandFont}cc` } : undefined}
               >
-                <Icon className={`h-5 w-5 shrink-0 ${iconClass}`} aria-hidden />
+                <Icon className={`h-[18px] w-[18px] shrink-0 ${iconClass}`} aria-hidden />
                 <span>{label}</span>
                 {href === "/cabinet/support" && supportUnreadCount > 0 && (
                   <span className="cabinet-support-unread-badge ml-auto flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[var(--color-accent-red)] px-1.5 text-xs font-semibold text-white">
@@ -248,10 +248,10 @@ export function CabinetMobileNavPortals() {
                 href="/establishment"
                 onClick={closeSidebar}
                 role="menuitem"
-                className="flex items-center gap-3 rounded-lg border border-transparent px-3 py-3 font-medium text-[var(--color-text)]/80 transition-colors hover:bg-[var(--color-dark-gray)]/10 hover:text-[var(--color-text)]"
+                className="flex items-center gap-2.5 rounded-lg border border-transparent px-2.5 py-2 font-medium text-[var(--color-text)]/80 transition-colors hover:bg-[var(--color-dark-gray)]/10 hover:text-[var(--color-text)]"
                 style={brandFont ? { color: `${brandFont}cc` } : undefined}
               >
-                <Building2 className="h-5 w-5 shrink-0 !text-amber-400" aria-hidden />
+                <Building2 className="h-[18px] w-[18px] shrink-0 !text-amber-400" aria-hidden />
                 <span>Кабинет заведения</span>
               </Link>
             )}
@@ -262,7 +262,7 @@ export function CabinetMobileNavPortals() {
               closeSidebar();
               void handleLogout();
             }}
-            className={`mt-4 flex ${CABINET_WAITER_BTN} w-full !justify-center gap-3 px-4 py-3 text-sm`}
+            className={`mt-3 flex ${CABINET_WAITER_BTN} w-full !justify-center gap-2.5 px-3 py-2 text-sm`}
             role="menuitem"
           >
             <LogOut className="h-4 w-4 shrink-0 text-[var(--color-brand-gold)]" aria-hidden />

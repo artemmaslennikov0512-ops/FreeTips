@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Link2, List, Key, Copy, RotateCw, Settings, ExternalLink, ShieldCheck, ShieldAlert, Download, Eye } from "lucide-react";
+import { Link2, List, Key, Copy, RotateCw, Settings, ExternalLink, ShieldCheck, ShieldAlert, Download, Eye, Send } from "lucide-react";
 import { PremiumCard } from "./PremiumCard";
 import { formatMoney } from "@/lib/utils";
 import { getBaseUrl } from "@/lib/get-base-url";
@@ -309,227 +309,249 @@ export default function CabinetDashboardPage() {
       : null;
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <div className="cabinet-dashboard-hero-grid grid min-w-0 grid-cols-1 gap-6 lg:[grid-template-columns:repeat(2,minmax(0,1fr))] lg:items-stretch">
-        <div className="cabinet-card flex min-h-0 min-w-0 flex-col rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden lg:h-full">
-          <div className="flex min-h-0 flex-1 flex-col p-6">
-            <div className="flex flex-col items-center gap-10">
-              <div
-                className={`cabinet-dashboard-name-hero w-full min-w-0 px-0 ${isM5Cabinet ? "cabinet-dashboard-name-hero--m5" : ""}`}
-              >
-                <div className="cabinet-dashboard-name-hero__pill">
-                  <p
-                    className={`cabinet-dashboard-name-hero__text ${isM5Cabinet ? "cabinet-dashboard-name-hero__text--m5" : ""}`}
-                  >
-                    {m5DashName ? (
-                      m5DashName.rest != null ? (
-                        <>
-                          <span className="text-[#8ec5ff]">{m5DashName.first}</span>{" "}
-                          <span className="text-[#e5252a]">{m5DashName.rest}</span>
-                        </>
+        <div className="flex min-h-0 min-w-0 flex-col gap-6 lg:h-full">
+          <div className="cabinet-card flex min-h-0 min-w-0 flex-col rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden lg:flex-1">
+            <div className="flex min-h-0 flex-1 flex-col px-4 py-4 sm:px-5 sm:py-5">
+              <div className="flex flex-col items-center gap-5">
+                <div className="cabinet-dashboard-balance-wrap flex w-full max-w-[320px] shrink-0 flex-col items-center justify-center overflow-visible">
+                  <PremiumCard
+                    fullName={fullName}
+                    uniqueId={uniqueId}
+                    balanceKop={stats?.balanceKop ?? undefined}
+                    compact
+                    variant={isM5Cabinet ? "m5" : "default"}
+                  />
+                </div>
+                <div
+                  className={`cabinet-dashboard-name-hero w-full min-w-0 px-0 ${isM5Cabinet ? "cabinet-dashboard-name-hero--m5" : ""}`}
+                >
+                  <div className="cabinet-dashboard-name-hero__pill">
+                    <p
+                      className={`cabinet-dashboard-name-hero__text ${isM5Cabinet ? "cabinet-dashboard-name-hero__text--m5" : ""}`}
+                    >
+                      {m5DashName ? (
+                        m5DashName.rest != null ? (
+                          <>
+                            <span className="text-[#8ec5ff]">{m5DashName.first}</span>{" "}
+                            <span className="text-[#e5252a]">{m5DashName.rest}</span>
+                          </>
+                        ) : (
+                          <span className="text-[#8ec5ff]">{m5DashName.first}</span>
+                        )
                       ) : (
-                        <span className="text-[#8ec5ff]">{m5DashName.first}</span>
-                      )
-                    ) : (
-                      dashName
-                    )}
-                  </p>
+                        dashName
+                      )}
+                    </p>
+                  </div>
+                </div>
+                <div className="grid w-full max-w-[320px] grid-cols-1 gap-3 sm:grid-cols-2">
+                  <Link
+                    href="/cabinet/transactions#operations-history"
+                    className={
+                      isM5Cabinet
+                        ? `${m5BtnNavLike} w-full justify-center text-sm`
+                        : `${CABINET_WAITER_BTN_INLINE} flex w-full items-center justify-center gap-2 px-4 py-2.5 text-sm`
+                    }
+                  >
+                    <List className="h-4 w-4 shrink-0" />
+                    Операции
+                  </Link>
+                  <Link
+                    href="/cabinet/transactions#waiter-card"
+                    className={
+                      isM5Cabinet
+                        ? `${m5BtnNavLike} w-full justify-center text-sm`
+                        : `${CABINET_WAITER_BTN_INLINE} flex w-full items-center justify-center gap-2 px-4 py-2.5 text-sm`
+                    }
+                    title="Вывод на карту через страницу Paygine"
+                  >
+                    <Send className="h-4 w-4 shrink-0" />
+                    Вывод
+                  </Link>
                 </div>
               </div>
-              <div className="cabinet-dashboard-balance-wrap flex w-full max-w-[320px] shrink-0 flex-col items-center justify-center overflow-visible">
-                <PremiumCard
-                  fullName={fullName}
-                  uniqueId={uniqueId}
-                  balanceKop={stats?.balanceKop ?? undefined}
-                  compact
-                  variant={isM5Cabinet ? "m5" : "default"}
-                />
-              </div>
             </div>
+          </div>
 
-            {verificationStatus && (
-              <div
-                className="cabinet-limits-block cabinet-verification-status mt-6 w-full min-w-0 max-w-full rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 p-5 flex flex-col items-center text-center"
-                data-verification-state={
-                  verificationStatus === "VERIFIED"
-                    ? "verified"
-                    : verificationStatus === "PENDING"
-                      ? "pending"
-                      : "required"
-                }
-              >
-                {verificationStatus === "VERIFIED" ? (
-                  <div className="flex w-full min-w-0 max-w-full flex-col items-center justify-center gap-3 px-1 text-center">
-                    <div
-                      className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-green-600/20 text-green-500"
-                      aria-hidden={true}
-                    >
-                      <ShieldCheck className="h-6 w-6" />
-                    </div>
-                    <p className="mb-0 text-center text-base font-semibold leading-snug text-white">Аккаунт верифицирован!</p>
-                    <p className="mb-0 max-w-sm text-center text-sm leading-relaxed text-white">Ваша личность подтверждена.</p>
+          {(Boolean(verificationStatus && verificationStatus !== "VERIFIED") || Boolean(payoutLimits)) && (
+            <div className="cabinet-card flex min-h-0 min-w-0 flex-col rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden lg:flex-1">
+              <div className="flex min-h-0 flex-1 flex-col px-4 py-4 sm:px-5 sm:py-5">
+                {verificationStatus && verificationStatus !== "VERIFIED" && (
+                  <div
+                    className="cabinet-limits-block cabinet-verification-status w-full min-w-0 max-w-full rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-3 sm:px-4 sm:py-3.5 flex flex-col items-center text-center"
+                    data-verification-state={
+                      verificationStatus === "PENDING" ? "pending" : "required"
+                    }
+                  >
+                    {verificationStatus === "PENDING" ? (
+                      <div className="flex items-center justify-center gap-2.5 text-center">
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-amber-500/20 text-amber-500">
+                          <ShieldAlert className="h-[18px] w-[18px]" />
+                        </div>
+                        <div>
+                          <p className="font-semibold text-white">Заявка на рассмотрении</p>
+                          <p className="text-sm text-white/90">Ожидайте результата проверки документов.</p>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center text-center">
+                        <p className="mb-2 font-semibold text-white">Уважаемый клиент,</p>
+                        <p className="mb-3 text-sm text-white/90">
+                          Чтобы пользоваться услугами сервиса, вам необходимо пройти верификацию.
+                        </p>
+                        <Link
+                          href="/cabinet/verification"
+                          className={
+                            isM5Cabinet
+                              ? `${m5BtnNavLike} text-sm`
+                              : `${CABINET_WAITER_BTN_INLINE} px-4 py-2 text-sm`
+                          }
+                        >
+                          <ShieldCheck className="h-4 w-4" />
+                          Пройти верификацию
+                        </Link>
+                      </div>
+                    )}
                   </div>
-                ) : verificationStatus === "PENDING" ? (
-                  <div className="flex items-center justify-center gap-3 text-center">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-500/20 text-amber-500">
-                      <ShieldAlert className="h-5 w-5" />
+                )}
+
+                {payoutLimits && (
+                  <div
+                    className={`cabinet-limits-block rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-3 sm:px-4 sm:py-4 ${
+                      verificationStatus && verificationStatus !== "VERIFIED" ? "mt-4" : ""
+                    }`}
+                  >
+                    <h4 className="mb-3 text-sm font-semibold text-[var(--color-text)]">Доступные лимиты</h4>
+                    <div className="space-y-4">
+                      <div>
+                        <div className="mb-1 flex justify-between text-sm">
+                          <span
+                            className="cabinet-limits-label text-[var(--color-text-secondary)]"
+                            title={cabinetLimitLabelTitle(limitPcts?.dayCount ?? 0, "Заявок в сутки")}
+                          >
+                            Заявок в сутки
+                          </span>
+                          <span className="font-medium text-[var(--color-text)]">
+                            {payoutUsageToday?.count ?? 0} из {payoutLimits.dailyLimitCount}
+                          </span>
+                        </div>
+                        <div className="cabinet-limits-track h-2.5 w-full overflow-hidden rounded-full bg-[var(--color-dark-gray)]/20">
+                          <div
+                            className={cabinetLimitsFillClass()}
+                            style={{
+                              width: `${Math.min(100, ((payoutUsageToday?.count ?? 0) / payoutLimits.dailyLimitCount) * 100)}%`,
+                            }}
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <div className="mb-1 flex justify-between text-sm">
+                          <span
+                            className="cabinet-limits-label text-[var(--color-text-secondary)]"
+                            title={cabinetLimitLabelTitle(limitPcts?.daySum ?? 0, "Сумма в сутки")}
+                          >
+                            Сумма в сутки
+                          </span>
+                          <span className="font-medium text-[var(--color-text)]">
+                            {formatMoney(BigInt(payoutUsageToday?.sumKop ?? 0))} из {formatMoney(BigInt(payoutLimits.dailyLimitKop))}
+                          </span>
+                        </div>
+                        <div className="cabinet-limits-track h-2.5 w-full overflow-hidden rounded-full bg-[var(--color-dark-gray)]/20">
+                          <div
+                            className={cabinetLimitsFillClass()}
+                            style={{
+                              width: `${Math.min(100, payoutLimits.dailyLimitKop > 0 ? (Number(payoutUsageToday?.sumKop ?? 0) / payoutLimits.dailyLimitKop) * 100 : 0)}%`,
+                            }}
+                          />
+                        </div>
+                      </div>
+                      {incomingMonthlyLimitKop != null && incomingMonthlyLimitKop > 0 && (
+                        <div>
+                          <div className="mb-1 flex justify-between text-sm">
+                            <span
+                              className="cabinet-limits-label text-[var(--color-text-secondary)]"
+                              title={cabinetLimitLabelTitle(limitPcts?.incomingMonthSum ?? 0, "Поступления за месяц")}
+                            >
+                              Поступления за месяц
+                            </span>
+                            <span className="font-medium text-[var(--color-text)]">
+                              {formatMoney(BigInt(incomingMonthSuccessSumKop))} из{" "}
+                              {formatMoney(BigInt(incomingMonthlyLimitKop))}
+                            </span>
+                          </div>
+                          <div className="cabinet-limits-track h-2.5 w-full overflow-hidden rounded-full bg-[var(--color-dark-gray)]/20">
+                            <div
+                              className={cabinetLimitsFillClass()}
+                              style={{
+                                width: `${Math.min(
+                                  100,
+                                  incomingMonthlyLimitKop > 0
+                                    ? (incomingMonthSuccessSumKop / incomingMonthlyLimitKop) * 100
+                                    : 0,
+                                )}%`,
+                              }}
+                            />
+                          </div>
+                        </div>
+                      )}
+                      {typeof payoutLimits.monthlyLimitCount === "number" && typeof payoutLimits.monthlyLimitKop === "number" && (
+                        <>
+                          <div>
+                            <div className="mb-1 flex justify-between text-sm">
+                              <span
+                                className="cabinet-limits-label text-[var(--color-text-secondary)]"
+                                title={cabinetLimitLabelTitle(limitPcts?.monthCount ?? 0, "Заявок в месяц")}
+                              >
+                                Заявок в месяц
+                              </span>
+                              <span className="font-medium text-[var(--color-text)]">
+                                {payoutUsageMonth?.count ?? 0} из {payoutLimits.monthlyLimitCount}
+                              </span>
+                            </div>
+                            <div className="cabinet-limits-track h-2.5 w-full overflow-hidden rounded-full bg-[var(--color-dark-gray)]/20">
+                              <div
+                                className={cabinetLimitsFillClass()}
+                                style={{
+                                  width: `${Math.min(100, payoutLimits.monthlyLimitCount > 0 ? ((payoutUsageMonth?.count ?? 0) / payoutLimits.monthlyLimitCount) * 100 : 0)}%`,
+                                }}
+                              />
+                            </div>
+                          </div>
+                          <div>
+                            <div className="mb-1 flex justify-between text-sm">
+                              <span
+                                className="cabinet-limits-label text-[var(--color-text-secondary)]"
+                                title={cabinetLimitLabelTitle(limitPcts?.monthSum ?? 0, "Сумма в месяц")}
+                              >
+                                Сумма в месяц
+                              </span>
+                              <span className="font-medium text-[var(--color-text)]">
+                                {formatMoney(BigInt(payoutUsageMonth?.sumKop ?? 0))} из {formatMoney(BigInt(payoutLimits.monthlyLimitKop))}
+                              </span>
+                            </div>
+                            <div className="cabinet-limits-track h-2.5 w-full overflow-hidden rounded-full bg-[var(--color-dark-gray)]/20">
+                              <div
+                                className={cabinetLimitsFillClass()}
+                                style={{
+                                  width: `${Math.min(100, payoutLimits.monthlyLimitKop > 0 ? (Number(payoutUsageMonth?.sumKop ?? 0) / payoutLimits.monthlyLimitKop) * 100 : 0)}%`,
+                                }}
+                              />
+                            </div>
+                          </div>
+                        </>
+                      )}
                     </div>
-                    <div>
-                      <p className="font-semibold text-white">Заявка на рассмотрении</p>
-                      <p className="text-sm text-white/90">Ожидайте результата проверки документов.</p>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="flex flex-col items-center text-center">
-                    <p className="mb-2 font-semibold text-white">Уважаемый клиент,</p>
-                    <p className="mb-3 text-sm text-white/90">
-                      Чтобы пользоваться услугами сервиса, вам необходимо пройти верификацию.
-                    </p>
-                    <Link
-                      href="/cabinet/verification"
-                      className={
-                        isM5Cabinet
-                          ? `${m5BtnNavLike} text-sm`
-                          : `${CABINET_WAITER_BTN_INLINE} px-4 py-2 text-sm`
-                      }
-                    >
-                      <ShieldCheck className="h-4 w-4" />
-                      Пройти верификацию
-                    </Link>
                   </div>
                 )}
               </div>
-            )}
-
-            {payoutLimits && (
-              <div className="cabinet-limits-block mt-6 rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 p-5">
-                <h4 className="mb-4 text-sm font-semibold text-[var(--color-text)]">Доступные лимиты</h4>
-                <div className="space-y-4">
-                  <div>
-                    <div className="mb-1 flex justify-between text-sm">
-                      <span
-                        className="cabinet-limits-label text-[var(--color-text-secondary)]"
-                        title={cabinetLimitLabelTitle(limitPcts?.dayCount ?? 0, "Заявок в сутки")}
-                      >
-                        Заявок в сутки
-                      </span>
-                      <span className="font-medium text-[var(--color-text)]">
-                        {payoutUsageToday?.count ?? 0} из {payoutLimits.dailyLimitCount}
-                      </span>
-                    </div>
-                    <div className="cabinet-limits-track h-2.5 w-full overflow-hidden rounded-full bg-[var(--color-dark-gray)]/20">
-                      <div
-                        className={cabinetLimitsFillClass()}
-                        style={{
-                          width: `${Math.min(100, ((payoutUsageToday?.count ?? 0) / payoutLimits.dailyLimitCount) * 100)}%`,
-                        }}
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <div className="mb-1 flex justify-between text-sm">
-                      <span
-                        className="cabinet-limits-label text-[var(--color-text-secondary)]"
-                        title={cabinetLimitLabelTitle(limitPcts?.daySum ?? 0, "Сумма в сутки")}
-                      >
-                        Сумма в сутки
-                      </span>
-                      <span className="font-medium text-[var(--color-text)]">
-                        {formatMoney(BigInt(payoutUsageToday?.sumKop ?? 0))} из {formatMoney(BigInt(payoutLimits.dailyLimitKop))}
-                      </span>
-                    </div>
-                    <div className="cabinet-limits-track h-2.5 w-full overflow-hidden rounded-full bg-[var(--color-dark-gray)]/20">
-                      <div
-                        className={cabinetLimitsFillClass()}
-                        style={{
-                          width: `${Math.min(100, payoutLimits.dailyLimitKop > 0 ? (Number(payoutUsageToday?.sumKop ?? 0) / payoutLimits.dailyLimitKop) * 100 : 0)}%`,
-                        }}
-                      />
-                    </div>
-                  </div>
-                  {incomingMonthlyLimitKop != null && incomingMonthlyLimitKop > 0 && (
-                    <div>
-                      <div className="mb-1 flex justify-between text-sm">
-                        <span
-                          className="cabinet-limits-label text-[var(--color-text-secondary)]"
-                          title={cabinetLimitLabelTitle(limitPcts?.incomingMonthSum ?? 0, "Поступления за месяц")}
-                        >
-                          Поступления за месяц
-                        </span>
-                        <span className="font-medium text-[var(--color-text)]">
-                          {formatMoney(BigInt(incomingMonthSuccessSumKop))} из{" "}
-                          {formatMoney(BigInt(incomingMonthlyLimitKop))}
-                        </span>
-                      </div>
-                      <div className="cabinet-limits-track h-2.5 w-full overflow-hidden rounded-full bg-[var(--color-dark-gray)]/20">
-                        <div
-                          className={cabinetLimitsFillClass()}
-                          style={{
-                            width: `${Math.min(
-                              100,
-                              incomingMonthlyLimitKop > 0
-                                ? (incomingMonthSuccessSumKop / incomingMonthlyLimitKop) * 100
-                                : 0,
-                            )}%`,
-                          }}
-                        />
-                      </div>
-                    </div>
-                  )}
-                  {typeof payoutLimits.monthlyLimitCount === "number" && typeof payoutLimits.monthlyLimitKop === "number" && (
-                    <>
-                      <div>
-                        <div className="mb-1 flex justify-between text-sm">
-                          <span
-                            className="cabinet-limits-label text-[var(--color-text-secondary)]"
-                            title={cabinetLimitLabelTitle(limitPcts?.monthCount ?? 0, "Заявок в месяц")}
-                          >
-                            Заявок в месяц
-                          </span>
-                          <span className="font-medium text-[var(--color-text)]">
-                            {payoutUsageMonth?.count ?? 0} из {payoutLimits.monthlyLimitCount}
-                          </span>
-                        </div>
-                        <div className="cabinet-limits-track h-2.5 w-full overflow-hidden rounded-full bg-[var(--color-dark-gray)]/20">
-                          <div
-                            className={cabinetLimitsFillClass()}
-                            style={{
-                              width: `${Math.min(100, payoutLimits.monthlyLimitCount > 0 ? ((payoutUsageMonth?.count ?? 0) / payoutLimits.monthlyLimitCount) * 100 : 0)}%`,
-                            }}
-                          />
-                        </div>
-                      </div>
-                      <div>
-                        <div className="mb-1 flex justify-between text-sm">
-                          <span
-                            className="cabinet-limits-label text-[var(--color-text-secondary)]"
-                            title={cabinetLimitLabelTitle(limitPcts?.monthSum ?? 0, "Сумма в месяц")}
-                          >
-                            Сумма в месяц
-                          </span>
-                          <span className="font-medium text-[var(--color-text)]">
-                            {formatMoney(BigInt(payoutUsageMonth?.sumKop ?? 0))} из {formatMoney(BigInt(payoutLimits.monthlyLimitKop))}
-                          </span>
-                        </div>
-                        <div className="cabinet-limits-track h-2.5 w-full overflow-hidden rounded-full bg-[var(--color-dark-gray)]/20">
-                          <div
-                            className={cabinetLimitsFillClass()}
-                            style={{
-                              width: `${Math.min(100, payoutLimits.monthlyLimitKop > 0 ? (Number(payoutUsageMonth?.sumKop ?? 0) / payoutLimits.monthlyLimitKop) * 100 : 0)}%`,
-                            }}
-                          />
-                        </div>
-                      </div>
-                    </>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
 
         <div id="quick-actions" className="cabinet-card flex min-h-0 min-w-0 flex-col rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden lg:h-full">
-          <div className="flex min-h-0 flex-1 flex-col p-6">
+          <div className="flex min-h-0 flex-1 flex-col px-4 py-4 sm:px-5 sm:py-5">
             <h3 className="cabinet-dashboard-card-title mb-3 text-center font-[family:var(--font-playfair)] text-lg font-semibold text-[var(--color-text)]">
               Быстрые действия
             </h3>
@@ -654,16 +676,16 @@ export default function CabinetDashboardPage() {
       </div>
 
       <div id="api-key" className="cabinet-card rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden">
-        <div className="border-0 px-6 py-4">
-          <h3 className="font-[family:var(--font-playfair)] text-lg font-semibold text-[var(--color-text)]">
+        <div className="border-0 px-4 py-2.5 sm:px-5">
+          <h3 className="font-[family:var(--font-playfair)] text-base font-semibold text-[var(--color-text)] sm:text-lg">
             API для уведомлений
           </h3>
         </div>
-        <div className="p-6">
-          <p className="mb-4 text-[var(--color-text)]/90">
+        <div className="cabinet-api-key-main px-4 py-4 sm:px-5 sm:py-4">
+          <p className="mb-3 text-[var(--color-text)]/90">
             Скопируйте ключ и вставьте его в приложение FreeTips для Android — так вы сможете пользоваться личным кабинетом официанта с телефона.
           </p>
-          <p className="mb-6 flex flex-wrap items-center gap-3">
+          <p className="mb-4 flex flex-wrap items-center gap-2 sm:gap-3">
             <span className="text-white">Приложение для Android:</span>
             <a
               href={`${getBaseUrl()}/freetips.apk`}
@@ -678,18 +700,13 @@ export default function CabinetDashboardPage() {
               Скачать приложение (APK)
             </a>
           </p>
-          <div className="cabinet-block-inner rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/6 p-5">
-            <div className="mb-4 text-sm font-semibold text-[var(--color-text)]">Ваш API ключ</div>
-            <div className="cabinet-input-window cabinet-block-inner mb-4 break-all rounded-md border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-3 font-mono text-sm text-[var(--color-text-secondary)]">
+          <div className="cabinet-block-inner rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/6 px-3 py-3 sm:px-4 sm:py-3.5">
+            <div className="mb-2 text-sm font-semibold text-[var(--color-text)]">Ваш API ключ</div>
+            <div className="cabinet-input-window cabinet-block-inner mb-3 break-all rounded-md border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-2.5 py-2 font-mono text-sm text-[var(--color-text-secondary)]">
               {apiKey ?? (hasApiKey ? "••••••••••••••••" : "Ключ не создан")}
             </div>
-            {hasApiKey && !apiKey && (
-              <p className="mb-4 text-xs text-[var(--color-muted)]">
-                Ключ скрыт для безопасности. Нажмите «Показать ключ», если он доступен, либо «Создать новый ключ» — затем сразу скопируйте ключ в приложение. Старый ключ перестанет работать.
-              </p>
-            )}
             {apiKey && (
-              <p className="mb-4 text-xs text-[var(--color-muted)]">
+              <p className="mb-3 text-xs text-[var(--color-muted)]">
                 Скопируйте ключ сейчас и вставьте в приложение — после обновления страницы он будет скрыт.
               </p>
             )}

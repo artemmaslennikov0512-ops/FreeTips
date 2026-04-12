@@ -34,7 +34,7 @@ export type CabinetMobileNavContextValue = {
   menuButtonRef: RefObject<HTMLButtonElement | null>;
   user: CabinetMobileNavUser;
   supportUnreadCount: number;
-  NAV: { label: string; href: string; icon: LucideIcon; iconClass: string }[];
+  NAV: { label: string; href: string; icon: LucideIcon }[];
   isActive: (href: string) => boolean;
   navActiveClasses: string;
   handleLogout: () => Promise<void>;
@@ -223,7 +223,7 @@ export function CabinetMobileNavPortals() {
           </div>
           <p className="cabinet-nav-label mb-2 px-3 text-center text-xs font-medium uppercase tracking-wider text-[var(--color-text)]/50">Навигация</p>
           <nav className="flex flex-col gap-0.5 rounded-[10px] border border-[var(--color-brand-gold)]/15 bg-[var(--color-dark-gray)]/5 p-1.5 shadow-[var(--shadow-subtle)]" role="none">
-            {NAV.map(({ label, href, icon: Icon, iconClass }) => (
+            {NAV.map(({ label, href, icon: Icon }) => (
               <Link
                 key={href}
                 href={href}
@@ -234,7 +234,7 @@ export function CabinetMobileNavPortals() {
                 }`}
                 style={!isActive(href) && brandFont ? { color: `${brandFont}cc` } : undefined}
               >
-                <Icon className={`h-[18px] w-[18px] shrink-0 ${iconClass}`} aria-hidden />
+                <Icon className="cabinet-nav-item-icon h-[18px] w-[18px] shrink-0" aria-hidden />
                 <span>{label}</span>
                 {href === "/cabinet/support" && supportUnreadCount > 0 && (
                   <span className="cabinet-support-unread-badge ml-auto flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[var(--color-accent-red)] px-1.5 text-xs font-semibold text-white">
@@ -251,7 +251,7 @@ export function CabinetMobileNavPortals() {
                 className="flex items-center gap-2.5 rounded-lg border border-transparent px-2.5 py-2 font-normal text-[var(--color-text)]/80 transition-colors hover:bg-[var(--color-dark-gray)]/10 hover:text-[var(--color-text)]"
                 style={brandFont ? { color: `${brandFont}cc` } : undefined}
               >
-                <Building2 className="h-[18px] w-[18px] shrink-0 !text-amber-400" aria-hidden />
+                <Building2 className="cabinet-nav-item-icon h-[18px] w-[18px] shrink-0" aria-hidden />
                 <span>Кабинет заведения</span>
               </Link>
             )}

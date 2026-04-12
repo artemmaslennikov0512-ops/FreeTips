@@ -46,31 +46,28 @@ const NAV: {
   label: string;
   href: string;
   icon: LucideIcon;
-  iconClass: string;
   recipientOnly?: boolean;
   employeeOnly?: boolean;
 }[] = [
-  { label: "Дашборд", href: "/cabinet", icon: LayoutDashboard, iconClass: "!text-sky-400" },
-  { label: "Операции", href: "/cabinet/transactions", icon: List, iconClass: "!text-emerald-400" },
-  { label: "Моя ссылка", href: "/cabinet/link", icon: Link2, iconClass: "!text-amber-400" },
+  { label: "Дашборд", href: "/cabinet", icon: LayoutDashboard },
+  { label: "Операции", href: "/cabinet/transactions", icon: List },
+  { label: "Моя ссылка", href: "/cabinet/link", icon: Link2 },
   {
     label: "Подключиться к заведению",
     href: "/cabinet/join-establishment",
     icon: UserPlus,
-    iconClass: "!text-rose-400",
     recipientOnly: true,
   },
   {
     label: "Покинуть заведение",
     href: "/cabinet/leave-establishment",
     icon: UserMinus,
-    iconClass: "!text-orange-400",
     employeeOnly: true,
   },
-  { label: "Верификация", href: "/cabinet/verification", icon: ShieldCheck, iconClass: "!text-violet-400" },
-  { label: "Поддержка", href: "/cabinet/support", icon: MessageCircle, iconClass: "!text-cyan-400" },
-  { label: "Сессии", href: "/cabinet/sessions", icon: Laptop, iconClass: "!text-slate-300" },
-  { label: "Настройки профиля", href: "/cabinet/settings", icon: Settings, iconClass: "!text-orange-400" },
+  { label: "Верификация", href: "/cabinet/verification", icon: ShieldCheck },
+  { label: "Поддержка", href: "/cabinet/support", icon: MessageCircle },
+  { label: "Сессии", href: "/cabinet/sessions", icon: Laptop },
+  { label: "Настройки профиля", href: "/cabinet/settings", icon: Settings },
 ];
 
 export default function CabinetLayout({ children }: { children: React.ReactNode }) {
@@ -458,7 +455,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
         </div>
         <div className="cabinet-nav-block flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto overflow-x-hidden px-3">
           <nav className="flex flex-col gap-0.5 rounded-[10px] border border-[var(--color-brand-gold)]/15 bg-[var(--color-dark-gray)]/5 p-1.5 shadow-[var(--shadow-subtle)]" aria-label="Навигация по кабинету">
-            {visibleNav.map(({ label, href, icon: Icon, iconClass }) => (
+            {visibleNav.map(({ label, href, icon: Icon }) => (
               <Link
                 key={href}
                 href={href}
@@ -470,7 +467,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
                 }`}
                 style={!isActive(href) && brandFont ? { color: `${brandFont}cc` } : undefined}
               >
-                <Icon className={`h-[18px] w-[18px] shrink-0 ${iconClass}`} aria-hidden />
+                <Icon className="cabinet-nav-item-icon h-[18px] w-[18px] shrink-0" aria-hidden />
                 <span>{label}</span>
                 {href === "/cabinet/support" && supportUnreadCount > 0 && (
                   <span
@@ -489,7 +486,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
                 className="flex items-center gap-2.5 rounded-lg border border-transparent px-2.5 py-2 text-[0.9375rem] font-normal text-[var(--color-text)]/80 transition-colors hover:bg-[var(--color-dark-gray)]/10 hover:text-[var(--color-text)]"
                 style={brandFont ? { color: `${brandFont}cc` } : undefined}
               >
-                <Building2 className="h-[18px] w-[18px] shrink-0 !text-amber-400" aria-hidden />
+                <Building2 className="cabinet-nav-item-icon h-[18px] w-[18px] shrink-0" aria-hidden />
                 <span>Кабинет заведения</span>
               </Link>
             )}

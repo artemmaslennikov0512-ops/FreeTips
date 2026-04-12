@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { Check, X, Download, Loader2 } from "lucide-react";
+import { Check, X, Download, Loader2, FolderArchive } from "lucide-react";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { AdminStatusTabs, apiStatusForTab, type AdminRequestTab } from "./AdminStatusTabs";
 import { AdminRequestsMainTabs, type AdminRequestsMainTab } from "./AdminRequestsMainTabs";
@@ -38,8 +38,10 @@ interface VerificationRequestItem {
   login: string;
   email: string | null;
   uniqueId: number;
+  waiterCode: string;
   hasPassportSpread: boolean;
   hasSelfie: boolean;
+  hasPassportMain: boolean;
 }
 
 type SectionCounts = { pending: number; approved: number; rejected: number };
@@ -53,7 +55,16 @@ type RequestsCountsPayload = {
 const DOC_LABELS: Record<string, string> = {
   passport_spread: "Паспорт (разворот)",
   selfie: "Селфи",
+  passport_main: "Паспорт (лицо)",
 };
+
+const DOC_TYPES = ["passport_spread", "selfie", "passport_main"] as const;
+
+function hasDoc(r: VerificationRequestItem, type: (typeof DOC_TYPES)[number]): boolean {
+  if (type === "passport_spread") return r.hasPassportSpread;
+  if (type === "selfie") return r.hasSelfie;
+  return r.hasPassportMain;
+}
 
 const ZERO_COUNTS: SectionCounts = { pending: 0, approved: 0, rejected: 0 };
 
@@ -219,7 +230,7 @@ export default function AdminVerificationRequestsPage() {
     }
   };
 
-  const downloadDoc = async (requestId: string, type: string) => {
+  const downloadDoc = async (requestId: string, type: string, waiterCode: string) => {
     const token = localStorage.getItem("accessToken");
     if (!token) return;
     const key = `${requestId}-${type}`;
@@ -233,9 +244,41 @@ export default function AdminVerificationRequestsPage() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `${type}.jpg`;
+      let filename = `${waiterCode}-${type}.jpg`;
+      const cd = res.headers.get("Content-Disposition");
+      const m = /filename="([^"]+)"/.exec(cd ?? "");
+      if (m?.[1]) filename = m[1];
+      a.download = filename;
       a.click();
       URL.revokeObjectURL(url);
+      await fetchList();
+    } finally {
+      setDownloading(null);
+    }
+  };
+
+  const downloadZipBundle = async (requestId: string, waiterCode: string) => {
+    const token = localStorage.getItem("accessToken");
+    if (!token) return;
+    const key = `zip-${requestId}`;
+    setDownloading(key);
+    try {
+      const res = await fetch(`/api/admin/verification-requests/${requestId}/documents/zip`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) return;
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      let filename = `${waiterCode}-verification.zip`;
+      const cd = res.headers.get("Content-Disposition");
+      const m = /filename="([^"]+)"/.exec(cd ?? "");
+      if (m?.[1]) filename = m[1];
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+      await fetchList();
     } finally {
       setDownloading(null);
     }
@@ -364,14 +407,15 @@ export default function AdminVerificationRequestsPage() {
                         </p>
                       )}
                       <div className="mt-3 flex flex-wrap gap-2 border-t border-white/10 pt-3">
-                        {(["passport_spread", "selfie"] as const).map((type) => {
-                          const has = type === "passport_spread" ? r.hasPassportSpread : r.hasSelfie;
+                        {DOC_TYPES.map((type) => {
+                          const has = hasDoc(r, type);
                           const key = `${r.id}-${type}`;
+                          const code = r.waiterCode ?? String(r.uniqueId);
                           return (
                             <button
                               key={type}
                               type="button"
-                              onClick={() => has && downloadDoc(r.id, type)}
+                              onClick={() => has && downloadDoc(r.id, type, code)}
                               disabled={!has || downloading === key}
                               className={`${ADMIN_BTN} ${ADMIN_BTN_NEUTRAL_SM} gap-1 text-xs font-medium disabled:opacity-50`}
                             >
@@ -384,6 +428,21 @@ export default function AdminVerificationRequestsPage() {
                             </button>
                           );
                         })}
+                        {(r.hasPassportSpread || r.hasSelfie || r.hasPassportMain) && (
+                          <button
+                            type="button"
+                            onClick={() => downloadZipBundle(r.id, r.waiterCode ?? String(r.uniqueId))}
+                            disabled={downloading === `zip-${r.id}`}
+                            className={`${ADMIN_BTN} ${ADMIN_BTN_NEUTRAL_SM} gap-1 text-xs font-medium disabled:opacity-50`}
+                          >
+                            {downloading === `zip-${r.id}` ? (
+                              <Loader2 className="h-3 w-3 animate-spin" />
+                            ) : (
+                              <FolderArchive className="h-3 w-3 shrink-0" />
+                            )}
+                            Папка ZIP ({r.waiterCode ?? r.uniqueId})
+                          </button>
+                        )}
                       </div>
                       {isPending && (
                         <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
@@ -460,14 +519,15 @@ export default function AdminVerificationRequestsPage() {
                             )}
                             <td className="px-3 py-2.5">
                               <div className="flex flex-wrap gap-2">
-                                {(["passport_spread", "selfie"] as const).map((type) => {
-                                  const has = type === "passport_spread" ? r.hasPassportSpread : r.hasSelfie;
+                                {DOC_TYPES.map((type) => {
+                                  const has = hasDoc(r, type);
                                   const key = `${r.id}-${type}`;
+                                  const code = r.waiterCode ?? String(r.uniqueId);
                                   return (
                                     <button
                                       key={type}
                                       type="button"
-                                      onClick={() => has && downloadDoc(r.id, type)}
+                                      onClick={() => has && downloadDoc(r.id, type, code)}
                                       disabled={!has || downloading === key}
                                       className={`${ADMIN_BTN} ${ADMIN_BTN_NEUTRAL_SM} gap-1 font-medium disabled:opacity-50`}
                                     >
@@ -480,6 +540,21 @@ export default function AdminVerificationRequestsPage() {
                                     </button>
                                   );
                                 })}
+                                {(r.hasPassportSpread || r.hasSelfie || r.hasPassportMain) && (
+                                  <button
+                                    type="button"
+                                    onClick={() => downloadZipBundle(r.id, r.waiterCode ?? String(r.uniqueId))}
+                                    disabled={downloading === `zip-${r.id}`}
+                                    className={`${ADMIN_BTN} ${ADMIN_BTN_NEUTRAL_SM} gap-1 font-medium disabled:opacity-50`}
+                                  >
+                                    {downloading === `zip-${r.id}` ? (
+                                      <Loader2 className="h-3 w-3 animate-spin" />
+                                    ) : (
+                                      <FolderArchive className="h-3 w-3" />
+                                    )}
+                                    ZIP ({r.waiterCode ?? r.uniqueId})
+                                  </button>
+                                )}
                               </div>
                             </td>
                             {isPending && (

@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { KeyRound, Lock, User } from "lucide-react";
 import { getOrCreateDeviceClientId } from "@/lib/device-client-id";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
+import { getBaseUrl } from "@/lib/get-base-url";
 import { AuthPageShell } from "@/components/AuthPageShell";
 import { AUTH_CARD_CLASS, AUTH_INPUT_CLASS, AUTH_INPUT_CLASS_NO_ICON, AUTH_BTN_PRIMARY } from "@/lib/auth-form-classes";
 
@@ -89,6 +90,39 @@ function RegisterForm() {
 
       if (data.accessToken) {
         localStorage.setItem("accessToken", data.accessToken);
+        const role = data.user?.role?.toUpperCase();
+        if (role === "RECIPIENT" && typeof window !== "undefined") {
+          try {
+            const authH = { Authorization: `Bearer ${data.accessToken}` };
+            const linksRes = await fetch("/api/links", { headers: authH });
+            let slug: string | undefined;
+            if (linksRes.ok) {
+              const lj = (await linksRes.json()) as { links?: { slug: string }[] };
+              slug = lj.links?.[0]?.slug;
+            }
+            if (!slug) {
+              const createRes = await fetch("/api/links", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  ...getCsrfHeader(),
+                  ...authH,
+                },
+                body: "{}",
+              });
+              if (createRes.ok) {
+                const cj = (await createRes.json()) as { link?: { slug: string } };
+                slug = cj.link?.slug;
+              }
+            }
+            const base = getBaseUrl();
+            if (slug && base) {
+              window.open(`${base}/pay/${encodeURIComponent(slug)}`, "_blank", "noopener,noreferrer");
+            }
+          } catch {
+            /* страница оплаты — опционально */
+          }
+        }
         router.push("/cabinet");
       }
     } catch {

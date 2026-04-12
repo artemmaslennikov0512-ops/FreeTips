@@ -48,6 +48,7 @@ export async function GET(request: NextRequest) {
           login: true,
           email: true,
           uniqueId: true,
+          tipLinks: { orderBy: { createdAt: "asc" }, take: 1, select: { slug: true } },
         },
       },
       documents: {
@@ -71,8 +72,10 @@ export async function GET(request: NextRequest) {
     login: r.user.login,
     email: r.user.email,
     uniqueId: r.user.uniqueId,
+    waiterCode: r.user.tipLinks[0]?.slug ?? String(r.user.uniqueId),
     hasPassportSpread: r.documents.some((d) => d.type === "passport_spread"),
     hasSelfie: r.documents.some((d) => d.type === "selfie"),
+    hasPassportMain: r.documents.some((d) => d.type === "passport_main"),
   }));
 
   return NextResponse.json({ requests: items });

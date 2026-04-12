@@ -27,7 +27,20 @@ export async function GET(
 
   const doc = await db.verificationDocument.findFirst({
     where: { requestId, type },
-    select: { id: true, filePath: true },
+    select: {
+      id: true,
+      filePath: true,
+      request: {
+        select: {
+          user: {
+            select: {
+              uniqueId: true,
+              tipLinks: { orderBy: { createdAt: "asc" }, take: 1, select: { slug: true } },
+            },
+          },
+        },
+      },
+    },
   });
   if (!doc) {
     return NextResponse.json({ error: "Документ не найден" }, { status: 404 });
@@ -41,7 +54,14 @@ export async function GET(
   const buf = readFileSync(fullPath);
   const ext = doc.filePath.split(".").pop() ?? "jpg";
   const mime = ext === "png" ? "image/png" : ext === "webp" ? "image/webp" : "image/jpeg";
-  const disposition = `attachment; filename="${type}.${ext}"`;
+  const slug = doc.request.user.tipLinks[0]?.slug?.trim();
+  const code =
+    slug && /^[\d-]+$/.test(slug)
+      ? slug
+      : slug && /^[a-zA-Z0-9_-]+$/.test(slug)
+        ? slug
+        : String(doc.request.user.uniqueId);
+  const disposition = `attachment; filename="${code}-${type}.${ext}"`;
 
   const del = await db.verificationDocument.deleteMany({ where: { id: doc.id } });
   if (del.count > 0) {

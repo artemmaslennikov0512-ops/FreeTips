@@ -208,7 +208,7 @@ export default function AdminUserDetailsPage() {
     if (!data?.user) return;
     setAdminEditFullName(data.user.fullName ?? "");
     setAdminEditBirthDate(toDateInputValueFromApi(data.user.birthDate));
-  }, [data?.user.id, data?.user.fullName, data?.user.birthDate]);
+  }, [data?.user]);
 
   const statusLabels: Record<string, string> = {
     PENDING: "В ожидании",

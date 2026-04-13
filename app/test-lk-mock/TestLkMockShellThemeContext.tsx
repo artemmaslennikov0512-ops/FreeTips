@@ -4,9 +4,8 @@ import {
   createContext,
   useCallback,
   useContext,
-  useEffect,
   useMemo,
-  useState,
+  useSyncExternalStore,
   type ReactNode,
 } from "react";
 
@@ -21,33 +20,53 @@ type Ctx = {
 
 const TestLkMockShellThemeContext = createContext<Ctx | null>(null);
 
+const THEME_STORE_EVENT = "test-lk-mock-shell-theme-store";
+
 function readSystemDark(): boolean {
   if (typeof window === "undefined") return false;
   return window.matchMedia("(prefers-color-scheme: dark)").matches;
 }
 
-export function TestLkMockShellThemeProvider({ children }: { children: ReactNode }) {
-  const [shellTheme, setShellThemeState] = useState<TestLkShellTheme>("light");
+function readStoredShellTheme(): TestLkShellTheme {
+  if (typeof window === "undefined") return "light";
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw === "light" || raw === "dark") return raw;
+    return readSystemDark() ? "dark" : "light";
+  } catch {
+    return readSystemDark() ? "dark" : "light";
+  }
+}
 
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw === "light" || raw === "dark") {
-        setShellThemeState(raw);
-      } else {
-        setShellThemeState(readSystemDark() ? "dark" : "light");
-      }
-    } catch {
-      setShellThemeState(readSystemDark() ? "dark" : "light");
-    }
-  }, []);
+function subscribeShellTheme(onStoreChange: () => void) {
+  if (typeof window === "undefined") return () => {};
+  const onStorage = (e: StorageEvent) => {
+    if (e.key === STORAGE_KEY || e.key === null) onStoreChange();
+  };
+  const onLocal = () => onStoreChange();
+  window.addEventListener("storage", onStorage);
+  window.addEventListener(THEME_STORE_EVENT, onLocal);
+  return () => {
+    window.removeEventListener("storage", onStorage);
+    window.removeEventListener(THEME_STORE_EVENT, onLocal);
+  };
+}
+
+export function TestLkMockShellThemeProvider({ children }: { children: ReactNode }) {
+  const shellTheme = useSyncExternalStore(
+    subscribeShellTheme,
+    readStoredShellTheme,
+    () => "light",
+  );
 
   const setShellTheme = useCallback((t: TestLkShellTheme) => {
-    setShellThemeState(t);
     try {
       localStorage.setItem(STORAGE_KEY, t);
     } catch {
       /* ignore */
+    }
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new Event(THEME_STORE_EVENT));
     }
   }, []);
 

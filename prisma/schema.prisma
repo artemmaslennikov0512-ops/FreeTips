@@ -397,9 +397,44 @@ model Establishment {
   registrationTokens RegistrationToken[] // токены для регистрации управляющего
   employeeJoinRequests EmployeeJoinRequest[]
   employeeLeaveRequests EmployeeLeaveRequest[]
+  halls                EstablishmentHall[]
 
   @@index([uniqueSlug])
   @@map("establishments")
+}
+
+/// Зал заведения (для карты зала, брони и привязки столов к официантам — дальше по плану).
+model EstablishmentHall {
+  id              String   @id @default(cuid())
+  establishmentId String
+  name            String   @db.VarChar(120)
+  sortOrder       Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  establishment Establishment       @relation(fields: [establishmentId], references: [id], onDelete: Cascade)
+  tables        EstablishmentTable[]
+
+  @@index([establishmentId])
+  @@map("establishment_halls")
+}
+
+/// Стол в зале; externalCode — задел под интеграцию с кассой.
+model EstablishmentTable {
+  id           String   @id @default(cuid())
+  hallId       String
+  label        String   @db.VarChar(80)
+  capacity     Int      @default(2)
+  sortOrder    Int      @default(0)
+  externalCode String?  @db.VarChar(64)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  hall EstablishmentHall @relation(fields: [hallId], references: [id], onDelete: Cascade)
+
+  @@unique([hallId, label])
+  @@index([hallId])
+  @@map("establishment_tables")
 }
 
 /// Заявка официанта (RECIPIENT) на подключение к заведению по коду точки.

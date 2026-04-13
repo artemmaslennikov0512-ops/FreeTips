@@ -57,7 +57,10 @@ export async function GET(request: NextRequest) {
 
     const items = rows.map((r) => toProfileSessionListItem(r, currentRefresh));
 
-    return NextResponse.json({ sessions: items });
+    /** Просмотр ЛК супер-админом: JWT целевого пользователя, refresh cookie — админа; список может быть пустым. */
+    const impersonationView = Boolean(auth.user.impersonatorUserId);
+
+    return NextResponse.json({ sessions: items, impersonationView });
   } catch (e) {
     logError("profile.sessions.list", e, { requestId });
     return internalError("Не удалось загрузить сессии");

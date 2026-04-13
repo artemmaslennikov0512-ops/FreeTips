@@ -84,6 +84,8 @@ export function LkSessionsSection({ variant }: { variant: LkSessionsVariant }) {
     variant === "admin" ? `${ADMIN_BTN} ${ADMIN_BTN_SM}` : "lk-sessions__btn--outline-gold";
 
   const [sessions, setSessions] = useState<SessionItem[] | null>(null);
+  /** JWT выдан при «войти в кабинет» из админки; refresh в cookie — у админа, не у целевого пользователя. */
+  const [impersonationView, setImpersonationView] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [revokeOthersBusy, setRevokeOthersBusy] = useState(false);
@@ -94,10 +96,12 @@ export function LkSessionsSection({ variant }: { variant: LkSessionsVariant }) {
     const res = await fetchWithAuth("/api/profile/sessions", { credentials: "include" });
     if (!res.ok) {
       setLoadError("Не удалось загрузить список сессий.");
+      setImpersonationView(false);
       setSessions([]);
       return;
     }
-    const data = (await res.json()) as { sessions?: SessionItem[] };
+    const data = (await res.json()) as { sessions?: SessionItem[]; impersonationView?: boolean };
+    setImpersonationView(data.impersonationView === true);
     setSessions(Array.isArray(data.sessions) ? data.sessions : []);
   }, []);
 
@@ -187,15 +191,38 @@ export function LkSessionsSection({ variant }: { variant: LkSessionsVariant }) {
       )}
 
       {sessions && sessions.length === 0 && !loadError && (
-        <p className="lk-sessions__muted mt-6">Нет активных сессий. Войдите снова.</p>
+        <p className="lk-sessions__muted mt-6">
+          {impersonationView ? (
+            <>
+              Нет активных серверных сессий у этого аккаунта. Если вы открыли кабинет из админки («войти от
+              имени пользователя»), это ожидаемо: у вас нет refresh-сессии официанта, только просмотр по токену
+              администратора. Собственные входы пользователя появятся здесь после его обычного входа по логину и
+              паролю.
+            </>
+          ) : (
+            <>Нет активных сессий. Войдите снова.</>
+          )}
+        </p>
       )}
 
       {sessions && sessions.length > 0 && (
         <div className={shell.card}>
+          {impersonationView && (
+            <p className="lk-sessions__muted mb-4 rounded-lg border border-white/10 bg-white/5 p-3 text-left text-sm">
+              Просмотр от администратора: ниже перечислены реальные входы этого пользователя. Метка «это
+              устройство» и кнопка «все, кроме текущей» для такого режима недоступны — ваша сессия привязана к
+              другому аккаунту.
+            </p>
+          )}
           <div className="lk-sessions__toolbar lk-sessions__toolbar--end">
             <button
               type="button"
-              disabled={othersCount === 0 || revokeOthersBusy}
+              disabled={impersonationView || othersCount === 0 || revokeOthersBusy}
+              title={
+                impersonationView
+                  ? "В режиме просмотра из админки недоступно: текущая сессия в cookie — не этого пользователя."
+                  : undefined
+              }
               onClick={() => void revokeOthers()}
               className={sessionEndBtnClass}
             >

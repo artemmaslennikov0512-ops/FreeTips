@@ -22,11 +22,17 @@ export default function EstablishmentOperationsPage() {
       setError(null);
       try {
         const res = await fetch("/api/establishment/operations", { headers: authHeaders() });
+        const payload = await res.json().catch(() => ({}));
         if (!res.ok) {
-          setError("Не удалось загрузить разделы");
+          const msg =
+            typeof payload?.error === "string"
+              ? payload.error
+              : "Не удалось загрузить разделы";
+          const hint = typeof payload?.hint === "string" ? ` ${payload.hint}` : "";
+          setError(msg + hint);
           return;
         }
-        setData(await res.json());
+        setData(payload);
       } catch {
         setError("Ошибка соединения");
       } finally {

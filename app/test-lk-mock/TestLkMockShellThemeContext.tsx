@@ -53,10 +53,10 @@ function subscribeShellTheme(onStoreChange: () => void) {
 }
 
 export function TestLkMockShellThemeProvider({ children }: { children: ReactNode }) {
-  const shellTheme = useSyncExternalStore(
+  const shellTheme = useSyncExternalStore<TestLkShellTheme>(
     subscribeShellTheme,
     readStoredShellTheme,
-    () => "light",
+    (): TestLkShellTheme => "light",
   );
 
   const setShellTheme = useCallback((t: TestLkShellTheme) => {

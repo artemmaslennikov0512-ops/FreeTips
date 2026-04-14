@@ -349,7 +349,7 @@ export default function EstablishmentHallsPage() {
         onSubmit={createHall}
         className="ft-panel-section-toolbar ft-panel-section-toolbar--row min-w-0 rounded-lg border border-[var(--color-brand-gold)]/30 bg-white/[0.06] p-2.5 shadow-[var(--shadow-subtle)] backdrop-blur-sm"
       >
-        <div className="w-full max-w-md min-w-0 flex-1 text-center sm:text-left">
+        <div className="min-w-0 w-60 max-w-full shrink text-center sm:w-72 sm:text-left">
           <label htmlFor="new-hall" className="mb-1 block text-xs text-white/70">
             Новый зал
           </label>

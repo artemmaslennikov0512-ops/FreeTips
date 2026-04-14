@@ -285,7 +285,7 @@ export default function EstablishmentBookingsPage() {
       ) : null}
 
       <div className="ft-panel-section-toolbar gap-2 rounded-lg border border-[var(--color-brand-gold)]/30 bg-white/[0.06] p-2.5 shadow-[var(--shadow-subtle)] backdrop-blur-sm">
-        <div className="ft-panel-section-toolbar ft-panel-section-toolbar--row w-full max-w-full justify-center gap-3">
+        <div className="flex min-w-0 flex-row flex-wrap items-end justify-center gap-3">
           <div className="text-center sm:text-left">
             <label htmlFor="booking-date" className="mb-1 block text-xs text-[var(--color-on-dark-muted)]">
               Дата (МСК)
@@ -313,7 +313,7 @@ export default function EstablishmentBookingsPage() {
           </button>
         </div>
         {tableOptions.length === 0 ? (
-          <p className="max-w-xl text-center text-sm text-[var(--color-on-dark-muted)]">
+          <p className="min-w-0 max-w-xl text-center text-sm text-[var(--color-on-dark-muted)]">
             Сначала добавьте залы и столы в разделе{" "}
             <Link href="/establishment/halls" className="font-medium text-[var(--color-brand-gold)] underline">
               Залы и столы

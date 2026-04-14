@@ -165,89 +165,98 @@ export default function EstablishmentMenuPage() {
       ) : null}
       <form
         onSubmit={addCategory}
-        className="ft-panel-section-toolbar ft-panel-section-toolbar--row gap-2 rounded-lg border border-[var(--color-brand-gold)]/30 bg-white/[0.06] p-2.5"
+        className="ft-panel-section-toolbar ft-panel-section-toolbar--row gap-1.5 rounded-lg border border-[var(--color-brand-gold)]/30 bg-white/[0.06] p-2"
       >
         <input
           value={newCatName}
           onChange={(e) => setNewCatName(e.target.value)}
           placeholder="Новая категория"
-          className="w-full max-w-md min-w-[10rem] flex-1 rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/30 px-2.5 py-1.5 text-center text-sm text-[var(--color-on-dark)] sm:text-left"
+          className="min-w-[10rem] w-52 max-w-full shrink rounded-md border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/30 px-2 py-1 text-sm text-[var(--color-on-dark)] sm:w-56 sm:text-left"
         />
         <button
           type="submit"
-          className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-lg bg-[var(--color-brand-gold)] px-3 py-1.5 text-xs font-semibold text-[#0a192f]"
+          className="inline-flex shrink-0 items-center justify-center gap-1 rounded-md bg-[var(--color-brand-gold)] px-2.5 py-1 text-[11px] font-semibold text-[#0a192f]"
         >
-          <Plus className="h-4 w-4" />
+          <Plus className="h-3.5 w-3.5" />
           Добавить категорию
         </button>
       </form>
       {loading ? (
         <p className="text-center text-[var(--color-on-dark-muted)]">Загрузка…</p>
       ) : (
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-1.5">
           {categories.map((c) => {
             const f = itemForms[c.id] ?? { name: "", priceRub: "", desc: "" };
+            const fieldClass =
+              "w-full rounded-md border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/30 px-2 py-1 text-[11px] leading-tight text-[var(--color-on-dark)] placeholder:text-[var(--color-on-dark-muted)]";
             return (
               <section
                 key={c.id}
-                className="rounded-lg border border-[var(--color-brand-gold)]/25 bg-white/[0.06] p-2.5"
+                className="rounded-md border border-[var(--color-brand-gold)]/25 bg-white/[0.06] p-2"
               >
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <h2 className="text-sm font-medium text-[var(--color-on-dark)]">{c.name}</h2>
+                <div className="flex flex-wrap items-center justify-between gap-1.5">
+                  <h2 className="text-xs font-semibold text-[var(--color-on-dark)]">{c.name}</h2>
                   <button
                     type="button"
                     onClick={() => removeCategory(c.id)}
-                    className="rounded-lg p-1.5 text-[var(--color-on-dark-muted)] hover:bg-red-500/25 hover:text-red-100"
+                    className="rounded-md p-1 text-[var(--color-on-dark-muted)] hover:bg-red-500/25 hover:text-red-100"
                     aria-label="Удалить категорию"
                   >
-                    <Trash2 className="h-4 w-4" />
+                    <Trash2 className="h-3.5 w-3.5" />
                   </button>
                 </div>
-                <ul className="mt-3 space-y-2">
+                <ul className="mt-1.5 space-y-1">
                   {c.items.map((it) => (
-                    <li key={it.id} className="flex flex-wrap items-center justify-between gap-2 border-t border-[var(--color-brand-gold)]/15 pt-2 first:border-t-0 first:pt-0">
-                      <div>
-                        <p className="text-sm text-[var(--color-on-dark)]">{it.name}</p>
-                        {it.description ? <p className="text-xs text-[var(--color-on-dark-muted)]">{it.description}</p> : null}
+                    <li
+                      key={it.id}
+                      className="flex flex-wrap items-center justify-between gap-1.5 border-t border-[var(--color-brand-gold)]/12 pt-1.5 first:border-t-0 first:pt-0"
+                    >
+                      <div className="min-w-0">
+                        <p className="text-xs font-medium text-[var(--color-on-dark)]">{it.name}</p>
+                        {it.description ? (
+                          <p className="text-[11px] leading-snug text-[var(--color-on-dark-muted)]">{it.description}</p>
+                        ) : null}
                       </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-medium text-[var(--color-brand-gold)]">{formatPrice(it.priceKop)}</span>
+                      <div className="flex shrink-0 items-center gap-1.5">
+                        <span className="text-[11px] font-medium text-[var(--color-brand-gold)]">{formatPrice(it.priceKop)}</span>
                         <button
                           type="button"
                           onClick={() => removeItem(it.id)}
-                          className="rounded-lg p-1 text-[var(--color-on-dark-muted)] hover:bg-red-500/25"
+                          className="rounded-md p-0.5 text-[var(--color-on-dark-muted)] hover:bg-red-500/25"
                           aria-label="Удалить"
                         >
-                          <Trash2 className="h-4 w-4" />
+                          <Trash2 className="h-3.5 w-3.5" />
                         </button>
                       </div>
                     </li>
                   ))}
                 </ul>
-                <div className="mt-2 grid gap-1.5 border-t border-[var(--color-brand-gold)]/20 pt-2 sm:grid-cols-3">
-                  <input
-                    placeholder="Название позиции"
-                    value={f.name}
-                    onChange={(e) => setItemForms((prev) => ({ ...prev, [c.id]: { ...f, name: e.target.value } }))}
-                    className="rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/30 px-2.5 py-1.5 text-xs text-[var(--color-on-dark)]"
-                  />
-                  <input
-                    placeholder="Цена, ₽"
-                    inputMode="decimal"
-                    value={f.priceRub}
-                    onChange={(e) => setItemForms((prev) => ({ ...prev, [c.id]: { ...f, priceRub: e.target.value } }))}
-                    className="rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/30 px-2.5 py-1.5 text-xs text-[var(--color-on-dark)]"
-                  />
+                <div className="mt-1.5 border-t border-[var(--color-brand-gold)]/15 pt-1.5">
+                  <div className="flex flex-col gap-1 sm:flex-row sm:items-stretch sm:gap-1.5">
+                    <input
+                      placeholder="Название позиции"
+                      value={f.name}
+                      onChange={(e) => setItemForms((prev) => ({ ...prev, [c.id]: { ...f, name: e.target.value } }))}
+                      className={`${fieldClass} min-w-0 sm:flex-1`}
+                    />
+                    <input
+                      placeholder="Цена, ₽"
+                      inputMode="decimal"
+                      value={f.priceRub}
+                      onChange={(e) => setItemForms((prev) => ({ ...prev, [c.id]: { ...f, priceRub: e.target.value } }))}
+                      className={`${fieldClass} sm:w-[6.25rem] sm:flex-none`}
+                    />
+                  </div>
                   <input
                     placeholder="Описание (необяз.)"
                     value={f.desc}
                     onChange={(e) => setItemForms((prev) => ({ ...prev, [c.id]: { ...f, desc: e.target.value } }))}
-                    className="rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/30 px-2.5 py-1.5 text-xs text-[var(--color-on-dark)] sm:col-span-3"
+                    className={`${fieldClass} mt-1`}
                   />
                   <button
                     type="button"
                     onClick={() => addItem(c.id)}
-                    className="rounded-lg bg-[var(--color-brand-gold)]/90 px-3 py-1.5 text-xs font-semibold text-[#0a192f] sm:col-span-3"
+                    className="mt-1.5 inline-flex w-full items-center justify-center rounded-md bg-[var(--color-brand-gold)]/90 px-2.5 py-1 text-[11px] font-semibold text-[#0a192f] sm:w-auto sm:self-start"
                   >
                     Добавить позицию
                   </button>

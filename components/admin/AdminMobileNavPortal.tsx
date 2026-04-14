@@ -8,6 +8,7 @@ import { LogOut } from "lucide-react";
 import { ADMIN_BTN } from "@/lib/admin-button-classes";
 
 type NavItem = { label: string; href: string; icon: LucideIcon; iconClass: string };
+type NavGroup = { title: string; items: NavItem[] };
 
 type User = { login: string };
 
@@ -15,7 +16,7 @@ export function AdminMobileNavPortal({
   sidebarOpen,
   closeSidebar,
   user,
-  NAV,
+  NAV_GROUPS,
   isActive,
   requestsPendingTotal,
   payoutsAwaitingTotal,
@@ -24,7 +25,7 @@ export function AdminMobileNavPortal({
   sidebarOpen: boolean;
   closeSidebar: () => void;
   user: User;
-  NAV: NavItem[];
+  NAV_GROUPS: NavGroup[];
   isActive: (href: string) => boolean;
   requestsPendingTotal: number | null;
   payoutsAwaitingTotal: number | null;
@@ -107,46 +108,62 @@ export function AdminMobileNavPortal({
             <p className="cabinet-nav-label mb-1.5 px-2 text-center text-[10px] font-semibold uppercase tracking-wider opacity-60">
               Навигация
             </p>
-            <nav className="flex flex-col gap-0.5 rounded-lg border border-[var(--color-brand-gold)]/15 p-1" role="none">
-              {NAV.map(({ label, href, icon: Icon, iconClass }) => {
-                const showRequestsBadge =
-                  href === "/admin/verification-requests" && requestsPendingTotal != null && requestsPendingTotal > 0;
-                const requestsBadgeN = requestsPendingTotal ?? 0;
-                const showPayoutsBadge =
-                  href === "/admin/payouts" && payoutsAwaitingTotal != null && payoutsAwaitingTotal > 0;
-                const payoutsBadgeN = payoutsAwaitingTotal ?? 0;
-                return (
-                  <Link
-                    key={href}
-                    href={href}
-                    onClick={closeSidebar}
-                    role="menuitem"
-                    className={`flex items-center gap-2.5 rounded-md px-2.5 py-2.5 text-sm font-medium transition-colors ${
-                      isActive(href)
-                        ? "cabinet-nav-active font-semibold"
-                        : "border border-transparent hover:bg-white/10"
-                    }`}
-                  >
-                    <Icon className={`h-4 w-4 shrink-0 ${iconClass}`} aria-hidden />
-                    <span className="flex flex-1 items-center gap-2">
-                      {label}
-                      {showRequestsBadge && (
-                        <span className="inline-flex min-h-[1.25rem] min-w-[1.25rem] shrink-0 items-center justify-center rounded-full bg-[var(--color-accent-red)] px-1.5 text-[10px] font-bold leading-none text-white tabular-nums">
-                          {requestsBadgeN > 99 ? "99+" : requestsBadgeN}
-                        </span>
-                      )}
-                      {showPayoutsBadge && (
-                        <span
-                          className="inline-flex min-h-[1.25rem] min-w-[1.25rem] shrink-0 items-center justify-center rounded-full bg-amber-500 px-1.5 text-[10px] font-bold leading-none text-[#0a192f] tabular-nums ring-1 ring-amber-200/40"
-                          title="Заявки на вывод в работе"
+            <nav className="flex flex-col gap-0 rounded-lg border border-[var(--color-brand-gold)]/15 p-1 pb-2" role="none">
+              {NAV_GROUPS.map((group) => (
+                <div
+                  key={group.title}
+                  className="mt-2.5 border-t border-white/10 pt-2.5 first:mt-0 first:border-t-0 first:pt-0"
+                  role="group"
+                  aria-label={group.title}
+                >
+                  <div className="px-2 pb-1 pt-0.5 text-[0.6rem] font-semibold uppercase tracking-[0.12em] text-white/45">
+                    {group.title}
+                  </div>
+                  <div className="flex flex-col gap-0.5">
+                    {group.items.map(({ label, href, icon: Icon, iconClass }) => {
+                      const showRequestsBadge =
+                        href === "/admin/verification-requests" &&
+                        requestsPendingTotal != null &&
+                        requestsPendingTotal > 0;
+                      const requestsBadgeN = requestsPendingTotal ?? 0;
+                      const showPayoutsBadge =
+                        href === "/admin/payouts" && payoutsAwaitingTotal != null && payoutsAwaitingTotal > 0;
+                      const payoutsBadgeN = payoutsAwaitingTotal ?? 0;
+                      return (
+                        <Link
+                          key={href}
+                          href={href}
+                          onClick={closeSidebar}
+                          role="menuitem"
+                          className={`flex items-center gap-2.5 rounded-md px-2.5 py-2.5 text-sm font-medium transition-colors ${
+                            isActive(href)
+                              ? "cabinet-nav-active font-semibold"
+                              : "border border-transparent hover:bg-white/10"
+                          }`}
                         >
-                          {payoutsBadgeN > 99 ? "99+" : payoutsBadgeN}
-                        </span>
-                      )}
-                    </span>
-                  </Link>
-                );
-              })}
+                          <Icon className={`h-4 w-4 shrink-0 ${iconClass}`} aria-hidden />
+                          <span className="flex flex-1 items-center gap-2">
+                            {label}
+                            {showRequestsBadge && (
+                              <span className="inline-flex min-h-[1.25rem] min-w-[1.25rem] shrink-0 items-center justify-center rounded-full bg-[var(--color-accent-red)] px-1.5 text-[10px] font-bold leading-none text-white tabular-nums">
+                                {requestsBadgeN > 99 ? "99+" : requestsBadgeN}
+                              </span>
+                            )}
+                            {showPayoutsBadge && (
+                              <span
+                                className="inline-flex min-h-[1.25rem] min-w-[1.25rem] shrink-0 items-center justify-center rounded-full bg-amber-500 px-1.5 text-[10px] font-bold leading-none text-[#0a192f] tabular-nums ring-1 ring-amber-200/40"
+                                title="Заявки на вывод в работе"
+                              >
+                                {payoutsBadgeN > 99 ? "99+" : payoutsBadgeN}
+                              </span>
+                            )}
+                          </span>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
             </nav>
             <button
               type="button"

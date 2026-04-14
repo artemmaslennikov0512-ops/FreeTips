@@ -50,8 +50,8 @@ export const ESTABLISHMENT_OPERATIONS_MODULES: EstablishmentOperationsModule[] =
   },
   {
     id: "service",
-    title: "Сервис стола",
-    description: "Кто обслуживает стол; чек и оплата — отдельно.",
+    title: "Сессии обслуживания",
+    description: "Сессия на стол: кто обслуживает; закрыть перед новой. Чек и оплата — отдельно.",
     cabinetPath: "/establishment/service",
     apiBase: "/api/establishment/service-sessions",
     implemented: true,

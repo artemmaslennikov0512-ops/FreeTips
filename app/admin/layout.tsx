@@ -37,17 +37,48 @@ interface User {
   mustChangePassword?: boolean;
 }
 
-const NAV: { label: string; href: string; icon: LucideIcon; iconClass: string }[] = [
-  { label: "Дашборд", href: "/admin/dashboard", icon: LayoutDashboard, iconClass: "!text-sky-400" },
-  { label: "Заведения", href: "/admin/establishments", icon: Building2, iconClass: "!text-amber-400" },
-  { label: "Выводы", href: "/admin/payouts", icon: Send, iconClass: "!text-emerald-400" },
-  { label: "Пользователи", href: "/admin/users", icon: Users, iconClass: "!text-violet-400" },
-  { label: "Заявки", href: "/admin/verification-requests", icon: FileCheck, iconClass: "!text-blue-400" },
-  { label: "Поддержка", href: "/admin/support", icon: MessageCircle, iconClass: "!text-cyan-400" },
-  { label: "Антифрод", href: "/admin/antifraud", icon: ShieldCheck, iconClass: "!text-rose-400" },
-  { label: "Приём по ссылкам", href: "/admin/payment-accept", icon: CreditCard, iconClass: "!text-[var(--color-brand-gold)]" },
-  { label: "Безопасность (2FA)", href: "/admin/security", icon: KeyRound, iconClass: "!text-amber-300" },
-  { label: "Сессии", href: "/admin/sessions", icon: Laptop, iconClass: "!text-slate-300" },
+type AdminNavItem = { label: string; href: string; icon: LucideIcon; iconClass: string };
+type AdminNavGroup = { title: string; items: AdminNavItem[] };
+
+const NAV_GROUPS: AdminNavGroup[] = [
+  {
+    title: "Обзор",
+    items: [{ label: "Дашборд", href: "/admin/dashboard", icon: LayoutDashboard, iconClass: "!text-sky-400" }],
+  },
+  {
+    title: "Платформа",
+    items: [
+      { label: "Заведения", href: "/admin/establishments", icon: Building2, iconClass: "!text-amber-400" },
+      { label: "Выводы", href: "/admin/payouts", icon: Send, iconClass: "!text-emerald-400" },
+      { label: "Пользователи", href: "/admin/users", icon: Users, iconClass: "!text-violet-400" },
+    ],
+  },
+  {
+    title: "Заявки и контроль",
+    items: [
+      { label: "Заявки", href: "/admin/verification-requests", icon: FileCheck, iconClass: "!text-blue-400" },
+      { label: "Поддержка", href: "/admin/support", icon: MessageCircle, iconClass: "!text-cyan-400" },
+      { label: "Антифрод", href: "/admin/antifraud", icon: ShieldCheck, iconClass: "!text-rose-400" },
+    ],
+  },
+  {
+    title: "Платежи",
+    items: [
+      {
+        label: "Приём по ссылкам",
+        href: "/admin/payment-accept",
+        icon: CreditCard,
+        iconClass: "!text-[var(--color-brand-gold)]",
+      },
+    ],
+  },
+  {
+    title: "Безопасность",
+    items: [
+      { label: "Безопасность (2FA)", href: "/admin/security", icon: KeyRound, iconClass: "!text-amber-300" },
+      { label: "Сессии", href: "/admin/sessions", icon: Laptop, iconClass: "!text-slate-300" },
+    ],
+  },
 ];
 
 const ADMIN_LG_SIDEBAR_COLLAPSED_KEY = "admin-lg-sidebar-collapsed";
@@ -237,7 +268,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         sidebarOpen={sidebarOpen}
         closeSidebar={closeSidebar}
         user={user}
-        NAV={NAV}
+        NAV_GROUPS={NAV_GROUPS}
         isActive={isActive}
         requestsPendingTotal={requestsPendingTotal}
         payoutsAwaitingTotal={payoutsAwaitingTotal}
@@ -283,45 +314,64 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </div>
           </div>
           <div className="cabinet-nav-block flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto overflow-x-hidden px-3 pb-2">
-            <nav className="flex flex-col gap-0.5 rounded-[10px] border border-[var(--color-brand-gold)]/15 bg-white/5 p-1.5 shadow-[var(--shadow-subtle)]" aria-label="Навигация админ-панели">
-              {NAV.map(({ label, href, icon: Icon, iconClass }) => {
-                const showRequestsBadge =
-                  href === "/admin/verification-requests" && requestsPendingTotal != null && requestsPendingTotal > 0;
-                const requestsBadgeN = requestsPendingTotal ?? 0;
-                const showPayoutsBadge =
-                  href === "/admin/payouts" && payoutsAwaitingTotal != null && payoutsAwaitingTotal > 0;
-                const payoutsBadgeN = payoutsAwaitingTotal ?? 0;
-                return (
-                  <Link
-                    key={href}
-                    href={href}
-                    onClick={closeSidebar}
-                    className={`flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[0.9375rem] font-normal transition-colors ${
-                      isActive(href)
-                        ? "cabinet-nav-active border border-[#0a192f]/25 bg-[#0a192f]/10 text-[#0a192f] font-medium"
-                        : "border border-transparent text-white/80 hover:bg-[var(--color-dark-gray)]/10 hover:text-white"
-                    }`}
-                  >
-                    <Icon className={`cabinet-nav-item-icon h-[18px] w-[18px] shrink-0 ${iconClass}`} aria-hidden />
-                    <span className="flex min-w-0 flex-1 items-center gap-2 break-words">
-                      {label}
-                      {showRequestsBadge && (
-                        <span className="inline-flex min-h-[1.25rem] min-w-[1.25rem] shrink-0 items-center justify-center rounded-full bg-[var(--color-accent-red)] px-1.5 text-[11px] font-bold leading-none text-white tabular-nums">
-                          {requestsBadgeN > 99 ? "99+" : requestsBadgeN}
-                        </span>
-                      )}
-                      {showPayoutsBadge && (
-                        <span
-                          className="inline-flex min-h-[1.25rem] min-w-[1.25rem] shrink-0 items-center justify-center rounded-full bg-amber-500 px-1.5 text-[11px] font-bold leading-none text-[#0a192f] tabular-nums ring-1 ring-amber-200/40"
-                          title="Заявки на вывод в работе"
+            <nav
+              className="flex flex-col gap-0 rounded-[10px] border border-[var(--color-brand-gold)]/15 bg-white/5 p-1.5 pb-2 shadow-[var(--shadow-subtle)]"
+              aria-label="Навигация админ-панели"
+            >
+              {NAV_GROUPS.map((group) => (
+                <div
+                  key={group.title}
+                  className="mt-3 border-t border-white/[0.08] pt-3 first:mt-0 first:border-t-0 first:pt-0"
+                  role="group"
+                  aria-label={group.title}
+                >
+                  <div className="px-2.5 pb-1.5 pt-0.5 text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-white/40">
+                    {group.title}
+                  </div>
+                  <div className="flex flex-col gap-0.5">
+                    {group.items.map(({ label, href, icon: Icon, iconClass }) => {
+                      const showRequestsBadge =
+                        href === "/admin/verification-requests" &&
+                        requestsPendingTotal != null &&
+                        requestsPendingTotal > 0;
+                      const requestsBadgeN = requestsPendingTotal ?? 0;
+                      const showPayoutsBadge =
+                        href === "/admin/payouts" && payoutsAwaitingTotal != null && payoutsAwaitingTotal > 0;
+                      const payoutsBadgeN = payoutsAwaitingTotal ?? 0;
+                      return (
+                        <Link
+                          key={href}
+                          href={href}
+                          onClick={closeSidebar}
+                          className={`flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[0.9375rem] font-normal transition-colors ${
+                            isActive(href)
+                              ? "cabinet-nav-active border border-[#0a192f]/25 bg-[#0a192f]/10 text-[#0a192f] font-medium"
+                              : "border border-transparent text-white/80 hover:bg-[var(--color-dark-gray)]/10 hover:text-white"
+                          }`}
                         >
-                          {payoutsBadgeN > 99 ? "99+" : payoutsBadgeN}
-                        </span>
-                      )}
-                    </span>
-                  </Link>
-                );
-              })}
+                          <Icon className={`cabinet-nav-item-icon h-[18px] w-[18px] shrink-0 ${iconClass}`} aria-hidden />
+                          <span className="flex min-w-0 flex-1 items-center gap-2 break-words">
+                            {label}
+                            {showRequestsBadge && (
+                              <span className="inline-flex min-h-[1.25rem] min-w-[1.25rem] shrink-0 items-center justify-center rounded-full bg-[var(--color-accent-red)] px-1.5 text-[11px] font-bold leading-none text-white tabular-nums">
+                                {requestsBadgeN > 99 ? "99+" : requestsBadgeN}
+                              </span>
+                            )}
+                            {showPayoutsBadge && (
+                              <span
+                                className="inline-flex min-h-[1.25rem] min-w-[1.25rem] shrink-0 items-center justify-center rounded-full bg-amber-500 px-1.5 text-[11px] font-bold leading-none text-[#0a192f] tabular-nums ring-1 ring-amber-200/40"
+                                title="Заявки на вывод в работе"
+                              >
+                                {payoutsBadgeN > 99 ? "99+" : payoutsBadgeN}
+                              </span>
+                            )}
+                          </span>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
             </nav>
             <button
               type="button"

@@ -144,7 +144,7 @@ export default function EstablishmentServicePage() {
           Зал и сервис
         </Link>
         <h1 className="cabinet-dashboard-name-hero font-[family:var(--font-playfair)] text-[var(--color-on-dark)]">
-          Сервис стола
+          Сессии обслуживания
         </h1>
         <p className="ft-panel-section-head__lead text-sm text-[var(--color-on-dark-muted)]">
           Открытая сессия на стол — одна; закройте перед новой. Оплата и чек — позже.
@@ -162,7 +162,7 @@ export default function EstablishmentServicePage() {
         onSubmit={openSession}
         className="ft-panel-section-toolbar ft-panel-section-toolbar--row gap-2 rounded-lg border border-[var(--color-brand-gold)]/30 bg-white/[0.06] p-2.5 sm:flex-wrap"
       >
-        <div className="w-full max-w-xs min-w-[12rem] flex-1 text-center sm:text-left">
+        <div className="min-w-[11rem] w-[13.5rem] max-w-full shrink-0 text-center sm:w-52 sm:text-left">
           <label className="mb-1 block text-xs text-[var(--color-on-dark-muted)]">Стол *</label>
           <select
             value={tableId}
@@ -177,7 +177,7 @@ export default function EstablishmentServicePage() {
             ))}
           </select>
         </div>
-        <div className="w-full max-w-xs min-w-[12rem] flex-1 text-center sm:text-left">
+        <div className="min-w-[11rem] w-[13.5rem] max-w-full shrink-0 text-center sm:w-52 sm:text-left">
           <label className="mb-1 block text-xs text-[var(--color-on-dark-muted)]">Официант (необяз.)</label>
           <select
             value={employeeId}
@@ -203,13 +203,17 @@ export default function EstablishmentServicePage() {
       {loading ? (
         <p className="text-center text-[var(--color-on-dark-muted)]">Загрузка…</p>
       ) : (
-        <>
+        <div className="mt-8 flex flex-col gap-6">
           <section>
-            <h2 className="mb-1.5 text-center text-xs font-semibold uppercase tracking-wide text-[var(--color-brand-gold)]">
+            <p
+              role="heading"
+              aria-level={2}
+              className="mb-2 text-center text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--color-brand-gold)] sm:text-[11px]"
+            >
               Открытые
-            </h2>
+            </p>
             {openSessions.length === 0 ? (
-              <p className="text-center text-sm text-[var(--color-on-dark-muted)]">Нет открытых сессий.</p>
+              <p className="text-center text-xs text-[var(--color-on-dark-muted)]">Нет открытых сессий.</p>
             ) : (
               <ul className="flex flex-col gap-2">
                 {openSessions.map((s) => (
@@ -237,9 +241,13 @@ export default function EstablishmentServicePage() {
             )}
           </section>
           <section>
-            <h2 className="mb-1.5 text-center text-xs font-semibold uppercase tracking-wide text-[var(--color-on-dark-muted)]">
+            <p
+              role="heading"
+              aria-level={2}
+              className="mb-2 text-center text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--color-on-dark-muted)] sm:text-[11px]"
+            >
               Недавние (все статусы)
-            </h2>
+            </p>
             <ul className="flex max-h-[24rem] flex-col gap-1 overflow-y-auto text-xs">
               {closedSessions.slice(0, 50).map((s) => (
                 <li key={s.id} className="rounded-md border border-[var(--color-brand-gold)]/15 bg-white/[0.04] px-2 py-1.5 text-[var(--color-on-dark-muted)]">
@@ -249,7 +257,7 @@ export default function EstablishmentServicePage() {
               ))}
             </ul>
           </section>
-        </>
+        </div>
       )}
     </div>
   );

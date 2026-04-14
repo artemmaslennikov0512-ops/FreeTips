@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Plus, Copy, RefreshCw, FileDown, Mail, Pencil, Upload, ImageIcon, UserMinus, Eye } from "lucide-react";
+import { Plus, Copy, RefreshCw, FileDown, Mail, Pencil, Upload, ImageIcon, UserMinus } from "lucide-react";
 import { authHeaders, getAccessToken } from "@/lib/auth-client";
 import { beginCabinetImpersonation } from "@/lib/cabinet-impersonation";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
@@ -549,7 +549,22 @@ export default function EstablishmentTeamPage() {
         ) : (
           employees.map((emp) => (
             <div key={emp.id} className={`cabinet-card rounded-lg border-0 bg-[var(--color-bg-sides)] p-3 shadow-[var(--shadow-subtle)] ${!emp.isActive ? "opacity-70" : ""}`}>
-              <p className="text-xs text-white/70">Код официанта: <span className="font-mono text-white/90">{emp.qrCodeIdentifier}</span></p>
+              <p className="text-xs text-white/70">
+                Код официанта:{" "}
+                {emp.hasUser ? (
+                  <button
+                    type="button"
+                    onClick={() => void openEmployeeCabinet(emp.id)}
+                    disabled={viewCabinetEmpId === emp.id}
+                    className="font-mono text-[var(--color-brand-gold)] hover:underline disabled:cursor-wait disabled:opacity-50"
+                    title="Открыть личный кабинет официанта"
+                  >
+                    {emp.qrCodeIdentifier}
+                  </button>
+                ) : (
+                  <span className="font-mono text-white/90">{emp.qrCodeIdentifier}</span>
+                )}
+              </p>
               <p className="mt-1 font-medium text-white">ФИО: {emp.name}</p>
               <p className="text-xs text-white/90">Должность: {emp.position || "—"}</p>
               <p className="mt-1 text-[11px] text-white/80">Коэфф. {emp.coefficient} · Рейтинг: {emp.reviewsCount > 0 ? `${emp.avgRating ?? "—"} (${emp.reviewsCount})` : "—"}</p>
@@ -564,15 +579,6 @@ export default function EstablishmentTeamPage() {
                 {emp.hasUser && (
                   <div className="flex w-full flex-col gap-2">
                     <span className="text-center text-xs text-white/80">Уже зарегистрирован</span>
-                    <button
-                      type="button"
-                      onClick={() => void openEmployeeCabinet(emp.id)}
-                      disabled={viewCabinetEmpId === emp.id}
-                      className="inline-flex items-center justify-center gap-1 rounded-lg border border-[var(--color-brand-gold)]/35 bg-[var(--color-brand-gold)]/10 px-3 py-2 text-xs text-white hover:bg-[var(--color-brand-gold)]/20 disabled:opacity-50"
-                    >
-                      <Eye className="h-3 w-3" />
-                      {viewCabinetEmpId === emp.id ? "…" : "Открыть ЛК"}
-                    </button>
                     <button
                       type="button"
                       onClick={() => void disconnectUser(emp)}
@@ -635,7 +641,21 @@ export default function EstablishmentTeamPage() {
               ) : (
                 employees.map((emp) => (
                   <tr key={emp.id} className={`establishment-team-table-row ${!emp.isActive ? "opacity-70" : ""}`}>
-                    <td className="establishment-team-table-cell whitespace-nowrap p-2 text-center font-mono text-white/90">{emp.qrCodeIdentifier}</td>
+                    <td className="establishment-team-table-cell whitespace-nowrap p-2 text-center font-mono text-white/90">
+                      {emp.hasUser ? (
+                        <button
+                          type="button"
+                          onClick={() => void openEmployeeCabinet(emp.id)}
+                          disabled={viewCabinetEmpId === emp.id}
+                          className="font-mono text-[var(--color-brand-gold)] hover:underline disabled:cursor-wait disabled:opacity-50"
+                          title="Открыть личный кабинет официанта"
+                        >
+                          {emp.qrCodeIdentifier}
+                        </button>
+                      ) : (
+                        emp.qrCodeIdentifier
+                      )}
+                    </td>
                     <td className="establishment-team-table-cell establishment-team-table-cell-name whitespace-nowrap p-2 text-center text-white">{emp.name}</td>
                     <td className="establishment-team-table-cell establishment-team-table-cell-position whitespace-nowrap p-2 text-center text-white/90">{emp.position || "—"}</td>
                     <td className="establishment-team-table-cell establishment-team-table-cell-coef whitespace-nowrap p-2 text-center text-white/90">{emp.coefficient}</td>
@@ -653,15 +673,6 @@ export default function EstablishmentTeamPage() {
                       {emp.hasUser ? (
                         <div className="flex flex-col items-center gap-2">
                           <span className="text-xs text-white/90">Уже зарегистрирован</span>
-                          <button
-                            type="button"
-                            onClick={() => void openEmployeeCabinet(emp.id)}
-                            disabled={viewCabinetEmpId === emp.id}
-                            className="inline-flex items-center gap-1 rounded-lg border border-[var(--color-brand-gold)]/35 bg-[var(--color-brand-gold)]/10 px-2 py-1.5 text-xs text-white hover:bg-[var(--color-brand-gold)]/20 disabled:opacity-50"
-                          >
-                            <Eye className="h-3 w-3" />
-                            {viewCabinetEmpId === emp.id ? "…" : "ЛК"}
-                          </button>
                           <button
                             type="button"
                             onClick={() => void disconnectUser(emp)}

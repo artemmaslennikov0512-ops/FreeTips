@@ -44,34 +44,53 @@ const LG_SIDEBAR_COLLAPSE_BTN =
 const LG_SIDEBAR_EXPAND_BTN =
   "cabinet-lg-sidebar-toggle cabinet-lg-sidebar-toggle--expand fixed left-0 top-1/2 z-[35] hidden h-9 w-9 -translate-y-1/2 translate-x-1/2 items-center justify-center rounded-full border border-white/20 bg-[var(--color-navy)] text-[var(--color-text)] shadow-none transition-[color,background-color,border-color] duration-200 hover:border-white/35 hover:bg-white/[0.08] hover:text-[var(--color-text)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-gold)]/35 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent lg:flex";
 
-const NAV: {
+type CabinetNavItem = {
   label: string;
   href: string;
   icon: LucideIcon;
   recipientOnly?: boolean;
   employeeOnly?: boolean;
   waiterFloorOnly?: boolean;
-}[] = [
-  { label: "Дашборд", href: "/cabinet", icon: LayoutDashboard },
-  { label: "Зал", href: "/cabinet/floor", icon: LayoutGrid, waiterFloorOnly: true },
-  { label: "Операции", href: "/cabinet/transactions", icon: List },
-  { label: "Моя ссылка", href: "/cabinet/link", icon: Link2 },
+};
+
+type CabinetNavGroup = { title: string; items: CabinetNavItem[] };
+
+const NAV_GROUPS: CabinetNavGroup[] = [
   {
-    label: "Подключиться к заведению",
-    href: "/cabinet/join-establishment",
-    icon: UserPlus,
-    recipientOnly: true,
+    title: "Обзор и работа",
+    items: [
+      { label: "Дашборд", href: "/cabinet", icon: LayoutDashboard },
+      { label: "Зал", href: "/cabinet/floor", icon: LayoutGrid, waiterFloorOnly: true },
+      { label: "Операции", href: "/cabinet/transactions", icon: List },
+      { label: "Моя ссылка", href: "/cabinet/link", icon: Link2 },
+    ],
   },
   {
-    label: "Покинуть заведение",
-    href: "/cabinet/leave-establishment",
-    icon: UserMinus,
-    employeeOnly: true,
+    title: "Заведение",
+    items: [
+      {
+        label: "Подключиться к заведению",
+        href: "/cabinet/join-establishment",
+        icon: UserPlus,
+        recipientOnly: true,
+      },
+      {
+        label: "Покинуть заведение",
+        href: "/cabinet/leave-establishment",
+        icon: UserMinus,
+        employeeOnly: true,
+      },
+    ],
   },
-  { label: "Верификация", href: "/cabinet/verification", icon: ShieldCheck },
-  { label: "Поддержка", href: "/cabinet/support", icon: MessageCircle },
-  { label: "Сессии", href: "/cabinet/sessions", icon: Laptop },
-  { label: "Настройки профиля", href: "/cabinet/settings", icon: Settings },
+  {
+    title: "Профиль и поддержка",
+    items: [
+      { label: "Верификация", href: "/cabinet/verification", icon: ShieldCheck },
+      { label: "Поддержка", href: "/cabinet/support", icon: MessageCircle },
+      { label: "Сессии", href: "/cabinet/sessions", icon: Laptop },
+      { label: "Настройки профиля", href: "/cabinet/settings", icon: Settings },
+    ],
+  },
 ];
 
 export default function CabinetLayout({ children }: { children: React.ReactNode }) {
@@ -321,15 +340,19 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
     : "cabinet-nav-active border font-medium";
 
   const effectiveNavRole = user?.role ?? cachedNavRole;
-  const visibleNav = useMemo(
-    () =>
-      NAV.filter((item) => {
-        if (item.recipientOnly && effectiveNavRole !== "RECIPIENT") return false;
-        if (item.employeeOnly && effectiveNavRole !== "EMPLOYEE") return false;
-        if (item.waiterFloorOnly && effectiveNavRole !== "EMPLOYEE") return false;
-        return true;
-      }),
+  const itemVisible = useCallback(
+    (item: CabinetNavItem) => {
+      if (item.recipientOnly && effectiveNavRole !== "RECIPIENT") return false;
+      if (item.employeeOnly && effectiveNavRole !== "EMPLOYEE") return false;
+      if (item.waiterFloorOnly && effectiveNavRole !== "EMPLOYEE") return false;
+      return true;
+    },
     [effectiveNavRole],
+  );
+  const visibleNavGroups = useMemo(
+    () =>
+      NAV_GROUPS.map((g) => ({ title: g.title, items: g.items.filter(itemVisible) })).filter((g) => g.items.length > 0),
+    [itemVisible],
   );
 
   const mobileNavValue = useMemo<CabinetMobileNavContextValue>(
@@ -340,7 +363,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
       menuButtonRef,
       user,
       supportUnreadCount,
-      NAV: visibleNav,
+      navGroups: visibleNavGroups,
       isActive,
       navActiveClasses,
       handleLogout,
@@ -360,7 +383,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
       menuButtonRef,
       user,
       supportUnreadCount,
-      visibleNav,
+      visibleNavGroups,
       isActive,
       navActiveClasses,
       handleLogout,
@@ -472,41 +495,69 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
           </div>
         </div>
         <div className="cabinet-nav-block flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto overflow-x-hidden px-3">
-          <nav className="flex flex-col gap-0.5 rounded-[10px] border border-[var(--color-brand-gold)]/15 bg-[var(--color-dark-gray)]/5 p-1.5 shadow-[var(--shadow-subtle)]" aria-label="Навигация по кабинету">
-            {visibleNav.map(({ label, href, icon: Icon }) => (
-              <Link
-                key={href}
-                href={href}
-                onClick={closeSidebar}
-                className={`flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[0.9375rem] font-normal transition-colors ${
-                  isActive(href)
-                    ? navActiveClasses
-                    : "border border-transparent text-[var(--color-text)]/80 hover:bg-[var(--color-dark-gray)]/10 hover:text-[var(--color-text)]"
-                }`}
-                style={!isActive(href) && brandFont ? { color: `${brandFont}cc` } : undefined}
+          <nav
+            className="flex flex-col gap-0 rounded-[10px] border border-[var(--color-brand-gold)]/15 bg-[var(--color-dark-gray)]/5 p-1.5 pb-2 shadow-[var(--shadow-subtle)]"
+            aria-label="Навигация по кабинету"
+          >
+            {visibleNavGroups.map((group) => (
+              <div
+                key={group.title}
+                className="mt-3 border-t border-[var(--color-brand-gold)]/12 pt-3 first:mt-0 first:border-t-0 first:pt-0"
+                role="group"
+                aria-label={group.title}
               >
-                <Icon className="cabinet-nav-item-icon h-[18px] w-[18px] shrink-0" aria-hidden />
-                <span>{label}</span>
-                {href === "/cabinet/support" && supportUnreadCount > 0 && (
-                  <span
-                    className="cabinet-support-unread-badge ml-auto flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[var(--color-accent-red)] px-1.5 text-xs font-semibold text-white"
-                    aria-label={`Непрочитанных: ${supportUnreadCount}`}
-                  >
-                    {supportUnreadCount > 99 ? "99+" : supportUnreadCount}
-                  </span>
-                )}
-              </Link>
+                <div className="px-2.5 pb-1.5 pt-0.5 text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-[var(--color-text)]/40">
+                  {group.title}
+                </div>
+                <div className="flex flex-col gap-0.5">
+                  {group.items.map(({ label, href, icon: Icon }) => (
+                    <Link
+                      key={href}
+                      href={href}
+                      onClick={closeSidebar}
+                      className={`flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[0.9375rem] font-normal transition-colors ${
+                        isActive(href)
+                          ? navActiveClasses
+                          : "border border-transparent text-[var(--color-text)]/80 hover:bg-[var(--color-dark-gray)]/10 hover:text-[var(--color-text)]"
+                      }`}
+                      style={!isActive(href) && brandFont ? { color: `${brandFont}cc` } : undefined}
+                    >
+                      <Icon className="cabinet-nav-item-icon h-[18px] w-[18px] shrink-0" aria-hidden />
+                      <span>{label}</span>
+                      {href === "/cabinet/support" && supportUnreadCount > 0 && (
+                        <span
+                          className="cabinet-support-unread-badge ml-auto flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[var(--color-accent-red)] px-1.5 text-xs font-semibold text-white"
+                          aria-label={`Непрочитанных: ${supportUnreadCount}`}
+                        >
+                          {supportUnreadCount > 99 ? "99+" : supportUnreadCount}
+                        </span>
+                      )}
+                    </Link>
+                  ))}
+                </div>
+              </div>
             ))}
             {user?.role === "ESTABLISHMENT_ADMIN" && (
-              <Link
-                href="/establishment"
-                onClick={closeSidebar}
-                className="flex items-center gap-2.5 rounded-lg border border-transparent px-2.5 py-2 text-[0.9375rem] font-normal text-[var(--color-text)]/80 transition-colors hover:bg-[var(--color-dark-gray)]/10 hover:text-[var(--color-text)]"
-                style={brandFont ? { color: `${brandFont}cc` } : undefined}
+              <div
+                className="mt-3 border-t border-[var(--color-brand-gold)]/12 pt-3"
+                role="group"
+                aria-label="Связанные кабинеты"
               >
-                <Building2 className="cabinet-nav-item-icon h-[18px] w-[18px] shrink-0" aria-hidden />
-                <span>Кабинет заведения</span>
-              </Link>
+                <div className="px-2.5 pb-1.5 pt-0.5 text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-[var(--color-text)]/40">
+                  Связанные кабинеты
+                </div>
+                <div className="flex flex-col gap-0.5">
+                  <Link
+                    href="/establishment"
+                    onClick={closeSidebar}
+                    className="flex items-center gap-2.5 rounded-lg border border-transparent px-2.5 py-2 text-[0.9375rem] font-normal text-[var(--color-text)]/80 transition-colors hover:bg-[var(--color-dark-gray)]/10 hover:text-[var(--color-text)]"
+                    style={brandFont ? { color: `${brandFont}cc` } : undefined}
+                  >
+                    <Building2 className="cabinet-nav-item-icon h-[18px] w-[18px] shrink-0" aria-hidden />
+                    <span>Кабинет заведения</span>
+                  </Link>
+                </div>
+              </div>
             )}
           </nav>
           <button

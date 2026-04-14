@@ -150,7 +150,7 @@ export default function EstablishmentGuestsPage() {
           value={q}
           onChange={(e) => setQ(e.target.value)}
           placeholder="Поиск…"
-          className="w-full max-w-md min-w-[12rem] flex-1 rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/30 px-2.5 py-1.5 text-center text-sm text-[var(--color-on-dark)] placeholder:text-[var(--color-on-dark-muted)] sm:max-w-xs sm:text-left"
+          className="min-w-[11rem] w-56 max-w-full shrink rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/30 px-2.5 py-1.5 text-sm text-[var(--color-on-dark)] placeholder:text-[var(--color-on-dark-muted)] sm:w-64 sm:text-left"
         />
         <button
           type="button"

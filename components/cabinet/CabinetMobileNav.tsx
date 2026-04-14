@@ -27,6 +27,10 @@ export type CabinetMobileNavUser = {
   employeePhotoUrl?: string | null;
 } | null;
 
+export type CabinetNavDrawerItem = { label: string; href: string; icon: LucideIcon };
+
+export type CabinetNavDrawerGroup = { title: string; items: CabinetNavDrawerItem[] };
+
 export type CabinetMobileNavContextValue = {
   sidebarOpen: boolean;
   setSidebarOpen: Dispatch<SetStateAction<boolean>>;
@@ -34,7 +38,7 @@ export type CabinetMobileNavContextValue = {
   menuButtonRef: RefObject<HTMLButtonElement | null>;
   user: CabinetMobileNavUser;
   supportUnreadCount: number;
-  NAV: { label: string; href: string; icon: LucideIcon }[];
+  navGroups: CabinetNavDrawerGroup[];
   isActive: (href: string) => boolean;
   navActiveClasses: string;
   handleLogout: () => Promise<void>;
@@ -126,7 +130,7 @@ export function CabinetMobileNavPortals() {
     closeSidebar,
     user,
     supportUnreadCount,
-    NAV,
+    navGroups,
     isActive,
     navActiveClasses,
     handleLogout,
@@ -222,38 +226,64 @@ export function CabinetMobileNavPortals() {
             </div>
           </div>
           <p className="cabinet-nav-label mb-2 px-3 text-center text-xs font-medium uppercase tracking-wider text-[var(--color-text)]/50">Навигация</p>
-          <nav className="flex flex-col gap-0.5 rounded-[10px] border border-[var(--color-brand-gold)]/15 bg-[var(--color-dark-gray)]/5 p-1.5 shadow-[var(--shadow-subtle)]" role="none">
-            {NAV.map(({ label, href, icon: Icon }) => (
-              <Link
-                key={href}
-                href={href}
-                onClick={closeSidebar}
-                role="menuitem"
-                className={`flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm font-normal transition-colors ${
-                  isActive(href) ? navActiveClasses : "border border-transparent text-[var(--color-text)]/80 hover:bg-[var(--color-dark-gray)]/10 hover:text-[var(--color-text)]"
-                }`}
-                style={!isActive(href) && brandFont ? { color: `${brandFont}cc` } : undefined}
+          <nav
+            className="flex flex-col gap-0 rounded-[10px] border border-[var(--color-brand-gold)]/15 bg-[var(--color-dark-gray)]/5 p-1.5 pb-2 shadow-[var(--shadow-subtle)]"
+            role="none"
+          >
+            {navGroups.map((group) => (
+              <div
+                key={group.title}
+                className="mt-3 border-t border-[var(--color-brand-gold)]/12 pt-3 first:mt-0 first:border-t-0 first:pt-0"
+                role="group"
+                aria-label={group.title}
               >
-                <Icon className="cabinet-nav-item-icon h-[18px] w-[18px] shrink-0" aria-hidden />
-                <span>{label}</span>
-                {href === "/cabinet/support" && supportUnreadCount > 0 && (
-                  <span className="cabinet-support-unread-badge ml-auto flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[var(--color-accent-red)] px-1.5 text-xs font-semibold text-white">
-                    {supportUnreadCount > 99 ? "99+" : supportUnreadCount}
-                  </span>
-                )}
-              </Link>
+                <div className="px-2.5 pb-1.5 pt-0.5 text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-[var(--color-text)]/40">
+                  {group.title}
+                </div>
+                <div className="flex flex-col gap-0.5">
+                  {group.items.map(({ label, href, icon: Icon }) => (
+                    <Link
+                      key={href}
+                      href={href}
+                      onClick={closeSidebar}
+                      role="menuitem"
+                      className={`flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm font-normal transition-colors ${
+                        isActive(href)
+                          ? navActiveClasses
+                          : "border border-transparent text-[var(--color-text)]/80 hover:bg-[var(--color-dark-gray)]/10 hover:text-[var(--color-text)]"
+                      }`}
+                      style={!isActive(href) && brandFont ? { color: `${brandFont}cc` } : undefined}
+                    >
+                      <Icon className="cabinet-nav-item-icon h-[18px] w-[18px] shrink-0" aria-hidden />
+                      <span>{label}</span>
+                      {href === "/cabinet/support" && supportUnreadCount > 0 && (
+                        <span className="cabinet-support-unread-badge ml-auto flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[var(--color-accent-red)] px-1.5 text-xs font-semibold text-white">
+                          {supportUnreadCount > 99 ? "99+" : supportUnreadCount}
+                        </span>
+                      )}
+                    </Link>
+                  ))}
+                </div>
+              </div>
             ))}
             {user?.role === "ESTABLISHMENT_ADMIN" && (
-              <Link
-                href="/establishment"
-                onClick={closeSidebar}
-                role="menuitem"
-                className="flex items-center gap-2.5 rounded-lg border border-transparent px-2.5 py-2 font-normal text-[var(--color-text)]/80 transition-colors hover:bg-[var(--color-dark-gray)]/10 hover:text-[var(--color-text)]"
-                style={brandFont ? { color: `${brandFont}cc` } : undefined}
-              >
-                <Building2 className="cabinet-nav-item-icon h-[18px] w-[18px] shrink-0" aria-hidden />
-                <span>Кабинет заведения</span>
-              </Link>
+              <div className="mt-3 border-t border-[var(--color-brand-gold)]/12 pt-3" role="group" aria-label="Связанные кабинеты">
+                <div className="px-2.5 pb-1.5 pt-0.5 text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-[var(--color-text)]/40">
+                  Связанные кабинеты
+                </div>
+                <div className="flex flex-col gap-0.5">
+                  <Link
+                    href="/establishment"
+                    onClick={closeSidebar}
+                    role="menuitem"
+                    className="flex items-center gap-2.5 rounded-lg border border-transparent px-2.5 py-2 font-normal text-[var(--color-text)]/80 transition-colors hover:bg-[var(--color-dark-gray)]/10 hover:text-[var(--color-text)]"
+                    style={brandFont ? { color: `${brandFont}cc` } : undefined}
+                  >
+                    <Building2 className="cabinet-nav-item-icon h-[18px] w-[18px] shrink-0" aria-hidden />
+                    <span>Кабинет заведения</span>
+                  </Link>
+                </div>
+              </div>
             )}
           </nav>
           <button

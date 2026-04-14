@@ -115,26 +115,44 @@ export default function EstablishmentOperationsPage() {
           Зал и сервис
         </h1>
         <p className="ft-panel-section-head__lead text-sm text-[var(--color-on-dark-muted)]">
-          Залы, столы и бронь; дальше — гости, меню и сервис стола. Оплату настроим отдельно.
+          Залы, столы и бронь; дальше — гости, меню и сессии обслуживания. Оплату настроим отдельно.
         </p>
       </div>
 
-      <div className="ft-panel-section-toolbar ft-panel-section-toolbar--row gap-2 rounded-lg border border-[var(--color-brand-gold)]/30 bg-white/[0.06] px-3 py-2.5 shadow-[var(--shadow-subtle)] backdrop-blur-sm sm:px-4">
-        <div className="flex max-w-xl flex-col items-center gap-1.5 text-center text-[var(--color-on-dark)] sm:items-center">
+      <div className="flex w-full max-w-full flex-col gap-2 self-stretch rounded-lg border border-[var(--color-brand-gold)]/30 bg-white/[0.06] px-3 py-2.5 shadow-[var(--shadow-subtle)] backdrop-blur-sm sm:px-4">
+        <div className="flex min-h-0 w-full max-w-xl flex-1 flex-col items-center gap-1.5 self-center text-center text-[var(--color-on-dark)]">
           <Layers className="h-4 w-4 shrink-0 text-[var(--color-brand-gold)]" aria-hidden />
           <div className="flex flex-col items-center gap-0.5">
-            <p className="text-[10px] uppercase tracking-wide text-[var(--color-on-dark-muted)]">Заведено</p>
+            <p className="text-[10px] uppercase tracking-wide text-[var(--color-on-dark-muted)]">Сводка</p>
             <p className="text-sm font-medium tabular-nums text-[var(--color-on-dark)]">
               {data.counts.halls} зал{data.counts.halls === 1 ? "" : data.counts.halls < 5 ? "а" : "ов"},{" "}
               {data.counts.tables} стол{data.counts.tables === 1 ? "" : data.counts.tables < 5 ? "а" : "ов"}
             </p>
-            <p className="text-xs text-[var(--color-on-dark-muted)]">
-              Предстоящих броней: {data.counts.bookings} · гостей в базе: {data.counts.guests} · позиций меню:{" "}
-              {data.counts.menuItems} · открытых сессий стола: {data.counts.openServiceSessions}
-            </p>
+            <div className="mt-1 flex w-full justify-center px-1">
+              <table className="w-full max-w-[17rem] border-collapse text-left text-[11px] leading-snug text-[var(--color-on-dark-muted)] sm:text-xs">
+                <caption className="sr-only">Сводка показателей по заведению</caption>
+                <tbody>
+                  {(
+                    [
+                      ["Предстоящих броней", data.counts.bookings],
+                      ["Гостей в базе", data.counts.guests],
+                      ["Позиций меню", data.counts.menuItems],
+                      ["Открытых сессий стола", data.counts.openServiceSessions],
+                    ] as const
+                  ).map(([label, value]) => (
+                    <tr key={label} className="border-b border-white/[0.08] last:border-b-0">
+                      <td className="py-1 pr-3 align-middle">{label}</td>
+                      <td className="py-1 text-right align-middle font-medium tabular-nums text-[var(--color-on-dark)]">
+                        {value}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
-        <div className="flex shrink-0 items-center justify-center">
+        <div className="flex w-full shrink-0 justify-end border-t border-[var(--color-brand-gold)]/20 pt-2">
           <Link
             href="/establishment/halls"
             className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-[var(--color-brand-gold)] px-3 py-2 text-xs font-semibold text-[#0a192f] shadow-[var(--shadow-button)] transition-opacity hover:opacity-90"
@@ -149,7 +167,7 @@ export default function EstablishmentOperationsPage() {
         {data.modules.map((m) => {
           const clickable = Boolean(m.implemented && m.cabinetPath);
           const shell =
-            "relative block min-h-0 w-full rounded-lg border border-[var(--color-brand-gold)]/25 bg-white/[0.05] p-3 shadow-sm backdrop-blur-sm transition-all duration-200 ease-out";
+            "relative flex h-full min-h-0 w-full flex-col rounded-lg border border-[var(--color-brand-gold)]/25 bg-white/[0.05] p-3 shadow-sm backdrop-blur-sm transition-all duration-200 ease-out";
           const implementedAccent = m.implemented ? "ring-1 ring-emerald-500/15" : "";
           const hoverable =
             "hover:-translate-y-0.5 hover:border-[var(--color-brand-gold)]/45 hover:bg-white/[0.09] hover:shadow-md hover:shadow-black/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-gold)]/40";
@@ -170,26 +188,32 @@ export default function EstablishmentOperationsPage() {
                   {m.implemented ? "Готово" : "Скоро"}
                 </span>
               </div>
-              <p className="mt-1.5 text-left text-xs leading-relaxed text-[var(--color-on-dark-muted)]">{m.description}</p>
-              {m.apiBase ? (
-                <p
-                  className="mt-2 max-w-full truncate font-mono text-[10px] leading-tight text-[var(--color-on-dark-muted)]/75"
-                  title={m.apiBase}
-                >
-                  {m.apiBase}
-                </p>
-              ) : null}
-              {clickable ? (
-                <div className="mt-2 flex items-center justify-end gap-1 text-xs font-semibold text-[var(--color-brand-gold)] group-hover:underline">
-                  Открыть
-                  <ArrowRight className="h-3 w-3 shrink-0 transition-transform group-hover:translate-x-0.5" aria-hidden />
+              <p className="mt-1.5 min-h-0 flex-1 text-left text-xs leading-relaxed text-[var(--color-on-dark-muted)]">
+                {m.description}
+              </p>
+              {m.apiBase || clickable ? (
+                <div className="mt-auto flex min-w-0 flex-col gap-2 pt-1">
+                  {m.apiBase ? (
+                    <p
+                      className="max-w-full truncate font-mono text-[10px] leading-tight text-[var(--color-on-dark-muted)]/75"
+                      title={m.apiBase}
+                    >
+                      {m.apiBase}
+                    </p>
+                  ) : null}
+                  {clickable ? (
+                    <div className="flex items-center justify-end gap-1 text-xs font-semibold text-[var(--color-brand-gold)] group-hover:underline">
+                      Открыть
+                      <ArrowRight className="h-3 w-3 shrink-0 transition-transform group-hover:translate-x-0.5" aria-hidden />
+                    </div>
+                  ) : null}
                 </div>
               ) : null}
             </>
           );
 
           return (
-            <li key={m.id} className="min-w-0">
+            <li key={m.id} className="h-full min-h-0 min-w-0">
               {clickable && m.cabinetPath ? (
                 <Link
                   href={m.cabinetPath}

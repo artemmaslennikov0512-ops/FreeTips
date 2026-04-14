@@ -145,12 +145,12 @@ export default function EstablishmentGuestsPage() {
           </button>
         </div>
       ) : null}
-      <div className="ft-panel-section-toolbar ft-panel-section-toolbar--row rounded-lg border border-[var(--color-brand-gold)]/30 bg-white/[0.06] p-2.5">
+      <div className="ft-panel-section-toolbar ft-panel-section-toolbar--row rounded-lg border border-[var(--color-brand-gold)]/30 bg-[#0d0e12] p-2.5">
         <input
           value={q}
           onChange={(e) => setQ(e.target.value)}
           placeholder="Поиск…"
-          className="min-w-[11rem] w-56 max-w-full shrink rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/30 px-2.5 py-1.5 text-sm text-[var(--color-on-dark)] placeholder:text-[var(--color-on-dark-muted)] sm:w-64 sm:text-left"
+          className="min-w-[11rem] w-56 max-w-full shrink rounded-lg border border-[var(--color-brand-gold)]/25 bg-white/[0.08] px-2.5 py-1.5 text-sm text-[var(--color-on-dark)] placeholder:text-[var(--color-on-dark-muted)] sm:w-64 sm:text-left"
         />
         <button
           type="button"
@@ -168,7 +168,7 @@ export default function EstablishmentGuestsPage() {
           {guests.map((g) => (
             <li
               key={g.id}
-              className="flex flex-wrap items-start justify-between gap-2 rounded-lg border border-[var(--color-brand-gold)]/25 bg-white/[0.06] p-2.5"
+              className="flex flex-wrap items-start justify-between gap-2 rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0d0e12] p-2.5"
             >
               <div>
                 <p className="text-sm font-medium text-[var(--color-on-dark)]">{g.displayName}</p>
@@ -206,7 +206,7 @@ export default function EstablishmentGuestsPage() {
         <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 p-4">
           <form
             onSubmit={createGuest}
-            className="w-full max-w-md rounded-lg border border-[var(--color-brand-gold)]/35 bg-[#1e2a3a] p-4"
+            className="establishment-dialog w-full max-w-md rounded-lg border border-[var(--color-brand-gold)]/35 p-4"
           >
             <h3 className="text-sm font-medium text-[var(--color-on-dark)]">Новый гость</h3>
             <div className="mt-4 grid gap-2">
@@ -215,27 +215,27 @@ export default function EstablishmentGuestsPage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Имя *"
-                className="rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/40 px-3 py-2 text-[var(--color-on-dark)]"
+                className="rounded-lg border border-[var(--color-brand-gold)]/25 bg-white/[0.09] px-3 py-2 text-[var(--color-on-dark)]"
               />
               <input
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="Телефон"
-                className="rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/40 px-3 py-2 text-[var(--color-on-dark)]"
+                className="rounded-lg border border-[var(--color-brand-gold)]/25 bg-white/[0.09] px-3 py-2 text-[var(--color-on-dark)]"
               />
               <input
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Email"
                 type="email"
-                className="rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/40 px-3 py-2 text-[var(--color-on-dark)]"
+                className="rounded-lg border border-[var(--color-brand-gold)]/25 bg-white/[0.09] px-3 py-2 text-[var(--color-on-dark)]"
               />
               <textarea
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="Заметка"
                 rows={2}
-                className="rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/40 px-3 py-2 text-[var(--color-on-dark)]"
+                className="rounded-lg border border-[var(--color-brand-gold)]/25 bg-white/[0.09] px-3 py-2 text-[var(--color-on-dark)]"
               />
             </div>
             <div className="mt-4 flex justify-end gap-2">
@@ -255,14 +255,14 @@ export default function EstablishmentGuestsPage() {
       ) : null}
       {editing ? (
         <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-md rounded-lg border border-[var(--color-brand-gold)]/35 bg-[#1e2a3a] p-4">
+          <div className="establishment-dialog w-full max-w-md rounded-lg border border-[var(--color-brand-gold)]/35 p-4">
             <h3 className="text-sm font-medium text-[var(--color-on-dark)]">Заметка</h3>
             <p className="text-sm text-[var(--color-on-dark-muted)]">{editing.displayName}</p>
             <textarea
               value={editNotes}
               onChange={(e) => setEditNotes(e.target.value)}
               rows={4}
-              className="mt-3 w-full rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/40 px-3 py-2 text-[var(--color-on-dark)]"
+              className="mt-3 w-full rounded-lg border border-[var(--color-brand-gold)]/25 bg-white/[0.09] px-3 py-2 text-[var(--color-on-dark)]"
             />
             <div className="mt-4 flex justify-end gap-2">
               <button type="button" onClick={() => setEditing(null)} className="text-sm text-[var(--color-on-dark-muted)]">

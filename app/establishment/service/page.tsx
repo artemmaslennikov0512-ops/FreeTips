@@ -160,14 +160,14 @@ export default function EstablishmentServicePage() {
       ) : null}
       <form
         onSubmit={openSession}
-        className="ft-panel-section-toolbar ft-panel-section-toolbar--row gap-2 rounded-lg border border-[var(--color-brand-gold)]/30 bg-white/[0.06] p-2.5 sm:flex-wrap"
+        className="ft-panel-section-toolbar ft-panel-section-toolbar--row gap-2 rounded-lg border border-[var(--color-brand-gold)]/30 bg-[#0d0e12] p-2.5 sm:flex-wrap"
       >
         <div className="min-w-[11rem] w-[13.5rem] max-w-full shrink-0 text-center sm:w-52 sm:text-left">
           <label className="mb-1 block text-xs text-[var(--color-on-dark-muted)]">Стол *</label>
           <select
             value={tableId}
             onChange={(e) => setTableId(e.target.value)}
-            className="w-full rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/30 px-2.5 py-1.5 text-sm text-[var(--color-on-dark)]"
+            className="w-full rounded-lg border border-[var(--color-brand-gold)]/25 bg-white/[0.08] px-2.5 py-1.5 text-sm text-[var(--color-on-dark)]"
           >
             <option value="">Выберите стол</option>
             {tables.map((t) => (
@@ -182,7 +182,7 @@ export default function EstablishmentServicePage() {
           <select
             value={employeeId}
             onChange={(e) => setEmployeeId(e.target.value)}
-            className="w-full rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/30 px-2.5 py-1.5 text-sm text-[var(--color-on-dark)]"
+            className="w-full rounded-lg border border-[var(--color-brand-gold)]/25 bg-white/[0.08] px-2.5 py-1.5 text-sm text-[var(--color-on-dark)]"
           >
             <option value="">Не указан</option>
             {activeEmployees.map((e) => (
@@ -219,7 +219,7 @@ export default function EstablishmentServicePage() {
                 {openSessions.map((s) => (
                   <li
                     key={s.id}
-                    className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-[var(--color-brand-gold)]/25 bg-white/[0.06] p-2.5"
+                    className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0d0e12] p-2.5"
                   >
                     <div>
                       <p className="text-sm font-medium text-[var(--color-on-dark)]">{s.tableLabel}</p>
@@ -250,7 +250,7 @@ export default function EstablishmentServicePage() {
             </p>
             <ul className="flex max-h-[24rem] flex-col gap-1 overflow-y-auto text-xs">
               {closedSessions.slice(0, 50).map((s) => (
-                <li key={s.id} className="rounded-md border border-[var(--color-brand-gold)]/15 bg-white/[0.04] px-2 py-1.5 text-[var(--color-on-dark-muted)]">
+                <li key={s.id} className="rounded-md border border-[var(--color-brand-gold)]/15 bg-[#0d0e12] px-2 py-1.5 text-[var(--color-on-dark-muted)]">
                   {s.tableLabel} · {s.status === "CLOSED" ? "закрыта" : s.status}
                   {s.closedAt ? ` · ${new Date(s.closedAt).toLocaleString("ru-RU", { timeZone: "Europe/Moscow" })}` : ""}
                 </li>

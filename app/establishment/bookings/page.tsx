@@ -284,7 +284,7 @@ export default function EstablishmentBookingsPage() {
         </div>
       ) : null}
 
-      <div className="ft-panel-section-toolbar gap-2 rounded-lg border border-[var(--color-brand-gold)]/30 bg-white/[0.06] p-2.5 shadow-[var(--shadow-subtle)] backdrop-blur-sm">
+      <div className="ft-panel-section-toolbar gap-2 rounded-lg border border-[var(--color-brand-gold)]/30 bg-[#0d0e12] p-2.5 shadow-[var(--shadow-subtle)]">
         <div className="flex min-w-0 flex-row flex-wrap items-end justify-center gap-3">
           <div className="text-center sm:text-left">
             <label htmlFor="booking-date" className="mb-1 block text-xs text-[var(--color-on-dark-muted)]">
@@ -299,7 +299,7 @@ export default function EstablishmentBookingsPage() {
                 setDateYmd(v);
                 if (v) loadBookings(v);
               }}
-              className="rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/30 px-2.5 py-1.5 text-sm text-[var(--color-on-dark)]"
+              className="rounded-lg border border-[var(--color-brand-gold)]/25 bg-white/[0.08] px-2.5 py-1.5 text-sm text-[var(--color-on-dark)]"
             />
           </div>
           <button
@@ -332,7 +332,7 @@ export default function EstablishmentBookingsPage() {
           {bookings.map((b) => (
             <li
               key={b.id}
-              className="rounded-lg border border-[var(--color-brand-gold)]/30 bg-white/[0.06] p-2.5 shadow-[var(--shadow-subtle)] backdrop-blur-sm"
+              className="rounded-lg border border-[var(--color-brand-gold)]/30 bg-[#0d0e12] p-2.5 shadow-[var(--shadow-subtle)]"
             >
               <div className="flex min-w-0 flex-wrap items-start justify-between gap-2">
                 <div className="min-w-0">
@@ -399,7 +399,7 @@ export default function EstablishmentBookingsPage() {
         >
           <form
             onSubmit={createBooking}
-            className="w-full max-w-md rounded-lg border border-[var(--color-brand-gold)]/35 bg-[#1e2a3a] p-4 shadow-2xl"
+            className="establishment-dialog w-full max-w-md rounded-lg border border-[var(--color-brand-gold)]/35 p-4 shadow-2xl"
           >
             <h3 id="new-booking-title" className="text-sm font-medium text-[var(--color-on-dark)]">
               Новая бронь
@@ -420,7 +420,7 @@ export default function EstablishmentBookingsPage() {
                       setFormEmail(g.email ?? "");
                     }
                   }}
-                  className="w-full rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/40 px-2.5 py-1.5 text-sm text-[var(--color-on-dark)]"
+                  className="w-full rounded-lg border border-[var(--color-brand-gold)]/25 bg-white/[0.09] px-2.5 py-1.5 text-sm text-[var(--color-on-dark)]"
                 >
                   <option value="">Не выбрано</option>
                   {guestOptions.map((g) => (
@@ -437,7 +437,7 @@ export default function EstablishmentBookingsPage() {
                 <input
                   value={formGuest}
                   onChange={(e) => setFormGuest(e.target.value)}
-                  className="w-full rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/40 px-2.5 py-1.5 text-sm text-[var(--color-on-dark)]"
+                  className="w-full rounded-lg border border-[var(--color-brand-gold)]/25 bg-white/[0.09] px-2.5 py-1.5 text-sm text-[var(--color-on-dark)]"
                   maxLength={120}
                   placeholder={formGuestId ? "По умолчанию из карточки" : ""}
                 />
@@ -449,7 +449,7 @@ export default function EstablishmentBookingsPage() {
                     type="time"
                     value={formStart}
                     onChange={(e) => setFormStart(e.target.value)}
-                    className="w-full rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/40 px-2.5 py-1.5 text-sm text-[var(--color-on-dark)]"
+                    className="w-full rounded-lg border border-[var(--color-brand-gold)]/25 bg-white/[0.09] px-2.5 py-1.5 text-sm text-[var(--color-on-dark)]"
                   />
                 </div>
                 <div>
@@ -458,7 +458,7 @@ export default function EstablishmentBookingsPage() {
                     type="time"
                     value={formEnd}
                     onChange={(e) => setFormEnd(e.target.value)}
-                    className="w-full rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/40 px-2.5 py-1.5 text-sm text-[var(--color-on-dark)]"
+                    className="w-full rounded-lg border border-[var(--color-brand-gold)]/25 bg-white/[0.09] px-2.5 py-1.5 text-sm text-[var(--color-on-dark)]"
                   />
                 </div>
               </div>
@@ -467,7 +467,7 @@ export default function EstablishmentBookingsPage() {
                 <select
                   value={formTableId}
                   onChange={(e) => setFormTableId(e.target.value)}
-                  className="w-full rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/40 px-2.5 py-1.5 text-sm text-[var(--color-on-dark)]"
+                  className="w-full rounded-lg border border-[var(--color-brand-gold)]/25 bg-white/[0.09] px-2.5 py-1.5 text-sm text-[var(--color-on-dark)]"
                 >
                   <option value="">Без стола</option>
                   {tableOptions.map((t) => (
@@ -485,7 +485,7 @@ export default function EstablishmentBookingsPage() {
                   max={99}
                   value={formParty}
                   onChange={(e) => setFormParty(e.target.value)}
-                  className="w-full rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/40 px-2.5 py-1.5 text-sm text-[var(--color-on-dark)]"
+                  className="w-full rounded-lg border border-[var(--color-brand-gold)]/25 bg-white/[0.09] px-2.5 py-1.5 text-sm text-[var(--color-on-dark)]"
                 />
               </div>
               <div>
@@ -493,7 +493,7 @@ export default function EstablishmentBookingsPage() {
                 <input
                   value={formPhone}
                   onChange={(e) => setFormPhone(e.target.value)}
-                  className="w-full rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/40 px-2.5 py-1.5 text-sm text-[var(--color-on-dark)]"
+                  className="w-full rounded-lg border border-[var(--color-brand-gold)]/25 bg-white/[0.09] px-2.5 py-1.5 text-sm text-[var(--color-on-dark)]"
                   maxLength={40}
                 />
               </div>
@@ -503,7 +503,7 @@ export default function EstablishmentBookingsPage() {
                   type="email"
                   value={formEmail}
                   onChange={(e) => setFormEmail(e.target.value)}
-                  className="w-full rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/40 px-2.5 py-1.5 text-sm text-[var(--color-on-dark)]"
+                  className="w-full rounded-lg border border-[var(--color-brand-gold)]/25 bg-white/[0.09] px-2.5 py-1.5 text-sm text-[var(--color-on-dark)]"
                   maxLength={255}
                 />
               </div>
@@ -513,7 +513,7 @@ export default function EstablishmentBookingsPage() {
                   value={formNotes}
                   onChange={(e) => setFormNotes(e.target.value)}
                   rows={2}
-                  className="w-full rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/40 px-2.5 py-1.5 text-sm text-[var(--color-on-dark)]"
+                  className="w-full rounded-lg border border-[var(--color-brand-gold)]/25 bg-white/[0.09] px-2.5 py-1.5 text-sm text-[var(--color-on-dark)]"
                   maxLength={500}
                 />
               </div>
@@ -544,13 +544,13 @@ export default function EstablishmentBookingsPage() {
           role="dialog"
           aria-modal
         >
-          <div className="w-full max-w-sm rounded-lg border border-[var(--color-brand-gold)]/35 bg-[#1e2a3a] p-4 shadow-2xl">
+          <div className="establishment-dialog w-full max-w-sm rounded-lg border border-[var(--color-brand-gold)]/35 p-4 shadow-2xl">
             <h3 className="text-sm font-medium text-[var(--color-on-dark)]">Статус брони</h3>
             <p className="mt-1 text-sm text-[var(--color-on-dark-muted)]">{editing.guestName}</p>
             <select
               value={editStatus}
               onChange={(e) => setEditStatus(e.target.value as BookingStatus)}
-              className="mt-3 w-full rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/40 px-2.5 py-1.5 text-sm text-[var(--color-on-dark)]"
+              className="mt-3 w-full rounded-lg border border-[var(--color-brand-gold)]/25 bg-white/[0.09] px-2.5 py-1.5 text-sm text-[var(--color-on-dark)]"
             >
               {(Object.keys(STATUS_LABEL) as BookingStatus[]).map((s) => (
                 <option key={s} value={s}>

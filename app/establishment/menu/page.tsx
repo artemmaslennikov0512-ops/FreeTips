@@ -165,13 +165,13 @@ export default function EstablishmentMenuPage() {
       ) : null}
       <form
         onSubmit={addCategory}
-        className="ft-panel-section-toolbar ft-panel-section-toolbar--row gap-1.5 rounded-lg border border-[var(--color-brand-gold)]/30 bg-white/[0.06] p-2"
+        className="ft-panel-section-toolbar ft-panel-section-toolbar--row gap-1.5 rounded-lg border border-[var(--color-brand-gold)]/30 bg-[#0d0e12] p-2"
       >
         <input
           value={newCatName}
           onChange={(e) => setNewCatName(e.target.value)}
           placeholder="Новая категория"
-          className="min-w-[10rem] w-52 max-w-full shrink rounded-md border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/30 px-2 py-1 text-sm text-[var(--color-on-dark)] sm:w-56 sm:text-left"
+          className="min-w-[10rem] w-52 max-w-full shrink rounded-md border border-[var(--color-brand-gold)]/25 bg-white/[0.08] px-2 py-1 text-sm text-[var(--color-on-dark)] sm:w-56 sm:text-left"
         />
         <button
           type="submit"
@@ -188,11 +188,11 @@ export default function EstablishmentMenuPage() {
           {categories.map((c) => {
             const f = itemForms[c.id] ?? { name: "", priceRub: "", desc: "" };
             const fieldClass =
-              "w-full rounded-md border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/30 px-2 py-1 text-[11px] leading-tight text-[var(--color-on-dark)] placeholder:text-[var(--color-on-dark-muted)]";
+              "w-full rounded-md border border-[var(--color-brand-gold)]/25 bg-white/[0.08] px-2 py-1 text-[11px] leading-tight text-[var(--color-on-dark)] placeholder:text-[var(--color-on-dark-muted)]";
             return (
               <section
                 key={c.id}
-                className="rounded-md border border-[var(--color-brand-gold)]/25 bg-white/[0.06] p-2"
+                className="rounded-md border border-[var(--color-brand-gold)]/25 bg-[#0d0e12] p-2"
               >
                 <div className="flex flex-wrap items-center justify-between gap-1.5">
                   <h2 className="text-xs font-semibold text-[var(--color-on-dark)]">{c.name}</h2>

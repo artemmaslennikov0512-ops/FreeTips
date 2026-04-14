@@ -35,7 +35,7 @@ const variantStyles = {
     optionSelected: "bg-[var(--color-brand-gold)] text-[#0a192f] hover:bg-[var(--color-brand-gold)]/90",
   },
   establishment: {
-    wrap: "custom-dropdown-establishment rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 overflow-visible focus-within:ring-1 focus-within:ring-[var(--color-brand-gold)]/40",
+    wrap: "custom-dropdown-establishment rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-white/[0.08] overflow-visible focus-within:ring-1 focus-within:ring-[var(--color-brand-gold)]/40",
     trigger:
       "custom-dropdown-trigger-establishment w-full flex items-center justify-between gap-2 rounded-[10px] border-0 bg-transparent pl-4 pr-10 py-3 text-white focus:outline-none cursor-pointer text-left",
     panel:

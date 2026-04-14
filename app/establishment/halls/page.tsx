@@ -347,7 +347,7 @@ export default function EstablishmentHallsPage() {
 
       <form
         onSubmit={createHall}
-        className="ft-panel-section-toolbar ft-panel-section-toolbar--row min-w-0 rounded-lg border border-[var(--color-brand-gold)]/30 bg-white/[0.06] p-2.5 shadow-[var(--shadow-subtle)] backdrop-blur-sm"
+        className="ft-panel-section-toolbar ft-panel-section-toolbar--row min-w-0 rounded-lg border border-[var(--color-brand-gold)]/30 bg-[#0d0e12] p-2.5 shadow-[var(--shadow-subtle)]"
       >
         <div className="min-w-0 w-60 max-w-full shrink text-center sm:w-72 sm:text-left">
           <label htmlFor="new-hall" className="mb-1 block text-xs text-white/70">
@@ -380,7 +380,7 @@ export default function EstablishmentHallsPage() {
         {halls.map((hall) => (
           <section
             key={hall.id}
-            className="min-w-0 rounded-lg border border-[var(--color-brand-gold)]/30 bg-white/[0.06] p-2.5 shadow-[var(--shadow-subtle)] backdrop-blur-sm sm:p-3"
+            className="min-w-0 rounded-lg border border-[var(--color-brand-gold)]/30 bg-[#0d0e12] p-2.5 shadow-[var(--shadow-subtle)] sm:p-3"
           >
             <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
               <div className="min-w-0 flex-1">
@@ -439,7 +439,7 @@ export default function EstablishmentHallsPage() {
               {hall.tables.map((t) => (
                 <li
                   key={t.id}
-                  className="flex flex-wrap items-center justify-between gap-1.5 rounded-md border border-[var(--color-brand-gold)]/20 bg-white/[0.07] px-2 py-1.5"
+                  className="flex flex-wrap items-center justify-between gap-1.5 rounded-md border border-[var(--color-brand-gold)]/20 bg-[#0d0e12] px-2 py-1.5"
                 >
                   <div className="min-w-0">
                     <span className="text-xs font-medium text-white">{t.label}</span>
@@ -528,7 +528,7 @@ export default function EstablishmentHallsPage() {
           aria-modal
           aria-labelledby="edit-table-title"
         >
-          <div className="w-full max-w-md rounded-lg border border-[var(--color-brand-gold)]/35 bg-[#1e2a3a] p-4 text-white shadow-2xl">
+          <div className="establishment-dialog w-full max-w-md rounded-lg border border-[var(--color-brand-gold)]/35 p-4 text-white shadow-2xl">
             <h3 id="edit-table-title" className="text-sm font-medium text-white">
               Стол
             </h3>

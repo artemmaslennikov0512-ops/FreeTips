@@ -119,7 +119,7 @@ export default function EstablishmentOperationsPage() {
         </p>
       </div>
 
-      <div className="flex w-full max-w-full flex-col gap-2 self-stretch rounded-lg border border-[var(--color-brand-gold)]/30 bg-white/[0.06] px-3 py-3 shadow-[var(--shadow-subtle)] backdrop-blur-sm sm:px-4 sm:py-3.5">
+      <div className="flex w-full max-w-full flex-col gap-2 self-stretch rounded-lg border border-[var(--color-brand-gold)]/30 bg-[#0d0e12] px-3 py-3 shadow-[var(--shadow-subtle)] sm:px-4 sm:py-3.5">
         <div className="flex min-h-0 w-full max-w-xl flex-1 flex-col items-center gap-2 self-center text-center text-[var(--color-on-dark)]">
           <Layers className="h-5 w-5 shrink-0 text-[var(--color-brand-gold)]" aria-hidden />
           <div className="flex flex-col items-center gap-1">
@@ -165,23 +165,26 @@ export default function EstablishmentOperationsPage() {
         </div>
       </div>
 
-      <ul className="grid min-w-0 grid-cols-1 items-start gap-1 sm:grid-cols-2 sm:gap-1.5 lg:grid-cols-3">
+      <ul
+        className="grid min-w-0 w-full items-stretch gap-2"
+        style={{ gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 9.75rem), 1fr))" }}
+      >
         {data.modules.map((m) => {
           const clickable = Boolean(m.implemented && m.cabinetPath);
           const shell =
-            "relative flex min-h-0 w-full flex-col rounded-md border border-[var(--color-brand-gold)]/25 bg-white/[0.05] px-2 py-2 shadow-sm backdrop-blur-sm transition-all duration-200 ease-out";
+            "relative flex h-full min-h-0 w-full min-w-0 flex-col rounded-md border border-[var(--color-brand-gold)]/25 bg-[#0d0e12] px-2 py-1.5 shadow-sm transition-all duration-200 ease-out";
           const implementedAccent = m.implemented ? "ring-1 ring-emerald-500/15" : "";
           const hoverable =
-            "hover:-translate-y-0.5 hover:border-[var(--color-brand-gold)]/45 hover:bg-white/[0.09] hover:shadow-md hover:shadow-black/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-gold)]/40";
+            "hover:-translate-y-0.5 hover:border-[var(--color-brand-gold)]/45 hover:bg-[#12141a] hover:shadow-md hover:shadow-black/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-gold)]/40";
 
           const body = (
             <>
-              <div className="flex min-w-0 items-start justify-between gap-1.5">
-                <h2 className="min-w-0 flex-1 text-left text-[0.8125rem] font-semibold leading-tight text-[var(--color-on-dark)]">
+              <div className="flex min-w-0 items-start justify-between gap-1">
+                <h2 className="min-w-0 flex-1 text-left text-xs font-semibold leading-snug text-[var(--color-on-dark)]">
                   {m.title}
                 </h2>
                 <span
-                  className={`shrink-0 rounded px-1 py-px text-[9px] font-semibold uppercase tracking-wide ${
+                  className={`shrink-0 rounded px-1 py-px text-[8px] font-semibold uppercase tracking-wide ${
                     m.implemented
                       ? "bg-emerald-500/30 text-emerald-50"
                       : "bg-white/10 text-[var(--color-on-dark-muted)]"
@@ -190,23 +193,23 @@ export default function EstablishmentOperationsPage() {
                   {m.implemented ? "Готово" : "Скоро"}
                 </span>
               </div>
-              <p className="mt-1 min-h-0 text-left text-[11px] leading-snug text-[var(--color-on-dark-muted)]">
+              <p className="mt-0.5 min-h-0 flex-1 text-left text-[10px] leading-snug text-[var(--color-on-dark-muted)]">
                 {m.description}
               </p>
               {m.apiBase || clickable ? (
-                <div className="mt-1.5 flex min-w-0 flex-col gap-0.5 pt-0.5">
+                <div className="mt-1 flex min-w-0 flex-col gap-0.5 border-t border-white/[0.06] pt-1">
                   {m.apiBase ? (
                     <p
-                      className="max-w-full truncate font-mono text-[10px] leading-tight text-[var(--color-on-dark-muted)]/75"
+                      className="max-w-full truncate font-mono text-[9px] leading-tight text-[var(--color-on-dark-muted)]/75"
                       title={m.apiBase}
                     >
                       {m.apiBase}
                     </p>
                   ) : null}
                   {clickable ? (
-                    <div className="flex items-center justify-end gap-0.5 text-[11px] font-semibold text-[var(--color-brand-gold)] group-hover:underline">
+                    <div className="flex items-center justify-end gap-0.5 text-[10px] font-semibold text-[var(--color-brand-gold)] group-hover:underline">
                       Открыть
-                      <ArrowRight className="h-2.5 w-2.5 shrink-0 transition-transform group-hover:translate-x-0.5" aria-hidden />
+                      <ArrowRight className="h-2 w-2 shrink-0 transition-transform group-hover:translate-x-0.5" aria-hidden />
                     </div>
                   ) : null}
                 </div>
@@ -215,7 +218,7 @@ export default function EstablishmentOperationsPage() {
           );
 
           return (
-            <li key={m.id} className="min-h-0 min-w-0">
+            <li key={m.id} className="flex min-h-0 min-w-0">
               {clickable && m.cabinetPath ? (
                 <Link
                   href={m.cabinetPath}

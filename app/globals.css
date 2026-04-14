@@ -5134,6 +5134,29 @@ html:not([data-theme="dark"]) .establishment-team-table .establishment-team-tabl
 body.establishment-page .establishment-panel .establishment-edit-modal {
   background-color: #1e2a3a !important;
 }
+/* Тёмная тема сайта: модалка команды — без navy, как остальной dark-LK */
+[data-theme="dark"] body.establishment-page .establishment-panel .establishment-edit-modal {
+  background-color: rgba(26, 26, 28, 0.94) !important;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.06),
+    0 24px 56px rgba(0, 0, 0, 0.52);
+}
+
+/* Модалки гостей / брони / залов: navy на тёмном main при светлой теме сайта; при тёмной — нейтральная панель */
+body.establishment-page .establishment-dialog {
+  background-color: #1e2a3a;
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.42);
+}
+[data-theme="dark"] body.establishment-page .establishment-dialog {
+  background-color: rgba(26, 26, 28, 0.94) !important;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.06),
+    0 24px 56px rgba(0, 0, 0, 0.52);
+}
 body.establishment-page .establishment-panel .establishment-edit-modal h2,
 body.establishment-page .establishment-panel .establishment-edit-modal label,
 body.establishment-page .establishment-panel .establishment-edit-modal .cabinet-input-window,
@@ -5141,19 +5164,19 @@ body.establishment-page .establishment-panel .establishment-edit-modal .cabinet-
   color: rgba(255, 255, 255, 0.95) !important;
 }
 body.establishment-page .establishment-panel .establishment-edit-modal .cabinet-input-window {
-  background: rgba(45, 55, 72, 0.6) !important;
+  background: rgba(255, 255, 255, 0.08) !important;
   border-color: rgba(197, 165, 114, 0.35) !important;
 }
 
 /*
- * Тёмная тема сайта: ЛК заведения — поля в main перебивают «чатовый» #363636 у .cabinet-premium,
- * чтобы формы/модалки новых разделов совпадали с navy (#1e2a3a) и золотой обводкой.
+ * Тёмная тема сайта: ЛК заведения — поля в main перебивают «чатовый» #363636 у .cabinet-premium.
+ * Фон без navy (#0a192f) — нейтральная подложка как у карточек (white / 6–8 %).
  */
 [data-theme="dark"] body.establishment-page .establishment-panel.cabinet-premium #main-content input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="hidden"]):not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="range"]):not([type="color"]),
 [data-theme="dark"] body.establishment-page .establishment-panel.cabinet-premium #main-content textarea,
 [data-theme="dark"] body.establishment-page .establishment-panel.cabinet-premium #main-content select {
-  background: rgba(10, 25, 47, 0.55) !important;
-  background-color: rgba(10, 25, 47, 0.55) !important;
+  background: rgba(255, 255, 255, 0.075) !important;
+  background-color: rgba(255, 255, 255, 0.075) !important;
   border: 1px solid rgba(197, 165, 114, 0.3) !important;
   color: rgba(255, 255, 255, 0.96) !important;
   -webkit-text-fill-color: rgba(255, 255, 255, 0.96) !important;
@@ -5166,7 +5189,7 @@ body.establishment-page .establishment-panel .establishment-edit-modal .cabinet-
   opacity: 1;
 }
 [data-theme="dark"] body.establishment-page .establishment-panel.cabinet-premium #main-content .cabinet-input-window {
-  background: rgba(45, 55, 72, 0.58) !important;
+  background: rgba(255, 255, 255, 0.08) !important;
   border: 1px solid rgba(197, 165, 114, 0.32) !important;
 }
 [data-theme="dark"] body.establishment-page .establishment-panel.cabinet-premium #main-content .cabinet-input-window input,
@@ -5182,7 +5205,7 @@ body.establishment-page .establishment-panel .establishment-edit-modal .cabinet-
   -webkit-text-fill-color: rgba(255, 255, 255, 0.48) !important;
 }
 [data-theme="dark"] body.establishment-page .establishment-panel.cabinet-premium #main-content select option {
-  background: #1e2a3a;
+  background: #252528;
   color: rgba(255, 255, 255, 0.95);
 }
 [data-theme="dark"] body.establishment-page .establishment-panel.cabinet-premium #main-content input:-webkit-autofill,
@@ -5193,13 +5216,13 @@ body.establishment-page .establishment-panel .establishment-edit-modal .cabinet-
 [data-theme="dark"] body.establishment-page .establishment-panel.cabinet-premium #main-content textarea:-webkit-autofill:focus,
 [data-theme="dark"] body.establishment-page .establishment-panel.cabinet-premium #main-content input:autofill,
 [data-theme="dark"] body.establishment-page .establishment-panel.cabinet-premium #main-content textarea:autofill {
-  background-color: rgba(10, 25, 47, 0.55) !important;
+  background-color: rgba(255, 255, 255, 0.075) !important;
   background-image: none !important;
   color: rgba(255, 255, 255, 0.96) !important;
   border: 1px solid rgba(197, 165, 114, 0.3) !important;
   -webkit-text-fill-color: rgba(255, 255, 255, 0.96) !important;
   caret-color: rgba(255, 255, 255, 0.96);
-  box-shadow: 0 0 0 1000px rgba(10, 25, 47, 0.72) inset !important;
+  box-shadow: 0 0 0 1000px rgba(32, 32, 34, 0.96) inset !important;
   filter: none !important;
   transition: background-color 99999s ease-out 0s !important;
 }

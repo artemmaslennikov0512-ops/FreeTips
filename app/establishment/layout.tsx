@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
+import type { LucideIcon } from "lucide-react";
 import {
   LayoutDashboard,
   Layers,
@@ -34,23 +35,51 @@ interface Profile {
   mustChangePassword?: boolean;
 }
 
-const NAV = [
-  { label: "Дашборд", href: "/establishment" },
-  { label: "Зал и сервис", href: "/establishment/operations" },
-  { label: "Бронь", href: "/establishment/bookings" },
-  { label: "Гости", href: "/establishment/guests" },
-  { label: "Меню", href: "/establishment/menu" },
-  { label: "Сервис стола", href: "/establishment/service" },
-  { label: "Команда", href: "/establishment/team" },
-  { label: "Подключение сотрудников", href: "/establishment/join-requests" },
-  { label: "Заявки на выход", href: "/establishment/leave-requests" },
-  { label: "QR и печать", href: "/establishment/qr" },
-  { label: "Распределение", href: "/establishment/payout-rules" },
-  { label: "Аналитика", href: "/establishment/analytics" },
-  { label: "Бренд", href: "/establishment/brand" },
-  { label: "Сессии", href: "/establishment/sessions" },
-  { label: "Безопасность", href: "/establishment/security" },
-] as const;
+type EstablishmentNavItem = { label: string; href: string; icon: LucideIcon };
+type EstablishmentNavGroup = { title: string; items: EstablishmentNavItem[] };
+
+const NAV_GROUPS: EstablishmentNavGroup[] = [
+  {
+    title: "Обзор",
+    items: [
+      { label: "Дашборд", href: "/establishment", icon: LayoutDashboard },
+      { label: "Зал и сервис", href: "/establishment/operations", icon: Layers },
+    ],
+  },
+  {
+    title: "Работа в зале",
+    items: [
+      { label: "Бронь", href: "/establishment/bookings", icon: CalendarDays },
+      { label: "Гости", href: "/establishment/guests", icon: UserCircle2 },
+      { label: "Меню", href: "/establishment/menu", icon: UtensilsCrossed },
+      { label: "Сервис стола", href: "/establishment/service", icon: ConciergeBell },
+    ],
+  },
+  {
+    title: "Персонал",
+    items: [
+      { label: "Команда", href: "/establishment/team", icon: Users },
+      { label: "Подключение сотрудников", href: "/establishment/join-requests", icon: UserPlus },
+      { label: "Заявки на выход", href: "/establishment/leave-requests", icon: UserMinus },
+    ],
+  },
+  {
+    title: "Оплаты и бренд",
+    items: [
+      { label: "QR и печать", href: "/establishment/qr", icon: QrCode },
+      { label: "Распределение", href: "/establishment/payout-rules", icon: PieChart },
+      { label: "Бренд", href: "/establishment/brand", icon: Palette },
+    ],
+  },
+  {
+    title: "Аналитика и доступ",
+    items: [
+      { label: "Аналитика", href: "/establishment/analytics", icon: BarChart3 },
+      { label: "Сессии", href: "/establishment/sessions", icon: Laptop },
+      { label: "Безопасность", href: "/establishment/security", icon: KeyRound },
+    ],
+  },
+];
 
 export default function EstablishmentLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -157,23 +186,6 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
   }
 
   const isActive = (href: string) => pathname === href || (href !== "/establishment" && pathname.startsWith(href));
-  const navIcons = [
-    LayoutDashboard,
-    Layers,
-    CalendarDays,
-    UserCircle2,
-    UtensilsCrossed,
-    ConciergeBell,
-    Users,
-    UserPlus,
-    UserMinus,
-    QrCode,
-    PieChart,
-    BarChart3,
-    Palette,
-    Laptop,
-    KeyRound,
-  ] as const;
 
   return (
     <div className="establishment-panel cabinet-premium flex min-h-screen w-full min-w-0 max-w-full overflow-x-hidden bg-[var(--color-bg)] font-[family:var(--font-inter)] text-white pt-2 lg:pt-4">
@@ -201,27 +213,38 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
         </div>
         <div className="cabinet-nav-block flex min-h-0 flex-1 flex-col overflow-y-auto overflow-x-hidden px-3 pb-2">
           <nav
-            className="flex flex-col gap-0.5 rounded-[10px] border border-[var(--color-brand-gold)]/15 bg-[var(--color-dark-gray)]/5 p-1.5 shadow-[var(--shadow-subtle)]"
+            className="flex flex-col gap-0 rounded-[10px] border border-[var(--color-brand-gold)]/15 bg-[var(--color-dark-gray)]/5 p-1.5 pb-2 shadow-[var(--shadow-subtle)]"
             aria-label="Навигация по кабинету заведения"
           >
-            {NAV.map(({ label, href }, i) => {
-              const Icon = navIcons[i];
-              return (
-                <Link
-                  key={href}
-                  href={href}
-                  onClick={closeSidebar}
-                  className={`flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[0.9375rem] font-normal transition-colors ${
-                    isActive(href)
-                      ? "cabinet-nav-active border border-[#0a192f]/35 bg-[#0a192f]/12 text-[#0a192f] font-medium"
-                      : "border border-transparent text-white/80 hover:bg-[var(--color-dark-gray)]/10 hover:text-white"
-                  }`}
-                >
-                  <Icon className="cabinet-nav-item-icon h-[18px] w-[18px] shrink-0" aria-hidden />
-                  <span className="min-w-0 break-words">{label}</span>
-                </Link>
-              );
-            })}
+            {NAV_GROUPS.map((group) => (
+              <div
+                key={group.title}
+                className="mt-3 border-t border-white/[0.08] pt-3 first:mt-0 first:border-t-0 first:pt-0"
+                role="group"
+                aria-label={group.title}
+              >
+                <div className="px-2.5 pb-1.5 pt-0.5 text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-white/40">
+                  {group.title}
+                </div>
+                <div className="flex flex-col gap-0.5">
+                  {group.items.map(({ label, href, icon: Icon }) => (
+                    <Link
+                      key={href}
+                      href={href}
+                      onClick={closeSidebar}
+                      className={`flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[0.9375rem] font-normal transition-colors ${
+                        isActive(href)
+                          ? "cabinet-nav-active border border-[#0a192f]/35 bg-[#0a192f]/12 text-[#0a192f] font-medium"
+                          : "border border-transparent text-white/80 hover:bg-[var(--color-dark-gray)]/10 hover:text-white"
+                      }`}
+                    >
+                      <Icon className="cabinet-nav-item-icon h-[18px] w-[18px] shrink-0" aria-hidden />
+                      <span className="min-w-0 break-words">{label}</span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            ))}
           </nav>
           <Link
             href="/cabinet"

@@ -377,7 +377,7 @@ export default function EstablishmentTeamPage() {
       <p className="text-white/90 text-xs">Сотрудников: {info.employeesCount}.</p>
 
       {showForm && (
-        <div className="cabinet-card rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden">
+        <div className="cabinet-card rounded-[10px] border-0 bg-[var(--establishment-charcoal)] shadow-[var(--shadow-subtle)] overflow-hidden">
           <form onSubmit={handleAddEmployee} className="p-4 space-y-3">
             <h2 className="text-base font-medium text-white">Новый сотрудник</h2>
             {formError && <p className="text-xs text-[var(--color-accent-red)]">{formError}</p>}
@@ -545,10 +545,10 @@ export default function EstablishmentTeamPage() {
       {/* Мобильная версия: карточки */}
       <div className="space-y-4 lg:hidden">
         {employees.length === 0 ? (
-          <div className="cabinet-card rounded-lg border-0 bg-[var(--color-bg-sides)] p-4 text-center text-xs text-white/90 shadow-[var(--shadow-subtle)]">Нет сотрудников.</div>
+          <div className="cabinet-card rounded-lg border-0 bg-[var(--establishment-charcoal)] p-4 text-center text-xs text-white/90 shadow-[var(--shadow-subtle)]">Нет сотрудников.</div>
         ) : (
           employees.map((emp) => (
-            <div key={emp.id} className={`cabinet-card rounded-lg border-0 bg-[var(--color-bg-sides)] p-3 shadow-[var(--shadow-subtle)] ${!emp.isActive ? "opacity-70" : ""}`}>
+            <div key={emp.id} className={`cabinet-card rounded-lg border-0 bg-[var(--establishment-charcoal)] p-3 shadow-[var(--shadow-subtle)] ${!emp.isActive ? "opacity-70" : ""}`}>
               <p className="text-xs text-white/70">
                 Код официанта:{" "}
                 {emp.hasUser ? (
@@ -639,7 +639,7 @@ export default function EstablishmentTeamPage() {
       </div>
 
       {/* Десктоп: таблица — белые границы в светлой теме, выравнивание по колонкам, overflow для узких экранов */}
-      <div className="establishment-team-table cabinet-card max-lg:hidden overflow-hidden rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)]">
+      <div className="establishment-team-table cabinet-card max-lg:hidden overflow-hidden rounded-[10px] border-0 bg-[var(--establishment-charcoal)] shadow-[var(--shadow-subtle)]">
         <div className="overflow-x-auto">
           <table className="establishment-team-table-grid w-full min-w-[640px] border-collapse">
             <thead>

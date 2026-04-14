@@ -18,6 +18,7 @@ import Image from "next/image";
 import type { LucideIcon } from "lucide-react";
 import { LogOut, Menu, User, BadgeCheck, Building2 } from "lucide-react";
 import { CABINET_WAITER_BTN } from "@/lib/cabinet-button-classes";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export type CabinetMobileNavUser = {
   login?: string;
@@ -106,7 +107,7 @@ export function CabinetMobileNavFixedButton() {
       className={`${BTN_CLASS} fixed z-[2005] lg:hidden`}
       style={{
         right: "max(0.75rem, env(safe-area-inset-right, 0px))",
-        top: "max(3.25rem, calc(env(safe-area-inset-top, 0px) + 2.75rem))",
+        top: "max(0.5rem, calc(env(safe-area-inset-top, 0px) + 0.25rem))",
       }}
       aria-label="Меню"
       aria-expanded={sidebarOpen}
@@ -115,6 +116,34 @@ export function CabinetMobileNavFixedButton() {
     >
       <Menu className="h-5 w-5 shrink-0 pointer-events-none" strokeWidth={2} aria-hidden />
     </button>
+  );
+}
+
+/** Тема + меню в углу экрана (мобильный ЛК без полоски в Header) */
+export function CabinetMobileNavMobileCorner() {
+  const { menuButtonRef, sidebarOpen, setSidebarOpen, isM5Cabinet } = useCabinetMobileNav();
+  return (
+    <div
+      className="fixed z-[2005] flex items-center gap-1.5 lg:hidden"
+      style={{
+        right: "max(0.75rem, env(safe-area-inset-right, 0px))",
+        top: "max(0.5rem, calc(env(safe-area-inset-top, 0px) + 0.25rem))",
+      }}
+    >
+      <ThemeToggle variant={isM5Cabinet ? "m5" : "default"} />
+      <button
+        ref={menuButtonRef}
+        type="button"
+        onClick={() => setSidebarOpen((o) => !o)}
+        className={`${BTN_CLASS}${isM5Cabinet ? " site-header-m5-menu-btn" : ""}`}
+        aria-label="Меню"
+        aria-expanded={sidebarOpen}
+        aria-haspopup="dialog"
+        aria-controls="cabinet-nav-dropdown"
+      >
+        <Menu className="h-5 w-5 shrink-0 pointer-events-none" strokeWidth={2} aria-hidden />
+      </button>
+    </div>
   );
 }
 

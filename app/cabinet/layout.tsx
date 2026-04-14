@@ -30,7 +30,12 @@ import { endCabinetImpersonation } from "@/lib/cabinet-impersonation";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { isCabinetM5CompetitionTheme } from "@/config/cabinet-theme-logins";
-import { CabinetMobileNavProvider, CabinetMobileNavPortals, type CabinetMobileNavContextValue } from "@/components/cabinet/CabinetMobileNav";
+import {
+  CabinetMobileNavProvider,
+  CabinetMobileNavPortals,
+  CabinetMobileNavMobileCorner,
+  type CabinetMobileNavContextValue,
+} from "@/components/cabinet/CabinetMobileNav";
 import { usePanelMobileMenu } from "@/components/PanelMobileMenuContext";
 import { LkPresenceHeartbeat } from "@/components/LkPresenceHeartbeat";
 import { PanelMobileBackButton } from "@/components/PanelMobileBackButton";
@@ -606,6 +611,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
           </div>
         </div>
       </main>
+      <CabinetMobileNavMobileCorner />
       <CabinetMobileNavPortals />
     </div>
     </CabinetMobileNavProvider>

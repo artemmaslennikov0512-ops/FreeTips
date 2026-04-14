@@ -27,6 +27,7 @@ import { getAccessToken, fetchWithAuth, clearAccessToken } from "@/lib/auth-clie
 import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { usePanelMobileMenu } from "@/components/PanelMobileMenuContext";
+import { PanelShellMobileCorner } from "@/components/PanelShellMobileCorner";
 import { PanelMobileBackButton } from "@/components/PanelMobileBackButton";
 import { LkPresenceHeartbeat } from "@/components/LkPresenceHeartbeat";
 
@@ -205,6 +206,7 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
 
   return (
     <div className="establishment-panel cabinet-premium flex min-h-screen w-full min-w-0 max-w-full overflow-x-hidden bg-[var(--color-bg)] font-[family:var(--font-inter)] text-white pt-1.5 lg:pt-3">
+      <PanelShellMobileCorner ariaControls="establishment-mobile-nav" ariaHaspopup="true" />
       <LkPresenceHeartbeat />
       {/* Шторка на мобильном */}
       <div

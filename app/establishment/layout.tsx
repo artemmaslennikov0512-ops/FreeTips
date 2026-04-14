@@ -205,7 +205,7 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
   const isActive = (href: string) => pathname === href || (href !== "/establishment" && pathname.startsWith(href));
 
   return (
-    <div className="establishment-panel cabinet-premium flex min-h-screen w-full min-w-0 max-w-full flex-col overflow-x-hidden bg-[var(--color-bg)] font-[family:var(--font-inter)] text-white pt-0 lg:flex-row lg:pt-3">
+    <div className="establishment-panel cabinet-premium flex min-h-screen w-full min-w-0 max-w-full flex-col overflow-x-hidden bg-[var(--color-bg)] font-[family:var(--font-inter)] text-[var(--color-text)] pt-0 lg:flex-row lg:pt-3">
       <PanelShellMobileCorner ariaControls="establishment-mobile-nav" ariaHaspopup="true" />
       <LkPresenceHeartbeat />
       {/* Шторка на мобильном */}
@@ -229,9 +229,9 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
             Кабинет заведения
           </span>
         </div>
-        <div className="cabinet-nav-block flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto overflow-x-hidden overscroll-y-contain px-2.5 pb-1.5">
+        <div className="cabinet-nav-block flex min-h-0 min-w-0 flex-col overflow-x-hidden overscroll-y-contain px-2.5 pb-1.5 max-lg:min-h-0 max-lg:flex-1 max-lg:overflow-hidden lg:flex-none">
           <nav
-            className="flex flex-col gap-0 rounded-lg border border-[var(--color-brand-gold)]/15 bg-[var(--color-dark-gray)]/5 p-1 pb-1.5 shadow-[var(--shadow-subtle)]"
+            className="flex flex-col gap-0 rounded-lg border border-[var(--color-brand-gold)]/15 bg-[var(--color-dark-gray)]/5 p-1 pb-1.5 shadow-[var(--shadow-subtle)] max-lg:min-h-0 max-lg:flex-1 max-lg:overflow-y-auto"
             aria-label="Навигация по кабинету заведения"
           >
             {NAV_GROUPS.map((group) => (
@@ -267,7 +267,7 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
           <button
             type="button"
             onClick={handleLogout}
-            className="mt-2 flex w-full items-center justify-center gap-2 rounded-md px-2 py-2 text-[0.8125rem] font-medium text-white/80 transition-colors hover:bg-[var(--color-dark-gray)]/10 hover:text-white"
+            className="mt-3 shrink-0 flex w-full items-center justify-center gap-2 rounded-md px-2 py-2 text-[0.8125rem] font-medium text-white/80 transition-colors hover:bg-[var(--color-dark-gray)]/10 hover:text-white"
           >
             <LogOut className="size-4 shrink-0" />
             <span>Выйти</span>

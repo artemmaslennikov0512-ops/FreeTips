@@ -40,6 +40,7 @@ import { usePanelMobileMenu } from "@/components/PanelMobileMenuContext";
 import { LkPresenceHeartbeat } from "@/components/LkPresenceHeartbeat";
 import { PanelMobileBackButton } from "@/components/PanelMobileBackButton";
 import { readCabinetNavRoleCache, writeCabinetNavRoleCache } from "@/lib/cabinet-nav-role-cache";
+import { useTheme } from "@/lib/theme-context";
 
 const CABINET_LG_SIDEBAR_COLLAPSED_KEY = "cabinet-lg-sidebar-collapsed";
 
@@ -101,6 +102,7 @@ const NAV_GROUPS: CabinetNavGroup[] = [
 export default function CabinetLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
+  const { theme } = useTheme();
   const { sidebarOpen, setSidebarOpen, closeSidebar, menuButtonRef } = usePanelMobileMenu();
   const [mounted, setMounted] = useState(false);
   const [user, setUser] = useState<{
@@ -177,9 +179,9 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
   const isM5Cabinet = isCabinetM5CompetitionTheme(user?.login);
   const applyEstablishmentBrand = hasBrand && !isM5Cabinet;
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (isM5Cabinet) {
-      document.body.style.backgroundColor = "#08090b";
+      document.body.style.backgroundColor = theme === "dark" ? "#08090b" : "";
       return () => {
         document.body.style.backgroundColor = "";
       };
@@ -190,7 +192,11 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
         document.body.style.backgroundColor = "";
       };
     }
-  }, [isM5Cabinet, brandMainBg, applyEstablishmentBrand]);
+    document.body.style.backgroundColor = "";
+    return () => {
+      document.body.style.backgroundColor = "";
+    };
+  }, [isM5Cabinet, theme, brandMainBg, applyEstablishmentBrand]);
 
   useEffect(() => {
     if (!mounted || typeof window === "undefined") return;
@@ -426,7 +432,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
         }`}
       >
         <div
-          className="cabinet-sidebar relative flex h-full min-h-0 w-[236px] min-w-[236px] flex-col overflow-hidden border-0 border-r border-white/10 py-4 shadow-2xl backdrop-blur-xl lg:static lg:max-h-[calc(100vh-2rem)] lg:rounded-[10px] lg:border-x lg:border-b lg:border-t-0 lg:border-white/10"
+          className="cabinet-sidebar relative flex min-h-0 w-[236px] min-w-[236px] flex-col overflow-hidden border-0 border-r border-white/10 py-4 shadow-2xl backdrop-blur-xl lg:static lg:h-auto lg:max-h-[calc(100vh-2rem)] lg:overflow-y-auto lg:overflow-x-hidden lg:rounded-[10px] lg:border-x lg:border-b lg:border-t-0 lg:border-white/10"
           style={sidebarStyle}
         >
         {user?.establishmentBrand?.logoUrl && (
@@ -503,7 +509,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
             </button>
           </div>
         </div>
-        <div className="cabinet-nav-block flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto overflow-x-hidden px-3">
+        <div className="cabinet-nav-block flex min-h-0 min-w-0 flex-col overflow-x-hidden px-3 lg:flex-none">
           <nav
             className="flex flex-col gap-0 rounded-[10px] border border-[var(--color-brand-gold)]/15 bg-[var(--color-dark-gray)]/5 p-1.5 pb-2 shadow-[var(--shadow-subtle)]"
             aria-label="Навигация по кабинету"
@@ -572,7 +578,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
           <button
             type="button"
             onClick={handleLogout}
-            className={`mt-8 flex shrink-0 ${CABINET_WAITER_BTN} w-full !justify-center gap-2.5 px-3 py-2 text-sm`}
+            className={`mt-4 flex shrink-0 ${CABINET_WAITER_BTN} w-full !justify-center gap-2.5 px-3 py-2 text-sm`}
           >
             <LogOut className="h-4 w-4 shrink-0 text-[var(--color-brand-gold)]" aria-hidden />
             <span>{adminCabinetView ? "Выйти из просмотра" : "Выйти"}</span>

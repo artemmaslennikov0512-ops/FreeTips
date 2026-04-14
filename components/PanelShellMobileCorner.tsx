@@ -23,8 +23,8 @@ export function PanelShellMobileCorner({
   const { menuButtonRef, sidebarOpen, setSidebarOpen } = usePanelMobileMenu();
 
   return (
-    <div className="cabinet-mobile-top-shell relative z-10 flex w-full shrink-0 flex-col lg:hidden">
-      <div className="flex items-center justify-end gap-1.5 px-3 pb-1.5 pt-[max(0.25rem,env(safe-area-inset-top,0px))]">
+    <div className="cabinet-mobile-top-shell relative z-10 flex w-full shrink-0 flex-col pb-3 lg:hidden">
+      <div className="flex items-center justify-end gap-1.5 px-3 pb-3 pt-[max(0.35rem,env(safe-area-inset-top,0px))]">
         <ThemeToggle variant="default" />
         <button
           ref={menuButtonRef}
@@ -39,7 +39,10 @@ export function PanelShellMobileCorner({
           <Menu className="h-5 w-5 shrink-0 pointer-events-none" strokeWidth={2} aria-hidden />
         </button>
       </div>
-      <div className="cabinet-mobile-top-shell__gold h-px w-full shrink-0 bg-[var(--color-brand-gold)]" aria-hidden />
+      <div
+        className="cabinet-mobile-top-shell__gold mx-0 h-0 w-full shrink-0 border-0 border-t border-[var(--color-brand-gold)]/45"
+        aria-hidden
+      />
     </div>
   );
 }

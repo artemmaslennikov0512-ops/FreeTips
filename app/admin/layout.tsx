@@ -283,8 +283,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             : "lg:relative lg:z-10 lg:w-[236px] lg:overflow-hidden"
         }`}
       >
-        <aside className="admin-sidebar cabinet-sidebar relative flex h-full min-h-0 w-[236px] min-w-[236px] flex-col overflow-hidden rounded-[10px] border border-white/10 bg-[var(--color-navy)] py-4 shadow-sm backdrop-blur-xl lg:static lg:max-h-[calc(100vh-2rem)]">
-        <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+        <aside className="admin-sidebar cabinet-sidebar relative flex min-h-0 w-[236px] min-w-[236px] flex-col overflow-hidden rounded-[10px] border border-white/10 bg-[var(--color-navy)] py-4 shadow-sm backdrop-blur-xl lg:static lg:h-auto lg:max-h-[calc(100vh-2rem)] lg:overflow-y-auto lg:overflow-x-hidden">
+        <div className="flex min-h-0 min-w-0 flex-col overflow-hidden">
           <div className="cabinet-sidebar-profile cabinet-block-inner mx-3 mb-3 rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2.5">
             <div className="flex items-center gap-3">
               <div className="cabinet-sidebar-avatar flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--color-brand-gold)] font-semibold text-[#0a192f] text-sm">
@@ -313,7 +313,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               </button>
             </div>
           </div>
-          <div className="cabinet-nav-block flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto overflow-x-hidden px-3 pb-2">
+          <div className="cabinet-nav-block flex min-h-0 min-w-0 flex-col overflow-x-hidden px-3 pb-2 lg:flex-none">
             <nav
               className="flex flex-col gap-0 rounded-[10px] border border-[var(--color-brand-gold)]/15 bg-white/5 p-1.5 pb-2 shadow-[var(--shadow-subtle)]"
               aria-label="Навигация админ-панели"
@@ -376,7 +376,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <button
               type="button"
               onClick={handleLogout}
-              className={`mt-8 ${ADMIN_BTN} w-full !justify-center gap-2.5 px-3 py-2 text-sm`}
+              className={`mt-4 ${ADMIN_BTN} w-full !justify-center gap-2.5 px-3 py-2 text-sm`}
             >
               <LogOut className="h-4 w-4 shrink-0 text-[var(--color-brand-gold)]" aria-hidden />
               <span>Выйти</span>

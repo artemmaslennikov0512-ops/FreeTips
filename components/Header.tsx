@@ -249,7 +249,7 @@ export function Header() {
     <header
       className={`site-header sticky top-0 z-30 w-full overflow-hidden bg-transparent ${
         isPanelMobileSlim
-          ? "max-lg:mx-0 max-lg:mt-0 max-lg:w-full max-lg:rounded-none border-0 lg:mx-3 lg:mt-2 lg:w-[calc(100%-1.5rem)] lg:rounded-[10px]"
+          ? "max-lg:hidden max-lg:mx-0 max-lg:mt-0 max-lg:w-full max-lg:rounded-none border-0 lg:mx-3 lg:mt-2 lg:w-[calc(100%-1.5rem)] lg:rounded-[10px]"
           : "mx-0 mt-2 rounded-lg md:rounded-[10px] lg:mx-3 lg:w-[calc(100%-1.5rem)]"
       } ${hideMobileSiteNav && !isPanelMobileSlim ? "border-0" : !isPanelMobileSlim ? "border border-white/10" : ""}${
         isCabinetM5Header ? " site-header--cabinet-m5" : ""

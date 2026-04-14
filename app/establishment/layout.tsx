@@ -205,7 +205,7 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
   const isActive = (href: string) => pathname === href || (href !== "/establishment" && pathname.startsWith(href));
 
   return (
-    <div className="establishment-panel cabinet-premium flex min-h-screen w-full min-w-0 max-w-full overflow-x-hidden bg-[var(--color-bg)] font-[family:var(--font-inter)] text-white pt-1.5 lg:pt-3">
+    <div className="establishment-panel cabinet-premium flex min-h-screen w-full min-w-0 max-w-full flex-col overflow-x-hidden bg-[var(--color-bg)] font-[family:var(--font-inter)] text-white pt-0 lg:flex-row lg:pt-3">
       <PanelShellMobileCorner ariaControls="establishment-mobile-nav" ariaHaspopup="true" />
       <LkPresenceHeartbeat />
       {/* Шторка на мобильном */}

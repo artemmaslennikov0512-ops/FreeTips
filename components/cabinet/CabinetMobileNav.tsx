@@ -119,30 +119,32 @@ export function CabinetMobileNavFixedButton() {
   );
 }
 
-/** Тема + меню в углу экрана (мобильный ЛК без полоски в Header) */
+/**
+ * Мобильный ЛК: в потоке документа (уезжает при прокрутке) — тема + меню, одна золотая полоска снизу.
+ */
 export function CabinetMobileNavMobileCorner() {
   const { menuButtonRef, sidebarOpen, setSidebarOpen, isM5Cabinet } = useCabinetMobileNav();
   return (
-    <div
-      className="fixed z-[2005] flex items-center gap-1.5 lg:hidden"
-      style={{
-        right: "max(0.75rem, env(safe-area-inset-right, 0px))",
-        top: "max(0.5rem, calc(env(safe-area-inset-top, 0px) + 0.25rem))",
-      }}
-    >
-      <ThemeToggle variant={isM5Cabinet ? "m5" : "default"} />
-      <button
-        ref={menuButtonRef}
-        type="button"
-        onClick={() => setSidebarOpen((o) => !o)}
-        className={`${BTN_CLASS}${isM5Cabinet ? " site-header-m5-menu-btn" : ""}`}
-        aria-label="Меню"
-        aria-expanded={sidebarOpen}
-        aria-haspopup="dialog"
-        aria-controls="cabinet-nav-dropdown"
-      >
-        <Menu className="h-5 w-5 shrink-0 pointer-events-none" strokeWidth={2} aria-hidden />
-      </button>
+    <div className="cabinet-mobile-top-shell relative z-10 flex w-full shrink-0 flex-col lg:hidden">
+      <div className="flex items-center justify-end gap-1.5 px-3 pb-1.5 pt-[max(0.25rem,env(safe-area-inset-top,0px))]">
+        <ThemeToggle variant={isM5Cabinet ? "m5" : "default"} />
+        <button
+          ref={menuButtonRef}
+          type="button"
+          onClick={() => setSidebarOpen((o) => !o)}
+          className={`${BTN_CLASS}${isM5Cabinet ? " site-header-m5-menu-btn" : ""}`}
+          aria-label="Меню"
+          aria-expanded={sidebarOpen}
+          aria-haspopup="dialog"
+          aria-controls="cabinet-nav-dropdown"
+        >
+          <Menu className="h-5 w-5 shrink-0 pointer-events-none" strokeWidth={2} aria-hidden />
+        </button>
+      </div>
+      <div
+        className="cabinet-mobile-top-shell__gold h-px w-full shrink-0 bg-[var(--color-brand-gold)]"
+        aria-hidden
+      />
     </div>
   );
 }
@@ -202,20 +204,30 @@ export function CabinetMobileNavPortals() {
         aria-hidden={!sidebarOpen}
       />
       <div
-        id="cabinet-nav-dropdown"
-        role="dialog"
-        aria-modal="true"
-        aria-label="Меню навигации"
-        className={`cabinet-mobile-nav-dialog cabinet-nav-dropdown cabinet-mobile-nav-dialog--fullscreen fixed inset-0 z-[2010] flex h-[100dvh] min-h-0 max-h-none w-full flex-col overflow-hidden rounded-none border border-[var(--color-brand-gold)]/25 shadow-none backdrop-blur-xl transition-opacity duration-200 lg:hidden ${
+        className={`cabinet-mobile-nav-shell fixed inset-0 z-[2010] flex items-center justify-center px-3 py-1 transition-opacity duration-200 lg:hidden sm:px-4 ${
           sidebarOpen ? "opacity-100" : "pointer-events-none opacity-0"
         }`}
-        data-cabinet-theme={isM5Cabinet ? "m5-competition" : undefined}
-        style={sidebarStyle}
+        style={{
+          paddingTop: "max(0.35rem, env(safe-area-inset-top, 0px))",
+          paddingBottom: "max(0.35rem, env(safe-area-inset-bottom, 0px))",
+        }}
         aria-hidden={!sidebarOpen}
       >
-        <div className="cabinet-nav-dropdown-inner flex min-h-0 flex-1 flex-col overflow-hidden px-3 pt-[max(0.75rem,env(safe-area-inset-top,0px))] pb-[max(0.75rem,env(safe-area-inset-bottom,0px))]">
+        <div
+          id="cabinet-nav-dropdown"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Меню навигации"
+          className={`cabinet-mobile-nav-dialog cabinet-nav-dropdown cabinet-mobile-nav-dialog--modal pointer-events-auto flex h-[min(calc(100svh-0.5rem),calc(100dvh-0.5rem))] min-h-0 w-[min(22rem,calc(100vw-1.5rem))] max-w-full flex-col overflow-hidden rounded-xl border border-[var(--color-brand-gold)]/25 shadow-[var(--shadow-card)] backdrop-blur-xl transition-[opacity,transform] duration-200 ${
+            sidebarOpen ? "scale-100 opacity-100" : "pointer-events-none scale-95 opacity-0"
+          }`}
+          data-cabinet-theme={isM5Cabinet ? "m5-competition" : undefined}
+          style={sidebarStyle}
+          aria-hidden={!sidebarOpen}
+        >
+        <div className="cabinet-nav-dropdown-inner flex min-h-0 flex-1 flex-col overflow-hidden px-3 pb-[max(0.35rem,env(safe-area-inset-bottom,0px))] pt-2.5">
           <div
-            className={`cabinet-sidebar-profile cabinet-block-inner mb-3 shrink-0 rounded-[10px] border border-[var(--color-brand-gold)]/20 px-3 py-2.5 ${!sidebarBg ? "bg-[var(--color-dark-gray)]/10" : ""}`}
+            className={`cabinet-sidebar-profile cabinet-block-inner mb-2 shrink-0 rounded-[10px] border border-[var(--color-brand-gold)]/20 px-3 py-2 ${!sidebarBg ? "bg-[var(--color-dark-gray)]/10" : ""}`}
             style={Object.keys(profileBlockStyle).length ? profileBlockStyle : undefined}
           >
             <div className="flex items-center gap-2.5">
@@ -254,31 +266,31 @@ export function CabinetMobileNavPortals() {
               </div>
             </div>
           </div>
-          <p className="cabinet-nav-label mb-2 shrink-0 px-3 text-center text-xs font-medium uppercase tracking-wider text-[var(--color-text)]/50">
+          <p className="cabinet-nav-label mb-1.5 shrink-0 px-3 text-center text-[0.6875rem] font-medium uppercase tracking-wider text-[var(--color-text)]/50">
             Навигация
           </p>
           <nav
-            className="cabinet-mobile-nav-dialog__nav flex min-h-0 flex-1 flex-col gap-0 overflow-y-auto overscroll-contain rounded-[10px] border border-[var(--color-brand-gold)]/15 bg-[var(--color-dark-gray)]/5 p-1.5 pb-2 shadow-[var(--shadow-subtle)]"
+            className="cabinet-mobile-nav-dialog__nav flex min-h-0 flex-1 flex-col gap-0 overflow-y-auto overscroll-contain rounded-[10px] border border-[var(--color-brand-gold)]/15 bg-[var(--color-dark-gray)]/5 p-1 pb-1.5 shadow-[var(--shadow-subtle)]"
             role="none"
           >
             {navGroups.map((group) => (
               <div
                 key={group.title}
-                className="mt-3 border-t border-[var(--color-brand-gold)]/12 pt-3 first:mt-0 first:border-t-0 first:pt-2"
+                className="mt-2 border-t border-[var(--color-brand-gold)]/12 pt-2 first:mt-0 first:border-t-0 first:pt-1.5"
                 role="group"
                 aria-label={group.title}
               >
-                <div className="cabinet-nav-group-title px-2.5 pb-2 pt-1 text-[0.6875rem] font-semibold uppercase leading-snug tracking-[0.12em]">
+                <div className="cabinet-nav-group-title px-2.5 pb-1 pt-0.5 text-[0.625rem] font-semibold uppercase leading-snug tracking-[0.12em]">
                   {group.title}
                 </div>
-                <div className="flex flex-col gap-0.5">
+                <div className="flex flex-col gap-px">
                   {group.items.map(({ label, href, icon: Icon }) => (
                     <Link
                       key={href}
                       href={href}
                       onClick={closeSidebar}
                       role="menuitem"
-                      className={`flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm font-normal transition-colors ${
+                      className={`flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[0.8125rem] font-normal leading-snug transition-colors ${
                         isActive(href)
                           ? navActiveClasses
                           : "border border-transparent text-[var(--color-text)]/80 hover:bg-[var(--color-dark-gray)]/10 hover:text-[var(--color-text)]"
@@ -298,16 +310,16 @@ export function CabinetMobileNavPortals() {
               </div>
             ))}
             {user?.role === "ESTABLISHMENT_ADMIN" && (
-              <div className="mt-3 border-t border-[var(--color-brand-gold)]/12 pt-3" role="group" aria-label="Связанные кабинеты">
-                <div className="cabinet-nav-group-title px-2.5 pb-2 pt-1 text-[0.6875rem] font-semibold uppercase leading-snug tracking-[0.12em]">
+              <div className="mt-2 border-t border-[var(--color-brand-gold)]/12 pt-2" role="group" aria-label="Связанные кабинеты">
+                <div className="cabinet-nav-group-title px-2.5 pb-1 pt-0.5 text-[0.625rem] font-semibold uppercase leading-snug tracking-[0.12em]">
                   Связанные кабинеты
                 </div>
-                <div className="flex flex-col gap-0.5">
+                <div className="flex flex-col gap-px">
                   <Link
                     href="/establishment"
                     onClick={closeSidebar}
                     role="menuitem"
-                    className="flex items-center gap-2.5 rounded-lg border border-transparent px-2.5 py-2 font-normal text-[var(--color-text)]/80 transition-colors hover:bg-[var(--color-dark-gray)]/10 hover:text-[var(--color-text)]"
+                    className="flex items-center gap-2.5 rounded-lg border border-transparent px-2.5 py-1.5 text-[0.8125rem] font-normal leading-snug text-[var(--color-text)]/80 transition-colors hover:bg-[var(--color-dark-gray)]/10 hover:text-[var(--color-text)]"
                     style={brandFont ? { color: `${brandFont}cc` } : undefined}
                   >
                     <Building2 className="cabinet-nav-item-icon h-[18px] w-[18px] shrink-0" aria-hidden />
@@ -323,12 +335,13 @@ export function CabinetMobileNavPortals() {
               closeSidebar();
               void handleLogout();
             }}
-            className={`mt-auto flex shrink-0 pt-4 ${CABINET_WAITER_BTN} w-full !justify-center gap-2.5 px-3 py-2 text-sm`}
+            className={`mt-auto flex shrink-0 pt-2 ${CABINET_WAITER_BTN} w-full !justify-center gap-2.5 px-3 py-1.5 text-sm`}
             role="menuitem"
           >
             <LogOut className="h-4 w-4 shrink-0 text-[var(--color-brand-gold)]" aria-hidden />
             <span>{logoutButtonLabel}</span>
           </button>
+        </div>
         </div>
       </div>
     </>,

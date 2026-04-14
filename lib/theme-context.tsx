@@ -75,6 +75,13 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     document.querySelectorAll('meta[name="theme-color"]').forEach((meta) => {
       meta.setAttribute("content", color);
     });
+    document.documentElement.style.colorScheme = effective === "dark" ? "dark" : "light";
+    if (applyHere) {
+      document.documentElement.style.backgroundColor = effective === "dark" ? themeColorDark : themeColorLightPanel;
+    } else {
+      document.documentElement.style.backgroundColor =
+        effective === "dark" ? "#171717" : "";
+    }
   }, [mounted, theme, pathname]);
 
   const setTheme = useCallback((next: Theme) => {

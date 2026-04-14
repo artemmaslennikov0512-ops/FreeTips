@@ -411,11 +411,12 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
     <CabinetMobileNavProvider value={mobileNavValue}>
     <LkPresenceHeartbeat />
     <div
-      className={`cabinet-premium flex min-h-screen w-full max-w-full overflow-x-hidden font-[family:var(--font-inter)] text-[var(--color-text)] max-lg:pt-0 pt-2 lg:pt-4 ${isM5Cabinet ? "bg-transparent" : "bg-[var(--color-bg)]"}`}
+      className={`cabinet-premium flex min-h-screen w-full max-w-full flex-col overflow-x-hidden font-[family:var(--font-inter)] text-[var(--color-text)] pt-2 lg:flex-row lg:pt-4 ${isM5Cabinet ? "bg-transparent" : "bg-[var(--color-bg)]"}`}
       data-brand-active={applyEstablishmentBrand ? "true" : undefined}
       data-cabinet-theme={isM5Cabinet ? "m5-competition" : undefined}
       style={Object.keys(brandStyle).length ? brandStyle : undefined}
     >
+      <CabinetMobileNavMobileCorner />
       {/* Левое меню (lg+): сворачиваемая колонка; на мобильном — портал меню */}
       <div
         className={`hidden shrink-0 transition-[width] duration-300 ease-out lg:mt-2 lg:flex lg:self-start ${
@@ -611,7 +612,6 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
           </div>
         </div>
       </main>
-      <CabinetMobileNavMobileCorner />
       <CabinetMobileNavPortals />
     </div>
     </CabinetMobileNavProvider>

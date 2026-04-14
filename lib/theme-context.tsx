@@ -73,6 +73,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     const themeColorDark = "#0d0e12";
     const color = effective === "dark" ? themeColorDark : applyHere ? themeColorLightPanel : themeColorLight;
     document.querySelectorAll('meta[name="theme-color"]').forEach((meta) => {
+      /* Два meta с media=(prefers-color-scheme) от Next viewport — iOS часто не перекрашивает UI, пока не снят media */
+      meta.removeAttribute("media");
       meta.setAttribute("content", color);
     });
     document.documentElement.style.colorScheme = effective === "dark" ? "dark" : "light";

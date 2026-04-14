@@ -258,28 +258,25 @@ export default function EstablishmentBookingsPage() {
   };
 
   return (
-    <div className="flex min-w-0 max-w-full flex-col gap-6">
-      <div className="flex flex-wrap items-center gap-3">
+    <div className="flex min-w-0 max-w-full flex-col gap-3">
+      <div className="ft-panel-section-head min-w-0">
         <Link
           href="/establishment/operations"
-          className="inline-flex items-center gap-1 text-sm text-[var(--color-on-dark-muted)] hover:text-[var(--color-on-dark)]"
+          className="inline-flex items-center justify-center gap-1 text-sm text-[var(--color-on-dark-muted)] hover:text-[var(--color-on-dark)]"
         >
           <ChevronLeft className="h-4 w-4" aria-hidden />
           Зал и сервис
         </Link>
-      </div>
-
-      <div className="min-w-0">
         <h1 className="cabinet-dashboard-name-hero font-[family:var(--font-playfair)] text-[var(--color-on-dark)]">
           Бронь
         </h1>
-        <p className="mt-2 max-w-2xl text-sm text-[var(--color-on-dark-muted)]">
+        <p className="ft-panel-section-head__lead text-sm text-[var(--color-on-dark-muted)]">
           Календарный день по Москве. Время начала и окончания — в часовом поясе Москвы (например, ужин 19:00–21:00).
         </p>
       </div>
 
       {error ? (
-        <div className="flex flex-wrap items-center gap-3 rounded-xl border border-red-400/35 bg-red-500/15 px-4 py-2 text-red-100">
+        <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-red-400/35 bg-red-500/15 px-4 py-3 text-center text-red-100">
           <span>{error}</span>
           <button type="button" onClick={() => setError(null)} className="text-sm underline">
             Скрыть
@@ -287,34 +284,36 @@ export default function EstablishmentBookingsPage() {
         </div>
       ) : null}
 
-      <div className="flex min-w-0 flex-wrap items-end gap-3 rounded-[10px] border border-[var(--color-brand-gold)]/30 bg-white/[0.06] p-4 shadow-[var(--shadow-subtle)] backdrop-blur-sm">
-        <div>
-          <label htmlFor="booking-date" className="mb-1 block text-xs text-[var(--color-on-dark-muted)]">
-            Дата (МСК)
-          </label>
-          <input
-            id="booking-date"
-            type="date"
-            value={dateYmd}
-            onChange={(e) => {
-              const v = e.target.value;
-              setDateYmd(v);
-              if (v) loadBookings(v);
-            }}
-            className="rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/30 px-3 py-2 text-[var(--color-on-dark)]"
-          />
+      <div className="ft-panel-section-toolbar gap-2 rounded-lg border border-[var(--color-brand-gold)]/30 bg-white/[0.06] p-2.5 shadow-[var(--shadow-subtle)] backdrop-blur-sm">
+        <div className="ft-panel-section-toolbar ft-panel-section-toolbar--row w-full max-w-full justify-center gap-3">
+          <div className="text-center sm:text-left">
+            <label htmlFor="booking-date" className="mb-1 block text-xs text-[var(--color-on-dark-muted)]">
+              Дата (МСК)
+            </label>
+            <input
+              id="booking-date"
+              type="date"
+              value={dateYmd}
+              onChange={(e) => {
+                const v = e.target.value;
+                setDateYmd(v);
+                if (v) loadBookings(v);
+              }}
+              className="rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/30 px-2.5 py-1.5 text-sm text-[var(--color-on-dark)]"
+            />
+          </div>
+          <button
+            type="button"
+            onClick={openCreate}
+            disabled={!dateYmd}
+            className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-lg bg-[var(--color-brand-gold)] px-3 py-2 text-xs font-semibold text-[#0a192f] shadow-[var(--shadow-button)] transition-opacity hover:opacity-90 disabled:opacity-40"
+          >
+            <Plus className="h-4 w-4" aria-hidden />
+            Новая бронь
+          </button>
         </div>
-        <button
-          type="button"
-          onClick={openCreate}
-          disabled={!dateYmd}
-          className="inline-flex items-center gap-2 rounded-xl bg-[var(--color-brand-gold)] px-4 py-2.5 text-sm font-semibold text-[#0a192f] shadow-[var(--shadow-button)] transition-opacity hover:opacity-90 disabled:opacity-40"
-        >
-          <Plus className="h-4 w-4" aria-hidden />
-          Новая бронь
-        </button>
         {tableOptions.length === 0 ? (
-          <p className="text-sm text-[var(--color-on-dark-muted)]">
+          <p className="max-w-xl text-center text-sm text-[var(--color-on-dark-muted)]">
             Сначала добавьте залы и столы в разделе{" "}
             <Link href="/establishment/halls" className="font-medium text-[var(--color-brand-gold)] underline">
               Залы и столы
@@ -325,33 +324,33 @@ export default function EstablishmentBookingsPage() {
       </div>
 
       {loading ? (
-        <div className="text-[var(--color-on-dark-muted)]">Загрузка…</div>
+        <div className="text-center text-[var(--color-on-dark-muted)]">Загрузка…</div>
       ) : bookings.length === 0 ? (
-        <p className="text-sm text-[var(--color-on-dark-muted)]">На этот день броней нет.</p>
+        <p className="text-center text-sm text-[var(--color-on-dark-muted)]">На этот день броней нет.</p>
       ) : (
-        <ul className="flex flex-col gap-3">
+        <ul className="flex flex-col gap-2">
           {bookings.map((b) => (
             <li
               key={b.id}
-              className="rounded-[10px] border border-[var(--color-brand-gold)]/30 bg-white/[0.06] p-4 shadow-[var(--shadow-subtle)] backdrop-blur-sm"
+              className="rounded-lg border border-[var(--color-brand-gold)]/30 bg-white/[0.06] p-2.5 shadow-[var(--shadow-subtle)] backdrop-blur-sm"
             >
               <div className="flex min-w-0 flex-wrap items-start justify-between gap-2">
                 <div className="min-w-0">
-                  <p className="font-medium text-[var(--color-on-dark)]">{b.guestName}</p>
+                  <p className="text-sm font-medium text-[var(--color-on-dark)]">{b.guestName}</p>
                   {b.guest ? (
                     <p className="mt-0.5 text-xs text-[var(--color-brand-gold)]">Карточка: {b.guest.displayName}</p>
                   ) : null}
-                  <p className="mt-0.5 text-sm text-[var(--color-on-dark-muted)]">
+                  <p className="mt-0.5 text-xs text-[var(--color-on-dark-muted)]">
                     {formatMoscowDate(b.startsAt)} · {formatMoscowTime(b.startsAt)} — {formatMoscowTime(b.endsAt)} ·{" "}
                     {b.partySize}{" "}
                     {b.partySize === 1 ? "гость" : b.partySize < 5 ? "гостя" : "гостей"}
                   </p>
                   {b.table ? (
-                    <p className="mt-1 text-sm text-[var(--color-on-dark-muted)]">
+                    <p className="mt-1 text-xs text-[var(--color-on-dark-muted)]">
                       {b.table.hallName} · стол {b.table.label} (до {b.table.capacity})
                     </p>
                   ) : (
-                    <p className="mt-1 text-sm text-[var(--color-on-dark-muted)]">Без привязки к столу</p>
+                    <p className="mt-1 text-xs text-[var(--color-on-dark-muted)]">Без привязки к столу</p>
                   )}
                   {(b.guestPhone || b.guestEmail) && (
                     <p className="mt-1 text-xs text-[var(--color-on-dark-muted)]">
@@ -359,11 +358,11 @@ export default function EstablishmentBookingsPage() {
                     </p>
                   )}
                   {b.notes ? (
-                    <p className="mt-2 text-sm text-[var(--color-on-dark-muted)]">{b.notes}</p>
+                    <p className="mt-1.5 text-xs text-[var(--color-on-dark-muted)]">{b.notes}</p>
                   ) : null}
                 </div>
                 <div className="flex shrink-0 flex-col items-end gap-2">
-                  <span className="rounded-lg bg-white/12 px-2 py-0.5 text-xs font-semibold text-[var(--color-on-dark)]">
+                  <span className="rounded-md bg-white/12 px-1.5 py-0.5 text-[10px] font-semibold text-[var(--color-on-dark)]">
                     {STATUS_LABEL[b.status]}
                   </span>
                   <div className="flex gap-1">
@@ -400,13 +399,13 @@ export default function EstablishmentBookingsPage() {
         >
           <form
             onSubmit={createBooking}
-            className="w-full max-w-md rounded-[10px] border border-[var(--color-brand-gold)]/35 bg-[#1e2a3a] p-5 shadow-2xl"
+            className="w-full max-w-md rounded-lg border border-[var(--color-brand-gold)]/35 bg-[#1e2a3a] p-4 shadow-2xl"
           >
-            <h3 id="new-booking-title" className="text-lg font-medium text-[var(--color-on-dark)]">
+            <h3 id="new-booking-title" className="text-sm font-medium text-[var(--color-on-dark)]">
               Новая бронь
             </h3>
             <p className="mt-1 text-xs text-[var(--color-on-dark-muted)]">Дата: {dateYmd} (МСК)</p>
-            <div className="mt-4 grid gap-3">
+            <div className="mt-3 grid gap-2">
               <div>
                 <label className="mb-1 block text-xs text-[var(--color-on-dark-muted)]">Гость из базы</label>
                 <select
@@ -421,7 +420,7 @@ export default function EstablishmentBookingsPage() {
                       setFormEmail(g.email ?? "");
                     }
                   }}
-                  className="w-full rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/40 px-3 py-2 text-[var(--color-on-dark)]"
+                  className="w-full rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/40 px-2.5 py-1.5 text-sm text-[var(--color-on-dark)]"
                 >
                   <option value="">Не выбрано</option>
                   {guestOptions.map((g) => (
@@ -438,7 +437,7 @@ export default function EstablishmentBookingsPage() {
                 <input
                   value={formGuest}
                   onChange={(e) => setFormGuest(e.target.value)}
-                  className="w-full rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/40 px-3 py-2 text-[var(--color-on-dark)]"
+                  className="w-full rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/40 px-2.5 py-1.5 text-sm text-[var(--color-on-dark)]"
                   maxLength={120}
                   placeholder={formGuestId ? "По умолчанию из карточки" : ""}
                 />
@@ -450,7 +449,7 @@ export default function EstablishmentBookingsPage() {
                     type="time"
                     value={formStart}
                     onChange={(e) => setFormStart(e.target.value)}
-                    className="w-full rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/40 px-3 py-2 text-[var(--color-on-dark)]"
+                    className="w-full rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/40 px-2.5 py-1.5 text-sm text-[var(--color-on-dark)]"
                   />
                 </div>
                 <div>
@@ -459,7 +458,7 @@ export default function EstablishmentBookingsPage() {
                     type="time"
                     value={formEnd}
                     onChange={(e) => setFormEnd(e.target.value)}
-                    className="w-full rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/40 px-3 py-2 text-[var(--color-on-dark)]"
+                    className="w-full rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/40 px-2.5 py-1.5 text-sm text-[var(--color-on-dark)]"
                   />
                 </div>
               </div>
@@ -468,7 +467,7 @@ export default function EstablishmentBookingsPage() {
                 <select
                   value={formTableId}
                   onChange={(e) => setFormTableId(e.target.value)}
-                  className="w-full rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/40 px-3 py-2 text-[var(--color-on-dark)]"
+                  className="w-full rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/40 px-2.5 py-1.5 text-sm text-[var(--color-on-dark)]"
                 >
                   <option value="">Без стола</option>
                   {tableOptions.map((t) => (
@@ -486,7 +485,7 @@ export default function EstablishmentBookingsPage() {
                   max={99}
                   value={formParty}
                   onChange={(e) => setFormParty(e.target.value)}
-                  className="w-full rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/40 px-3 py-2 text-[var(--color-on-dark)]"
+                  className="w-full rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/40 px-2.5 py-1.5 text-sm text-[var(--color-on-dark)]"
                 />
               </div>
               <div>
@@ -494,7 +493,7 @@ export default function EstablishmentBookingsPage() {
                 <input
                   value={formPhone}
                   onChange={(e) => setFormPhone(e.target.value)}
-                  className="w-full rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/40 px-3 py-2 text-[var(--color-on-dark)]"
+                  className="w-full rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/40 px-2.5 py-1.5 text-sm text-[var(--color-on-dark)]"
                   maxLength={40}
                 />
               </div>
@@ -504,7 +503,7 @@ export default function EstablishmentBookingsPage() {
                   type="email"
                   value={formEmail}
                   onChange={(e) => setFormEmail(e.target.value)}
-                  className="w-full rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/40 px-3 py-2 text-[var(--color-on-dark)]"
+                  className="w-full rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/40 px-2.5 py-1.5 text-sm text-[var(--color-on-dark)]"
                   maxLength={255}
                 />
               </div>
@@ -514,7 +513,7 @@ export default function EstablishmentBookingsPage() {
                   value={formNotes}
                   onChange={(e) => setFormNotes(e.target.value)}
                   rows={2}
-                  className="w-full rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/40 px-3 py-2 text-[var(--color-on-dark)]"
+                  className="w-full rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/40 px-2.5 py-1.5 text-sm text-[var(--color-on-dark)]"
                   maxLength={500}
                 />
               </div>
@@ -523,14 +522,14 @@ export default function EstablishmentBookingsPage() {
               <button
                 type="button"
                 onClick={() => setShowForm(false)}
-                className="rounded-lg px-4 py-2 text-sm text-[var(--color-on-dark-muted)] hover:text-[var(--color-on-dark)]"
+                className="rounded-md px-3 py-1.5 text-xs text-[var(--color-on-dark-muted)] hover:text-[var(--color-on-dark)]"
               >
                 Отмена
               </button>
               <button
                 type="submit"
                 disabled={submitting}
-                className="rounded-xl bg-[var(--color-brand-gold)] px-4 py-2 text-sm font-semibold text-[#0a192f] disabled:opacity-50"
+                className="rounded-lg bg-[var(--color-brand-gold)] px-3 py-1.5 text-xs font-semibold text-[#0a192f] disabled:opacity-50"
               >
                 Создать
               </button>
@@ -545,13 +544,13 @@ export default function EstablishmentBookingsPage() {
           role="dialog"
           aria-modal
         >
-          <div className="w-full max-w-sm rounded-[10px] border border-[var(--color-brand-gold)]/35 bg-[#1e2a3a] p-5 shadow-2xl">
-            <h3 className="text-lg font-medium text-[var(--color-on-dark)]">Статус брони</h3>
+          <div className="w-full max-w-sm rounded-lg border border-[var(--color-brand-gold)]/35 bg-[#1e2a3a] p-4 shadow-2xl">
+            <h3 className="text-sm font-medium text-[var(--color-on-dark)]">Статус брони</h3>
             <p className="mt-1 text-sm text-[var(--color-on-dark-muted)]">{editing.guestName}</p>
             <select
               value={editStatus}
               onChange={(e) => setEditStatus(e.target.value as BookingStatus)}
-              className="mt-4 w-full rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/40 px-3 py-2 text-[var(--color-on-dark)]"
+              className="mt-3 w-full rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/40 px-2.5 py-1.5 text-sm text-[var(--color-on-dark)]"
             >
               {(Object.keys(STATUS_LABEL) as BookingStatus[]).map((s) => (
                 <option key={s} value={s}>
@@ -563,7 +562,7 @@ export default function EstablishmentBookingsPage() {
               <button
                 type="button"
                 onClick={() => setEditing(null)}
-                className="rounded-lg px-4 py-2 text-sm text-[var(--color-on-dark-muted)]"
+                className="rounded-md px-3 py-1.5 text-xs text-[var(--color-on-dark-muted)]"
               >
                 Закрыть
               </button>
@@ -571,7 +570,7 @@ export default function EstablishmentBookingsPage() {
                 type="button"
                 onClick={saveEdit}
                 disabled={savingEdit}
-                className="rounded-xl bg-[var(--color-brand-gold)] px-4 py-2 text-sm font-semibold text-[#0a192f] disabled:opacity-50"
+                className="rounded-lg bg-[var(--color-brand-gold)] px-3 py-1.5 text-xs font-semibold text-[#0a192f] disabled:opacity-50"
               >
                 Сохранить
               </button>

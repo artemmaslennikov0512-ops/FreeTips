@@ -2,7 +2,8 @@ import { setAccessToken } from "@/lib/auth-client";
 import { drainImpersonationState, setCabinetImpersonationState } from "@/lib/cabinet-impersonation-state";
 
 /**
- * Супер-админ: войти в ЛК получателя/официанта. Токен админа сохраняется в localStorage (рядом с accessToken).
+ * Просмотр ЛК другого пользователя: токен текущего пользователя (супер-админ или управляющий заведения)
+ * сохраняется в localStorage рядом с выданным accessToken цели.
  */
 export function beginCabinetImpersonation(adminAccessToken: string, targetAccessToken: string, returnPath: string): void {
   setCabinetImpersonationState(adminAccessToken, returnPath);

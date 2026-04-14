@@ -43,9 +43,16 @@ function LoginForm() {
       return;
     }
     fetch("/api/profile", { headers: { Authorization: `Bearer ${token}` } })
-      .then((res) => {
+      .then(async (res) => {
         if (res.ok) {
-          router.replace("/cabinet");
+          const data = await res.json().catch(() => null);
+          if (data?.role === "ESTABLISHMENT_ADMIN" && data?.establishmentId) {
+            router.replace("/establishment");
+          } else if (data?.role === "ADMIN" || data?.role === "SUPERADMIN") {
+            router.replace("/admin/dashboard");
+          } else {
+            router.replace("/cabinet");
+          }
           return;
         }
         if (res.status === 401) clearAccessToken();

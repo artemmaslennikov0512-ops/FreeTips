@@ -9,6 +9,7 @@ import { z } from "zod";
 import { requireEstablishmentAdmin } from "@/lib/middleware/auth";
 import { db } from "@/lib/db";
 import { parseJsonWithLimit } from "@/lib/api/helpers";
+import { ensureTablePaySlugsForEstablishment } from "@/lib/ensure-table-pay-slugs";
 
 const createHallSchema = z.object({
   name: z.string().trim().min(1, "Укажите название зала").max(120),
@@ -22,6 +23,7 @@ function serializeTable(t: {
   capacity: number;
   sortOrder: number;
   externalCode: string | null;
+  tablePaySlug: string | null;
   createdAt: Date;
   updatedAt: Date;
 }) {
@@ -32,6 +34,7 @@ function serializeTable(t: {
     capacity: t.capacity,
     sortOrder: t.sortOrder,
     externalCode: t.externalCode,
+    tablePaySlug: t.tablePaySlug,
     createdAt: t.createdAt.toISOString(),
     updatedAt: t.updatedAt.toISOString(),
   };
@@ -62,6 +65,8 @@ function serializeHall(
 export async function GET(request: NextRequest) {
   const auth = await requireEstablishmentAdmin(request);
   if (auth.response) return auth.response;
+
+  await ensureTablePaySlugsForEstablishment(auth.establishmentId);
 
   const halls = await db.establishmentHall.findMany({
     where: { establishmentId: auth.establishmentId },

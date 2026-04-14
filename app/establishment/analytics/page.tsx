@@ -77,9 +77,9 @@ export default function AnalyticsPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="font-[family:var(--font-playfair)] text-xl font-semibold text-white text-center">
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="font-[family:var(--font-playfair)] text-lg font-semibold text-white text-center">
           Аналитика
         </h1>
         <div className="flex items-center gap-2">
@@ -99,7 +99,7 @@ export default function AnalyticsPage() {
             type="button"
             onClick={exportCsv}
             disabled={!stats?.byDay?.length}
-            className="inline-flex items-center gap-2 rounded-[10px] bg-[var(--color-brand-gold)] px-4 py-2 font-medium text-[#0a192f] hover:opacity-90 disabled:opacity-50"
+            className="inline-flex items-center gap-1.5 rounded-[10px] bg-[var(--color-brand-gold)] px-3 py-1.5 text-sm font-medium text-[#0a192f] hover:opacity-90 disabled:opacity-50"
           >
             <Download className="h-4 w-4" />
             Экспорт CSV
@@ -110,33 +110,33 @@ export default function AnalyticsPage() {
       {stats && (
         <>
           <div className="grid gap-4 sm:grid-cols-2">
-            <div className="cabinet-block-inner rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 p-5">
-              <p className="text-sm text-white/90">Всего чаевых за период</p>
-              <p className="text-2xl font-semibold text-white">
+            <div className="cabinet-block-inner rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 p-4">
+              <p className="text-xs text-white/90">Всего чаевых за период</p>
+              <p className="text-lg font-semibold text-white">
                 {(stats.totalTipsKop / 100).toFixed(2)} ₽
               </p>
             </div>
-            <div className="cabinet-block-inner rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 p-5">
-              <p className="text-sm text-white/90">Количество транзакций</p>
-              <p className="text-2xl font-semibold text-white">
+            <div className="cabinet-block-inner rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 p-4">
+              <p className="text-xs text-white/90">Количество транзакций</p>
+              <p className="text-lg font-semibold text-white">
                 {stats.transactionsCount}
               </p>
             </div>
           </div>
 
           <div className="cabinet-card rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden">
-            <div className="p-5">
-              <h2 className="text-lg font-medium text-white mb-4">По дням</h2>
+            <div className="p-4">
+              <h2 className="text-base font-medium text-white mb-3">По дням</h2>
               {stats.byDay.length === 0 ? (
                 <p className="text-white/90">Нет данных за выбранный период.</p>
               ) : (
                 <div className="space-y-3">
                   {stats.byDay.map((d) => (
                     <div key={d.date} className="flex items-center gap-4">
-                      <span className="w-28 text-sm text-white/90 shrink-0">
+                      <span className="w-24 text-xs text-white/90 shrink-0">
                         {formatDate(d.date)}
                       </span>
-                      <div className="flex-1 h-6 rounded bg-[var(--color-dark-gray)]/20 overflow-hidden">
+                      <div className="flex-1 h-5 rounded bg-[var(--color-dark-gray)]/20 overflow-hidden">
                         <div
                           className="h-full rounded bg-[var(--color-brand-gold)] min-w-[2px]"
                           style={{
@@ -144,7 +144,7 @@ export default function AnalyticsPage() {
                           }}
                         />
                       </div>
-                      <span className="w-24 text-right text-sm font-medium text-white shrink-0">
+                      <span className="w-20 text-right text-xs font-medium text-white shrink-0">
                         {(d.amountKop / 100).toFixed(2)} ₽
                       </span>
                     </div>

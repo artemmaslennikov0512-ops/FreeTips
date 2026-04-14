@@ -35,12 +35,13 @@ export function parseGlobalWaiterCodeString(code: string): number | null {
 }
 
 async function isWaiterCodeTakenGlobally(tx: Prisma.TransactionClient, code: string): Promise<boolean> {
-  const [emp, link, est] = await Promise.all([
+  const [emp, link, est, table] = await Promise.all([
     tx.employee.findUnique({ where: { qrCodeIdentifier: code } }),
     tx.tipLink.findFirst({ where: { slug: code } }),
     tx.establishment.findUnique({ where: { uniqueSlug: code }, select: { id: true } }),
+    tx.establishmentTable.findFirst({ where: { tablePaySlug: code }, select: { id: true } }),
   ]);
-  return !!(emp || link || est);
+  return !!(emp || link || est || table);
 }
 
 const MAX_ALLOCATION_ATTEMPTS = 50_000;

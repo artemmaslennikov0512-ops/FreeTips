@@ -97,12 +97,12 @@ export default function EstablishmentJoinRequestsPage() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-3xl space-y-6 pb-2">
+    <div className="mx-auto w-full max-w-3xl space-y-4 pb-2">
       <div className="text-center">
-        <h1 className="font-[family:var(--font-playfair)] text-xl font-semibold text-white sm:text-2xl">
+        <h1 className="font-[family:var(--font-playfair)] text-lg font-semibold text-white">
           Подключение сотрудников
         </h1>
-        <p className="mt-2 text-sm leading-relaxed text-white/75">
+        <p className="mt-1.5 text-xs leading-relaxed text-white/75">
           Заявки от официантов, которые указали код вашего заведения. После одобрения создаётся карточка сотрудника и
           выдаётся код для чаевых; официанту нужно войти в аккаунт заново.
         </p>
@@ -121,11 +121,11 @@ export default function EstablishmentJoinRequestsPage() {
       {rows.length === 0 ? (
         <p className="text-center text-sm text-white/70">Нет ожидающих заявок.</p>
       ) : (
-        <ul className="space-y-4 text-start">
+        <ul className="space-y-3 text-start">
           {rows.map((r) => (
             <li
               key={r.id}
-              className="cabinet-card rounded-[10px] border-0 bg-[var(--color-bg-sides)] p-4 text-[var(--color-text)] shadow-[var(--shadow-subtle)] sm:p-5"
+              className="cabinet-card rounded-[10px] border-0 bg-[var(--color-bg-sides)] p-3.5 text-[var(--color-text)] shadow-[var(--shadow-subtle)] sm:p-4"
             >
               <p className="font-medium">{r.userFullName || r.userLogin}</p>
               <p className="text-sm text-[var(--color-text-secondary)]">@{r.userLogin}</p>

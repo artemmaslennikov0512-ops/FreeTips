@@ -533,7 +533,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
         </button>
       )}
 
-      <main className="relative min-h-screen min-w-0 flex-1 overflow-x-hidden px-0 pt-1.5 pb-3 lg:px-0 lg:pt-2 lg:pr-3 lg:ml-0 lg:mr-0 flex flex-col">
+      <main className="relative min-h-screen min-w-0 flex-1 px-0 pt-1.5 pb-3 lg:px-0 lg:pt-2 lg:pr-3 lg:ml-0 lg:mr-0 flex flex-col">
         <div
           className="cabinet-main-block app-panel-main-surface relative z-10 mt-0 mr-0 mb-3 ml-0 flex min-h-0 w-full max-w-full flex-1 flex-col rounded-lg border-x border-b border-white/10 backdrop-blur-xl md:rounded-[10px] lg:z-0 lg:mr-3 lg:ml-3"
           style={mainBlockStyle}
@@ -542,7 +542,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
             <PanelMobileBackButton variant="cabinet" fallbackHref="/cabinet" />
           )}
           <div
-            className="flex min-h-0 flex-1 flex-col overflow-x-hidden px-4 py-3 sm:px-6 md:py-6 lg:p-8"
+            className="flex min-h-0 min-w-0 flex-1 flex-col px-4 py-3 sm:px-6 md:py-6 lg:p-8"
             id="main-content"
           >
             {children}

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Превью (тест)",
-  description: "Тестовые страницы: лендинг, донат стримера, ссылки в макет ЛК. Без реальных платежей.",
+  description: "Тестовые страницы: лендинг, донат стримера. Без реальных платежей.",
   robots: { index: false, follow: false },
 };
 

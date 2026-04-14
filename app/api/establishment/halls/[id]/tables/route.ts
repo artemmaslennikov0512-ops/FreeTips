@@ -10,6 +10,8 @@ import { requireEstablishmentAdmin } from "@/lib/middleware/auth";
 import { db } from "@/lib/db";
 import { parseJsonWithLimit, jsonError } from "@/lib/api/helpers";
 import { Prisma } from "@prisma/client";
+import { allocateNextGlobalWaiterCode, WaiterQrIdentifierExhaustedError } from "@/lib/waiter-qr-identifier";
+import { ensureTablePaySlugsForEstablishment } from "@/lib/ensure-table-pay-slugs";
 
 const createTableSchema = z.object({
   label: z.string().trim().min(1, "Укажите обозначение стола").max(80),
@@ -40,6 +42,8 @@ export async function GET(request: NextRequest, ctx: Ctx) {
     return NextResponse.json({ error: "Зал не найден" }, { status: 404 });
   }
 
+  await ensureTablePaySlugsForEstablishment(auth.establishmentId);
+
   const tables = await db.establishmentTable.findMany({
     where: { hallId },
     orderBy: [{ sortOrder: "asc" }, { label: "asc" }],
@@ -53,6 +57,7 @@ export async function GET(request: NextRequest, ctx: Ctx) {
       capacity: t.capacity,
       sortOrder: t.sortOrder,
       externalCode: t.externalCode,
+      tablePaySlug: t.tablePaySlug,
       createdAt: t.createdAt.toISOString(),
       updatedAt: t.updatedAt.toISOString(),
     })),
@@ -88,14 +93,18 @@ export async function POST(request: NextRequest, ctx: Ctx) {
     body.data.sortOrder ?? (maxSort._max.sortOrder != null ? maxSort._max.sortOrder + 1 : 0);
 
   try {
-    const table = await db.establishmentTable.create({
-      data: {
-        hallId,
-        label: body.data.label.trim(),
-        capacity: body.data.capacity ?? 2,
-        sortOrder: nextOrder,
-        externalCode: body.data.externalCode ?? null,
-      },
+    const table = await db.$transaction(async (tx) => {
+      const tablePaySlug = await allocateNextGlobalWaiterCode(tx);
+      return tx.establishmentTable.create({
+        data: {
+          hallId,
+          label: body.data.label.trim(),
+          capacity: body.data.capacity ?? 2,
+          sortOrder: nextOrder,
+          externalCode: body.data.externalCode ?? null,
+          tablePaySlug,
+        },
+      });
     });
     return NextResponse.json(
       {
@@ -105,12 +114,16 @@ export async function POST(request: NextRequest, ctx: Ctx) {
         capacity: table.capacity,
         sortOrder: table.sortOrder,
         externalCode: table.externalCode,
+        tablePaySlug: table.tablePaySlug,
         createdAt: table.createdAt.toISOString(),
         updatedAt: table.updatedAt.toISOString(),
       },
       { status: 201 },
     );
   } catch (e) {
+    if (e instanceof WaiterQrIdentifierExhaustedError) {
+      return jsonError(503, e.message);
+    }
     if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2002") {
       return jsonError(409, "Стол с таким обозначением уже есть в этом зале");
     }

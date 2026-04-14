@@ -386,13 +386,13 @@ export default function EstablishmentBrandPage() {
   const previewBannerSub = printBannerSubtext.trim() || "команда ресторана";
 
   return (
-    <div className="mx-auto max-w-6xl space-y-6">
+    <div className="mx-auto max-w-6xl space-y-4">
       <div>
-        <h1 className="font-[family:var(--font-playfair)] text-xl font-semibold text-white flex items-center justify-center gap-2 w-full">
-          <Palette className="h-5 w-5" />
+        <h1 className="font-[family:var(--font-playfair)] text-lg font-semibold text-white flex items-center justify-center gap-2 w-full">
+          <Palette className="h-4 w-4 shrink-0" />
           Бренд заведения
         </h1>
-        <p className="text-white/90 text-sm mt-1 text-center">
+        <p className="text-white/90 text-xs mt-1 text-center">
           Выберите, что настраиваете: карточка для печати, страница оплаты или кабинет. Общая палитра одна — превью покажет, как это будет выглядеть.
         </p>
       </div>
@@ -413,10 +413,10 @@ export default function EstablishmentBrandPage() {
       </div>
 
       {/* Две колонки: слева — настройки, справа — превью */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
         {/* Левая колонка: форма настроек */}
         <div className="cabinet-card rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden order-2 lg:order-1">
-          <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          <form onSubmit={handleSubmit} className="p-4 space-y-3">
             {message && (
               <p className={`text-sm ${message.startsWith("Сохранено") ? "text-[var(--color-accent-emerald)]" : "text-[var(--color-accent-red)]"}`}>
                 {message}
@@ -739,7 +739,7 @@ export default function EstablishmentBrandPage() {
             </span>
           </div>
           <div
-            className="p-6 flex flex-col items-center gap-4 rounded-b-[10px] max-h-[70vh] overflow-y-auto"
+            className="p-4 flex flex-col items-center gap-3 rounded-b-[10px] max-h-[70vh] overflow-y-auto"
             style={{
               backgroundColor: mainBgRgba ?? (hex(mainBackgroundColor) || undefined),
             }}

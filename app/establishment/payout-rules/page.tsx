@@ -171,19 +171,19 @@ export default function PayoutRulesPage() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl space-y-6">
+    <div className="mx-auto max-w-3xl space-y-4">
       <div>
-        <h1 className="font-[family:var(--font-playfair)] text-xl font-semibold text-white text-center">
+        <h1 className="font-[family:var(--font-playfair)] text-lg font-semibold text-white text-center">
           Правила распределения
         </h1>
-        <p className="text-white/90 text-sm mt-1">
+        <p className="text-white/90 text-xs mt-1">
           Доля заведения (процент, остающийся у заведения) и при необходимости — процент в фонд. Остаток пула распределяется между сотрудниками по коэффициентам (настраиваются в разделе «Команда»).
         </p>
       </div>
 
-      <div className="cabinet-card rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] p-6 space-y-4">
+      <div className="cabinet-card rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] p-4 space-y-3">
         <div>
-          <h2 className="text-lg font-medium text-white">Куда уходят чаевые по QR сотрудников</h2>
+          <h2 className="text-base font-medium text-white">Куда уходят чаевые по QR сотрудников</h2>
           <p className="text-xs text-white/60 mt-1">
             Действует только для официантов из раздела «Команда» этого заведения. Самостоятельно зарегистрированные получатели без привязки к заведению всегда получают оплату на личный счёт.
           </p>
@@ -227,7 +227,7 @@ export default function PayoutRulesPage() {
           type="button"
           onClick={handleSaveTipRouting}
           disabled={routingSaving}
-          className="rounded-[10px] bg-[var(--color-brand-gold)] px-4 py-2 font-medium text-[#0a192f] hover:opacity-90 disabled:opacity-50"
+          className="rounded-[10px] bg-[var(--color-brand-gold)] px-3 py-1.5 text-sm font-medium text-[#0a192f] hover:opacity-90 disabled:opacity-50"
         >
           {routingSaving ? "Сохранение…" : "Сохранить настройку QR"}
         </button>
@@ -235,8 +235,8 @@ export default function PayoutRulesPage() {
 
       {showForm && (
         <div className="cabinet-card rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)]">
-          <form onSubmit={handleSubmit} className="p-6 space-y-4">
-            <h2 className="text-lg font-medium text-white">
+          <form onSubmit={handleSubmit} className="p-4 space-y-3">
+            <h2 className="text-base font-medium text-white">
               {editingId ? "Редактировать правило" : "Новое правило"}
             </h2>
             {formError && (
@@ -282,7 +282,7 @@ export default function PayoutRulesPage() {
               <button
                 type="submit"
                 disabled={submitting}
-                className="rounded-[10px] bg-[var(--color-brand-gold)] px-4 py-2 font-medium text-[#0a192f] hover:opacity-90 disabled:opacity-50"
+                className="rounded-[10px] bg-[var(--color-brand-gold)] px-3 py-1.5 text-sm font-medium text-[#0a192f] hover:opacity-90 disabled:opacity-50"
               >
                 {submitting ? "Сохранение…" : editingId ? "Сохранить" : "Добавить"}
               </button>
@@ -294,7 +294,7 @@ export default function PayoutRulesPage() {
                   setFormName("");
                   setFormValue("");
                 }}
-                className="rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-4 py-2 font-medium text-white hover:bg-[var(--color-dark-gray)]/20"
+                className="rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-1.5 text-sm font-medium text-white hover:bg-[var(--color-dark-gray)]/20"
               >
                 Отмена
               </button>
@@ -318,7 +318,7 @@ export default function PayoutRulesPage() {
           )}
         </div>
         {rules.length === 0 ? (
-          <div className="p-6 text-center text-white/90">
+          <div className="p-4 text-center text-sm text-white/90">
             Нет правил. Добавьте правило «Доля заведения» (например 10–20%), чтобы заведение получало процент от пула чаевых. Остаток распределяется между сотрудниками по коэффициентам.
           </div>
         ) : (

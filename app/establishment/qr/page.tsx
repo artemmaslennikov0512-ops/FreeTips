@@ -126,11 +126,11 @@ export default function EstablishmentQrPage() {
   const examplePayLink = exampleSlug ? `${getBaseUrl()}/pay/${exampleSlug}` : null;
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6">
-      <h1 className="font-[family:var(--font-playfair)] text-xl font-semibold text-white text-center">
+    <div className="mx-auto max-w-2xl space-y-4">
+      <h1 className="font-[family:var(--font-playfair)] text-lg font-semibold text-white text-center">
         QR и печать
       </h1>
-      <p className="text-white/90 text-sm text-center">
+      <p className="text-white/90 text-xs text-center">
         Ссылки для оплаты и карточки для печати. Вид карточки настраивается в разделе «Бренд».
       </p>
 
@@ -138,7 +138,7 @@ export default function EstablishmentQrPage() {
         <div className="border-b border-white/10 px-4 py-3 w-full">
           <span className="text-sm font-medium text-white/90">Код официанта, ссылка и QR</span>
         </div>
-        <div className="p-6 space-y-4 w-full max-w-lg flex flex-col items-center">
+        <div className="p-4 space-y-3 w-full max-w-lg flex flex-col items-center">
           {examplePayLink ? (
             <>
               <div className="flex flex-col items-center w-full">

@@ -121,61 +121,61 @@ export default function EstablishmentGuestsPage() {
   };
 
   return (
-    <div className="flex min-w-0 max-w-full flex-col gap-6">
-      <Link
-        href="/establishment/operations"
-        className="inline-flex w-fit items-center gap-1 text-sm text-[var(--color-on-dark-muted)] hover:text-[var(--color-on-dark)]"
-      >
-        <ChevronLeft className="h-4 w-4" aria-hidden />
-        Зал и сервис
-      </Link>
-      <div>
+    <div className="flex min-w-0 max-w-full flex-col gap-3">
+      <div className="ft-panel-section-head min-w-0">
+        <Link
+          href="/establishment/operations"
+          className="inline-flex items-center justify-center gap-1 text-sm text-[var(--color-on-dark-muted)] hover:text-[var(--color-on-dark)]"
+        >
+          <ChevronLeft className="h-4 w-4" aria-hidden />
+          Зал и сервис
+        </Link>
         <h1 className="cabinet-dashboard-name-hero font-[family:var(--font-playfair)] text-[var(--color-on-dark)]">
           Гости
         </h1>
-        <p className="mt-2 text-sm text-[var(--color-on-dark-muted)]">
+        <p className="ft-panel-section-head__lead text-sm text-[var(--color-on-dark-muted)]">
           Карточки для броней и заметок. Поиск по имени, телефону или email.
         </p>
       </div>
       {error ? (
-        <div className="rounded-xl border border-red-400/35 bg-red-500/15 px-4 py-2 text-red-100">
-          {error}{" "}
+        <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-red-400/35 bg-red-500/15 px-4 py-3 text-center text-red-100">
+          <span>{error}</span>
           <button type="button" className="underline" onClick={() => setError(null)}>
             Скрыть
           </button>
         </div>
       ) : null}
-      <div className="flex flex-wrap items-end gap-2 rounded-[10px] border border-[var(--color-brand-gold)]/30 bg-white/[0.06] p-4">
+      <div className="ft-panel-section-toolbar ft-panel-section-toolbar--row rounded-lg border border-[var(--color-brand-gold)]/30 bg-white/[0.06] p-2.5">
         <input
           value={q}
           onChange={(e) => setQ(e.target.value)}
           placeholder="Поиск…"
-          className="min-w-[12rem] flex-1 rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/30 px-3 py-2 text-[var(--color-on-dark)] placeholder:text-[var(--color-on-dark-muted)]"
+          className="w-full max-w-md min-w-[12rem] flex-1 rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/30 px-2.5 py-1.5 text-center text-sm text-[var(--color-on-dark)] placeholder:text-[var(--color-on-dark-muted)] sm:max-w-xs sm:text-left"
         />
         <button
           type="button"
           onClick={() => setShowForm(true)}
-          className="inline-flex items-center gap-2 rounded-xl bg-[var(--color-brand-gold)] px-4 py-2.5 text-sm font-semibold text-[#0a192f]"
+          className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-lg bg-[var(--color-brand-gold)] px-3 py-2 text-xs font-semibold text-[#0a192f]"
         >
           <Plus className="h-4 w-4" aria-hidden />
           Добавить
         </button>
       </div>
       {loading ? (
-        <p className="text-[var(--color-on-dark-muted)]">Загрузка…</p>
+        <p className="text-center text-[var(--color-on-dark-muted)]">Загрузка…</p>
       ) : (
         <ul className="flex flex-col gap-2">
           {guests.map((g) => (
             <li
               key={g.id}
-              className="flex flex-wrap items-start justify-between gap-2 rounded-[10px] border border-[var(--color-brand-gold)]/25 bg-white/[0.06] p-4"
+              className="flex flex-wrap items-start justify-between gap-2 rounded-lg border border-[var(--color-brand-gold)]/25 bg-white/[0.06] p-2.5"
             >
               <div>
-                <p className="font-medium text-[var(--color-on-dark)]">{g.displayName}</p>
-                <p className="text-sm text-[var(--color-on-dark-muted)]">
+                <p className="text-sm font-medium text-[var(--color-on-dark)]">{g.displayName}</p>
+                <p className="text-xs text-[var(--color-on-dark-muted)]">
                   {[g.phone, g.email].filter(Boolean).join(" · ") || "—"}
                 </p>
-                {g.notes ? <p className="mt-2 text-sm text-[var(--color-on-dark-muted)]">{g.notes}</p> : null}
+                {g.notes ? <p className="mt-1.5 text-xs text-[var(--color-on-dark-muted)]">{g.notes}</p> : null}
               </div>
               <div className="flex gap-1">
                 <button
@@ -206,9 +206,9 @@ export default function EstablishmentGuestsPage() {
         <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 p-4">
           <form
             onSubmit={createGuest}
-            className="w-full max-w-md rounded-[10px] border border-[var(--color-brand-gold)]/35 bg-[#1e2a3a] p-5"
+            className="w-full max-w-md rounded-lg border border-[var(--color-brand-gold)]/35 bg-[#1e2a3a] p-4"
           >
-            <h3 className="text-lg font-medium text-[var(--color-on-dark)]">Новый гость</h3>
+            <h3 className="text-sm font-medium text-[var(--color-on-dark)]">Новый гость</h3>
             <div className="mt-4 grid gap-2">
               <input
                 required
@@ -255,8 +255,8 @@ export default function EstablishmentGuestsPage() {
       ) : null}
       {editing ? (
         <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-md rounded-[10px] border border-[var(--color-brand-gold)]/35 bg-[#1e2a3a] p-5">
-            <h3 className="text-lg font-medium text-[var(--color-on-dark)]">Заметка</h3>
+          <div className="w-full max-w-md rounded-lg border border-[var(--color-brand-gold)]/35 bg-[#1e2a3a] p-4">
+            <h3 className="text-sm font-medium text-[var(--color-on-dark)]">Заметка</h3>
             <p className="text-sm text-[var(--color-on-dark-muted)]">{editing.displayName}</p>
             <textarea
               value={editNotes}

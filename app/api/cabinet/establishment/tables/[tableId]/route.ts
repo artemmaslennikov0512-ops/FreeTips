@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { EstablishmentServiceSessionStatus } from "@prisma/client";
 import { requireEstablishmentEmployee } from "@/lib/middleware/auth";
 import { db } from "@/lib/db";
+import { ensureTablePaySlugsForEstablishment } from "@/lib/ensure-table-pay-slugs";
 
 type Ctx = { params: Promise<{ tableId: string }> };
 
@@ -34,6 +35,8 @@ export async function GET(request: NextRequest, ctx: Ctx) {
   if ("response" in auth) return auth.response;
 
   const { tableId } = await ctx.params;
+
+  await ensureTablePaySlugsForEstablishment(auth.establishmentId);
 
   const table = await db.establishmentTable.findFirst({
     where: { id: tableId, hall: { establishmentId: auth.establishmentId } },
@@ -92,6 +95,7 @@ export async function GET(request: NextRequest, ctx: Ctx) {
       capacity: table.capacity,
       hallId: table.hall.id,
       hallName: table.hall.name,
+      tablePaySlug: table.tablePaySlug,
     },
     session: sessionPayload,
     order: order

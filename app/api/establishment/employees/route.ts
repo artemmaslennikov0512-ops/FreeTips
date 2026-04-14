@@ -1,6 +1,6 @@
 /**
  * GET /api/establishment/employees — список сотрудников заведения.
- * POST /api/establishment/employees — добавить сотрудника (с проверкой лимита).
+ * POST /api/establishment/employees — добавить сотрудника.
  * Требует: ESTABLISHMENT_ADMIN, свой establishmentId
  */
 
@@ -93,29 +93,6 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   const auth = await requireEstablishmentAdmin(request);
   if (auth.response) return auth.response;
-
-  const establishment = await db.establishment.findUnique({
-    where: { id: auth.establishmentId },
-    select: {
-      maxEmployeesCount: true,
-      tipPoolUserId: true,
-      _count: { select: { employees: true } },
-    },
-  });
-  if (!establishment) {
-    return NextResponse.json({ error: "Заведение не найдено" }, { status: 404 });
-  }
-
-  const max = establishment.maxEmployeesCount;
-  const current = establishment._count.employees;
-  if (max != null && current >= max) {
-    return NextResponse.json(
-      {
-        error: `Достигнут лимит сотрудников (${max}). Увеличить лимит может суперадмин в разделе «Заведения».`,
-      },
-      { status: 403 },
-    );
-  }
 
   const parsed = await parseJsonWithLimit(request, MAX_BODY_SIZE_AUTH);
   if (!parsed.ok) return parsed.response;

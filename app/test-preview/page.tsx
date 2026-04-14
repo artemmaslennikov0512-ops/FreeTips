@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, LayoutDashboard, Palette, Radio, Sparkles } from "lucide-react";
+import { ArrowRight, Palette, Radio, Sparkles } from "lucide-react";
 
 const cards = [
   {
@@ -13,13 +13,6 @@ const cards = [
     description: "Тот же продуктовый смысл, фото как на главной, блоки про стрим и новые сценарии — сравните с /.",
     href: "/test-preview/landing",
     icon: Sparkles,
-  },
-  {
-    title: "Тестовый ЛК (новый стиль)",
-    description:
-      "Изолированная бирюзовая тема: названия и порядок как в /cabinet, макетные разделы внизу. Тот же интерфейс по адресу /test-lk-mock/cabinet-nav/…",
-    href: "/test-lk-mock",
-    icon: LayoutDashboard,
   },
   {
     title: "Страница доната (заглушка)",
@@ -37,7 +30,7 @@ export default function TestPreviewHubPage() {
         Тестовые страницы
       </h1>
       <p className="mt-3 text-[var(--color-muted)] leading-relaxed">
-        Ниже — маршруты для просмотра лендинга, макета ЛК и доната. Реальные платежи не выполняются.
+        Ниже — маршруты для просмотра лендинга и доната. Реальные платежи не выполняются.
       </p>
       <ul className="mt-10 space-y-4">
         {cards.map(({ title, description, href, icon: Icon }) => (

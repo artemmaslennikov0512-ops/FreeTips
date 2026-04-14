@@ -139,55 +139,61 @@ export default function EstablishmentMenuPage() {
   };
 
   return (
-    <div className="flex min-w-0 max-w-full flex-col gap-6">
-      <Link
-        href="/establishment/operations"
-        className="inline-flex w-fit items-center gap-1 text-sm text-[var(--color-on-dark-muted)] hover:text-[var(--color-on-dark)]"
-      >
-        <ChevronLeft className="h-4 w-4" aria-hidden />
-        Зал и сервис
-      </Link>
-      <div>
+    <div className="flex min-w-0 max-w-full flex-col gap-3">
+      <div className="ft-panel-section-head min-w-0">
+        <Link
+          href="/establishment/operations"
+          className="inline-flex items-center justify-center gap-1 text-sm text-[var(--color-on-dark-muted)] hover:text-[var(--color-on-dark)]"
+        >
+          <ChevronLeft className="h-4 w-4" aria-hidden />
+          Зал и сервис
+        </Link>
         <h1 className="cabinet-dashboard-name-hero font-[family:var(--font-playfair)] text-[var(--color-on-dark)]">
           Меню
         </h1>
-        <p className="mt-2 text-sm text-[var(--color-on-dark-muted)]">
+        <p className="ft-panel-section-head__lead text-sm text-[var(--color-on-dark-muted)]">
           Категории и позиции. Цены в рублях; на сервере хранятся в копейках.
         </p>
       </div>
       {error ? (
-        <div className="rounded-xl border border-red-400/35 bg-red-500/15 px-4 py-2 text-red-100">
-          {error}{" "}
+        <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-red-400/35 bg-red-500/15 px-4 py-3 text-center text-red-100">
+          <span>{error}</span>
           <button type="button" className="underline" onClick={() => setError(null)}>
             Скрыть
           </button>
         </div>
       ) : null}
-      <form onSubmit={addCategory} className="flex flex-wrap gap-2 rounded-[10px] border border-[var(--color-brand-gold)]/30 bg-white/[0.06] p-4">
+      <form
+        onSubmit={addCategory}
+        className="ft-panel-section-toolbar ft-panel-section-toolbar--row gap-2 rounded-lg border border-[var(--color-brand-gold)]/30 bg-white/[0.06] p-2.5"
+      >
         <input
           value={newCatName}
           onChange={(e) => setNewCatName(e.target.value)}
           placeholder="Новая категория"
-          className="min-w-[10rem] flex-1 rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/30 px-3 py-2 text-[var(--color-on-dark)]"
+          className="w-full max-w-md min-w-[10rem] flex-1 rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/30 px-2.5 py-1.5 text-center text-sm text-[var(--color-on-dark)] sm:text-left"
         />
-        <button type="submit" className="inline-flex items-center gap-2 rounded-xl bg-[var(--color-brand-gold)] px-4 py-2 text-sm font-semibold text-[#0a192f]">
+        <button
+          type="submit"
+          className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-lg bg-[var(--color-brand-gold)] px-3 py-1.5 text-xs font-semibold text-[#0a192f]"
+        >
           <Plus className="h-4 w-4" />
           Добавить категорию
         </button>
       </form>
       {loading ? (
-        <p className="text-[var(--color-on-dark-muted)]">Загрузка…</p>
+        <p className="text-center text-[var(--color-on-dark-muted)]">Загрузка…</p>
       ) : (
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-2">
           {categories.map((c) => {
             const f = itemForms[c.id] ?? { name: "", priceRub: "", desc: "" };
             return (
               <section
                 key={c.id}
-                className="rounded-[10px] border border-[var(--color-brand-gold)]/25 bg-white/[0.06] p-4"
+                className="rounded-lg border border-[var(--color-brand-gold)]/25 bg-white/[0.06] p-2.5"
               >
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <h2 className="text-lg font-medium text-[var(--color-on-dark)]">{c.name}</h2>
+                  <h2 className="text-sm font-medium text-[var(--color-on-dark)]">{c.name}</h2>
                   <button
                     type="button"
                     onClick={() => removeCategory(c.id)}
@@ -201,11 +207,11 @@ export default function EstablishmentMenuPage() {
                   {c.items.map((it) => (
                     <li key={it.id} className="flex flex-wrap items-center justify-between gap-2 border-t border-[var(--color-brand-gold)]/15 pt-2 first:border-t-0 first:pt-0">
                       <div>
-                        <p className="text-[var(--color-on-dark)]">{it.name}</p>
-                        {it.description ? <p className="text-sm text-[var(--color-on-dark-muted)]">{it.description}</p> : null}
+                        <p className="text-sm text-[var(--color-on-dark)]">{it.name}</p>
+                        {it.description ? <p className="text-xs text-[var(--color-on-dark-muted)]">{it.description}</p> : null}
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium text-[var(--color-brand-gold)]">{formatPrice(it.priceKop)}</span>
+                        <span className="text-xs font-medium text-[var(--color-brand-gold)]">{formatPrice(it.priceKop)}</span>
                         <button
                           type="button"
                           onClick={() => removeItem(it.id)}
@@ -218,30 +224,30 @@ export default function EstablishmentMenuPage() {
                     </li>
                   ))}
                 </ul>
-                <div className="mt-3 grid gap-2 border-t border-[var(--color-brand-gold)]/20 pt-3 sm:grid-cols-3">
+                <div className="mt-2 grid gap-1.5 border-t border-[var(--color-brand-gold)]/20 pt-2 sm:grid-cols-3">
                   <input
                     placeholder="Название позиции"
                     value={f.name}
                     onChange={(e) => setItemForms((prev) => ({ ...prev, [c.id]: { ...f, name: e.target.value } }))}
-                    className="rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/30 px-3 py-2 text-[var(--color-on-dark)]"
+                    className="rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/30 px-2.5 py-1.5 text-xs text-[var(--color-on-dark)]"
                   />
                   <input
                     placeholder="Цена, ₽"
                     inputMode="decimal"
                     value={f.priceRub}
                     onChange={(e) => setItemForms((prev) => ({ ...prev, [c.id]: { ...f, priceRub: e.target.value } }))}
-                    className="rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/30 px-3 py-2 text-[var(--color-on-dark)]"
+                    className="rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/30 px-2.5 py-1.5 text-xs text-[var(--color-on-dark)]"
                   />
                   <input
                     placeholder="Описание (необяз.)"
                     value={f.desc}
                     onChange={(e) => setItemForms((prev) => ({ ...prev, [c.id]: { ...f, desc: e.target.value } }))}
-                    className="rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/30 px-3 py-2 text-[var(--color-on-dark)] sm:col-span-3"
+                    className="rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/30 px-2.5 py-1.5 text-xs text-[var(--color-on-dark)] sm:col-span-3"
                   />
                   <button
                     type="button"
                     onClick={() => addItem(c.id)}
-                    className="rounded-xl bg-[var(--color-brand-gold)]/90 px-4 py-2 text-sm font-semibold text-[#0a192f] sm:col-span-3"
+                    className="rounded-lg bg-[var(--color-brand-gold)]/90 px-3 py-1.5 text-xs font-semibold text-[#0a192f] sm:col-span-3"
                   >
                     Добавить позицию
                   </button>

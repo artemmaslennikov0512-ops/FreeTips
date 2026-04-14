@@ -11,6 +11,7 @@ import { requireEstablishmentAdmin } from "@/lib/middleware/auth";
 import { db } from "@/lib/db";
 import { parseJsonWithLimit, jsonError } from "@/lib/api/helpers";
 import { Prisma } from "@prisma/client";
+import { ensureTablePaySlugsForEstablishment } from "@/lib/ensure-table-pay-slugs";
 
 const patchTableSchema = z.object({
   label: z.string().trim().min(1).max(80).optional(),
@@ -30,6 +31,8 @@ export async function GET(request: NextRequest, ctx: Ctx) {
   if (auth.response) return auth.response;
   const { id } = await ctx.params;
 
+  await ensureTablePaySlugsForEstablishment(auth.establishmentId);
+
   const table = await db.establishmentTable.findFirst({
     where: { id, hall: { establishmentId: auth.establishmentId } },
     include: { hall: { select: { id: true, name: true } } },
@@ -46,6 +49,7 @@ export async function GET(request: NextRequest, ctx: Ctx) {
     capacity: table.capacity,
     sortOrder: table.sortOrder,
     externalCode: table.externalCode,
+    tablePaySlug: table.tablePaySlug,
     createdAt: table.createdAt.toISOString(),
     updatedAt: table.updatedAt.toISOString(),
   });
@@ -114,6 +118,7 @@ export async function PATCH(request: NextRequest, ctx: Ctx) {
       capacity: table.capacity,
       sortOrder: table.sortOrder,
       externalCode: table.externalCode,
+      tablePaySlug: table.tablePaySlug,
       createdAt: table.createdAt.toISOString(),
       updatedAt: table.updatedAt.toISOString(),
     });

@@ -22,17 +22,14 @@ export function ConditionalLayout({ children }: { children: React.ReactNode }) {
     pathname.startsWith("/change-password") ||
     pathname.startsWith("/reset-password");
   const isPayPage = pathname.startsWith("/pay") || isTestPreviewDonate;
-  const isTestLkMock = pathname.startsWith("/test-lk-mock");
   const isZayavka = pathname === "/zayavka";
   const isLoginPage = pathname === "/login" || pathname.startsWith("/login/");
   const isForgotPassword = pathname.startsWith("/forgot-password");
-  const hideHeader = isPayPage || isZayavka || isLoginPage || isForgotPassword || isTestLkMock;
+  const hideHeader = isPayPage || isZayavka || isLoginPage || isForgotPassword;
   const widthClass =
     isCabinet || isAdmin || isEstablishment
       ? "max-w-none bg-transparent"
-      : isTestLkMock
-        ? "max-w-none bg-transparent"
-        : isLanding
+      : isLanding
           ? "max-w-none bg-[var(--color-bg)]"
           : isPayPage
             ? "max-w-none bg-[var(--color-bg)]"

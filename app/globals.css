@@ -2163,7 +2163,7 @@ html:not([data-theme="dark"]) .cabinet-premium[data-brand-active]:not([data-cabi
   color: rgba(212, 188, 140, 0.98) !important;
 }
 
-/* Светлая тема: виртуальная карта — как в тестовом ЛК (teal / deep green, светлый текст) */
+/* Светлая тема: виртуальная карта (teal / deep green, светлый текст) */
 html:not([data-theme="dark"]) .cabinet-premium .premium-card-front:not(.premium-card-front--m5) {
   background: linear-gradient(145deg, #0f766e 0%, #14b8a6 55%, #0d281f 100%) !important;
   background-image: linear-gradient(145deg, #0f766e 0%, #14b8a6 55%, #0d281f 100%) !important;
@@ -2368,6 +2368,15 @@ body.establishment-page .establishment-panel.cabinet-premium {
   box-sizing: border-box;
 }
 
+/* Заведение (lg+): внешний gutter как у шапки (Header: lg:mx-3 + w-[calc(100%-1.5rem)]), иначе основной блок уходит влево относительно правого края шапки */
+@media (min-width: 1024px) {
+  body.establishment-page .establishment-panel.cabinet-premium {
+    margin-left: 0.75rem;
+    margin-right: 0.75rem;
+    width: calc(100% - 1.5rem);
+  }
+}
+
 /*
  * Мобильная (< lg, 1024px): не нулевые поля — один gutter у шапки и у панели,
  * чтобы карточка контента совпадала по ширине с шапкой (и safe-area на вырезах).
@@ -2534,6 +2543,27 @@ html:not([data-theme="dark"]) .admin-panel .admin-main-block.cabinet-main-block 
 [data-brand-active="true"] .cabinet-premium .cabinet-main-block #main-content .text-white\/80,
 [data-brand-active="true"] .cabinet-premium .cabinet-main-block #main-content .text-white\/70 {
   color: var(--color-text-secondary);
+}
+
+/*
+ * Светлая тема сайта: main-блок ЛК официанта и заведения — тёмный (#1e2a3a).
+ * Глобальная типографика (h1–h3) задаёт color: var(--color-navy) — на тёмном фоне даёт «наезд» и плохой контраст.
+ */
+html:not([data-theme="dark"])
+  body:is(.cabinet-page, .establishment-page)
+  .cabinet-premium:not([data-cabinet-theme="m5-competition"]):not(.admin-panel)
+  .cabinet-main-block
+  #main-content
+  :where(h1, h2, h3, h4) {
+  color: rgba(255, 255, 255, 0.96) !important;
+}
+html:not([data-theme="dark"])
+  body.cabinet-page
+  .cabinet-premium[data-brand-active="true"]:not([data-cabinet-theme="m5-competition"])
+  .cabinet-main-block
+  #main-content
+  :where(h1, h2, h3, h4) {
+  color: var(--color-text) !important;
 }
 
 /* Светлая тема: блоки на основном блоке — тот же фон и рамка, что у блока чата поддержки (не M5) */
@@ -4207,7 +4237,7 @@ html:not([data-theme="dark"]) .cabinet-premium #waiter-card.cabinet-card .waiter
 html:not([data-theme="dark"]) .cabinet-premium #waiter-card.cabinet-card .waiter-card-summary * {
   color: #fff !important;
 }
-/* Текст баланса на карте (операции) — светлый на teal, как тестовый ЛК / дашборд */
+/* Текст баланса на карте (операции) — светлый на teal, как на дашборде */
 html:not([data-theme="dark"]) .cabinet-premium #waiter-card.cabinet-card .premium-card-balance-block,
 html:not([data-theme="dark"]) .cabinet-premium #waiter-card.cabinet-card .premium-card-balance-block p,
 html:not([data-theme="dark"]) .cabinet-premium #waiter-card.cabinet-card .p-6 p.premium-card-balance-text,
@@ -4865,6 +4895,110 @@ html:not([data-theme="dark"]) .admin-panel select:focus {
 .establishment-panel select:focus {
   outline: none;
   box-shadow: 0 0 0 2px rgba(197, 165, 114, 0.4);
+}
+
+/* Светлая тема: нативный select в заведении — светлое поле и тёмный текст (не «белый текст на белом») */
+html:not([data-theme="dark"]) body.establishment-page .establishment-panel select {
+  background: rgba(255, 255, 255, 0.94) !important;
+  color: #0a192f !important;
+  border: 1px solid rgba(197, 165, 114, 0.45) !important;
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.65rem;
+}
+html:not([data-theme="dark"]) body.establishment-page .establishment-panel select option {
+  background: #ffffff !important;
+  color: #0a192f !important;
+}
+html:not([data-theme="dark"]) body.establishment-page .establishment-panel select:focus {
+  box-shadow: 0 0 0 2px rgba(197, 165, 114, 0.45);
+}
+
+/* Светлая тема: CustomDropdown в заведении — явный контраст панели и пунктов */
+html:not([data-theme="dark"]) body.establishment-page .custom-dropdown-establishment {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(197, 165, 114, 0.38) !important;
+}
+html:not([data-theme="dark"]) body.establishment-page .custom-dropdown-establishment .custom-dropdown-trigger-establishment {
+  color: rgba(255, 255, 255, 0.95) !important;
+}
+html:not([data-theme="dark"]) body.establishment-page .custom-dropdown-establishment .custom-dropdown-panel-establishment {
+  background: #1e2a3a !important;
+  border: 1px solid rgba(197, 165, 114, 0.35) !important;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+  z-index: 80;
+}
+html:not([data-theme="dark"]) body.establishment-page .custom-dropdown-establishment button[role="option"] {
+  color: rgba(255, 255, 255, 0.94) !important;
+}
+html:not([data-theme="dark"]) body.establishment-page .custom-dropdown-establishment button[role="option"]:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+html:not([data-theme="dark"]) body.establishment-page .custom-dropdown-establishment button[role="option"][aria-selected="true"] {
+  background: rgba(197, 165, 114, 0.28) !important;
+  color: #fffaf0 !important;
+}
+html:not([data-theme="dark"]) body.establishment-page .custom-dropdown-establishment label {
+  color: rgba(255, 255, 255, 0.88) !important;
+}
+
+/* Новые разделы (заведение / зал официанта): шапка и панели действий по центру */
+.ft-panel-section-head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
+  gap: 0.35rem;
+}
+.ft-panel-section-head > p,
+.ft-panel-section-head > .ft-panel-section-head__lead {
+  max-width: 42rem;
+  width: 100%;
+  margin-inline: auto;
+}
+.ft-panel-section-toolbar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  text-align: center;
+  width: 100%;
+}
+@media (min-width: 640px) {
+  .ft-panel-section-toolbar--row {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: center;
+  }
+}
+.ft-panel-section-head__lead {
+  font-size: 0.8125rem;
+  line-height: 1.45;
+}
+@media (max-width: 639px) {
+  .ft-panel-section-head__lead {
+    font-size: 0.75rem;
+  }
+}
+/* Кабинет заведения: компактнее базовый текст контента */
+body.establishment-page .establishment-panel #main-content {
+  font-size: 0.8125rem;
+  line-height: 1.45;
+}
+
+/* Таблица «Команда»: плотные ячейки и мелкий шрифт */
+body.establishment-page .establishment-team-table.establishment-team-table :is(th, td) {
+  padding: 0.3125rem 0.4375rem !important;
+  font-size: 0.6875rem !important;
+  line-height: 1.35 !important;
+}
+body.establishment-page .establishment-team-table :is(th, td) button {
+  font-size: 0.625rem !important;
+  line-height: 1.2 !important;
+  padding: 0.12rem 0.35rem !important;
 }
 
 /* Таблица «Команда»: светлая тема — белые границы; выравнивание по колонкам задано в разметке */

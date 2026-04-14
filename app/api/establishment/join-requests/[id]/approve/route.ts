@@ -58,18 +58,10 @@ export async function POST(request: NextRequest, { params }: Params) {
 
       const establishment = await tx.establishment.findUnique({
         where: { id: auth.establishmentId },
-        select: {
-          maxEmployeesCount: true,
-          _count: { select: { employees: true } },
-        },
+        select: { id: true },
       });
       if (!establishment) {
         throw new Error("ESTABLISHMENT_NOT_FOUND");
-      }
-      const max = establishment.maxEmployeesCount;
-      const current = establishment._count.employees;
-      if (max != null && current >= max) {
-        throw new Error("EMPLOYEE_LIMIT");
       }
 
       const displayName = u.fullName?.trim() || u.login;
@@ -113,9 +105,6 @@ export async function POST(request: NextRequest, { params }: Params) {
       }
       if (e.message === "USER_NOT_RECIPIENT" || e.message === "USER_ALREADY_EMPLOYEE") {
         return NextResponse.json({ error: "Пользователь не может быть подключён по этой заявке" }, { status: 409 });
-      }
-      if (e.message === "EMPLOYEE_LIMIT") {
-        return NextResponse.json({ error: "Достигнут лимит сотрудников" }, { status: 403 });
       }
     }
     throw e;

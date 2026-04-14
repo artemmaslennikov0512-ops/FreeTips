@@ -246,13 +246,6 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
               </div>
             ))}
           </nav>
-          <Link
-            href="/cabinet"
-            onClick={closeSidebar}
-            className="mt-4 flex items-center gap-2.5 rounded-lg border border-transparent px-2.5 py-2 text-[0.9375rem] font-normal text-white/80 transition-colors hover:bg-[var(--color-dark-gray)]/10 hover:text-white"
-          >
-            Личный кабинет
-          </Link>
           <button
             type="button"
             onClick={handleLogout}
@@ -264,13 +257,13 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
         </div>
       </aside>
 
-      <main className="relative min-h-0 min-w-0 flex-1 overflow-x-hidden px-0 pt-1.5 pb-3 lg:pt-2 lg:pl-0 lg:pr-3 lg:ml-0 flex flex-col">
-        <div className="cabinet-main-block app-panel-main-surface relative z-10 mt-0 mr-0 mb-3 ml-0 flex min-h-0 flex-1 flex-col rounded-lg border-x border-b border-white/10 bg-white/[0.06] backdrop-blur-xl md:rounded-[10px] lg:z-0 lg:mr-3 lg:ml-3 lg:rounded-[10px]">
+      <main className="relative min-h-0 min-w-0 flex-1 px-0 pt-1.5 pb-3 lg:pt-2 lg:pl-0 lg:pr-0 lg:ml-0 flex flex-col">
+        <div className="cabinet-main-block app-panel-main-surface relative z-10 mt-0 mr-0 mb-3 ml-0 flex min-h-0 flex-1 flex-col rounded-lg border-x border-b border-white/10 bg-white/[0.06] backdrop-blur-xl md:rounded-[10px] lg:z-0 lg:mr-0 lg:ml-0 lg:rounded-[10px]">
           {pathname !== "/establishment" && (
             <PanelMobileBackButton variant="establishment" fallbackHref="/establishment" />
           )}
           <div
-            className="flex min-h-0 flex-1 flex-col overflow-x-hidden px-4 py-3 sm:px-6 md:py-6 lg:p-8"
+            className="flex min-h-0 min-w-0 flex-1 flex-col px-4 py-2 sm:px-6 sm:py-3 md:py-4 lg:px-8 lg:py-5"
             id="main-content"
           >
             {children}

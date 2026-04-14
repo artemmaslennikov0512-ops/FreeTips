@@ -86,23 +86,10 @@ export async function POST(request: NextRequest) {
 
   const establishment = await db.establishment.findUnique({
     where: { id: establishmentId },
-    select: {
-      id: true,
-      maxEmployeesCount: true,
-      _count: { select: { employees: true } },
-    },
+    select: { id: true },
   });
   if (!establishment) {
     return NextResponse.json({ error: MSG_ESTABLISHMENT_STALE_OR_MISSING }, { status: 404 });
-  }
-
-  const max = establishment.maxEmployeesCount;
-  const current = establishment._count.employees;
-  if (max != null && current >= max) {
-    return NextResponse.json(
-      { error: "В этом заведении достигнут лимит сотрудников" },
-      { status: 403 },
-    );
   }
 
   const duplicate = await db.employeeJoinRequest.findFirst({

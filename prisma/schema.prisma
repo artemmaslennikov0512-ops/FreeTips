@@ -64,6 +64,8 @@ enum EstablishmentTableOrderStatus {
   OPEN
   PRESENTED
   CANCELLED
+  /// Оплата меню по пречеку зафиксирована (интеграция эквайринга / ручная отметка).
+  PAID
 }
 
 model User {
@@ -446,6 +448,7 @@ model EstablishmentHall {
 }
 
 /// Стол в зале; externalCode — задел под интеграцию с кассой.
+/// tablePaySlug — постоянный код для `/pay/table/{slug}` (общая глобальная нумерация с QR официантов).
 model EstablishmentTable {
   id           String   @id @default(cuid())
   hallId       String
@@ -453,6 +456,7 @@ model EstablishmentTable {
   capacity     Int      @default(2)
   sortOrder    Int      @default(0)
   externalCode String?  @db.VarChar(64)
+  tablePaySlug String?  @unique @db.VarChar(50)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 

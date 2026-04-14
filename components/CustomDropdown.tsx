@@ -39,7 +39,7 @@ const variantStyles = {
     trigger:
       "custom-dropdown-trigger-establishment w-full flex items-center justify-between gap-2 rounded-[10px] border-0 bg-transparent pl-4 pr-10 py-3 text-white focus:outline-none cursor-pointer text-left",
     panel:
-      "custom-dropdown-panel custom-dropdown-panel-establishment absolute left-0 right-0 top-full z-20 mt-1 rounded-xl border border-[var(--color-brand-gold)]/20 bg-[#1e2a3a] shadow-xl overflow-hidden",
+      "custom-dropdown-panel custom-dropdown-panel-establishment absolute left-0 right-0 top-full z-[70] mt-1 rounded-xl border border-[var(--color-brand-gold)]/20 bg-[#1e2a3a] shadow-xl overflow-hidden",
     option: "w-full flex items-center px-4 py-3 text-left text-sm font-medium transition-colors text-white/90 hover:bg-white/10",
     optionSelected: "bg-[var(--color-brand-gold)]/20 text-white hover:bg-[var(--color-brand-gold)]/30",
   },

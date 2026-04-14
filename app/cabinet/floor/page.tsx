@@ -54,34 +54,34 @@ export default function CabinetFloorPage() {
   }, [load]);
 
   return (
-    <div className="flex min-w-0 max-w-full flex-col gap-6">
-      <div>
-        <h1 className="text-2xl font-semibold text-[var(--color-text)]">Зал</h1>
-        <p className="mt-1 text-sm text-[var(--color-text)]/70">
+    <div className="flex min-w-0 max-w-full flex-col gap-3">
+      <div className="ft-panel-section-head min-w-0">
+        <h1 className="text-lg font-semibold text-[var(--color-text)]">Зал</h1>
+        <p className="ft-panel-section-head__lead text-sm text-[var(--color-text)]/70">
           Выберите стол, откройте обслуживание и соберите заказ из меню заведения.
         </p>
       </div>
       {error ? (
-        <div className="rounded-lg border border-red-400/40 bg-red-500/10 px-4 py-3 text-sm text-red-200">
-          {error}
+        <div className="flex flex-col items-center justify-center gap-2 rounded-lg border border-red-400/45 bg-red-950/25 px-4 py-3 text-center text-sm text-red-100">
+          <span>{error}</span>
           {error.includes("не привязан") ? (
-            <p className="mt-2 text-[var(--color-text)]/80">
+            <p className="max-w-md text-[var(--color-text)]/80">
               Подключитесь к заведению через приглашение от управляющего.
             </p>
           ) : null}
         </div>
       ) : null}
       {loading ? (
-        <p className="text-sm text-[var(--color-text)]/70">Загрузка…</p>
+        <p className="text-center text-sm text-[var(--color-text)]/70">Загрузка…</p>
       ) : halls.length === 0 ? (
-        <p className="text-sm text-[var(--color-text)]/70">
+        <p className="text-center text-sm text-[var(--color-text)]/70">
           Залы и столы ещё не настроены. Попросите управляющего добавить их в кабинете заведения.
         </p>
       ) : (
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-3">
           {halls.map((h) => (
             <section key={h.id}>
-              <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-[var(--color-brand-gold)]">
+              <h2 className="mb-1.5 text-center text-xs font-semibold uppercase tracking-wide text-[var(--color-brand-gold)]">
                 {h.name}
               </h2>
               <ul className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
@@ -93,7 +93,7 @@ export default function CabinetFloorPage() {
                     <li key={t.id}>
                       <Link
                         href={`/cabinet/floor/${t.id}`}
-                        className={`flex flex-col rounded-lg border px-4 py-3 transition-colors ${
+                        className={`flex flex-col items-center rounded-lg border px-3 py-2 text-center text-sm transition-colors ${
                           busyOther
                             ? "border-amber-400/35 bg-amber-500/10 hover:bg-amber-500/15"
                             : mine
@@ -106,9 +106,9 @@ export default function CabinetFloorPage() {
                           <span className="ml-2 text-xs font-normal text-[var(--color-text)]/60">до {t.capacity}</span>
                         </span>
                         {busyOther ? (
-                          <span className="mt-1 text-xs text-amber-100/90">Занят коллегой</span>
+                          <span className="mt-1 text-xs font-medium text-amber-200">Занят коллегой</span>
                         ) : mine ? (
-                          <span className="mt-1 text-xs text-emerald-100/90">
+                          <span className="mt-1 text-xs font-medium text-emerald-200">
                             Ваш стол
                             {occ.order ? ` · ${(Number(occ.order.totalKop) / 100).toLocaleString("ru-RU")} ₽` : ""}
                           </span>

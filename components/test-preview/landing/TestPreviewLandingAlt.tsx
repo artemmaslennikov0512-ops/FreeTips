@@ -49,12 +49,6 @@ export function TestPreviewLandingAlt() {
           <p className="mt-5 max-w-2xl text-lg leading-relaxed sm:text-xl" style={{ color: "var(--tpa-muted)" }}>
             Гость или зритель платит привычным способом. Получатель видит операции в личном кабинете. Этот экран — отдельное оформление, чтобы вы могли сравнить с текущим сайтом.
           </p>
-          <p className="mt-4 text-sm font-medium">
-            <Link href="/test-lk-mock" className="inline-flex items-center gap-1.5 no-underline hover:underline" style={{ color: "var(--tpa-accent)" }}>
-              Тестовый ЛК в новой палитре (превью)
-              <ArrowRight className="h-4 w-4" aria-hidden />
-            </Link>
-          </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
               href="/zayavka"
@@ -172,11 +166,11 @@ export function TestPreviewLandingAlt() {
                 Публичная страница доната, сообщение от зрителя, учёт в кабинете (на превью — макеты и заглушка оплаты).
               </p>
               <Link
-                href="/test-lk-mock/streamer"
+                href="/test-preview/donate/demo"
                 className="mt-4 inline-flex items-center gap-1 text-sm font-semibold no-underline hover:underline"
                 style={{ color: "var(--tpa-accent)" }}
               >
-                Макет раздела в ЛК (в разработке)
+                Демо-донат (заглушка)
                 <ArrowRight className="h-4 w-4" aria-hidden />
               </Link>
             </div>

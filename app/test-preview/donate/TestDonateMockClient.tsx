@@ -63,10 +63,10 @@ export function TestDonateMockClient({ slug }: Props) {
               Ещё раз
             </button>
             <Link
-              href="/test-lk-mock/streamer"
+              href="/cabinet"
               className="rounded-xl bg-[var(--color-brand-gold)] px-4 py-2.5 text-sm font-medium text-[#0a192f] no-underline"
             >
-              Макет кабинета стримера
+              Личный кабинет
             </Link>
           </div>
         </div>

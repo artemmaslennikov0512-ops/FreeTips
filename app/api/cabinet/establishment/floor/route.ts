@@ -6,10 +6,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { EstablishmentServiceSessionStatus } from "@prisma/client";
 import { requireEstablishmentEmployee } from "@/lib/middleware/auth";
 import { db } from "@/lib/db";
+import { ensureTablePaySlugsForEstablishment } from "@/lib/ensure-table-pay-slugs";
 
 export async function GET(request: NextRequest) {
   const auth = await requireEstablishmentEmployee(request);
   if ("response" in auth) return auth.response;
+
+  await ensureTablePaySlugsForEstablishment(auth.establishmentId);
 
   const halls = await db.establishmentHall.findMany({
     where: { establishmentId: auth.establishmentId },
@@ -77,6 +80,7 @@ export async function GET(request: NextRequest) {
           capacity: t.capacity,
           hallId: h.id,
           hallName: h.name,
+          tablePaySlug: t.tablePaySlug,
           openSession: sess
             ? {
                 id: sess.id,

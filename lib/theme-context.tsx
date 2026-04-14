@@ -76,12 +76,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       meta.setAttribute("content", color);
     });
     document.documentElement.style.colorScheme = effective === "dark" ? "dark" : "light";
-    if (applyHere) {
-      document.documentElement.style.backgroundColor = effective === "dark" ? themeColorDark : themeColorLightPanel;
-    } else {
-      document.documentElement.style.backgroundColor =
-        effective === "dark" ? "#171717" : "";
-    }
+    /* Фон страницы/оверскролла — только из CSS (html.app-shell-panel[data-theme=…]), иначе inline «залипает»
+       от прошлой темы при SPA-переходах и переключении светлая↔тёмная на iOS. */
+    document.documentElement.style.removeProperty("background-color");
   }, [mounted, theme, pathname]);
 
   const setTheme = useCallback((next: Theme) => {

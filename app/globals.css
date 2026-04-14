@@ -123,11 +123,11 @@ html:not([data-theme="dark"])
   --color-muted: rgba(148, 163, 184, 0.9);
 }
 
-/* Моб. полоска ЛК: светлая тема сайта — читаемый переключатель (корень заведения был text-white) */
+/* Моб. полоска ЛК: светлая тема — тот же тёплый фон, что у html/body панели (#e0dfdc), без отдельного «белого куска» */
 html:not([data-theme="dark"]) body.cabinet-page .cabinet-mobile-top-shell,
 html:not([data-theme="dark"]) body.establishment-page .cabinet-mobile-top-shell {
   color: var(--color-navy);
-  background: rgba(255, 255, 255, 0.88);
+  background: #e0dfdc;
 }
 html:not([data-theme="dark"]) body.cabinet-page .cabinet-mobile-top-shell .theme-toggle-btn,
 html:not([data-theme="dark"]) body.establishment-page .cabinet-mobile-top-shell .theme-toggle-btn {
@@ -257,6 +257,9 @@ html:not([data-theme="dark"]) body.cabinet-page .cabinet-premium[data-cabinet-th
     body.cabinet-page:not(.establishment-page):not(.admin-page)
     .cabinet-premium:not([data-cabinet-theme="m5-competition"]):not([data-brand-active="true"]) {
     background-color: #e0dfdc !important;
+    /* На тёплом фоне #22262e выглядит почти чёрным — чуть светлее уголь, десктоп без изменений */
+    --color-bg-sides: #3a4252;
+    --cabinet-block-bg: #3a4252;
   }
   html[data-theme="dark"]
     body.cabinet-page:not(.establishment-page):not(.admin-page)
@@ -2792,11 +2795,37 @@ html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-compe
 }
 
 /*
+ * Десктоп ЛК официанта: перебиваем Tailwind bg-[var(--color-bg-sides)] (#22262e), иначе карточки становятся
+ * плоским тёмно-серым; на navy main нужна лёгкая «пластина» rgba как раньше. Мобильный вид — отдельный блок max-width 1023px.
+ */
+@media (min-width: 1024px) {
+  html:not([data-theme="dark"])
+    body.cabinet-page:not(.establishment-page)
+    .cabinet-premium:not([data-cabinet-theme="m5-competition"]):not([data-brand-active="true"])
+    .cabinet-main-block
+    :is(.cabinet-card, .cabinet-section-header) {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(197, 165, 114, 0.5);
+    border-radius: 1rem;
+  }
+}
+
+/*
  * Подключение / выход из заведения: карточки с белым bg в разметке — не «стекло» 0.04, иначе виден тёмный main,
  * а .cabinet-form-surface даёт тёмный кегль (подписи и поля нечитаемы). Непрозрачный фон + тёмные переменные внутри.
  */
-html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-join-establishment .cabinet-card,
-html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-leave-establishment .cabinet-card {
+html:not([data-theme="dark"])
+  body.cabinet-page:not(.establishment-page)
+  .cabinet-premium:not([data-cabinet-theme="m5-competition"])
+  .cabinet-main-block
+  .cabinet-join-establishment
+  .cabinet-card,
+html:not([data-theme="dark"])
+  body.cabinet-page:not(.establishment-page)
+  .cabinet-premium:not([data-cabinet-theme="m5-competition"])
+  .cabinet-main-block
+  .cabinet-leave-establishment
+  .cabinet-card {
   background: var(--color-bg-sides) !important;
   --color-text: #0a192f;
   --color-text-secondary: #475569;
@@ -6270,12 +6299,15 @@ html {
   background-color: var(--color-bg);
 }
 
-/* Класс app-shell-panel выставляется inline-скриптом и ThemeProvider до/при навигации — фон как у ЛК, без просвета при overscroll на iOS */
-[data-theme="dark"] html.app-shell-panel {
+/*
+ * ЛК / админка / заведение / pay: фон именно на <html data-theme> (без устаревшего inline от прошлой темы).
+ * Раньше было [data-theme="dark"] html.app-shell-panel — так не матчится (у html нет предка с data-theme).
+ */
+html.app-shell-panel[data-theme="dark"] {
   background-color: #0d0e12;
   color-scheme: dark;
 }
-html.app-shell-panel:not([data-theme="dark"]) {
+html.app-shell-panel[data-theme="light"] {
   background-color: #e0dfdc;
   color-scheme: light;
 }

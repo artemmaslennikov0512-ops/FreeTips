@@ -236,13 +236,15 @@ html:not([data-theme="dark"]) body.cabinet-page .cabinet-premium[data-cabinet-th
 /*
  * Мобильный ЛК официанта (/cabinet): плоский фон страницы и без отдельной «карты» main-block
  * (не кабинет заведения / админка; не тема M5; не бренд заведения).
+ * Фон страницы — как на ПК (body.cabinet-page #e0dfdc). Карточки — тот же тёмный пласт, что на десктопе:
+ * глобальное правило «стекла» rgba(255,255,255,0.04) здесь на светлом фоне выглядело как белые блоки.
  */
 @media (max-width: 1023px) {
   html:not([data-theme="dark"])
     body.cabinet-page:not(.establishment-page):not(.admin-page):not(
         :has(.cabinet-premium[data-brand-active="true"])
       ):not(:has(.cabinet-premium[data-cabinet-theme="m5-competition"])) {
-    background: #f7f4ef;
+    background: #e0dfdc;
   }
   html[data-theme="dark"]
     body.cabinet-page:not(.establishment-page):not(.admin-page):not(
@@ -254,7 +256,7 @@ html:not([data-theme="dark"]) body.cabinet-page .cabinet-premium[data-cabinet-th
   html:not([data-theme="dark"])
     body.cabinet-page:not(.establishment-page):not(.admin-page)
     .cabinet-premium:not([data-cabinet-theme="m5-competition"]):not([data-brand-active="true"]) {
-    background-color: #f7f4ef !important;
+    background-color: #e0dfdc !important;
   }
   html[data-theme="dark"]
     body.cabinet-page:not(.establishment-page):not(.admin-page)
@@ -287,9 +289,34 @@ html:not([data-theme="dark"]) body.cabinet-page .cabinet-premium[data-cabinet-th
     body.cabinet-page:not(.establishment-page):not(.admin-page)
     .cabinet-premium:not([data-cabinet-theme="m5-competition"]):not([data-brand-active="true"])
     .cabinet-main-block
+    :is(.cabinet-card, .cabinet-section-header) {
+    background: var(--color-bg-sides) !important;
+    border: 1px solid rgba(197, 165, 114, 0.32);
+    border-radius: 0.625rem;
+    box-shadow: var(--shadow-subtle);
+  }
+
+  html:not([data-theme="dark"])
+    body.cabinet-page:not(.establishment-page):not(.admin-page)
+    .cabinet-premium:not([data-cabinet-theme="m5-competition"]):not([data-brand-active="true"])
+    .cabinet-main-block
     #main-content
     :where(h1, h2, h3, h4) {
     color: #0a192f !important;
+  }
+  html:not([data-theme="dark"])
+    body.cabinet-page:not(.establishment-page):not(.admin-page)
+    .cabinet-premium:not([data-cabinet-theme="m5-competition"]):not([data-brand-active="true"])
+    .cabinet-main-block
+    #main-content
+    .cabinet-card :where(h1, h2, h3, h4),
+  html:not([data-theme="dark"])
+    body.cabinet-page:not(.establishment-page):not(.admin-page)
+    .cabinet-premium:not([data-cabinet-theme="m5-competition"]):not([data-brand-active="true"])
+    .cabinet-main-block
+    #main-content
+    .cabinet-section-header :where(h1, h2, h3, h4) {
+    color: var(--color-text) !important;
   }
   html:not([data-theme="dark"])
     body.cabinet-page:not(.establishment-page):not(.admin-page)
@@ -4864,6 +4891,21 @@ html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-compe
 html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-limits-block h4,
 html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-limits-block .font-medium {
   color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/*
+ * Мобильный дашборд ЛК: внутри .cabinet-card блок лимитов не дублирует «вторую коробку»
+ * (рамка + полупрозрачный фон) — иначе визуально три уровня: страница → карточка → лимиты.
+ */
+@media (max-width: 1023px) {
+  body.cabinet-page:not(.establishment-page)
+    .cabinet-premium:not([data-cabinet-theme="m5-competition"]):not([data-brand-active="true"])
+    .cabinet-card
+    .cabinet-limits-block:not(.cabinet-verification-status) {
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
 }
 
 /* Светлая тема: текст в блоке статуса верификации — белый на тёмном фоне блока */

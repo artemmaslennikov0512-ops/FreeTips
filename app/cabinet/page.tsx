@@ -309,13 +309,13 @@ export default function CabinetDashboardPage() {
       : null;
 
   return (
-    <div className="space-y-6">
-      <div className="cabinet-dashboard-hero-grid grid min-w-0 grid-cols-1 gap-6 lg:[grid-template-columns:repeat(2,minmax(0,1fr))] lg:items-stretch">
-        <div className="flex min-h-0 min-w-0 flex-col gap-6 lg:h-full">
+    <div className="space-y-4 lg:space-y-6">
+      <div className="cabinet-dashboard-hero-grid grid min-w-0 grid-cols-1 gap-4 lg:gap-6 lg:[grid-template-columns:repeat(2,minmax(0,1fr))] lg:items-stretch">
+        <div className="flex min-h-0 min-w-0 flex-col gap-4 lg:gap-6 lg:h-full">
           <div className="cabinet-card flex min-h-0 min-w-0 flex-col overflow-x-hidden rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] lg:flex-1">
             <div className="flex min-h-0 flex-1 flex-col px-4 py-4 pb-5 sm:px-5 sm:py-5 sm:pb-6">
               <div className="flex min-h-0 w-full flex-1 flex-col items-center justify-between gap-4">
-                <div className="flex w-full shrink-0 flex-col items-center gap-8">
+                <div className="flex w-full shrink-0 flex-col items-center gap-5 lg:gap-8">
                   <div
                     className={`cabinet-dashboard-name-hero w-full min-w-0 px-0 ${isM5Cabinet ? "cabinet-dashboard-name-hero--m5" : ""}`}
                   >

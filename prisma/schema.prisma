@@ -45,6 +45,27 @@ enum VerificationStatus {
   REJECTED   // отклонён (клиент видит причину, может подать заново)
 }
 
+enum EstablishmentBookingStatus {
+  PENDING   // создана, ждёт подтверждения
+  CONFIRMED // подтверждена
+  SEATED    // гости за столом
+  COMPLETED // визит завершён
+  NO_SHOW   // не пришли
+  CANCELLED // отменена
+}
+
+enum EstablishmentServiceSessionStatus {
+  OPEN
+  CLOSED
+}
+
+/// Заказ официанта по столу (пречек); оплата — отдельно.
+enum EstablishmentTableOrderStatus {
+  OPEN
+  PRESENTED
+  CANCELLED
+}
+
 model User {
   id                String    @id @default(cuid())
   uniqueId          Int       @unique @default(autoincrement())
@@ -398,6 +419,11 @@ model Establishment {
   employeeJoinRequests EmployeeJoinRequest[]
   employeeLeaveRequests EmployeeLeaveRequest[]
   halls                EstablishmentHall[]
+  bookings             EstablishmentBooking[]
+  guests               EstablishmentGuest[]
+  menuCategories       EstablishmentMenuCategory[]
+  serviceSessions      EstablishmentServiceSession[]
+  tableOrders          EstablishmentTableOrder[]
 
   @@index([uniqueSlug])
   @@map("establishments")
@@ -430,11 +456,157 @@ model EstablishmentTable {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  hall EstablishmentHall @relation(fields: [hallId], references: [id], onDelete: Cascade)
+  hall             EstablishmentHall              @relation(fields: [hallId], references: [id], onDelete: Cascade)
+  bookings         EstablishmentBooking[]
+  serviceSessions  EstablishmentServiceSession[]
 
   @@unique([hallId, label])
   @@index([hallId])
   @@map("establishment_tables")
+}
+
+/// Бронь столика в заведении (время хранится как момент в UTC; в UI — календарный день Москвы).
+model EstablishmentBooking {
+  id              String                     @id @default(cuid())
+  establishmentId String
+  tableId         String?
+  guestId         String?
+  guestName       String                     @db.VarChar(120)
+  guestPhone      String?                    @db.VarChar(40)
+  guestEmail      String?                    @db.VarChar(255)
+  partySize       Int                        @default(1)
+  startsAt        DateTime
+  endsAt          DateTime
+  status          EstablishmentBookingStatus @default(PENDING)
+  notes           String?                    @db.VarChar(500)
+  createdAt       DateTime                   @default(now())
+  updatedAt       DateTime                   @updatedAt
+
+  establishment Establishment       @relation(fields: [establishmentId], references: [id], onDelete: Cascade)
+  table         EstablishmentTable? @relation(fields: [tableId], references: [id], onDelete: SetNull)
+  guest         EstablishmentGuest? @relation(fields: [guestId], references: [id], onDelete: SetNull)
+
+  @@index([establishmentId, startsAt])
+  @@index([tableId, startsAt])
+  @@index([guestId])
+  @@map("establishment_bookings")
+}
+
+/// Гость заведения (карточка для броней и истории визитов).
+model EstablishmentGuest {
+  id              String   @id @default(cuid())
+  establishmentId String
+  displayName     String   @db.VarChar(120)
+  phone           String?  @db.VarChar(40)
+  email           String?  @db.VarChar(255)
+  notes           String?  @db.Text
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  establishment Establishment        @relation(fields: [establishmentId], references: [id], onDelete: Cascade)
+  bookings      EstablishmentBooking[]
+  tableOrders   EstablishmentTableOrder[]
+
+  @@index([establishmentId])
+  @@map("establishment_guests")
+}
+
+/// Категория меню заведения.
+model EstablishmentMenuCategory {
+  id              String   @id @default(cuid())
+  establishmentId String
+  name            String   @db.VarChar(120)
+  sortOrder       Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  establishment Establishment         @relation(fields: [establishmentId], references: [id], onDelete: Cascade)
+  items         EstablishmentMenuItem[]
+
+  @@index([establishmentId])
+  @@map("establishment_menu_categories")
+}
+
+/// Позиция меню (цена в копейках).
+model EstablishmentMenuItem {
+  id          String   @id @default(cuid())
+  categoryId  String
+  name        String   @db.VarChar(160)
+  description String?  @db.VarChar(500)
+  priceKop    BigInt   @default(0)
+  sortOrder   Int      @default(0)
+  isAvailable Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  category   EstablishmentMenuCategory    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  orderLines EstablishmentTableOrderLine[]
+
+  @@index([categoryId])
+  @@map("establishment_menu_items")
+}
+
+/// Открытая/закрытая смена обслуживания стола (официант, без позиций чека — оплата отдельно).
+model EstablishmentServiceSession {
+  id              String                           @id @default(cuid())
+  establishmentId String
+  tableId         String
+  employeeId      String?
+  status          EstablishmentServiceSessionStatus @default(OPEN)
+  openedAt        DateTime                         @default(now())
+  closedAt        DateTime?
+
+  establishment Establishment      @relation(fields: [establishmentId], references: [id], onDelete: Cascade)
+  table         EstablishmentTable @relation(fields: [tableId], references: [id], onDelete: Cascade)
+  employee      Employee?          @relation(fields: [employeeId], references: [id], onDelete: SetNull)
+  tableOrder    EstablishmentTableOrder?
+
+  @@index([establishmentId, status])
+  @@index([tableId, status])
+  @@index([employeeId])
+  @@map("establishment_service_sessions")
+}
+
+/// Один заказ на открытую сессию стола (MVP).
+model EstablishmentTableOrder {
+  id               String                        @id @default(cuid())
+  establishmentId  String
+  serviceSessionId String                        @unique
+  employeeId       String
+  status           EstablishmentTableOrderStatus @default(OPEN)
+  totalKop         BigInt                        @default(0)
+  guestId          String?
+  presentedAt      DateTime?
+  createdAt        DateTime                      @default(now())
+  updatedAt        DateTime                      @updatedAt
+
+  establishment  Establishment               @relation(fields: [establishmentId], references: [id], onDelete: Cascade)
+  serviceSession   EstablishmentServiceSession @relation(fields: [serviceSessionId], references: [id], onDelete: Cascade)
+  employee         Employee                    @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  guest            EstablishmentGuest?         @relation(fields: [guestId], references: [id], onDelete: SetNull)
+  lines            EstablishmentTableOrderLine[]
+
+  @@index([establishmentId])
+  @@index([employeeId])
+  @@map("establishment_table_orders")
+}
+
+model EstablishmentTableOrderLine {
+  id               String   @id @default(cuid())
+  orderId          String
+  menuItemId       String?
+  nameSnapshot     String   @db.VarChar(160)
+  priceKopSnapshot BigInt
+  quantity         Int      @default(1)
+  comment          String?  @db.VarChar(200)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  order    EstablishmentTableOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  menuItem EstablishmentMenuItem?  @relation(fields: [menuItemId], references: [id], onDelete: SetNull)
+
+  @@index([orderId])
+  @@map("establishment_table_order_lines")
 }
 
 /// Заявка официанта (RECIPIENT) на подключение к заведению по коду точки.
@@ -497,6 +669,8 @@ model Employee {
   tipLinks           TipLink[]           // приём чаевых (TipLink.slug = qrCodeIdentifier), ведут в пул заведения
   registrationTokens RegistrationToken[] // токены для регистрации официанта (1 токен = 1 сотрудник)
   reviews            EmployeeReview[]
+  serviceSessions    EstablishmentServiceSession[]
+  tableOrders        EstablishmentTableOrder[]
 
   @@index([establishmentId])
   @@index([qrCodeIdentifier])

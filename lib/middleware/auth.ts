@@ -6,6 +6,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyAccessToken, type TokenPayload } from "@/lib/auth/jwt";
 import { getUserRepository } from "@/lib/infrastructure/user-repository";
+import { db } from "@/lib/db";
 import { touchUserLastSeenThrottled } from "@/lib/user-last-seen-touch";
 import { messageFromUnknown } from "@/lib/errors";
 import { logWarn } from "@/lib/logger";
@@ -141,5 +142,54 @@ export async function requireEstablishmentAdmin(
   return {
     user: authResult.user,
     establishmentId,
+  };
+}
+
+export type EstablishmentEmployeeAuth = {
+  user: TokenPayload;
+  establishmentId: string;
+  employeeId: string;
+  employeeName: string;
+};
+
+/**
+ * Пользователь — активный сотрудник заведения (EMPLOYEE с привязкой Employee → establishmentId).
+ */
+export async function requireEstablishmentEmployee(
+  request: NextRequest,
+): Promise<
+  | EstablishmentEmployeeAuth
+  | { user?: never; establishmentId?: never; employeeId?: never; employeeName?: never; response: NextResponse }
+> {
+  const authResult = await requireAuth(request);
+  if ("response" in authResult && authResult.response) {
+    return { response: authResult.response };
+  }
+
+  if (authResult.user.role !== "EMPLOYEE") {
+    return {
+      response: NextResponse.json({ error: "Доступно только сотрудникам заведения" }, { status: 403 }),
+    };
+  }
+
+  const emp = await db.employee.findFirst({
+    where: { userId: authResult.user.userId, isActive: true },
+    select: { id: true, establishmentId: true, name: true },
+  });
+
+  if (!emp) {
+    return {
+      response: NextResponse.json(
+        { error: "Аккаунт не привязан к заведению или сотрудник деактивирован" },
+        { status: 403 },
+      ),
+    };
+  }
+
+  return {
+    user: authResult.user,
+    establishmentId: emp.establishmentId,
+    employeeId: emp.id,
+    employeeName: emp.name,
   };
 }

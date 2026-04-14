@@ -234,7 +234,7 @@ export default function EstablishmentHallsPage() {
   };
 
   if (loading) {
-    return <div className="text-white/90">Загрузка…</div>;
+    return <div className="text-[var(--color-on-dark-muted)]">Загрузка…</div>;
   }
 
   return (
@@ -242,30 +242,30 @@ export default function EstablishmentHallsPage() {
       <div className="flex flex-wrap items-center gap-3">
         <Link
           href="/establishment/operations"
-          className="inline-flex items-center gap-1 text-sm text-white/70 hover:text-white"
+          className="inline-flex items-center gap-1 text-sm text-[var(--color-on-dark-muted)] hover:text-[var(--color-on-dark)]"
         >
           <ChevronLeft className="h-4 w-4" aria-hidden />
-          Операции
+          Зал и сервис
         </Link>
       </div>
 
       <div className="min-w-0">
-        <h1 className="cabinet-dashboard-name-hero font-[family:var(--font-playfair)] text-white">
+        <h1 className="cabinet-dashboard-name-hero font-[family:var(--font-playfair)] text-[var(--color-on-dark)]">
           Залы и столы
         </h1>
-        <p className="mt-2 max-w-2xl text-sm text-white/75">
+        <p className="mt-2 max-w-2xl text-sm text-[var(--color-on-dark-muted)]">
           Структура зала для будущей брони и привязки к официанту. Код стола (externalCode) можно
           заполнить под интеграцию с кассой позже.
         </p>
       </div>
 
       {error ? (
-        <div className="flex flex-wrap items-center gap-3 rounded-xl bg-red-500/20 px-4 py-2 text-red-200">
+        <div className="flex flex-wrap items-center gap-3 rounded-xl border border-red-400/35 bg-red-500/15 px-4 py-2 text-red-100">
           <span>{error}</span>
           <button
             type="button"
             onClick={() => setError(null)}
-            className="text-sm underline hover:no-underline"
+            className="text-sm text-red-100/90 underline hover:no-underline"
           >
             Скрыть
           </button>
@@ -274,10 +274,10 @@ export default function EstablishmentHallsPage() {
 
       <form
         onSubmit={createHall}
-        className="flex min-w-0 flex-col gap-2 rounded-[10px] border border-white/10 bg-[var(--color-bg-sides)]/80 p-4 sm:flex-row sm:items-end"
+        className="flex min-w-0 flex-col gap-2 rounded-[10px] border border-[var(--color-brand-gold)]/30 bg-white/[0.06] p-4 shadow-[var(--shadow-subtle)] backdrop-blur-sm sm:flex-row sm:items-end"
       >
         <div className="min-w-0 flex-1">
-          <label htmlFor="new-hall" className="mb-1 block text-xs text-white/60">
+          <label htmlFor="new-hall" className="mb-1 block text-xs text-[var(--color-on-dark-muted)]">
             Новый зал
           </label>
           <input
@@ -285,7 +285,7 @@ export default function EstablishmentHallsPage() {
             value={newHallName}
             onChange={(e) => setNewHallName(e.target.value)}
             placeholder="Например, Основной зал"
-            className="w-full rounded-lg border border-white/15 bg-[#0a192f]/25 px-3 py-2 text-white placeholder:text-white/35"
+            className="w-full rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/30 px-3 py-2 text-[var(--color-on-dark)] placeholder:text-[var(--color-on-dark-muted)]"
             maxLength={120}
           />
         </div>
@@ -300,14 +300,14 @@ export default function EstablishmentHallsPage() {
       </form>
 
       {halls.length === 0 ? (
-        <p className="text-sm text-white/60">Пока нет залов — добавьте первый.</p>
+        <p className="text-sm text-[var(--color-on-dark-muted)]">Пока нет залов — добавьте первый.</p>
       ) : null}
 
       <div className="flex flex-col gap-4">
         {halls.map((hall) => (
           <section
             key={hall.id}
-            className="min-w-0 rounded-[10px] border border-white/10 bg-[var(--color-bg-sides)]/60 p-4 sm:p-5"
+            className="min-w-0 rounded-[10px] border border-[var(--color-brand-gold)]/30 bg-white/[0.06] p-4 shadow-[var(--shadow-subtle)] backdrop-blur-sm sm:p-5"
           >
             <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
               <div className="min-w-0 flex-1">
@@ -316,32 +316,32 @@ export default function EstablishmentHallsPage() {
                     <input
                       value={editHallName}
                       onChange={(e) => setEditHallName(e.target.value)}
-                      className="min-w-0 flex-1 rounded-lg border border-white/15 bg-[#0a192f]/25 px-3 py-2 text-white"
+                      className="min-w-0 flex-1 rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/30 px-3 py-2 text-[var(--color-on-dark)]"
                       maxLength={120}
                     />
                     <button
                       type="button"
                       onClick={() => saveHall(hall.id)}
                       disabled={savingHallId === hall.id}
-                      className="rounded-lg bg-white/10 px-3 py-2 text-sm text-white hover:bg-white/15 disabled:opacity-50"
+                      className="rounded-lg bg-white/12 px-3 py-2 text-sm text-[var(--color-on-dark)] hover:bg-white/18 disabled:opacity-50"
                     >
                       Сохранить
                     </button>
                     <button
                       type="button"
                       onClick={() => setEditingHallId(null)}
-                      className="rounded-lg px-3 py-2 text-sm text-white/70 hover:text-white"
+                      className="rounded-lg px-3 py-2 text-sm text-[var(--color-on-dark-muted)] hover:text-[var(--color-on-dark)]"
                     >
                       Отмена
                     </button>
                   </div>
                 ) : (
                   <div className="flex flex-wrap items-center gap-2">
-                    <h2 className="text-lg font-medium text-white">{hall.name}</h2>
+                    <h2 className="text-lg font-medium text-[var(--color-on-dark)]">{hall.name}</h2>
                     <button
                       type="button"
                       onClick={() => startEditHall(hall)}
-                      className="rounded-lg p-1.5 text-white/60 hover:bg-white/10 hover:text-white"
+                      className="rounded-lg p-1.5 text-[var(--color-on-dark-muted)] hover:bg-white/10 hover:text-[var(--color-on-dark)]"
                       aria-label="Переименовать зал"
                     >
                       <Pencil className="h-4 w-4" />
@@ -349,37 +349,39 @@ export default function EstablishmentHallsPage() {
                     <button
                       type="button"
                       onClick={() => deleteHall(hall.id)}
-                      className="rounded-lg p-1.5 text-white/60 hover:bg-red-500/20 hover:text-red-200"
+                      className="rounded-lg p-1.5 text-[var(--color-on-dark-muted)] hover:bg-red-500/25 hover:text-red-100"
                       aria-label="Удалить зал"
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>
                   </div>
                 )}
-                <p className="mt-1 text-xs text-white/45">
+                <p className="mt-1 text-xs text-[var(--color-on-dark-muted)] opacity-90">
                   Столов: {hall.tables.length} · порядок сортировки: {hall.sortOrder}
                 </p>
               </div>
             </div>
 
-            <ul className="mt-4 space-y-2 border-t border-white/10 pt-4">
+            <ul className="mt-4 space-y-2 border-t border-[var(--color-brand-gold)]/20 pt-4">
               {hall.tables.map((t) => (
                 <li
                   key={t.id}
-                  className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-white/5 bg-white/[0.03] px-3 py-2"
+                  className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-[var(--color-brand-gold)]/15 bg-[#0a192f]/25 px-3 py-2"
                 >
                   <div className="min-w-0">
-                    <span className="font-medium text-white">{t.label}</span>
-                    <span className="ml-2 text-sm text-white/55">до {t.capacity} гостей</span>
+                    <span className="font-medium text-[var(--color-on-dark)]">{t.label}</span>
+                    <span className="ml-2 text-sm text-[var(--color-on-dark-muted)]">до {t.capacity} гостей</span>
                     {t.externalCode ? (
-                      <span className="ml-2 font-mono text-xs text-white/40">{t.externalCode}</span>
+                      <span className="ml-2 font-mono text-xs text-[var(--color-on-dark-muted)] opacity-80">
+                        {t.externalCode}
+                      </span>
                     ) : null}
                   </div>
                   <div className="flex shrink-0 gap-1">
                     <button
                       type="button"
                       onClick={() => startEditTable(t)}
-                      className="rounded-lg p-1.5 text-white/60 hover:bg-white/10 hover:text-white"
+                      className="rounded-lg p-1.5 text-[var(--color-on-dark-muted)] hover:bg-white/10 hover:text-[var(--color-on-dark)]"
                       aria-label="Изменить стол"
                     >
                       <Pencil className="h-4 w-4" />
@@ -387,7 +389,7 @@ export default function EstablishmentHallsPage() {
                     <button
                       type="button"
                       onClick={() => deleteTable(t.id)}
-                      className="rounded-lg p-1.5 text-white/60 hover:bg-red-500/20 hover:text-red-200"
+                      className="rounded-lg p-1.5 text-[var(--color-on-dark-muted)] hover:bg-red-500/25 hover:text-red-100"
                       aria-label="Удалить стол"
                     >
                       <Trash2 className="h-4 w-4" />
@@ -399,34 +401,34 @@ export default function EstablishmentHallsPage() {
 
             <form
               onSubmit={(e) => addTable(hall.id, e)}
-              className="mt-4 grid gap-2 border-t border-white/10 pt-4 sm:grid-cols-12 sm:items-end"
+              className="mt-4 grid gap-2 border-t border-[var(--color-brand-gold)]/20 pt-4 sm:grid-cols-12 sm:items-end"
             >
               <div className="sm:col-span-4">
-                <label className="mb-1 block text-xs text-white/60">Стол</label>
+                <label className="mb-1 block text-xs text-[var(--color-on-dark-muted)]">Стол</label>
                 <input
                   value={getTableForm(hall.id).label}
                   onChange={(e) => setTableForm(hall.id, { label: e.target.value })}
                   placeholder="№ или название"
-                  className="w-full rounded-lg border border-white/15 bg-[#0a192f]/25 px-3 py-2 text-sm text-white"
+                  className="w-full rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/30 px-3 py-2 text-sm text-[var(--color-on-dark)] placeholder:text-[var(--color-on-dark-muted)]"
                   maxLength={80}
                 />
               </div>
               <div className="sm:col-span-2">
-                <label className="mb-1 block text-xs text-white/60">Мест</label>
+                <label className="mb-1 block text-xs text-[var(--color-on-dark-muted)]">Мест</label>
                 <input
                   value={getTableForm(hall.id).capacity}
                   onChange={(e) => setTableForm(hall.id, { capacity: e.target.value })}
                   inputMode="numeric"
-                  className="w-full rounded-lg border border-white/15 bg-[#0a192f]/25 px-3 py-2 text-sm text-white"
+                  className="w-full rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/30 px-3 py-2 text-sm text-[var(--color-on-dark)]"
                 />
               </div>
               <div className="sm:col-span-4">
-                <label className="mb-1 block text-xs text-white/60">Код для кассы (необяз.)</label>
+                <label className="mb-1 block text-xs text-[var(--color-on-dark-muted)]">Код для кассы (необяз.)</label>
                 <input
                   value={getTableForm(hall.id).externalCode}
                   onChange={(e) => setTableForm(hall.id, { externalCode: e.target.value })}
                   placeholder="POS / UUID"
-                  className="w-full rounded-lg border border-white/15 bg-[#0a192f]/25 px-3 py-2 text-sm text-white"
+                  className="w-full rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/30 px-3 py-2 text-sm text-[var(--color-on-dark)] placeholder:text-[var(--color-on-dark-muted)]"
                   maxLength={64}
                 />
               </div>
@@ -434,7 +436,7 @@ export default function EstablishmentHallsPage() {
                 <button
                   type="submit"
                   disabled={!getTableForm(hall.id).label.trim()}
-                  className="flex w-full items-center justify-center gap-1 rounded-xl border border-[var(--color-brand-gold)]/50 py-2 text-sm font-medium text-[var(--color-brand-gold)] hover:bg-[var(--color-brand-gold)]/10 disabled:opacity-40"
+                  className="flex w-full items-center justify-center gap-1 rounded-xl border border-[var(--color-brand-gold)]/45 bg-white/[0.08] py-2 text-sm font-semibold text-[var(--color-brand-gold)] hover:bg-[var(--color-brand-gold)]/15 disabled:opacity-40"
                 >
                   <Plus className="h-4 w-4" aria-hidden />
                   Стол
@@ -452,35 +454,35 @@ export default function EstablishmentHallsPage() {
           aria-modal
           aria-labelledby="edit-table-title"
         >
-          <div className="w-full max-w-md rounded-[10px] border border-white/15 bg-[var(--color-bg)] p-5 shadow-2xl">
-            <h3 id="edit-table-title" className="text-lg font-medium text-white">
+          <div className="w-full max-w-md rounded-[10px] border border-[var(--color-brand-gold)]/35 bg-[#1e2a3a] p-5 text-[var(--color-on-dark)] shadow-2xl">
+            <h3 id="edit-table-title" className="text-lg font-medium text-[var(--color-on-dark)]">
               Стол
             </h3>
             <div className="mt-4 space-y-3">
               <div>
-                <label className="mb-1 block text-xs text-white/60">Обозначение</label>
+                <label className="mb-1 block text-xs text-[var(--color-on-dark-muted)]">Обозначение</label>
                 <input
                   value={editTableLabel}
                   onChange={(e) => setEditTableLabel(e.target.value)}
-                  className="w-full rounded-lg border border-white/15 bg-[#0a192f]/25 px-3 py-2 text-white"
+                  className="w-full rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/40 px-3 py-2 text-[var(--color-on-dark)]"
                   maxLength={80}
                 />
               </div>
               <div>
-                <label className="mb-1 block text-xs text-white/60">Мест</label>
+                <label className="mb-1 block text-xs text-[var(--color-on-dark-muted)]">Мест</label>
                 <input
                   value={editTableCapacity}
                   onChange={(e) => setEditTableCapacity(e.target.value)}
                   inputMode="numeric"
-                  className="w-full rounded-lg border border-white/15 bg-[#0a192f]/25 px-3 py-2 text-white"
+                  className="w-full rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/40 px-3 py-2 text-[var(--color-on-dark)]"
                 />
               </div>
               <div>
-                <label className="mb-1 block text-xs text-white/60">Код для кассы</label>
+                <label className="mb-1 block text-xs text-[var(--color-on-dark-muted)]">Код для кассы</label>
                 <input
                   value={editTableCode}
                   onChange={(e) => setEditTableCode(e.target.value)}
-                  className="w-full rounded-lg border border-white/15 bg-[#0a192f]/25 px-3 py-2 text-white"
+                  className="w-full rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0a192f]/40 px-3 py-2 text-[var(--color-on-dark)]"
                   maxLength={64}
                 />
               </div>
@@ -489,7 +491,7 @@ export default function EstablishmentHallsPage() {
               <button
                 type="button"
                 onClick={() => setEditingTable(null)}
-                className="rounded-lg px-4 py-2 text-sm text-white/80 hover:text-white"
+                className="rounded-lg px-4 py-2 text-sm text-[var(--color-on-dark-muted)] hover:text-[var(--color-on-dark)]"
               >
                 Отмена
               </button>

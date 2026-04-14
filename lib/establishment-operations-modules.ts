@@ -1,6 +1,6 @@
 /**
  * Манифест разделов операционного кабинета заведения (бронь, залы, гости, меню…).
- * Используется GET /api/establishment/operations и страница «Операции».
+ * Используется GET /api/establishment/operations и страница «Зал и сервис» в ЛК заведения.
  */
 
 export type EstablishmentOperationsModule = {
@@ -27,33 +27,33 @@ export const ESTABLISHMENT_OPERATIONS_MODULES: EstablishmentOperationsModule[] =
   {
     id: "bookings",
     title: "Бронь",
-    description: "Слоты, календарь, статусы визита и привязка к столу.",
-    cabinetPath: null,
-    apiBase: null,
-    implemented: false,
+    description: "Слоты, статусы визита, стол и карточка гостя.",
+    cabinetPath: "/establishment/bookings",
+    apiBase: "/api/establishment/bookings",
+    implemented: true,
   },
   {
     id: "guests",
     title: "Гости",
-    description: "Контакты, история визитов, заметки.",
-    cabinetPath: null,
-    apiBase: null,
-    implemented: false,
+    description: "Контакты и заметки; привязка к брони.",
+    cabinetPath: "/establishment/guests",
+    apiBase: "/api/establishment/guests",
+    implemented: true,
   },
   {
     id: "menu",
     title: "Меню",
-    description: "Категории и позиции; позже — выгрузка в зал или синхронизация с кассой.",
-    cabinetPath: null,
-    apiBase: null,
-    implemented: false,
+    description: "Категории и позиции, цена в копейках; позже — касса и зал.",
+    cabinetPath: "/establishment/menu",
+    apiBase: "/api/establishment/menu",
+    implemented: true,
   },
   {
     id: "service",
     title: "Сервис стола",
-    description: "Открытый заказ, официант, смена; оплату настроим отдельно.",
-    cabinetPath: null,
-    apiBase: null,
-    implemented: false,
+    description: "Кто обслуживает стол; чек и оплата — отдельно.",
+    cabinetPath: "/establishment/service",
+    apiBase: "/api/establishment/service-sessions",
+    implemented: true,
   },
 ];

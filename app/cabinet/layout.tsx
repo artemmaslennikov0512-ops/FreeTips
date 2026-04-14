@@ -21,6 +21,7 @@ import {
   Laptop,
   ChevronLeft,
   ChevronRight,
+  LayoutGrid,
 } from "lucide-react";
 import { CABINET_WAITER_BTN } from "@/lib/cabinet-button-classes";
 import { getAccessToken, fetchWithAuth, clearAccessToken } from "@/lib/auth-client";
@@ -49,8 +50,10 @@ const NAV: {
   icon: LucideIcon;
   recipientOnly?: boolean;
   employeeOnly?: boolean;
+  waiterFloorOnly?: boolean;
 }[] = [
   { label: "Дашборд", href: "/cabinet", icon: LayoutDashboard },
+  { label: "Зал", href: "/cabinet/floor", icon: LayoutGrid, waiterFloorOnly: true },
   { label: "Операции", href: "/cabinet/transactions", icon: List },
   { label: "Моя ссылка", href: "/cabinet/link", icon: Link2 },
   {
@@ -323,6 +326,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
       NAV.filter((item) => {
         if (item.recipientOnly && effectiveNavRole !== "RECIPIENT") return false;
         if (item.employeeOnly && effectiveNavRole !== "EMPLOYEE") return false;
+        if (item.waiterFloorOnly && effectiveNavRole !== "EMPLOYEE") return false;
         return true;
       }),
     [effectiveNavRole],

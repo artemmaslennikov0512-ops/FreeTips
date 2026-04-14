@@ -6,6 +6,10 @@ import Link from "next/link";
 import {
   LayoutDashboard,
   Layers,
+  CalendarDays,
+  UserCircle2,
+  UtensilsCrossed,
+  ConciergeBell,
   LogOut,
   Users,
   UserPlus,
@@ -32,7 +36,11 @@ interface Profile {
 
 const NAV = [
   { label: "Дашборд", href: "/establishment" },
-  { label: "Операции", href: "/establishment/operations" },
+  { label: "Зал и сервис", href: "/establishment/operations" },
+  { label: "Бронь", href: "/establishment/bookings" },
+  { label: "Гости", href: "/establishment/guests" },
+  { label: "Меню", href: "/establishment/menu" },
+  { label: "Сервис стола", href: "/establishment/service" },
   { label: "Команда", href: "/establishment/team" },
   { label: "Подключение сотрудников", href: "/establishment/join-requests" },
   { label: "Заявки на выход", href: "/establishment/leave-requests" },
@@ -149,7 +157,23 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
   }
 
   const isActive = (href: string) => pathname === href || (href !== "/establishment" && pathname.startsWith(href));
-  const navIcons = [LayoutDashboard, Layers, Users, UserPlus, UserMinus, QrCode, PieChart, BarChart3, Palette, Laptop, KeyRound] as const;
+  const navIcons = [
+    LayoutDashboard,
+    Layers,
+    CalendarDays,
+    UserCircle2,
+    UtensilsCrossed,
+    ConciergeBell,
+    Users,
+    UserPlus,
+    UserMinus,
+    QrCode,
+    PieChart,
+    BarChart3,
+    Palette,
+    Laptop,
+    KeyRound,
+  ] as const;
 
   return (
     <div className="establishment-panel cabinet-premium flex min-h-screen w-full min-w-0 max-w-full overflow-x-hidden bg-[var(--color-bg)] font-[family:var(--font-inter)] text-white pt-2 lg:pt-4">

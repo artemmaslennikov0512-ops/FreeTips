@@ -106,7 +106,7 @@ export function CabinetMobileNavFixedButton() {
       className={`${BTN_CLASS} fixed z-[2005] lg:hidden`}
       style={{
         right: "max(0.75rem, env(safe-area-inset-right, 0px))",
-        top: "max(5rem, calc(env(safe-area-inset-top, 0px) + 4.25rem))",
+        top: "max(3.25rem, calc(env(safe-area-inset-top, 0px) + 2.75rem))",
       }}
       aria-label="Меню"
       aria-expanded={sidebarOpen}

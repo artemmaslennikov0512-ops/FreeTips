@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { ChevronLeft, Plus, Trash2, Pencil } from "lucide-react";
 import { authHeaders } from "@/lib/auth-client";
+import { EstablishmentDataGridPlaceholder } from "@/components/establishment/EstablishmentDataGridPlaceholder";
 
 interface GuestRow {
   id: string;
@@ -145,7 +146,7 @@ export default function EstablishmentGuestsPage() {
           </button>
         </div>
       ) : null}
-      <div className="ft-panel-section-toolbar ft-panel-section-toolbar--row rounded-lg border border-[var(--color-brand-gold)]/30 bg-[#0d0e12] p-2.5">
+      <div className="ft-panel-section-toolbar ft-panel-section-toolbar--row rounded-lg border border-[var(--color-brand-gold)]/30 bg-[var(--establishment-charcoal)] p-2.5">
         <input
           value={q}
           onChange={(e) => setQ(e.target.value)}
@@ -162,13 +163,31 @@ export default function EstablishmentGuestsPage() {
         </button>
       </div>
       {loading ? (
-        <p className="text-center text-[var(--color-on-dark-muted)]">Загрузка…</p>
+        <EstablishmentDataGridPlaceholder
+          loading
+          rows={5}
+          columns={[
+            { label: "Имя", colClassName: "min-w-[6.5rem] sm:min-w-[8rem]" },
+            { label: "Телефон / email", colClassName: "min-w-[7rem]" },
+            { label: "Заметка", colClassName: "min-w-[5rem] w-full" },
+          ]}
+          footerNote="Загрузка…"
+        />
+      ) : guests.length === 0 ? (
+        <EstablishmentDataGridPlaceholder
+          rows={5}
+          columns={[
+            { label: "Имя", colClassName: "min-w-[6.5rem] sm:min-w-[8rem]" },
+            { label: "Телефон / email", colClassName: "min-w-[7rem]" },
+            { label: "Заметка", colClassName: "min-w-[5rem] w-full" },
+          ]}
+        />
       ) : (
         <ul className="flex flex-col gap-2">
           {guests.map((g) => (
             <li
               key={g.id}
-              className="flex flex-wrap items-start justify-between gap-2 rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0d0e12] p-2.5"
+              className="flex flex-wrap items-start justify-between gap-2 rounded-lg border border-[var(--color-brand-gold)]/25 bg-[var(--establishment-charcoal)] p-2.5"
             >
               <div>
                 <p className="text-sm font-medium text-[var(--color-on-dark)]">{g.displayName}</p>

@@ -119,7 +119,7 @@ export default function EstablishmentOperationsPage() {
         </p>
       </div>
 
-      <div className="flex w-full max-w-full flex-col gap-2 self-stretch rounded-lg border border-[var(--color-brand-gold)]/30 bg-[#0d0e12] px-3 py-3 shadow-[var(--shadow-subtle)] sm:px-4 sm:py-3.5">
+      <div className="flex w-full max-w-full flex-col gap-2 self-stretch rounded-lg border border-[var(--color-brand-gold)]/30 bg-[var(--establishment-charcoal)] px-3 py-3 shadow-[var(--shadow-subtle)] sm:px-4 sm:py-3.5">
         <div className="flex min-h-0 w-full max-w-xl flex-1 flex-col items-center gap-2 self-center text-center text-[var(--color-on-dark)]">
           <Layers className="h-5 w-5 shrink-0 text-[var(--color-brand-gold)]" aria-hidden />
           <div className="flex flex-col items-center gap-1">
@@ -172,7 +172,7 @@ export default function EstablishmentOperationsPage() {
         {data.modules.map((m) => {
           const clickable = Boolean(m.implemented && m.cabinetPath);
           const shell =
-            "relative flex h-full min-h-0 w-full min-w-0 flex-col rounded-md border border-[var(--color-brand-gold)]/25 bg-[#0d0e12] px-2 py-1.5 shadow-sm transition-all duration-200 ease-out";
+            "relative flex h-full min-h-0 w-full min-w-0 flex-col rounded-md border border-[var(--color-brand-gold)]/25 bg-[var(--establishment-charcoal)] px-2 py-1.5 shadow-sm transition-all duration-200 ease-out";
           const implementedAccent = m.implemented ? "ring-1 ring-emerald-500/15" : "";
           const hoverable =
             "hover:-translate-y-0.5 hover:border-[var(--color-brand-gold)]/45 hover:bg-[#12141a] hover:shadow-md hover:shadow-black/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-gold)]/40";

@@ -101,6 +101,20 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
   }, []);
 
   useEffect(() => {
+    if (!sidebarOpen) return;
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeSidebar();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [sidebarOpen, closeSidebar]);
+
+  useEffect(() => {
     if (!mounted || typeof window === "undefined") return;
 
     const checkAuth = async () => {
@@ -204,16 +218,16 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
       {/* Сайдбар выше затемнения (fixed + z); на lg остаётся в потоке */}
       <aside
         id="establishment-mobile-nav"
-        className={`cabinet-sidebar fixed left-0 top-0 z-[100] flex max-h-[100vh] w-[min(calc(100vw-4rem),19.25rem)] max-w-[19.25rem] flex-col overflow-y-auto overflow-x-hidden rounded-[10px] border border-white/10 py-3 shadow-2xl backdrop-blur-xl transition-[transform] duration-300 ease-out lg:static lg:left-auto lg:top-auto lg:ml-0 lg:mt-1.5 lg:mr-0 lg:mb-0 lg:max-h-none lg:z-auto lg:w-[14.75rem] lg:max-w-none lg:translate-x-0 lg:border lg:self-start bg-white/[0.06] ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        className={`cabinet-sidebar establishment-mobile-sidebar fixed z-[100] flex min-h-0 flex-col overflow-hidden rounded-[10px] border border-white/10 shadow-2xl backdrop-blur-xl transition-[transform] duration-300 ease-out bg-white/[0.06] max-lg:left-[max(0.5rem,env(safe-area-inset-left,0px))] max-lg:top-[max(0.5rem,env(safe-area-inset-top,0px))] max-lg:bottom-[max(0.5rem,env(safe-area-inset-bottom,0px))] max-lg:w-[min(19.25rem,calc(100vw-1.25rem-max(env(safe-area-inset-left,0px),0.5rem)-max(env(safe-area-inset-right,0px),0.5rem)))] max-lg:max-w-none max-lg:py-2 max-lg:min-w-0 lg:static lg:left-auto lg:top-auto lg:bottom-auto lg:ml-0 lg:mt-1.5 lg:mr-0 lg:mb-0 lg:max-h-none lg:z-auto lg:w-[14.75rem] lg:max-w-none lg:translate-x-0 lg:border lg:self-start lg:py-3 ${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full max-lg:pointer-events-none"
         }`}
       >
-        <div className="mb-2 w-full shrink-0 px-2.5 text-center">
+        <div className="mb-2 w-full shrink-0 px-2.5 text-center max-lg:mb-1.5">
           <span className="inline-block font-[family:var(--font-playfair)] text-[1.0625rem] font-bold leading-tight text-white">
             Кабинет заведения
           </span>
         </div>
-        <div className="cabinet-nav-block flex min-h-0 flex-1 flex-col overflow-y-auto overflow-x-hidden px-2.5 pb-1.5">
+        <div className="cabinet-nav-block flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto overflow-x-hidden overscroll-y-contain px-2.5 pb-1.5">
           <nav
             className="flex flex-col gap-0 rounded-lg border border-[var(--color-brand-gold)]/15 bg-[var(--color-dark-gray)]/5 p-1 pb-1.5 shadow-[var(--shadow-subtle)]"
             aria-label="Навигация по кабинету заведения"

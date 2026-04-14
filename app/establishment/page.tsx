@@ -166,14 +166,14 @@ export default function EstablishmentPage() {
               </Link>
               <Link
                 href="/establishment/payout-rules"
-                className="inline-flex min-h-[2.75rem] items-center gap-2 rounded-[10px] border border-[var(--color-brand-gold)]/35 bg-[var(--color-dark-gray)]/10 px-5 py-2.5 text-sm font-semibold text-[var(--color-text)] hover:border-[var(--color-brand-gold)]/50 hover:bg-[var(--color-dark-gray)]/18 sm:px-6 sm:py-3"
+                className="establishment-quick-action-outline inline-flex min-h-[2.75rem] items-center gap-2 rounded-[10px] border border-[var(--color-brand-gold)]/35 bg-[var(--color-dark-gray)]/10 px-5 py-2.5 text-sm font-semibold hover:border-[var(--color-brand-gold)]/50 hover:bg-[var(--color-dark-gray)]/18 sm:px-6 sm:py-3"
               >
                 <PieChart className="h-5 w-5 shrink-0" />
                 Распределение
               </Link>
               <Link
                 href="/establishment/analytics"
-                className="inline-flex min-h-[2.75rem] items-center gap-2 rounded-[10px] border border-[var(--color-brand-gold)]/35 bg-[var(--color-dark-gray)]/10 px-5 py-2.5 text-sm font-semibold text-[var(--color-text)] hover:border-[var(--color-brand-gold)]/50 hover:bg-[var(--color-dark-gray)]/18 sm:px-6 sm:py-3"
+                className="establishment-quick-action-outline inline-flex min-h-[2.75rem] items-center gap-2 rounded-[10px] border border-[var(--color-brand-gold)]/35 bg-[var(--color-dark-gray)]/10 px-5 py-2.5 text-sm font-semibold hover:border-[var(--color-brand-gold)]/50 hover:bg-[var(--color-dark-gray)]/18 sm:px-6 sm:py-3"
               >
                 <BarChart3 className="h-5 w-5 shrink-0" />
                 Аналитика

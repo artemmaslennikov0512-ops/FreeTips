@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ChevronLeft, Plus, Trash2, Pencil } from "lucide-react";
 import { authHeaders } from "@/lib/auth-client";
 import { todayYmdMoscow } from "@/lib/establishment-booking-moscow";
+import { EstablishmentDataGridPlaceholder } from "@/components/establishment/EstablishmentDataGridPlaceholder";
 
 type BookingStatus =
   | "PENDING"
@@ -284,7 +285,7 @@ export default function EstablishmentBookingsPage() {
         </div>
       ) : null}
 
-      <div className="ft-panel-section-toolbar gap-2 rounded-lg border border-[var(--color-brand-gold)]/30 bg-[#0d0e12] p-2.5 shadow-[var(--shadow-subtle)]">
+      <div className="ft-panel-section-toolbar gap-2 rounded-lg border border-[var(--color-brand-gold)]/30 bg-[var(--establishment-charcoal)] p-2.5 shadow-[var(--shadow-subtle)]">
         <div className="flex min-w-0 flex-row flex-wrap items-end justify-center gap-3">
           <div className="text-center sm:text-left">
             <label htmlFor="booking-date" className="mb-1 block text-xs text-[var(--color-on-dark-muted)]">
@@ -324,15 +325,38 @@ export default function EstablishmentBookingsPage() {
       </div>
 
       {loading ? (
-        <div className="text-center text-[var(--color-on-dark-muted)]">Загрузка…</div>
+        <EstablishmentDataGridPlaceholder
+          loading
+          rows={5}
+          columns={[
+            { label: "Время", colClassName: "min-w-[5.5rem]" },
+            { label: "Гость", colClassName: "min-w-[6rem] sm:min-w-[8rem]" },
+            { label: "Стол", colClassName: "min-w-[5rem]" },
+            { label: "Статус", colClassName: "min-w-[4.5rem]" },
+          ]}
+          footerNote="Загрузка…"
+        />
       ) : bookings.length === 0 ? (
-        <p className="text-center text-sm text-[var(--color-on-dark-muted)]">На этот день броней нет.</p>
+        <EstablishmentDataGridPlaceholder
+          rows={5}
+          columns={[
+            { label: "Время", colClassName: "min-w-[5.5rem]" },
+            { label: "Гость", colClassName: "min-w-[6rem] sm:min-w-[8rem]" },
+            { label: "Стол", colClassName: "min-w-[5rem]" },
+            { label: "Статус", colClassName: "min-w-[4.5rem]" },
+          ]}
+          footerNote={
+            tableOptions.length === 0
+              ? "Сначала добавьте залы и столы — затем здесь появятся брони на выбранный день."
+              : "На этот день броней нет."
+          }
+        />
       ) : (
         <ul className="flex flex-col gap-2">
           {bookings.map((b) => (
             <li
               key={b.id}
-              className="rounded-lg border border-[var(--color-brand-gold)]/30 bg-[#0d0e12] p-2.5 shadow-[var(--shadow-subtle)]"
+              className="rounded-lg border border-[var(--color-brand-gold)]/30 bg-[var(--establishment-charcoal)] p-2.5 shadow-[var(--shadow-subtle)]"
             >
               <div className="flex min-w-0 flex-wrap items-start justify-between gap-2">
                 <div className="min-w-0">

@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Plus, Copy, RefreshCw, FileDown, Mail, Pencil, Upload, ImageIcon, UserMinus } from "lucide-react";
+import { Plus, Copy, RefreshCw, FileDown, Mail, Pencil, Upload, ImageIcon, X, Check } from "lucide-react";
 import { authHeaders, getAccessToken } from "@/lib/auth-client";
 import { beginCabinetImpersonation } from "@/lib/cabinet-impersonation";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
@@ -573,20 +573,42 @@ export default function EstablishmentTeamPage() {
                 <button type="button" onClick={() => openEdit(emp)} className="inline-flex items-center gap-1 rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-xs text-white hover:bg-[var(--color-dark-gray)]/20">
                   <Pencil className="h-3 w-3" /> Редактировать
                 </button>
-                <button type="button" onClick={() => toggleActive(emp)} disabled={togglingId === emp.id} className="rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-xs text-white hover:bg-[var(--color-dark-gray)]/20 disabled:opacity-50">
-                  {togglingId === emp.id ? "…" : emp.isActive ? "Деактивировать" : "Активировать"}
+                <button
+                  type="button"
+                  onClick={() => toggleActive(emp)}
+                  disabled={togglingId === emp.id}
+                  title={
+                    emp.isActive
+                      ? "Деактивировать карточку — сотрудник не будет в списке активных, гостевые ссылки сохраняются."
+                      : "Активировать карточку — снова показывать сотрудника как активного."
+                  }
+                  aria-label={emp.isActive ? "Деактивировать" : "Активировать"}
+                  className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-white/15 bg-white/[0.06] text-white/85 transition-colors hover:border-red-400/45 hover:bg-red-500/15 hover:text-red-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400/40 disabled:opacity-50"
+                >
+                  {togglingId === emp.id ? (
+                    <span className="text-xs leading-none">…</span>
+                  ) : emp.isActive ? (
+                    <X className="h-4 w-4" strokeWidth={2.25} aria-hidden />
+                  ) : (
+                    <Check className="h-4 w-4" strokeWidth={2.25} aria-hidden />
+                  )}
                 </button>
                 {emp.hasUser && (
-                  <div className="flex w-full flex-col gap-2">
+                  <div className="flex w-full flex-col items-center gap-2">
                     <span className="text-center text-xs text-white/80">Уже зарегистрирован</span>
                     <button
                       type="button"
                       onClick={() => void disconnectUser(emp)}
                       disabled={disconnectingId === emp.id}
-                      className="inline-flex items-center justify-center gap-1 rounded-lg border border-amber-500/35 bg-amber-500/10 px-3 py-2 text-xs text-amber-100 hover:bg-amber-500/15 disabled:opacity-50"
+                      title="Отвязать личный аккаунт от карточки: официант станет самостоятельным получателем, потребуется повторный вход. QR заведения останется."
+                      aria-label="Отвязать аккаунт"
+                      className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-amber-500/30 bg-amber-500/[0.08] text-amber-100/95 transition-colors hover:border-amber-400/55 hover:bg-amber-500/20 hover:text-amber-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/45 disabled:opacity-50"
                     >
-                      <UserMinus className="h-3 w-3" />
-                      {disconnectingId === emp.id ? "…" : "Отвязать аккаунт"}
+                      {disconnectingId === emp.id ? (
+                        <span className="text-xs leading-none">…</span>
+                      ) : (
+                        <X className="h-4 w-4" strokeWidth={2.25} aria-hidden />
+                      )}
                     </button>
                   </div>
                 )}
@@ -636,7 +658,7 @@ export default function EstablishmentTeamPage() {
             <tbody>
               {employees.length === 0 ? (
                 <tr className="establishment-team-table-row">
-                  <td colSpan={9} className="p-3 text-center text-xs text-white/90">Нет сотрудников.</td>
+                  <td colSpan={9} className="p-3 text-center text-sm text-white/90">Нет сотрудников.</td>
                 </tr>
               ) : (
                 employees.map((emp) => (
@@ -661,26 +683,48 @@ export default function EstablishmentTeamPage() {
                     <td className="establishment-team-table-cell establishment-team-table-cell-coef whitespace-nowrap p-2 text-center text-white/90">{emp.coefficient}</td>
                     <td className="establishment-team-table-cell establishment-team-table-cell-rating whitespace-nowrap p-2 text-center text-white/90">{emp.reviewsCount > 0 ? `${emp.avgRating ?? "—"} (${emp.reviewsCount})` : "—"}</td>
                     <td className="establishment-team-table-cell establishment-team-table-cell-status p-2 text-center">
-                      <div className="flex flex-wrap items-center justify-center gap-2">
-                        <span className={`text-xs ${emp.isActive ? "text-[var(--color-accent-emerald)]" : "text-white/80"}`}>{emp.isActive ? "Активен" : "Неактивен"}</span>
-                        <button type="button" onClick={() => toggleActive(emp)} disabled={togglingId === emp.id} className="rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-2 py-1 text-xs text-white hover:bg-[var(--color-dark-gray)]/20 disabled:opacity-50">
-                          {togglingId === emp.id ? "…" : emp.isActive ? "Деактивировать" : "Активировать"}
+                      <div className="flex flex-wrap items-center justify-center gap-1.5">
+                        <span className={`text-sm ${emp.isActive ? "text-[var(--color-accent-emerald)]" : "text-white/80"}`}>{emp.isActive ? "Активен" : "Неактивен"}</span>
+                        <button
+                          type="button"
+                          onClick={() => toggleActive(emp)}
+                          disabled={togglingId === emp.id}
+                          title={
+                            emp.isActive
+                              ? "Деактивировать карточку — сотрудник не будет в списке активных, гостевые ссылки сохраняются."
+                              : "Активировать карточку — снова показывать сотрудника как активного."
+                          }
+                          aria-label={emp.isActive ? "Деактивировать" : "Активировать"}
+                          className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-white/15 bg-white/[0.06] text-white/85 transition-colors hover:border-red-400/45 hover:bg-red-500/15 hover:text-red-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400/40 disabled:opacity-50"
+                        >
+                          {togglingId === emp.id ? (
+                            <span className="text-[11px] leading-none">…</span>
+                          ) : emp.isActive ? (
+                            <X className="h-3.5 w-3.5" strokeWidth={2.25} aria-hidden />
+                          ) : (
+                            <Check className="h-3.5 w-3.5" strokeWidth={2.25} aria-hidden />
+                          )}
                         </button>
                       </div>
                     </td>
                     <td className="establishment-team-table-cell establishment-team-table-cell-linked whitespace-nowrap p-2 text-center text-white/90">{emp.hasUser ? "Да" : "Нет"}</td>
                     <td className="establishment-team-table-cell establishment-team-table-cell-link p-2 text-center">
                       {emp.hasUser ? (
-                        <div className="flex flex-col items-center gap-2">
-                          <span className="text-xs text-white/90">Уже зарегистрирован</span>
+                        <div className="flex flex-col items-center gap-1.5">
+                          <span className="text-sm text-white/90">Уже зарегистрирован</span>
                           <button
                             type="button"
                             onClick={() => void disconnectUser(emp)}
                             disabled={disconnectingId === emp.id}
-                            className="inline-flex items-center gap-1 rounded-lg border border-amber-500/35 bg-amber-500/10 px-2 py-1.5 text-xs text-amber-100 hover:bg-amber-500/15 disabled:opacity-50"
+                            title="Отвязать личный аккаунт от карточки: официант станет самостоятельным получателем, потребуется повторный вход. QR заведения останется."
+                            aria-label="Отвязать аккаунт"
+                            className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-amber-500/30 bg-amber-500/[0.08] text-amber-100/95 transition-colors hover:border-amber-400/55 hover:bg-amber-500/20 hover:text-amber-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/45 disabled:opacity-50"
                           >
-                            <UserMinus className="h-3 w-3" />
-                            {disconnectingId === emp.id ? "…" : "Отвязать"}
+                            {disconnectingId === emp.id ? (
+                              <span className="text-[11px] leading-none">…</span>
+                            ) : (
+                              <X className="h-3.5 w-3.5" strokeWidth={2.25} aria-hidden />
+                            )}
                           </button>
                         </div>
                       ) : linkByEmpId[emp.id] ? (

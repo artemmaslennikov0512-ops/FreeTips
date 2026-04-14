@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 import { authHeaders } from "@/lib/auth-client";
+import { EstablishmentDataGridPlaceholder } from "@/components/establishment/EstablishmentDataGridPlaceholder";
 
 interface TableOption {
   id: string;
@@ -160,7 +161,7 @@ export default function EstablishmentServicePage() {
       ) : null}
       <form
         onSubmit={openSession}
-        className="ft-panel-section-toolbar ft-panel-section-toolbar--row gap-2 rounded-lg border border-[var(--color-brand-gold)]/30 bg-[#0d0e12] p-2.5 sm:flex-wrap"
+        className="ft-panel-section-toolbar ft-panel-section-toolbar--row gap-2 rounded-lg border border-[var(--color-brand-gold)]/30 bg-[var(--establishment-charcoal)] p-2.5 sm:flex-wrap"
       >
         <div className="min-w-[11rem] w-[13.5rem] max-w-full shrink-0 text-center sm:w-52 sm:text-left">
           <label className="mb-1 block text-xs text-[var(--color-on-dark-muted)]">Стол *</label>
@@ -201,7 +202,16 @@ export default function EstablishmentServicePage() {
         </button>
       </form>
       {loading ? (
-        <p className="text-center text-[var(--color-on-dark-muted)]">Загрузка…</p>
+        <EstablishmentDataGridPlaceholder
+          loading
+          rows={4}
+          columns={[
+            { label: "Стол", colClassName: "min-w-[5rem]" },
+            { label: "Официант", colClassName: "min-w-[6rem]" },
+            { label: "Открыта", colClassName: "min-w-[6.5rem] w-full" },
+          ]}
+          footerNote="Загрузка…"
+        />
       ) : (
         <div className="mt-8 flex flex-col gap-6">
           <section>
@@ -213,13 +223,20 @@ export default function EstablishmentServicePage() {
               Открытые
             </p>
             {openSessions.length === 0 ? (
-              <p className="text-center text-xs text-[var(--color-on-dark-muted)]">Нет открытых сессий.</p>
+              <EstablishmentDataGridPlaceholder
+                rows={4}
+                columns={[
+                  { label: "Стол", colClassName: "min-w-[5rem]" },
+                  { label: "Официант", colClassName: "min-w-[6rem]" },
+                  { label: "Открыта", colClassName: "min-w-[6.5rem] w-full" },
+                ]}
+              />
             ) : (
               <ul className="flex flex-col gap-2">
                 {openSessions.map((s) => (
                   <li
                     key={s.id}
-                    className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-[var(--color-brand-gold)]/25 bg-[#0d0e12] p-2.5"
+                    className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-[var(--color-brand-gold)]/25 bg-[var(--establishment-charcoal)] p-2.5"
                   >
                     <div>
                       <p className="text-sm font-medium text-[var(--color-on-dark)]">{s.tableLabel}</p>
@@ -248,14 +265,25 @@ export default function EstablishmentServicePage() {
             >
               Недавние (все статусы)
             </p>
-            <ul className="flex max-h-[24rem] flex-col gap-1 overflow-y-auto text-xs">
-              {closedSessions.slice(0, 50).map((s) => (
-                <li key={s.id} className="rounded-md border border-[var(--color-brand-gold)]/15 bg-[#0d0e12] px-2 py-1.5 text-[var(--color-on-dark-muted)]">
-                  {s.tableLabel} · {s.status === "CLOSED" ? "закрыта" : s.status}
-                  {s.closedAt ? ` · ${new Date(s.closedAt).toLocaleString("ru-RU", { timeZone: "Europe/Moscow" })}` : ""}
-                </li>
-              ))}
-            </ul>
+            {closedSessions.length === 0 ? (
+              <EstablishmentDataGridPlaceholder
+                rows={3}
+                columns={[
+                  { label: "Стол", colClassName: "min-w-[5rem]" },
+                  { label: "Статус", colClassName: "min-w-[5rem]" },
+                  { label: "Закрыта", colClassName: "min-w-[6.5rem] w-full" },
+                ]}
+              />
+            ) : (
+              <ul className="flex max-h-[24rem] flex-col gap-1 overflow-y-auto text-xs">
+                {closedSessions.slice(0, 50).map((s) => (
+                  <li key={s.id} className="rounded-md border border-[var(--color-brand-gold)]/15 bg-[var(--establishment-charcoal)] px-2 py-1.5 text-[var(--color-on-dark-muted)]">
+                    {s.tableLabel} · {s.status === "CLOSED" ? "закрыта" : s.status}
+                    {s.closedAt ? ` · ${new Date(s.closedAt).toLocaleString("ru-RU", { timeZone: "Europe/Moscow" })}` : ""}
+                  </li>
+                ))}
+              </ul>
+            )}
           </section>
         </div>
       )}

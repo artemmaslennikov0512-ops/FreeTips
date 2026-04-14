@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { ChevronLeft, Plus, Trash2 } from "lucide-react";
 import { authHeaders } from "@/lib/auth-client";
+import { EstablishmentDataGridPlaceholder } from "@/components/establishment/EstablishmentDataGridPlaceholder";
 
 interface MenuItem {
   id: string;
@@ -165,7 +166,7 @@ export default function EstablishmentMenuPage() {
       ) : null}
       <form
         onSubmit={addCategory}
-        className="ft-panel-section-toolbar ft-panel-section-toolbar--row gap-1.5 rounded-lg border border-[var(--color-brand-gold)]/30 bg-[#0d0e12] p-2"
+        className="ft-panel-section-toolbar ft-panel-section-toolbar--row gap-1.5 rounded-lg border border-[var(--color-brand-gold)]/30 bg-[var(--establishment-charcoal)] p-2"
       >
         <input
           value={newCatName}
@@ -182,7 +183,26 @@ export default function EstablishmentMenuPage() {
         </button>
       </form>
       {loading ? (
-        <p className="text-center text-[var(--color-on-dark-muted)]">Загрузка…</p>
+        <EstablishmentDataGridPlaceholder
+          loading
+          rows={4}
+          columns={[
+            { label: "Категория", colClassName: "min-w-[5.5rem]" },
+            { label: "Позиция", colClassName: "min-w-[7rem] w-full" },
+            { label: "Цена", colClassName: "min-w-[4rem] text-right sm:text-left" },
+          ]}
+          footerNote="Загрузка…"
+        />
+      ) : categories.length === 0 ? (
+        <EstablishmentDataGridPlaceholder
+          rows={4}
+          columns={[
+            { label: "Категория", colClassName: "min-w-[5.5rem]" },
+            { label: "Позиция", colClassName: "min-w-[7rem] w-full" },
+            { label: "Цена", colClassName: "min-w-[4rem] text-right sm:text-left" },
+          ]}
+          footerNote="Добавьте категорию выше — здесь появятся блоки с позициями меню."
+        />
       ) : (
         <div className="flex flex-col gap-1.5">
           {categories.map((c) => {
@@ -192,7 +212,7 @@ export default function EstablishmentMenuPage() {
             return (
               <section
                 key={c.id}
-                className="rounded-md border border-[var(--color-brand-gold)]/25 bg-[#0d0e12] p-2"
+                className="rounded-md border border-[var(--color-brand-gold)]/25 bg-[var(--establishment-charcoal)] p-2"
               >
                 <div className="flex flex-wrap items-center justify-between gap-1.5">
                   <h2 className="text-xs font-semibold text-[var(--color-on-dark)]">{c.name}</h2>

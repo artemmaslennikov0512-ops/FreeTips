@@ -122,6 +122,8 @@ export function Header() {
   const isCabinetM5Header =
     Boolean(pathname?.startsWith("/cabinet")) &&
     isCabinetM5CompetitionTheme(user?.login);
+  /** ЛК официанта (/cabinet): на мобильном — узкая полоска (тема + меню), без «шапки» с логотипом */
+  const isWaiterCabinet = Boolean(pathname?.startsWith("/cabinet"));
   const panelMenu = useOptionalPanelMobileMenu();
 
   const panelMenuControlsId =
@@ -243,11 +245,36 @@ export function Header() {
 
   return (
     <header
-      className={`site-header sticky top-0 z-30 mx-0 mt-2 w-full overflow-hidden rounded-lg bg-transparent md:rounded-[10px] lg:mx-3 lg:w-[calc(100%-1.5rem)] ${
-        hideMobileSiteNav ? "border-0" : "border border-white/10"
-      }${isCabinetM5Header ? " site-header--cabinet-m5" : ""}`}
+      className={`site-header sticky top-0 z-30 w-full overflow-hidden bg-transparent ${
+        isWaiterCabinet
+          ? "max-lg:mx-0 max-lg:mt-0 max-lg:w-full max-lg:rounded-none border-0 lg:mx-3 lg:mt-2 lg:w-[calc(100%-1.5rem)] lg:rounded-[10px]"
+          : "mx-0 mt-2 rounded-lg md:rounded-[10px] lg:mx-3 lg:w-[calc(100%-1.5rem)]"
+      } ${hideMobileSiteNav && !isWaiterCabinet ? "border-0" : !isWaiterCabinet ? "border border-white/10" : ""}${
+        isCabinetM5Header ? " site-header--cabinet-m5" : ""
+      }`}
     >
-        <div className="mx-auto flex h-16 w-full items-center justify-between px-4 sm:px-6 lg:px-8">
+      {isWaiterCabinet ? (
+        <div className="cabinet-mobile-header-slim lg:hidden flex items-center justify-end gap-1 border-b border-black/[0.09] bg-transparent px-3 pb-2 pt-[max(0.35rem,env(safe-area-inset-top,0px))] dark:border-white/[0.12]">
+          <ThemeToggle variant={isCabinetM5Header ? "m5" : "default"} />
+          {hideMobileSiteNav && panelMenu ? (
+            <button
+              ref={panelMenu.menuButtonRef}
+              type="button"
+              onClick={() => panelMenu.setSidebarOpen((o) => !o)}
+              className={`min-h-[44px] min-w-[44px] inline-flex items-center justify-center rounded-lg text-[var(--color-brand-gold)] hover:bg-[var(--color-brand-gold)]/10 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-gold)]/50 focus-visible:ring-offset-2${isCabinetM5Header ? " site-header-m5-menu-btn" : ""}`}
+              aria-label="Меню"
+              aria-expanded={panelMenu.sidebarOpen}
+              aria-haspopup="dialog"
+              aria-controls={panelMenuControlsId}
+            >
+              <Menu className="h-5 w-5 shrink-0" strokeWidth={2} aria-hidden />
+            </button>
+          ) : null}
+        </div>
+      ) : null}
+        <div
+          className={`mx-auto flex h-16 w-full items-center justify-between px-4 sm:px-6 lg:px-8${isWaiterCabinet ? " max-lg:hidden" : ""}`}
+        >
         <Link
           href={site.logo.href}
           className="flex items-center gap-2"

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Plus, Trash2, Pencil, ChevronLeft, Copy } from "lucide-react";
 import QRCode from "qrcode";
 import { authHeaders } from "@/lib/auth-client";
+import { EstablishmentDataGridPlaceholder } from "@/components/establishment/EstablishmentDataGridPlaceholder";
 
 interface TableRow {
   id: string;
@@ -36,7 +37,7 @@ function GuestTablePayCell({ slug }: { slug: string }) {
       queueMicrotask(() => setQr(null));
       return;
     }
-    void QRCode.toDataURL(abs, { width: 168, margin: 1, errorCorrectionLevel: "M" })
+    void QRCode.toDataURL(abs, { width: 208, margin: 1, errorCorrectionLevel: "M" })
       .then((d) => queueMicrotask(() => setQr(d)))
       .catch(() => queueMicrotask(() => setQr(null)));
   }, [url]);
@@ -54,20 +55,20 @@ function GuestTablePayCell({ slug }: { slug: string }) {
 
   return (
     <div className="mt-2 w-full border-t border-[var(--color-brand-gold)]/15 pt-2 text-center">
-      <p className="text-[11px] font-medium uppercase tracking-wide text-white/65">
+      <p className="text-[9px] font-medium uppercase tracking-[0.06em] text-white/55 sm:text-[10px]">
         Постоянная ссылка и QR для гостя
       </p>
-      <div className="mt-2 flex flex-col items-center gap-2 sm:flex-row sm:items-start sm:justify-center">
+      <div className="mt-2 flex flex-col items-center gap-2.5 sm:flex-row sm:items-start sm:justify-center">
         {qr ? (
           // eslint-disable-next-line @next/next/no-img-element -- data URL из qrcode
-          <img src={qr} alt="" width={80} height={80} className="shrink-0 rounded border border-white/10 bg-white p-1" />
+          <img src={qr} alt="" width={100} height={100} className="shrink-0 rounded border border-white/10 bg-white p-1" />
         ) : null}
         <div className="flex min-w-0 max-w-full flex-1 flex-col items-center space-y-2 sm:items-start sm:text-left">
           <a
             href={url || undefined}
             target="_blank"
             rel="noopener noreferrer"
-            className="block max-w-full break-all text-center font-mono text-[11px] text-[var(--color-brand-gold)] underline sm:text-left"
+            className="block max-w-full break-all text-center font-mono text-[13px] leading-snug text-[var(--color-brand-gold)] underline sm:text-left"
           >
             {url || "…"}
           </a>
@@ -75,9 +76,9 @@ function GuestTablePayCell({ slug }: { slug: string }) {
             type="button"
             onClick={copy}
             disabled={!url}
-            className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-[var(--color-brand-gold)]/35 bg-white/5 px-2.5 py-1 text-[11px] text-white/90 hover:bg-white/10 disabled:opacity-40"
+            className="inline-flex items-center justify-center gap-1 rounded-md border border-[var(--color-brand-gold)]/30 bg-white/5 px-2 py-0.5 text-[10px] font-medium leading-tight text-white/88 hover:bg-white/10 disabled:opacity-40"
           >
-            <Copy className="h-3.5 w-3.5 shrink-0" aria-hidden />
+            <Copy className="h-3 w-3 shrink-0" aria-hidden />
             {copied ? "Скопировано" : "Копировать"}
           </button>
         </div>
@@ -347,7 +348,7 @@ export default function EstablishmentHallsPage() {
 
       <form
         onSubmit={createHall}
-        className="ft-panel-section-toolbar ft-panel-section-toolbar--row min-w-0 rounded-lg border border-[var(--color-brand-gold)]/30 bg-[#0d0e12] p-2.5 shadow-[var(--shadow-subtle)]"
+        className="ft-panel-section-toolbar ft-panel-section-toolbar--row min-w-0 rounded-lg border border-[var(--color-brand-gold)]/30 bg-[var(--establishment-charcoal)] p-2.5 shadow-[var(--shadow-subtle)]"
       >
         <div className="min-w-0 w-60 max-w-full shrink text-center sm:w-72 sm:text-left">
           <label htmlFor="new-hall" className="mb-1 block text-xs text-white/70">
@@ -373,14 +374,23 @@ export default function EstablishmentHallsPage() {
       </form>
 
       {halls.length === 0 ? (
-        <p className="text-center text-xs text-white/70">Пока нет залов — добавьте первый.</p>
+        <EstablishmentDataGridPlaceholder
+          rows={4}
+          columns={[
+            { label: "Зал", colClassName: "min-w-[5.5rem]" },
+            { label: "Стол", colClassName: "min-w-[4.5rem]" },
+            { label: "Вместимость", colClassName: "min-w-[4.5rem]" },
+            { label: "Код", colClassName: "min-w-[4rem] w-full" },
+          ]}
+          footerNote="Пока нет залов — добавьте первый выше."
+        />
       ) : null}
 
       <div className="flex flex-col gap-2">
         {halls.map((hall) => (
           <section
             key={hall.id}
-            className="min-w-0 rounded-lg border border-[var(--color-brand-gold)]/30 bg-[#0d0e12] p-2.5 shadow-[var(--shadow-subtle)] sm:p-3"
+            className="min-w-0 rounded-lg border border-[var(--color-brand-gold)]/30 bg-[var(--establishment-charcoal)] p-2.5 shadow-[var(--shadow-subtle)] sm:p-3"
           >
             <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
               <div className="min-w-0 flex-1">
@@ -439,11 +449,11 @@ export default function EstablishmentHallsPage() {
               {hall.tables.map((t) => (
                 <li
                   key={t.id}
-                  className="flex flex-wrap items-center justify-between gap-1.5 rounded-md border border-[var(--color-brand-gold)]/20 bg-[#0d0e12] px-2 py-1.5"
+                  className="flex flex-wrap items-center justify-between gap-1.5 rounded-md border border-[var(--color-brand-gold)]/20 bg-[var(--establishment-charcoal)] px-2 py-1.5"
                 >
                   <div className="min-w-0">
-                    <span className="text-xs font-medium text-white">{t.label}</span>
-                    <span className="ml-1.5 text-[11px] text-white/72">до {t.capacity} гостей</span>
+                    <span className="text-sm font-medium text-white">{t.label}</span>
+                    <span className="ml-2 text-sm text-white/80">до {t.capacity} гостей</span>
                     {t.externalCode ? (
                       <span className="ml-1.5 font-mono text-[10px] text-white/72 opacity-80">
                         {t.externalCode}

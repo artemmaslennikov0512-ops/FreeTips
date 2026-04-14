@@ -406,7 +406,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
     <CabinetMobileNavProvider value={mobileNavValue}>
     <LkPresenceHeartbeat />
     <div
-      className={`cabinet-premium flex min-h-screen w-full max-w-full overflow-x-hidden font-[family:var(--font-inter)] text-[var(--color-text)] pt-2 lg:pt-4 ${isM5Cabinet ? "bg-transparent" : "bg-[var(--color-bg)]"}`}
+      className={`cabinet-premium flex min-h-screen w-full max-w-full overflow-x-hidden font-[family:var(--font-inter)] text-[var(--color-text)] max-lg:pt-0 pt-2 lg:pt-4 ${isM5Cabinet ? "bg-transparent" : "bg-[var(--color-bg)]"}`}
       data-brand-active={applyEstablishmentBrand ? "true" : undefined}
       data-cabinet-theme={isM5Cabinet ? "m5-competition" : undefined}
       style={Object.keys(brandStyle).length ? brandStyle : undefined}
@@ -590,9 +590,9 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
         </button>
       )}
 
-      <main className="relative min-h-screen min-w-0 flex-1 px-0 pt-1.5 pb-3 lg:px-0 lg:pt-2 lg:pr-3 lg:ml-0 lg:mr-0 flex flex-col">
+      <main className="relative min-h-screen min-w-0 flex-1 px-0 max-lg:pt-0 pt-1.5 pb-3 lg:px-0 lg:pt-2 lg:pr-3 lg:ml-0 lg:mr-0 flex flex-col">
         <div
-          className="cabinet-main-block app-panel-main-surface relative z-10 mt-0 mr-0 mb-3 ml-0 flex min-h-0 w-full max-w-full flex-1 flex-col rounded-lg border-x border-b border-white/10 backdrop-blur-xl md:rounded-[10px] lg:z-0 lg:mr-3 lg:ml-3"
+          className="cabinet-main-block app-panel-main-surface relative z-10 mt-0 mr-0 mb-3 ml-0 flex min-h-0 w-full max-w-full flex-1 flex-col rounded-lg border-x border-b border-white/10 backdrop-blur-xl md:rounded-[10px] lg:z-0 lg:mr-3 lg:ml-3 max-lg:mb-0 max-lg:ml-0 max-lg:mr-0 max-lg:rounded-none max-lg:border-0 max-lg:bg-transparent max-lg:shadow-none max-lg:backdrop-blur-none"
           style={mainBlockStyle}
         >
           {pathname !== "/cabinet" && (

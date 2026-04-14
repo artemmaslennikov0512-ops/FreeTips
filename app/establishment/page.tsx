@@ -90,7 +90,7 @@ export default function EstablishmentPage() {
   const limitText = `${employeesCount}`;
 
   return (
-    <div className="cabinet-card flex min-h-0 min-w-0 w-full max-w-full flex-col rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden">
+    <div className="establishment-dashboard-surface cabinet-card flex min-h-0 min-w-0 w-full max-w-full flex-col rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden">
       <div className="flex min-h-0 flex-1 flex-col px-4 py-3 sm:px-5 sm:py-4">
         <div className="flex min-h-0 w-full flex-1 flex-col items-center justify-between gap-3">
           <div className="flex w-full shrink-0 flex-col items-center gap-3 sm:gap-4">

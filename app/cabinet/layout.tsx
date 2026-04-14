@@ -39,10 +39,10 @@ import { readCabinetNavRoleCache, writeCabinetNavRoleCache } from "@/lib/cabinet
 const CABINET_LG_SIDEBAR_COLLAPSED_KEY = "cabinet-lg-sidebar-collapsed";
 
 const LG_SIDEBAR_COLLAPSE_BTN =
-  "cabinet-lg-sidebar-toggle cabinet-lg-sidebar-toggle--collapse relative z-30 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/10 text-[var(--color-text)] shadow-none transition-[color,background-color,border-color] duration-200 hover:border-white/35 hover:bg-white/[0.14] hover:text-[var(--color-text)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-gold)]/35 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent";
+  "cabinet-lg-sidebar-toggle cabinet-lg-sidebar-toggle--collapse relative z-30 inline-flex h-8 min-h-8 w-[2.125rem] shrink-0 items-center justify-center rounded-md border border-white/20 bg-white/10 px-0 text-[var(--color-text)] shadow-none transition-[color,background-color,border-color] duration-200 hover:border-white/35 hover:bg-white/[0.14] hover:text-[var(--color-text)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-gold)]/35 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent";
 
 const LG_SIDEBAR_EXPAND_BTN =
-  "cabinet-lg-sidebar-toggle cabinet-lg-sidebar-toggle--expand fixed left-0 top-1/2 z-[35] hidden h-9 w-9 -translate-y-1/2 translate-x-1/2 items-center justify-center rounded-full border border-white/20 bg-[var(--color-navy)] text-[var(--color-text)] shadow-none transition-[color,background-color,border-color] duration-200 hover:border-white/35 hover:bg-white/[0.08] hover:text-[var(--color-text)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-gold)]/35 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent lg:flex";
+  "cabinet-lg-sidebar-toggle cabinet-lg-sidebar-toggle--expand fixed left-0 top-1/2 z-[35] hidden h-8 min-h-8 w-[2.125rem] -translate-y-1/2 translate-x-1/2 items-center justify-center rounded-md border border-white/20 bg-[var(--color-navy)] px-0 text-[var(--color-text)] shadow-none transition-[color,background-color,border-color] duration-200 hover:border-white/35 hover:bg-white/[0.08] hover:text-[var(--color-text)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-gold)]/35 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent lg:inline-flex";
 
 type CabinetNavItem = {
   label: string;
@@ -477,12 +477,12 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
             </div>
           </div>
         </div>
-        <div className="mb-2 mt-4 flex h-9 shrink-0 items-center px-3">
-          <span className="w-9 shrink-0 select-none" aria-hidden />
+        <div className="mb-2 mt-4 flex h-8 shrink-0 items-center px-3">
+          <span className="w-8 shrink-0 select-none" aria-hidden />
           <span className="cabinet-nav-label min-w-0 flex-1 text-center text-xs font-medium uppercase leading-none tracking-wider text-[var(--color-text)]/50">
             Навигация
           </span>
-          <div className="flex h-9 w-9 shrink-0 items-center justify-end">
+          <div className="flex h-8 min-w-[2.125rem] shrink-0 items-center justify-end">
             <button
               type="button"
               onClick={() => setSidebarCollapsedPersisted(true)}
@@ -490,7 +490,10 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
               aria-label="Скрыть боковое меню"
               title="Скрыть меню"
             >
-              <ChevronLeft className="h-5 w-5 shrink-0" strokeWidth={2} aria-hidden />
+              <span className="pointer-events-none inline-flex items-center justify-center" aria-hidden>
+                <ChevronLeft className="h-3.5 w-3.5 shrink-0 -mr-[5px]" strokeWidth={2} />
+                <ChevronLeft className="h-3.5 w-3.5 shrink-0" strokeWidth={2} />
+              </span>
             </button>
           </div>
         </div>
@@ -502,11 +505,11 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
             {visibleNavGroups.map((group) => (
               <div
                 key={group.title}
-                className="mt-3 border-t border-[var(--color-brand-gold)]/12 pt-3 first:mt-0 first:border-t-0 first:pt-0"
+                className="mt-3 border-t border-[var(--color-brand-gold)]/12 pt-3 first:mt-0 first:border-t-0 first:pt-2"
                 role="group"
                 aria-label={group.title}
               >
-                <div className="px-2.5 pb-1.5 pt-0.5 text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-[var(--color-text)]/40">
+                <div className="cabinet-nav-group-title px-2.5 pb-2 pt-1 text-[0.6875rem] font-semibold uppercase leading-snug tracking-[0.12em]">
                   {group.title}
                 </div>
                 <div className="flex flex-col gap-0.5">
@@ -543,7 +546,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
                 role="group"
                 aria-label="Связанные кабинеты"
               >
-                <div className="px-2.5 pb-1.5 pt-0.5 text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-[var(--color-text)]/40">
+                <div className="cabinet-nav-group-title px-2.5 pb-2 pt-1 text-[0.6875rem] font-semibold uppercase leading-snug tracking-[0.12em]">
                   Связанные кабинеты
                 </div>
                 <div className="flex flex-col gap-0.5">
@@ -580,7 +583,10 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
           aria-label="Показать боковое меню"
           title="Меню"
         >
-          <ChevronRight className="h-5 w-5 shrink-0" strokeWidth={2} aria-hidden />
+          <span className="pointer-events-none inline-flex items-center justify-center" aria-hidden>
+            <ChevronRight className="h-3.5 w-3.5 shrink-0 -mr-[5px]" strokeWidth={2} />
+            <ChevronRight className="h-3.5 w-3.5 shrink-0" strokeWidth={2} />
+          </span>
         </button>
       )}
 

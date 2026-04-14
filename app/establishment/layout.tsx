@@ -7,6 +7,7 @@ import type { LucideIcon } from "lucide-react";
 import {
   LayoutDashboard,
   Layers,
+  Building2,
   CalendarDays,
   UserCircle2,
   UtensilsCrossed,
@@ -49,6 +50,7 @@ const NAV_GROUPS: EstablishmentNavGroup[] = [
   {
     title: "Работа в зале",
     items: [
+      { label: "Залы и столы", href: "/establishment/halls", icon: Building2 },
       { label: "Бронь", href: "/establishment/bookings", icon: CalendarDays },
       { label: "Гости", href: "/establishment/guests", icon: UserCircle2 },
       { label: "Меню", href: "/establishment/menu", icon: UtensilsCrossed },
@@ -202,12 +204,12 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
       {/* Сайдбар выше затемнения (fixed + z); на lg остаётся в потоке */}
       <aside
         id="establishment-mobile-nav"
-        className={`cabinet-sidebar fixed left-0 top-0 z-[100] flex max-h-[100vh] w-[min(calc(100vw-4rem),18.5rem)] max-w-[18.5rem] flex-col overflow-y-auto overflow-x-hidden rounded-[10px] border border-white/10 py-3 shadow-2xl backdrop-blur-xl transition-[transform] duration-300 ease-out lg:static lg:left-auto lg:top-auto lg:ml-0 lg:mt-1.5 lg:mr-0 lg:mb-0 lg:max-h-none lg:z-auto lg:w-[13.75rem] lg:max-w-none lg:translate-x-0 lg:border lg:self-start bg-white/[0.06] ${
+        className={`cabinet-sidebar fixed left-0 top-0 z-[100] flex max-h-[100vh] w-[min(calc(100vw-4rem),19.25rem)] max-w-[19.25rem] flex-col overflow-y-auto overflow-x-hidden rounded-[10px] border border-white/10 py-3 shadow-2xl backdrop-blur-xl transition-[transform] duration-300 ease-out lg:static lg:left-auto lg:top-auto lg:ml-0 lg:mt-1.5 lg:mr-0 lg:mb-0 lg:max-h-none lg:z-auto lg:w-[14.75rem] lg:max-w-none lg:translate-x-0 lg:border lg:self-start bg-white/[0.06] ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         <div className="mb-2 w-full shrink-0 px-2.5 text-center">
-          <span className="inline-block font-[family:var(--font-playfair)] text-base font-bold leading-tight text-white">
+          <span className="inline-block font-[family:var(--font-playfair)] text-[1.0625rem] font-bold leading-tight text-white">
             Кабинет заведения
           </span>
         </div>
@@ -223,7 +225,7 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
                 role="group"
                 aria-label={group.title}
               >
-                <div className="px-2 pb-1 pt-0.5 text-[0.6rem] font-semibold uppercase tracking-[0.1em] text-white/40">
+                <div className="px-2 pb-1 pt-0.5 text-[0.6875rem] font-semibold uppercase tracking-[0.1em] text-white/40">
                   {group.title}
                 </div>
                 <div className="flex flex-col gap-px">
@@ -232,13 +234,13 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
                       key={href}
                       href={href}
                       onClick={closeSidebar}
-                      className={`flex items-center gap-2 rounded-md px-2 py-1.5 text-[0.8125rem] font-normal leading-snug transition-colors ${
+                      className={`flex items-center gap-2.5 rounded-md px-2 py-[0.4375rem] text-sm font-normal leading-snug transition-colors ${
                         isActive(href)
                           ? "cabinet-nav-active border border-[#0a192f]/35 bg-[#0a192f]/12 text-[#0a192f] font-medium"
                           : "border border-transparent text-white/80 hover:bg-[var(--color-dark-gray)]/10 hover:text-white"
                       }`}
                     >
-                      <Icon className="cabinet-nav-item-icon h-4 w-4 shrink-0" aria-hidden />
+                      <Icon className="cabinet-nav-item-icon size-[1.125rem] shrink-0" aria-hidden />
                       <span className="min-w-0 break-words">{label}</span>
                     </Link>
                   ))}
@@ -249,9 +251,9 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
           <button
             type="button"
             onClick={handleLogout}
-            className="mt-2 flex w-full items-center justify-center gap-2 rounded-md px-2 py-1.5 text-xs font-medium text-white/80 transition-colors hover:bg-[var(--color-dark-gray)]/10 hover:text-white"
+            className="mt-2 flex w-full items-center justify-center gap-2 rounded-md px-2 py-2 text-[0.8125rem] font-medium text-white/80 transition-colors hover:bg-[var(--color-dark-gray)]/10 hover:text-white"
           >
-            <LogOut className="h-3.5 w-3.5 shrink-0" />
+            <LogOut className="size-4 shrink-0" />
             <span>Выйти</span>
           </button>
         </div>

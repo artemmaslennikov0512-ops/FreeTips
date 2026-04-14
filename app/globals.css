@@ -816,25 +816,41 @@ body.cabinet-page:has(.cabinet-premium[data-cabinet-theme="m5-competition"])
     inset 0 1px 0 rgba(255, 255, 255, 0.08),
     0 0 20px rgba(28, 105, 212, 0.08);
 }
-/* Светлая тема: белый фон + золотая обводка; без blur; лёгкая тень, чтобы не «кричала» на карточке */
-html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-dashboard-name-hero__pill {
-  border-color: rgba(197, 165, 114, 0.4);
-  background: #ffffff;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+/* Светлая тема ЛК официанта: плашка ФИО как «Операции» / «Вывод» (.cabinet-waiter-btn) */
+html:not([data-theme="dark"])
+  body.cabinet-page
+  .cabinet-premium:not([data-cabinet-theme="m5-competition"])
+  .cabinet-dashboard-name-hero__pill {
+  border: 1px solid rgba(197, 165, 114, 0.55);
+  background: transparent;
+  box-shadow: none;
+  padding: 0.4375rem 0.875rem;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
 }
-html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-dashboard-name-hero__text:not(.cabinet-dashboard-name-hero__text--m5) {
+html:not([data-theme="dark"])
+  body.cabinet-page
+  .cabinet-premium:not([data-cabinet-theme="m5-competition"])
+  .cabinet-dashboard-name-hero__pill:hover {
+  background: rgba(197, 165, 114, 0.12);
+}
+html:not([data-theme="dark"])
+  body.cabinet-page
+  .cabinet-premium:not([data-cabinet-theme="m5-competition"])
+  .cabinet-dashboard-name-hero__text:not(.cabinet-dashboard-name-hero__text--m5) {
   background-image: none;
   -webkit-background-clip: unset;
   background-clip: unset;
-  color: #1a1611;
-  -webkit-text-fill-color: #1a1611;
+  color: #c5a572 !important;
+  -webkit-text-fill-color: #c5a572;
   filter: none;
+  font-weight: 500;
+  font-size: 0.8125rem;
+  line-height: 1.25;
   font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
-/* Тёмная тема: ФИО на дашборде — без градиентного «вырезания», нормальный контраст (Inter) */
+/* Тёмная тема: ФИО на дашборде — без градиентного «вырезания» (админка, заведение и т.д. — светлый текст) */
 [data-theme="dark"] .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-dashboard-name-hero__text:not(.cabinet-dashboard-name-hero__text--m5) {
   background-image: none !important;
   -webkit-background-clip: unset !important;
@@ -843,6 +859,26 @@ html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-compe
   -webkit-text-fill-color: rgba(250, 250, 250, 0.96) !important;
   filter: none !important;
   font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+}
+
+/* Тёмная тема ЛК официанта: плашка ФИО как «Операции» / «Вывод» (перебивает блок выше) */
+[data-theme="dark"] body.cabinet-page .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-dashboard-name-hero__pill {
+  border: 1px solid rgba(197, 165, 114, 0.55);
+  background: transparent;
+  box-shadow: none;
+  padding: 0.4375rem 0.875rem;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+[data-theme="dark"] body.cabinet-page .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-dashboard-name-hero__pill:hover {
+  background: rgba(197, 165, 114, 0.12);
+}
+[data-theme="dark"] body.cabinet-page .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-dashboard-name-hero__text:not(.cabinet-dashboard-name-hero__text--m5) {
+  color: #c5a572 !important;
+  -webkit-text-fill-color: #c5a572 !important;
+  font-weight: 500;
+  font-size: 0.8125rem;
+  line-height: 1.25;
 }
 @media (prefers-reduced-motion: reduce) {
   .cabinet-dashboard-name-hero__pill,
@@ -1829,6 +1865,15 @@ html:not([data-theme="dark"]) .cabinet-mobile-nav-dialog[data-cabinet-theme="m5-
   backdrop-filter: blur(12px);
   isolation: isolate;
 }
+
+/* Полноэкранное моб. меню ЛК: без ограничения высоты и без тени «карточки» */
+html:not([data-theme="dark"]) .cabinet-mobile-nav-dialog--fullscreen.cabinet-mobile-nav-dialog:not([data-cabinet-theme="m5-competition"]),
+[data-theme="dark"] .cabinet-mobile-nav-dialog--fullscreen.cabinet-mobile-nav-dialog:not([data-cabinet-theme="m5-competition"]),
+html:not([data-theme="dark"]) .cabinet-mobile-nav-dialog--fullscreen.cabinet-mobile-nav-dialog[data-cabinet-theme="m5-competition"],
+[data-theme="dark"] .cabinet-mobile-nav-dialog--fullscreen.cabinet-mobile-nav-dialog[data-cabinet-theme="m5-competition"] {
+  max-height: none !important;
+  box-shadow: none !important;
+}
 [data-theme="dark"] .cabinet-mobile-nav-dialog:not([data-cabinet-theme="m5-competition"]) a,
 [data-theme="dark"] .cabinet-mobile-nav-dialog:not([data-cabinet-theme="m5-competition"]) button {
   color: rgba(250, 250, 250, 0.9) !important;
@@ -1973,6 +2018,20 @@ html:not([data-theme="dark"]) .admin-panel .admin-sidebar .cabinet-nav-block nav
 /* Светлая тема: подпись «Навигация» в сайдбаре */
 html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-sidebar:not(.admin-sidebar) .cabinet-nav-label {
   color: rgba(255, 255, 255, 0.8) !important;
+}
+
+/* Светлая тема ЛК официанта: заголовки групп (ОБЗОР…, ЗАВЕДЕНИЕ…) — светлый кегль на navy, не --color-text/40 (тёмный на тёмном) */
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-sidebar:not(.admin-sidebar) .cabinet-nav-group-title,
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-nav-dropdown .cabinet-nav-group-title,
+html:not([data-theme="dark"]) .cabinet-mobile-nav-dialog:not([data-cabinet-theme="m5-competition"]) .cabinet-nav-group-title {
+  color: rgba(255, 255, 255, 0.82) !important;
+}
+
+/* Тёмная тема: те же заголовки — чуть выше контраст к фону nav */
+[data-theme="dark"] .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-sidebar:not(.admin-sidebar) .cabinet-nav-group-title,
+[data-theme="dark"] .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-nav-dropdown .cabinet-nav-group-title,
+[data-theme="dark"] .cabinet-mobile-nav-dialog:not([data-cabinet-theme="m5-competition"]) .cabinet-nav-group-title {
+  color: rgba(250, 250, 250, 0.58) !important;
 }
 
 /* ЛК официанта: один цвет иконок в навигации (сайдбар + мобильное меню) */
@@ -5070,19 +5129,79 @@ html:not([data-theme="dark"]) .establishment-team-table .establishment-team-tabl
   border-right: none;
 }
 
-/* Модалка «Редактировать сотрудника» — всегда тёмная (и в светлой теме кабинета заведения) */
-.establishment-edit-modal {
+/* Модалка «Редактировать сотрудника» — всегда тёмная (и в светлой теме кабинета заведения).
+   Префикс body…panel перебивает [data-theme="dark"] .cabinet-premium .cabinet-input-window { #363636 }. */
+body.establishment-page .establishment-panel .establishment-edit-modal {
   background-color: #1e2a3a !important;
 }
-.establishment-edit-modal h2,
-.establishment-edit-modal label,
-.establishment-edit-modal .cabinet-input-window,
-.establishment-edit-modal .cabinet-input-window::placeholder {
+body.establishment-page .establishment-panel .establishment-edit-modal h2,
+body.establishment-page .establishment-panel .establishment-edit-modal label,
+body.establishment-page .establishment-panel .establishment-edit-modal .cabinet-input-window,
+body.establishment-page .establishment-panel .establishment-edit-modal .cabinet-input-window::placeholder {
   color: rgba(255, 255, 255, 0.95) !important;
 }
-.establishment-edit-modal .cabinet-input-window {
+body.establishment-page .establishment-panel .establishment-edit-modal .cabinet-input-window {
   background: rgba(45, 55, 72, 0.6) !important;
   border-color: rgba(197, 165, 114, 0.35) !important;
+}
+
+/*
+ * Тёмная тема сайта: ЛК заведения — поля в main перебивают «чатовый» #363636 у .cabinet-premium,
+ * чтобы формы/модалки новых разделов совпадали с navy (#1e2a3a) и золотой обводкой.
+ */
+[data-theme="dark"] body.establishment-page .establishment-panel.cabinet-premium #main-content input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="hidden"]):not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="range"]):not([type="color"]),
+[data-theme="dark"] body.establishment-page .establishment-panel.cabinet-premium #main-content textarea,
+[data-theme="dark"] body.establishment-page .establishment-panel.cabinet-premium #main-content select {
+  background: rgba(10, 25, 47, 0.55) !important;
+  background-color: rgba(10, 25, 47, 0.55) !important;
+  border: 1px solid rgba(197, 165, 114, 0.3) !important;
+  color: rgba(255, 255, 255, 0.96) !important;
+  -webkit-text-fill-color: rgba(255, 255, 255, 0.96) !important;
+  caret-color: rgba(255, 255, 255, 0.96);
+}
+[data-theme="dark"] body.establishment-page .establishment-panel.cabinet-premium #main-content input::placeholder,
+[data-theme="dark"] body.establishment-page .establishment-panel.cabinet-premium #main-content textarea::placeholder {
+  color: rgba(255, 255, 255, 0.48) !important;
+  -webkit-text-fill-color: rgba(255, 255, 255, 0.48) !important;
+  opacity: 1;
+}
+[data-theme="dark"] body.establishment-page .establishment-panel.cabinet-premium #main-content .cabinet-input-window {
+  background: rgba(45, 55, 72, 0.58) !important;
+  border: 1px solid rgba(197, 165, 114, 0.32) !important;
+}
+[data-theme="dark"] body.establishment-page .establishment-panel.cabinet-premium #main-content .cabinet-input-window input,
+[data-theme="dark"] body.establishment-page .establishment-panel.cabinet-premium #main-content .cabinet-input-window textarea {
+  background: transparent !important;
+  border: none !important;
+  color: rgba(255, 255, 255, 0.96) !important;
+  -webkit-text-fill-color: rgba(255, 255, 255, 0.96) !important;
+}
+[data-theme="dark"] body.establishment-page .establishment-panel.cabinet-premium #main-content .cabinet-input-window input::placeholder,
+[data-theme="dark"] body.establishment-page .establishment-panel.cabinet-premium #main-content .cabinet-input-window textarea::placeholder {
+  color: rgba(255, 255, 255, 0.48) !important;
+  -webkit-text-fill-color: rgba(255, 255, 255, 0.48) !important;
+}
+[data-theme="dark"] body.establishment-page .establishment-panel.cabinet-premium #main-content select option {
+  background: #1e2a3a;
+  color: rgba(255, 255, 255, 0.95);
+}
+[data-theme="dark"] body.establishment-page .establishment-panel.cabinet-premium #main-content input:-webkit-autofill,
+[data-theme="dark"] body.establishment-page .establishment-panel.cabinet-premium #main-content input:-webkit-autofill:hover,
+[data-theme="dark"] body.establishment-page .establishment-panel.cabinet-premium #main-content input:-webkit-autofill:focus,
+[data-theme="dark"] body.establishment-page .establishment-panel.cabinet-premium #main-content textarea:-webkit-autofill,
+[data-theme="dark"] body.establishment-page .establishment-panel.cabinet-premium #main-content textarea:-webkit-autofill:hover,
+[data-theme="dark"] body.establishment-page .establishment-panel.cabinet-premium #main-content textarea:-webkit-autofill:focus,
+[data-theme="dark"] body.establishment-page .establishment-panel.cabinet-premium #main-content input:autofill,
+[data-theme="dark"] body.establishment-page .establishment-panel.cabinet-premium #main-content textarea:autofill {
+  background-color: rgba(10, 25, 47, 0.55) !important;
+  background-image: none !important;
+  color: rgba(255, 255, 255, 0.96) !important;
+  border: 1px solid rgba(197, 165, 114, 0.3) !important;
+  -webkit-text-fill-color: rgba(255, 255, 255, 0.96) !important;
+  caret-color: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 0 0 1000px rgba(10, 25, 47, 0.72) inset !important;
+  filter: none !important;
+  transition: background-color 99999s ease-out 0s !important;
 }
 
 /* ---- Админка: единые кнопки (капсула, золото как «Выслать токен») ---- */
@@ -5956,6 +6075,19 @@ body {
   font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
+/*
+ * Фокус с мыши/тапа: без видимой обводки и без «кольца» Tailwind — убирает мигание по клику.
+ * Навигация с клавиатуры остаётся через :focus-visible (где задано в компонентах / .focus-visible:ring).
+ */
+html {
+  -webkit-tap-highlight-color: transparent;
+}
+:focus:not(:focus-visible) {
+  outline: none !important;
+  --tw-ring-offset-shadow: 0 0 #0000 !important;
+  --tw-ring-shadow: 0 0 #0000 !important;
+}
+
 /* Тёмная тема: фон страницы — однотонный тёмный, без фото; матовое стекло блоков сохраняется */
 [data-theme="dark"] body.cabinet-page {
   background: #0d0e12;
@@ -5979,14 +6111,14 @@ body {
   min-height: 100vh;
 }
 
-/* Кабинет заведения (тёмная тема): панель и основной блок — тот же «чёрный», что у body (#0d0e12), без blur-светлости на main */
-[data-theme="dark"] body.establishment-page .establishment-panel.cabinet-premium {
-  background: #0d0e12 !important;
-}
-[data-theme="dark"] body.establishment-page .establishment-panel.cabinet-premium .cabinet-main-block {
-  background: #0d0e12 !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
+/* Кабинет заведения (тёмная тема): карточка дашборда — как сайдбар (не cabinet-main-block) */
+[data-theme="dark"] body.establishment-page .establishment-panel.cabinet-premium .cabinet-card.establishment-dashboard-surface {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(192, 192, 192, 0.4) !important;
+  box-shadow:
+    0 4px 14px rgba(0, 0, 0, 0.3),
+    0 2px 6px rgba(0, 0, 0, 0.2),
+    0 0 0 1px rgba(192, 192, 192, 0.08) !important;
 }
 
 img, video, svg {

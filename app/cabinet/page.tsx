@@ -573,18 +573,6 @@ export default function CabinetDashboardPage() {
                   {tipLink}
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={copyTipLink}
-                    className={
-                      isM5Cabinet
-                        ? m5BtnPairRed
-                        : `${CABINET_WAITER_BTN_INLINE} px-4 py-2 text-[14px]`
-                    }
-                  >
-                    <Copy className="h-4 w-4" />
-                    {linkCopied ? "Скопировано!" : "Копировать ссылку"}
-                  </button>
                   <a
                     href={tipLink}
                     target="_blank"
@@ -598,6 +586,18 @@ export default function CabinetDashboardPage() {
                     <ExternalLink className="h-4 w-4" />
                     Перейти по ссылке
                   </a>
+                  <button
+                    type="button"
+                    onClick={copyTipLink}
+                    className={
+                      isM5Cabinet
+                        ? m5BtnPairRed
+                        : `${CABINET_WAITER_BTN_INLINE} px-4 py-2 text-[14px]`
+                    }
+                  >
+                    <Copy className="h-4 w-4" />
+                    {linkCopied ? "Скопировано!" : "Копировать ссылку"}
+                  </button>
                 </div>
               </div>
             )}

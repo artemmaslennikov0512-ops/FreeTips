@@ -177,16 +177,16 @@ export function CabinetMobileNavPortals() {
         role="dialog"
         aria-modal="true"
         aria-label="Меню навигации"
-        className={`cabinet-mobile-nav-dialog cabinet-nav-dropdown fixed left-1/2 top-1/2 z-[2010] w-[min(calc(100vw-1.5rem),22rem)] max-h-[min(85dvh,560px)] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-[10px] border border-[var(--color-brand-gold)]/20 shadow-[var(--shadow-card)] backdrop-blur-xl transition-[opacity,transform] duration-200 lg:hidden ${
-          sidebarOpen ? "scale-100 opacity-100" : "pointer-events-none scale-95 opacity-0"
+        className={`cabinet-mobile-nav-dialog cabinet-nav-dropdown cabinet-mobile-nav-dialog--fullscreen fixed inset-0 z-[2010] flex h-[100dvh] min-h-0 max-h-none w-full flex-col overflow-hidden rounded-none border border-[var(--color-brand-gold)]/25 shadow-none backdrop-blur-xl transition-opacity duration-200 lg:hidden ${
+          sidebarOpen ? "opacity-100" : "pointer-events-none opacity-0"
         }`}
         data-cabinet-theme={isM5Cabinet ? "m5-competition" : undefined}
         style={sidebarStyle}
         aria-hidden={!sidebarOpen}
       >
-        <div className="cabinet-nav-dropdown-inner overflow-hidden rounded-[10px] px-3 py-3">
+        <div className="cabinet-nav-dropdown-inner flex min-h-0 flex-1 flex-col overflow-hidden px-3 pt-[max(0.75rem,env(safe-area-inset-top,0px))] pb-[max(0.75rem,env(safe-area-inset-bottom,0px))]">
           <div
-            className={`cabinet-sidebar-profile cabinet-block-inner mb-4 rounded-[10px] border border-[var(--color-brand-gold)]/20 px-3 py-2.5 ${!sidebarBg ? "bg-[var(--color-dark-gray)]/10" : ""}`}
+            className={`cabinet-sidebar-profile cabinet-block-inner mb-3 shrink-0 rounded-[10px] border border-[var(--color-brand-gold)]/20 px-3 py-2.5 ${!sidebarBg ? "bg-[var(--color-dark-gray)]/10" : ""}`}
             style={Object.keys(profileBlockStyle).length ? profileBlockStyle : undefined}
           >
             <div className="flex items-center gap-2.5">
@@ -225,19 +225,21 @@ export function CabinetMobileNavPortals() {
               </div>
             </div>
           </div>
-          <p className="cabinet-nav-label mb-2 px-3 text-center text-xs font-medium uppercase tracking-wider text-[var(--color-text)]/50">Навигация</p>
+          <p className="cabinet-nav-label mb-2 shrink-0 px-3 text-center text-xs font-medium uppercase tracking-wider text-[var(--color-text)]/50">
+            Навигация
+          </p>
           <nav
-            className="flex flex-col gap-0 rounded-[10px] border border-[var(--color-brand-gold)]/15 bg-[var(--color-dark-gray)]/5 p-1.5 pb-2 shadow-[var(--shadow-subtle)]"
+            className="cabinet-mobile-nav-dialog__nav flex min-h-0 flex-1 flex-col gap-0 overflow-y-auto overscroll-contain rounded-[10px] border border-[var(--color-brand-gold)]/15 bg-[var(--color-dark-gray)]/5 p-1.5 pb-2 shadow-[var(--shadow-subtle)]"
             role="none"
           >
             {navGroups.map((group) => (
               <div
                 key={group.title}
-                className="mt-3 border-t border-[var(--color-brand-gold)]/12 pt-3 first:mt-0 first:border-t-0 first:pt-0"
+                className="mt-3 border-t border-[var(--color-brand-gold)]/12 pt-3 first:mt-0 first:border-t-0 first:pt-2"
                 role="group"
                 aria-label={group.title}
               >
-                <div className="px-2.5 pb-1.5 pt-0.5 text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-[var(--color-text)]/40">
+                <div className="cabinet-nav-group-title px-2.5 pb-2 pt-1 text-[0.6875rem] font-semibold uppercase leading-snug tracking-[0.12em]">
                   {group.title}
                 </div>
                 <div className="flex flex-col gap-0.5">
@@ -268,7 +270,7 @@ export function CabinetMobileNavPortals() {
             ))}
             {user?.role === "ESTABLISHMENT_ADMIN" && (
               <div className="mt-3 border-t border-[var(--color-brand-gold)]/12 pt-3" role="group" aria-label="Связанные кабинеты">
-                <div className="px-2.5 pb-1.5 pt-0.5 text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-[var(--color-text)]/40">
+                <div className="cabinet-nav-group-title px-2.5 pb-2 pt-1 text-[0.6875rem] font-semibold uppercase leading-snug tracking-[0.12em]">
                   Связанные кабинеты
                 </div>
                 <div className="flex flex-col gap-0.5">
@@ -292,7 +294,7 @@ export function CabinetMobileNavPortals() {
               closeSidebar();
               void handleLogout();
             }}
-            className={`mt-8 flex shrink-0 ${CABINET_WAITER_BTN} w-full !justify-center gap-2.5 px-3 py-2 text-sm`}
+            className={`mt-auto flex shrink-0 pt-4 ${CABINET_WAITER_BTN} w-full !justify-center gap-2.5 px-3 py-2 text-sm`}
             role="menuitem"
           >
             <LogOut className="h-4 w-4 shrink-0 text-[var(--color-brand-gold)]" aria-hidden />

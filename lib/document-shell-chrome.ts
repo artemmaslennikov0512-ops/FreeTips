@@ -1,8 +1,9 @@
 /**
  * Хром документа: `data-theme`, `app-shell-panel`, `meta theme-color`, `color-scheme`.
- * Нормализация здесь + в ThemeProvider (rAF, MutationObserver на head) — иначе Safari/iOS даёт швы и чужой `theme-color`.
- * Тёмные шторки: `pushOverlaySafariChromeDark` / `popOverlaySafariChromeDark` — только `color-scheme` / стили; `theme-color` на панели не трогаем.
- * Простая мобильная шторка (overflow + Escape + overlay): `usePanelMobileSimpleDrawerEffects`. ЛК — фиксация body в `CabinetMobileNavPortals`.
+ * Публичный `applyDocumentShellChrome` откладывает правки `<head>` на два кадра — иначе при навигации Next/React
+ * можно поймать `removeChild` на null. Синхронно только `applyDocumentShellChromeSync` (например после `popOverlaySafariChromeDark`).
+ * Тёмные шторки: `pushOverlaySafariChromeDark` / `popOverlaySafariChromeDark`; на панели `theme-color` не ставим.
+ * Простая мобильная шторка: `usePanelMobileSimpleDrawerEffects`. ЛК — фиксация body в `CabinetMobileNavPortals`.
  */
 
 export const THEME_STORAGE_KEY = "theme";
@@ -83,7 +84,7 @@ function syncThemeColorMeta(content: string | null): void {
   const meta = document.createElement("meta");
   meta.setAttribute("name", "theme-color");
   meta.setAttribute("content", content);
-  document.head.appendChild(meta);
+  document.head?.appendChild(meta);
 }
 
 function syncColorSchemeMeta(scheme: "light" | "dark"): void {
@@ -95,7 +96,7 @@ function syncColorSchemeMeta(scheme: "light" | "dark"): void {
   const m = document.createElement("meta");
   m.setAttribute("name", "color-scheme");
   m.setAttribute("content", scheme);
-  document.head.appendChild(m);
+  document.head?.appendChild(m);
 }
 
 /** Счётчик открытых тёмных шторок: тёмный `color-scheme` для оверлея; `theme-color` на панели не ставим. */
@@ -115,14 +116,44 @@ export function popOverlaySafariChromeDark(): void {
   if (overlaySafariChromeDarkDepth <= 0) return;
   overlaySafariChromeDarkDepth -= 1;
   if (overlaySafariChromeDarkDepth > 0) return;
-  applyDocumentShellChrome(typeof window !== "undefined" ? window.location.pathname : null, readThemePreference());
+  applyDocumentShellChromeSync(
+    typeof window !== "undefined" ? window.location.pathname : null,
+    readThemePreference(),
+  );
 }
 
-/**
- * Применить тему к документу. Вызывать из ThemeProvider (layout + rAF + MutationObserver),
- * не дублировать руками в страницах.
- */
-export function applyDocumentShellChrome(pathname: string | null, preference: SiteThemePreference): void {
+let deferredOuterRaf = 0;
+let deferredInnerRaf = 0;
+let deferredFlushPending = false;
+let deferredPathname: string | null = null;
+let deferredPreference: SiteThemePreference = "light";
+
+function cancelDeferredDocumentShellChrome(): void {
+  if (deferredOuterRaf) {
+    cancelAnimationFrame(deferredOuterRaf);
+    deferredOuterRaf = 0;
+  }
+  if (deferredInnerRaf) {
+    cancelAnimationFrame(deferredInnerRaf);
+    deferredInnerRaf = 0;
+  }
+  deferredFlushPending = false;
+}
+
+function scheduleDeferredDocumentShellChrome(): void {
+  if (deferredFlushPending) return;
+  deferredFlushPending = true;
+  deferredOuterRaf = requestAnimationFrame(() => {
+    deferredOuterRaf = 0;
+    deferredInnerRaf = requestAnimationFrame(() => {
+      deferredInnerRaf = 0;
+      deferredFlushPending = false;
+      applyDocumentShellChromeNow(deferredPathname, deferredPreference);
+    });
+  });
+}
+
+function applyDocumentShellChromeNow(pathname: string | null, preference: SiteThemePreference): void {
   if (typeof document === "undefined") return;
 
   const authOnly = isAuthOnlyPath(pathname);
@@ -155,4 +186,22 @@ export function applyDocumentShellChrome(pathname: string | null, preference: Si
     document.documentElement.style.colorScheme = effective === "dark" ? "dark" : "light";
   }
   document.documentElement.style.removeProperty("background-color");
+}
+
+/** Сразу (после закрытия оверлея и т.п.). Отменяет отложенный вызов, если он висел в очереди. */
+export function applyDocumentShellChromeSync(pathname: string | null, preference: SiteThemePreference): void {
+  if (typeof document === "undefined") return;
+  cancelDeferredDocumentShellChrome();
+  applyDocumentShellChromeNow(pathname, preference);
+}
+
+/**
+ * Отложенное применение: не трогать `<head>` в том же такте, что коммит React / смена маршрута.
+ * Вызывать из ThemeProvider и при необходимости из шторок ЛК.
+ */
+export function applyDocumentShellChrome(pathname: string | null, preference: SiteThemePreference): void {
+  if (typeof document === "undefined") return;
+  deferredPathname = pathname;
+  deferredPreference = preference;
+  scheduleDeferredDocumentShellChrome();
 }

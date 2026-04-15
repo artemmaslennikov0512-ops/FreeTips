@@ -5,7 +5,6 @@ import {
   useCallback,
   useContext,
   useEffect,
-  useLayoutEffect,
   useSyncExternalStore,
   type CSSProperties,
   type Dispatch,
@@ -169,12 +168,10 @@ export function CabinetMobileNavPortals() {
 
   useMobileDarkChromeOverlay(sidebarOpen);
 
-  /* WebKit после открытия шторки: двойной apply подстраховывает document shell (см. ThemeProvider). */
-  useLayoutEffect(() => {
+  /* После открытия шторки — один отложенный apply (двойной rAF внутри document-shell-chrome). */
+  useEffect(() => {
     if (!sidebarOpen) return;
     applyDocumentShellChrome(pathname, theme);
-    const id = requestAnimationFrame(() => applyDocumentShellChrome(pathname, theme));
-    return () => cancelAnimationFrame(id);
   }, [sidebarOpen, pathname, theme]);
 
   const onOverlayDown = useCallback(

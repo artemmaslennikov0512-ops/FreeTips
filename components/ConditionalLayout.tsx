@@ -46,8 +46,10 @@ export function ConditionalLayout({ children }: { children: React.ReactNode }) {
     </>
   );
 
+  const minHeightClass = isPanelShell ? "min-h-[100dvh] min-h-screen" : "min-h-screen";
+
   return (
-    <div className={`flex min-h-screen w-full min-w-0 flex-1 flex-col border-0 ${widthClass} ${isAuthPage ? "layout-auth" : ""} ${isPayPage ? "layout-pay" : ""} ${isZayavka ? "layout-zayavka" : ""} ${isLoginPage ? "layout-login" : ""}`}
+    <div className={`flex ${minHeightClass} w-full min-w-0 flex-1 flex-col border-0 ${widthClass} ${isAuthPage ? "layout-auth" : ""} ${isPayPage ? "layout-pay" : ""} ${isZayavka ? "layout-zayavka" : ""} ${isLoginPage ? "layout-login" : ""}`}
     >
       {isPanelShell ? <PanelMobileMenuProvider>{shell}</PanelMobileMenuProvider> : shell}
       <ConditionalFooter />

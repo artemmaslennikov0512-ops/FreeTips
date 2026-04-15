@@ -5,6 +5,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useLayoutEffect,
   useSyncExternalStore,
   type CSSProperties,
   type Dispatch,
@@ -13,12 +14,15 @@ import {
   type SetStateAction,
 } from "react";
 import { createPortal } from "react-dom";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import type { LucideIcon } from "lucide-react";
 import { LogOut, Menu, User, BadgeCheck, Building2 } from "lucide-react";
 import { CABINET_WAITER_BTN } from "@/lib/cabinet-button-classes";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { useTheme } from "@/lib/theme-context";
+import { applyDocumentShellChrome } from "@/lib/document-shell-chrome";
 
 export type CabinetMobileNavUser = {
   login?: string;
@@ -122,11 +126,14 @@ export function CabinetMobileNavFixedButton() {
 /**
  * Мобильный ЛК: в потоке документа (уезжает при прокрутке) — тема + меню, одна золотая полоска снизу.
  */
-export function CabinetMobileNavMobileCorner() {
+export function CabinetMobileNavMobileCorner({ aboveGoldLine }: { aboveGoldLine?: ReactNode }) {
   const { menuButtonRef, sidebarOpen, setSidebarOpen, isM5Cabinet } = useCabinetMobileNav();
+  const hasAbove = aboveGoldLine != null && aboveGoldLine !== false;
   return (
     <div className="cabinet-mobile-top-shell relative z-10 flex w-full shrink-0 flex-col pb-3 lg:hidden">
-      <div className="flex items-center justify-end gap-1.5 px-3 pb-3 pt-[max(0.35rem,env(safe-area-inset-top,0px))]">
+      <div
+        className={`flex items-center justify-end gap-1.5 px-3 pt-[max(0.35rem,env(safe-area-inset-top,0px))] ${hasAbove ? "pb-2" : "pb-3"}`}
+      >
         <ThemeToggle variant={isM5Cabinet ? "m5" : "default"} />
         <button
           ref={menuButtonRef}
@@ -141,6 +148,7 @@ export function CabinetMobileNavMobileCorner() {
           <Menu className="h-5 w-5 shrink-0 pointer-events-none" strokeWidth={2} aria-hidden />
         </button>
       </div>
+      {hasAbove ? <div className="w-full shrink-0">{aboveGoldLine}</div> : null}
       <div
         className="cabinet-mobile-top-shell__gold mx-0 h-0 w-full shrink-0 border-0 border-t border-[var(--color-brand-gold)]/45"
         aria-hidden
@@ -156,6 +164,8 @@ export function CabinetMobileNavPortals() {
     () => true,
     () => false,
   );
+  const pathname = usePathname();
+  const { theme } = useTheme();
   const {
     sidebarOpen,
     closeSidebar,
@@ -175,14 +185,49 @@ export function CabinetMobileNavPortals() {
     sidebarFirstName,
   } = useCabinetMobileNav();
 
+  /*
+   * iOS Safari: только overflow:hidden на body даёт сдвиг на ширину скроллбара / «вспышку» по краям при открытии шторки.
+   * Фиксируем body с сохранением scrollY + блокируем html — без скачка вёрстки.
+   */
   useEffect(() => {
     if (!sidebarOpen) return;
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    const html = document.documentElement;
+    const body = document.body;
+    const scrollY = window.scrollY;
+    const prevBodyOverflow = body.style.overflow;
+    const prevBodyPosition = body.style.position;
+    const prevBodyTop = body.style.top;
+    const prevBodyLeft = body.style.left;
+    const prevBodyRight = body.style.right;
+    const prevBodyWidth = body.style.width;
+
+    html.classList.add("cabinet-mobile-drawer-lock");
+    body.style.overflow = "hidden";
+    body.style.position = "fixed";
+    body.style.top = `-${scrollY}px`;
+    body.style.left = "0";
+    body.style.right = "0";
+    body.style.width = "100%";
+
     return () => {
-      document.body.style.overflow = prev;
+      html.classList.remove("cabinet-mobile-drawer-lock");
+      body.style.overflow = prevBodyOverflow;
+      body.style.position = prevBodyPosition;
+      body.style.top = prevBodyTop;
+      body.style.left = prevBodyLeft;
+      body.style.right = prevBodyRight;
+      body.style.width = prevBodyWidth;
+      window.scrollTo(0, scrollY);
     };
   }, [sidebarOpen]);
+
+  /* После открытия шторки WebKit перерисовывает safe-area — повторяем синхронизацию theme-color / data-theme */
+  useLayoutEffect(() => {
+    if (!sidebarOpen) return;
+    applyDocumentShellChrome(pathname, theme);
+    const id = requestAnimationFrame(() => applyDocumentShellChrome(pathname, theme));
+    return () => cancelAnimationFrame(id);
+  }, [sidebarOpen, pathname, theme]);
 
   const onOverlayDown = useCallback(
     (e: React.MouseEvent) => {

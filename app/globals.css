@@ -1957,10 +1957,17 @@ html:not([data-theme="dark"]) .admin-mobile-nav-overlay {
   background: rgba(0, 0, 0, 0.78);
 }
 
+/* Блокировка фона при открытой моб. шторке ЛК: без сдвига вёрстки и лишнего rubber-band в Safari */
+html.cabinet-mobile-drawer-lock {
+  overflow: hidden !important;
+  overscroll-behavior: none;
+}
+
 /* ЛК официанта: оверлей мобильного меню (createPortal на body) — плотнее затемнение контента под шторкой */
 .cabinet-mobile-nav-overlay {
   -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
+  touch-action: none;
 }
 html:not([data-theme="dark"]) .cabinet-mobile-nav-overlay {
   background: rgba(8, 12, 22, 0.72);

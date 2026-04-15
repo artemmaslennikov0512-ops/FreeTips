@@ -422,7 +422,13 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
       data-cabinet-theme={isM5Cabinet ? "m5-competition" : undefined}
       style={Object.keys(brandStyle).length ? brandStyle : undefined}
     >
-      <CabinetMobileNavMobileCorner />
+      <CabinetMobileNavMobileCorner
+        aboveGoldLine={
+          pathname !== "/cabinet" ? (
+            <PanelMobileBackButton variant="cabinet" fallbackHref="/cabinet" placement="aboveMobileGoldLine" />
+          ) : undefined
+        }
+      />
       {/* Левое меню (lg+): сворачиваемая колонка; на мобильном — портал меню */}
       <div
         className={`hidden shrink-0 transition-[width] duration-300 ease-out lg:mt-2 lg:flex lg:self-start ${
@@ -607,9 +613,6 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
           className="cabinet-main-block app-panel-main-surface relative z-10 mt-0 mr-0 mb-3 ml-0 flex min-h-0 w-full max-w-full flex-1 flex-col rounded-lg border-x border-b border-white/10 backdrop-blur-xl md:rounded-[10px] lg:z-0 lg:mr-3 lg:ml-3 max-lg:mb-0 max-lg:ml-0 max-lg:mr-0 max-lg:rounded-none max-lg:border-0 max-lg:bg-transparent max-lg:shadow-none max-lg:backdrop-blur-none"
           style={mainBlockStyle}
         >
-          {pathname !== "/cabinet" && (
-            <PanelMobileBackButton variant="cabinet" fallbackHref="/cabinet" />
-          )}
           <div
             className="flex min-h-0 min-w-0 flex-1 flex-col px-4 py-3 sm:px-6 md:py-6 lg:p-8"
             id="main-content"

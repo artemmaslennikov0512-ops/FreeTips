@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useMobileDarkChromeOverlay } from "@/lib/use-mobile-dark-chrome-overlay";
 import Link from "next/link";
 import { ChevronLeft, Plus, Trash2, Pencil } from "lucide-react";
-import { authHeaders } from "@/lib/auth-client";
+import { fetchWithAuth } from "@/lib/auth-client";
 import { todayYmdMoscow } from "@/lib/establishment-booking-moscow";
 import { EstablishmentDataGridPlaceholder } from "@/components/establishment/EstablishmentDataGridPlaceholder";
 import { PANEL_PAGE_TITLE_ESTABLISHMENT_HERO_ON_DARK } from "@/lib/panel-shell-visual-classes";
@@ -99,7 +99,7 @@ export default function EstablishmentBookingsPage() {
 
   const loadTables = useCallback(async () => {
     try {
-      const res = await fetch("/api/establishment/halls", { headers: authHeaders() });
+      const res = await fetchWithAuth("/api/establishment/halls");
       if (!res.ok) return;
       const data = await res.json();
       const halls = data.halls ?? [];
@@ -122,7 +122,7 @@ export default function EstablishmentBookingsPage() {
 
   const loadGuests = useCallback(async () => {
     try {
-      const res = await fetch("/api/establishment/guests", { headers: authHeaders() });
+      const res = await fetchWithAuth("/api/establishment/guests");
       if (!res.ok) return;
       const data = await res.json();
       setGuestOptions(data.guests ?? []);
@@ -136,7 +136,7 @@ export default function EstablishmentBookingsPage() {
     setError(null);
     try {
       const q = ymd ? `?date=${encodeURIComponent(ymd)}` : "";
-      const res = await fetch(`/api/establishment/bookings${q}`, { headers: authHeaders() });
+      const res = await fetchWithAuth(`/api/establishment/bookings${q}`);
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
         setError(data?.error ?? "Не удалось загрузить брони");
@@ -185,9 +185,9 @@ export default function EstablishmentBookingsPage() {
     setSubmitting(true);
     setError(null);
     try {
-      const res = await fetch("/api/establishment/bookings", {
+      const res = await fetchWithAuth("/api/establishment/bookings", {
         method: "POST",
-        headers: { "Content-Type": "application/json", ...authHeaders() },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...(formGuestId ? { guestId: formGuestId } : {}),
           ...(formGuest.trim() ? { guestName: formGuest.trim() } : {}),
@@ -225,9 +225,9 @@ export default function EstablishmentBookingsPage() {
     setSavingEdit(true);
     setError(null);
     try {
-      const res = await fetch(`/api/establishment/bookings/${editing.id}`, {
+      const res = await fetchWithAuth(`/api/establishment/bookings/${editing.id}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json", ...authHeaders() },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: editStatus }),
       });
       const data = await res.json().catch(() => ({}));
@@ -247,9 +247,8 @@ export default function EstablishmentBookingsPage() {
   const removeBooking = async (id: string) => {
     if (!confirm("Удалить бронь из списка?")) return;
     try {
-      const res = await fetch(`/api/establishment/bookings/${id}`, {
+      const res = await fetchWithAuth(`/api/establishment/bookings/${id}`, {
         method: "DELETE",
-        headers: authHeaders(),
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));

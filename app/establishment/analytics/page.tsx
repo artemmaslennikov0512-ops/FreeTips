@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Download } from "lucide-react";
-import { authHeaders } from "@/lib/auth-client";
+import { fetchWithAuth } from "@/lib/auth-client";
 import { CustomDropdown } from "@/components/CustomDropdown";
 import { PANEL_PAGE_TITLE_ESTABLISHMENT_WHITE_LG } from "@/lib/panel-shell-visual-classes";
 
@@ -35,9 +35,7 @@ export default function AnalyticsPage() {
     const load = async () => {
       setLoading(true);
       try {
-        const res = await fetch(`/api/establishment/stats?period=${period}`, {
-          headers: authHeaders(),
-        });
+        const res = await fetchWithAuth(`/api/establishment/stats?period=${period}`);
         if (res.ok) {
           const data = await res.json();
           setStats(data);

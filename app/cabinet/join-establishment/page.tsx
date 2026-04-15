@@ -197,6 +197,7 @@ export default function JoinEstablishmentPage() {
         <div className="flex flex-col gap-3 sm:flex-row sm:items-stretch">
           <input
             id="establishment-code"
+            name="establishmentCode"
             type="text"
             inputMode="numeric"
             autoComplete="off"
@@ -231,7 +232,7 @@ export default function JoinEstablishmentPage() {
         )}
 
         {found && (
-          <div className="mt-6 rounded-[10px] border border-[var(--color-brand-gold)]/25 bg-[var(--color-dark-gray)]/10 p-4 text-center sm:p-5">
+          <div className="cabinet-join-establishment-found mt-6 rounded-[10px] border border-[var(--color-brand-gold)]/25 bg-[var(--color-dark-gray)]/10 p-4 text-center sm:p-5">
             <div className="flex flex-col items-center gap-2">
               <Building2 className="h-6 w-6 shrink-0 text-[var(--color-brand-gold)]" aria-hidden />
               <div className="min-w-0 max-w-full">

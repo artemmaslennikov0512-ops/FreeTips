@@ -221,6 +221,7 @@ export function RecipientPayLimitsCard({ className = "" }: { className?: string 
           </p>
           <input
             id="recipient-max-daily-incoming"
+            name="recipientMaxDailyIncomingRubles"
             type="text"
             inputMode="decimal"
             className={`${ADMIN_PANEL_INPUT_STRETCH} mt-2 min-w-0`}
@@ -239,6 +240,7 @@ export function RecipientPayLimitsCard({ className = "" }: { className?: string 
           <p className="mt-0.5 text-[11px] leading-snug text-white/60">Пусто = нет лимита. Слот освобождается после оплаты или отмены.</p>
           <input
             id="recipient-max-pending"
+            name="recipientMaxConcurrentPending"
             type="text"
             inputMode="numeric"
             className={`${ADMIN_PANEL_INPUT_STRETCH} mt-2 min-w-0`}
@@ -259,6 +261,7 @@ export function RecipientPayLimitsCard({ className = "" }: { className?: string 
           </p>
           <input
             id="recipient-pay-interval"
+            name="recipientMinMinutesBetweenPayInits"
             type="text"
             inputMode="numeric"
             className={`${ADMIN_PANEL_INPUT_STRETCH} mt-2 min-w-0`}
@@ -279,6 +282,7 @@ export function RecipientPayLimitsCard({ className = "" }: { className?: string 
           </p>
           <input
             id="recipient-max-pay-inits-day"
+            name="recipientMaxPayInitsPerDay"
             type="text"
             inputMode="numeric"
             className={`${ADMIN_PANEL_INPUT_STRETCH} mt-2 min-w-0`}

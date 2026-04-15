@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useMobileDarkChromeOverlay } from "@/lib/use-mobile-dark-chrome-overlay";
 import Image from "next/image";
 import { FileDown, ImageIcon, X } from "lucide-react";
-import { authHeaders } from "@/lib/auth-client";
+import { fetchWithAuth } from "@/lib/auth-client";
 import { getBaseUrl } from "@/lib/get-base-url";
 import { PANEL_PAGE_TITLE_ESTABLISHMENT_WHITE_LG } from "@/lib/panel-shell-visual-classes";
 
@@ -24,8 +24,8 @@ export default function EstablishmentQrPage() {
     const load = async () => {
       try {
         const [infoRes, empRes] = await Promise.all([
-          fetch("/api/establishment/info", { headers: authHeaders() }),
-          fetch("/api/establishment/employees", { headers: authHeaders() }),
+          fetchWithAuth("/api/establishment/info"),
+          fetchWithAuth("/api/establishment/employees"),
         ]);
         if (!infoRes.ok || !empRes.ok) {
           setError("Ошибка загрузки");
@@ -60,7 +60,7 @@ export default function EstablishmentQrPage() {
   const downloadPdf = async () => {
     setDownloading(true);
     try {
-      const res = await fetch("/api/establishment/employees/pdf", { headers: authHeaders() });
+      const res = await fetchWithAuth("/api/establishment/employees/pdf");
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
         alert(data?.error ?? "Ошибка загрузки PDF");
@@ -85,7 +85,7 @@ export default function EstablishmentQrPage() {
     setPreviewLoading(true);
     setPdfPreviewUrl(null);
     try {
-      const res = await fetch("/api/establishment/employees/pdf", { headers: authHeaders() });
+      const res = await fetchWithAuth("/api/establishment/employees/pdf");
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
         alert(data?.error ?? "Ошибка загрузки");

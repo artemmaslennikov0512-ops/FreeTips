@@ -2,8 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { Loader2, Check, X } from "lucide-react";
-import { authHeaders } from "@/lib/auth-client";
-import { getCsrfHeader } from "@/lib/security/csrf-client";
+import { fetchWithAuth } from "@/lib/auth-client";
 import { ADMIN_BTN, ADMIN_BTN_PRIMARY, ADMIN_BTN_SM } from "@/lib/admin-button-classes";
 import {
   PANEL_PAGE_SUBTITLE_ESTABLISHMENT_INTRO,
@@ -30,7 +29,7 @@ export default function EstablishmentJoinRequestsPage() {
 
   const load = useCallback(async () => {
     setError(null);
-    const res = await fetch("/api/establishment/join-requests?status=PENDING", { headers: authHeaders() });
+    const res = await fetchWithAuth("/api/establishment/join-requests?status=PENDING");
     if (!res.ok) {
       const d = (await res.json().catch(() => ({}))) as { error?: string };
       setError(d.error ?? "Не удалось загрузить заявки");
@@ -48,9 +47,9 @@ export default function EstablishmentJoinRequestsPage() {
     setActingId(id);
     setError(null);
     try {
-      const res = await fetch(`/api/establishment/join-requests/${id}/approve`, {
+      const res = await fetchWithAuth(`/api/establishment/join-requests/${id}/approve`, {
         method: "POST",
-        headers: { "Content-Type": "application/json", ...authHeaders(), ...getCsrfHeader() },
+        headers: { "Content-Type": "application/json" },
         body: "{}",
       });
       const data = (await res.json().catch(() => ({}))) as { error?: string; message?: string };
@@ -74,9 +73,9 @@ export default function EstablishmentJoinRequestsPage() {
     setActingId(id);
     setError(null);
     try {
-      const res = await fetch(`/api/establishment/join-requests/${id}/reject`, {
+      const res = await fetchWithAuth(`/api/establishment/join-requests/${id}/reject`, {
         method: "POST",
-        headers: { "Content-Type": "application/json", ...authHeaders(), ...getCsrfHeader() },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ reason: reason.trim() || undefined }),
       });
       const data = (await res.json().catch(() => ({}))) as { error?: string };

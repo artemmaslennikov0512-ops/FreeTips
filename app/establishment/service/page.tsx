@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
-import { authHeaders } from "@/lib/auth-client";
+import { fetchWithAuth } from "@/lib/auth-client";
 import { EstablishmentDataGridPlaceholder } from "@/components/establishment/EstablishmentDataGridPlaceholder";
 import { PANEL_PAGE_TITLE_ESTABLISHMENT_HERO_ON_DARK } from "@/lib/panel-shell-visual-classes";
 
@@ -45,9 +45,9 @@ export default function EstablishmentServicePage() {
     setError(null);
     try {
       const [sessRes, hallRes, empRes] = await Promise.all([
-        fetch("/api/establishment/service-sessions", { headers: authHeaders() }),
-        fetch("/api/establishment/halls", { headers: authHeaders() }),
-        fetch("/api/establishment/employees", { headers: authHeaders() }),
+        fetchWithAuth("/api/establishment/service-sessions"),
+        fetchWithAuth("/api/establishment/halls"),
+        fetchWithAuth("/api/establishment/employees"),
       ]);
       const sessData = await sessRes.json().catch(() => ({}));
       if (!sessRes.ok) {
@@ -92,9 +92,9 @@ export default function EstablishmentServicePage() {
     setOpening(true);
     setError(null);
     try {
-      const res = await fetch("/api/establishment/service-sessions", {
+      const res = await fetchWithAuth("/api/establishment/service-sessions", {
         method: "POST",
-        headers: { "Content-Type": "application/json", ...authHeaders() },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           tableId,
           employeeId: employeeId || null,
@@ -117,9 +117,9 @@ export default function EstablishmentServicePage() {
 
   const closeSession = async (id: string) => {
     try {
-      const res = await fetch(`/api/establishment/service-sessions/${id}`, {
+      const res = await fetchWithAuth(`/api/establishment/service-sessions/${id}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json", ...authHeaders() },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: "CLOSED" }),
       });
       const data = await res.json().catch(() => ({}));

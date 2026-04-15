@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Users, PieChart, BarChart3, Wallet } from "lucide-react";
-import { authHeaders } from "@/lib/auth-client";
+import { fetchWithAuth } from "@/lib/auth-client";
 
 interface EstablishmentInfo {
   id: string;
@@ -38,10 +38,9 @@ export default function EstablishmentPage() {
       setLoading(true);
       setError(null);
       try {
-        const headers = authHeaders();
         const [infoRes, statsRes] = await Promise.all([
-          fetch("/api/establishment/info", { headers }),
-          fetch("/api/establishment/stats?period=7d", { headers }),
+          fetchWithAuth("/api/establishment/info"),
+          fetchWithAuth("/api/establishment/stats?period=7d"),
         ]);
         if (!infoRes.ok) {
           setError("Не удалось загрузить данные заведения");

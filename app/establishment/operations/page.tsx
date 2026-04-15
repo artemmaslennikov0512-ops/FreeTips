@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, Layers } from "lucide-react";
-import { authHeaders } from "@/lib/auth-client";
+import { fetchWithAuth } from "@/lib/auth-client";
 import type { EstablishmentOperationsModule } from "@/lib/establishment-operations-modules";
 import { PANEL_PAGE_TITLE_ESTABLISHMENT_HERO_ON_DARK } from "@/lib/panel-shell-visual-classes";
 
@@ -29,7 +29,7 @@ export default function EstablishmentOperationsPage() {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch("/api/establishment/operations", { headers: authHeaders() });
+        const res = await fetchWithAuth("/api/establishment/operations");
         const text = await res.text();
         let payload: {
           error?: string;

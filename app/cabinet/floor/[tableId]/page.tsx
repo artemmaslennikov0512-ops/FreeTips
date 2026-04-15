@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { ChevronLeft, Copy, Minus, Plus, Trash2 } from "lucide-react";
 import QRCode from "qrcode";
-import { authHeaders } from "@/lib/auth-client";
+import { fetchWithAuth } from "@/lib/auth-client";
 import { getBaseUrl } from "@/lib/get-base-url";
 
 interface MenuItem {
@@ -81,8 +81,8 @@ export default function CabinetFloorTablePage() {
     setError(null);
     try {
       const [tRes, mRes] = await Promise.all([
-        fetch(`/api/cabinet/establishment/tables/${tableId}`, { headers: authHeaders() }),
-        fetch("/api/cabinet/establishment/menu", { headers: authHeaders() }),
+        fetchWithAuth(`/api/cabinet/establishment/tables/${tableId}`),
+        fetchWithAuth("/api/cabinet/establishment/menu"),
       ]);
       const tData = await tRes.json().catch(() => ({}));
       const mData = await mRes.json().catch(() => ({}));
@@ -131,9 +131,8 @@ export default function CabinetFloorTablePage() {
     setBusy(true);
     setError(null);
     try {
-      const res = await fetch(`/api/cabinet/establishment/tables/${tableId}/open`, {
+      const res = await fetchWithAuth(`/api/cabinet/establishment/tables/${tableId}/open`, {
         method: "POST",
-        headers: authHeaders(),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
@@ -153,9 +152,9 @@ export default function CabinetFloorTablePage() {
     setBusy(true);
     setError(null);
     try {
-      const res = await fetch(`/api/cabinet/establishment/orders/${order.id}/lines`, {
+      const res = await fetchWithAuth(`/api/cabinet/establishment/orders/${order.id}/lines`, {
         method: "POST",
-        headers: { "Content-Type": "application/json", ...authHeaders() },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ menuItemId, quantity: 1 }),
       });
       const data = await res.json().catch(() => ({}));
@@ -176,9 +175,9 @@ export default function CabinetFloorTablePage() {
     setBusy(true);
     setError(null);
     try {
-      const res = await fetch(`/api/cabinet/establishment/orders/${order.id}/lines/${lineId}`, {
+      const res = await fetchWithAuth(`/api/cabinet/establishment/orders/${order.id}/lines/${lineId}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json", ...authHeaders() },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ quantity }),
       });
       const data = await res.json().catch(() => ({}));
@@ -199,9 +198,8 @@ export default function CabinetFloorTablePage() {
     setBusy(true);
     setError(null);
     try {
-      const res = await fetch(`/api/cabinet/establishment/orders/${order.id}/lines/${lineId}`, {
+      const res = await fetchWithAuth(`/api/cabinet/establishment/orders/${order.id}/lines/${lineId}`, {
         method: "DELETE",
-        headers: authHeaders(),
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
@@ -221,9 +219,9 @@ export default function CabinetFloorTablePage() {
     setBusy(true);
     setError(null);
     try {
-      const res = await fetch(`/api/cabinet/establishment/orders/${order.id}`, {
+      const res = await fetchWithAuth(`/api/cabinet/establishment/orders/${order.id}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json", ...authHeaders() },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: "PRESENTED" }),
       });
       const data = await res.json().catch(() => ({}));
@@ -245,9 +243,9 @@ export default function CabinetFloorTablePage() {
     setBusy(true);
     setError(null);
     try {
-      const res = await fetch(`/api/cabinet/establishment/service-sessions/${session.id}`, {
+      const res = await fetchWithAuth(`/api/cabinet/establishment/service-sessions/${session.id}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json", ...authHeaders() },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: "CLOSED" }),
       });
       const data = await res.json().catch(() => ({}));

@@ -179,13 +179,13 @@ export function TestPreviewVisualLanding() {
                 <label className="tpa-label" htmlFor="tpa-demo-name">
                   Имя или заведение
                 </label>
-                <input id="tpa-demo-name" className="tpa-input" type="text" placeholder="Например, Кафе Сезон" autoComplete="off" />
+                <input id="tpa-demo-name" name="demoBusinessName" className="tpa-input" type="text" placeholder="Например, Кафе Сезон" autoComplete="off" />
               </div>
               <div>
                 <label className="tpa-label" htmlFor="tpa-demo-email">
                   Email
                 </label>
-                <input id="tpa-demo-email" className="tpa-input" type="email" placeholder="you@example.com" autoComplete="off" />
+                <input id="tpa-demo-email" name="demoEmail" className="tpa-input" type="email" placeholder="you@example.com" autoComplete="off" />
                 <p className="tpa-hint">На него пришлём доступ к демо-кабинету.</p>
               </div>
               <div>

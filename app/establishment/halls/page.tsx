@@ -5,7 +5,7 @@ import { useMobileDarkChromeOverlay } from "@/lib/use-mobile-dark-chrome-overlay
 import Link from "next/link";
 import { Plus, Trash2, Pencil, ChevronLeft, Copy } from "lucide-react";
 import QRCode from "qrcode";
-import { authHeaders } from "@/lib/auth-client";
+import { fetchWithAuth } from "@/lib/auth-client";
 import { EstablishmentDataGridPlaceholder } from "@/components/establishment/EstablishmentDataGridPlaceholder";
 import { PANEL_PAGE_TITLE_ESTABLISHMENT_HERO_WHITE } from "@/lib/panel-shell-visual-classes";
 
@@ -124,7 +124,7 @@ export default function EstablishmentHallsPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/establishment/halls", { headers: authHeaders() });
+      const res = await fetchWithAuth("/api/establishment/halls");
       if (!res.ok) {
         setError("Не удалось загрузить залы");
         return;
@@ -161,9 +161,9 @@ export default function EstablishmentHallsPage() {
     if (!name) return;
     setCreatingHall(true);
     try {
-      const res = await fetch("/api/establishment/halls", {
+      const res = await fetchWithAuth("/api/establishment/halls", {
         method: "POST",
-        headers: { "Content-Type": "application/json", ...authHeaders() },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name }),
       });
       const data = await res.json().catch(() => ({}));
@@ -183,9 +183,8 @@ export default function EstablishmentHallsPage() {
   const deleteHall = async (id: string) => {
     if (!confirm("Удалить зал и все столы в нём?")) return;
     try {
-      const res = await fetch(`/api/establishment/halls/${id}`, {
+      const res = await fetchWithAuth(`/api/establishment/halls/${id}`, {
         method: "DELETE",
-        headers: authHeaders(),
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
@@ -208,9 +207,9 @@ export default function EstablishmentHallsPage() {
     if (!name) return;
     setSavingHallId(id);
     try {
-      const res = await fetch(`/api/establishment/halls/${id}`, {
+      const res = await fetchWithAuth(`/api/establishment/halls/${id}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json", ...authHeaders() },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name }),
       });
       const data = await res.json().catch(() => ({}));
@@ -234,9 +233,9 @@ export default function EstablishmentHallsPage() {
     if (!label) return;
     const capacity = Math.min(99, Math.max(1, parseInt(f.capacity, 10) || 2));
     try {
-      const res = await fetch(`/api/establishment/halls/${hallId}/tables`, {
+      const res = await fetchWithAuth(`/api/establishment/halls/${hallId}/tables`, {
         method: "POST",
-        headers: { "Content-Type": "application/json", ...authHeaders() },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           label,
           capacity,
@@ -258,9 +257,8 @@ export default function EstablishmentHallsPage() {
   const deleteTable = async (tableId: string) => {
     if (!confirm("Удалить стол?")) return;
     try {
-      const res = await fetch(`/api/establishment/tables/${tableId}`, {
+      const res = await fetchWithAuth(`/api/establishment/tables/${tableId}`, {
         method: "DELETE",
-        headers: authHeaders(),
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
@@ -287,9 +285,9 @@ export default function EstablishmentHallsPage() {
     const capacity = Math.min(99, Math.max(1, parseInt(editTableCapacity, 10) || 2));
     setSavingTable(true);
     try {
-      const res = await fetch(`/api/establishment/tables/${editingTable.id}`, {
+      const res = await fetchWithAuth(`/api/establishment/tables/${editingTable.id}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json", ...authHeaders() },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           label,
           capacity,

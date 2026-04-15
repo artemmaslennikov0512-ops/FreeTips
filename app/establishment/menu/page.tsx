@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { ChevronLeft, Plus, Trash2 } from "lucide-react";
-import { authHeaders } from "@/lib/auth-client";
+import { fetchWithAuth } from "@/lib/auth-client";
 import { EstablishmentDataGridPlaceholder } from "@/components/establishment/EstablishmentDataGridPlaceholder";
 import { PANEL_PAGE_TITLE_ESTABLISHMENT_HERO_ON_DARK } from "@/lib/panel-shell-visual-classes";
 
@@ -33,7 +33,7 @@ export default function EstablishmentMenuPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/establishment/menu", { headers: authHeaders() });
+      const res = await fetchWithAuth("/api/establishment/menu");
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
         setError(data?.error ?? "Ошибка загрузки");
@@ -55,9 +55,9 @@ export default function EstablishmentMenuPage() {
     e.preventDefault();
     if (!newCatName.trim()) return;
     try {
-      const res = await fetch("/api/establishment/menu/categories", {
+      const res = await fetchWithAuth("/api/establishment/menu/categories", {
         method: "POST",
-        headers: { "Content-Type": "application/json", ...authHeaders() },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: newCatName.trim() }),
       });
       const data = await res.json().catch(() => ({}));
@@ -75,7 +75,7 @@ export default function EstablishmentMenuPage() {
   const removeCategory = async (id: string) => {
     if (!confirm("Удалить категорию и все позиции?")) return;
     try {
-      const res = await fetch(`/api/establishment/menu/categories/${id}`, { method: "DELETE", headers: authHeaders() });
+      const res = await fetchWithAuth(`/api/establishment/menu/categories/${id}`, { method: "DELETE" });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
         setError(data?.error ?? "Ошибка");
@@ -97,9 +97,9 @@ export default function EstablishmentMenuPage() {
     }
     const priceKop = Math.round(rub * 100);
     try {
-      const res = await fetch("/api/establishment/menu/items", {
+      const res = await fetchWithAuth("/api/establishment/menu/items", {
         method: "POST",
-        headers: { "Content-Type": "application/json", ...authHeaders() },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           categoryId,
           name: f.name.trim(),
@@ -122,7 +122,7 @@ export default function EstablishmentMenuPage() {
   const removeItem = async (id: string) => {
     if (!confirm("Удалить позицию?")) return;
     try {
-      const res = await fetch(`/api/establishment/menu/items/${id}`, { method: "DELETE", headers: authHeaders() });
+      const res = await fetchWithAuth(`/api/establishment/menu/items/${id}`, { method: "DELETE" });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
         setError(data?.error ?? "Ошибка");

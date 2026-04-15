@@ -228,8 +228,12 @@ export function ProfileTotpSection({
               Чтобы отключить, введите пароль аккаунта и текущий 6-значный код из приложения.
             </p>
             <div>
-              <label className={v.label}>Пароль</label>
+              <label className={v.label} htmlFor={`${variant}-totp-disable-password`}>
+                Пароль
+              </label>
               <input
+                id={`${variant}-totp-disable-password`}
+                name="totpDisablePassword"
                 type="password"
                 autoComplete="current-password"
                 value={disablePassword}
@@ -238,8 +242,12 @@ export function ProfileTotpSection({
               />
             </div>
             <div>
-              <label className={v.label}>Код из приложения</label>
+              <label className={v.label} htmlFor={`${variant}-totp-disable-code`}>
+                Код из приложения
+              </label>
               <input
+                id={`${variant}-totp-disable-code`}
+                name="totpDisableCode"
                 type="text"
                 inputMode="numeric"
                 autoComplete="one-time-code"
@@ -276,8 +284,12 @@ export function ProfileTotpSection({
                 </div>
                 <p className={`${v.textMuted} text-center text-xs`}>В приложении выберите «Добавить аккаунт» и отсканируйте код.</p>
                 <div className="w-full">
-                  <label className={v.label}>Код для проверки</label>
+                  <label className={v.label} htmlFor={`${variant}-totp-verify-code`}>
+                    Код для проверки
+                  </label>
                   <input
+                    id={`${variant}-totp-verify-code`}
+                    name="totpVerifyCode"
                     type="text"
                     inputMode="numeric"
                     autoComplete="one-time-code"

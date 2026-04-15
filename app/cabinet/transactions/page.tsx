@@ -293,6 +293,8 @@ export default function CabinetTransactionsPage() {
                 </p>
                 <div className="flex flex-wrap items-center justify-center gap-3">
                   <input
+                    id="cabinet-transactions-payout-amount"
+                    name="payoutAmountRub"
                     type="number"
                     step="0.01"
                     min={canWithdrawByLimit ? PAYOUT_MIN_AMOUNT_KOP / 100 : undefined}

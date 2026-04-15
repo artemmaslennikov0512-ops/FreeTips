@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useMobileDarkChromeOverlay } from "@/lib/use-mobile-dark-chrome-overlay";
 import Image from "next/image";
 import { Palette, Printer, Smartphone, LayoutDashboard, FileDown, ImageIcon, X } from "lucide-react";
-import { authHeaders } from "@/lib/auth-client";
+import { fetchWithAuth } from "@/lib/auth-client";
 import { CustomDropdown } from "@/components/CustomDropdown";
 import { getBaseUrl } from "@/lib/get-base-url";
 import { PANEL_PAGE_TITLE_ESTABLISHMENT_WHITE_LG_FLEX_ROW } from "@/lib/panel-shell-visual-classes";
@@ -103,9 +103,7 @@ export default function EstablishmentBrandPage() {
   useEffect(() => {
     const load = async () => {
       try {
-        const res = await fetch("/api/establishment/settings", {
-          headers: authHeaders(),
-        });
+        const res = await fetchWithAuth("/api/establishment/settings");
         if (res.ok) {
           const data = await res.json();
           setSettings(data);
@@ -142,7 +140,7 @@ export default function EstablishmentBrandPage() {
 
   useEffect(() => {
     if (activeGroup !== "pay" || typeof window === "undefined") return;
-    fetch("/api/establishment/settings", { headers: authHeaders() })
+    fetchWithAuth("/api/establishment/settings")
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
         if (data) {
@@ -157,9 +155,9 @@ export default function EstablishmentBrandPage() {
     setMessage(null);
     setSaving(true);
     try {
-      const res = await fetch("/api/establishment/settings", {
+      const res = await fetchWithAuth("/api/establishment/settings", {
         method: "PATCH",
-        headers: { "Content-Type": "application/json", ...authHeaders() },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           logoUrl: logoUrl.trim() || null,
           primaryColor: primaryColor.trim() || null,
@@ -227,9 +225,9 @@ export default function EstablishmentBrandPage() {
     setMessage(null);
     setResetting(true);
     try {
-      const res = await fetch("/api/establishment/settings", {
+      const res = await fetchWithAuth("/api/establishment/settings", {
         method: "PATCH",
-        headers: { "Content-Type": "application/json", ...authHeaders() },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ resetToDefaults: true }),
       });
       const data = await res.json().catch(() => ({}));
@@ -280,7 +278,7 @@ export default function EstablishmentBrandPage() {
 
   useEffect(() => {
     if (activeGroup !== "print") return;
-    fetch("/api/establishment/employees", { headers: authHeaders() })
+    fetchWithAuth("/api/establishment/employees")
       .then((r) => r.ok ? r.json() : null)
       .then((data) => {
         const employees = data?.employees ?? [];
@@ -304,7 +302,7 @@ export default function EstablishmentBrandPage() {
   const downloadPdf = useCallback(async () => {
     setPdfDownloading(true);
     try {
-      const res = await fetch("/api/establishment/employees/pdf", { headers: authHeaders() });
+      const res = await fetchWithAuth("/api/establishment/employees/pdf");
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
         alert(data?.error ?? "Ошибка загрузки PDF");
@@ -329,7 +327,7 @@ export default function EstablishmentBrandPage() {
     setPdfPreviewLoading(true);
     setPdfPreviewUrl(null);
     try {
-      const res = await fetch("/api/establishment/employees/pdf", { headers: authHeaders() });
+      const res = await fetchWithAuth("/api/establishment/employees/pdf");
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
         alert(data?.error ?? "Ошибка загрузки");

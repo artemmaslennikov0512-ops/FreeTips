@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Send, Loader2, RefreshCw } from "lucide-react";
-import { getAccessToken, authHeaders, clearAccessToken } from "@/lib/auth-client";
+import { clearAccessToken, fetchWithAuth } from "@/lib/auth-client";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { ADMIN_BTN, ADMIN_BTN_ICON, ADMIN_BTN_PRIMARY } from "@/lib/admin-button-classes";
@@ -41,12 +41,9 @@ export default function AdminSupportThreadPage() {
   const listEndRef = useRef<HTMLDivElement>(null);
 
   const fetchThread = useCallback(async () => {
-    const token = getAccessToken();
-    if (!token || !threadId) return;
+    if (!threadId) return;
     try {
-      const res = await fetch(`/api/admin/support/threads/${threadId}/messages`, {
-        headers: authHeaders(),
-      });
+      const res = await fetchWithAuth(`/api/admin/support/threads/${threadId}/messages`);
       if (res.status === 401 || res.status === 403) {
         clearAccessToken();
         router.replace("/login");
@@ -82,14 +79,9 @@ export default function AdminSupportThreadPage() {
 
   useEffect(() => {
     if (!threadId) return;
-    const token = getAccessToken();
-    if (!token) {
-      router.replace("/login");
-      return;
-    }
     setLoading(true);
     fetchThread().finally(() => setLoading(false));
-  }, [threadId, fetchThread, router]);
+  }, [threadId, fetchThread]);
 
   useEffect(() => {
     listEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -98,16 +90,13 @@ export default function AdminSupportThreadPage() {
   const sendReply = useCallback(async () => {
     const text = input.trim();
     if (!text || sending || !threadId) return;
-    const token = getAccessToken();
-    if (!token) return;
     setSending(true);
     setInput("");
     try {
-      const res = await fetch(`/api/admin/support/threads/${threadId}/messages`, {
+      const res = await fetchWithAuth(`/api/admin/support/threads/${threadId}/messages`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          ...authHeaders(),
           ...getCsrfHeader(),
         },
         body: JSON.stringify({ text }),
@@ -239,11 +228,14 @@ export default function AdminSupportThreadPage() {
             className="flex gap-2"
           >
             <input
+              id={`admin-support-reply-${threadId}`}
+              name="supportReply"
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ответ клиенту…"
               maxLength={4000}
+              autoComplete="off"
               className="support-chat-input flex-1 rounded-xl border border-white/20 bg-white/5 px-4 py-3 text-white placeholder:text-white/60 focus:border-[var(--color-brand-gold)]/50 focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-gold)]/30"
               disabled={sending}
             />

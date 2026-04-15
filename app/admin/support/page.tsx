@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { MessageCircle, ChevronRight } from "lucide-react";
-import { getAccessToken, authHeaders, clearAccessToken } from "@/lib/auth-client";
+import { clearAccessToken, fetchWithAuth } from "@/lib/auth-client";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 
 type ThreadItem = {
@@ -30,14 +30,9 @@ export default function AdminSupportPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const token = getAccessToken();
-    if (!token) {
-      router.replace("/login");
-      return;
-    }
     (async () => {
       try {
-        const res = await fetch("/api/admin/support/threads", { headers: authHeaders() });
+        const res = await fetchWithAuth("/api/admin/support/threads");
         if (res.status === 401 || res.status === 403) {
           clearAccessToken();
           router.replace("/login");

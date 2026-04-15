@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useMobileDarkChromeOverlay } from "@/lib/use-mobile-dark-chrome-overlay";
 import Link from "next/link";
 import { ChevronLeft, Plus, Trash2, Pencil } from "lucide-react";
-import { authHeaders } from "@/lib/auth-client";
+import { fetchWithAuth } from "@/lib/auth-client";
 import { EstablishmentDataGridPlaceholder } from "@/components/establishment/EstablishmentDataGridPlaceholder";
 import { PANEL_PAGE_TITLE_ESTABLISHMENT_HERO_ON_DARK } from "@/lib/panel-shell-visual-classes";
 
@@ -37,7 +37,7 @@ export default function EstablishmentGuestsPage() {
     setError(null);
     try {
       const url = q.trim() ? `/api/establishment/guests?q=${encodeURIComponent(q.trim())}` : "/api/establishment/guests";
-      const res = await fetch(url, { headers: authHeaders() });
+      const res = await fetchWithAuth(url);
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
         setError(data?.error ?? "Ошибка загрузки");
@@ -62,9 +62,9 @@ export default function EstablishmentGuestsPage() {
     setSubmitting(true);
     setError(null);
     try {
-      const res = await fetch("/api/establishment/guests", {
+      const res = await fetchWithAuth("/api/establishment/guests", {
         method: "POST",
-        headers: { "Content-Type": "application/json", ...authHeaders() },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           displayName: name.trim(),
           phone: phone.trim() || undefined,
@@ -93,9 +93,9 @@ export default function EstablishmentGuestsPage() {
   const saveNotes = async () => {
     if (!editing) return;
     try {
-      const res = await fetch(`/api/establishment/guests/${editing.id}`, {
+      const res = await fetchWithAuth(`/api/establishment/guests/${editing.id}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json", ...authHeaders() },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ notes: editNotes }),
       });
       if (!res.ok) {
@@ -113,7 +113,7 @@ export default function EstablishmentGuestsPage() {
   const remove = async (id: string) => {
     if (!confirm("Удалить гостя? Связь с бронями обнулится.")) return;
     try {
-      const res = await fetch(`/api/establishment/guests/${id}`, { method: "DELETE", headers: authHeaders() });
+      const res = await fetchWithAuth(`/api/establishment/guests/${id}`, { method: "DELETE" });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
         setError(data?.error ?? "Ошибка");

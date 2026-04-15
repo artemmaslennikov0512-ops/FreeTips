@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { MessageCircle, Send, Loader2, RefreshCw } from "lucide-react";
-import { getAccessToken, authHeaders, clearAccessToken } from "@/lib/auth-client";
+import { clearAccessToken, fetchWithAuth } from "@/lib/auth-client";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { CABINET_WAITER_BTN } from "@/lib/cabinet-button-classes";
@@ -33,10 +33,8 @@ export default function CabinetSupportPage() {
   const listEndRef = useRef<HTMLDivElement>(null);
 
   const fetchMessages = useCallback(async () => {
-    const token = getAccessToken();
-    if (!token) return;
     try {
-      const res = await fetch("/api/support/messages", { headers: authHeaders() });
+      const res = await fetchWithAuth("/api/support/messages");
       if (res.status === 401) {
         clearAccessToken();
         router.replace("/login");
@@ -56,15 +54,10 @@ export default function CabinetSupportPage() {
   }, [router]);
 
   const loadInitial = useCallback(async () => {
-    const token = getAccessToken();
-    if (!token) {
-      router.replace("/login");
-      return;
-    }
     setLoading(true);
     await fetchMessages();
     setLoading(false);
-  }, [fetchMessages, router]);
+  }, [fetchMessages]);
 
   const refresh = useCallback(async () => {
     setRefreshing(true);
@@ -83,16 +76,13 @@ export default function CabinetSupportPage() {
   const sendMessage = useCallback(async () => {
     const text = input.trim();
     if (!text || sending) return;
-    const token = getAccessToken();
-    if (!token) return;
     setSending(true);
     setInput("");
     try {
-      const res = await fetch("/api/support/messages", {
+      const res = await fetchWithAuth("/api/support/messages", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          ...authHeaders(),
           ...getCsrfHeader(),
         },
         body: JSON.stringify({ text }),
@@ -218,11 +208,14 @@ export default function CabinetSupportPage() {
             className="flex gap-2"
           >
             <input
+              id="support-chat-message"
+              name="supportMessage"
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Напишите сообщение…"
               maxLength={4000}
+              autoComplete="off"
               className="support-chat-input flex-1 rounded-xl border border-white/20 bg-white/5 px-4 py-3 text-[var(--color-text)] placeholder:text-[var(--color-text)]/60 focus:border-[var(--color-brand-gold)]/50 focus:outline-none focus:ring-1 focus:ring-[var(--color-brand-gold)]/30"
               disabled={sending}
             />

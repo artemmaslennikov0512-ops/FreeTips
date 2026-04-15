@@ -280,8 +280,12 @@ export default function CabinetVerificationPage() {
             <div className="min-w-0 space-y-4">
               <p className="text-xs text-white/70">Все поля обязательны для заполнения.</p>
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-white">ФИО <span className="text-red-400">*</span></label>
+                <label className="mb-1.5 block text-sm font-medium text-white" htmlFor="verification-fullName">
+                  ФИО <span className="text-red-400">*</span>
+                </label>
                 <input
+                  id="verification-fullName"
+                  name="fullName"
                   type="text"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
@@ -292,8 +296,12 @@ export default function CabinetVerificationPage() {
                 {fieldErrors.fullName && <p className="mt-1 text-sm text-red-500">{fieldErrors.fullName}</p>}
               </div>
               <div className="min-w-0">
-                <label className="mb-1.5 block text-sm font-medium text-white">Дата рождения <span className="text-red-400">*</span></label>
+                <label className="mb-1.5 block text-sm font-medium text-white" htmlFor="verification-birthDate">
+                  Дата рождения <span className="text-red-400">*</span>
+                </label>
                 <input
+                  id="verification-birthDate"
+                  name="birthDate"
                   type="date"
                   value={birthDate}
                   onChange={(e) => setBirthDate(e.target.value)}
@@ -304,8 +312,12 @@ export default function CabinetVerificationPage() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="mb-1.5 block text-sm font-medium text-white">Серия паспорта <span className="text-red-400">*</span></label>
+                  <label className="mb-1.5 block text-sm font-medium text-white" htmlFor="verification-passport-series">
+                    Серия паспорта <span className="text-red-400">*</span>
+                  </label>
                   <input
+                    id="verification-passport-series"
+                    name="passportSeries"
                     type="text"
                     inputMode="numeric"
                     maxLength={4}
@@ -318,8 +330,12 @@ export default function CabinetVerificationPage() {
                   {fieldErrors.passportSeries && <p className="mt-1 text-sm text-red-500">{fieldErrors.passportSeries}</p>}
                 </div>
                 <div>
-                  <label className="mb-1.5 block text-sm font-medium text-white">Номер паспорта <span className="text-red-400">*</span></label>
+                  <label className="mb-1.5 block text-sm font-medium text-white" htmlFor="verification-passport-number">
+                    Номер паспорта <span className="text-red-400">*</span>
+                  </label>
                   <input
+                    id="verification-passport-number"
+                    name="passportNumber"
                     type="text"
                     inputMode="numeric"
                     maxLength={6}
@@ -333,8 +349,12 @@ export default function CabinetVerificationPage() {
                 </div>
               </div>
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-white">ИНН <span className="text-red-400">*</span></label>
+                <label className="mb-1.5 block text-sm font-medium text-white" htmlFor="verification-inn">
+                  ИНН <span className="text-red-400">*</span>
+                </label>
                 <input
+                  id="verification-inn"
+                  name="inn"
                   type="text"
                   inputMode="numeric"
                   maxLength={14}
@@ -383,6 +403,8 @@ export default function CabinetVerificationPage() {
                     )}
                   </div>
                   <input
+                    id={`verification-upload-${type}`}
+                    name={type === "passport_spread" ? "passportSpread" : "selfieWithPassport"}
                     type="file"
                     accept="image/jpeg,image/png,image/webp"
                     className="block w-full text-sm text-white file:mr-3 file:inline-flex file:cursor-pointer file:items-center file:justify-center file:rounded-full file:border file:border-[rgba(197,165,114,0.55)] file:bg-transparent file:px-4 file:py-2 file:font-medium file:text-[var(--color-brand-gold)] file:font-[family:var(--font-inter,system-ui,sans-serif)]"
@@ -398,8 +420,10 @@ export default function CabinetVerificationPage() {
               ))}
 
               <div className="border-t border-[var(--color-dark-gray)]/20 pt-6">
-                <label className="flex cursor-pointer items-start gap-3">
+                <label className="flex cursor-pointer items-start gap-3" htmlFor="verification-consent">
                   <input
+                    id="verification-consent"
+                    name="verificationConsent"
                     type="checkbox"
                     checked={consent}
                     onChange={(e) => setConsent(e.target.checked)}

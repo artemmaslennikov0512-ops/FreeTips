@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Plus, Copy, RefreshCw } from "lucide-react";
-import { authHeaders } from "@/lib/auth-client";
+import { fetchWithAuth } from "@/lib/auth-client";
 import { ADMIN_BTN, ADMIN_BTN_NEUTRAL_SM, ADMIN_BTN_PRIMARY, ADMIN_BTN_SM } from "@/lib/admin-button-classes";
 import { ADMIN_PANEL_INPUT_FULL_WIDTH, ADMIN_PANEL_INPUT_STRETCH } from "@/lib/admin-surface-classes";
 import {
@@ -51,7 +51,7 @@ export default function AdminEstablishmentsPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/admin/establishments", { headers: authHeaders() });
+      const res = await fetchWithAuth("/api/admin/establishments");
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
         setError(d?.error ?? "Ошибка загрузки");
@@ -87,9 +87,9 @@ export default function AdminEstablishmentsPage() {
         setSubmitting(false);
         return;
       }
-      const res = await fetch("/api/admin/establishments", {
+      const res = await fetchWithAuth("/api/admin/establishments", {
         method: "POST",
-        headers: { "Content-Type": "application/json", ...authHeaders() },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: form.name.trim(),
           address: form.address.trim() || undefined,
@@ -123,9 +123,8 @@ export default function AdminEstablishmentsPage() {
   const getOrRegenerateToken = async (estId: string) => {
     setLoadingTokenId(estId);
     try {
-      const res = await fetch(`/api/admin/establishments/${estId}/registration-token`, {
+      const res = await fetchWithAuth(`/api/admin/establishments/${estId}/registration-token`, {
         method: "POST",
-        headers: authHeaders(),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {

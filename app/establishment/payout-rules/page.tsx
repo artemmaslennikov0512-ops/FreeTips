@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Plus, Pencil, Trash2 } from "lucide-react";
-import { authHeaders } from "@/lib/auth-client";
+import { fetchWithAuth } from "@/lib/auth-client";
 import { CustomDropdown } from "@/components/CustomDropdown";
 import { PANEL_PAGE_TITLE_ESTABLISHMENT_WHITE_LG } from "@/lib/panel-shell-visual-classes";
 
@@ -35,9 +35,7 @@ export default function PayoutRulesPage() {
   const [routingMessage, setRoutingMessage] = useState<string | null>(null);
 
   const fetchRules = async () => {
-    const res = await fetch("/api/establishment/payout-rules", {
-      headers: authHeaders(),
-    });
+    const res = await fetchWithAuth("/api/establishment/payout-rules");
     if (!res.ok) {
       setError("Ошибка загрузки");
       return;
@@ -51,8 +49,8 @@ export default function PayoutRulesPage() {
       setLoading(true);
       setError(null);
       const [rulesOk, settingsRes] = await Promise.all([
-        fetch("/api/establishment/payout-rules", { headers: authHeaders() }),
-        fetch("/api/establishment/settings", { headers: authHeaders() }),
+        fetchWithAuth("/api/establishment/payout-rules"),
+        fetchWithAuth("/api/establishment/settings"),
       ]);
       if (!rulesOk.ok) {
         setError("Ошибка загрузки");
@@ -76,9 +74,9 @@ export default function PayoutRulesPage() {
     setRoutingMessage(null);
     setRoutingSaving(true);
     try {
-      const res = await fetch("/api/establishment/settings", {
+      const res = await fetchWithAuth("/api/establishment/settings", {
         method: "PATCH",
-        headers: { "Content-Type": "application/json", ...authHeaders() },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ tipRoutingMode }),
       });
       const data = await res.json().catch(() => ({}));
@@ -120,9 +118,9 @@ export default function PayoutRulesPage() {
             type: formType,
             value: valueNum,
           });
-      const res = await fetch(url, {
+      const res = await fetchWithAuth(url, {
         method,
-        headers: { "Content-Type": "application/json", ...authHeaders() },
+        headers: { "Content-Type": "application/json" },
         body,
       });
       const data = await res.json().catch(() => ({}));
@@ -154,9 +152,8 @@ export default function PayoutRulesPage() {
 
   const handleDelete = async (id: string) => {
     if (!confirm("Удалить правило?")) return;
-    const res = await fetch(`/api/establishment/payout-rules/${id}`, {
+    const res = await fetchWithAuth(`/api/establishment/payout-rules/${id}`, {
       method: "DELETE",
-      headers: authHeaders(),
     });
     if (res.ok) await fetchRules();
   };

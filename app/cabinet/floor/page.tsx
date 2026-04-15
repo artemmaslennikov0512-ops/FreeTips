@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { authHeaders } from "@/lib/auth-client";
+import { fetchWithAuth } from "@/lib/auth-client";
 
 interface FloorTable {
   id: string;
@@ -33,7 +33,7 @@ export default function CabinetFloorPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/cabinet/establishment/floor", { headers: authHeaders() });
+      const res = await fetchWithAuth("/api/cabinet/establishment/floor");
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
         setError(data?.error ?? "Не удалось загрузить зал");

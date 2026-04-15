@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { User, Loader2, CheckCircle2, Camera, ImageIcon } from "lucide-react";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
-import { getAccessToken, authHeaders, clearAccessToken } from "@/lib/auth-client";
+import { clearAccessToken, fetchWithAuth } from "@/lib/auth-client";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { ProfileTotpSection } from "@/components/ProfileTotpSection";
 import { patchProfileSchema, changePasswordSchema } from "@/lib/validations";
@@ -80,19 +80,13 @@ export default function CabinetSettingsPage() {
   const identityLocked = (user?.verificationStatus ?? "").toUpperCase() === "VERIFIED";
 
   useEffect(() => {
-    const token = getAccessToken();
-    if (!token) {
-      router.replace("/login");
-      return;
-    }
-
-    const ac = new AbortController();
+    let cancelled = false;
 
     (async () => {
       try {
-        const res = await fetch("/api/profile", { headers: authHeaders(), signal: ac.signal });
-        if (ac.signal.aborted) return;
-        if (res.status === 401) {
+        const res = await fetchWithAuth("/api/profile");
+        if (cancelled) return;
+        if (res.status === 401 || res.status === 403) {
           clearAccessToken();
           router.replace("/login");
           return;
@@ -110,24 +104,26 @@ export default function CabinetSettingsPage() {
           return;
         }
         const data = (await res.json()) as Profile;
-        if (ac.signal.aborted) return;
+        if (cancelled) return;
         setUser(data);
         if (!profileFormTouchedRef.current) {
           hydrateFormFromProfile(data);
         }
       } catch {
-        if (ac.signal.aborted) return;
+        if (cancelled) return;
         setError("Ошибка соединения");
       } finally {
-        if (!ac.signal.aborted) setLoading(false);
+        setLoading(false);
       }
     })();
 
-    return () => ac.abort();
+    return () => {
+      cancelled = true;
+    };
   }, [router, hydrateFormFromProfile]);
 
   const handleSaveProfile = async () => {
-    if (!getAccessToken() || !user) return;
+    if (!user) return;
 
     setProfileFieldErrors({});
     setSaveError(null);
@@ -158,11 +154,10 @@ export default function CabinetSettingsPage() {
 
     setSaving(true);
     try {
-      const res = await fetch("/api/profile", {
+      const res = await fetchWithAuth("/api/profile", {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          ...authHeaders(),
           ...getCsrfHeader(),
         },
         body: JSON.stringify(parsed.data),
@@ -208,8 +203,6 @@ export default function CabinetSettingsPage() {
   };
 
   const handleChangePassword = async () => {
-    if (!getAccessToken()) return;
-
     setPwError(null);
     setPwFieldErrors({});
 
@@ -226,11 +219,10 @@ export default function CabinetSettingsPage() {
     setPwSaving(true);
     setPwOk(false);
     try {
-      const res = await fetch("/api/profile/change-password", {
+      const res = await fetchWithAuth("/api/profile/change-password", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          ...authHeaders(),
           ...getCsrfHeader(),
         },
         body: JSON.stringify(parsed.data),
@@ -257,16 +249,15 @@ export default function CabinetSettingsPage() {
 
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file || !getAccessToken()) return;
+    if (!file) return;
     setPhotoError(null);
     setPhotoUploading(true);
     try {
       const formData = new FormData();
       formData.set("file", file);
       formData.set("type", "avatar");
-      const res = await fetch("/api/profile/employee-photo", {
+      const res = await fetchWithAuth("/api/profile/employee-photo", {
         method: "POST",
-        headers: authHeaders(),
         body: formData,
       });
       const data = (await res.json()) as { ok?: boolean; error?: string };
@@ -274,7 +265,7 @@ export default function CabinetSettingsPage() {
         setPhotoError(data?.error ?? "Ошибка загрузки");
         return;
       }
-      const profileRes = await fetch("/api/profile", { headers: authHeaders() });
+      const profileRes = await fetchWithAuth("/api/profile");
       if (profileRes.ok) {
         const updated = (await profileRes.json()) as Profile;
         setUser(updated);
@@ -316,6 +307,21 @@ export default function CabinetSettingsPage() {
     );
   }
 
+  if (!user) {
+    return (
+      <div className="flex min-h-[40vh] flex-col items-center justify-center">
+        <p className="text-[var(--color-text-secondary)]">Не удалось загрузить данные профиля.</p>
+        <button
+          type="button"
+          onClick={() => window.location.reload()}
+          className={`mt-4 ${CABINET_WAITER_BTN_INLINE} px-5 py-2.5 text-[14px]`}
+        >
+          Обновить страницу
+        </button>
+      </div>
+    );
+  }
+
   const isEmployee = user?.role?.toUpperCase() === "EMPLOYEE";
   const isRecipient = user?.role?.toUpperCase() === "RECIPIENT";
   const canUploadPhoto = isEmployee || isRecipient;
@@ -352,6 +358,8 @@ export default function CabinetSettingsPage() {
                 <div className="flex flex-col items-start gap-2">
                   <input
                     ref={photoInputRef}
+                    id="settings-employee-photo"
+                    name="employeePhoto"
                     type="file"
                     accept="image/jpeg,image/png,image/webp,image/jpg"
                     onChange={handlePhotoUpload}
@@ -421,6 +429,7 @@ export default function CabinetSettingsPage() {
             <label htmlFor="settings-login" className="mb-1 block text-sm font-medium text-[var(--color-text)]">Логин</label>
             <input
               id="settings-login"
+              name="login"
               type="text"
               value={editLogin}
               onChange={(e) => {
@@ -435,6 +444,7 @@ export default function CabinetSettingsPage() {
             <label htmlFor="settings-email" className="mb-1 block text-sm font-medium text-[var(--color-text)]">Email (необязательно)</label>
             <input
               id="settings-email"
+              name="email"
               type="email"
               value={editEmail}
               onChange={(e) => {
@@ -460,6 +470,7 @@ export default function CabinetSettingsPage() {
               <label htmlFor="settings-lastName" className="mb-1 block text-sm font-medium text-[var(--color-text)]">Фамилия</label>
               <input
                 id="settings-lastName"
+                name="lastName"
                 type="text"
                 value={editLastName}
                 readOnly={identityLocked}
@@ -477,6 +488,7 @@ export default function CabinetSettingsPage() {
               <label htmlFor="settings-firstName" className="mb-1 block text-sm font-medium text-[var(--color-text)]">Имя</label>
               <input
                 id="settings-firstName"
+                name="firstName"
                 type="text"
                 value={editFirstName}
                 readOnly={identityLocked}
@@ -493,6 +505,7 @@ export default function CabinetSettingsPage() {
               <label htmlFor="settings-patronymic" className="mb-1 block text-sm font-medium text-[var(--color-text)]">Отчество</label>
               <input
                 id="settings-patronymic"
+                name="patronymic"
                 type="text"
                 value={editPatronymic}
                 readOnly={identityLocked}
@@ -509,6 +522,7 @@ export default function CabinetSettingsPage() {
               <label htmlFor="settings-birthDate" className="mb-1 block text-sm font-medium text-[var(--color-text)]">Дата рождения</label>
               <input
                 id="settings-birthDate"
+                name="birthDate"
                 type="date"
                 value={editBirthDate}
                 readOnly={identityLocked}
@@ -525,6 +539,7 @@ export default function CabinetSettingsPage() {
               <label htmlFor="settings-establishment" className="mb-1 block text-sm font-medium text-[var(--color-text)]">Заведение</label>
               <input
                 id="settings-establishment"
+                name="establishment"
                 type="text"
                 value={editEstablishment}
                 onChange={(e) => {
@@ -586,6 +601,7 @@ export default function CabinetSettingsPage() {
             <label htmlFor="settings-pwCurrent" className="mb-1 block text-sm font-medium text-[var(--color-text)]">Текущий пароль</label>
             <input
               id="settings-pwCurrent"
+              name="currentPassword"
               type="password"
               autoComplete="current-password"
               value={pwCurrent}
@@ -598,6 +614,7 @@ export default function CabinetSettingsPage() {
             <label htmlFor="settings-pwNew" className="mb-1 block text-sm font-medium text-[var(--color-text)]">Новый пароль</label>
             <input
               id="settings-pwNew"
+              name="newPassword"
               type="password"
               autoComplete="new-password"
               value={pwNew}
@@ -610,6 +627,7 @@ export default function CabinetSettingsPage() {
             <label htmlFor="settings-pwConfirm" className="mb-1 block text-sm font-medium text-[var(--color-text)]">Повторите новый пароль</label>
             <input
               id="settings-pwConfirm"
+              name="newPasswordConfirm"
               type="password"
               autoComplete="new-password"
               value={pwConfirm}

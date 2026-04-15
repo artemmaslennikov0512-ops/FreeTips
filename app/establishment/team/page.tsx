@@ -5,9 +5,8 @@ import { useMobileDarkChromeOverlay } from "@/lib/use-mobile-dark-chrome-overlay
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Plus, Copy, RefreshCw, FileDown, Mail, Pencil, Upload, ImageIcon, X, Check } from "lucide-react";
-import { authHeaders, fetchWithAuth } from "@/lib/auth-client";
+import { fetchWithAuth } from "@/lib/auth-client";
 import { beginCabinetImpersonation } from "@/lib/cabinet-impersonation";
-import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { PANEL_PAGE_TITLE_ESTABLISHMENT_WHITE_LG } from "@/lib/panel-shell-visual-classes";
 
 interface EstablishmentInfo {
@@ -68,8 +67,8 @@ export default function EstablishmentTeamPage() {
     setError(null);
     try {
       const [infoRes, empRes] = await Promise.all([
-        fetchWithAuth("/api/establishment/info", { headers: authHeaders() }),
-        fetchWithAuth("/api/establishment/employees", { headers: authHeaders() }),
+        fetchWithAuth("/api/establishment/info"),
+        fetchWithAuth("/api/establishment/employees"),
       ]);
       if (!infoRes.ok || !empRes.ok) {
         setError("Ошибка загрузки");
@@ -101,7 +100,7 @@ export default function EstablishmentTeamPage() {
     try {
       const res = await fetchWithAuth("/api/establishment/employees", {
         method: "POST",
-        headers: { "Content-Type": "application/json", ...authHeaders() },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: formName.trim(),
           position: formPosition.trim() || undefined,
@@ -129,7 +128,6 @@ export default function EstablishmentTeamPage() {
     try {
       const res = await fetchWithAuth(`/api/establishment/employees/${empId}/registration-token`, {
         method: "POST",
-        headers: authHeaders(),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
@@ -151,9 +149,7 @@ export default function EstablishmentTeamPage() {
   const downloadPdf = async () => {
     setDownloadingPdf(true);
     try {
-      const res = await fetchWithAuth("/api/establishment/employees/pdf", {
-        headers: authHeaders(),
-      });
+      const res = await fetchWithAuth("/api/establishment/employees/pdf");
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
         alert(data?.error ?? "Ошибка загрузки PDF");
@@ -180,7 +176,7 @@ export default function EstablishmentTeamPage() {
     try {
       const res = await fetchWithAuth(`/api/establishment/employees/${empId}/invite`, {
         method: "POST",
-        headers: { "Content-Type": "application/json", ...authHeaders() },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: email.trim() }),
       });
       const data = await res.json().catch(() => ({}));
@@ -201,7 +197,7 @@ export default function EstablishmentTeamPage() {
     try {
       const res = await fetchWithAuth(`/api/establishment/employees/${emp.id}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json", ...authHeaders() },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ isActive: !emp.isActive }),
       });
       const data = await res.json().catch(() => ({}));
@@ -229,7 +225,7 @@ export default function EstablishmentTeamPage() {
     try {
       const res = await fetchWithAuth(`/api/establishment/employees/${emp.id}/disconnect`, {
         method: "POST",
-        headers: { "Content-Type": "application/json", ...authHeaders(), ...getCsrfHeader() },
+        headers: { "Content-Type": "application/json" },
         body: "{}",
       });
       const data = await res.json().catch(() => ({}));
@@ -264,7 +260,7 @@ export default function EstablishmentTeamPage() {
     try {
       const res = await fetchWithAuth(`/api/establishment/employees/${editEmployee.id}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json", ...authHeaders() },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: editName.trim(),
           position: editPosition.trim() || null,
@@ -314,7 +310,6 @@ export default function EstablishmentTeamPage() {
       form.set("file", file);
       const res = await fetchWithAuth(`/api/establishment/employees/${empId}/photo`, {
         method: "POST",
-        headers: authHeaders(),
         body: form,
       });
       const data = await res.json().catch(() => ({}));

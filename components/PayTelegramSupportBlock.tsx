@@ -1,6 +1,6 @@
 /** Блок «проблема с оплатой» + явная кнопка перехода в Telegram поддержки. */
 
-export const PAY_SUPPORT_TELEGRAM_URL = "https://t.me/SupporFT_SD";
+const PAY_SUPPORT_TELEGRAM_URL = "https://t.me/SupporFT_SD";
 
 type Props = {
   className?: string;

@@ -10,7 +10,7 @@ import { getFraudObserveSettings } from "@/lib/fraud-observe-settings";
 
 const ROLES_EXCLUDED_FROM_SHARED_IP_COUNT = ["ADMIN", "SUPERADMIN"] as const;
 
-export function isMeaningfulClientIp(ip: string): boolean {
+function isMeaningfulClientIp(ip: string): boolean {
   const t = ip.trim();
   if (!t || t === "unknown") return false;
   return true;

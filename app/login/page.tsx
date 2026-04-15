@@ -18,7 +18,7 @@ import {
 } from "@/lib/auth-form-classes";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { writeCabinetNavRoleCache } from "@/lib/cabinet-nav-role-cache";
-import { clearAccessToken } from "@/lib/auth-client";
+import { clearAccessToken, migrateLegacyAccessTokenToCookie } from "@/lib/auth-client";
 
 function LoginForm() {
   const router = useRouter();
@@ -37,28 +37,23 @@ function LoginForm() {
   const [totpCode, setTotpCode] = useState("");
 
   useEffect(() => {
-    const token = typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
-    if (!token) {
-      setCheckingAuth(false);
-      return;
-    }
-    fetch("/api/profile", { headers: { Authorization: `Bearer ${token}` } })
-      .then(async (res) => {
-        if (res.ok) {
-          const data = await res.json().catch(() => null);
-          if (data?.role === "ESTABLISHMENT_ADMIN" && data?.establishmentId) {
-            router.replace("/establishment");
-          } else if (data?.role === "ADMIN" || data?.role === "SUPERADMIN") {
-            router.replace("/admin/dashboard");
-          } else {
-            router.replace("/cabinet");
-          }
-          return;
+    void (async () => {
+      await migrateLegacyAccessTokenToCookie();
+      const res = await fetch("/api/profile", { credentials: "include" });
+      if (res.ok) {
+        const data = await res.json().catch(() => null);
+        if (data?.role === "ESTABLISHMENT_ADMIN" && data?.establishmentId) {
+          router.replace("/establishment");
+        } else if (data?.role === "ADMIN" || data?.role === "SUPERADMIN") {
+          router.replace("/admin/dashboard");
+        } else {
+          router.replace("/cabinet");
         }
-        if (res.status === 401) clearAccessToken();
-        setCheckingAuth(false);
-      })
-      .catch(() => setCheckingAuth(false));
+        return;
+      }
+      if (res.status === 401) clearAccessToken();
+      setCheckingAuth(false);
+    })().catch(() => setCheckingAuth(false));
   }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -99,8 +94,7 @@ function LoginForm() {
         return;
       }
 
-      if (data.accessToken) {
-        localStorage.setItem("accessToken", data.accessToken);
+      if (data.user) {
         writeCabinetNavRoleCache(data.user?.role);
         if (data.mustChangePassword) {
           router.push("/change-password");
@@ -144,8 +138,7 @@ function LoginForm() {
         setError(data.error || "Ошибка проверки кода");
         return;
       }
-      if (data.accessToken) {
-        localStorage.setItem("accessToken", data.accessToken);
+      if (data.user) {
         writeCabinetNavRoleCache(data.user?.role);
         if (data.mustChangePassword) {
           router.push("/change-password");

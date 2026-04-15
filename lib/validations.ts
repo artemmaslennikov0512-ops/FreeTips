@@ -10,22 +10,8 @@ import { PAYOUT_MAX_AMOUNT_KOP, PAYOUT_MIN_AMOUNT_KOP } from "./payout-amount-bo
 const REGISTRATION_TOKEN_MIN_LENGTH = 10;
 const REGISTRATION_TOKEN_MAX_LENGTH = 512;
 
-// Телефон: российский формат (опционально +7, затем 10 цифр)
-export const phoneSchema = z
-  .string()
-  .regex(/^(\+7|7|8)?[0-9]{10}$/, "Неверный формат телефона")
-  .transform((val) => {
-    // Нормализуем: убираем +7/7/8, оставляем 10 цифр
-    const digits = val.replace(/\D/g, "");
-    return digits.length === 11 && digits.startsWith("7")
-      ? digits.slice(1)
-      : digits.length === 10
-        ? digits
-        : val;
-  });
-
 /** Телефон для заявки «оставить заявку»: обязательный, +7/8/10 цифр, в БД — 10 цифр */
-export const phoneRegistrationRequiredSchema = z
+const phoneRegistrationRequiredSchema = z
   .string()
   .trim()
   .min(1, "Укажите телефон")
@@ -50,7 +36,7 @@ export const passwordSchema = z
   .regex(/[0-9]/, "Пароль должен содержать хотя бы одну цифру");
 
 // Логин: 3–50 символов, латиница, цифры, подчёркивание (пробелы обрезаются)
-export const loginSchema = z
+const loginSchema = z
   .string()
   .trim()
   .min(3, "Логин должен быть не менее 3 символов")
@@ -58,7 +44,7 @@ export const loginSchema = z
   .regex(/^[a-zA-Z0-9_]+$/, "Логин: только латиница, цифры и _");
 
 /** Кодовое слово при регистрации / для сброса пароля (bcrypt на сервере; до 72 байт для bcrypt) */
-export const recoveryCodewordSchema = z
+const recoveryCodewordSchema = z
   .string()
   .trim()
   .min(3, "Кодовое слово — не менее 3 символов")
@@ -77,14 +63,14 @@ export const adminRecoveryCodewordUpdateSchema = z
 
 // Сумма в копейках: положительное целое, верхняя граница (100 млн ₽) против злоупотреблений
 const AMOUNT_KOP_MAX = BigInt("10000000000"); // 100 000 000 руб
-export const amountKopSchema = z
+const amountKopSchema = z
   .bigint()
   .positive("Сумма должна быть положительной")
   .max(AMOUNT_KOP_MAX, "Сумма превышает допустимый лимит")
   .or(z.number().int().positive().max(Number(AMOUNT_KOP_MAX)).transform((n) => BigInt(n)));
 
 // Код в пути /pay/{slug} (тело поля `slug` в API): 3–50 символов, латиница, цифры, дефис, _
-export const slugSchema = z
+const slugSchema = z
   .string()
   .min(3, "Код должен быть не менее 3 символов")
   .max(50, "Код не должен превышать 50 символов")
@@ -122,8 +108,6 @@ export const registerSchema = z
     message: "Пароли не совпадают",
     path: ["passwordConfirm"],
   });
-
-export type RegisterInput = z.infer<typeof registerSchema>;
 
 // Вход
 export const loginRequestSchema = z.object({
@@ -259,7 +243,7 @@ export const supportMessageSchema = z.object({
 });
 
 /** ИНН РФ: 10 цифр (юрлицо) или 12 (физлицо / ИП). Ввод с пробелами — нормализуем до цифр. */
-export const verificationInnSchema = z
+const verificationInnSchema = z
   .string()
   .trim()
   .transform((s) => s.replace(/\D/g, ""))

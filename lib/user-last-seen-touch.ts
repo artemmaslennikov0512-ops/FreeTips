@@ -5,7 +5,7 @@
  */
 
 import { db } from "@/lib/db";
-import { LK_LAST_SEEN_TOUCH_MIN_INTERVAL_MS } from "@/lib/lk-presence";
+import { LK_PRESENCE_WINDOW_MS } from "@/lib/lk-presence";
 
 /** Сколько одновременных записей lastSeenAt по разным пользователям (остальные ждут очереди). */
 const MAX_CONCURRENT_LAST_SEEN_TOUCHES = 25;
@@ -35,7 +35,7 @@ function releaseConcurrencySlot(): void {
 const inflightByUser = new Map<string, Promise<boolean>>();
 
 async function runTouchDb(userId: string): Promise<boolean> {
-  const since = new Date(Date.now() - LK_LAST_SEEN_TOUCH_MIN_INTERVAL_MS);
+  const since = new Date(Date.now() - LK_PRESENCE_WINDOW_MS);
   const now = new Date();
   const result = await db.user.updateMany({
     where: {
@@ -48,7 +48,7 @@ async function runTouchDb(userId: string): Promise<boolean> {
 }
 
 /**
- * Продлевает lastSeenAt, если прошло ≥ LK_LAST_SEEN_TOUCH_MIN_INTERVAL_MS с прошлой записи.
+ * Продлевает lastSeenAt, если прошло ≥ LK_PRESENCE_WINDOW_MS с прошлой записи.
  * @returns true если была запись в БД
  */
 export async function touchUserLastSeenThrottled(userId: string): Promise<boolean> {

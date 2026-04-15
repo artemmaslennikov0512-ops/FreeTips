@@ -10,7 +10,12 @@ import {
   ADMIN_BTN_PRIMARY,
   ADMIN_BTN_SM,
 } from "@/lib/admin-button-classes";
-import { getCsrfHeader } from "@/lib/security/csrf-client";
+import {
+  PANEL_ADMIN_DASHBOARD_TABLE_CARD,
+  PANEL_ADMIN_DASHBOARD_TABLE_DESKTOP_BASE,
+} from "@/lib/panel-shell-visual-classes";
+import { ADMIN_PANEL_TEXTAREA } from "@/lib/admin-surface-classes";
+import { fetchWithAuth } from "@/lib/auth-client";
 import { Check, ChevronDown, ChevronRight, ClipboardCheck, Copy, Send, Loader2, XCircle } from "lucide-react";
 import { AdminStatusTabs, AdminRequestTab, apiStatusForTab } from "./AdminStatusTabs";
 
@@ -44,7 +49,7 @@ function loadIssuedLinksFromStorage(): Record<string, string> {
   }
 }
 
-export interface RegistrationRequestRow {
+interface RegistrationRequestRow {
   id: string;
   requestType: string;
   fullName: string;
@@ -238,15 +243,11 @@ export function AdminConnectionRequestsBlock({
   }, []);
 
   const fetchList = useCallback(async () => {
-    const token = localStorage.getItem("accessToken");
-    if (!token) return;
     setLoading(true);
     setError(null);
     try {
       const status = apiStatusForTab(tab);
-      const res = await fetch(`/api/admin/registration-requests?status=${status}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await fetchWithAuth(`/api/admin/registration-requests?status=${status}`);
       if (!res.ok) {
         setError("Ошибка загрузки заявок на подключение");
         return;
@@ -295,17 +296,13 @@ export function AdminConnectionRequestsBlock({
 
   const handleRejectSubmit = async () => {
     if (!rejectModal || !rejectReason.trim()) return;
-    const token = localStorage.getItem("accessToken");
-    if (!token) return;
     setRejectSubmitting(true);
     setRejectError(null);
     try {
-      const res = await fetch(`/api/admin/registration-requests/${rejectModal.id}/reject`, {
+      const res = await fetchWithAuth(`/api/admin/registration-requests/${rejectModal.id}/reject`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-          ...getCsrfHeader(),
         },
         body: JSON.stringify({ reason: rejectReason.trim() }),
       });
@@ -326,13 +323,10 @@ export function AdminConnectionRequestsBlock({
   };
 
   const handleApprove = async (id: string) => {
-    const token = localStorage.getItem("accessToken");
-    if (!token) return;
     setApprovingId(id);
     try {
-      const res = await fetch(`/api/admin/registration-requests/${id}/approve`, {
+      const res = await fetchWithAuth(`/api/admin/registration-requests/${id}/approve`, {
         method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
       });
       const data = (await res.json().catch(() => ({}))) as { link?: string; expiresAt?: string; error?: string };
       if (!res.ok) {
@@ -361,13 +355,10 @@ export function AdminConnectionRequestsBlock({
   };
 
   const handleSendToken = async (id: string) => {
-    const token = localStorage.getItem("accessToken");
-    if (!token) return;
     setSendingTokenId(id);
     try {
-      const res = await fetch(`/api/admin/registration-requests/${id}/send-token`, {
+      const res = await fetchWithAuth(`/api/admin/registration-requests/${id}/send-token`, {
         method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
       });
       const data = (await res.json().catch(() => ({}))) as {
         link?: string;
@@ -451,7 +442,7 @@ export function AdminConnectionRequestsBlock({
               const isApproving = approvingId === r.id;
               const isMobileExpanded = expandedId === r.id;
               return (
-                <div key={r.id} className="admin-dashboard-table cabinet-section-header rounded-2xl border-0 p-4">
+                <div key={r.id} className={PANEL_ADMIN_DASHBOARD_TABLE_CARD}>
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <span className="text-xs text-white/70">{r.requestType === "establishment" ? "Заведение" : "Получатель"}</span>
                     <span
@@ -621,7 +612,7 @@ export function AdminConnectionRequestsBlock({
           </div>
 
           <div
-            className={`admin-dashboard-table cabinet-section-header hidden max-w-full rounded-xl border-0 text-left lg:block ${
+            className={`${PANEL_ADMIN_DASHBOARD_TABLE_DESKTOP_BASE} ${
               stretchTableArea && compactTableLayout
                 ? "min-h-[min(48dvh,520px)] min-w-0 w-full flex-1 overflow-auto"
                 : "w-full overflow-hidden"
@@ -857,7 +848,7 @@ export function AdminConnectionRequestsBlock({
               value={rejectReason}
               onChange={(e) => setRejectReason(e.target.value)}
               placeholder="Например: не отвечаете на уточняющие письма; данные заведения не подтверждены."
-              className="mb-4 w-full min-h-[120px] rounded-xl px-4 py-3 text-left focus:outline-none focus:ring-2 focus:ring-[var(--color-brand-gold)]/40"
+              className={`mb-4 ${ADMIN_PANEL_TEXTAREA}`}
               rows={4}
             />
             {rejectError && (

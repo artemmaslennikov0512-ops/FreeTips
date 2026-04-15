@@ -5,9 +5,10 @@ import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { fetchWithAuth, clearAccessToken } from "@/lib/auth-client";
 import { ADMIN_BTN, ADMIN_BTN_PRIMARY, ADMIN_BTN_SM } from "@/lib/admin-button-classes";
+import { ADMIN_PANEL_PAGE_XL } from "@/lib/admin-surface-classes";
 import { CABINET_WAITER_BTN_INLINE } from "@/lib/cabinet-button-classes";
 
-export type LkSessionsVariant = "admin" | "cabinet" | "establishment";
+type LkSessionsVariant = "admin" | "cabinet" | "establishment";
 
 type SessionItem = {
   id: string;
@@ -69,7 +70,7 @@ function shellForVariant(variant: LkSessionsVariant): { root: string; card: stri
     };
   }
   return {
-    root: `${rootFullWidth} space-y-6 text-white`,
+    root: `${ADMIN_PANEL_PAGE_XL} min-w-0`,
     card:
       "lk-sessions__card cabinet-section-header mt-6 w-full rounded-2xl border-0 p-4 text-left shadow-[var(--shadow-card)] sm:p-6",
     primaryBtn: `lk-sessions__btn--primary ${ADMIN_BTN} ${ADMIN_BTN_PRIMARY}`,

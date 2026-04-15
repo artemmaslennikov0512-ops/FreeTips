@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { ADMIN_BTN, ADMIN_BTN_PRIMARY } from "@/lib/admin-button-classes";
+import { fetchWithAuth } from "@/lib/auth-client";
 import {
   ADMIN_PANEL_ALERT_OK,
   ADMIN_PANEL_ALERT_WARN,
@@ -64,12 +65,8 @@ export function RecipientPayLimitsCard({ className = "" }: { className?: string 
 
   useEffect(() => {
     const run = async () => {
-      const token = localStorage.getItem("accessToken");
-      if (!token) return;
       try {
-        const res = await fetch("/api/admin/payment-accept", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await fetchWithAuth("/api/admin/payment-accept");
         if (!res.ok) {
           setLoadError("Не удалось загрузить лимиты");
           return;
@@ -152,17 +149,11 @@ export function RecipientPayLimitsCard({ className = "" }: { className?: string 
 
     setSavingLimits(true);
     setLimitsMessage(null);
-    const token = localStorage.getItem("accessToken");
-    if (!token) {
-      setSavingLimits(false);
-      return;
-    }
     void (async () => {
       try {
-        const res = await fetch("/api/admin/payment-accept", {
+        const res = await fetchWithAuth("/api/admin/payment-accept", {
           method: "PATCH",
           headers: {
-            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({

@@ -18,9 +18,16 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import type { LucideIcon } from "lucide-react";
-import { LogOut, Menu, User, BadgeCheck, Building2 } from "lucide-react";
+import { LogOut, User, BadgeCheck, Building2 } from "lucide-react";
 import { CABINET_WAITER_BTN } from "@/lib/cabinet-button-classes";
-import { ThemeToggle } from "@/components/ThemeToggle";
+import {
+  PANEL_MOBILE_NAV_OVERLAY_TRANSITION,
+  PANEL_MOBILE_NAV_SHELL_TRANSITION,
+  PANEL_MOBILE_PORTAL_SAFE_PADDING_COMPACT,
+  PANEL_MOBILE_Z_NAV_PORTAL_LAYER,
+  PANEL_MOBILE_Z_NAV_PORTAL_SHELL,
+} from "@/lib/panel-mobile-ui";
+import { PanelMobileTopChrome } from "@/components/PanelMobileTopChrome";
 import { useTheme } from "@/lib/theme-context";
 import { applyDocumentShellChrome } from "@/lib/document-shell-chrome";
 import { useMobileDarkChromeOverlay } from "@/lib/use-mobile-dark-chrome-overlay";
@@ -33,7 +40,7 @@ export type CabinetMobileNavUser = {
   employeePhotoUrl?: string | null;
 } | null;
 
-export type CabinetNavDrawerItem = { label: string; href: string; icon: LucideIcon };
+type CabinetNavDrawerItem = { label: string; href: string; icon: LucideIcon };
 
 export type CabinetNavDrawerGroup = { title: string; items: CabinetNavDrawerItem[] };
 
@@ -72,56 +79,10 @@ export function CabinetMobileNavProvider({
   return <CabinetMobileNavContext.Provider value={value}>{children}</CabinetMobileNavContext.Provider>;
 }
 
-export function useCabinetMobileNav(): CabinetMobileNavContextValue {
+function useCabinetMobileNav(): CabinetMobileNavContextValue {
   const ctx = useContext(CabinetMobileNavContext);
   if (!ctx) throw new Error("useCabinetMobileNav: нет провайдера");
   return ctx;
-}
-
-const BTN_CLASS = `cabinet-menu-btn ${CABINET_WAITER_BTN} flex h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center !gap-0 !p-0 active:scale-95 transition-[transform,opacity]`;
-
-/** Кнопка в правом верхнем углу карточки (дашборд) */
-export function CabinetMobileNavCardButton() {
-  const { menuButtonRef, sidebarOpen, setSidebarOpen } = useCabinetMobileNav();
-  return (
-    <div className="pointer-events-none absolute right-2 top-2 z-20 sm:right-3 sm:top-3 lg:hidden">
-      <button
-        ref={menuButtonRef}
-        type="button"
-        onClick={() => setSidebarOpen((o) => !o)}
-        className={`${BTN_CLASS} pointer-events-auto`}
-        aria-label="Меню"
-        aria-expanded={sidebarOpen}
-        aria-haspopup="dialog"
-        aria-controls="cabinet-nav-dropdown"
-      >
-        <Menu className="h-5 w-5 shrink-0 pointer-events-none" strokeWidth={2} aria-hidden />
-      </button>
-    </div>
-  );
-}
-
-/** Фиксированная кнопка под шапкой — остальные страницы ЛК */
-export function CabinetMobileNavFixedButton() {
-  const { menuButtonRef, sidebarOpen, setSidebarOpen } = useCabinetMobileNav();
-  return (
-    <button
-      ref={menuButtonRef}
-      type="button"
-      onClick={() => setSidebarOpen((o) => !o)}
-      className={`${BTN_CLASS} fixed z-[2005] lg:hidden`}
-      style={{
-        right: "max(0.75rem, env(safe-area-inset-right, 0px))",
-        top: "max(0.5rem, calc(env(safe-area-inset-top, 0px) + 0.25rem))",
-      }}
-      aria-label="Меню"
-      aria-expanded={sidebarOpen}
-      aria-haspopup="dialog"
-      aria-controls="cabinet-nav-dropdown"
-    >
-      <Menu className="h-5 w-5 shrink-0 pointer-events-none" strokeWidth={2} aria-hidden />
-    </button>
-  );
 }
 
 /**
@@ -130,30 +91,15 @@ export function CabinetMobileNavFixedButton() {
 export function CabinetMobileNavMobileCorner({ leadingSlot }: { leadingSlot?: ReactNode }) {
   const { menuButtonRef, sidebarOpen, setSidebarOpen, isM5Cabinet } = useCabinetMobileNav();
   return (
-    <div className="cabinet-mobile-top-shell relative z-10 flex w-full shrink-0 flex-col pb-3 lg:hidden">
-      <div className="flex w-full min-w-0 items-center gap-2 px-3 pb-3 pt-[max(0.35rem,env(safe-area-inset-top,0px))]">
-        <div className="flex min-w-0 flex-1 items-center justify-start">{leadingSlot}</div>
-        <div className="flex shrink-0 items-center gap-1.5">
-          <ThemeToggle variant={isM5Cabinet ? "m5" : "default"} />
-          <button
-            ref={menuButtonRef}
-            type="button"
-            onClick={() => setSidebarOpen((o) => !o)}
-            className={`${BTN_CLASS}${isM5Cabinet ? " site-header-m5-menu-btn" : ""}`}
-            aria-label="Меню"
-            aria-expanded={sidebarOpen}
-            aria-haspopup="dialog"
-            aria-controls="cabinet-nav-dropdown"
-          >
-            <Menu className="h-5 w-5 shrink-0 pointer-events-none" strokeWidth={2} aria-hidden />
-          </button>
-        </div>
-      </div>
-      <div
-        className="cabinet-mobile-top-shell__gold mx-0 h-0 w-full shrink-0 border-0 border-t border-[var(--color-brand-gold)]/45"
-        aria-hidden
-      />
-    </div>
+    <PanelMobileTopChrome
+      leadingSlot={leadingSlot}
+      menuButtonRef={menuButtonRef}
+      sidebarOpen={sidebarOpen}
+      setSidebarOpen={setSidebarOpen}
+      ariaControls="cabinet-nav-dropdown"
+      menuButtonExtraClassName={isM5Cabinet ? "site-header-m5-menu-btn" : ""}
+      themeToggleVariant={isM5Cabinet ? "m5" : "default"}
+    />
   );
 }
 
@@ -221,9 +167,9 @@ export function CabinetMobileNavPortals() {
     };
   }, [sidebarOpen]);
 
-  /* После открытия шторки WebKit перерисовывает safe-area — повторяем синхронизацию theme-color / data-theme */
   useMobileDarkChromeOverlay(sidebarOpen);
 
+  /* WebKit после открытия шторки: двойной apply подстраховывает meta theme-color (см. ThemeProvider). */
   useLayoutEffect(() => {
     if (!sidebarOpen) return;
     applyDocumentShellChrome(pathname, theme);
@@ -243,7 +189,7 @@ export function CabinetMobileNavPortals() {
   return createPortal(
     <>
       <div
-        className={`cabinet-mobile-nav-overlay mobile-drawer-screen-bleed fixed z-[2000] transition-opacity duration-300 lg:hidden ${
+        className={`cabinet-mobile-nav-overlay mobile-drawer-screen-bleed fixed ${PANEL_MOBILE_Z_NAV_PORTAL_LAYER} ${PANEL_MOBILE_NAV_OVERLAY_TRANSITION} ${
           sidebarOpen ? "opacity-100" : "pointer-events-none opacity-0"
         }`}
         onClick={onOverlayDown}
@@ -251,13 +197,10 @@ export function CabinetMobileNavPortals() {
         aria-hidden={!sidebarOpen}
       />
       <div
-        className={`cabinet-mobile-nav-shell mobile-drawer-screen-bleed pointer-events-none fixed z-[2010] flex items-center justify-center px-3 py-1 transition-opacity duration-200 lg:hidden sm:px-4 ${
+        className={`cabinet-mobile-nav-shell mobile-drawer-screen-bleed pointer-events-none fixed ${PANEL_MOBILE_Z_NAV_PORTAL_SHELL} flex items-center justify-center px-3 py-1 ${PANEL_MOBILE_NAV_SHELL_TRANSITION} sm:px-4 ${
           sidebarOpen ? "opacity-100" : "opacity-0"
         }`}
-        style={{
-          paddingTop: "max(0.35rem, env(safe-area-inset-top, 0px))",
-          paddingBottom: "max(0.35rem, env(safe-area-inset-bottom, 0px))",
-        }}
+        style={PANEL_MOBILE_PORTAL_SAFE_PADDING_COMPACT}
         aria-hidden={!sidebarOpen}
       >
         <div

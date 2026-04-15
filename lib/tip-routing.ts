@@ -79,7 +79,7 @@ export function parseTipSplitFromPayerInfo(payerInfo: string | null | undefined)
 }
 
 /** Гарантирует paygineSdRef у пользователя-пула (нужен для Relocate на кубышку заведения). */
-export async function ensurePoolUserPaygineSdRef(poolUserId: string): Promise<void> {
+async function ensurePoolUserPaygineSdRef(poolUserId: string): Promise<void> {
   const u = await db.user.findUnique({
     where: { id: poolUserId },
     select: { paygineSdRef: true },

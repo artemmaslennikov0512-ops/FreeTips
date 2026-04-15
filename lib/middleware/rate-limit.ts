@@ -45,7 +45,7 @@ export const REGISTRATION_REQUEST_RATE_LIMIT = {
   keyPrefix: "reg-request",
 } as const;
 
-export type RateLimitOptions = {
+type RateLimitOptions = {
   windowMs?: number;
   maxRequests?: number;
   keyPrefix?: string;
@@ -60,23 +60,28 @@ export function getWebhookRateLimitOptions(): RateLimitOptions & { keyPrefix: st
   };
 }
 
-/** Окно и лимит для POST /api/pay/[slug] по IP (антифрод). По умолчанию 2000; в проде можно задать PAY_RATE_LIMIT_IP_MAX=60. */
+const payIpDefaultMax =
+  typeof process !== "undefined" && process.env.NODE_ENV === "production" ? 60 : 2000;
+const paySlugDefaultMax =
+  typeof process !== "undefined" && process.env.NODE_ENV === "production" ? 30 : 2000;
+
+/** Окно и лимит для POST /api/pay/[slug] по IP (антифрод). В dev по умолчанию мягче; в prod — 60 без env. */
 export const PAY_RATE_LIMIT_IP = {
   windowMs: 15 * 60 * 1000,
   maxRequests:
     typeof process !== "undefined" && process.env.PAY_RATE_LIMIT_IP_MAX !== undefined && process.env.PAY_RATE_LIMIT_IP_MAX !== ""
     ? Math.max(10, parseInt(process.env.PAY_RATE_LIMIT_IP_MAX, 10) || 60)
-    : 2000,
+    : payIpDefaultMax,
   keyPrefix: "pay-ip",
 } as const;
 
-/** Окно и лимит для POST /api/pay/[slug] по slug (защита от накрутки). По умолчанию 2000; в проде можно задать PAY_RATE_LIMIT_SLUG_MAX=30. */
+/** Окно и лимит для POST /api/pay/[slug] по slug. В prod по умолчанию 30 без env. */
 export const PAY_RATE_LIMIT_SLUG = {
   windowMs: 15 * 60 * 1000,
   maxRequests:
     typeof process !== "undefined" && process.env.PAY_RATE_LIMIT_SLUG_MAX !== undefined && process.env.PAY_RATE_LIMIT_SLUG_MAX !== ""
     ? Math.max(10, parseInt(process.env.PAY_RATE_LIMIT_SLUG_MAX, 10) || 30)
-    : 2000,
+    : paySlugDefaultMax,
   keyPrefix: "pay-slug",
 } as const;
 
@@ -160,22 +165,6 @@ export async function checkRateLimitByKey(
 }
 
 /**
- * Проверяет rate limit по userId.
- */
-export async function checkRateLimitByUserId(
-  userId: string,
-  options?: RateLimitOptions,
-): Promise<RateLimitResult> {
-  const resolved = resolveOptions(options);
-  const key = buildKey(resolved.keyPrefix, userId);
-
-  if (getRedisUrl()) {
-    return checkRateLimitWithRedis(key, resolved.windowMs, resolved.maxRequests);
-  }
-  return checkRateLimitMemory(userIdStore, key, resolved.windowMs, resolved.maxRequests);
-}
-
-/**
  * Получает IP адрес из request.
  * Если TRUST_PROXY=true|1 — доверенные заголовки от прокси/CDN (иначе клиент может подделать их при прямом доступе к origin).
  * Порядок: cf-connecting-ip, true-client-ip, x-forwarded-for (первый хоп), x-real-ip.
@@ -183,13 +172,16 @@ export async function checkRateLimitByUserId(
  */
 export function getClientIP(request: NextRequest): string {
   const trustProxy = process.env.TRUST_PROXY === "true" || process.env.TRUST_PROXY === "1";
+  const trustProxyStrict = process.env.TRUST_PROXY_STRICT === "true" || process.env.TRUST_PROXY_STRICT === "1";
   if (trustProxy) {
     const cf = request.headers.get("cf-connecting-ip")?.trim();
     if (cf) return cf;
     const trueClient = request.headers.get("true-client-ip")?.trim();
     if (trueClient) return trueClient;
-    const forwarded = request.headers.get("x-forwarded-for");
-    if (forwarded) return forwarded.split(",")[0]!.trim();
+    if (!trustProxyStrict) {
+      const forwarded = request.headers.get("x-forwarded-for");
+      if (forwarded) return forwarded.split(",")[0]!.trim();
+    }
     const realIP = request.headers.get("x-real-ip")?.trim();
     if (realIP) return realIP;
   }
@@ -219,7 +211,7 @@ export function getRateLimitIpKey(request: NextRequest): string {
  * Очищает истёкшие записи in-memory store.
  * Вызывается периодически из instrumentation (при отсутствии Redis).
  */
-export function cleanupExpiredEntries(): void {
+function cleanupExpiredEntries(): void {
   const now = Date.now();
   for (const [key, entry] of ipStore.entries()) {
     if (now > entry.resetAt) ipStore.delete(key);

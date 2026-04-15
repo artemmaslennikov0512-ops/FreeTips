@@ -39,18 +39,3 @@ export function checkAndConsumeEmailCode(email: string, code: string): boolean {
   verifiedStore.set(key, Date.now() + VERIFIED_TTL_MS);
   return true;
 }
-
-export function isEmailVerified(email: string): boolean {
-  cleanupCodes();
-  const key = normalizeEmail(email);
-  const exp = verifiedStore.get(key);
-  return exp != null && exp > Date.now();
-}
-
-export function consumeEmailVerified(email: string): boolean {
-  const key = normalizeEmail(email);
-  const exp = verifiedStore.get(key);
-  if (exp == null || exp <= Date.now()) return false;
-  verifiedStore.delete(key);
-  return true;
-}

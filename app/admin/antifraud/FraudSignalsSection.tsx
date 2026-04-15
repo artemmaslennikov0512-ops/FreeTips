@@ -4,8 +4,9 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { ExternalLink, RefreshCw, ShieldAlert, Ban } from "lucide-react";
 import { formatDate } from "@/lib/utils";
-import { getCsrfHeader } from "@/lib/security/csrf-client";
+import { fetchWithAuth } from "@/lib/auth-client";
 import { ADMIN_BTN, ADMIN_BTN_DANGER, ADMIN_BTN_PRIMARY, ADMIN_BTN_SM } from "@/lib/admin-button-classes";
+import { PANEL_SECTION_CARD_SM } from "@/lib/panel-shell-visual-classes";
 
 interface FraudSignalRow {
   id: string;
@@ -78,14 +79,10 @@ export function FraudSignalsSection() {
   const [blockingUserId, setBlockingUserId] = useState<string | null>(null);
 
   const load = useCallback(async () => {
-    const token = localStorage.getItem("accessToken");
-    if (!token) return;
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/admin/fraud-signals?days=90&users=50", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await fetchWithAuth("/api/admin/fraud-signals?days=90&users=50");
       if (!res.ok) {
         setError("Не удалось загрузить сигналы");
         return;
@@ -113,16 +110,12 @@ export function FraudSignalsSection() {
     ) {
       return;
     }
-    const token = localStorage.getItem("accessToken");
-    if (!token) return;
     setBlockingUserId(userId);
     try {
-      const res = await fetch(`/api/admin/users/${userId}`, {
+      const res = await fetchWithAuth(`/api/admin/users/${userId}`, {
         method: "PATCH",
         headers: {
-          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
-          ...getCsrfHeader(),
         },
         body: JSON.stringify({ isBlocked: true }),
       });
@@ -149,7 +142,7 @@ export function FraudSignalsSection() {
   };
 
   return (
-    <section className="cabinet-section-header rounded-2xl border-0 p-4 sm:p-6">
+    <section className={PANEL_SECTION_CARD_SM}>
       <div className="fraud-signals-panel antifraud-inner cabinet-block-inner min-w-0 rounded-xl border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/85 p-3 sm:p-4">
         <div className="mb-3 flex flex-col items-center gap-2 text-center sm:flex-row sm:justify-center sm:gap-4">
           <h2 className="fraud-signals-panel-title text-sm font-semibold">Подозрительная активность</h2>

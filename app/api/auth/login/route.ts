@@ -1,6 +1,6 @@
 /**
  * POST /api/auth/login
- * Вход: логин + пароль. Выдаёт access + refresh (refresh в httpOnly cookie).
+ * Вход: логин + пароль. Access и refresh в httpOnly-cookie; в JSON только user.
  */
 
 import { NextRequest, NextResponse } from "next/server";
@@ -12,6 +12,7 @@ import {
   generateAccessToken,
   generateRefreshToken,
   generateTwoFactorPendingToken,
+  setAccessTokenCookie,
   setRefreshTokenCookie,
 } from "@/lib/auth/jwt";
 import { checkRateLimitByIP, getClientIpAndRateLimitKey, AUTH_RATE_LIMIT } from "@/lib/middleware/rate-limit";
@@ -109,8 +110,8 @@ export async function POST(request: NextRequest) {
     const accessToken = await generateAccessToken(tokenPayload);
     const refreshToken = await generateRefreshToken(tokenPayload);
 
-    // Сохраняем refresh token в cookie
     await setRefreshTokenCookie(refreshToken);
+    await setAccessTokenCookie(accessToken);
 
     const meta = buildNewSessionMetadata(request, ip, validated.deviceClientId);
     // Создаём сессию
@@ -126,7 +127,6 @@ export async function POST(request: NextRequest) {
     logSecurity("auth.login.success", { requestId, ip, userId: user.id });
     return NextResponse.json(
       {
-        accessToken,
         user: {
           id: user.id,
           login: user.login,

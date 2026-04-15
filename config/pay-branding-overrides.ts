@@ -4,7 +4,7 @@
  * Цвета — только #RRGGBB (как в PayPageClient).
  */
 /** Slug страницы /pay/:slug — класс `pay-page--m5-competition` до ответа API (глобальные стили). */
-export const PAY_PAGE_M5_SHELL_SLUGS = new Set(["ahmedm5f90", "ahmedm5f98"]);
+const PAY_PAGE_M5_SHELL_SLUGS = new Set(["ahmedm5f90", "ahmedm5f98"]);
 
 export function isPayPageM5ShellSlug(slug: string): boolean {
   return PAY_PAGE_M5_SHELL_SLUGS.has(slug.trim().toLowerCase());

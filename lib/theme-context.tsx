@@ -8,11 +8,9 @@ import {
   type SiteThemePreference,
 } from "@/lib/document-shell-chrome";
 
-export type Theme = SiteThemePreference;
-
 type ThemeContextValue = {
-  theme: Theme;
-  setTheme: (next: Theme) => void;
+  theme: SiteThemePreference;
+  setTheme: (next: SiteThemePreference) => void;
   toggleTheme: () => void;
 };
 
@@ -20,13 +18,11 @@ const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const [theme, setThemeState] = useState<Theme>("light");
+  const [theme, setThemeState] = useState<SiteThemePreference>("light");
   const [mounted, setMounted] = useState(false);
 
   const pathnameRef = useRef(pathname);
   const themeRef = useRef(theme);
-  pathnameRef.current = pathname;
-  themeRef.current = theme;
 
   useEffect(() => {
     queueMicrotask(() => {
@@ -36,9 +32,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useLayoutEffect(() => {
+    pathnameRef.current = pathname;
+    themeRef.current = theme;
     if (!mounted) return;
     applyDocumentShellChrome(pathname, theme);
-  }, [mounted, theme, pathname]);
+  }, [mounted, pathname, theme]);
 
   /*
    * Next иногда пересоздаёт meta theme-color после первого layout — двойной rAF подстраховывает Safari.
@@ -84,7 +82,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     };
   }, [mounted]);
 
-  const setTheme = useCallback((next: Theme) => {
+  const setTheme = useCallback((next: SiteThemePreference) => {
     setThemeState(next);
   }, []);
 

@@ -6,6 +6,12 @@ import Link from "next/link";
 import { Loader2, UtensilsCrossed } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import type { TablePayGuestBranding, TablePayGuestLine, TablePayGuestPayload } from "@/lib/table-pay-guest-state";
+import {
+  CLIENT_MSG_CONNECTION_ERROR,
+  CLIENT_MSG_PAGE_LOAD_FAILED,
+  PAY_MSG_TABLE_NOT_FOUND,
+} from "@/lib/copy/client-facing-messages";
+import { TABLE_PAY_GUEST_ERROR } from "@/lib/pay-ui-classes";
 
 function formatRub(kopStr: string): string {
   const n = Number(BigInt(kopStr || "0")) / 100;
@@ -42,18 +48,18 @@ export default function TablePayGuestClient() {
       const json = (await res.json().catch(() => ({}))) as TablePayGuestPayload & { error?: string };
       if (!res.ok) {
         setData(null);
-        setError(json?.error ?? "Не удалось загрузить страницу");
+        setError(json?.error ?? CLIENT_MSG_PAGE_LOAD_FAILED);
         return;
       }
       if (json.state === "not_found" || json.state === "invalid_slug") {
         setData(null);
-        setError("Стол не найден");
+        setError(PAY_MSG_TABLE_NOT_FOUND);
         return;
       }
       setData(json);
     } catch {
       setData(null);
-      setError("Ошибка соединения");
+      setError(CLIENT_MSG_CONNECTION_ERROR);
     } finally {
       setLoading(false);
     }
@@ -90,7 +96,7 @@ export default function TablePayGuestClient() {
             Загрузка…
           </div>
         ) : error ? (
-          <p className="text-sm text-red-600 dark:text-red-300">{error}</p>
+          <p className={TABLE_PAY_GUEST_ERROR}>{error}</p>
         ) : data ? (
           <>
             <div className="flex flex-col items-center gap-3 text-center">

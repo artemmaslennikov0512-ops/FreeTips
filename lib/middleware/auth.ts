@@ -1,15 +1,25 @@
 /**
  * Middleware для проверки JWT и извлечения пользователя.
- * Использует IUserRepository (по умолчанию — Prisma); в тестах можно подменить через setUserRepository().
+ * Использует IUserRepository (по умолчанию — Prisma).
  */
 
 import { NextRequest, NextResponse } from "next/server";
 import { verifyAccessToken, type TokenPayload } from "@/lib/auth/jwt";
+import { ACCESS_TOKEN_COOKIE_NAME } from "@/lib/auth/access-token-cookie";
+import { getBearerTokenFromRequest } from "@/lib/auth/bearer-from-request";
 import { getUserRepository } from "@/lib/infrastructure/user-repository";
 import { db } from "@/lib/db";
 import { touchUserLastSeenThrottled } from "@/lib/user-last-seen-touch";
 import { messageFromUnknown } from "@/lib/errors";
 import { logWarn } from "@/lib/logger";
+
+/** Bearer имеет приоритет (импersonация ЛК); иначе httpOnly-cookie `ft_access`. */
+function getAccessTokenFromRequest(request: NextRequest): string | null {
+  const bearer = getBearerTokenFromRequest(request);
+  if (bearer) return bearer;
+  const fromCookie = request.cookies.get(ACCESS_TOKEN_COOKIE_NAME)?.value?.trim();
+  return fromCookie || null;
+}
 
 /**
  * Middleware для проверки JWT access token
@@ -18,9 +28,9 @@ import { logWarn } from "@/lib/logger";
 export async function requireAuth(
   request: NextRequest,
 ): Promise<{ user: TokenPayload; response?: never } | { user?: never; response: NextResponse }> {
-  const authHeader = request.headers.get("authorization");
+  const token = getAccessTokenFromRequest(request);
 
-  if (!authHeader?.startsWith("Bearer ")) {
+  if (!token) {
     return {
       response: NextResponse.json(
         { error: "Токен не предоставлен" },
@@ -29,7 +39,6 @@ export async function requireAuth(
     };
   }
 
-  const token = authHeader.substring(7);
   const payload = await verifyAccessToken(token);
 
   if (!payload || !payload.userId) {
@@ -145,7 +154,7 @@ export async function requireEstablishmentAdmin(
   };
 }
 
-export type EstablishmentEmployeeAuth = {
+type EstablishmentEmployeeAuth = {
   user: TokenPayload;
   establishmentId: string;
   employeeId: string;

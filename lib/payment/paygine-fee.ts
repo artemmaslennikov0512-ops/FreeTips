@@ -11,10 +11,10 @@ export const FEE_PERCENT_PAYOUT_CARD = 1;
 export const FEE_MIN_PAYOUT_KOP = 3000;
 
 /** Процент комиссии при приёме по QR (СБП). Взимается с плательщика дополнительно к amount; amount зачисляется на кубышку. */
-export const FEE_PERCENT_IN_QR_SBP = 2.5;
+const FEE_PERCENT_IN_QR_SBP = 2.5;
 
 /** Процент комиссии при приёме по карте (основной канал в проде). Взимается с плательщика дополнительно к amount; amount зачисляется на кубышку. */
-export const FEE_PERCENT_IN_CARD = 2.5;
+const FEE_PERCENT_IN_CARD = 2.5;
 
 export function feeKopForPayout(amountKop: number): number {
   if (!Number.isFinite(amountKop) || amountKop <= 0) return 0;

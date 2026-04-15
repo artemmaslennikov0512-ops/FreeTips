@@ -126,8 +126,8 @@ export function Header() {
   /** ЛК официанта и кабинет заведения: на мобильном — узкая полоска (тема + меню), без полной шапки с логотипом */
   const isWaiterCabinet = Boolean(pathname?.startsWith("/cabinet"));
   const isEstablishmentCabinet = Boolean(pathname?.startsWith("/establishment"));
-  const isAdminPanel = Boolean(pathname?.startsWith("/admin"));
-  const isPanelMobileSlim = isWaiterCabinet || isEstablishmentCabinet || isAdminPanel;
+  const isPanelMobileSlim =
+    isWaiterCabinet || isEstablishmentCabinet || Boolean(pathname?.startsWith("/admin"));
   const panelMenu = useOptionalPanelMobileMenu();
 
   const panelMenuControlsId =

@@ -3,13 +3,14 @@
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Building2, Loader2, Search, Send } from "lucide-react";
-import { getCsrfHeader } from "@/lib/security/csrf-client";
+import { fetchWithAuth, clearAccessToken } from "@/lib/auth-client";
 import { CABINET_WAITER_BTN_INLINE } from "@/lib/cabinet-button-classes";
 import {
   normalizeEstablishmentCodeInput,
   validateEstablishmentCodeFormat,
   MSG_EST_CODE_NOT_FOUND,
 } from "@/lib/establishment-code-input";
+import { PANEL_PAGE_TITLE_CABINET } from "@/lib/panel-shell-visual-classes";
 
 type FoundEst = { id: string; name: string; code: string };
 
@@ -52,10 +53,8 @@ export default function JoinEstablishmentPage() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [requests, setRequests] = useState<JoinRow[]>([]);
 
-  const loadRequests = useCallback(async (token: string) => {
-    const res = await fetch("/api/cabinet/employee-join-requests", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+  const loadRequests = useCallback(async () => {
+    const res = await fetchWithAuth("/api/cabinet/employee-join-requests");
     if (res.ok) {
       const data = (await res.json()) as { requests: JoinRow[] };
       setRequests(data.requests ?? []);
@@ -63,15 +62,10 @@ export default function JoinEstablishmentPage() {
   }, []);
 
   useEffect(() => {
-    const token = localStorage.getItem("accessToken");
-    if (!token) {
-      router.replace("/login");
-      return;
-    }
-    fetch("/api/profile", { headers: { Authorization: `Bearer ${token}` } })
+    fetchWithAuth("/api/profile")
       .then(async (res) => {
         if (res.status === 401) {
-          localStorage.removeItem("accessToken");
+          clearAccessToken();
           router.replace("/login");
           return;
         }
@@ -82,7 +76,7 @@ export default function JoinEstablishmentPage() {
           return;
         }
         setRoleOk(true);
-        await loadRequests(token);
+        await loadRequests();
       })
       .finally(() => setLoading(false));
   }, [router, loadRequests]);
@@ -95,8 +89,6 @@ export default function JoinEstablishmentPage() {
   };
 
   const handleSearch = async () => {
-    const token = localStorage.getItem("accessToken");
-    if (!token) return;
     const normalized = normalizeEstablishmentCodeInput(code);
     const formatCheck = validateEstablishmentCodeFormat(normalized);
     if (!formatCheck.ok) {
@@ -109,9 +101,8 @@ export default function JoinEstablishmentPage() {
     setFound(null);
     setSubmitError(null);
     try {
-      const res = await fetch(
+      const res = await fetchWithAuth(
         `/api/cabinet/establishment-lookup?code=${encodeURIComponent(formatCheck.code)}`,
-        { headers: { Authorization: `Bearer ${token}` } },
       );
       const data = (await res.json()) as {
         error?: string;
@@ -137,17 +128,13 @@ export default function JoinEstablishmentPage() {
 
   const handleSubmitRequest = async () => {
     if (!found) return;
-    const token = localStorage.getItem("accessToken");
-    if (!token) return;
     setSubmitting(true);
     setSubmitError(null);
     try {
-      const res = await fetch("/api/cabinet/employee-join-requests", {
+      const res = await fetchWithAuth("/api/cabinet/employee-join-requests", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-          ...getCsrfHeader(),
         },
         body: JSON.stringify({ establishmentId: found.id }),
       });
@@ -158,7 +145,7 @@ export default function JoinEstablishmentPage() {
       }
       setFound(null);
       setCode("");
-      await loadRequests(token);
+      await loadRequests();
     } catch {
       setSubmitError("Не удалось связаться с сервером. Проверьте подключение к интернету.");
     } finally {
@@ -186,7 +173,7 @@ export default function JoinEstablishmentPage() {
   return (
     <div className="cabinet-form-surface cabinet-join-establishment mx-auto w-full max-w-xl space-y-8 pb-2">
       <div className="text-center">
-        <h1 className="font-[family:var(--font-playfair)] text-xl font-semibold text-[var(--color-text)] sm:text-2xl">
+        <h1 className={PANEL_PAGE_TITLE_CABINET}>
           Подключиться к заведению
         </h1>
         <p className="mt-2 text-sm leading-relaxed text-[var(--color-text-secondary)]">

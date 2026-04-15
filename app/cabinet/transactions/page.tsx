@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo, Fragment, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { CheckCircle2, Clock, XCircle, ChevronLeft, ChevronRight } from "lucide-react";
 import { formatMoney, formatDate } from "@/lib/utils";
-import { getCsrfHeader } from "@/lib/security/csrf-client";
+import { fetchWithAuth, clearAccessToken } from "@/lib/auth-client";
 import { PAYOUT_MIN_AMOUNT_KOP } from "@/lib/payout-amount-bounds";
 import { FEE_MIN_PAYOUT_KOP, FEE_PERCENT_PAYOUT_CARD, feeKopForPayout } from "@/lib/payment/paygine-fee";
 import { Stats } from "../shared";
@@ -126,14 +126,10 @@ export default function CabinetTransactionsPage() {
   }, [list.length]);
 
   const fetchData = useCallback(async () => {
-    const token = localStorage.getItem("accessToken");
-    if (!token) return;
     try {
-      const res = await fetch("/api/operations?limit=50", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await fetchWithAuth("/api/operations?limit=50");
       if (res.status === 401) {
-        localStorage.removeItem("accessToken");
+        clearAccessToken();
         router.replace("/login");
         return;
       }
@@ -145,9 +141,7 @@ export default function CabinetTransactionsPage() {
       setList(data.operations);
       setTotal(data.total);
 
-      const profileRes = await fetch("/api/profile", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const profileRes = await fetchWithAuth("/api/profile");
       if (profileRes.ok) {
         const profile = (await profileRes.json()) as {
           login?: string;
@@ -177,18 +171,13 @@ export default function CabinetTransactionsPage() {
   }, [router]);
 
   useEffect(() => {
-    const token = localStorage.getItem("accessToken");
-    if (!token) {
-      router.replace("/login");
-      return;
-    }
     fetchData();
-  }, [router, fetchData]);
+  }, [fetchData]);
 
   // Обновление баланса и списка при возврате на вкладку (после зачислений/списаний)
   useEffect(() => {
     const onVisible = () => {
-      if (document.visibilityState === "visible" && localStorage.getItem("accessToken")) {
+      if (document.visibilityState === "visible") {
         fetchData();
       }
     };
@@ -197,8 +186,6 @@ export default function CabinetTransactionsPage() {
   }, [fetchData]);
 
   const handleSDPayOutPage = async () => {
-    const token = localStorage.getItem("accessToken");
-    if (!token) return;
     if (!payoutLimitsFromProfile) {
       setSdPageError("Подождите загрузки лимитов или обновите страницу");
       return;
@@ -219,12 +206,10 @@ export default function CabinetTransactionsPage() {
     setSdPageLoading(true);
     setSdPageError(null);
     try {
-      const res = await fetch("/api/payouts/sd-pay-out-page", {
+      const res = await fetchWithAuth("/api/payouts/sd-pay-out-page", {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
-          ...getCsrfHeader(),
         },
         body: JSON.stringify({ amountKop }),
       });

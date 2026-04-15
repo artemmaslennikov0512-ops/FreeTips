@@ -3,12 +3,12 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AlertCircle } from "lucide-react";
-import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { AuthPageShell } from "@/components/AuthPageShell";
 import { changePasswordSchema } from "@/lib/validations";
 import { getFieldErrors } from "@/lib/form-errors";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { AUTH_CARD_CLASS, AUTH_INPUT_CLASS_NO_ICON, AUTH_ERROR_BORDER, AUTH_BTN_PRIMARY } from "@/lib/auth-form-classes";
+import { fetchWithAuth, migrateLegacyAccessTokenToCookie } from "@/lib/auth-client";
 
 export default function ChangePasswordPage() {
   const router = useRouter();
@@ -22,16 +22,9 @@ export default function ChangePasswordPage() {
 
   useEffect(() => {
     const checkMustChange = async () => {
-      const token = localStorage.getItem("accessToken");
-      if (!token) {
-        router.replace("/login");
-        return;
-      }
-
       try {
-        const res = await fetch("/api/profile", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        await migrateLegacyAccessTokenToCookie();
+        const res = await fetchWithAuth("/api/profile");
 
         if (!res.ok) {
           router.replace("/login");
@@ -74,20 +67,12 @@ export default function ChangePasswordPage() {
     }
 
     setLoading(true);
-    const token = localStorage.getItem("accessToken");
-    if (!token) {
-      setError("Не авторизован");
-      setLoading(false);
-      return;
-    }
 
     try {
-      const res = await fetch("/api/profile/change-password", {
+      const res = await fetchWithAuth("/api/profile/change-password", {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
-          ...getCsrfHeader(),
         },
         body: JSON.stringify(parsed.data),
       });
@@ -99,9 +84,7 @@ export default function ChangePasswordPage() {
       }
 
       // После успешной смены редиректим в ЛК или админку
-      const profileRes = await fetch("/api/profile", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const profileRes = await fetchWithAuth("/api/profile");
       if (profileRes.ok) {
         const profile = await profileRes.json();
         if (profile.role === "ADMIN" || profile.role === "SUPERADMIN") {

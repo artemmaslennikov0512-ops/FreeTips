@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { fetchWithAuth } from "@/lib/auth-client";
 import { ADMIN_BTN, ADMIN_BTN_PRIMARY } from "@/lib/admin-button-classes";
 import { RecipientPayLimitsCard } from "@/components/admin/RecipientPayLimitsCard";
 import { FraudSignalsSection } from "./FraudSignalsSection";
 import { ADMIN_PANEL_STATE_CENTER } from "@/lib/admin-surface-classes";
+import { PANEL_SECTION_CARD_SM } from "@/lib/panel-shell-visual-classes";
 
 const ANTIFRAUD_INPUT =
   "antifraud-input w-36 min-w-[7rem] max-w-full shrink-0 rounded-lg border border-[rgba(197,165,114,0.25)] bg-[var(--color-bg-sides)] px-3 py-2 text-center text-sm text-[var(--color-text)] placeholder:text-[var(--color-muted)] focus:outline-none focus:border-[var(--color-brand-gold)] disabled:bg-[var(--color-light-gray)] read-only:bg-[var(--color-light-gray)]";
@@ -83,17 +85,10 @@ export default function AdminAntifraudPage() {
 
   useEffect(() => {
     const fetchStats = async () => {
-      const token = localStorage.getItem("accessToken");
-      if (!token) return;
-
       try {
         const [res, obsRes] = await Promise.all([
-          fetch("/api/admin/stats", {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-          fetch("/api/admin/fraud-observe-settings", {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
+          fetchWithAuth("/api/admin/stats"),
+          fetchWithAuth("/api/admin/fraud-observe-settings"),
         ]);
 
         if (!res.ok) {
@@ -155,8 +150,6 @@ export default function AdminAntifraudPage() {
   }, []);
 
   const applyObserveSettings = async (resetToBuiltIn: boolean) => {
-    const token = localStorage.getItem("accessToken");
-    if (!token) return;
     setLoadingObserveSave(true);
     setAntifraudMessage(null);
     try {
@@ -197,9 +190,9 @@ export default function AdminAntifraudPage() {
         }
       }
 
-      const res = await fetch("/api/admin/fraud-observe-settings", {
+      const res = await fetchWithAuth("/api/admin/fraud-observe-settings", {
         method: "PUT",
-        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
       const data = (await res.json()) as { error?: string; effective?: FraudObserveEffective };
@@ -230,17 +223,15 @@ export default function AdminAntifraudPage() {
   };
 
   const applyAutoConfirmToggle = async (enabled: boolean) => {
-    const token = localStorage.getItem("accessToken");
-    if (!token) return;
     setLoadingAutoConfirm(true);
     setAntifraudMessage(null);
     try {
       const rubStr = appliedAutoConfirmRub ?? "";
       const rub = rubStr === "" ? null : parseFloat(rubStr.replace(",", "."));
       const thresholdKop = rub != null && !Number.isNaN(rub) && rub >= 0 ? Math.round(rub * 100) : null;
-      const res = await fetch("/api/admin/users/auto-confirm-bulk", {
+      const res = await fetchWithAuth("/api/admin/users/auto-confirm-bulk", {
         method: "POST",
-        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ enabled, thresholdKop }),
       });
       const data = (await res.json()) as { error?: string; updated?: number; message?: string };
@@ -258,8 +249,6 @@ export default function AdminAntifraudPage() {
   };
 
   const applyAutoConfirm = async () => {
-    const token = localStorage.getItem("accessToken");
-    if (!token) return;
     setLoadingAutoConfirm(true);
     setAntifraudMessage(null);
     try {
@@ -270,9 +259,9 @@ export default function AdminAntifraudPage() {
         setLoadingAutoConfirm(false);
         return;
       }
-      const res = await fetch("/api/admin/users/auto-confirm-bulk", {
+      const res = await fetchWithAuth("/api/admin/users/auto-confirm-bulk", {
         method: "POST",
-        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ enabled: autoConfirmEnabled, thresholdKop }),
       });
       const data = (await res.json()) as { error?: string; updated?: number; message?: string };
@@ -293,8 +282,6 @@ export default function AdminAntifraudPage() {
   };
 
   const applyDailyRub = async () => {
-    const token = localStorage.getItem("accessToken");
-    if (!token) return;
     setLoadingDailyRub(true);
     setAntifraudMessage(null);
     try {
@@ -304,9 +291,9 @@ export default function AdminAntifraudPage() {
         setLoadingDailyRub(false);
         return;
       }
-      const res = await fetch("/api/admin/users/limits-bulk", {
+      const res = await fetchWithAuth("/api/admin/users/limits-bulk", {
         method: "POST",
-        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ dailyLimitKop: rub != null && !Number.isNaN(rub) ? Math.round(rub * 100) : null }),
       });
       const data = (await res.json()) as { error?: string; updated?: number; message?: string };
@@ -327,8 +314,6 @@ export default function AdminAntifraudPage() {
   };
 
   const applyIncomingMonthlyRub = async () => {
-    const token = localStorage.getItem("accessToken");
-    if (!token) return;
     setLoadingIncomingMonthlyRub(true);
     setAntifraudMessage(null);
     try {
@@ -339,9 +324,9 @@ export default function AdminAntifraudPage() {
         setLoadingIncomingMonthlyRub(false);
         return;
       }
-      const res = await fetch("/api/admin/users/limits-bulk", {
+      const res = await fetchWithAuth("/api/admin/users/limits-bulk", {
         method: "POST",
-        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           incomingMonthlyLimitKop: rub != null && !Number.isNaN(rub) ? Math.round(rub * 100) : null,
         }),
@@ -364,8 +349,6 @@ export default function AdminAntifraudPage() {
   };
 
   const applyMonthlyRub = async () => {
-    const token = localStorage.getItem("accessToken");
-    if (!token) return;
     setLoadingMonthlyRub(true);
     setAntifraudMessage(null);
     try {
@@ -375,9 +358,9 @@ export default function AdminAntifraudPage() {
         setLoadingMonthlyRub(false);
         return;
       }
-      const res = await fetch("/api/admin/users/limits-bulk", {
+      const res = await fetchWithAuth("/api/admin/users/limits-bulk", {
         method: "POST",
-        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ monthlyLimitKop: rub != null && !Number.isNaN(rub) ? Math.round(rub * 100) : null }),
       });
       const data = (await res.json()) as { error?: string; updated?: number; message?: string };
@@ -398,8 +381,6 @@ export default function AdminAntifraudPage() {
   };
 
   const applyDailyCount = async () => {
-    const token = localStorage.getItem("accessToken");
-    if (!token) return;
     setLoadingDailyCount(true);
     setAntifraudMessage(null);
     try {
@@ -409,9 +390,9 @@ export default function AdminAntifraudPage() {
         setLoadingDailyCount(false);
         return;
       }
-      const res = await fetch("/api/admin/users/limits-bulk", {
+      const res = await fetchWithAuth("/api/admin/users/limits-bulk", {
         method: "POST",
-        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ dailyLimitCount: count ?? null }),
       });
       const data = (await res.json()) as { error?: string; updated?: number; message?: string };
@@ -432,8 +413,6 @@ export default function AdminAntifraudPage() {
   };
 
   const applyMonthlyCount = async () => {
-    const token = localStorage.getItem("accessToken");
-    if (!token) return;
     setLoadingMonthlyCount(true);
     setAntifraudMessage(null);
     try {
@@ -443,9 +422,9 @@ export default function AdminAntifraudPage() {
         setLoadingMonthlyCount(false);
         return;
       }
-      const res = await fetch("/api/admin/users/limits-bulk", {
+      const res = await fetchWithAuth("/api/admin/users/limits-bulk", {
         method: "POST",
-        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ monthlyLimitCount: count ?? null }),
       });
       const data = (await res.json()) as { error?: string; updated?: number; message?: string };
@@ -467,9 +446,6 @@ export default function AdminAntifraudPage() {
 
   /** Текущие значения п. 1–6 и авто-вывод (учитывает режим «Изменить») → один запрос на всех пользователей. */
   const applyPushAllLimits = async () => {
-    const token = localStorage.getItem("accessToken");
-    if (!token) return;
-
     const autoRubRaw = (editingAutoConfirm ? inputAutoConfirmRub : appliedAutoConfirmRub ?? "").trim();
     const dailyRubRaw = (editingDailyRub ? inputDailyRub : appliedDailyRub ?? "").trim();
     const incomingRubRaw = (editingIncomingMonthlyRub ? inputIncomingMonthlyRub : appliedIncomingMonthlyRub ?? "").trim();
@@ -520,9 +496,9 @@ export default function AdminAntifraudPage() {
     setLoadingPushAllLimits(true);
     setAntifraudMessage(null);
     try {
-      const res = await fetch("/api/admin/users/limits-push-all", {
+      const res = await fetchWithAuth("/api/admin/users/limits-push-all", {
         method: "POST",
-        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           dailyLimitCount: dailyCount,
           dailyLimitKop: dailyKop,
@@ -594,7 +570,7 @@ export default function AdminAntifraudPage() {
       <RecipientPayLimitsCard />
 
       {observeEffective != null && (
-        <section className="cabinet-section-header rounded-2xl border-0 p-4 sm:p-6">
+        <section className={PANEL_SECTION_CARD_SM}>
           <div className="antifraud-inner cabinet-block-inner min-w-0 rounded-xl border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/85 p-3 sm:p-4">
             <h2 className="mb-3 text-center text-sm font-semibold text-white">Пороги сигналов</h2>
             <div className="space-y-3 text-xs text-white/90">
@@ -716,7 +692,7 @@ export default function AdminAntifraudPage() {
         </section>
       )}
 
-      <section className="cabinet-section-header rounded-2xl border-0 p-4 sm:p-6">
+      <section className={PANEL_SECTION_CARD_SM}>
         <div className="antifraud-inner cabinet-block-inner min-w-0 rounded-xl border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/85 p-3 sm:p-4">
           {antifraudMessage && (
             <p className="mb-3 text-center text-sm text-white">

@@ -17,6 +17,7 @@ import {
   AUTH_BTN_PRIMARY,
 } from "@/lib/auth-form-classes";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
+import { clearAccessToken, migrateLegacyAccessTokenToCookie } from "@/lib/auth-client";
 
 export default function LoginEstablishmentPage() {
   const router = useRouter();
@@ -33,28 +34,21 @@ export default function LoginEstablishmentPage() {
   const [totpCode, setTotpCode] = useState("");
 
   useEffect(() => {
-    const token = typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
-    if (!token) {
-      setCheckingAuth(false);
-      return;
-    }
-    fetch("/api/profile", { headers: { Authorization: `Bearer ${token}` } })
-      .then((res) => {
-        if (!res.ok) {
-          if (res.status === 401) localStorage.removeItem("accessToken");
-          setCheckingAuth(false);
-          return;
-        }
-        return res.json();
-      })
-      .then((data) => {
-        if (data?.role === "ESTABLISHMENT_ADMIN" && data?.establishmentId) {
-          router.replace("/establishment");
-        } else {
-          setCheckingAuth(false);
-        }
-      })
-      .catch(() => setCheckingAuth(false));
+    void (async () => {
+      await migrateLegacyAccessTokenToCookie();
+      const res = await fetch("/api/profile", { credentials: "include" });
+      if (!res.ok) {
+        if (res.status === 401) clearAccessToken();
+        setCheckingAuth(false);
+        return;
+      }
+      const data = await res.json().catch(() => null);
+      if (data?.role === "ESTABLISHMENT_ADMIN" && data?.establishmentId) {
+        router.replace("/establishment");
+      } else {
+        setCheckingAuth(false);
+      }
+    })().catch(() => setCheckingAuth(false));
   }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -97,7 +91,7 @@ export default function LoginEstablishmentPage() {
         return;
       }
 
-      if (data.accessToken && data.user) {
+      if (data.user) {
         if (data.user.role !== "ESTABLISHMENT_ADMIN") {
           setError(
             "Этот аккаунт не является управляющим заведением. Используйте обычную страницу входа.",
@@ -105,7 +99,6 @@ export default function LoginEstablishmentPage() {
           setLoading(false);
           return;
         }
-        localStorage.setItem("accessToken", data.accessToken);
         if (data.mustChangePassword) {
           router.push("/change-password");
         } else {
@@ -145,7 +138,7 @@ export default function LoginEstablishmentPage() {
         setLoading(false);
         return;
       }
-      if (data.accessToken && data.user) {
+      if (data.user) {
         if (data.user.role !== "ESTABLISHMENT_ADMIN") {
           setError(
             "Этот аккаунт не является управляющим заведением. Используйте обычную страницу входа.",
@@ -153,7 +146,6 @@ export default function LoginEstablishmentPage() {
           setLoading(false);
           return;
         }
-        localStorage.setItem("accessToken", data.accessToken);
         if (data.mustChangePassword) {
           router.push("/change-password");
         } else {

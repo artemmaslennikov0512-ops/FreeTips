@@ -5,6 +5,10 @@ import { Loader2, Check, X } from "lucide-react";
 import { authHeaders } from "@/lib/auth-client";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { ADMIN_BTN, ADMIN_BTN_PRIMARY, ADMIN_BTN_SM } from "@/lib/admin-button-classes";
+import {
+  PANEL_PAGE_SUBTITLE_ESTABLISHMENT_INTRO,
+  PANEL_PAGE_TITLE_ESTABLISHMENT_WHITE_LG_FLUSH,
+} from "@/lib/panel-shell-visual-classes";
 
 type Row = {
   id: string;
@@ -99,10 +103,8 @@ export default function EstablishmentLeaveRequestsPage() {
   return (
     <div className="mx-auto w-full max-w-3xl space-y-4 pb-2">
       <div className="text-center">
-        <h1 className="font-[family:var(--font-playfair)] text-lg font-semibold text-white">
-          Заявки на выход
-        </h1>
-        <p className="mt-1.5 text-xs leading-relaxed text-white/75">
+        <h1 className={PANEL_PAGE_TITLE_ESTABLISHMENT_WHITE_LG_FLUSH}>Заявки на выход</h1>
+        <p className={PANEL_PAGE_SUBTITLE_ESTABLISHMENT_INTRO}>
           Официанты могут запросить выход из команды. После одобрения их аккаунт отвязывается от карточки сотрудника; QR
           заведения сохраняется. Официанту нужно войти в аккаунт заново.
         </p>

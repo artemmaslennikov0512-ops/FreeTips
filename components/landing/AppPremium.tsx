@@ -2,6 +2,15 @@
 
 import Image from "next/image";
 import { Smartphone, TrendingUp, QrCode, KeyRound } from "lucide-react";
+import {
+  LANDING_DECO_GRID_LAYER,
+  LANDING_DECO_GRID_STYLE,
+  LANDING_DECO_PHOTO_BASE,
+  LANDING_HEADING_H2,
+  LANDING_SCROLL_MARGIN,
+  LANDING_SECTION_INNER,
+  LANDING_SECTION_Y,
+} from "@/lib/landing-ui-classes";
 
 const benefits = [
   {
@@ -23,24 +32,20 @@ const benefits = [
 
 export function AppPremium() {
   return (
-    <section id="app" className="relative overflow-hidden w-full py-12 sm:py-16 lg:py-[100px] bg-[var(--color-charcoal)] [&_h2]:!text-white [&_h3]:!text-white scroll-mt-24">
+    <section
+      id="app"
+      className={`relative w-full overflow-hidden bg-[var(--color-charcoal)] ${LANDING_SECTION_Y} [&_h2]:!text-white [&_h3]:!text-white ${LANDING_SCROLL_MARGIN}`}
+    >
       <div
-        className="absolute inset-0 z-[0] bg-cover bg-center bg-no-repeat opacity-[0.18]"
+        className={`${LANDING_DECO_PHOTO_BASE} opacity-[0.18]`}
         style={{ backgroundImage: "url('/images/landing-pattern-app-soft.png')" }}
         aria-hidden
       />
-      <div
-        className="absolute inset-0 opacity-[0.04] z-[1]"
-        style={{
-          backgroundImage: `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80'><path d='M0,0 L80,0 L80,80' fill='none' stroke='white' stroke-width='1.5'/></svg>")`,
-          backgroundSize: "80px 80px",
-        }}
-        aria-hidden
-      />
-      <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8 xl:max-w-7xl 2xl:max-w-screen-2xl relative z-10">
+      <div className={LANDING_DECO_GRID_LAYER} style={LANDING_DECO_GRID_STYLE} aria-hidden />
+      <div className={LANDING_SECTION_INNER}>
         <div className="max-w-[700px] mx-auto mb-10 sm:mb-14 flex flex-col items-center text-center">
           <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 mb-4 w-full min-w-0">
-            <h2 className="font-[family:var(--font-playfair)] text-2xl sm:text-3xl lg:text-4xl font-semibold !text-white min-w-0 max-w-full text-center">
+            <h2 className={`${LANDING_HEADING_H2} min-w-0 max-w-full text-center !text-white`}>
               Своё приложение FreeTips
             </h2>
             <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center shrink-0 bg-[rgba(197,165,114,0.2)] text-[var(--color-accent-gold)] shadow-[0_4px_12px_rgba(0,0,0,0.15)]" aria-hidden>

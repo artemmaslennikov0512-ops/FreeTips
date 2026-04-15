@@ -8,18 +8,8 @@ import { PAYOUT_DAILY_LIMIT_COUNT, PAYOUT_DAILY_LIMIT_KOP } from "@/lib/payout-l
 
 const ID = "default";
 
-export type SystemDefaultLimitsData = {
-  payoutDailyLimitCount: number | null;
-  payoutDailyLimitKop: bigint | null;
-  payoutMonthlyLimitCount: number | null;
-  payoutMonthlyLimitKop: bigint | null;
-  incomingMonthlyLimitKop: bigint | null;
-  autoConfirmPayouts: boolean;
-  autoConfirmPayoutThresholdKop: bigint | null;
-};
-
 /** Данные для Prisma user.create/update (только поля лимитов и автоподтверждения). */
-export type SystemDefaultLimitsUpdateData = {
+type SystemDefaultLimitsUpdateData = {
   payoutDailyLimitCount?: number | null;
   payoutDailyLimitKop?: bigint | null;
   payoutMonthlyLimitCount?: number | null;

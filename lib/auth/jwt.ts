@@ -7,6 +7,10 @@ import { SignJWT, jwtVerify, type JWTPayload } from "jose";
 import { cookies } from "next/headers";
 
 import { getJwtSecret, getJwtRefreshSecret, getNodeEnv } from "@/lib/config";
+import {
+  ACCESS_TOKEN_COOKIE_MAX_AGE_SEC,
+  ACCESS_TOKEN_COOKIE_NAME,
+} from "@/lib/auth/access-token-cookie";
 
 function getJWTSecretKey(): Uint8Array {
   return new TextEncoder().encode(getJwtSecret());
@@ -16,8 +20,9 @@ function getJWTRefreshSecretKey(): Uint8Array {
   return new TextEncoder().encode(getJwtRefreshSecret());
 }
 
-// Время жизни токенов (access 24h — без постоянного выброса из кабинета; refresh продлевает сессию до 7 дней)
-const ACCESS_TOKEN_EXPIRES_IN = "24h";
+// Access короткий (меньше окно при XSS/утечке); сессия держится refresh в httpOnly cookie до 7 дней.
+// Клиент: fetchWithAuth + проактивный refresh в layout кабинета/админки/заведения.
+const ACCESS_TOKEN_EXPIRES_IN = "15m";
 const IMPERSONATION_ACCESS_EXPIRES_IN = "4h";
 const REFRESH_TOKEN_EXPIRES_IN = "7d";
 
@@ -34,9 +39,9 @@ export interface TokenPayload extends JWTPayload {
  * `login_2fa_pending` — публичный вход (/api/auth/login → /api/auth/login/totp).
  * `admin_2fa_pending` — зарезервировано под отдельный админский поток (не принимать на login/totp).
  */
-export type TwoFactorPendingPurpose = "login_2fa_pending" | "admin_2fa_pending";
+type TwoFactorPendingPurpose = "login_2fa_pending" | "admin_2fa_pending";
 
-export interface TwoFactorPendingPayload extends JWTPayload {
+interface TwoFactorPendingPayload extends JWTPayload {
   purpose: TwoFactorPendingPurpose;
   userId: string;
   login: string;
@@ -60,7 +65,7 @@ export async function generateAccessToken(payload: TokenPayload): Promise<string
 
 /**
  * Access token от имени целевого пользователя для просмотра кабинета супер-админом.
- * Короче обычного access; refresh по cookie админа его не продлевает — клиент хранит бэкап токена админа в localStorage.
+ * Короче обычного access; refresh по cookie админа его не продлевает — клиент кладёт этот JWT в sessionStorage вкладки при «просмотре ЛК».
  */
 export async function generateImpersonationAccessToken(
   target: Pick<TokenPayload, "userId" | "login" | "role">,
@@ -188,5 +193,32 @@ export async function deleteRefreshTokenCookie(): Promise<void> {
   } catch (error) {
     const { logWarn } = await import("@/lib/logger");
     logWarn("refresh_token_cookie.delete_failed", { error: String(error) });
+  }
+}
+
+/** httpOnly access JWT (браузер); не доступен из JS — снижает риск XSS. */
+export async function setAccessTokenCookie(token: string): Promise<void> {
+  try {
+    const cookieStore = await cookies();
+    cookieStore.set(ACCESS_TOKEN_COOKIE_NAME, token, {
+      httpOnly: true,
+      secure: getNodeEnv() === "production",
+      sameSite: "strict",
+      maxAge: ACCESS_TOKEN_COOKIE_MAX_AGE_SEC,
+      path: "/",
+    });
+  } catch (error) {
+    const { logWarn } = await import("@/lib/logger");
+    logWarn("access_token_cookie.set_failed", { error: String(error) });
+  }
+}
+
+export async function deleteAccessTokenCookie(): Promise<void> {
+  try {
+    const cookieStore = await cookies();
+    cookieStore.delete(ACCESS_TOKEN_COOKIE_NAME);
+  } catch (error) {
+    const { logWarn } = await import("@/lib/logger");
+    logWarn("access_token_cookie.delete_failed", { error: String(error) });
   }
 }

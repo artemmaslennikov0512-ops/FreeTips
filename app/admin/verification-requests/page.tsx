@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useMobileDarkChromeOverlay } from "@/lib/use-mobile-dark-chrome-overlay";
 import Link from "next/link";
 import { Check, X, Download, Loader2, FolderArchive } from "lucide-react";
-import { getCsrfHeader } from "@/lib/security/csrf-client";
+import { fetchWithAuth } from "@/lib/auth-client";
 import { AdminStatusTabs, apiStatusForTab, type AdminRequestTab } from "./AdminStatusTabs";
 import { AdminRequestsMainTabs, type AdminRequestsMainTab } from "./AdminRequestsMainTabs";
 import { AdminConnectionRequestsBlock } from "./AdminConnectionRequestsBlock";
@@ -15,7 +15,12 @@ import {
   ADMIN_BTN_NEUTRAL_SM,
   ADMIN_BTN_SUCCESS,
 } from "@/lib/admin-button-classes";
-import { ADMIN_PANEL_CARD } from "@/lib/admin-surface-classes";
+import { ADMIN_PANEL_CARD, ADMIN_PANEL_TEXTAREA } from "@/lib/admin-surface-classes";
+import {
+  PANEL_ADMIN_DASHBOARD_TABLE_CARD,
+  PANEL_ADMIN_DASHBOARD_TABLE_DESKTOP,
+  PANEL_PAGE_TITLE_ADMIN_CENTERED,
+} from "@/lib/panel-shell-visual-classes";
 import {
   mainTabNewPending,
   readMainTabAckConnection,
@@ -98,12 +103,8 @@ export default function AdminVerificationRequestsPage() {
   useMobileDarkChromeOverlay(rejectModal !== null);
 
   const fetchCounts = useCallback(async (): Promise<RequestsCountsPayload | null> => {
-    const token = localStorage.getItem("accessToken");
-    if (!token) return null;
     try {
-      const res = await fetch("/api/admin/requests-counts", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await fetchWithAuth("/api/admin/requests-counts");
       if (!res.ok) return null;
       const data = (await res.json()) as RequestsCountsPayload;
       setCounts(data);
@@ -128,15 +129,11 @@ export default function AdminVerificationRequestsPage() {
   }, [refreshCountsAndNotifyLayout]);
 
   const fetchList = useCallback(async () => {
-    const token = localStorage.getItem("accessToken");
-    if (!token) return;
     setLoading(true);
     setError(null);
     try {
       const status = apiStatusForTab(verificationTab);
-      const res = await fetch(`/api/admin/verification-requests?status=${status}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await fetchWithAuth(`/api/admin/verification-requests?status=${status}`);
       if (!res.ok) {
         setError("Ошибка загрузки заявок");
         return;
@@ -165,17 +162,13 @@ export default function AdminVerificationRequestsPage() {
   }, [fetchList, mainTab]);
 
   const handleApprove = async (id: string) => {
-    const token = localStorage.getItem("accessToken");
-    if (!token) return;
     setApprovingId(id);
     setError(null);
     try {
-      const res = await fetch(`/api/admin/verification-requests/${id}/approve`, {
+      const res = await fetchWithAuth(`/api/admin/verification-requests/${id}/approve`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-          ...getCsrfHeader(),
         },
         body: "{}",
       });
@@ -199,17 +192,13 @@ export default function AdminVerificationRequestsPage() {
 
   const handleRejectSubmit = async () => {
     if (!rejectModal || !rejectReason.trim()) return;
-    const token = localStorage.getItem("accessToken");
-    if (!token) return;
     setRejectSubmitting(true);
     setRejectError(null);
     try {
-      const res = await fetch(`/api/admin/verification-requests/${rejectModal.id}/reject`, {
+      const res = await fetchWithAuth(`/api/admin/verification-requests/${rejectModal.id}/reject`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-          ...getCsrfHeader(),
         },
         body: JSON.stringify({ reason: rejectReason.trim() }),
       });
@@ -234,14 +223,10 @@ export default function AdminVerificationRequestsPage() {
   };
 
   const downloadDoc = async (requestId: string, type: string, waiterCode: string) => {
-    const token = localStorage.getItem("accessToken");
-    if (!token) return;
     const key = `${requestId}-${type}`;
     setDownloading(key);
     try {
-      const res = await fetch(`/api/admin/verification-requests/${requestId}/documents/${type}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await fetchWithAuth(`/api/admin/verification-requests/${requestId}/documents/${type}`);
       if (!res.ok) return;
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
@@ -261,14 +246,10 @@ export default function AdminVerificationRequestsPage() {
   };
 
   const downloadZipBundle = async (requestId: string, waiterCode: string) => {
-    const token = localStorage.getItem("accessToken");
-    if (!token) return;
     const key = `zip-${requestId}`;
     setDownloading(key);
     try {
-      const res = await fetch(`/api/admin/verification-requests/${requestId}/documents/zip`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await fetchWithAuth(`/api/admin/verification-requests/${requestId}/documents/zip`);
       if (!res.ok) return;
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
@@ -310,9 +291,7 @@ export default function AdminVerificationRequestsPage() {
   return (
     <div className="w-full min-w-0 space-y-6 text-center text-white">
       <div className="flex flex-col items-center gap-3 text-center">
-        <h1 className="text-center font-[family:var(--font-playfair)] text-xl font-semibold text-white sm:text-2xl">
-          Заявки
-        </h1>
+        <h1 className={PANEL_PAGE_TITLE_ADMIN_CENTERED}>Заявки</h1>
         <AdminRequestsMainTabs
           value={mainTab}
           onChange={setMainTab}
@@ -376,7 +355,7 @@ export default function AdminVerificationRequestsPage() {
                   {list.map((r) => (
                     <div
                       key={r.id}
-                      className="admin-dashboard-table cabinet-section-header rounded-2xl border-0 p-4 text-left"
+                      className={PANEL_ADMIN_DASHBOARD_TABLE_CARD}
                     >
                       <p className="text-xs text-white/60">
                         {new Date(r.createdAt).toLocaleString("ru-RU", {
@@ -479,7 +458,7 @@ export default function AdminVerificationRequestsPage() {
                     </div>
                   ))}
                 </div>
-                <div className="admin-dashboard-table cabinet-section-header hidden min-h-[min(48dvh,520px)] w-full min-w-0 flex-1 overflow-auto rounded-xl border-0 text-left lg:block">
+                <div className={PANEL_ADMIN_DASHBOARD_TABLE_DESKTOP}>
                   <div className="min-w-0 overflow-x-auto">
                     <table className="w-full min-w-[760px] border-collapse text-sm">
                       <thead>
@@ -635,7 +614,7 @@ export default function AdminVerificationRequestsPage() {
               value={rejectReason}
               onChange={(e) => setRejectReason(e.target.value)}
               placeholder="Например: Нечитаемое фото паспорта. Загрузите чёткое изображение главной страницы."
-              className="mb-4 w-full min-h-[120px] rounded-xl px-4 py-3 text-left focus:outline-none focus:ring-2 focus:ring-[var(--color-brand-gold)]/40"
+              className={`mb-4 ${ADMIN_PANEL_TEXTAREA}`}
               rows={4}
             />
             {rejectError && <p className="reject-modal-error-msg mb-2 w-full text-center text-sm text-red-400">{rejectError}</p>}

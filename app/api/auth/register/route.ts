@@ -11,7 +11,7 @@ import { getUserRepository } from "@/lib/infrastructure/user-repository";
 import { registerSchema } from "@/lib/validations";
 import { hashPassword } from "@/lib/auth/password";
 import { encryptRecoveryCodewordForAdminDisplay } from "@/lib/auth/recovery-codeword-crypto";
-import { generateAccessToken, generateRefreshToken, setRefreshTokenCookie } from "@/lib/auth/jwt";
+import { generateAccessToken, generateRefreshToken, setAccessTokenCookie, setRefreshTokenCookie } from "@/lib/auth/jwt";
 import { checkRateLimitByIP, getClientIpAndRateLimitKey, AUTH_RATE_LIMIT } from "@/lib/middleware/rate-limit";
 import { hashRegistrationToken } from "@/lib/auth/registration-token";
 import { getWaiterPaygineSdRef } from "@/lib/payment/paygine-sd-ref";
@@ -144,6 +144,7 @@ export async function POST(request: NextRequest) {
     const refreshToken = await generateRefreshToken(tokenPayload);
 
     await setRefreshTokenCookie(refreshToken);
+    await setAccessTokenCookie(accessToken);
 
     const meta = buildNewSessionMetadata(request, ip, validated.deviceClientId);
     await db.session.create({
@@ -162,7 +163,6 @@ export async function POST(request: NextRequest) {
     }
     return NextResponse.json(
       {
-        accessToken,
         user: {
           id: user.id,
           login: user.login,

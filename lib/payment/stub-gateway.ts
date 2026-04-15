@@ -41,7 +41,7 @@ function verifyWebhookSignature(rawBody: string, signature: string | null): bool
   return bufExpected.length === bufActual.length && timingSafeEqual(bufExpected, bufActual);
 }
 
-export class StubPaymentGateway implements PaymentGateway {
+class StubPaymentGateway implements PaymentGateway {
   async createPayment(params: CreatePaymentParams): Promise<CreatePaymentResult> {
     const { linkId, recipientId, amountKop, idempotencyKey, comment, initiatorIp, tipSplit } = params;
 

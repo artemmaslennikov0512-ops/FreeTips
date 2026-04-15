@@ -20,7 +20,7 @@ export async function getPlatformPaymentSettings(): Promise<PaymentAcceptSetting
   return rowToAcceptSettings(row);
 }
 
-export type PlatformPaymentSettingsRow = {
+type PlatformPaymentSettingsRow = {
   globalPaymentsDisabled: boolean;
   paymentWhitelistUserIds: string[];
   paymentBlacklistUserIds: string[];

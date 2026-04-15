@@ -17,7 +17,7 @@ export class WaiterQrIdentifierExhaustedError extends Error {
 }
 
 /** Сериал 1…999999 → «000-001»… (шесть цифр, разбивка 3+3). */
-export function formatGlobalWaiterCode(serial: number): string {
+function formatGlobalWaiterCode(serial: number): string {
   if (serial < 1 || serial > MAX_GLOBAL_SERIAL) {
     throw new WaiterQrIdentifierExhaustedError();
   }

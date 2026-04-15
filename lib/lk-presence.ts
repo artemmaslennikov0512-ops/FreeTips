@@ -7,10 +7,8 @@
  * Дольше окна без активности → в админке «не в ЛК»; следующий запрос снова пишет метку.
  */
 
-/** И окно «сейчас в ЛК», и минимальный зазор между записями lastSeenAt — одно число. */
+/** И окно «сейчас в ЛК», и минимальный зазор между записями lastSeenAt — одно число (мс). */
 export const LK_PRESENCE_WINDOW_MS = 5 * 60 * 1000;
-
-export const LK_LAST_SEEN_TOUCH_MIN_INTERVAL_MS = LK_PRESENCE_WINDOW_MS;
 
 export function isActiveInLk(lastSeenAt: Date | null, now: Date = new Date()): boolean {
   if (!lastSeenAt) return false;

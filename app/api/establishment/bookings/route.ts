@@ -162,7 +162,7 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  let guestId: string | null = body.data.guestId ?? null;
+  const guestId: string | null = body.data.guestId ?? null;
   let guestName = (body.data.guestName ?? "").trim();
   let guestPhone = normalizeOptionalString(body.data.guestPhone as string | undefined);
   let guestEmail = normalizeOptionalString(body.data.guestEmail as string | undefined);

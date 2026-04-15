@@ -6,24 +6,20 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { getRefreshTokenCookie, deleteRefreshTokenCookie } from "@/lib/auth/jwt";
+import { getRefreshTokenCookie, deleteRefreshTokenCookie, deleteAccessTokenCookie } from "@/lib/auth/jwt";
 import { logError, logSecurity } from "@/lib/logger";
 import { getRequestId } from "@/lib/security/request";
 import { getClientIP } from "@/lib/middleware/rate-limit";
-import { internalError } from "@/lib/api/helpers";
+import { internalError, jsonError } from "@/lib/api/helpers";
 import { verifyCsrfFromRequest } from "@/lib/security/csrf";
-
-function hasBearer(request: NextRequest): boolean {
-  const auth = request.headers.get("authorization");
-  return Boolean(auth?.startsWith("Bearer "));
-}
+import { hasAuthorizationBearer } from "@/lib/auth/bearer-from-request";
 
 export async function POST(request: NextRequest) {
   const requestId = getRequestId(request);
   const ip = getClientIP(request);
 
-  if (!hasBearer(request) && !verifyCsrfFromRequest(request)) {
-    return NextResponse.json({ error: "Некорректный CSRF токен" }, { status: 403 });
+  if (!hasAuthorizationBearer(request) && !verifyCsrfFromRequest(request)) {
+    return jsonError(403, "Некорректный CSRF токен");
   }
 
   try {
@@ -37,8 +33,8 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Удаляем cookie
     await deleteRefreshTokenCookie();
+    await deleteAccessTokenCookie();
 
     logSecurity("auth.logout.success", { requestId, ip });
     return NextResponse.json(
@@ -48,6 +44,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     logError("auth.logout.error", error, { requestId, ip });
     await deleteRefreshTokenCookie();
+    await deleteAccessTokenCookie();
     return internalError("Ошибка при выходе");
   }
 }

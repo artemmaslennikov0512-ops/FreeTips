@@ -22,13 +22,12 @@ import {
   ShieldOff,
   MonitorSmartphone,
 } from "lucide-react";
-import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { PAYOUT_MAX_AMOUNT_KOP, PAYOUT_MIN_AMOUNT_KOP } from "@/lib/payout-amount-bounds";
 import { formatDate, formatMoneyCompact, toDateInputValueFromApi } from "@/lib/utils";
 import { PremiumCard } from "@/app/cabinet/PremiumCard";
 import { ADMIN_BTN, ADMIN_BTN_DANGER, ADMIN_BTN_PRIMARY } from "@/lib/admin-button-classes";
 import { ADMIN_PANEL_STATE_CENTER } from "@/lib/admin-surface-classes";
-import { getAccessToken } from "@/lib/auth-client";
+import { fetchWithAuth, migrateLegacyAccessTokenToCookie } from "@/lib/auth-client";
 import { beginCabinetImpersonation } from "@/lib/cabinet-impersonation";
 import { getPayginePayoutFormTarget } from "@/lib/paygine-payout-form-target";
 
@@ -141,14 +140,18 @@ export default function AdminUserDetailsPage() {
   const [identityOk, setIdentityOk] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem("accessToken");
-    if (!token || !userId) return;
+    if (!userId) return;
+    let cancelled = false;
     setLoading(true);
     setError(null);
-    fetch(`/api/admin/users/${userId}`, { headers: { Authorization: `Bearer ${token}` } })
-      .then(async (res) => {
+    void (async () => {
+      await migrateLegacyAccessTokenToCookie();
+      if (cancelled) return;
+      try {
+        const res = await fetchWithAuth(`/api/admin/users/${userId}`);
         if (!res.ok) throw new Error("Ошибка загрузки");
         const json = (await res.json()) as UserDetailsResponse;
+        if (cancelled) return;
         setData(json);
         setDisplayApiKey(null);
         const u = json.user;
@@ -199,9 +202,15 @@ export default function AdminUserDetailsPage() {
           setAppliedMonthlyCount(null);
           setInputMonthlyCount("");
         }
-      })
-      .catch(() => setError("Ошибка загрузки"))
-      .finally(() => setLoading(false));
+      } catch {
+        if (!cancelled) setError("Ошибка загрузки");
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, [userId]);
 
   useEffect(() => {
@@ -219,8 +228,6 @@ export default function AdminUserDetailsPage() {
 
   const handlePasswordReset = async () => {
     if (!userId) return;
-    const token = localStorage.getItem("accessToken");
-    if (!token) return;
     if (!newPassword || newPassword !== newPasswordConfirm) {
       setPasswordError("Пароли не совпадают");
       return;
@@ -229,12 +236,10 @@ export default function AdminUserDetailsPage() {
     setPasswordError(null);
     setPasswordOk(false);
     try {
-      const res = await fetch(`/api/admin/users/${userId}/password`, {
+      const res = await fetchWithAuth(`/api/admin/users/${userId}/password`, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
-          ...getCsrfHeader(),
         },
         body: JSON.stringify({ newPassword, newPasswordConfirm }),
       });
@@ -256,8 +261,6 @@ export default function AdminUserDetailsPage() {
 
   const handleRecoveryCodewordSave = async () => {
     if (!userId) return;
-    const token = localStorage.getItem("accessToken");
-    if (!token) return;
     if (!newRecoveryCodeword.trim() || newRecoveryCodeword !== newRecoveryCodewordConfirm) {
       setRecoveryCodewordError("Кодовые слова не совпадают или пусты");
       return;
@@ -270,12 +273,10 @@ export default function AdminUserDetailsPage() {
     setRecoveryCodewordError(null);
     setRecoveryCodewordOk(false);
     try {
-      const res = await fetch(`/api/admin/users/${userId}/recovery-codeword`, {
+      const res = await fetchWithAuth(`/api/admin/users/${userId}/recovery-codeword`, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
-          ...getCsrfHeader(),
         },
         body: JSON.stringify({
           recoveryCodeword: newRecoveryCodeword.trim(),
@@ -314,14 +315,10 @@ export default function AdminUserDetailsPage() {
 
   const patchUser = async (payload: Record<string, unknown>) => {
     if (!userId) return null;
-    const token = localStorage.getItem("accessToken");
-    if (!token) return null;
-    const res = await fetch(`/api/admin/users/${userId}`, {
+    const res = await fetchWithAuth(`/api/admin/users/${userId}`, {
       method: "PATCH",
       headers: {
-        Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
-        ...getCsrfHeader(),
       },
       body: JSON.stringify(payload),
     });
@@ -525,8 +522,6 @@ export default function AdminUserDetailsPage() {
 
   const handlePayout = async () => {
     if (!userId) return;
-    const token = localStorage.getItem("accessToken");
-    if (!token) return;
     const amountRub = parseFloat(payoutAmount);
     if (!amountRub || amountRub <= 0) {
       setPayoutError("Введите корректную сумму");
@@ -542,12 +537,10 @@ export default function AdminUserDetailsPage() {
     setPayoutLoading(true);
     setPayoutError(null);
     try {
-      const res = await fetch(`/api/admin/users/${userId}/sd-pay-out-page`, {
+      const res = await fetchWithAuth(`/api/admin/users/${userId}/sd-pay-out-page`, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
-          ...getCsrfHeader(),
         },
         body: JSON.stringify({ amountKop }),
       });
@@ -587,9 +580,7 @@ export default function AdminUserDetailsPage() {
         setTimeout(() => setPayoutNewTabHint(false), 8000);
       }
       setPayoutAmount("");
-      const profileRes = await fetch(`/api/admin/users/${userId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const profileRes = await fetchWithAuth(`/api/admin/users/${userId}`);
       if (profileRes.ok) {
         const json = (await profileRes.json()) as UserDetailsResponse;
         setData(json);
@@ -604,13 +595,10 @@ export default function AdminUserDetailsPage() {
 
   const handleRegenerateApiKey = async () => {
     if (!userId) return;
-    const token = localStorage.getItem("accessToken");
-    if (!token) return;
     setApiKeyLoading(true);
     try {
-      const res = await fetch(`/api/admin/users/${userId}/api-key`, {
+      const res = await fetchWithAuth(`/api/admin/users/${userId}/api-key`, {
         method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) {
         setApiKeyLoading(false);
@@ -636,17 +624,13 @@ export default function AdminUserDetailsPage() {
 
   const handleBlockToggle = async () => {
     if (!userId) return;
-    const token = localStorage.getItem("accessToken");
-    if (!token) return;
     setBlockLoading(true);
     setBlockError(null);
     try {
-      const res = await fetch(`/api/admin/users/${userId}`, {
+      const res = await fetchWithAuth(`/api/admin/users/${userId}`, {
         method: "PATCH",
         headers: {
-          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
-          ...getCsrfHeader(),
         },
         body: JSON.stringify({ isBlocked: !data!.user.isBlocked }),
       });
@@ -668,17 +652,13 @@ export default function AdminUserDetailsPage() {
 
   const handleManualVerify = async () => {
     if (!userId) return;
-    const token = localStorage.getItem("accessToken");
-    if (!token) return;
     setVerifyLoading(true);
     setVerifyError(null);
     try {
-      const res = await fetch(`/api/admin/users/${userId}/verify`, {
+      const res = await fetchWithAuth(`/api/admin/users/${userId}/verify`, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
-          ...getCsrfHeader(),
         },
       });
       const respData = await res.json();
@@ -705,17 +685,13 @@ export default function AdminUserDetailsPage() {
   const handleUnverify = async () => {
     if (!userId) return;
     if (!window.confirm("Снять верификацию с этого пользователя?")) return;
-    const token = localStorage.getItem("accessToken");
-    if (!token) return;
     setUnverifyLoading(true);
     setVerifyError(null);
     try {
-      const res = await fetch(`/api/admin/users/${userId}/unverify`, {
+      const res = await fetchWithAuth(`/api/admin/users/${userId}/unverify`, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
-          ...getCsrfHeader(),
         },
       });
       const respData = await res.json();
@@ -741,21 +717,18 @@ export default function AdminUserDetailsPage() {
 
   const handleOpenUserCabinet = async () => {
     if (!userId) return;
-    const adminToken = getAccessToken();
-    if (!adminToken) return;
     setCabinetViewLoading(true);
     setCabinetViewError(null);
     try {
-      const res = await fetch(`/api/admin/users/${userId}/cabinet-token`, {
+      const res = await fetchWithAuth(`/api/admin/users/${userId}/cabinet-token`, {
         method: "POST",
-        headers: { Authorization: `Bearer ${adminToken}` },
       });
       const body = (await res.json()) as { accessToken?: string; error?: string };
       if (!res.ok || !body.accessToken) {
         setCabinetViewError(body.error ?? "Не удалось открыть профиль");
         return;
       }
-      beginCabinetImpersonation(adminToken, body.accessToken, `/admin/users/${userId}`);
+      beginCabinetImpersonation(body.accessToken, `/admin/users/${userId}`);
       router.push("/cabinet");
     } catch {
       setCabinetViewError("Ошибка соединения");

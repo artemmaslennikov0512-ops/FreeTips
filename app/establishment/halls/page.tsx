@@ -7,6 +7,7 @@ import { Plus, Trash2, Pencil, ChevronLeft, Copy } from "lucide-react";
 import QRCode from "qrcode";
 import { authHeaders } from "@/lib/auth-client";
 import { EstablishmentDataGridPlaceholder } from "@/components/establishment/EstablishmentDataGridPlaceholder";
+import { PANEL_PAGE_TITLE_ESTABLISHMENT_HERO_WHITE } from "@/lib/panel-shell-visual-classes";
 
 interface TableRow {
   id: string;
@@ -327,7 +328,7 @@ export default function EstablishmentHallsPage() {
           <ChevronLeft className="h-4 w-4" aria-hidden />
           Зал и сервис
         </Link>
-        <h1 className="cabinet-dashboard-name-hero font-[family:var(--font-playfair)] text-white">
+        <h1 className={PANEL_PAGE_TITLE_ESTABLISHMENT_HERO_WHITE}>
           Залы и столы
         </h1>
         <p className="ft-panel-section-head__lead text-xs text-white/75">

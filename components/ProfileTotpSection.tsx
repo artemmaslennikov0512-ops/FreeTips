@@ -20,7 +20,7 @@ type TotpProfile = {
   totpEnrollmentPending?: boolean;
 };
 
-export type ProfileTotpVariant = "admin" | "cabinet" | "establishment";
+type ProfileTotpVariant = "admin" | "cabinet" | "establishment";
 
 const API = {
   start: "/api/profile/totp/start",

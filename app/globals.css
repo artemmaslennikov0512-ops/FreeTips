@@ -1881,11 +1881,6 @@ html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-compe
   gap: 0 !important;
   justify-content: center !important;
 }
-.admin-panel .cabinet-menu-btn.admin-btn {
-  padding: 0 !important;
-  gap: 0 !important;
-  justify-content: center !important;
-}
 /* Светлая тема: мобильное меню — как сайдбар (не M5 — у M5 свои правила) */
 html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-nav-dropdown {
   background: #1e2a3a !important;

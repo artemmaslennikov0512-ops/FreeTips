@@ -7,6 +7,7 @@ import { Palette, Printer, Smartphone, LayoutDashboard, FileDown, ImageIcon, X }
 import { authHeaders } from "@/lib/auth-client";
 import { CustomDropdown } from "@/components/CustomDropdown";
 import { getBaseUrl } from "@/lib/get-base-url";
+import { PANEL_PAGE_TITLE_ESTABLISHMENT_WHITE_LG_FLEX_ROW } from "@/lib/panel-shell-visual-classes";
 
 type BrandGroup = "print" | "pay" | "cabinet";
 
@@ -391,7 +392,7 @@ export default function EstablishmentBrandPage() {
   return (
     <div className="mx-auto max-w-6xl space-y-4">
       <div>
-        <h1 className="font-[family:var(--font-playfair)] text-lg font-semibold text-white flex items-center justify-center gap-2 w-full">
+        <h1 className={PANEL_PAGE_TITLE_ESTABLISHMENT_WHITE_LG_FLEX_ROW}>
           <Palette className="h-4 w-4 shrink-0" />
           Бренд заведения
         </h1>

@@ -1,6 +1,6 @@
 import { describeSessionDevice } from "@/lib/user-agent-device-label";
 
-export type SessionRowForList = {
+type SessionRowForList = {
   id: string;
   createdAt: Date;
   lastSeenAt: Date;
@@ -9,7 +9,7 @@ export type SessionRowForList = {
   refreshToken: string;
 };
 
-export type ProfileSessionListItem = {
+type ProfileSessionListItem = {
   id: string;
   createdAt: string;
   lastSeenAt: string;
@@ -23,7 +23,7 @@ export type ProfileSessionListItem = {
   isCurrent: boolean;
 };
 
-export function parseStoredDeviceInfo(raw: string | null): {
+function parseStoredDeviceInfo(raw: string | null): {
   ip: string | null;
   userAgent: string | null;
   deviceClientId: string | null;

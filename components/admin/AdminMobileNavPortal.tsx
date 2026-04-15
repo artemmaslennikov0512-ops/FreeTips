@@ -1,12 +1,16 @@
 "use client";
 
-import { useEffect, useCallback, useSyncExternalStore } from "react";
-import { useMobileDarkChromeOverlay } from "@/lib/use-mobile-dark-chrome-overlay";
+import { useCallback, useSyncExternalStore } from "react";
+import { usePanelMobileSimpleDrawerEffects } from "@/lib/use-panel-mobile-simple-drawer-effects";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import type { LucideIcon } from "lucide-react";
 import { LogOut } from "lucide-react";
 import { ADMIN_BTN } from "@/lib/admin-button-classes";
+import {
+  PANEL_MOBILE_PORTAL_SAFE_PADDING_RELAXED,
+  PANEL_MOBILE_Z_NAV_PORTAL_LAYER,
+} from "@/lib/panel-mobile-ui";
 
 type NavItem = { label: string; href: string; icon: LucideIcon; iconClass: string };
 type NavGroup = { title: string; items: NavItem[] };
@@ -38,25 +42,7 @@ export function AdminMobileNavPortal({
     () => false,
   );
 
-  useEffect(() => {
-    if (!sidebarOpen) return;
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = prev;
-    };
-  }, [sidebarOpen]);
-
-  useMobileDarkChromeOverlay(sidebarOpen);
-
-  useEffect(() => {
-    if (!sidebarOpen) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") closeSidebar();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [sidebarOpen, closeSidebar]);
+  usePanelMobileSimpleDrawerEffects(sidebarOpen, closeSidebar);
 
   const onOverlayDown = useCallback(
     (e: React.MouseEvent) => {
@@ -69,7 +55,7 @@ export function AdminMobileNavPortal({
 
   return createPortal(
     <div
-      className={`admin-mobile-nav-root mobile-drawer-screen-bleed fixed z-[2000] lg:hidden ${sidebarOpen ? "" : "pointer-events-none"}`}
+      className={`admin-mobile-nav-root mobile-drawer-screen-bleed fixed ${PANEL_MOBILE_Z_NAV_PORTAL_LAYER} lg:hidden ${sidebarOpen ? "" : "pointer-events-none"}`}
       aria-hidden={!sidebarOpen}
     >
       <div
@@ -81,10 +67,7 @@ export function AdminMobileNavPortal({
       />
       <div
         className="pointer-events-none absolute inset-0 flex items-center justify-center px-3"
-        style={{
-          paddingTop: "max(0.75rem, env(safe-area-inset-top, 0px))",
-          paddingBottom: "max(0.75rem, env(safe-area-inset-bottom, 0px))",
-        }}
+        style={PANEL_MOBILE_PORTAL_SAFE_PADDING_RELAXED}
       >
         <div
           id="admin-nav-dropdown"

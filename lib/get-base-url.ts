@@ -22,7 +22,7 @@ function getRequestOrigin(request: NextRequest): string {
  * Возвращает origin, пригодный для перехода из браузера.
  * 0.0.0.0 и :: заменяются на localhost.
  */
-export function toClientOrigin(origin: string): string {
+function toClientOrigin(origin: string): string {
   try {
     const u = new URL(origin);
     if (UNUSABLE_HOSTS.includes(u.hostname)) {

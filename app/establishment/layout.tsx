@@ -23,14 +23,26 @@ import {
   KeyRound,
   Laptop,
 } from "lucide-react";
-import { getAccessToken, fetchWithAuth, clearAccessToken } from "@/lib/auth-client";
+import { fetchWithAuth, clearAccessToken, migrateLegacyAccessTokenToCookie } from "@/lib/auth-client";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { usePanelMobileMenu } from "@/components/PanelMobileMenuContext";
 import { PanelShellMobileCorner } from "@/components/PanelShellMobileCorner";
 import { PanelMobileBackButton } from "@/components/PanelMobileBackButton";
 import { LkPresenceHeartbeat } from "@/components/LkPresenceHeartbeat";
-import { useMobileDarkChromeOverlay } from "@/lib/use-mobile-dark-chrome-overlay";
+import { ProactiveAccessRefresh } from "@/components/ProactiveAccessRefresh";
+import { usePanelMobileSimpleDrawerEffects } from "@/lib/use-panel-mobile-simple-drawer-effects";
+import {
+  PANEL_MOBILE_NAV_OVERLAY_TRANSITION,
+  PANEL_MOBILE_Z_ESTABLISHMENT_DRAWER,
+  PANEL_MOBILE_Z_ESTABLISHMENT_OVERLAY,
+} from "@/lib/panel-mobile-ui";
+import {
+  PANEL_APP_MAIN_SURFACE_ESTABLISHMENT,
+  PANEL_ESTABLISHMENT_SIDEBAR_LOGOUT,
+  PANEL_ESTABLISHMENT_SIDEBAR_TITLE_LINE,
+  PANEL_MAIN_CONTENT_INNER_ESTABLISHMENT,
+} from "@/lib/panel-shell-visual-classes";
 
 interface Profile {
   role: string;
@@ -102,31 +114,13 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
     return () => document.body.classList.remove("cabinet-page", "establishment-page");
   }, []);
 
-  useEffect(() => {
-    if (!sidebarOpen) return;
-    const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") closeSidebar();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => {
-      document.body.style.overflow = prevOverflow;
-      window.removeEventListener("keydown", onKey);
-    };
-  }, [sidebarOpen, closeSidebar]);
-
-  useMobileDarkChromeOverlay(sidebarOpen);
+  usePanelMobileSimpleDrawerEffects(sidebarOpen, closeSidebar);
 
   useEffect(() => {
     if (!mounted || typeof window === "undefined") return;
 
     const checkAuth = async () => {
-      if (!getAccessToken()) {
-        router.replace("/login");
-        return;
-      }
-
+      await migrateLegacyAccessTokenToCookie();
       try {
         const res = await fetchWithAuth("/api/profile");
 
@@ -218,10 +212,11 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
           ) : undefined
         }
       />
+      <ProactiveAccessRefresh />
       <LkPresenceHeartbeat />
       {/* Шторка на мобильном */}
       <div
-        className={`cabinet-overlay mobile-drawer-screen-bleed fixed z-[90] backdrop-blur-xl transition-opacity duration-300 lg:hidden ${
+        className={`cabinet-overlay mobile-drawer-screen-bleed fixed ${PANEL_MOBILE_Z_ESTABLISHMENT_OVERLAY} backdrop-blur-xl ${PANEL_MOBILE_NAV_OVERLAY_TRANSITION} ${
           sidebarOpen ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
         onClick={closeSidebar}
@@ -231,14 +226,12 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
       {/* Сайдбар выше затемнения (fixed + z); на lg остаётся в потоке */}
       <aside
         id="establishment-mobile-nav"
-        className={`cabinet-sidebar establishment-mobile-sidebar fixed z-[100] flex min-h-0 flex-col overflow-hidden rounded-[10px] border border-white/10 shadow-2xl backdrop-blur-xl transition-[transform] duration-300 ease-out bg-white/[0.06] max-lg:left-[max(0.5rem,env(safe-area-inset-left,0px))] max-lg:top-[max(0.5rem,env(safe-area-inset-top,0px))] max-lg:bottom-[max(0.5rem,env(safe-area-inset-bottom,0px))] max-lg:w-[min(19.25rem,calc(100vw-1.25rem-max(env(safe-area-inset-left,0px),0.5rem)-max(env(safe-area-inset-right,0px),0.5rem)))] max-lg:max-w-none max-lg:py-2 max-lg:min-w-0 lg:static lg:left-auto lg:top-auto lg:bottom-auto lg:ml-0 lg:mt-1.5 lg:mr-0 lg:mb-0 lg:max-h-none lg:z-auto lg:w-[14.75rem] lg:max-w-none lg:translate-x-0 lg:border lg:self-start lg:py-3 ${
+        className={`cabinet-sidebar establishment-mobile-sidebar fixed ${PANEL_MOBILE_Z_ESTABLISHMENT_DRAWER} flex min-h-0 flex-col overflow-hidden rounded-[10px] border border-white/10 shadow-2xl backdrop-blur-xl transition-[transform] duration-300 ease-out bg-white/[0.06] max-lg:left-[max(0.5rem,env(safe-area-inset-left,0px))] max-lg:top-[max(0.5rem,env(safe-area-inset-top,0px))] max-lg:bottom-[max(0.5rem,env(safe-area-inset-bottom,0px))] max-lg:w-[min(19.25rem,calc(100vw-1.25rem-max(env(safe-area-inset-left,0px),0.5rem)-max(env(safe-area-inset-right,0px),0.5rem)))] max-lg:max-w-none max-lg:py-2 max-lg:min-w-0 lg:static lg:left-auto lg:top-auto lg:bottom-auto lg:ml-0 lg:mt-1.5 lg:mr-0 lg:mb-0 lg:max-h-none lg:z-auto lg:w-[14.75rem] lg:max-w-none lg:translate-x-0 lg:border lg:self-start lg:py-3 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full max-lg:pointer-events-none"
         }`}
       >
         <div className="mb-2 w-full shrink-0 px-2.5 text-center max-lg:mb-1.5">
-          <span className="inline-block font-[family:var(--font-playfair)] text-[1.0625rem] font-bold leading-tight text-white">
-            Кабинет заведения
-          </span>
+          <span className={PANEL_ESTABLISHMENT_SIDEBAR_TITLE_LINE}>Кабинет заведения</span>
         </div>
         <div className="cabinet-nav-block flex min-h-0 min-w-0 flex-col overflow-x-hidden overscroll-y-contain px-2.5 pb-1.5 max-lg:min-h-0 max-lg:flex-1 max-lg:overflow-hidden lg:flex-none">
           <nav
@@ -278,7 +271,7 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
           <button
             type="button"
             onClick={handleLogout}
-            className="mt-3 shrink-0 flex w-full items-center justify-center gap-2 rounded-md px-2 py-2 text-[0.8125rem] font-medium text-white/80 transition-colors hover:bg-[var(--color-dark-gray)]/10 hover:text-white"
+            className={PANEL_ESTABLISHMENT_SIDEBAR_LOGOUT}
           >
             <LogOut className="size-4 shrink-0" />
             <span>Выйти</span>
@@ -287,11 +280,8 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
       </aside>
 
       <main className="relative min-h-0 min-w-0 flex-1 px-0 pt-1.5 pb-3 lg:pt-2 lg:pl-0 lg:pr-0 lg:ml-0 flex flex-col">
-        <div className="cabinet-main-block app-panel-main-surface relative z-10 mt-0 mr-0 mb-3 ml-0 flex min-h-0 flex-1 flex-col rounded-lg border-x border-b border-white/10 bg-white/[0.06] backdrop-blur-xl md:rounded-[10px] lg:z-0 lg:mr-0 lg:ml-3 lg:rounded-[10px]">
-          <div
-            className="flex min-h-0 min-w-0 flex-1 flex-col px-4 py-2 sm:px-6 sm:py-3 md:py-4 lg:px-8 lg:py-5"
-            id="main-content"
-          >
+        <div className={PANEL_APP_MAIN_SURFACE_ESTABLISHMENT}>
+          <div className={PANEL_MAIN_CONTENT_INNER_ESTABLISHMENT} id="main-content">
             {children}
           </div>
         </div>

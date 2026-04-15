@@ -6,6 +6,7 @@ import Image from "next/image";
 import { FileDown, ImageIcon, X } from "lucide-react";
 import { authHeaders } from "@/lib/auth-client";
 import { getBaseUrl } from "@/lib/get-base-url";
+import { PANEL_PAGE_TITLE_ESTABLISHMENT_WHITE_LG } from "@/lib/panel-shell-visual-classes";
 
 export default function EstablishmentQrPage() {
   const [loading, setLoading] = useState(true);
@@ -130,7 +131,7 @@ export default function EstablishmentQrPage() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-4">
-      <h1 className="font-[family:var(--font-playfair)] text-lg font-semibold text-white text-center">
+      <h1 className={PANEL_PAGE_TITLE_ESTABLISHMENT_WHITE_LG}>
         QR и печать
       </h1>
       <p className="text-white/90 text-xs text-center">

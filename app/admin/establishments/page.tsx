@@ -5,6 +5,14 @@ import { Plus, Copy, RefreshCw } from "lucide-react";
 import { authHeaders } from "@/lib/auth-client";
 import { ADMIN_BTN, ADMIN_BTN_NEUTRAL_SM, ADMIN_BTN_PRIMARY, ADMIN_BTN_SM } from "@/lib/admin-button-classes";
 import { ADMIN_PANEL_INPUT_FULL_WIDTH, ADMIN_PANEL_INPUT_STRETCH } from "@/lib/admin-surface-classes";
+import {
+  PANEL_ADMIN_ESTABLISHMENTS_TABLE_WRAP,
+  PANEL_PAGE_TITLE_ADMIN_ON_DARK_CENTERED,
+  PANEL_SECTION_CARD_FORM_SPACE,
+  PANEL_SECTION_CARD_P4,
+  PANEL_SECTION_CARD_ROUNDED_XL_P4,
+  PANEL_SECTION_CARD_ROUNDED_XL_P6_CENTERED,
+} from "@/lib/panel-shell-visual-classes";
 
 interface EstablishmentRow {
   id: string;
@@ -143,9 +151,7 @@ export default function AdminEstablishmentsPage() {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="text-center font-[family:var(--font-playfair)] text-xl font-semibold text-[var(--color-on-dark)] sm:text-2xl">
-          Заведения
-        </h1>
+        <h1 className={PANEL_PAGE_TITLE_ADMIN_ON_DARK_CENTERED}>Заведения</h1>
         <button
           type="button"
           onClick={() => setShowForm(true)}
@@ -161,7 +167,7 @@ export default function AdminEstablishmentsPage() {
       )}
 
       {createdLink && (
-        <div className="cabinet-section-header rounded-2xl border-0 p-4">
+        <div className={PANEL_SECTION_CARD_P4}>
           <p className="mb-2 font-medium text-[var(--color-on-dark)]">
             Заведение «{createdLink.name}» создано. Код заведения (общий пул /pay):{" "}
             <span className="font-mono tracking-wide">{createdLink.waiterCode}</span>
@@ -193,7 +199,7 @@ export default function AdminEstablishmentsPage() {
       {showForm && (
         <form
           onSubmit={handleCreate}
-          className="cabinet-section-header space-y-4 rounded-2xl border-0 p-6 text-left"
+          className={PANEL_SECTION_CARD_FORM_SPACE}
         >
           <h2 className="text-lg font-medium text-[var(--color-on-dark)]">Новое заведение</h2>
           {formError && (
@@ -273,12 +279,12 @@ export default function AdminEstablishmentsPage() {
       {/* Мобильная версия: карточки */}
       <div className="space-y-4 lg:hidden">
         {list.length === 0 ? (
-          <div className="cabinet-section-header rounded-xl border-0 p-6 text-center text-[var(--color-on-dark-muted)]">
+          <div className={PANEL_SECTION_CARD_ROUNDED_XL_P6_CENTERED}>
             Нет заведений. Создайте первое.
           </div>
         ) : (
           list.map((est) => (
-            <div key={est.id} className="cabinet-section-header rounded-xl border-0 p-4">
+            <div key={est.id} className={PANEL_SECTION_CARD_ROUNDED_XL_P4}>
               <p className="font-medium text-[var(--color-on-dark)]">{est.name}</p>
               <p className="mt-1 font-mono text-sm text-[var(--color-on-dark-muted)]">{est.uniqueSlug}</p>
               <p className="mt-2 text-sm text-[var(--color-on-dark-muted)]">
@@ -308,7 +314,7 @@ export default function AdminEstablishmentsPage() {
       </div>
 
       {/* Десктоп: таблица */}
-      <div className="admin-establishments-table cabinet-section-header max-lg:hidden overflow-x-auto rounded-xl border-0">
+      <div className={PANEL_ADMIN_ESTABLISHMENTS_TABLE_WRAP}>
         <table className="w-full min-w-[700px] text-left">
           <thead>
             <tr className="border-b border-white/15">

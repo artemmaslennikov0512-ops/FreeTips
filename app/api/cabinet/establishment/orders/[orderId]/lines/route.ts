@@ -4,7 +4,6 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { EstablishmentTableOrderStatus } from "@prisma/client";
 import { requireEstablishmentEmployee } from "@/lib/middleware/auth";
 import { db } from "@/lib/db";
 import { parseJsonWithLimit, jsonError } from "@/lib/api/helpers";

@@ -3,10 +3,7 @@
 import { useLayoutEffect } from "react";
 import { popOverlaySafariChromeDark, pushOverlaySafariChromeDark } from "@/lib/document-shell-chrome";
 
-/**
- * Пока `open` — тёмный `theme-color` / `color-scheme` для Safari (счётчик в document-shell-chrome).
- * Вызывать из любого клиентского полноэкранного оверлея с тёмным затемнением на мобильном.
- */
+/** Тёмный Safari `theme-color` пока открыт полноэкранный тёмный оверлей (счётчик в document-shell-chrome). */
 export function useMobileDarkChromeOverlay(open: boolean): void {
   useLayoutEffect(() => {
     if (!open) return;

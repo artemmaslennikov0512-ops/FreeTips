@@ -4,9 +4,9 @@
 
 import { parseGlobalWaiterCodeString } from "@/lib/waiter-qr-identifier";
 
-export const MSG_EST_CODE_EMPTY = "Введите код заведения";
+const MSG_EST_CODE_EMPTY = "Введите код заведения";
 
-export const MSG_EST_CODE_FORMAT =
+const MSG_EST_CODE_FORMAT =
   "Неверный формат кода заведения. Укажите 6 цифр: 000-002 или без дефиса 000002. Это код заведения от администратора, а не персональная ссылка официанта.";
 
 export const MSG_EST_CODE_NOT_FOUND =

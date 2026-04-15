@@ -24,7 +24,7 @@ import {
   LayoutGrid,
 } from "lucide-react";
 import { CABINET_WAITER_BTN } from "@/lib/cabinet-button-classes";
-import { getAccessToken, fetchWithAuth, clearAccessToken } from "@/lib/auth-client";
+import { fetchWithAuth, clearAccessToken, migrateLegacyAccessTokenToCookie } from "@/lib/auth-client";
 import { isCabinetImpersonating } from "@/lib/cabinet-impersonation-state";
 import { endCabinetImpersonation } from "@/lib/cabinet-impersonation";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
@@ -38,9 +38,19 @@ import {
 } from "@/components/cabinet/CabinetMobileNav";
 import { usePanelMobileMenu } from "@/components/PanelMobileMenuContext";
 import { LkPresenceHeartbeat } from "@/components/LkPresenceHeartbeat";
+import { ProactiveAccessRefresh } from "@/components/ProactiveAccessRefresh";
 import { PanelMobileBackButton } from "@/components/PanelMobileBackButton";
 import { readCabinetNavRoleCache, writeCabinetNavRoleCache } from "@/lib/cabinet-nav-role-cache";
 import { useTheme } from "@/lib/theme-context";
+import {
+  PANEL_APP_MAIN_SURFACE_CABINET,
+  PANEL_MAIN_CONTENT_INNER_ADMIN_CABINET,
+  PANEL_NAV_WRAP_CABINET,
+  PANEL_SIDEBAR_NAV_GROUP_SEPARATOR_CABINET,
+  PANEL_SIDEBAR_NAV_ICON,
+  PANEL_SIDEBAR_NAV_LINK_INACTIVE_CABINET,
+  PANEL_SIDEBAR_NAV_LINK_ROW,
+} from "@/lib/panel-shell-visual-classes";
 
 const CABINET_LG_SIDEBAR_COLLAPSED_KEY = "cabinet-lg-sidebar-collapsed";
 
@@ -200,11 +210,8 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
 
   useEffect(() => {
     if (!mounted || typeof window === "undefined") return;
-    if (!getAccessToken()) {
-      router.replace("/login");
-      return;
-    }
-    fetchWithAuth("/api/profile")
+    void migrateLegacyAccessTokenToCookie().then(() =>
+      fetchWithAuth("/api/profile")
       .then((res) => {
         if (res.status === 401 || res.status === 403) {
           clearAccessToken();
@@ -236,11 +243,10 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
           });
         }
       })
-      .catch(() => {});
+      .catch(() => {}));
   }, [mounted, router]);
 
   const fetchSupportUnread = useCallback(() => {
-    if (!getAccessToken()) return;
     fetchWithAuth("/api/support/unread-count")
       .then((res) => (res.ok ? res.json() : null))
       .then((data: { count?: number } | null) => {
@@ -260,7 +266,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
 
   useEffect(() => {
     const onFocus = () => {
-      if (document.visibilityState === "visible" && getAccessToken()) {
+      if (document.visibilityState === "visible") {
         fetchSupportUnread();
       }
     };
@@ -415,6 +421,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
 
   return (
     <CabinetMobileNavProvider value={mobileNavValue}>
+    <ProactiveAccessRefresh />
     <LkPresenceHeartbeat />
     <div
       className={`cabinet-premium flex min-h-screen w-full max-w-full flex-col overflow-x-hidden font-[family:var(--font-inter)] text-[var(--color-text)] pt-2 lg:flex-row lg:pt-4 ${isM5Cabinet ? "bg-transparent" : "bg-[var(--color-bg)]"}`}
@@ -516,14 +523,11 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
           </div>
         </div>
         <div className="cabinet-nav-block flex min-h-0 min-w-0 flex-col overflow-x-hidden px-3 lg:flex-none">
-          <nav
-            className="flex flex-col gap-0 rounded-[10px] border border-[var(--color-brand-gold)]/15 bg-[var(--color-dark-gray)]/5 p-1.5 pb-2 shadow-[var(--shadow-subtle)]"
-            aria-label="Навигация по кабинету"
-          >
+          <nav className={PANEL_NAV_WRAP_CABINET} aria-label="Навигация по кабинету">
             {visibleNavGroups.map((group) => (
               <div
                 key={group.title}
-                className="mt-3 border-t border-[var(--color-brand-gold)]/12 pt-3 first:mt-0 first:border-t-0 first:pt-2"
+                className={PANEL_SIDEBAR_NAV_GROUP_SEPARATOR_CABINET}
                 role="group"
                 aria-label={group.title}
               >
@@ -536,14 +540,12 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
                       key={href}
                       href={href}
                       onClick={closeSidebar}
-                      className={`flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[0.9375rem] font-normal transition-colors ${
-                        isActive(href)
-                          ? navActiveClasses
-                          : "border border-transparent text-[var(--color-text)]/80 hover:bg-[var(--color-dark-gray)]/10 hover:text-[var(--color-text)]"
+                      className={`${PANEL_SIDEBAR_NAV_LINK_ROW} ${
+                        isActive(href) ? navActiveClasses : PANEL_SIDEBAR_NAV_LINK_INACTIVE_CABINET
                       }`}
                       style={!isActive(href) && brandFont ? { color: `${brandFont}cc` } : undefined}
                     >
-                      <Icon className="cabinet-nav-item-icon h-[18px] w-[18px] shrink-0" aria-hidden />
+                      <Icon className={PANEL_SIDEBAR_NAV_ICON} aria-hidden />
                       <span>{label}</span>
                       {href === "/cabinet/support" && supportUnreadCount > 0 && (
                         <span
@@ -559,11 +561,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
               </div>
             ))}
             {user?.role === "ESTABLISHMENT_ADMIN" && (
-              <div
-                className="mt-3 border-t border-[var(--color-brand-gold)]/12 pt-3"
-                role="group"
-                aria-label="Связанные кабинеты"
-              >
+              <div className={PANEL_SIDEBAR_NAV_GROUP_SEPARATOR_CABINET} role="group" aria-label="Связанные кабинеты">
                 <div className="cabinet-nav-group-title px-2.5 pb-2 pt-1 text-[0.6875rem] font-semibold uppercase leading-snug tracking-[0.12em]">
                   Связанные кабинеты
                 </div>
@@ -571,10 +569,10 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
                   <Link
                     href="/establishment"
                     onClick={closeSidebar}
-                    className="flex items-center gap-2.5 rounded-lg border border-transparent px-2.5 py-2 text-[0.9375rem] font-normal text-[var(--color-text)]/80 transition-colors hover:bg-[var(--color-dark-gray)]/10 hover:text-[var(--color-text)]"
+                    className={`${PANEL_SIDEBAR_NAV_LINK_ROW} ${PANEL_SIDEBAR_NAV_LINK_INACTIVE_CABINET}`}
                     style={brandFont ? { color: `${brandFont}cc` } : undefined}
                   >
-                    <Building2 className="cabinet-nav-item-icon h-[18px] w-[18px] shrink-0" aria-hidden />
+                    <Building2 className={PANEL_SIDEBAR_NAV_ICON} aria-hidden />
                     <span>Кабинет заведения</span>
                   </Link>
                 </div>
@@ -609,14 +607,8 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
       )}
 
       <main className="relative min-h-screen min-w-0 flex-1 px-0 max-lg:pt-0 pt-1.5 pb-3 lg:px-0 lg:pt-2 lg:pr-3 lg:ml-0 lg:mr-0 flex flex-col">
-        <div
-          className="cabinet-main-block app-panel-main-surface relative z-10 mt-0 mr-0 mb-3 ml-0 flex min-h-0 w-full max-w-full flex-1 flex-col rounded-lg border-x border-b border-white/10 backdrop-blur-xl md:rounded-[10px] lg:z-0 lg:mr-3 lg:ml-3 max-lg:mb-0 max-lg:ml-0 max-lg:mr-0 max-lg:rounded-none max-lg:border-0 max-lg:bg-transparent max-lg:shadow-none max-lg:backdrop-blur-none"
-          style={mainBlockStyle}
-        >
-          <div
-            className="flex min-h-0 min-w-0 flex-1 flex-col px-4 py-3 sm:px-6 md:py-6 lg:p-8"
-            id="main-content"
-          >
+        <div className={PANEL_APP_MAIN_SURFACE_CABINET} style={mainBlockStyle}>
+          <div className={PANEL_MAIN_CONTENT_INNER_ADMIN_CABINET} id="main-content">
             {children}
           </div>
         </div>

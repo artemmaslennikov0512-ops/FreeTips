@@ -57,7 +57,7 @@
 - `app/api/` — auth, profile, links, transactions, payouts, pay/[slug], payment/webhook, admin (stats, payouts, users)
 - `components/` — Header, Footer, секции лендинга
 - `config/site.ts` — навигация, футер, реквизиты
-- `lib/` — `db`, `validations`, `utils`, `balance`, `get-base-url`, `generate-slug`, `auth/`, `middleware/`, `payment/` (интерфейс PaymentGateway, заглушка StubPaymentGateway), `api/helpers` (лимит тела, единый формат ошибок), `ports/` (IUserRepository), `infrastructure/` (PrismaUserRepository)
+- `lib/` — `db`, `validations`, `utils`, `balance`, `get-base-url`, `auth/`, `middleware/`, `payment/` (интерфейс PaymentGateway, заглушка StubPaymentGateway), `api/helpers` (лимит тела, единый формат ошибок), `ports/` (IUserRepository), `infrastructure/` (PrismaUserRepository)
 - `prisma/` — схема БД
 - `docs/API.md` — описание API
 

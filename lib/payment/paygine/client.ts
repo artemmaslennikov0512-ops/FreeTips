@@ -1,6 +1,6 @@
 /**
  * Клиент Paygine по документу «Интеграция с ПЦ» (Оглавление1.txt).
- * В приложении: пополнение только картой (Register → SDPayIn). Purchase/PurchaseSBP используются скриптами.
+ * В приложении: пополнение картой (Register → SDPayIn).
  * Порядок параметров и подпись — Таблицы 1, 2, 44 и Приложение №2.
  *
  * Все запросы к API Paygine идут через очередь: по одному в момент. При нескольких вебхуках одновременно
@@ -20,10 +20,9 @@ function withPaygineSerial<T>(fn: () => Promise<T>): Promise<T> {
 
 // Базовый URL для запросов — до /webapi включительно. Тест: https://test.paygine.com/webapi , прод: https://pay.paygine.com/webapi
 const TEST_BASE_URL = "https://test.paygine.com/webapi";
-const PROD_BASE_URL = "https://pay.paygine.com/webapi";
 const ALLOWED_HOSTS = ["test.paygine.com", "pay.paygine.com"];
 
-export function getPaygineBaseUrl(): string {
+function getPaygineBaseUrl(): string {
   const raw = process.env.PAYGINE_BASE_URL?.trim();
   if (!raw) return TEST_BASE_URL;
   const url = raw.replace(/\/$/, "");
@@ -44,18 +43,13 @@ export function getPaygineBaseUrl(): string {
   return TEST_BASE_URL;
 }
 
-/** Прод-контур: true, если используется pay.paygine.com. */
-export function isPaygineProduction(): boolean {
-  return getPaygineBaseUrl() === PROD_BASE_URL;
-}
-
-export type PaygineConfig = {
+type PaygineConfig = {
   sector: string;
   password: string;
   baseUrl?: string;
 };
 
-export type RegisterParams = {
+type RegisterParams = {
   amount: number;
   currency: number;
   reference: string;
@@ -68,7 +62,7 @@ export type RegisterParams = {
   sd_ref?: string;
 };
 
-export type RegisterResult =
+type RegisterResult =
   | { ok: true; orderId: number }
   | {
       ok: false;
@@ -160,7 +154,7 @@ export async function registerOrder(
  * Подпись строго: sector, id, reference, password (reference — пустая строка, если не передаём).
  * Без reference в подписи ПЦ отвечает ошибкой; в &lt;description&gt; часто попадает description заказа (у нас — slug ссылки).
  */
-export type OrderStatusResult =
+type OrderStatusResult =
   | {
       ok: true;
       /** Тег <order_state> или <state> уровня заказа (до <operations>). */
@@ -235,7 +229,7 @@ export function isPaygineOrderPaidInOrderResponse(orderState: string, operationS
   );
 }
 
-export type GetOrderStatusOptions = {
+type GetOrderStatusOptions = {
   /** Номер заказа на стороне ТСП — тот же reference, что в webapi/Register (idempotencyKey чаевых). */
   reference?: string | null;
 };
@@ -281,42 +275,7 @@ export async function getOrderStatus(
   });
 }
 
-export type PaygineFormParams = Record<string, string>;
-
-/**
- * webapi/Purchase — оплата по карте (Таблица 2).
- * Редирект на платёжные страницы ПЦ. Сумма и url/failurl берутся из Заказа (Register).
- * Подпись: sector, id, payer_id, pan_token_sha256, password. Без payer_id/pan_token_sha256: sector, id, password.
- */
-export function buildPurchaseFormParams(
-  config: PaygineConfig,
-  opts: { orderId: number }
-): PaygineFormParams {
-  const { sector, password } = config;
-  const signParts = [String(sector), String(opts.orderId)];
-  const signature = buildPaygineSignature(signParts, password);
-  return {
-    sector: String(sector),
-    id: String(opts.orderId),
-    signature,
-  };
-}
-
-/** webapi/PurchaseSBP — подпись как у Purchase (sector, id, password). */
-export function buildPurchaseSBPFormParams(
-  config: PaygineConfig,
-  opts: { orderId: number }
-): PaygineFormParams {
-  return buildPurchaseFormParams(config, opts);
-}
-
-export function getPurchaseEndpoint(): string {
-  return `${getPaygineBaseUrl()}/Purchase`;
-}
-
-export function getPurchaseSBPEndpoint(): string {
-  return `${getPaygineBaseUrl()}/PurchaseSBP`;
-}
+type PaygineFormParams = Record<string, string>;
 
 /** Валюта RUB для SDPayIn (строка, как в скрипте). */
 const CURRENCY_RUB_STR = "643";
@@ -326,7 +285,7 @@ const CURRENCY_RUB_STR = "643";
  * POST на webapi/b2puser/sd-services/SDPayIn.
  * Подпись: sector, id, amount, currency, sd_ref, password (Приложение №2).
  */
-export type SDPayInFormParams = {
+type SDPayInFormParams = {
   orderId: number;
   amountKop: number;
   sdRef: string;
@@ -363,129 +322,16 @@ export function getSDPayInEndpoint(): string {
   return `${getPaygineBaseUrl()}/b2puser/sd-services/SDPayIn`;
 }
 
-// --- Выплаты СБП по документу Оглавление1 (Таблицы 53, 54) ---
-// webapi/sbp/SBPCreditPrecheck и webapi/sbp/SBPCredit. Сначала Register (получить id заказа).
-
-/**
- * webapi/sbp/SBPCreditPrecheck — проверка возможности выплаты через СБП (Таблица 53).
- * Обязательно: id — из Register. Подпись: sector, id, recipientBankId, phone, password.
- * Параметр банка в документе: recipientBankId (не bank_id).
- */
-export type SBPCreditPrecheckParams = {
-  orderId: number; // id заказа из Register
-  recipientBankId: string;
-  phone: string;
-};
-
-export type SBPCreditPrecheckResult =
-  | { ok: true; precheck_id: string }
-  | { ok: false; code?: string; description?: string };
-
-export async function sbpCreditPrecheck(
-  config: PaygineConfig,
-  params: SBPCreditPrecheckParams
-): Promise<SBPCreditPrecheckResult> {
-  return withPaygineSerial(async () => {
-  const { sector, password } = config;
-  const signParts = [
-    String(sector),
-    String(params.orderId),
-    params.recipientBankId,
-    params.phone,
-  ];
-  const signature = buildPaygineSignature(signParts, password);
-
-  const body = new URLSearchParams([
-    ["sector", String(sector)],
-    ["id", String(params.orderId)],
-    ["recipientBankId", params.recipientBankId],
-    ["phone", params.phone],
-    ["signature", signature],
-  ]);
-
-  const res = await fetch(`${getPaygineBaseUrl()}/sbp/SBPCreditPrecheck`, {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: body.toString(),
-  });
-
-  const text = await res.text();
-  if (!res.ok) {
-    return { ok: false, description: text.slice(0, 500) || `HTTP ${res.status}` };
-  }
-
-  const precheckId = text.match(/<precheck_id>([^<]+)<\/precheck_id>/i)?.[1]?.trim();
-  if (precheckId) {
-    return { ok: true, precheck_id: precheckId };
-  }
-
-  const errCode = text.match(/<code>([^<]+)<\/code>/)?.[1];
-  const errDesc = text.match(/<description>([^<]*)<\/description>/)?.[1];
-  return { ok: false, code: errCode ?? undefined, description: (errDesc ?? text).slice(0, 500) };
-  });
-}
-
-/**
- * webapi/sbp/SBPCredit — B2C выплаты через СБП (Таблица 54).
- * Подпись: sector, id, precheck_id, password. В документе параметра description нет.
- */
-export type SBPCreditParams = {
-  orderId: number;
-  precheck_id: string;
-};
-
-export type SBPCreditResult =
-  | { ok: true; operationId?: string }
-  | { ok: false; code?: string; description?: string };
-
-export async function sbpCredit(
-  config: PaygineConfig,
-  params: SBPCreditParams
-): Promise<SBPCreditResult> {
-  return withPaygineSerial(async () => {
-  const { sector, password } = config;
-  const signParts = [String(sector), String(params.orderId), params.precheck_id];
-  const signature = buildPaygineSignature(signParts, password);
-
-  const body = new URLSearchParams([
-    ["sector", String(sector)],
-    ["id", String(params.orderId)],
-    ["precheck_id", params.precheck_id],
-    ["signature", signature],
-  ]);
-
-  const res = await fetch(`${getPaygineBaseUrl()}/sbp/SBPCredit`, {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: body.toString(),
-  });
-
-  const text = await res.text();
-  if (!res.ok) {
-    return { ok: false, description: text.slice(0, 500) || `HTTP ${res.status}` };
-  }
-
-  const errCode = text.match(/<code>([^<]+)<\/code>/)?.[1];
-  const errDesc = text.match(/<description>([^<]*)<\/description>/)?.[1];
-  if (errCode || errDesc) {
-    return { ok: false, code: errCode ?? undefined, description: (errDesc ?? text).slice(0, 500) };
-  }
-
-  const operationId = text.match(/<id>(\d+)<\/id>/i)?.[1];
-  return { ok: true, operationId };
-  });
-}
-
 // --- Перевод между кубышками (SDRelocateFunds) и вывод на карту (SDPayOut) ---
 // Для перевода: Register (новый заказ) → SDRelocateFunds(id, from_sd_ref, to_sd_ref).
 
-export type SDRelocateFundsParams = {
+type SDRelocateFundsParams = {
   orderId: number;
   fromSdRef: string;
   toSdRef: string;
 };
 
-export type SDRelocateFundsResult =
+type SDRelocateFundsResult =
   | { ok: true }
   | { ok: false; code?: string; description?: string; debugBody?: string };
 
@@ -548,7 +394,7 @@ export async function sdRelocateFunds(
   });
 }
 
-export type SDPayOutParams = {
+type SDPayOutParams = {
   sdRef: string;
   pan: string; // номер карты без пробелов
   amountKop: number;
@@ -556,7 +402,7 @@ export type SDPayOutParams = {
   feeKop?: number;
 };
 
-export type SDPayOutResult =
+type SDPayOutResult =
   | { ok: true; operationId?: string }
   | { ok: false; code?: string; description?: string };
 
@@ -648,7 +494,7 @@ const SD_SERVICES_PATH = "b2puser/sd-services";
 
 const DEFAULT_REQUEST_TIMEOUT_MS = 10_000;
 
-export type SDGetBalanceResult =
+type SDGetBalanceResult =
   | { ok: true; balanceKop: number }
   | { ok: false; code?: string; description?: string };
 
@@ -715,13 +561,13 @@ export async function sdGetBalance(
   });
 }
 
-export type SDPayOutSBPPrecheckParams = {
+type SDPayOutSBPPrecheckParams = {
   phone: string;
   bank_id: string;
   amount: number;
 };
 
-export type SDPayOutSBPPrecheckResult =
+type SDPayOutSBPPrecheckResult =
   | { ok: true; precheck_id: string }
   | { ok: false; code?: string; description?: string };
 
@@ -776,11 +622,11 @@ export async function sdPayOutSBPPrecheck(
   });
 }
 
-export type SDPayOutSBPParams = {
+type SDPayOutSBPParams = {
   precheck_id: string;
 };
 
-export type SDPayOutSBPResult =
+type SDPayOutSBPResult =
   | { ok: true; operationId?: string }
   | { ok: false; code?: string; description?: string };
 

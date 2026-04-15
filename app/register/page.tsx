@@ -7,6 +7,7 @@ import { KeyRound, Lock, User } from "lucide-react";
 import { getOrCreateDeviceClientId } from "@/lib/device-client-id";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { getBaseUrl } from "@/lib/get-base-url";
+import { fetchWithAuth, migrateLegacyAccessTokenToCookie } from "@/lib/auth-client";
 import { AuthPageShell } from "@/components/AuthPageShell";
 import { AUTH_CARD_CLASS, AUTH_INPUT_CLASS, AUTH_INPUT_CLASS_NO_ICON, AUTH_BTN_PRIMARY } from "@/lib/auth-form-classes";
 
@@ -26,21 +27,15 @@ function RegisterForm() {
   });
 
   useEffect(() => {
-    const token = typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
-    if (!token) {
+    void (async () => {
+      await migrateLegacyAccessTokenToCookie();
+      const res = await fetch("/api/profile", { credentials: "include" });
+      if (res.ok) {
+        router.replace("/cabinet");
+        return;
+      }
       setCheckingAuth(false);
-      return;
-    }
-    fetch("/api/profile", { headers: { Authorization: `Bearer ${token}` } })
-      .then((res) => {
-        if (res.ok) {
-          router.replace("/cabinet");
-          return;
-        }
-        if (res.status === 401) localStorage.removeItem("accessToken");
-        setCheckingAuth(false);
-      })
-      .catch(() => setCheckingAuth(false));
+    })().catch(() => setCheckingAuth(false));
   }, [router]);
 
   useEffect(() => {
@@ -73,7 +68,6 @@ function RegisterForm() {
       let data: {
         error?: string;
         details?: { path: string; message: string }[];
-        accessToken?: string;
         user?: { id: string; login: string; email?: string | null; role: string };
       };
       try {
@@ -88,26 +82,20 @@ function RegisterForm() {
         return;
       }
 
-      if (data.accessToken) {
-        localStorage.setItem("accessToken", data.accessToken);
+      if (data.user) {
         const role = data.user?.role?.toUpperCase();
         if (role === "RECIPIENT" && typeof window !== "undefined") {
           try {
-            const authH = { Authorization: `Bearer ${data.accessToken}` };
-            const linksRes = await fetch("/api/links", { headers: authH });
+            const linksRes = await fetchWithAuth("/api/links");
             let slug: string | undefined;
             if (linksRes.ok) {
               const lj = (await linksRes.json()) as { links?: { slug: string }[] };
               slug = lj.links?.[0]?.slug;
             }
             if (!slug) {
-              const createRes = await fetch("/api/links", {
+              const createRes = await fetchWithAuth("/api/links", {
                 method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  ...getCsrfHeader(),
-                  ...authH,
-                },
+                headers: { "Content-Type": "application/json" },
                 body: "{}",
               });
               if (createRes.ok) {

@@ -13,6 +13,13 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { resolveDemoPaySlug } from "@/lib/demo-pay-slug";
+import {
+  LANDING_DECO_GRID_LAYER,
+  LANDING_DECO_GRID_STYLE,
+  LANDING_DECO_PHOTO_BASE,
+  LANDING_SCROLL_MARGIN,
+  LANDING_SECTION_INNER,
+} from "@/lib/landing-ui-classes";
 
 const METRICS: { value: string; label: string; benefit: string; Icon: LucideIcon }[] = [
   {
@@ -67,25 +74,18 @@ export function HeroPremium() {
   return (
     <section
       id="about"
-      className="section-dark hero-premium-section relative overflow-hidden w-full bg-[var(--color-navy)] pt-[100px] pb-[48px] sm:pt-[120px] sm:pb-[60px] scroll-mt-24"
+      className={`section-dark hero-premium-section relative overflow-hidden w-full bg-[var(--color-navy)] pt-[100px] pb-[48px] sm:pt-[120px] sm:pb-[60px] ${LANDING_SCROLL_MARGIN}`}
     >
       {/* Фон: официант с QR, гость с экраном успеха */}
       <div
-        className="absolute inset-0 z-[0] bg-cover bg-center bg-no-repeat opacity-[0.25]"
+        className={`${LANDING_DECO_PHOTO_BASE} opacity-[0.25]`}
         style={{ backgroundImage: "url('/images/waiter-qr-guest-success-freetips-ui.png')" }}
         aria-hidden
       />
       {/* Градиент для глубины */}
       <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-navy)] via-transparent to-[var(--color-charcoal)]/30 pointer-events-none z-[1]" aria-hidden />
-      <div
-        className="absolute inset-0 opacity-[0.04] z-[1]"
-        style={{
-          backgroundImage: `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80'><path d='M0,0 L80,0 L80,80' fill='none' stroke='white' stroke-width='1.5'/></svg>")`,
-          backgroundSize: "80px 80px",
-        }}
-        aria-hidden
-      />
-      <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8 xl:max-w-7xl 2xl:max-w-screen-2xl relative z-10">
+      <div className={LANDING_DECO_GRID_LAYER} style={LANDING_DECO_GRID_STYLE} aria-hidden />
+      <div className={LANDING_SECTION_INNER}>
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto] lg:items-start gap-10 lg:gap-12 xl:gap-16">
           {/* Левая колонка: заголовок, подзаголовок, кнопки, метрики */}
           <div className="max-w-[640px] relative z-[2] flex flex-col">

@@ -1,15 +1,8 @@
 /**
- * Единая точка для «хрома» документа: data-theme, класс панели, meta theme-color, color-scheme.
- *
- * Почему без этого «подхватываются» чужие цвета на iOS / Safari:
- * - Next из `viewport.themeColor` может вставить несколько `<meta name="theme-color" media="…">`;
- *   при SPA навигации они иногда пересоздаются уже с media — Safari рисует полосы адреса не тем цветом.
- * - `body` с Tailwind `bg-[var(--color-bg)]` берёт `--color-bg` из каскада; пока на `html` не выставлены
- *   `data-theme` / `--color-bg` для панели, один кадр может быть старый цвет (оверскролл / safe area).
- * - Любой поздний патч `<head>` обходит локальные «точечные» фиксы — поэтому нормализация здесь + Observer.
- * - В светлой теме Safari красит полосы у краёв по `theme-color` (часто `#e0dfdc`); тёмная шторка поверх не меняет
- *   этот meta — без `pushOverlaySafariChromeDark` при открытой шторке остаются «сохранённые» светлые полосы.
- *   Для любого нового полноэкранного тёмного оверлея на мобильном: `useMobileDarkChromeOverlay` в `lib/use-mobile-dark-chrome-overlay.ts`.
+ * Хром документа: `data-theme`, `app-shell-panel`, `meta theme-color`, `color-scheme`.
+ * Нормализация здесь + в ThemeProvider (rAF, MutationObserver на head) — иначе Safari/iOS даёт швы и чужой `theme-color`.
+ * Тёмные шторки: `useMobileDarkChromeOverlay` → счётчик `pushOverlaySafariChromeDark` / `popOverlaySafariChromeDark`.
+ * Простая мобильная шторка (overflow + Escape + overlay): `usePanelMobileSimpleDrawerEffects`. ЛК — фиксация body в `CabinetMobileNavPortals`.
  */
 
 export const THEME_STORAGE_KEY = "theme";
@@ -23,7 +16,7 @@ export const THEME_COLOR_DARK = "#0d0e12";
 
 export type SiteThemePreference = "light" | "dark";
 
-export function isAuthOnlyPath(pathname: string | null): boolean {
+function isAuthOnlyPath(pathname: string | null): boolean {
   if (!pathname) return false;
   return (
     pathname.startsWith("/zayavka") ||
@@ -36,7 +29,7 @@ export function isAuthOnlyPath(pathname: string | null): boolean {
 }
 
 /** Где действует переключатель темы из localStorage */
-export function isPanelThemeScope(pathname: string | null): boolean {
+function isPanelThemeScope(pathname: string | null): boolean {
   if (!pathname) return false;
   return (
     pathname.startsWith("/cabinet") ||
@@ -54,37 +47,34 @@ export function readThemePreference(): SiteThemePreference {
 }
 
 /** Значение `data-theme` на <html> с учётом маршрута */
-export function effectiveDocumentTheme(pathname: string | null, preference: SiteThemePreference): SiteThemePreference {
+function effectiveDocumentTheme(pathname: string | null, preference: SiteThemePreference): SiteThemePreference {
   if (isAuthOnlyPath(pathname)) return "dark";
   if (isPanelThemeScope(pathname)) return preference;
   return "light";
 }
 
-function themeColorFor(pathname: string | null, preference: SiteThemePreference): string {
-  const authOnly = isAuthOnlyPath(pathname);
-  const applyHere = isPanelThemeScope(pathname);
-  const effective = authOnly ? "dark" : applyHere ? preference : "light";
+function resolvedThemeColor(pathname: string | null, preference: SiteThemePreference): string {
+  const effective = effectiveDocumentTheme(pathname, preference);
   if (effective === "dark") return THEME_COLOR_DARK;
-  if (applyHere) return THEME_COLOR_LIGHT_PANEL;
+  if (isPanelThemeScope(pathname)) return THEME_COLOR_LIGHT_PANEL;
   return THEME_COLOR_LIGHT_SITE;
 }
 
-/**
- * Счётчик открытых полноэкранных шторок с тёмным затемнением при **светлой** сохранённой теме сайта.
- * Safari окрашивает область статус-бара и панели по `theme-color`; если оставить `#e0dfdc`, а меню тёмное —
- * сверху/снизу остаются «сохранённые» светлые полосы (это не CSS страницы, а хром браузера).
- */
+function syncThemeColorMeta(content: string): void {
+  document.querySelectorAll('meta[name="theme-color"]').forEach((meta) => {
+    meta.removeAttribute("media");
+    meta.setAttribute("content", content);
+  });
+}
+
+/** Счётчик открытых тёмных шторок: Safari тянет `theme-color` из сохранённой светлой темы — без override полосы у краёв. */
 let overlaySafariChromeDarkDepth = 0;
 
-/** Пока шторка открыта — `theme-color` и `color-scheme` под тёмное затемнение (вложенность через счётчик). */
 export function pushOverlaySafariChromeDark(): void {
   if (typeof document === "undefined") return;
   overlaySafariChromeDarkDepth += 1;
   if (overlaySafariChromeDarkDepth !== 1) return;
-  document.querySelectorAll('meta[name="theme-color"]').forEach((meta) => {
-    meta.removeAttribute("media");
-    meta.setAttribute("content", THEME_COLOR_DARK);
-  });
+  syncThemeColorMeta(THEME_COLOR_DARK);
   document.documentElement.style.colorScheme = "dark";
 }
 
@@ -118,13 +108,9 @@ export function applyDocumentShellChrome(pathname: string | null, preference: Si
     }
   }
 
-  const color = themeColorFor(pathname, preference);
   const forceDarkChrome = overlaySafariChromeDarkDepth > 0;
-  const metaContent = forceDarkChrome ? THEME_COLOR_DARK : color;
-  document.querySelectorAll('meta[name="theme-color"]').forEach((meta) => {
-    meta.removeAttribute("media");
-    meta.setAttribute("content", metaContent);
-  });
+  const metaContent = forceDarkChrome ? THEME_COLOR_DARK : resolvedThemeColor(pathname, preference);
+  syncThemeColorMeta(metaContent);
 
   if (forceDarkChrome) {
     document.documentElement.style.colorScheme = "dark";

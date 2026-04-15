@@ -7,7 +7,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/middleware/auth";
 import { requireApiKey } from "@/lib/api-key-auth";
 
-export type AuthUserId = { userId: string; role?: string };
+type AuthUserId = { userId: string; role?: string };
 
 /**
  * Возвращает userId (и при Bearer — role) при успешной авторизации (Bearer или X-API-Key).

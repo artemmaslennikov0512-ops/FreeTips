@@ -21,10 +21,10 @@ import { PAYMENT_MIN_AMOUNT_KOP } from "@/lib/payment-amount-bounds";
 import { TransactionStatus } from "@prisma/client";
 
 /** Сообщение гостю на /pay при срабатывании внутренних суточных лимитов платформы (сумма / число успехов). */
-export const PUBLIC_PLATFORM_DAILY_LIMIT_MESSAGE =
+const PUBLIC_PLATFORM_DAILY_LIMIT_MESSAGE =
   "Приём чаевых временно недоступен. Напишите в поддержку — мы поможем.";
 
-export type RecipientPayLimitSettings = {
+type RecipientPayLimitSettings = {
   recipientMaxIncomingKopPerMskDay: bigint | null;
   recipientMaxConcurrentPendingPayments: number | null;
   recipientMinMinutesBetweenPayInits: number | null;
@@ -42,7 +42,7 @@ function successNetToRecipientKop(r: {
 }
 
 /** null или ≤0 — без суточного лимита по сумме. */
-export function effectiveMaxIncomingKopPerMskDay(settings: RecipientPayLimitSettings): bigint | null {
+function effectiveMaxIncomingKopPerMskDay(settings: RecipientPayLimitSettings): bigint | null {
   const c = settings.recipientMaxIncomingKopPerMskDay;
   if (c == null) return null;
   if (c <= BigInt(0)) return null;
@@ -50,7 +50,7 @@ export function effectiveMaxIncomingKopPerMskDay(settings: RecipientPayLimitSett
 }
 
 /** null или &lt; 1 — пауза между заказами отключена. */
-export function effectiveMinMinutesBetweenPayInits(settings: RecipientPayLimitSettings): number | null {
+function effectiveMinMinutesBetweenPayInits(settings: RecipientPayLimitSettings): number | null {
   const w = settings.recipientMinMinutesBetweenPayInits;
   if (w == null || !Number.isFinite(w)) return null;
   const i = Math.floor(w);
@@ -59,7 +59,7 @@ export function effectiveMinMinutesBetweenPayInits(settings: RecipientPayLimitSe
 }
 
 /** null или &lt; 1 — лимит одновременных PENDING отключён. */
-export function effectiveMaxConcurrentPendingPayments(settings: RecipientPayLimitSettings): number | null {
+function effectiveMaxConcurrentPendingPayments(settings: RecipientPayLimitSettings): number | null {
   const n = settings.recipientMaxConcurrentPendingPayments;
   if (n == null || !Number.isFinite(n)) return null;
   const i = Math.floor(n);
@@ -68,7 +68,7 @@ export function effectiveMaxConcurrentPendingPayments(settings: RecipientPayLimi
 }
 
 /** null или &lt; 1 — суточный лимит успешных зачислений отключён. */
-export function effectiveMaxPayInitsPerDay(settings: RecipientPayLimitSettings): number | null {
+function effectiveMaxPayInitsPerDay(settings: RecipientPayLimitSettings): number | null {
   const n = settings.recipientMaxPayInitsPerDay;
   if (n == null || !Number.isFinite(n)) return null;
   const i = Math.floor(n);
@@ -191,7 +191,7 @@ async function countSuccessfulIncomingCreditsSinceMoscowDayStart(
   });
 }
 
-export type EvaluateRecipientPayLimitsInput = {
+type EvaluateRecipientPayLimitsInput = {
   recipientId: string;
   amountKop: bigint;
   tipSplit: TipSplitSnapshot | null;
@@ -199,7 +199,7 @@ export type EvaluateRecipientPayLimitsInput = {
   idempotencyKey?: string;
 };
 
-export type EvaluateRecipientPayLimitsOptions = {
+type EvaluateRecipientPayLimitsOptions = {
   /** Не раскрывать гостю тексты про внутренние суточные лимиты платформы (сумма / число успехов за день). */
   obscurePlatformDailyLimits?: boolean;
 };

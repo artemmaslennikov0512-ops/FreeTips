@@ -7,7 +7,7 @@
 import { getAppUrl } from "@/lib/config";
 
 /** Результат шаблона письма: subject и html для sendEmail(). */
-export type EmailTemplateResult = { subject: string; html: string };
+type EmailTemplateResult = { subject: string; html: string };
 
 const APP_NAME = "FreeTips";
 

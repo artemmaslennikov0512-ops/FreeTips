@@ -1,6 +1,15 @@
 "use client";
 
 import { QrCode, SlidersHorizontal, Lock } from "lucide-react";
+import {
+  LANDING_DECO_GRID_LAYER,
+  LANDING_DECO_GRID_STYLE,
+  LANDING_DECO_PHOTO_BASE,
+  LANDING_HEADING_H2,
+  LANDING_SCROLL_MARGIN,
+  LANDING_SECTION_INNER,
+  LANDING_SECTION_Y,
+} from "@/lib/landing-ui-classes";
 
 const steps = [
   {
@@ -25,23 +34,19 @@ const steps = [
 
 export function ProcessPremium() {
   return (
-    <section id="process" className="section-dark w-full py-12 sm:py-16 lg:py-[100px] bg-[var(--color-charcoal)] text-[var(--color-on-navy)] relative overflow-hidden scroll-mt-24">
+    <section
+      id="process"
+      className={`section-dark relative w-full overflow-hidden bg-[var(--color-charcoal)] text-[var(--color-on-navy)] ${LANDING_SECTION_Y} ${LANDING_SCROLL_MARGIN}`}
+    >
       <div
-        className="absolute inset-0 z-[0] bg-cover bg-center bg-no-repeat opacity-[0.18]"
+        className={`${LANDING_DECO_PHOTO_BASE} opacity-[0.18]`}
         style={{ backgroundImage: "url('/images/landing-pattern-process-steps-soft.png')" }}
         aria-hidden
       />
-      <div
-        className="absolute inset-0 opacity-[0.04] z-[1]"
-        style={{
-          backgroundImage: `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80'><path d='M0,0 L80,0 L80,80' fill='none' stroke='white' stroke-width='1.5'/></svg>")`,
-          backgroundSize: "80px 80px",
-        }}
-        aria-hidden
-      />
-      <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8 xl:max-w-7xl 2xl:max-w-screen-2xl relative z-10">
+      <div className={LANDING_DECO_GRID_LAYER} style={LANDING_DECO_GRID_STYLE} aria-hidden />
+      <div className={LANDING_SECTION_INNER}>
         <div className="process-premium-header max-w-[700px] mx-auto mb-10 sm:mb-16">
-          <h2 className="font-[family:var(--font-playfair)] text-2xl sm:text-3xl lg:text-4xl font-semibold text-white mb-4">Безупречный процесс</h2>
+          <h2 className={`${LANDING_HEADING_H2} mb-4 text-white`}>Безупречный процесс</h2>
           <p className="text-lg text-[var(--color-on-dark-muted)]">Три простых шага, которые отражают наше стремление к совершенству в каждой детали.</p>
         </div>
         <div className="grid gap-6 sm:gap-10 sm:grid-cols-3 mt-10 sm:mt-16">

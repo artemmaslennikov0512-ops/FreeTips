@@ -5,7 +5,7 @@
 
 const STORAGE_KEY = "ft_device_client_v1";
 
-export function isDeviceClientIdUuidV4(s: string): boolean {
+function isDeviceClientIdUuidV4(s: string): boolean {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
     s.trim(),
   );

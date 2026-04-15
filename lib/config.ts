@@ -59,13 +59,6 @@ export function getNodeEnv(): "development" | "production" | "test" {
   return getEnv().NODE_ENV;
 }
 
-/** DATABASE_URL. Бросает, если не задан (при обращении к БД). */
-export function getDatabaseUrl(): string {
-  const url = getEnv().DATABASE_URL;
-  if (!url?.trim()) throw new Error("DATABASE_URL должен быть установлен в .env");
-  return url;
-}
-
 /** JWT_SECRET. Бросает, если не задан (при генерации/проверке токенов). */
 export function getJwtSecret(): string {
   const s = getEnv().JWT_SECRET;
@@ -100,18 +93,6 @@ export function getPaygineConfig(): { sector: string; password: string } | null 
     typeof passwordRaw === "string" ? passwordRaw.trim().replace(/^\uFEFF/, "") : "";
   if (!sector || !password) return null;
   return { sector, password };
-}
-
-/** Paygine base URL (без слэша). Для HTTP к ПЦ см. getPaygineBaseUrl в lib/payment/paygine/client.ts. */
-export function getPaygineBaseUrl(): string {
-  return getEnv().PAYGINE_BASE_URL?.trim().replace(/\/$/, "") ?? "";
-}
-
-/** Paygine request timeout (ms). */
-export function getPaygineRequestTimeoutMs(): number {
-  const v = getEnv().PAYGINE_REQUEST_TIMEOUT_MS;
-  const n = Number(v);
-  return Number.isFinite(n) && n > 0 ? n : 30_000;
 }
 
 /** Paygine SD_REF_LEGAL (кубышка ЮЛ для комиссий). */

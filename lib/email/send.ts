@@ -6,7 +6,7 @@
 import nodemailer from "nodemailer";
 import { messageFromUnknown } from "@/lib/errors";
 
-export interface SendEmailOptions {
+interface SendEmailOptions {
   to: string;
   subject: string;
   html: string;
@@ -15,20 +15,7 @@ export interface SendEmailOptions {
   from?: string;
 }
 
-export type SendEmailResult = { ok: true } | { ok: false; error: string };
-
-/** Проверка: задана ли хотя бы одна конфигурация почты (для диагностики без раскрытия секретов). */
-export function isMailConfigured(): boolean {
-  return getMailProvider() !== "none";
-}
-
-function getMailProvider(): "smtp" | "resend" | "none" {
-  const smtpHost = process.env.SMTP_HOST?.trim();
-  if (smtpHost) return "smtp";
-  const resendKey = process.env.RESEND_API_KEY?.trim();
-  if (resendKey) return "resend";
-  return "none";
-}
+type SendEmailResult = { ok: true } | { ok: false; error: string };
 
 /** Отправить письмо. Возвращает { ok: true } или { ok: false, error }. Если почта не настроена — { ok: false, error: "..." }. */
 export async function sendEmail(options: SendEmailOptions): Promise<SendEmailResult> {

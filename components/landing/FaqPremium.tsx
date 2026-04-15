@@ -1,4 +1,12 @@
 import { ChevronDown } from "lucide-react";
+import {
+  LANDING_DECO_GRID_LAYER_FAQ,
+  LANDING_DECO_GRID_STYLE,
+  LANDING_HEADING_H2,
+  LANDING_SCROLL_MARGIN,
+  LANDING_SECTION_INNER,
+  LANDING_SECTION_Y,
+} from "@/lib/landing-ui-classes";
 
 const FAQ_ITEMS = [
   {
@@ -27,21 +35,14 @@ export function FaqPremium() {
   return (
     <section
       id="quest"
-      className="section-dark relative w-full overflow-hidden bg-[var(--color-navy)] py-12 sm:py-16 lg:py-[100px] scroll-mt-24"
+      className={`section-dark relative w-full overflow-hidden bg-[var(--color-navy)] ${LANDING_SECTION_Y} ${LANDING_SCROLL_MARGIN}`}
       aria-labelledby="faq-heading"
     >
-      <div
-        className="absolute inset-0 z-[0] opacity-[0.06]"
-        style={{
-          backgroundImage: `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80'><path d='M0,0 L80,0 L80,80' fill='none' stroke='white' stroke-width='1.5'/></svg>")`,
-          backgroundSize: "80px 80px",
-        }}
-        aria-hidden
-      />
-      <div className="absolute inset-0 bg-gradient-to-b from-[var(--color-navy)] to-[var(--color-charcoal)]/35 pointer-events-none z-[1]" aria-hidden />
-      <div className="relative z-10 mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8 xl:max-w-7xl 2xl:max-w-screen-2xl">
+      <div className={LANDING_DECO_GRID_LAYER_FAQ} style={LANDING_DECO_GRID_STYLE} aria-hidden />
+      <div className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-b from-[var(--color-navy)] to-[var(--color-charcoal)]/35" aria-hidden />
+      <div className={LANDING_SECTION_INNER}>
         <div className="mx-auto max-w-[720px] text-center mb-10 sm:mb-14">
-          <h2 id="faq-heading" className="font-[family:var(--font-playfair)] text-2xl sm:text-3xl lg:text-4xl font-semibold text-[var(--color-on-navy)] mb-3">
+          <h2 id="faq-heading" className={`${LANDING_HEADING_H2} mb-3 text-[var(--color-on-navy)]`}>
             Частые вопросы
           </h2>
           <p className="text-lg text-[var(--color-on-dark-muted)]">

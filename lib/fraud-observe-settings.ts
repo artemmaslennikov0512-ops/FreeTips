@@ -38,7 +38,7 @@ export const FRAUD_OBSERVE_DEFAULTS = {
   sharedIpMinAccounts: 3,
 } as const;
 
-export type ResolvedFraudObserveSettings = {
+type ResolvedFraudObserveSettings = {
   payoutWindowMinutes: number;
   payoutMinCount: number;
   payInitWindowMinutes: number;
@@ -72,11 +72,11 @@ function mergeRow(row: Awaited<ReturnType<typeof fetchRow>>): ResolvedFraudObser
 }
 
 /** Сброс кэша после сохранения из админки */
-export function invalidateFraudObserveSettingsCache(): void {
+function invalidateFraudObserveSettingsCache(): void {
   cache = null;
 }
 
-export type FraudObserveSettingsPatch = Partial<{
+type FraudObserveSettingsPatch = Partial<{
   observePayoutWindowMinutes: number | null;
   observePayoutMinCount: number | null;
   observePayInitWindowMinutes: number | null;

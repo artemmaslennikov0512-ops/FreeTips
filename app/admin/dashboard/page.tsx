@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Users, TrendingUp, Send, DollarSign, ShieldAlert, Activity } from "lucide-react";
 import { formatMoneyCompact } from "@/lib/utils";
 import { ADMIN_PANEL_STATE_CENTER } from "@/lib/admin-surface-classes";
+import { fetchWithAuth } from "@/lib/auth-client";
 
 interface Stats {
   usersCount: number;
@@ -31,13 +32,8 @@ export default function AdminDashboardPage() {
 
   useEffect(() => {
     const fetchStats = async () => {
-      const token = localStorage.getItem("accessToken");
-      if (!token) return;
-
       try {
-        const res = await fetch("/api/admin/stats", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await fetchWithAuth("/api/admin/stats");
 
         if (!res.ok) {
           setError("Ошибка загрузки статистики");
@@ -61,14 +57,10 @@ export default function AdminDashboardPage() {
   }, []);
 
   useEffect(() => {
-    const token = localStorage.getItem("accessToken");
-    if (!token) return;
     let cancelled = false;
     (async () => {
       try {
-        const res = await fetch("/api/admin/requests-counts", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await fetchWithAuth("/api/admin/requests-counts");
         if (!res.ok || cancelled) return;
         const data = (await res.json()) as { totalPending?: number };
         if (!cancelled) {

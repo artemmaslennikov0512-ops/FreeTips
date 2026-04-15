@@ -5,6 +5,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { CheckCircle2, XCircle, ArrowRight, HelpCircle, Loader2 } from "lucide-react";
 import { formatMoney } from "@/lib/utils";
+import { fetchWithAuth, clearAccessToken } from "@/lib/auth-client";
+import { PANEL_CARD_TITLE_CABINET_XL } from "@/lib/panel-shell-visual-classes";
 
 const REDIRECT_DELAY_MS = 4000;
 
@@ -20,12 +22,6 @@ export default function CabinetPayoutReturnPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem("accessToken");
-    if (!token) {
-      router.replace("/login");
-      return;
-    }
-
     const payoutId = searchParams.get("payoutId");
     const success = searchParams.get("success");
     if (!payoutId || (success !== "0" && success !== "1")) {
@@ -34,10 +30,13 @@ export default function CabinetPayoutReturnPage() {
       return;
     }
 
-    fetch(`/api/payouts/return?payoutId=${encodeURIComponent(payoutId)}&success=${success}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    fetchWithAuth(`/api/payouts/return?payoutId=${encodeURIComponent(payoutId)}&success=${success}`)
       .then(async (res) => {
+        if (res.status === 401) {
+          clearAccessToken();
+          router.replace("/login");
+          return;
+        }
         const data = await res.json();
         if (data.error && res.status >= 400) {
           setResult({ status: "error", error: data.error });
@@ -83,7 +82,7 @@ export default function CabinetPayoutReturnPage() {
               <CheckCircle2 className="h-10 w-10 text-[var(--color-accent-emerald)]" />
             </span>
           </div>
-          <h2 className="font-[family:var(--font-playfair)] text-xl font-semibold text-[var(--color-text)]">
+          <h2 className={PANEL_CARD_TITLE_CABINET_XL}>
             Вывод выполнен
           </h2>
           {result.amountKop != null && (
@@ -104,7 +103,7 @@ export default function CabinetPayoutReturnPage() {
               <XCircle className="h-10 w-10 text-[var(--color-accent-red)]" />
             </span>
           </div>
-          <h2 className="font-[family:var(--font-playfair)] text-xl font-semibold text-[var(--color-text)]">
+          <h2 className={PANEL_CARD_TITLE_CABINET_XL}>
             Вывод не выполнен
           </h2>
           <p className="text-[var(--color-text-secondary)]">
@@ -120,7 +119,7 @@ export default function CabinetPayoutReturnPage() {
               <HelpCircle className="h-10 w-10 text-[var(--color-muted)]" />
             </span>
           </div>
-          <h2 className="font-[family:var(--font-playfair)] text-xl font-semibold text-[var(--color-text)]">
+          <h2 className={PANEL_CARD_TITLE_CABINET_XL}>
             Результат операции
           </h2>
           <p className="text-[var(--color-text-secondary)]">

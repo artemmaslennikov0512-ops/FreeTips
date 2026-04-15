@@ -1,0 +1,11 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "ignore": [
+    "docs/**",
+    "scripts/**",
+    "**/*.backup.*",
+    "prisma/create-user.ts",
+    "lib/default-recipient-settings.ts"
+  ],
+  "ignoreDependencies": ["ws", "playwright"]
+}

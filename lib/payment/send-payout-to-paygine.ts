@@ -10,13 +10,13 @@ import { sdPayOut } from "@/lib/payment/paygine/client";
 import { feeKopForPayout } from "@/lib/payment/paygine-fee";
 import { broadcastBalanceUpdated } from "@/lib/ws-broadcast";
 
-export type SendPayoutToPaygineOptions = {
+type SendPayoutToPaygineOptions = {
   /** Номер карты для вывода (SDPayOut). Обязателен. */
   pan?: string;
   completedByUserId?: string | null;
 };
 
-export type SendPayoutToPaygineResult =
+type SendPayoutToPaygineResult =
   | { success: true; operationId?: string; precheck_id: string }
   | { success: false; error: string; code?: string; description?: string };
 

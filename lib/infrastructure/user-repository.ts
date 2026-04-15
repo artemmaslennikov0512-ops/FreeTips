@@ -16,8 +16,3 @@ export function getUserRepository(): IUserRepository {
   }
   return defaultInstance;
 }
-
-/** Для тестов: подставить мок (вызвать с null для сброса к Prisma) */
-export function setUserRepository(repo: IUserRepository | null): void {
-  defaultInstance = repo;
-}

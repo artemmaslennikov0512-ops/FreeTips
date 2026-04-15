@@ -34,7 +34,7 @@ function parseDetailsForReceipt(details: string): { requisites: string; bank: st
   return { requisites: s || "—", bank: null };
 }
 
-export interface PayoutReceiptData {
+interface PayoutReceiptData {
   id: string;
   amountKop: number;
   details: string;
@@ -46,7 +46,7 @@ export interface PayoutReceiptData {
   operationType: "phone" | "card";
 }
 
-export interface ReceiptOptions {
+interface ReceiptOptions {
   /** TTF-шрифт с поддержкой кириллицы (обязателен для русского текста) */
   fontBytes: Uint8Array;
   /** PNG-логотип (опционально); иначе рисуется текст SITE_NAME */

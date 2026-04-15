@@ -6,7 +6,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { loginTotpSchema } from "@/lib/validations";
-import { generateAccessToken, generateRefreshToken, setRefreshTokenCookie, verifyTwoFactorPendingToken } from "@/lib/auth/jwt";
+import {
+  generateAccessToken,
+  generateRefreshToken,
+  setAccessTokenCookie,
+  setRefreshTokenCookie,
+  verifyTwoFactorPendingToken,
+} from "@/lib/auth/jwt";
 import { checkRateLimitByIP, getClientIpAndRateLimitKey, AUTH_TOTP_VERIFY_RATE_LIMIT } from "@/lib/middleware/rate-limit";
 import { logError, logSecurity } from "@/lib/logger";
 import { getRequestId } from "@/lib/security/request";
@@ -93,6 +99,7 @@ export async function POST(request: NextRequest) {
     const refreshToken = await generateRefreshToken(tokenPayload);
 
     await setRefreshTokenCookie(refreshToken);
+    await setAccessTokenCookie(accessToken);
 
     const meta = buildNewSessionMetadata(request, ip, validated.deviceClientId);
     const fromMeta = JSON.parse(meta.deviceInfo) as {
@@ -112,7 +119,6 @@ export async function POST(request: NextRequest) {
     logSecurity("auth.login.success_after_2fa", { requestId, ip, userId: user.id });
     return NextResponse.json(
       {
-        accessToken,
         user: {
           id: user.id,
           login: user.login,

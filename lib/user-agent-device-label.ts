@@ -59,7 +59,7 @@ function parsePlatformSuffix(ua: string): string {
 /**
  * Имя и мажорная версия браузера (Chromium / Firefox / Safari-цепочка).
  */
-export function parseBrowserFromUserAgent(ua: string): { name: string; version: string } | null {
+function parseBrowserFromUserAgent(ua: string): { name: string; version: string } | null {
   const edge = ua.match(/\bEdg(?:e|A|iOS)?\/(\d+)/i);
   if (edge) return { name: "Edge", version: edge[1] };
 
@@ -92,7 +92,7 @@ export function parseBrowserFromUserAgent(ua: string): { name: string; version: 
   return null;
 }
 
-export type SessionDeviceDescription = {
+type SessionDeviceDescription = {
   /** Тип устройства и ОС: «Телефон · Android 14» */
   platformLabel: string;
   /** Браузер с версией: «Chrome 131» */

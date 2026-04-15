@@ -7,8 +7,9 @@ import { ShieldCheck, FileImage, CheckCircle2, AlertCircle, Clock } from "lucide
 import { cabinetInputClassName } from "../shared";
 import { getFieldErrors } from "@/lib/form-errors";
 import { verificationStep1Schema, verificationSubmitSchema } from "@/lib/validations";
-import { getCsrfHeader } from "@/lib/security/csrf-client";
+import { fetchWithAuth, clearAccessToken } from "@/lib/auth-client";
 import { CABINET_WAITER_BTN_INLINE } from "@/lib/cabinet-button-classes";
+import { PANEL_PAGE_TITLE_CABINET_CENTERED_TIGHT } from "@/lib/panel-shell-visual-classes";
 type VerificationData = {
   verificationStatus: string;
   verificationRejectionReason: string | null;
@@ -50,12 +51,10 @@ export default function CabinetVerificationPage() {
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [submitOk, setSubmitOk] = useState(false);
   const fetchVerification = useCallback(async () => {
-    const token = localStorage.getItem("accessToken");
-    if (!token) return;
     try {
-      const res = await fetch("/api/verification", { headers: { Authorization: `Bearer ${token}` } });
+      const res = await fetchWithAuth("/api/verification");
       if (res.status === 401) {
-        localStorage.removeItem("accessToken");
+        clearAccessToken();
         router.replace("/login");
         return;
       }
@@ -101,13 +100,10 @@ export default function CabinetVerificationPage() {
     }
     setSaving(true);
     try {
-      const token = localStorage.getItem("accessToken");
-      const res = await fetch("/api/verification", {
+      const res = await fetchWithAuth("/api/verification", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-          ...getCsrfHeader(),
         },
         body: JSON.stringify(parsed.data),
       });
@@ -131,14 +127,12 @@ export default function CabinetVerificationPage() {
     setUploadError(null);
     setUploading((prev) => ({ ...prev, [type]: true }));
     try {
-      const token = localStorage.getItem("accessToken");
       const form = new FormData();
       form.set("requestId", requestId);
       form.set("type", type);
       form.set("file", file);
-      const res = await fetch("/api/verification/upload", {
+      const res = await fetchWithAuth("/api/verification/upload", {
         method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
         body: form,
       });
       if (res.ok) {
@@ -171,13 +165,10 @@ export default function CabinetVerificationPage() {
     }
     setSaving(true);
     try {
-      const token = localStorage.getItem("accessToken");
-      const res = await fetch("/api/verification", {
+      const res = await fetchWithAuth("/api/verification", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-          ...getCsrfHeader(),
         },
         body: JSON.stringify(parsed.data),
       });
@@ -215,7 +206,7 @@ export default function CabinetVerificationPage() {
   if (data?.verificationStatus === "VERIFIED") {
     return (
       <div className="flex flex-col items-center space-y-6">
-        <h1 className="font-[family:var(--font-playfair)] text-xl font-semibold text-[var(--color-text)] text-center">
+        <h1 className={PANEL_PAGE_TITLE_CABINET_CENTERED_TIGHT}>
           Верификация
         </h1>
         <div className="mx-auto w-full min-w-0 max-w-full rounded-xl border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 p-6 text-center sm:max-w-xl">
@@ -245,7 +236,7 @@ export default function CabinetVerificationPage() {
   if (pendingWithAllDocs) {
     return (
       <div className="flex flex-col items-center space-y-6">
-        <h1 className="font-[family:var(--font-playfair)] text-xl font-semibold text-[var(--color-text)] text-center">
+        <h1 className={PANEL_PAGE_TITLE_CABINET_CENTERED_TIGHT}>
           Верификация
         </h1>
         <div className="mx-auto flex w-fit max-w-xl flex-col items-center rounded-xl border border-amber-500/30 bg-amber-500/10 p-6 text-center">
@@ -261,7 +252,7 @@ export default function CabinetVerificationPage() {
 
   return (
     <div className="space-y-8">
-      <h1 className="font-[family:var(--font-playfair)] text-xl font-semibold text-[var(--color-text)] text-center">
+      <h1 className={PANEL_PAGE_TITLE_CABINET_CENTERED_TIGHT}>
         Верификация
       </h1>
 

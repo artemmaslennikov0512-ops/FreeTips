@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
 
-export type TipSettlementPhase = "idle" | "verifying" | "success" | "fail" | "slow";
+type TipSettlementPhase = "idle" | "verifying" | "success" | "fail" | "slow";
 
 const POLL_MS = 2000;
 const MAX_ATTEMPTS = 45;

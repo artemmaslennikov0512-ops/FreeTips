@@ -6,7 +6,7 @@
 
 import { closeSharedRedis, getSharedIoredis } from "@/lib/redis-shared";
 
-export type RateLimitResult = { allowed: boolean; remaining: number; resetAt: number };
+type RateLimitResult = { allowed: boolean; remaining: number; resetAt: number };
 
 /**
  * Проверка rate limit через Redis: INCR + EXPIRE при первом запросе в окне.

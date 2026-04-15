@@ -1,18 +1,16 @@
-import { setAccessToken } from "@/lib/auth-client";
-import { drainImpersonationState, setCabinetImpersonationState } from "@/lib/cabinet-impersonation-state";
+import { drainImpersonationState, setCabinetImpersonationState, setImpersonationTargetBearer } from "@/lib/cabinet-impersonation-state";
 
 /**
- * Просмотр ЛК другого пользователя: токен текущего пользователя (супер-админ или управляющий заведения)
- * сохраняется в localStorage рядом с выданным accessToken цели.
+ * Просмотр ЛК целевого пользователя: JWT цели в sessionStorage, путь возврата в localStorage.
+ * Сессия админа остаётся в httpOnly-cookie — отдельный бэкап токена админа не нужен.
  */
-export function beginCabinetImpersonation(adminAccessToken: string, targetAccessToken: string, returnPath: string): void {
-  setCabinetImpersonationState(adminAccessToken, returnPath);
-  setAccessToken(targetAccessToken);
+export function beginCabinetImpersonation(targetAccessToken: string, returnPath: string): void {
+  setCabinetImpersonationState(returnPath);
+  setImpersonationTargetBearer(targetAccessToken);
 }
 
-/** Восстановить токен админа и очистить флаги. Возвращает путь для router.push / location.assign. */
+/** Восстановить UI после просмотра. Возвращает путь для router.replace / location.assign. */
 export function endCabinetImpersonation(): string {
-  const { adminToken, returnPath } = drainImpersonationState();
-  if (adminToken) setAccessToken(adminToken);
+  const { returnPath } = drainImpersonationState();
   return returnPath ?? "/admin/dashboard";
 }

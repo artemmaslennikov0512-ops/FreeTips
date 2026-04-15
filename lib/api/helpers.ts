@@ -17,7 +17,7 @@ export const MAX_BODY_SIZE_DEFAULT = 1024 * 1024;
 /** Максимальный размер тела webhook (256 KB) */
 export const MAX_BODY_SIZE_WEBHOOK = 256 * 1024;
 
-export interface ApiErrorBody {
+interface ApiErrorBody {
   error: string;
   details?: unknown;
 }

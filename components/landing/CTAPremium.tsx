@@ -1,24 +1,27 @@
 import Link from "next/link";
+import {
+  LANDING_DECO_GRID_LAYER,
+  LANDING_DECO_GRID_STYLE,
+  LANDING_DECO_PHOTO_BASE,
+  LANDING_HEADING_H2,
+  LANDING_SECTION_INNER,
+  LANDING_SECTION_Y,
+} from "@/lib/landing-ui-classes";
 
 export function CTAPremium() {
   return (
-    <section className="section-dark relative overflow-hidden w-full py-12 sm:py-16 lg:py-[100px] bg-gradient-to-br from-[var(--color-navy)] to-[var(--color-charcoal)] text-[var(--color-on-navy)] text-center">
+    <section
+      className={`section-dark relative w-full overflow-hidden bg-gradient-to-br from-[var(--color-navy)] to-[var(--color-charcoal)] text-center text-[var(--color-on-navy)] ${LANDING_SECTION_Y}`}
+    >
       <div
-        className="absolute inset-0 z-[0] bg-cover bg-center bg-no-repeat opacity-[0.18]"
+        className={`${LANDING_DECO_PHOTO_BASE} opacity-[0.18]`}
         style={{ backgroundImage: "url('/images/landing-pattern-cta-invite.png')" }}
         aria-hidden
       />
-      <div
-        className="absolute inset-0 opacity-[0.04] z-[1]"
-        style={{
-          backgroundImage: `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80'><path d='M0,0 L80,0 L80,80' fill='none' stroke='white' stroke-width='1.5'/></svg>")`,
-          backgroundSize: "80px 80px",
-        }}
-        aria-hidden
-      />
-      <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8 xl:max-w-7xl 2xl:max-w-screen-2xl relative z-10">
+      <div className={LANDING_DECO_GRID_LAYER} style={LANDING_DECO_GRID_STYLE} aria-hidden />
+      <div className={LANDING_SECTION_INNER}>
         <div className="cta-premium-block max-w-[700px] mx-auto mb-10 text-center">
-          <h2 className="font-[family:var(--font-playfair)] text-2xl sm:text-3xl lg:text-4xl font-semibold text-white mb-4">Готовы повысить стандарты?</h2>
+          <h2 className={`${LANDING_HEADING_H2} mb-4 text-white`}>Готовы повысить стандарты?</h2>
           <p className="text-lg text-[var(--color-on-dark-muted)] mx-auto mb-10 text-center max-w-[700px]">
             Присоединяйтесь к компаниям, которые уже используют FreeTips для развития культуры качественного сервиса.
           </p>

@@ -6,8 +6,9 @@ import Image from "next/image";
 import { Copy, Download, Link2, Loader2 } from "lucide-react";
 import QRCode from "qrcode";
 import { getBaseUrl } from "@/lib/get-base-url";
-import { getCsrfHeader } from "@/lib/security/csrf-client";
+import { fetchWithAuth, clearAccessToken } from "@/lib/auth-client";
 import { CABINET_WAITER_BTN_INLINE } from "@/lib/cabinet-button-classes";
+import { PANEL_CARD_TITLE_CABINET_XL_CENTERED } from "@/lib/panel-shell-visual-classes";
 type LinkRow = { id: string; slug: string; createdAt: string };
 
 export default function CabinetLinkPage() {
@@ -20,15 +21,10 @@ export default function CabinetLinkPage() {
   const [copied, setCopied] = useState(false);
   useEffect(() => {
     let cancelled = false;
-    const token = localStorage.getItem("accessToken");
-    if (!token) {
-      router.replace("/login");
-      return;
-    }
-    fetch("/api/links", { headers: { Authorization: `Bearer ${token}` } })
+    fetchWithAuth("/api/links")
       .then(async (res) => {
         if (res.status === 401) {
-          localStorage.removeItem("accessToken");
+          clearAccessToken();
           router.replace("/login");
           return null;
         }
@@ -60,25 +56,18 @@ export default function CabinetLinkPage() {
   }, [link]);
 
   const handleCreate = async () => {
-    const token = localStorage.getItem("accessToken");
-    if (!token) {
-      router.replace("/login");
-      return;
-    }
     setCreating(true);
     setError(null);
     try {
-      const res = await fetch("/api/links", {
+      const res = await fetchWithAuth("/api/links", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-          ...getCsrfHeader(),
         },
         body: "{}",
       });
       if (res.status === 401) {
-        localStorage.removeItem("accessToken");
+        clearAccessToken();
         router.replace("/login");
         return;
       }
@@ -146,7 +135,7 @@ export default function CabinetLinkPage() {
       ) : (
         <div className="grid gap-8 md:grid-cols-2">
           <div id="link-payment" className="cabinet-card rounded-xl border-0 bg-[var(--color-bg-sides)] p-6 shadow-[var(--shadow-subtle)] transition-all hover:shadow-[var(--shadow-medium)]">
-            <h2 className="mb-4 text-center font-[family:var(--font-playfair)] text-xl font-semibold text-[var(--color-text)]">
+            <h2 className={`mb-4 ${PANEL_CARD_TITLE_CABINET_XL_CENTERED}`}>
               Код официанта и оплата
             </h2>
             <div className="rounded-xl bg-[var(--color-dark-gray)]/6 p-5">
@@ -182,7 +171,7 @@ export default function CabinetLinkPage() {
           </div>
 
           <div id="link-qr-card" className="cabinet-card rounded-xl border-0 bg-[var(--color-bg-sides)] p-6 shadow-[var(--shadow-subtle)] transition-all hover:shadow-[var(--shadow-medium)]">
-            <h2 className="mb-4 text-center font-[family:var(--font-playfair)] text-xl font-semibold text-[var(--color-text)]">
+            <h2 className={`mb-4 ${PANEL_CARD_TITLE_CABINET_XL_CENTERED}`}>
               QR-код
             </h2>
             <div className="flex flex-col items-center gap-4">

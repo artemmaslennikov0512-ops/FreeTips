@@ -2,7 +2,7 @@
  * Краткое сообщение для UI + сырой ответ провайдера (для суперадмина, без секретов в тексте).
  */
 
-export type ClassifiedSendFailure = { summary: string; detail: string };
+type ClassifiedSendFailure = { summary: string; detail: string };
 
 export function classifySendEmailFailure(raw: string): ClassifiedSendFailure {
   const detail = raw.replace(/\s+/g, " ").trim().slice(0, 500);

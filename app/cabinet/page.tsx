@@ -11,6 +11,7 @@ import { isCabinetM5CompetitionTheme, m5SplitDisplayName } from "@/config/cabine
 import { CabinetSkeleton } from "@/components/CabinetSkeleton";
 import { CABINET_WAITER_BTN_INLINE } from "@/lib/cabinet-button-classes";
 import { Stats } from "./shared";
+import { fetchWithAuth, clearAccessToken } from "@/lib/auth-client";
 
 function cabinetLimitsFillClass(): string {
   return "h-full rounded-full bg-[var(--color-brand-gold)] transition-all duration-300";
@@ -71,12 +72,10 @@ export default function CabinetDashboardPage() {
   }, [savingForEdit]);
 
   const fetchProfileAndData = useCallback(async () => {
-    const token = localStorage.getItem("accessToken");
-    if (!token) return;
     try {
-      const profileRes = await fetch("/api/profile", { headers: { Authorization: `Bearer ${token}` } });
+      const profileRes = await fetchWithAuth("/api/profile");
       if (profileRes.status === 401) {
-        localStorage.removeItem("accessToken");
+        clearAccessToken();
         router.replace("/login");
         return;
       }
@@ -125,7 +124,7 @@ export default function CabinetDashboardPage() {
         typeof profile.incomingMonthSuccessSumKop === "number" ? profile.incomingMonthSuccessSumKop : 0,
       );
       setVerificationStatus(profile.verificationStatus ?? null);
-      const linksRes = await fetch("/api/links", { headers: { Authorization: `Bearer ${token}` } });
+      const linksRes = await fetchWithAuth("/api/links");
       if (linksRes.ok) {
         const linksData = (await linksRes.json()) as { links: { slug: string }[] };
         if (linksData.links?.length > 0) {
@@ -145,13 +144,8 @@ export default function CabinetDashboardPage() {
   }, [router]);
 
   useEffect(() => {
-    const token = localStorage.getItem("accessToken");
-    if (!token) {
-      router.replace("/login");
-      return;
-    }
     fetchProfileAndData();
-  }, [router, fetchProfileAndData]);
+  }, [fetchProfileAndData]);
 
   useEffect(() => {
     setSavingForEdit(savingFor ?? "");
@@ -160,7 +154,7 @@ export default function CabinetDashboardPage() {
   // Обновление баланса при возврате на вкладку (после зачислений/списаний)
   useEffect(() => {
     const onVisible = () => {
-      if (document.visibilityState === "visible" && localStorage.getItem("accessToken")) {
+      if (document.visibilityState === "visible") {
         fetchProfileAndData();
       }
     };
@@ -180,15 +174,13 @@ export default function CabinetDashboardPage() {
   }, [tipLink]);
 
   const saveSavingFor = useCallback(async () => {
-    const token = localStorage.getItem("accessToken");
-    if (!token) return;
     const value = savingForEdit.trim() || null;
     if (value === (savingFor ?? null)) return;
     setSavingForSaving(true);
     try {
-      const res = await fetch("/api/profile", {
+      const res = await fetchWithAuth("/api/profile", {
         method: "PATCH",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ savingFor: value ?? "" }),
       });
       if (res.ok) {
@@ -209,14 +201,11 @@ export default function CabinetDashboardPage() {
   }, [apiKey]);
 
   const regenerateApiKey = useCallback(async () => {
-    const token = localStorage.getItem("accessToken");
-    if (!token) return;
     setRevealKeyError(null);
     setApiKeyLoading(true);
     try {
-      const res = await fetch("/api/profile/api-key", {
+      const res = await fetchWithAuth("/api/profile/api-key", {
         method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) {
         const data = (await res.json()) as { apiKey: string };
@@ -229,14 +218,11 @@ export default function CabinetDashboardPage() {
   }, []);
 
   const revealApiKey = useCallback(async () => {
-    const token = localStorage.getItem("accessToken");
-    if (!token) return;
     setRevealKeyError(null);
     setRevealKeyLoading(true);
     try {
-      const res = await fetch("/api/profile/api-key", {
+      const res = await fetchWithAuth("/api/profile/api-key", {
         method: "GET",
-        headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) {
         const data = (await res.json()) as { apiKey: string };

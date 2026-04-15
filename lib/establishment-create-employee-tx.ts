@@ -10,7 +10,7 @@ import { hashPassword } from "@/lib/auth/password";
 import { getWaiterPaygineSdRef } from "@/lib/payment/paygine-sd-ref";
 import { allocateWaiterQrIdentifier, WaiterQrIdentifierExhaustedError } from "@/lib/waiter-qr-identifier";
 
-export type CreatedEstablishmentEmployee = {
+type CreatedEstablishmentEmployee = {
   id: string;
   name: string;
   position: string | null;
@@ -20,7 +20,7 @@ export type CreatedEstablishmentEmployee = {
 /**
  * Гарантирует tipPoolUserId у заведения и возвращает id пользователя-пула.
  */
-export async function ensureEstablishmentPoolUserId(
+async function ensureEstablishmentPoolUserId(
   tx: Prisma.TransactionClient,
   establishmentId: string,
   currentPoolUserId: string | null | undefined,

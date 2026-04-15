@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Search, Copy, Check, Filter, ArrowUpDown, Lock, RefreshCw } from "lucide-react";
 import Link from "next/link";
-import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { CustomDropdown } from "@/components/CustomDropdown";
 import { getBaseUrl } from "@/lib/get-base-url";
 import { formatDate, formatMoneyCompact, formatRelativeTimeAgo } from "@/lib/utils";
@@ -16,6 +15,8 @@ import {
   ADMIN_BTN_SM,
 } from "@/lib/admin-button-classes";
 import { ADMIN_PANEL_STATE_CENTER } from "@/lib/admin-surface-classes";
+import { PANEL_PAGE_TITLE_ADMIN } from "@/lib/panel-shell-visual-classes";
+import { fetchWithAuth } from "@/lib/auth-client";
 
 interface User {
   id: string;
@@ -112,9 +113,6 @@ export default function AdminUsersPage() {
   const [blockAllError, setBlockAllError] = useState<string | null>(null);
 
   const fetchUsers = useCallback(async () => {
-    const token = localStorage.getItem("accessToken");
-    if (!token) return;
-
     setLoading(true);
     setError(null);
     try {
@@ -127,9 +125,7 @@ export default function AdminUsersPage() {
       if (sortOrder) qp.set("sortOrder", sortOrder);
       const qs = qp.toString();
       const url = `/api/admin/users${qs ? `?${qs}` : ""}`;
-      const res = await fetch(url, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await fetchWithAuth(url);
 
       if (!res.ok) {
         setError("Ошибка загрузки пользователей");
@@ -187,17 +183,12 @@ export default function AdminUsersPage() {
   };
 
   const handleToggleBlocked = async (user: User) => {
-    const token = localStorage.getItem("accessToken");
-    if (!token) return;
-
     setUpdatingId(user.id);
     try {
-      const res = await fetch(`/api/admin/users/${user.id}`, {
+      const res = await fetchWithAuth(`/api/admin/users/${user.id}`, {
         method: "PATCH",
         headers: {
-          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
-          ...getCsrfHeader(),
         },
         body: JSON.stringify({ isBlocked: !user.isBlocked }),
       });
@@ -216,8 +207,6 @@ export default function AdminUsersPage() {
   };
 
   const handleBlockAll = async () => {
-    const token = localStorage.getItem("accessToken");
-    if (!token) return;
     if (!window.confirm("Заблокировать всех пользователей (кроме вас)? Это действие нельзя отменить одной кнопкой.")) {
       return;
     }
@@ -225,12 +214,10 @@ export default function AdminUsersPage() {
     setBlockAllError(null);
     setError(null);
     try {
-      const res = await fetch("/api/admin/users/block-all", {
+      const res = await fetchWithAuth("/api/admin/users/block-all", {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
-          ...getCsrfHeader(),
         },
         body: "{}",
       });
@@ -248,17 +235,13 @@ export default function AdminUsersPage() {
   };
 
   const handleCreateToken = async () => {
-    const token = localStorage.getItem("accessToken");
-    if (!token) return;
     setTokenLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/admin/registration-tokens", {
+      const res = await fetchWithAuth("/api/admin/registration-tokens", {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
-          ...getCsrfHeader(),
         },
         body: "{}",
       });
@@ -318,7 +301,7 @@ export default function AdminUsersPage() {
   return (
     <div className="min-w-0 max-w-full">
       <div className="mb-6 flex flex-col items-center gap-1 text-center sm:mb-8">
-        <h1 className="font-[family:var(--font-playfair)] text-xl font-semibold text-white sm:text-2xl">Пользователи</h1>
+        <h1 className={PANEL_PAGE_TITLE_ADMIN}>Пользователи</h1>
         <p className="max-w-lg text-sm text-white/75">Поиск по логину, email и коду официанта в ссылке оплаты.</p>
       </div>
       {error && (

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowRight, Layers } from "lucide-react";
 import { authHeaders } from "@/lib/auth-client";
 import type { EstablishmentOperationsModule } from "@/lib/establishment-operations-modules";
+import { PANEL_PAGE_TITLE_ESTABLISHMENT_HERO_ON_DARK } from "@/lib/panel-shell-visual-classes";
 
 interface OperationsResponse {
   modules: EstablishmentOperationsModule[];
@@ -111,7 +112,7 @@ export default function EstablishmentOperationsPage() {
   return (
     <div className="flex min-w-0 max-w-full flex-col gap-3">
       <div className="ft-panel-section-head min-w-0">
-        <h1 className="cabinet-dashboard-name-hero font-[family:var(--font-playfair)] text-[var(--color-on-dark)]">
+        <h1 className={PANEL_PAGE_TITLE_ESTABLISHMENT_HERO_ON_DARK}>
           Зал и сервис
         </h1>
         <p className="ft-panel-section-head__lead text-sm text-[var(--color-on-dark-muted)]">

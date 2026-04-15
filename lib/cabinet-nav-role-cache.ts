@@ -1,5 +1,5 @@
 /** Роль для пунктов сайдбара ЛК с recipientOnly/employeeOnly до ответа /api/profile (без «мигания» при F5). */
-export const CABINET_NAV_ROLE_CACHE_KEY = "freetipsCabinetNavRole";
+const CABINET_NAV_ROLE_CACHE_KEY = "freetipsCabinetNavRole";
 
 export function readCabinetNavRoleCache(): string | null {
   if (typeof window === "undefined") return null;

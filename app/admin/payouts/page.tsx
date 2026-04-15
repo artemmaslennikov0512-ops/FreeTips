@@ -4,12 +4,19 @@ import { useCallback, useEffect, useState } from "react";
 import { useMobileDarkChromeOverlay } from "@/lib/use-mobile-dark-chrome-overlay";
 import Link from "next/link";
 import { Send, CheckCircle2, XCircle } from "lucide-react";
-import { getCsrfHeader } from "@/lib/security/csrf-client";
+import { fetchWithAuth } from "@/lib/auth-client";
 import { notifyAdminRequestsCountsChanged } from "@/lib/admin-requests-counts-sync";
 import { CustomDropdown } from "@/components/CustomDropdown";
 import { formatDate, formatMoneyCompact } from "@/lib/utils";
 import { ADMIN_BTN, ADMIN_BTN_DANGER, ADMIN_BTN_NEUTRAL_SM, ADMIN_BTN_PRIMARY, ADMIN_BTN_SM } from "@/lib/admin-button-classes";
 import { ADMIN_PANEL_STATE_CENTER } from "@/lib/admin-surface-classes";
+import {
+  PANEL_PAGE_SUBTITLE_ADMIN_MUTED,
+  PANEL_PAGE_TITLE_ADMIN,
+  PANEL_SECTION_CARD_ROUNDED_XL_EMPTY_WHITE,
+  PANEL_SECTION_CARD_ROUNDED_XL_P4,
+  PANEL_SECTION_TABLE_DESKTOP_WRAP,
+} from "@/lib/panel-shell-visual-classes";
 
 interface Payout {
   id: string;
@@ -44,15 +51,10 @@ export default function AdminPayoutsPage() {
   useMobileDarkChromeOverlay(payoutIdForPanModal !== null);
 
   const fetchPayouts = useCallback(async () => {
-    const token = localStorage.getItem("accessToken");
-    if (!token) return;
-
     setLoading(true);
     try {
       const url = `/api/admin/payouts${statusFilter ? `?status=${statusFilter}` : ""}`;
-      const res = await fetch(url, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await fetchWithAuth(url);
 
       if (!res.ok) {
         setError("Ошибка загрузки заявок");
@@ -73,17 +75,12 @@ export default function AdminPayoutsPage() {
   }, [fetchPayouts]);
 
   const handleStatusChange = async (payoutId: string, newStatus: Payout["status"]) => {
-    const token = localStorage.getItem("accessToken");
-    if (!token) return;
-
     setUpdating(payoutId);
     try {
-      const res = await fetch(`/api/admin/payouts/${payoutId}`, {
+      const res = await fetchWithAuth(`/api/admin/payouts/${payoutId}`, {
         method: "PATCH",
         headers: {
-          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
-          ...getCsrfHeader(),
         },
         body: JSON.stringify({ status: newStatus }),
       });
@@ -116,17 +113,12 @@ export default function AdminPayoutsPage() {
       return;
     }
 
-    const token = localStorage.getItem("accessToken");
-    if (!token) return;
-
     setSendingPaygine(payoutId);
     try {
-      const res = await fetch(`/api/admin/payouts/${payoutId}/send-paygine`, {
+      const res = await fetchWithAuth(`/api/admin/payouts/${payoutId}/send-paygine`, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
-          ...getCsrfHeader(),
         },
         body: JSON.stringify({ pan }),
       });
@@ -184,8 +176,8 @@ export default function AdminPayoutsPage() {
   return (
     <div className="min-w-0 max-w-full">
       <div className="mb-6 flex flex-col items-center gap-1 text-center sm:mb-8">
-        <h1 className="font-[family:var(--font-playfair)] text-xl font-semibold text-white sm:text-2xl">Заявки на вывод</h1>
-        <p className="max-w-lg text-sm text-white/75">Статусы, ручная отметка и отправка выплат в Paygine.</p>
+        <h1 className={PANEL_PAGE_TITLE_ADMIN}>Заявки на вывод</h1>
+        <p className={PANEL_PAGE_SUBTITLE_ADMIN_MUTED}>Статусы, ручная отметка и отправка выплат в Paygine.</p>
       </div>
       <div className="mb-6 w-full max-w-xs sm:mx-0 mx-auto">
         <CustomDropdown
@@ -207,10 +199,10 @@ export default function AdminPayoutsPage() {
       {/* Мобильная версия: карточки */}
       <div className="space-y-4 lg:hidden">
         {payouts.length === 0 ? (
-          <div className="cabinet-section-header rounded-xl border-0 px-6 py-8 text-center text-white/90">Заявок не найдено</div>
+          <div className={PANEL_SECTION_CARD_ROUNDED_XL_EMPTY_WHITE}>Заявок не найдено</div>
         ) : (
           payouts.map((payout) => (
-            <div key={payout.id} className="cabinet-section-header rounded-xl border-0 p-4">
+            <div key={payout.id} className={PANEL_SECTION_CARD_ROUNDED_XL_P4}>
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <span className="text-xs text-white/70">{payout.id.slice(0, 8)}…</span>
                 <span>{getStatusBadge(payout.status)}</span>
@@ -247,7 +239,7 @@ export default function AdminPayoutsPage() {
       </div>
 
       {/* Десктоп: таблица */}
-      <div className="cabinet-section-header max-lg:hidden overflow-x-auto rounded-xl border-0">
+      <div className={PANEL_SECTION_TABLE_DESKTOP_WRAP}>
         <table className="w-full min-w-[800px]">
           <thead className="border-0 bg-[var(--color-brand-gold)]">
             <tr>

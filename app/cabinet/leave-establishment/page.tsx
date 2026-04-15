@@ -3,8 +3,9 @@
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Building2, Loader2, LogOut, Undo2 } from "lucide-react";
-import { getCsrfHeader } from "@/lib/security/csrf-client";
+import { fetchWithAuth, clearAccessToken } from "@/lib/auth-client";
 import { CABINET_WAITER_BTN_INLINE } from "@/lib/cabinet-button-classes";
+import { PANEL_PAGE_TITLE_CABINET } from "@/lib/panel-shell-visual-classes";
 
 type LeaveRow = {
   id: string;
@@ -36,10 +37,8 @@ export default function LeaveEstablishmentPage() {
   const [actionError, setActionError] = useState<string | null>(null);
   const [requests, setRequests] = useState<LeaveRow[]>([]);
 
-  const loadRequests = useCallback(async (token: string) => {
-    const res = await fetch("/api/cabinet/employee-leave-requests", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+  const loadRequests = useCallback(async () => {
+    const res = await fetchWithAuth("/api/cabinet/employee-leave-requests");
     if (res.ok) {
       const data = (await res.json()) as { requests: LeaveRow[] };
       setRequests(data.requests ?? []);
@@ -47,15 +46,10 @@ export default function LeaveEstablishmentPage() {
   }, []);
 
   useEffect(() => {
-    const token = localStorage.getItem("accessToken");
-    if (!token) {
-      router.replace("/login");
-      return;
-    }
-    fetch("/api/profile", { headers: { Authorization: `Bearer ${token}` } })
+    fetchWithAuth("/api/profile")
       .then(async (res) => {
         if (res.status === 401) {
-          localStorage.removeItem("accessToken");
+          clearAccessToken();
           router.replace("/login");
           return;
         }
@@ -67,7 +61,7 @@ export default function LeaveEstablishmentPage() {
         }
         setRoleOk(true);
         setEstablishmentName(p.establishmentName ?? null);
-        await loadRequests(token);
+        await loadRequests();
       })
       .finally(() => setLoading(false));
   }, [router, loadRequests]);
@@ -76,17 +70,13 @@ export default function LeaveEstablishmentPage() {
     if (!window.confirm("Отправить заявку на выход из заведения? Пока администратор не одобрит, вы остаётесь в команде.")) {
       return;
     }
-    const token = localStorage.getItem("accessToken");
-    if (!token) return;
     setSubmitting(true);
     setActionError(null);
     try {
-      const res = await fetch("/api/cabinet/employee-leave-requests", {
+      const res = await fetchWithAuth("/api/cabinet/employee-leave-requests", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-          ...getCsrfHeader(),
         },
         body: "{}",
       });
@@ -95,7 +85,7 @@ export default function LeaveEstablishmentPage() {
         setActionError(data.error ?? "Не удалось отправить заявку");
         return;
       }
-      await loadRequests(token);
+      await loadRequests();
     } catch {
       setActionError("Не удалось связаться с сервером");
     } finally {
@@ -104,17 +94,13 @@ export default function LeaveEstablishmentPage() {
   };
 
   const cancelPending = async () => {
-    const token = localStorage.getItem("accessToken");
-    if (!token) return;
     setSubmitting(true);
     setActionError(null);
     try {
-      const res = await fetch("/api/cabinet/employee-leave-requests/cancel", {
+      const res = await fetchWithAuth("/api/cabinet/employee-leave-requests/cancel", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-          ...getCsrfHeader(),
         },
         body: "{}",
       });
@@ -123,7 +109,7 @@ export default function LeaveEstablishmentPage() {
         setActionError(data.error ?? "Не удалось отменить заявку");
         return;
       }
-      await loadRequests(token);
+      await loadRequests();
     } catch {
       setActionError("Не удалось связаться с сервером");
     } finally {
@@ -146,7 +132,7 @@ export default function LeaveEstablishmentPage() {
   return (
     <div className="cabinet-form-surface cabinet-leave-establishment mx-auto w-full max-w-xl space-y-8 pb-2">
       <div className="text-center">
-        <h1 className="font-[family:var(--font-playfair)] text-xl font-semibold text-[var(--color-text)] sm:text-2xl">
+        <h1 className={PANEL_PAGE_TITLE_CABINET}>
           Покинуть заведение
         </h1>
         <p className="mt-2 text-sm leading-relaxed text-[var(--color-text-secondary)]">

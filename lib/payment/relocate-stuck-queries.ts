@@ -14,9 +14,9 @@ type RelocateStuckRow = {
 };
 
 /** Размер выборки в админке и в /api/health/payment-relocate */
-export const RELOCATE_STUCK_MONITORING_SAMPLE_LIMIT = 15;
+const RELOCATE_STUCK_MONITORING_SAMPLE_LIMIT = 15;
 
-export type RelocateStuckSampleJson = {
+type RelocateStuckSampleJson = {
   id: string;
   recipientId: string;
   relocateStartedAt: string;

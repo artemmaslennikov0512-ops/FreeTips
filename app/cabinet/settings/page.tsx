@@ -12,6 +12,7 @@ import { patchProfileSchema, changePasswordSchema } from "@/lib/validations";
 import { getFieldErrors } from "@/lib/form-errors";
 import { cabinetInputClassName } from "../shared";
 import { CABINET_WAITER_BTN_INLINE } from "@/lib/cabinet-button-classes";
+import { PANEL_SECTION_TITLE_CABINET_LG, PANEL_SECTION_TITLE_CABINET_LG_ON_DARK } from "@/lib/panel-shell-visual-classes";
 import { toDateInputValueFromApi } from "@/lib/utils";
 
 /** Одна пробельная норма для сравнения с сервером (убирает «двойные» пробелы в ФИО из БД). */
@@ -326,7 +327,7 @@ export default function CabinetSettingsPage() {
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--color-accent-gold)]/20 text-[var(--color-accent-gold)]">
               <Camera className="h-6 w-6" />
             </div>
-            <h2 className="font-[family:var(--font-playfair)] text-lg font-semibold text-white">Фото профиля</h2>
+            <h2 className={PANEL_SECTION_TITLE_CABINET_LG_ON_DARK}>Фото профиля</h2>
           </div>
           <div className="p-6">
             <p className="text-sm text-white/75 mb-4">
@@ -391,7 +392,7 @@ export default function CabinetSettingsPage() {
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--color-accent-gold)]/20 text-[var(--color-accent-gold)]">
               <User className="h-6 w-6" />
             </div>
-            <h2 className="font-[family:var(--font-playfair)] text-lg font-semibold text-[var(--color-text)]">Данные для входа</h2>
+            <h2 className={PANEL_SECTION_TITLE_CABINET_LG}>Данные для входа</h2>
           </div>
           {user && (
             <span className="rounded-lg bg-[var(--color-dark-gray)]/10 px-3 py-1.5 font-mono text-sm text-[var(--color-text)]/90">
@@ -553,7 +554,7 @@ export default function CabinetSettingsPage() {
 
       <div id="settings-2fa" className="cabinet-card rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden">
         <div className="border-0 px-6 py-4">
-          <h2 className="font-[family:var(--font-playfair)] text-lg font-semibold text-[var(--color-text)]">Безопасность</h2>
+          <h2 className={PANEL_SECTION_TITLE_CABINET_LG}>Безопасность</h2>
           <p className="mt-1 text-sm text-[var(--color-text-secondary)]">Двухфакторный вход через приложение вроде Google Authenticator.</p>
         </div>
         <div className="border-t border-[var(--color-dark-gray)]/10 px-6 pb-6">
@@ -563,7 +564,7 @@ export default function CabinetSettingsPage() {
 
       <div id="settings-password" className="cabinet-card rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden">
         <div className="border-0 px-6 py-4">
-          <h2 className="font-[family:var(--font-playfair)] text-lg font-semibold text-[var(--color-text)]">Сменить пароль</h2>
+          <h2 className={PANEL_SECTION_TITLE_CABINET_LG}>Сменить пароль</h2>
         </div>
         <div className="p-6">
         <div className="max-w-xl">

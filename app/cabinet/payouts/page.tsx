@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { fetchWithAuth, clearAccessToken } from "@/lib/auth-client";
 import { formatMoney, formatDate } from "@/lib/utils";
 import { FileDown } from "lucide-react";
 import { PAYOUT_STATUS_LABEL } from "../shared";
+import { PANEL_CARD_TITLE_CABINET_XL } from "@/lib/panel-shell-visual-classes";
 
 type Payout = { id: string; amountKop: number; status: string; createdAt: string; details: string };
 
@@ -21,19 +23,11 @@ export default function CabinetPayoutsPage() {
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
 
   useEffect(() => {
-    const token = localStorage.getItem("accessToken");
-    if (!token) {
-      router.replace("/login");
-      return;
-    }
-
     (async () => {
       try {
-        const res = await fetch("/api/payouts", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await fetchWithAuth("/api/payouts");
         if (res.status === 401) {
-          localStorage.removeItem("accessToken");
+          clearAccessToken();
           router.replace("/login");
           return;
         }
@@ -52,14 +46,10 @@ export default function CabinetPayoutsPage() {
   }, [router]);
 
   const handleDownloadReceipt = async (payoutId: string) => {
-    const token = localStorage.getItem("accessToken");
-    if (!token) return;
     setDownloadingId(payoutId);
     setError(null);
     try {
-      const res = await fetch(`/api/payouts/${payoutId}/receipt`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await fetchWithAuth(`/api/payouts/${payoutId}/receipt`);
       if (!res.ok) {
         const data = (await res.json().catch(() => ({}))) as { error?: string };
         throw new Error(data.error || "Не удалось скачать чек");
@@ -96,7 +86,7 @@ export default function CabinetPayoutsPage() {
 
       <div className="cabinet-card overflow-hidden rounded-xl border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)]">
         <div className="border-0 px-6 py-5">
-          <h2 className="font-[family:var(--font-playfair)] text-xl font-semibold text-[var(--color-text)]">
+          <h2 className={PANEL_CARD_TITLE_CABINET_XL}>
             Заявки на вывод
           </h2>
         </div>

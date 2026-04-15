@@ -3,9 +3,9 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { ChevronDown } from "lucide-react";
 
-export type CustomDropdownVariant = "admin" | "establishment" | "default";
+type CustomDropdownVariant = "admin" | "establishment" | "default";
 
-export interface CustomDropdownOption {
+interface CustomDropdownOption {
   value: string;
   label: string;
 }

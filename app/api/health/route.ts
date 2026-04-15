@@ -1,16 +1,29 @@
 /**
- * GET /api/health — health check для load balancer и мониторинга.
- * Проверяет доступность БД. paygineConfigured — для диагностики редиректа на оплату.
+ * GET /api/health — проверка доступности БД для балансировщика и мониторинга.
+ * Если задан HEALTH_CHECK_SECRET — полный ответ только при ?secret= или заголовке x-health-check-secret.
+ * Иначе — прежнее поведение (полный JSON всем).
  */
 
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
 import { db } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-export async function GET() {
+function healthSecretOk(request: NextRequest): boolean {
+  const secret = process.env.HEALTH_CHECK_SECRET?.trim();
+  if (!secret) return true;
+  const q = request.nextUrl.searchParams.get("secret")?.trim();
+  const h = request.headers.get("x-health-check-secret")?.trim();
+  return q === secret || h === secret;
+}
+
+export async function GET(request: NextRequest) {
+  if (!healthSecretOk(request)) {
+    return NextResponse.json({ status: "ok" }, { status: 200 });
+  }
+
   const start = Date.now();
   try {
     await db.$queryRaw(Prisma.sql`SELECT 1`);

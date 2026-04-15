@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { authHeaders } from "@/lib/auth-client";
 import { CustomDropdown } from "@/components/CustomDropdown";
+import { PANEL_PAGE_TITLE_ESTABLISHMENT_WHITE_LG } from "@/lib/panel-shell-visual-classes";
 
 interface PayoutRule {
   id: string;
@@ -173,7 +174,7 @@ export default function PayoutRulesPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-4">
       <div>
-        <h1 className="font-[family:var(--font-playfair)] text-lg font-semibold text-white text-center">
+        <h1 className={PANEL_PAGE_TITLE_ESTABLISHMENT_WHITE_LG}>
           Правила распределения
         </h1>
         <p className="text-white/90 text-xs mt-1">

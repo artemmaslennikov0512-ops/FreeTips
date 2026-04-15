@@ -19,7 +19,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-import { getAccessToken, fetchWithAuth, clearAccessToken } from "@/lib/auth-client";
+import { fetchWithAuth, clearAccessToken, migrateLegacyAccessTokenToCookie } from "@/lib/auth-client";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { AdminMobileNavPortal } from "@/components/admin/AdminMobileNavPortal";
@@ -27,8 +27,20 @@ import { ADMIN_REQUESTS_COUNTS_CHANGED } from "@/lib/admin-requests-counts-sync"
 import { ADMIN_BTN, ADMIN_BTN_PRIMARY } from "@/lib/admin-button-classes";
 import { usePanelMobileMenu } from "@/components/PanelMobileMenuContext";
 import { LkPresenceHeartbeat } from "@/components/LkPresenceHeartbeat";
+import { ProactiveAccessRefresh } from "@/components/ProactiveAccessRefresh";
 import { PanelMobileBackButton } from "@/components/PanelMobileBackButton";
 import { PanelShellMobileCorner } from "@/components/PanelShellMobileCorner";
+import {
+  PANEL_APP_MAIN_SURFACE_ADMIN,
+  PANEL_MAIN_CONTENT_INNER_ADMIN_CABINET,
+  PANEL_NAV_WRAP_ADMIN,
+  PANEL_SIDEBAR_NAV_ACTIVE_ADMIN,
+  PANEL_SIDEBAR_NAV_GROUP_SEPARATOR_ADMIN,
+  PANEL_SIDEBAR_NAV_GROUP_TITLE_ADMIN,
+  PANEL_SIDEBAR_NAV_ICON,
+  PANEL_SIDEBAR_NAV_LINK_INACTIVE_ADMIN,
+  PANEL_SIDEBAR_NAV_LINK_ROW,
+} from "@/lib/panel-shell-visual-classes";
 
 interface User {
   id: string;
@@ -134,11 +146,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     if (!mounted || typeof window === "undefined") return;
 
     const checkAuth = async () => {
-      if (!getAccessToken()) {
-        router.replace("/login");
-        return;
-      }
-
+      await migrateLegacyAccessTokenToCookie();
       try {
         const res = await fetchWithAuth("/api/profile");
 
@@ -186,12 +194,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const refreshRequestsPendingTotal = useCallback(async () => {
     if (!user || user.role !== "SUPERADMIN") return;
-    const token = getAccessToken();
-    if (!token) return;
     try {
-      const res = await fetch("/api/admin/requests-counts", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await fetchWithAuth("/api/admin/requests-counts");
       if (!res.ok) return;
       const data = (await res.json()) as { totalPending?: number; payoutsAwaitingAction?: number };
       setRequestsPendingTotal(typeof data.totalPending === "number" ? data.totalPending : 0);
@@ -262,19 +266,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     return null;
   }
 
-  const showMobileBack =
-    pathname !== "/admin/dashboard" && pathname !== "/admin";
-
   return (
     <div className="admin-panel cabinet-premium flex min-h-screen w-full min-w-0 max-w-full flex-col overflow-x-hidden bg-[var(--color-bg)] font-[family:var(--font-inter)] text-[var(--color-text)] pt-2 lg:flex-row lg:pt-4">
       <PanelShellMobileCorner
         ariaControls="admin-nav-dropdown"
         leadingSlot={
-          showMobileBack ? (
+          pathname !== "/admin/dashboard" && pathname !== "/admin" ? (
             <PanelMobileBackButton variant="admin" fallbackHref="/admin/dashboard" placement="mobileToolbar" />
           ) : undefined
         }
       />
+      <ProactiveAccessRefresh />
       <LkPresenceHeartbeat />
       <AdminMobileNavPortal
         sidebarOpen={sidebarOpen}
@@ -326,20 +328,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </div>
           </div>
           <div className="cabinet-nav-block flex min-h-0 min-w-0 flex-col overflow-x-hidden px-3 pb-2 lg:flex-none">
-            <nav
-              className="flex flex-col gap-0 rounded-[10px] border border-[var(--color-brand-gold)]/15 bg-white/5 p-1.5 pb-2 shadow-[var(--shadow-subtle)]"
-              aria-label="Навигация админ-панели"
-            >
+            <nav className={PANEL_NAV_WRAP_ADMIN} aria-label="Навигация админ-панели">
               {NAV_GROUPS.map((group) => (
                 <div
                   key={group.title}
-                  className="mt-3 border-t border-white/[0.08] pt-3 first:mt-0 first:border-t-0 first:pt-0"
+                  className={PANEL_SIDEBAR_NAV_GROUP_SEPARATOR_ADMIN}
                   role="group"
                   aria-label={group.title}
                 >
-                  <div className="px-2.5 pb-1.5 pt-0.5 text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-white/40">
-                    {group.title}
-                  </div>
+                  <div className={PANEL_SIDEBAR_NAV_GROUP_TITLE_ADMIN}>{group.title}</div>
                   <div className="flex flex-col gap-0.5">
                     {group.items.map(({ label, href, icon: Icon, iconClass }) => {
                       const showRequestsBadge =
@@ -355,13 +352,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                           key={href}
                           href={href}
                           onClick={closeSidebar}
-                          className={`flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[0.9375rem] font-normal transition-colors ${
-                            isActive(href)
-                              ? "cabinet-nav-active border border-[#0a192f]/25 bg-[#0a192f]/10 text-[#0a192f] font-medium"
-                              : "border border-transparent text-white/80 hover:bg-[var(--color-dark-gray)]/10 hover:text-white"
+                          className={`${PANEL_SIDEBAR_NAV_LINK_ROW} ${
+                            isActive(href) ? PANEL_SIDEBAR_NAV_ACTIVE_ADMIN : PANEL_SIDEBAR_NAV_LINK_INACTIVE_ADMIN
                           }`}
                         >
-                          <Icon className={`cabinet-nav-item-icon h-[18px] w-[18px] shrink-0 ${iconClass}`} aria-hidden />
+                          <Icon className={`${PANEL_SIDEBAR_NAV_ICON} ${iconClass}`} aria-hidden />
                           <span className="flex min-w-0 flex-1 items-center gap-2 break-words">
                             {label}
                             {showRequestsBadge && (
@@ -411,11 +406,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       )}
 
       <main className="relative min-h-screen min-w-0 flex-1 px-0 max-lg:pt-0 pt-1.5 pb-3 lg:relative lg:z-0 lg:pt-2 lg:pl-0 lg:pr-3 lg:ml-0 lg:mr-0 flex flex-col">
-        <div className="admin-main-block cabinet-main-block app-panel-main-surface relative z-10 mt-0 mr-0 mb-3 ml-0 flex min-h-0 w-full min-w-0 max-w-full flex-1 flex-col rounded-lg border-x border-b border-white/10 bg-white/[0.06] backdrop-blur-xl md:rounded-[10px] lg:z-0 lg:mr-3 lg:ml-3 max-lg:mb-0 max-lg:ml-0 max-lg:mr-0 max-lg:rounded-none max-lg:border-0 max-lg:bg-transparent max-lg:shadow-none max-lg:backdrop-blur-none">
-          <div
-            className="flex min-h-0 min-w-0 flex-1 flex-col overflow-x-hidden px-4 py-3 sm:px-6 md:py-6 lg:p-8"
-            id="main-content"
-          >
+        <div className={PANEL_APP_MAIN_SURFACE_ADMIN}>
+          <div className={PANEL_MAIN_CONTENT_INNER_ADMIN_CABINET} id="main-content">
             {children}
           </div>
         </div>

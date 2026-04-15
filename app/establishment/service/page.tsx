@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 import { authHeaders } from "@/lib/auth-client";
 import { EstablishmentDataGridPlaceholder } from "@/components/establishment/EstablishmentDataGridPlaceholder";
+import { PANEL_PAGE_TITLE_ESTABLISHMENT_HERO_ON_DARK } from "@/lib/panel-shell-visual-classes";
 
 interface TableOption {
   id: string;
@@ -144,7 +145,7 @@ export default function EstablishmentServicePage() {
           <ChevronLeft className="h-4 w-4" aria-hidden />
           Зал и сервис
         </Link>
-        <h1 className="cabinet-dashboard-name-hero font-[family:var(--font-playfair)] text-[var(--color-on-dark)]">
+        <h1 className={PANEL_PAGE_TITLE_ESTABLISHMENT_HERO_ON_DARK}>
           Сессии обслуживания
         </h1>
         <p className="ft-panel-section-head__lead text-sm text-[var(--color-on-dark-muted)]">

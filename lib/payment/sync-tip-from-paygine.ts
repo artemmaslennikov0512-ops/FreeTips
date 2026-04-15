@@ -12,7 +12,7 @@ import { runRelocateQueued } from "@/lib/payment/relocate-queue";
 import { RELOCATE_CLAIM_STALE_MS } from "@/lib/payment/relocate-constants";
 import { logInfo } from "@/lib/logger";
 
-export type SyncTipFromPaygineOptions = {
+type SyncTipFromPaygineOptions = {
   /**
    * Для cron/admin: если в Paygine заказ не COMPLETED — пометить транзакцию FAILED.
    * Для гостя после оплаты не использовать (заказ может ещё обрабатываться).
@@ -20,7 +20,7 @@ export type SyncTipFromPaygineOptions = {
   failIfPaygineNotCompleted?: boolean;
 };
 
-export type SyncTipFromPaygineResult = {
+type SyncTipFromPaygineResult = {
   ok: boolean;
   status: TransactionStatus;
   paygineOrderState?: string;

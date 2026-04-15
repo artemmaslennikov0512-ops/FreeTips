@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { fetchWithAuth, getAccessToken } from "@/lib/auth-client";
+import { fetchWithAuth } from "@/lib/auth-client";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
 
 /**
@@ -16,7 +16,6 @@ export function LkPresenceHeartbeat() {
   useEffect(() => {
     const send = () => {
       if (typeof document !== "undefined" && document.visibilityState !== "visible") return;
-      if (!getAccessToken()) return;
       if (inFlight.current) return;
       inFlight.current = true;
       void fetchWithAuth("/api/profile/heartbeat", {

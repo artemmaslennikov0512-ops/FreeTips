@@ -5,9 +5,10 @@ import { useMobileDarkChromeOverlay } from "@/lib/use-mobile-dark-chrome-overlay
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Plus, Copy, RefreshCw, FileDown, Mail, Pencil, Upload, ImageIcon, X, Check } from "lucide-react";
-import { authHeaders, getAccessToken } from "@/lib/auth-client";
+import { authHeaders, fetchWithAuth } from "@/lib/auth-client";
 import { beginCabinetImpersonation } from "@/lib/cabinet-impersonation";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
+import { PANEL_PAGE_TITLE_ESTABLISHMENT_WHITE_LG } from "@/lib/panel-shell-visual-classes";
 
 interface EstablishmentInfo {
   id: string;
@@ -67,8 +68,8 @@ export default function EstablishmentTeamPage() {
     setError(null);
     try {
       const [infoRes, empRes] = await Promise.all([
-        fetch("/api/establishment/info", { headers: authHeaders() }),
-        fetch("/api/establishment/employees", { headers: authHeaders() }),
+        fetchWithAuth("/api/establishment/info", { headers: authHeaders() }),
+        fetchWithAuth("/api/establishment/employees", { headers: authHeaders() }),
       ]);
       if (!infoRes.ok || !empRes.ok) {
         setError("Ошибка загрузки");
@@ -98,7 +99,7 @@ export default function EstablishmentTeamPage() {
     setFormError(null);
     setSubmitting(true);
     try {
-      const res = await fetch("/api/establishment/employees", {
+      const res = await fetchWithAuth("/api/establishment/employees", {
         method: "POST",
         headers: { "Content-Type": "application/json", ...authHeaders() },
         body: JSON.stringify({
@@ -126,10 +127,10 @@ export default function EstablishmentTeamPage() {
   const getOrRegenerateToken = async (empId: string) => {
     setLoadingTokenId(empId);
     try {
-      const res = await fetch(
-        `/api/establishment/employees/${empId}/registration-token`,
-        { method: "POST", headers: authHeaders() },
-      );
+      const res = await fetchWithAuth(`/api/establishment/employees/${empId}/registration-token`, {
+        method: "POST",
+        headers: authHeaders(),
+      });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
         alert(data?.error ?? "Ошибка");
@@ -150,7 +151,7 @@ export default function EstablishmentTeamPage() {
   const downloadPdf = async () => {
     setDownloadingPdf(true);
     try {
-      const res = await fetch("/api/establishment/employees/pdf", {
+      const res = await fetchWithAuth("/api/establishment/employees/pdf", {
         headers: authHeaders(),
       });
       if (!res.ok) {
@@ -177,7 +178,7 @@ export default function EstablishmentTeamPage() {
     if (!email?.trim()) return;
     setInvitingId(empId);
     try {
-      const res = await fetch(`/api/establishment/employees/${empId}/invite`, {
+      const res = await fetchWithAuth(`/api/establishment/employees/${empId}/invite`, {
         method: "POST",
         headers: { "Content-Type": "application/json", ...authHeaders() },
         body: JSON.stringify({ email: email.trim() }),
@@ -198,7 +199,7 @@ export default function EstablishmentTeamPage() {
   const toggleActive = async (emp: EmployeeRow) => {
     setTogglingId(emp.id);
     try {
-      const res = await fetch(`/api/establishment/employees/${emp.id}`, {
+      const res = await fetchWithAuth(`/api/establishment/employees/${emp.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json", ...authHeaders() },
         body: JSON.stringify({ isActive: !emp.isActive }),
@@ -226,7 +227,7 @@ export default function EstablishmentTeamPage() {
     }
     setDisconnectingId(emp.id);
     try {
-      const res = await fetch(`/api/establishment/employees/${emp.id}/disconnect`, {
+      const res = await fetchWithAuth(`/api/establishment/employees/${emp.id}/disconnect`, {
         method: "POST",
         headers: { "Content-Type": "application/json", ...authHeaders(), ...getCsrfHeader() },
         body: "{}",
@@ -261,7 +262,7 @@ export default function EstablishmentTeamPage() {
     setEditError(null);
     setSavingEdit(true);
     try {
-      const res = await fetch(`/api/establishment/employees/${editEmployee.id}`, {
+      const res = await fetchWithAuth(`/api/establishment/employees/${editEmployee.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json", ...authHeaders() },
         body: JSON.stringify({
@@ -286,20 +287,17 @@ export default function EstablishmentTeamPage() {
   };
 
   const openEmployeeCabinet = async (empId: string) => {
-    const adminToken = getAccessToken();
-    if (!adminToken) return;
     setViewCabinetEmpId(empId);
     try {
-      const res = await fetch(`/api/establishment/employees/${empId}/cabinet-token`, {
+      const res = await fetchWithAuth(`/api/establishment/employees/${empId}/cabinet-token`, {
         method: "POST",
-        headers: authHeaders(),
       });
       const body = (await res.json().catch(() => ({}))) as { accessToken?: string; error?: string };
       if (!res.ok || !body.accessToken) {
         alert(body.error ?? "Не удалось открыть кабинет");
         return;
       }
-      beginCabinetImpersonation(adminToken, body.accessToken, "/establishment/team");
+      beginCabinetImpersonation(body.accessToken, "/establishment/team");
       router.push("/cabinet");
     } catch {
       alert("Ошибка соединения");
@@ -314,7 +312,7 @@ export default function EstablishmentTeamPage() {
       const form = new FormData();
       form.set("type", type);
       form.set("file", file);
-      const res = await fetch(`/api/establishment/employees/${empId}/photo`, {
+      const res = await fetchWithAuth(`/api/establishment/employees/${empId}/photo`, {
         method: "POST",
         headers: authHeaders(),
         body: form,
@@ -353,7 +351,7 @@ export default function EstablishmentTeamPage() {
   return (
     <div className="space-y-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h1 className="font-[family:var(--font-playfair)] text-lg font-semibold text-white text-center">
+        <h1 className={PANEL_PAGE_TITLE_ESTABLISHMENT_WHITE_LG}>
           Команда
         </h1>
         <div className="flex flex-wrap items-center gap-1.5">

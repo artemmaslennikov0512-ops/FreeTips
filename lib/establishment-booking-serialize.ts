@@ -1,6 +1,6 @@
 import type { EstablishmentBookingStatus } from "@prisma/client";
 
-export type BookingWithTable = {
+type BookingWithTable = {
   id: string;
   establishmentId: string;
   tableId: string | null;

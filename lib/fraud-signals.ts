@@ -25,8 +25,6 @@ export const FRAUD_RULE = {
   ACCOUNT_SHARED_AUTH_IP: "ACCOUNT_SHARED_AUTH_IP",
 } as const;
 
-export type FraudRuleCode = (typeof FRAUD_RULE)[keyof typeof FRAUD_RULE];
-
 type RecordParams = {
   userId: string;
   ruleCode: string;

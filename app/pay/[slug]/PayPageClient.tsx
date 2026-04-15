@@ -14,6 +14,27 @@ import { getCsrfHeader } from "@/lib/security/csrf-client";
 import { isPayPageM5ShellSlug } from "@/config/pay-branding-overrides";
 import { PayTelegramSupportBlock } from "@/components/PayTelegramSupportBlock";
 import { PAYMENT_MAX_AMOUNT_KOP, PAYMENT_MIN_AMOUNT_KOP } from "@/lib/payment-amount-bounds";
+import { PayInlineError } from "@/components/pay/PayInlineError";
+import {
+  CLIENT_MSG_CONNECTION_ERROR,
+  CLIENT_MSG_PAGE_LOAD_FAILED,
+  PAY_MSG_LINK_NOT_FOUND,
+  PAY_MSG_MIN_AMOUNT_RUB,
+  PAY_MSG_PAYMENT_DECLINED,
+  PAY_MSG_PAYMENT_GENERIC_ERROR,
+} from "@/lib/copy/client-facing-messages";
+import {
+  PAY_PAGE_CENTERED_NARROW,
+  PAY_PAGE_FATAL_HOME_LINK,
+  PAY_PAGE_FATAL_WRAP,
+  PAY_RESULT_ICON_ERROR,
+  PAY_RESULT_ICON_PENDING,
+  PAY_RESULT_ICON_SUCCESS,
+  PAY_RESULT_SUBTITLE_MUTED,
+  PAY_RESULT_TITLE,
+  PAY_SUCCESS_CARD_GEOMETRY,
+  PAY_SUCCESS_FLOW_OUTER,
+} from "@/lib/pay-ui-classes";
 
 const PRESETS = [50, 100, 200, 500] as const;
 
@@ -130,11 +151,11 @@ export default function PayPageClient() {
       try {
         const res = await fetch(`/api/pay/${slug}`);
         if (res.status === 404) {
-          setError("Ссылка не найдена");
+          setError(PAY_MSG_LINK_NOT_FOUND);
           return;
         }
         if (!res.ok) {
-          setError("Не удалось загрузить страницу");
+          setError(CLIENT_MSG_PAGE_LOAD_FAILED);
           return;
         }
         const data = (await res.json()) as {
@@ -167,7 +188,7 @@ export default function PayPageClient() {
         setBranding(data.branding ?? null);
         setPayM5Shell(isPayPageM5ShellSlug(slug) || data.m5PayShell === true);
       } catch {
-        setError("Ошибка соединения");
+        setError(CLIENT_MSG_CONNECTION_ERROR);
       } finally {
         setLoading(false);
       }
@@ -187,7 +208,7 @@ export default function PayPageClient() {
   const handlePay = async () => {
     const kop = amountKop();
     if (kop < PAYMENT_MIN_AMOUNT_KOP) {
-      setResultError("Минимальная сумма — 1 ₽");
+      setResultError(PAY_MSG_MIN_AMOUNT_RUB);
       setResult("fail");
       return;
     }
@@ -224,7 +245,7 @@ export default function PayPageClient() {
       };
 
       if (!res.ok) {
-        setResultError(data.error ?? "Ошибка оплаты");
+        setResultError(data.error ?? PAY_MSG_PAYMENT_GENERIC_ERROR);
         setResult("fail");
         return;
       }
@@ -246,9 +267,9 @@ export default function PayPageClient() {
       }
 
       setResult(data.success ? "success" : "fail");
-      if (!data.success) setResultError("Платёж не прошёл");
+      if (!data.success) setResultError(PAY_MSG_PAYMENT_DECLINED);
     } catch {
-      setResultError("Ошибка соединения");
+      setResultError(CLIENT_MSG_CONNECTION_ERROR);
       setResult("fail");
     } finally {
       if (!leaveForPaygine) setPaying(false);
@@ -262,14 +283,14 @@ export default function PayPageClient() {
 
   if (tidFromUrl && urlOutcome && payReturnFail) {
     return (
-      <div className={`pay-page${m5c} pay-success-always-light flex min-h-screen min-h-[100dvh] w-full flex-col items-center justify-center gap-0 px-4 py-8`}>
-        <div className={`pay-success-card${m5SuccessCard} w-full max-w-sm rounded-2xl border border-[var(--color-brand-gold)]/40 bg-white p-8 text-center shadow-[var(--shadow-card)]`}>
-          <div className="pay-result-icon pay-result-icon-error mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[var(--color-accent-red)]/15">
+      <div className={`pay-page${m5c} ${PAY_SUCCESS_FLOW_OUTER}`}>
+        <div className={`pay-success-card${m5SuccessCard} ${PAY_SUCCESS_CARD_GEOMETRY}`}>
+          <div className={PAY_RESULT_ICON_ERROR}>
             <XCircle className="h-9 w-9 text-[var(--color-accent-red)]" />
           </div>
           <div className="mt-8 flex flex-col items-center text-center">
-            <h1 className="font-[family:var(--font-playfair)] text-2xl font-semibold text-[#0a192f]">Оплата не прошла</h1>
-            <p className="mt-3 text-center text-sm text-[#2d3748]">
+            <h1 className={PAY_RESULT_TITLE}>Оплата не прошла</h1>
+            <p className={PAY_RESULT_SUBTITLE_MUTED}>
               Платёж был отклонён или отменён. Вы можете попробовать снова.
             </p>
           </div>
@@ -295,8 +316,8 @@ export default function PayPageClient() {
 
   if (tidFromUrl && urlOutcome === "success" && settlementPhase === "verifying") {
     return (
-      <div className={`pay-page${m5c} pay-success-always-light flex min-h-screen min-h-[100dvh] w-full flex-col items-center justify-center px-4 py-8`}>
-        <div className={`pay-success-card${m5SuccessCard} w-full max-w-sm rounded-2xl border border-[var(--color-brand-gold)]/40 bg-white p-8 text-center shadow-[var(--shadow-card)]`}>
+      <div className={`pay-page${m5c} ${PAY_SUCCESS_FLOW_OUTER}`}>
+        <div className={`pay-success-card${m5SuccessCard} ${PAY_SUCCESS_CARD_GEOMETRY}`}>
           <Loader2 className="mx-auto h-12 w-12 animate-spin text-[var(--color-accent-emerald)]" aria-hidden />
           <p className="mt-6 text-center text-lg font-medium text-[#0a192f]">Подтверждаем зачисление…</p>
           <p className="mt-2 text-center text-sm text-[#2d3748]">
@@ -310,14 +331,14 @@ export default function PayPageClient() {
 
   if (tidFromUrl && urlOutcome === "success" && settlementPhase === "slow") {
     return (
-      <div className={`pay-page${m5c} pay-success-always-light flex min-h-screen min-h-[100dvh] w-full flex-col items-center justify-center px-4 py-8`}>
-        <div className={`pay-success-card${m5SuccessCard} w-full max-w-sm rounded-2xl border border-[var(--color-brand-gold)]/40 bg-white p-8 text-center shadow-[var(--shadow-card)]`}>
-          <div className="pay-result-icon mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-amber-500/15">
+      <div className={`pay-page${m5c} ${PAY_SUCCESS_FLOW_OUTER}`}>
+        <div className={`pay-success-card${m5SuccessCard} ${PAY_SUCCESS_CARD_GEOMETRY}`}>
+          <div className={PAY_RESULT_ICON_PENDING}>
             <Loader2 className="h-9 w-9 text-amber-600 animate-spin" aria-hidden />
           </div>
           <div className="mt-8 flex flex-col items-center text-center">
-            <h1 className="font-[family:var(--font-playfair)] text-2xl font-semibold text-[#0a192f]">Платёж принят</h1>
-            <p className="mt-3 text-center text-sm text-[#2d3748]">
+            <h1 className={PAY_RESULT_TITLE}>Платёж принят</h1>
+            <p className={PAY_RESULT_SUBTITLE_MUTED}>
               Банк подтвердил оплату. Зачисление на баланс получателя может занять несколько минут — это нормально.
             </p>
           </div>
@@ -339,17 +360,15 @@ export default function PayPageClient() {
 
   if (tidFromUrl && urlOutcome === "success" && settlementPhase === "success") {
     return (
-      <div className={`pay-page${m5c} pay-success-always-light flex min-h-screen min-h-[100dvh] w-full flex-col items-center justify-center px-4 py-8`}>
-        <div className={`pay-success-card${m5SuccessCard} w-full max-w-sm rounded-2xl border border-[var(--color-brand-gold)]/40 bg-white p-8 text-center shadow-[var(--shadow-card)]`}>
-          <div className="pay-result-icon pay-result-icon-success mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[var(--color-accent-emerald)]/15">
+      <div className={`pay-page${m5c} ${PAY_SUCCESS_FLOW_OUTER}`}>
+        <div className={`pay-success-card${m5SuccessCard} ${PAY_SUCCESS_CARD_GEOMETRY}`}>
+          <div className={PAY_RESULT_ICON_SUCCESS}>
             <CheckCircle2 className="h-9 w-9 text-[var(--color-accent-emerald)]" />
           </div>
           <div className="mt-8 flex flex-col items-center text-center">
-            <h1 className="font-[family:var(--font-playfair)] text-2xl font-semibold text-[#0a192f]">
-              Спасибо!
-            </h1>
+            <h1 className={PAY_RESULT_TITLE}>Спасибо!</h1>
             <p className="mt-1 text-center text-lg font-medium text-[#0a192f]">Чаевые зачислены.</p>
-            <p className="mt-3 text-center text-sm text-[#2d3748]">{successRecipientLabel} получил вашу благодарность.</p>
+            <p className={PAY_RESULT_SUBTITLE_MUTED}>{successRecipientLabel} получил вашу благодарность.</p>
           </div>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
             <button
@@ -382,7 +401,7 @@ export default function PayPageClient() {
   if (loading) {
     return (
       <div className={`pay-page pay-page--cards${m5c} w-full`}>
-        <div className="mx-auto max-w-md px-4">
+        <div className={PAY_PAGE_CENTERED_NARROW}>
           <LoadingSpinner message="Загрузка…" className="min-h-[60vh]" />
         </div>
       </div>
@@ -391,10 +410,10 @@ export default function PayPageClient() {
 
   if (error || !recipientName) {
     return (
-      <div className={`pay-page pay-page--cards${m5c} mx-auto flex min-h-[60vh] max-w-md flex-col items-center justify-center px-4 text-center`}>
+      <div className={`pay-page pay-page--cards${m5c} ${PAY_PAGE_FATAL_WRAP}`}>
         <XCircle className="h-14 w-14 text-[var(--color-text-secondary)]" />
-        <h1 className="mt-4 text-xl font-semibold text-[var(--color-text)]">{error ?? "Ссылка не найдена"}</h1>
-        <Link href="/" className="mt-6 text-[var(--color-accent-gold)] hover:opacity-90 hover:underline">
+        <h1 className="mt-4 text-xl font-semibold text-[var(--color-text)]">{error ?? PAY_MSG_LINK_NOT_FOUND}</h1>
+        <Link href="/" className={PAY_PAGE_FATAL_HOME_LINK}>
           На главную
         </Link>
       </div>
@@ -403,17 +422,15 @@ export default function PayPageClient() {
 
   if (result === "success") {
     return (
-      <div className={`pay-page${m5c} pay-success-always-light flex min-h-screen min-h-[100dvh] w-full flex-col items-center justify-center px-4 py-8`}>
-        <div className={`pay-success-card${m5SuccessCard} w-full max-w-sm rounded-2xl border border-[var(--color-brand-gold)]/40 bg-white p-8 text-center shadow-[var(--shadow-card)]`}>
-          <div className="pay-result-icon pay-result-icon-success mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[var(--color-accent-emerald)]/15">
+      <div className={`pay-page${m5c} ${PAY_SUCCESS_FLOW_OUTER}`}>
+        <div className={`pay-success-card${m5SuccessCard} ${PAY_SUCCESS_CARD_GEOMETRY}`}>
+          <div className={PAY_RESULT_ICON_SUCCESS}>
             <CheckCircle2 className="h-9 w-9 text-[var(--color-accent-emerald)]" />
           </div>
           <div className="mt-8 flex flex-col items-center text-center">
-            <h1 className="font-[family:var(--font-playfair)] text-2xl font-semibold text-[#0a192f]">
-              Спасибо!
-            </h1>
+            <h1 className={PAY_RESULT_TITLE}>Спасибо!</h1>
             <p className="mt-1 text-center text-lg font-medium text-[#0a192f]">Чаевые зачислены.</p>
-            <p className="mt-3 text-center text-sm text-[#2d3748]">
+            <p className={PAY_RESULT_SUBTITLE_MUTED}>
               {(recipientName ?? "Получатель")} получил вашу благодарность.
             </p>
           </div>
@@ -609,11 +626,7 @@ export default function PayPageClient() {
                   aria-label="Своя сумма в рублях, не больше 1 000"
                 />
               </div>
-              {kop > PAYMENT_MAX_AMOUNT_KOP && (
-                <p className="mt-2 text-center text-sm text-[var(--color-accent-red)]" role="alert">
-                  {PAYMENT_MAX_ERROR}
-                </p>
-              )}
+              {kop > PAYMENT_MAX_AMOUNT_KOP && <PayInlineError>{PAYMENT_MAX_ERROR}</PayInlineError>}
             </>
           )}
         </div>
@@ -638,11 +651,7 @@ export default function PayPageClient() {
           </div>
         </div>
 
-        {result === "fail" && resultError && (
-          <p className="mt-2 text-center text-sm text-[var(--color-accent-red)]" role="alert">
-            {resultError}
-          </p>
-        )}
+        {result === "fail" && resultError && <PayInlineError>{resultError}</PayInlineError>}
 
         <div className="pay-page-pay-footer flex flex-col gap-3">
           <PayTelegramSupportBlock />

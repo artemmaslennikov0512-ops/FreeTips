@@ -25,7 +25,7 @@ const estBrandingSelect = {
   borderOpacityPercent: true,
 } as const;
 
-export type PaySlugEstablishment = {
+type PaySlugEstablishment = {
   id: string;
   name: string;
   tipRoutingMode: string | null;
@@ -123,7 +123,7 @@ export async function establishmentBoundForPayTipLink(
   return est;
 }
 
-export type PayInitResolution = {
+type PayInitResolution = {
   paymentRecipientId: string;
   tipSplit: TipSplitSnapshot | null;
   mode: TipRoutingMode;

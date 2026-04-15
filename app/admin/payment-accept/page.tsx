@@ -12,6 +12,8 @@ import {
   ADMIN_PANEL_PAGE_WIDE,
   ADMIN_PANEL_STATE_CENTER_COMPACT,
 } from "@/lib/admin-surface-classes";
+import { PANEL_PAGE_TITLE_ADMIN_XL_CENTERED } from "@/lib/panel-shell-visual-classes";
+import { fetchWithAuth } from "@/lib/auth-client";
 
 const BTN_PRIMARY = `${ADMIN_BTN} ${ADMIN_BTN_PRIMARY} px-5 py-2.5 text-sm disabled:opacity-50`;
 const BTN_NEUTRAL = `${ADMIN_BTN} admin-btn--neutral px-4 py-2 text-sm disabled:opacity-50`;
@@ -68,12 +70,8 @@ export default function AdminPaymentAcceptPage() {
 
   useEffect(() => {
     const run = async () => {
-      const token = localStorage.getItem("accessToken");
-      if (!token) return;
       try {
-        const res = await fetch("/api/admin/payment-accept", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await fetchWithAuth("/api/admin/payment-accept");
         if (!res.ok) {
           setLoadError("Не удалось загрузить настройки");
           return;
@@ -101,15 +99,12 @@ export default function AdminPaymentAcceptPage() {
     whitelistText?: string | null;
     blacklistText?: string | null;
   }) => {
-    const token = localStorage.getItem("accessToken");
-    if (!token) return;
     setSaving(true);
     setMessage(null);
     try {
-      const res = await fetch("/api/admin/payment-accept", {
+      const res = await fetchWithAuth("/api/admin/payment-accept", {
         method: "PATCH",
         headers: {
-          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify(patch),
@@ -244,9 +239,7 @@ export default function AdminPaymentAcceptPage() {
       <div className="flex flex-col items-center gap-3">
         <CreditCard className="h-9 w-9 shrink-0 text-[var(--color-brand-gold)]" aria-hidden />
         <div className="max-w-2xl">
-          <h1 className="text-center font-[family:var(--font-playfair)] text-2xl font-semibold text-white">
-            Приём по платёжным ссылкам
-          </h1>
+          <h1 className={PANEL_PAGE_TITLE_ADMIN_XL_CENTERED}>Приём по платёжным ссылкам</h1>
         </div>
       </div>
 

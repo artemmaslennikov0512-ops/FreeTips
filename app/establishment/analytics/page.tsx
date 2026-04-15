@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Download } from "lucide-react";
 import { authHeaders } from "@/lib/auth-client";
 import { CustomDropdown } from "@/components/CustomDropdown";
+import { PANEL_PAGE_TITLE_ESTABLISHMENT_WHITE_LG } from "@/lib/panel-shell-visual-classes";
 
 interface Stats {
   totalTipsKop: number;
@@ -79,7 +80,7 @@ export default function AnalyticsPage() {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="font-[family:var(--font-playfair)] text-lg font-semibold text-white text-center">
+        <h1 className={PANEL_PAGE_TITLE_ESTABLISHMENT_WHITE_LG}>
           Аналитика
         </h1>
         <div className="flex items-center gap-2">

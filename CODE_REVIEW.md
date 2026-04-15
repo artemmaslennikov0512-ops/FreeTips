@@ -154,7 +154,7 @@
 - **Исправлено:** Используется `rateLimit429Response(rateLimit, "Слишком много заявок. Попробуйте позже.")`.
 
 ### 9.4 [LOW] Чтение Paygine-конфига из process.env вне lib/config
-- **Файлы:** `lib/payment/paygine-gateway.ts`, `lib/payment/send-payout-to-paygine.ts`, `lib/payment/request-paygine-balance.ts`, `lib/payment/stub-gateway.ts`
+- **Файлы:** `lib/payment/paygine-gateway.ts`, `lib/payment/send-payout-to-paygine.ts`, `lib/payment/stub-gateway.ts`
 - **Проблема:** PAYGINE_SECTOR, PAYGINE_PASSWORD и др. читаются напрямую из `process.env`, тогда как в `lib/config.ts` есть валидация и централизованные геттеры (`getPaygineConfig()`, `getPaygineBaseUrl()`).
 - **Рекомендация:** По возможности использовать геттеры из `lib/config.ts`, чтобы не дублировать логику и иметь одну точку валидации env.
 

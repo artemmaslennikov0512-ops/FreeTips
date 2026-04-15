@@ -8,6 +8,14 @@ import { db } from "@/lib/db";
 import { AutoSubmitForm } from "@/components/AutoSubmitForm";
 import { getPaygineConfig, getAppUrl } from "@/lib/config";
 import { createPayRedirectToken } from "@/lib/payment/redirect-token";
+import { PayNoticeFrame } from "@/components/pay/PayNoticeFrame";
+import {
+  PAY_MSG_GATEWAY_NOT_CONFIGURED,
+  PAY_MSG_TRANSACTION_ALREADY_FINAL,
+  PAY_MSG_TRANSACTION_INVALID_DATA,
+  PAY_MSG_TRANSACTION_NOT_FOUND,
+} from "@/lib/copy/client-facing-messages";
+import { PAY_NOTICE_LINK_HOME } from "@/lib/pay-ui-classes";
 
 export default async function PayRedirectPage({ searchParams }: { searchParams: Promise<{ tid?: string; method?: string }> }) {
   const { tid, method } = await searchParams;
@@ -18,9 +26,9 @@ export default async function PayRedirectPage({ searchParams }: { searchParams: 
   const APP_BASE_URL = getAppUrl();
   if (!config) {
     return (
-      <div className="mx-auto max-w-md px-4 py-12 text-center">
-        <p className="text-[var(--color-text-secondary)]">Платёжный шлюз не настроен.</p>
-      </div>
+      <PayNoticeFrame>
+        <p className="text-[var(--color-text-secondary)]">{PAY_MSG_GATEWAY_NOT_CONFIGURED}</p>
+      </PayNoticeFrame>
     );
   }
 
@@ -31,12 +39,12 @@ export default async function PayRedirectPage({ searchParams }: { searchParams: 
 
   if (!tx) {
     return (
-      <div className="mx-auto max-w-md px-4 py-12 text-center">
-        <p className="text-[var(--color-text)]">Платёж не найден.</p>
-        <Link href="/" className="mt-4 inline-block text-[var(--color-accent-gold)] hover:underline">
+      <PayNoticeFrame>
+        <p className="text-[var(--color-text)]">{PAY_MSG_TRANSACTION_NOT_FOUND}</p>
+        <Link href="/" className={PAY_NOTICE_LINK_HOME}>
           На главную
         </Link>
-      </div>
+      </PayNoticeFrame>
     );
   }
 
@@ -46,35 +54,35 @@ export default async function PayRedirectPage({ searchParams }: { searchParams: 
 
   if (tx.status !== "PENDING" || !tx.externalId) {
     return (
-      <div className="mx-auto max-w-md px-4 py-12 text-center">
-        <p className="text-[var(--color-text)]">Платёж уже обработан или отменён.</p>
-        <Link href="/" className="mt-4 inline-block text-[var(--color-accent-gold)] hover:underline">
+      <PayNoticeFrame>
+        <p className="text-[var(--color-text)]">{PAY_MSG_TRANSACTION_ALREADY_FINAL}</p>
+        <Link href="/" className={PAY_NOTICE_LINK_HOME}>
           На главную
         </Link>
-      </div>
+      </PayNoticeFrame>
     );
   }
 
   const orderId = parseInt(tx.externalId, 10);
   if (!Number.isFinite(orderId)) {
     return (
-      <div className="mx-auto max-w-md px-4 py-12 text-center">
-        <p className="text-[var(--color-text-secondary)]">Неверные данные платежа.</p>
-      </div>
+      <PayNoticeFrame>
+        <p className="text-[var(--color-text-secondary)]">{PAY_MSG_TRANSACTION_INVALID_DATA}</p>
+      </PayNoticeFrame>
     );
   }
 
   const orderSdRef = tx.paygineOrderSdRef?.trim();
   if (!orderSdRef || !APP_BASE_URL) {
     return (
-      <div className="mx-auto max-w-md px-4 py-12 text-center">
+      <PayNoticeFrame>
         <p className="text-[var(--color-text-secondary)]">
           {!orderSdRef ? "Не указана кубышка заказа. Создайте платёж заново." : "Задайте NEXT_PUBLIC_APP_URL в окружении."}
         </p>
-        <Link href="/" className="mt-4 inline-block text-[var(--color-accent-gold)] hover:underline">
+        <Link href="/" className={PAY_NOTICE_LINK_HOME}>
           На главную
         </Link>
-      </div>
+      </PayNoticeFrame>
     );
   }
 
@@ -82,7 +90,7 @@ export default async function PayRedirectPage({ searchParams }: { searchParams: 
   const action = "/api/pay/redirect-proxy";
 
   return (
-    <div className="mx-auto max-w-md px-4 py-12 text-center">
+    <PayNoticeFrame>
       <p className="text-[var(--color-text)]">Перенаправление на платёжную форму…</p>
       <form id="paygine-form" method="POST" action={action}>
         <input type="hidden" name="tid" value={tx.id} />
@@ -95,6 +103,6 @@ export default async function PayRedirectPage({ searchParams }: { searchParams: 
         </button>
       </form>
       <AutoSubmitForm formId="paygine-form" />
-    </div>
+    </PayNoticeFrame>
   );
 }

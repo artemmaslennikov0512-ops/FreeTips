@@ -2,7 +2,7 @@ import type { NextRequest } from "next/server";
 import { truncateUserAgent } from "@/lib/user-agent-device-label";
 import { normalizeDeviceClientId } from "@/lib/device-client-id";
 
-export type NewSessionMetadata = {
+type NewSessionMetadata = {
   deviceInfo: string;
 };
 

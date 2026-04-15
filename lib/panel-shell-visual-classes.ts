@@ -53,7 +53,7 @@ export const PANEL_SIDEBAR_NAV_ACTIVE_ADMIN =
 
 /** Кнопка «Выйти» в сайдбаре заведения (моб.) */
 export const PANEL_ESTABLISHMENT_SIDEBAR_LOGOUT =
-  "mt-3 shrink-0 flex w-full items-center justify-center gap-2 rounded-md px-2 py-2 text-[0.8125rem] font-medium text-white/80 transition-colors hover:bg-[var(--color-dark-gray)]/10 hover:text-white";
+  "establishment-sidebar-logout mt-3 shrink-0 flex w-full items-center justify-center gap-2 rounded-md px-2 py-2 text-[0.8125rem] font-medium text-white/80 transition-colors hover:bg-[var(--color-dark-gray)]/10 hover:text-white";
 
 // --- Кабинет заведения: «Назад»
 

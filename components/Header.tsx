@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { useState, useCallback, useEffect, useRef } from "react";
+import { useMobileDarkChromeOverlay } from "@/lib/use-mobile-dark-chrome-overlay";
 import { createPortal } from "react-dom";
 import { Menu, X, LogOut, Compass } from "lucide-react";
 import { site } from "@/config/site";
@@ -125,7 +126,8 @@ export function Header() {
   /** ЛК официанта и кабинет заведения: на мобильном — узкая полоска (тема + меню), без полной шапки с логотипом */
   const isWaiterCabinet = Boolean(pathname?.startsWith("/cabinet"));
   const isEstablishmentCabinet = Boolean(pathname?.startsWith("/establishment"));
-  const isPanelMobileSlim = isWaiterCabinet || isEstablishmentCabinet;
+  const isAdminPanel = Boolean(pathname?.startsWith("/admin"));
+  const isPanelMobileSlim = isWaiterCabinet || isEstablishmentCabinet || isAdminPanel;
   const panelMenu = useOptionalPanelMobileMenu();
 
   const panelMenuControlsId =
@@ -134,6 +136,8 @@ export function Header() {
   useEffect(() => {
     if (hideMobileSiteNav) setSideOpen(false);
   }, [hideMobileSiteNav]);
+
+  useMobileDarkChromeOverlay(sideOpen);
 
   if (isLanding) {
     return (

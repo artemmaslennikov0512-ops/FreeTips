@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { useMobileDarkChromeOverlay } from "@/lib/use-mobile-dark-chrome-overlay";
 import Link from "next/link";
 import { Check, X, Download, Loader2, FolderArchive } from "lucide-react";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
@@ -93,6 +94,8 @@ export default function AdminVerificationRequestsPage() {
   /** Базовый pending после последнего решения по заявке (не при открытии вкладки). */
   const [storedAckVerification, setStoredAckVerification] = useState<number | undefined>(undefined);
   const [storedAckConnection, setStoredAckConnection] = useState<number | undefined>(undefined);
+
+  useMobileDarkChromeOverlay(rejectModal !== null);
 
   const fetchCounts = useCallback(async (): Promise<RequestsCountsPayload | null> => {
     const token = localStorage.getItem("accessToken");

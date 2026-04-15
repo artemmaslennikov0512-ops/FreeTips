@@ -1951,10 +1951,31 @@ html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-compe
   backdrop-filter: blur(10px);
 }
 html:not([data-theme="dark"]) .admin-mobile-nav-overlay {
-  background: rgba(8, 12, 22, 0.72);
+  /* Сплошной холст под полупрозрачным слоем — иначе у blur по краям (notch / home) просвечивает другой цвет */
+  background: linear-gradient(rgba(8, 12, 22, 0.72), rgba(8, 12, 22, 0.72)), #e0dfdc;
 }
 [data-theme="dark"] .admin-mobile-nav-overlay {
-  background: rgba(0, 0, 0, 0.78);
+  background: linear-gradient(rgba(0, 0, 0, 0.78), rgba(0, 0, 0, 0.78)), #0d0e12;
+}
+
+/*
+ * Фиксированные слои моб. шторок (портал на body): тянем за пределы safe-area + min 100dvh,
+ * чтобы не оставались «полоски» сверху/снизу и артефакты compositing в Safari.
+ */
+.mobile-drawer-screen-bleed {
+  top: calc(-1 * env(safe-area-inset-top, 0px));
+  right: calc(-1 * env(safe-area-inset-right, 0px));
+  bottom: calc(-1 * env(safe-area-inset-bottom, 0px));
+  left: calc(-1 * env(safe-area-inset-left, 0px));
+  width: auto;
+  height: auto;
+  min-width: 100%;
+  min-height: 100%;
+  min-height: 100dvh;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 
 /* Блокировка фона при открытой моб. шторке ЛК: без сдвига вёрстки и лишнего rubber-band в Safari */
@@ -1970,10 +1991,10 @@ html.cabinet-mobile-drawer-lock {
   touch-action: none;
 }
 html:not([data-theme="dark"]) .cabinet-mobile-nav-overlay {
-  background: rgba(8, 12, 22, 0.72);
+  background: linear-gradient(rgba(8, 12, 22, 0.72), rgba(8, 12, 22, 0.72)), #e0dfdc;
 }
 [data-theme="dark"] .cabinet-mobile-nav-overlay {
-  background: rgba(0, 0, 0, 0.78);
+  background: linear-gradient(rgba(0, 0, 0, 0.78), rgba(0, 0, 0, 0.78)), #0d0e12;
 }
 
 /*
@@ -2534,7 +2555,7 @@ html:not([data-theme="dark"]) .cabinet-premium .premium-card:not(.premium-card--
 }
 
 [data-theme="dark"] .cabinet-premium .cabinet-overlay {
-  background: rgba(0, 0, 0, 0.82) !important;
+  background: linear-gradient(rgba(0, 0, 0, 0.82), rgba(0, 0, 0, 0.82)), #0d0e12 !important;
   border-color: rgba(255, 255, 255, 0.1);
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08);
 }
@@ -2542,7 +2563,7 @@ html:not([data-theme="dark"]) .cabinet-premium .premium-card:not(.premium-card--
 /* Заведение / мобильная светлая тема: затемнение под сайдбаром + «стеклянный» сайдбар как в тёмной */
 @media (max-width: 1023px) {
   html:not([data-theme="dark"]) body.establishment-page .cabinet-overlay {
-    background: rgba(8, 12, 22, 0.72) !important;
+    background: linear-gradient(rgba(8, 12, 22, 0.72), rgba(8, 12, 22, 0.72)), #e0dfdc !important;
     -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
   }

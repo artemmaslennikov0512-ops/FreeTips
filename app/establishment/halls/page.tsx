@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useMobileDarkChromeOverlay } from "@/lib/use-mobile-dark-chrome-overlay";
 import Link from "next/link";
 import { Plus, Trash2, Pencil, ChevronLeft, Copy } from "lucide-react";
 import QRCode from "qrcode";
@@ -115,6 +116,8 @@ export default function EstablishmentHallsPage() {
   const [editTableCapacity, setEditTableCapacity] = useState("2");
   const [editTableCode, setEditTableCode] = useState("");
   const [savingTable, setSavingTable] = useState(false);
+
+  useMobileDarkChromeOverlay(editingTable !== null);
 
   const load = useCallback(async () => {
     setLoading(true);

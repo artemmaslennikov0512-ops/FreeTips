@@ -423,9 +423,9 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
       style={Object.keys(brandStyle).length ? brandStyle : undefined}
     >
       <CabinetMobileNavMobileCorner
-        aboveGoldLine={
+        leadingSlot={
           pathname !== "/cabinet" ? (
-            <PanelMobileBackButton variant="cabinet" fallbackHref="/cabinet" placement="aboveMobileGoldLine" />
+            <PanelMobileBackButton variant="cabinet" fallbackHref="/cabinet" placement="mobileToolbar" />
           ) : undefined
         }
       />

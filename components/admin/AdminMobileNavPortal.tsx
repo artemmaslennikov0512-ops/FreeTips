@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useCallback, useSyncExternalStore } from "react";
+import { useMobileDarkChromeOverlay } from "@/lib/use-mobile-dark-chrome-overlay";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import type { LucideIcon } from "lucide-react";
@@ -46,6 +47,8 @@ export function AdminMobileNavPortal({
     };
   }, [sidebarOpen]);
 
+  useMobileDarkChromeOverlay(sidebarOpen);
+
   useEffect(() => {
     if (!sidebarOpen) return;
     const onKey = (e: KeyboardEvent) => {
@@ -66,7 +69,7 @@ export function AdminMobileNavPortal({
 
   return createPortal(
     <div
-      className={`admin-mobile-nav-root fixed inset-0 z-[2000] lg:hidden ${sidebarOpen ? "" : "pointer-events-none"}`}
+      className={`admin-mobile-nav-root mobile-drawer-screen-bleed fixed z-[2000] lg:hidden ${sidebarOpen ? "" : "pointer-events-none"}`}
       aria-hidden={!sidebarOpen}
     >
       <div

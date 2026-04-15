@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { useMobileDarkChromeOverlay } from "@/lib/use-mobile-dark-chrome-overlay";
 import Image from "next/image";
 import { Palette, Printer, Smartphone, LayoutDashboard, FileDown, ImageIcon, X } from "lucide-react";
 import { authHeaders } from "@/lib/auth-client";
@@ -87,6 +88,8 @@ export default function EstablishmentBrandPage() {
   const [pdfPreviewLoading, setPdfPreviewLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [activeGroup, setActiveGroup] = useState<BrandGroup>("pay");
+
+  useMobileDarkChromeOverlay(pdfPreviewUrl !== null);
 
   const clampPercent = (v: number) => Math.min(100, Math.max(0, v));
   const clampMm = (v: number) => Math.min(200, Math.max(20, v));

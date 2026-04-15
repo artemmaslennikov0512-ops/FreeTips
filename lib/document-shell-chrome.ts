@@ -7,6 +7,9 @@
  * - `body` с Tailwind `bg-[var(--color-bg)]` берёт `--color-bg` из каскада; пока на `html` не выставлены
  *   `data-theme` / `--color-bg` для панели, один кадр может быть старый цвет (оверскролл / safe area).
  * - Любой поздний патч `<head>` обходит локальные «точечные» фиксы — поэтому нормализация здесь + Observer.
+ * - В светлой теме Safari красит полосы у краёв по `theme-color` (часто `#e0dfdc`); тёмная шторка поверх не меняет
+ *   этот meta — без `pushOverlaySafariChromeDark` при открытой шторке остаются «сохранённые» светлые полосы.
+ *   Для любого нового полноэкранного тёмного оверлея на мобильном: `useMobileDarkChromeOverlay` в `lib/use-mobile-dark-chrome-overlay.ts`.
  */
 
 export const THEME_STORAGE_KEY = "theme";
@@ -67,6 +70,33 @@ function themeColorFor(pathname: string | null, preference: SiteThemePreference)
 }
 
 /**
+ * Счётчик открытых полноэкранных шторок с тёмным затемнением при **светлой** сохранённой теме сайта.
+ * Safari окрашивает область статус-бара и панели по `theme-color`; если оставить `#e0dfdc`, а меню тёмное —
+ * сверху/снизу остаются «сохранённые» светлые полосы (это не CSS страницы, а хром браузера).
+ */
+let overlaySafariChromeDarkDepth = 0;
+
+/** Пока шторка открыта — `theme-color` и `color-scheme` под тёмное затемнение (вложенность через счётчик). */
+export function pushOverlaySafariChromeDark(): void {
+  if (typeof document === "undefined") return;
+  overlaySafariChromeDarkDepth += 1;
+  if (overlaySafariChromeDarkDepth !== 1) return;
+  document.querySelectorAll('meta[name="theme-color"]').forEach((meta) => {
+    meta.removeAttribute("media");
+    meta.setAttribute("content", THEME_COLOR_DARK);
+  });
+  document.documentElement.style.colorScheme = "dark";
+}
+
+export function popOverlaySafariChromeDark(): void {
+  if (typeof document === "undefined") return;
+  if (overlaySafariChromeDarkDepth <= 0) return;
+  overlaySafariChromeDarkDepth -= 1;
+  if (overlaySafariChromeDarkDepth > 0) return;
+  applyDocumentShellChrome(typeof window !== "undefined" ? window.location.pathname : null, readThemePreference());
+}
+
+/**
  * Применить тему к документу. Вызывать из ThemeProvider (layout + rAF + MutationObserver),
  * не дублировать руками в страницах.
  */
@@ -89,11 +119,17 @@ export function applyDocumentShellChrome(pathname: string | null, preference: Si
   }
 
   const color = themeColorFor(pathname, preference);
+  const forceDarkChrome = overlaySafariChromeDarkDepth > 0;
+  const metaContent = forceDarkChrome ? THEME_COLOR_DARK : color;
   document.querySelectorAll('meta[name="theme-color"]').forEach((meta) => {
     meta.removeAttribute("media");
-    meta.setAttribute("content", color);
+    meta.setAttribute("content", metaContent);
   });
 
-  document.documentElement.style.colorScheme = effective === "dark" ? "dark" : "light";
+  if (forceDarkChrome) {
+    document.documentElement.style.colorScheme = "dark";
+  } else {
+    document.documentElement.style.colorScheme = effective === "dark" ? "dark" : "light";
+  }
   document.documentElement.style.removeProperty("background-color");
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { useMobileDarkChromeOverlay } from "@/lib/use-mobile-dark-chrome-overlay";
 import Image from "next/image";
 import { FileDown, ImageIcon, X } from "lucide-react";
 import { authHeaders } from "@/lib/auth-client";
@@ -15,6 +16,8 @@ export default function EstablishmentQrPage() {
   const [downloading, setDownloading] = useState(false);
   const [pdfPreviewUrl, setPdfPreviewUrl] = useState<string | null>(null);
   const [previewLoading, setPreviewLoading] = useState(false);
+
+  useMobileDarkChromeOverlay(pdfPreviewUrl !== null);
 
   useEffect(() => {
     const load = async () => {

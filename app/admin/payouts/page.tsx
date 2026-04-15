@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { useMobileDarkChromeOverlay } from "@/lib/use-mobile-dark-chrome-overlay";
 import Link from "next/link";
 import { Send, CheckCircle2, XCircle } from "lucide-react";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
@@ -39,6 +40,8 @@ export default function AdminPayoutsPage() {
   const [sendingPaygine, setSendingPaygine] = useState<string | null>(null);
   const [payoutIdForPanModal, setPayoutIdForPanModal] = useState<string | null>(null);
   const [panInput, setPanInput] = useState("");
+
+  useMobileDarkChromeOverlay(payoutIdForPanModal !== null);
 
   const fetchPayouts = useCallback(async () => {
     const token = localStorage.getItem("accessToken");

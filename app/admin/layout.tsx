@@ -28,6 +28,7 @@ import { ADMIN_BTN, ADMIN_BTN_PRIMARY } from "@/lib/admin-button-classes";
 import { usePanelMobileMenu } from "@/components/PanelMobileMenuContext";
 import { LkPresenceHeartbeat } from "@/components/LkPresenceHeartbeat";
 import { PanelMobileBackButton } from "@/components/PanelMobileBackButton";
+import { PanelShellMobileCorner } from "@/components/PanelShellMobileCorner";
 
 interface User {
   id: string;
@@ -261,8 +262,19 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     return null;
   }
 
+  const showMobileBack =
+    pathname !== "/admin/dashboard" && pathname !== "/admin";
+
   return (
-    <div className="admin-panel cabinet-premium flex min-h-screen w-full min-w-0 max-w-full bg-[var(--color-bg)] font-[family:var(--font-inter)] text-[var(--color-text)] pt-2 lg:pt-4">
+    <div className="admin-panel cabinet-premium flex min-h-screen w-full min-w-0 max-w-full flex-col overflow-x-hidden bg-[var(--color-bg)] font-[family:var(--font-inter)] text-[var(--color-text)] pt-2 lg:flex-row lg:pt-4">
+      <PanelShellMobileCorner
+        ariaControls="admin-nav-dropdown"
+        leadingSlot={
+          showMobileBack ? (
+            <PanelMobileBackButton variant="admin" fallbackHref="/admin/dashboard" placement="mobileToolbar" />
+          ) : undefined
+        }
+      />
       <LkPresenceHeartbeat />
       <AdminMobileNavPortal
         sidebarOpen={sidebarOpen}
@@ -398,13 +410,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </button>
       )}
 
-      <main className="relative min-h-screen min-w-0 flex-1 overflow-x-hidden px-0 pt-1.5 pb-3 lg:relative lg:z-0 lg:pt-2 lg:pl-0 lg:pr-3 lg:ml-0 lg:mr-0 flex flex-col">
-        <div className="admin-main-block cabinet-main-block app-panel-main-surface relative z-10 mt-0 mr-0 mb-3 ml-0 flex min-h-0 w-full min-w-0 max-w-full flex-1 flex-col rounded-lg border-x border-b border-white/10 bg-white/[0.06] backdrop-blur-xl md:rounded-[10px] lg:z-0 lg:mr-3 lg:ml-3 lg:rounded-[10px]">
-          {pathname !== "/admin/dashboard" && (
-            <PanelMobileBackButton variant="admin" fallbackHref="/admin/dashboard" />
-          )}
+      <main className="relative min-h-screen min-w-0 flex-1 px-0 max-lg:pt-0 pt-1.5 pb-3 lg:relative lg:z-0 lg:pt-2 lg:pl-0 lg:pr-3 lg:ml-0 lg:mr-0 flex flex-col">
+        <div className="admin-main-block cabinet-main-block app-panel-main-surface relative z-10 mt-0 mr-0 mb-3 ml-0 flex min-h-0 w-full min-w-0 max-w-full flex-1 flex-col rounded-lg border-x border-b border-white/10 bg-white/[0.06] backdrop-blur-xl md:rounded-[10px] lg:z-0 lg:mr-3 lg:ml-3 max-lg:mb-0 max-lg:ml-0 max-lg:mr-0 max-lg:rounded-none max-lg:border-0 max-lg:bg-transparent max-lg:shadow-none max-lg:backdrop-blur-none">
           <div
-            className="flex min-h-0 w-full max-w-full flex-1 flex-col overflow-x-hidden px-4 py-3 sm:px-6 md:py-6 lg:p-8"
+            className="flex min-h-0 min-w-0 flex-1 flex-col overflow-x-hidden px-4 py-3 sm:px-6 md:py-6 lg:p-8"
             id="main-content"
           >
             {children}

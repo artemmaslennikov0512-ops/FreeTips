@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { useMobileDarkChromeOverlay } from "@/lib/use-mobile-dark-chrome-overlay";
 import Link from "next/link";
 import { ChevronLeft, Plus, Trash2, Pencil } from "lucide-react";
 import { authHeaders } from "@/lib/auth-client";
@@ -92,6 +93,8 @@ export default function EstablishmentBookingsPage() {
   const [editing, setEditing] = useState<BookingRow | null>(null);
   const [editStatus, setEditStatus] = useState<BookingStatus>("PENDING");
   const [savingEdit, setSavingEdit] = useState(false);
+
+  useMobileDarkChromeOverlay(showForm || editing !== null);
 
   const loadTables = useCallback(async () => {
     try {

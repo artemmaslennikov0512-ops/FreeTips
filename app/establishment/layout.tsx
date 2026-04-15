@@ -30,6 +30,7 @@ import { usePanelMobileMenu } from "@/components/PanelMobileMenuContext";
 import { PanelShellMobileCorner } from "@/components/PanelShellMobileCorner";
 import { PanelMobileBackButton } from "@/components/PanelMobileBackButton";
 import { LkPresenceHeartbeat } from "@/components/LkPresenceHeartbeat";
+import { useMobileDarkChromeOverlay } from "@/lib/use-mobile-dark-chrome-overlay";
 
 interface Profile {
   role: string;
@@ -114,6 +115,8 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
       window.removeEventListener("keydown", onKey);
     };
   }, [sidebarOpen, closeSidebar]);
+
+  useMobileDarkChromeOverlay(sidebarOpen);
 
   useEffect(() => {
     if (!mounted || typeof window === "undefined") return;
@@ -209,16 +212,16 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
       <PanelShellMobileCorner
         ariaControls="establishment-mobile-nav"
         ariaHaspopup="true"
-        aboveGoldLine={
+        leadingSlot={
           pathname !== "/establishment" ? (
-            <PanelMobileBackButton variant="establishment" fallbackHref="/establishment" placement="aboveMobileGoldLine" />
+            <PanelMobileBackButton variant="establishment" fallbackHref="/establishment" placement="mobileToolbar" />
           ) : undefined
         }
       />
       <LkPresenceHeartbeat />
       {/* Шторка на мобильном */}
       <div
-        className={`cabinet-overlay fixed inset-0 z-[90] bg-[rgba(15,23,42,0.65)] backdrop-blur-xl transition-opacity duration-300 lg:hidden ${
+        className={`cabinet-overlay mobile-drawer-screen-bleed fixed z-[90] backdrop-blur-xl transition-opacity duration-300 lg:hidden ${
           sidebarOpen ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
         onClick={closeSidebar}

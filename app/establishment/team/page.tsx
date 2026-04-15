@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import { useMobileDarkChromeOverlay } from "@/lib/use-mobile-dark-chrome-overlay";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Plus, Copy, RefreshCw, FileDown, Mail, Pencil, Upload, ImageIcon, X, Check } from "lucide-react";
@@ -58,6 +59,8 @@ export default function EstablishmentTeamPage() {
   const [viewCabinetEmpId, setViewCabinetEmpId] = useState<string | null>(null);
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const printInputRef = useRef<HTMLInputElement>(null);
+
+  useMobileDarkChromeOverlay(editEmployee !== null);
 
   const fetchData = async (): Promise<EmployeeRow[]> => {
     setLoading(true);

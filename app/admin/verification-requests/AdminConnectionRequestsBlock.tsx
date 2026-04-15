@@ -1,6 +1,7 @@
 "use client";
 
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
+import { useMobileDarkChromeOverlay } from "@/lib/use-mobile-dark-chrome-overlay";
 import Link from "next/link";
 import {
   ADMIN_BTN,
@@ -222,6 +223,8 @@ export function AdminConnectionRequestsBlock({
   const [rejectReason, setRejectReason] = useState("");
   const [rejectSubmitting, setRejectSubmitting] = useState(false);
   const [rejectError, setRejectError] = useState<string | null>(null);
+
+  useMobileDarkChromeOverlay(rejectModal !== null);
 
   useEffect(() => {
     const valid = loadIssuedLinksFromStorage();

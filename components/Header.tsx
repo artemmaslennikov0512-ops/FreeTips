@@ -8,7 +8,7 @@ import { createPortal } from "react-dom";
 import { Menu, X, LogOut, Compass } from "lucide-react";
 import { site } from "@/config/site";
 import { getCsrfHeader } from "@/lib/security/csrf-client";
-import { getAccessToken, authHeaders, clearAccessToken } from "@/lib/auth-client";
+import { clearAccessToken, fetchWithAuth } from "@/lib/auth-client";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { isCabinetM5CompetitionTheme } from "@/config/cabinet-theme-logins";
 import { useOptionalPanelMobileMenu } from "@/components/PanelMobileMenuContext";
@@ -30,25 +30,30 @@ export function Header() {
   }, []);
 
   useEffect(() => {
-    const token = getAccessToken();
-    if (!token) {
-      setUser(null);
-      return;
-    }
-    fetch("/api/profile", { headers: authHeaders() })
-      .then((res) => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetchWithAuth("/api/profile");
+        if (cancelled) return;
         if (res.status === 401) {
           clearAccessToken();
           setUser(null);
-          return null;
+          return;
         }
-        return res.json();
-      })
-      .then((data) => {
+        if (!res.ok) {
+          setUser(null);
+          return;
+        }
+        const data = (await res.json()) as { login?: string; role?: string; fullName?: string | null };
         if (data?.login) setUser({ login: data.login, role: data.role, fullName: data.fullName });
         else setUser(null);
-      })
-      .catch(() => setUser(null));
+      } catch {
+        if (!cancelled) setUser(null);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, [pathname]);
 
   const cabinetHref =

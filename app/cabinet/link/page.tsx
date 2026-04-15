@@ -119,7 +119,7 @@ export default function CabinetLinkPage() {
               <Link2 className="cabinet-link-empty-icon h-8 w-8 text-[var(--color-brand-gold)]" aria-hidden />
             </div>
             <p className="cabinet-link-empty-hint max-w-md text-base leading-relaxed text-[var(--color-text-secondary)]">
-              У вас ещё нет кода официанта и ссылки для приёма чаевых.
+              У вас ещё нет ID для чаевых и ссылки для приёма чаевых.
             </p>
             <button
               type="button"
@@ -136,10 +136,10 @@ export default function CabinetLinkPage() {
         <div className="grid gap-8 md:grid-cols-2">
           <div id="link-payment" className="cabinet-card rounded-xl border-0 bg-[var(--color-bg-sides)] p-6 shadow-[var(--shadow-subtle)] transition-all hover:shadow-[var(--shadow-medium)]">
             <h2 className={`mb-4 ${PANEL_CARD_TITLE_CABINET_XL_CENTERED}`}>
-              Код официанта и оплата
+              Ваш ID для чаевых и оплата
             </h2>
             <div className="rounded-xl bg-[var(--color-dark-gray)]/6 p-5">
-              <div className="mb-2 font-semibold text-[var(--color-text)]">Код официанта</div>
+              <div className="mb-2 font-semibold text-[var(--color-text)]">Ваш ID для чаевых</div>
               <div className="cabinet-input-window mb-4 break-all rounded-lg border border-[var(--color-brand-gold)]/20 px-4 py-3 font-mono text-base font-semibold tracking-wide text-[var(--color-text)]">
                 {link.slug}
               </div>

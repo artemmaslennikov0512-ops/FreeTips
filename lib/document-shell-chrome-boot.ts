@@ -1,9 +1,4 @@
-import {
-  THEME_COLOR_DARK,
-  THEME_COLOR_LIGHT_PANEL,
-  THEME_COLOR_LIGHT_SITE,
-  THEME_STORAGE_KEY,
-} from "@/lib/document-shell-chrome";
+import { THEME_COLOR_DARK, THEME_COLOR_LIGHT_SITE, THEME_STORAGE_KEY } from "@/lib/document-shell-chrome";
 
 /**
  * Синхронный скрипт до гидрации: те же правила и цвета, что в applyDocumentShellChrome.
@@ -18,11 +13,15 @@ var t=authOnly?'dark':scope?localStorage.getItem('${THEME_STORAGE_KEY}'):null;
 document.documentElement.setAttribute('data-theme',authOnly?'dark':t==='dark'?'dark':'light');
 document.documentElement.classList.toggle('app-shell-panel',!!scope);
 var eff=document.documentElement.getAttribute('data-theme');
-var tc=eff==='dark'?'${THEME_COLOR_DARK}':scope?'${THEME_COLOR_LIGHT_PANEL}':'${THEME_COLOR_LIGHT_SITE}';
+var tc=scope?null:(eff==='dark'?'${THEME_COLOR_DARK}':'${THEME_COLOR_LIGHT_SITE}');
 var cs=eff==='dark'?'dark':'light';
 var mtcs=document.querySelectorAll('meta[name="theme-color"]');
-var okTc=mtcs.length===1&&mtcs[0].getAttribute('content')===tc&&!mtcs[0].hasAttribute('media');
-if(!okTc){mtcs.forEach(function(m){m.remove();});var mtc=document.createElement('meta');mtc.setAttribute('name','theme-color');mtc.setAttribute('content',tc);document.head.appendChild(mtc);}
+if(tc===null){
+  if(mtcs.length)mtcs.forEach(function(m){m.remove();});
+}else{
+  var okTc=mtcs.length===1&&mtcs[0].getAttribute('content')===tc&&!mtcs[0].hasAttribute('media');
+  if(!okTc){mtcs.forEach(function(m){m.remove();});var mtc=document.createElement('meta');mtc.setAttribute('name','theme-color');mtc.setAttribute('content',tc);document.head.appendChild(mtc);}
+}
 var mcss=document.querySelectorAll('meta[name="color-scheme"]');
 var okCs=mcss.length===1&&mcss[0].getAttribute('content')===cs;
 if(!okCs){mcss.forEach(function(m){m.remove();});var mcs=document.createElement('meta');mcs.setAttribute('name','color-scheme');mcs.setAttribute('content',cs);document.head.appendChild(mcs);}

@@ -24,7 +24,7 @@ function cabinetLimitLabelTitle(pct: number, label: string): string | undefined 
 }
 
 const QUICK_ACTIONS = [
-  { href: "/cabinet/link", icon: Link2, title: "Код и QR", desc: "Код официанта и ссылка для чаевых" },
+  { href: "/cabinet/link", icon: Link2, title: "Код и QR", desc: "Ваш ID для чаевых и ссылка для гостей" },
   { href: "/cabinet/transactions", icon: List, title: "История операций и вывод средств", desc: "Все поступления, транзакции и вывод" },
   { href: "#api-key", icon: Key, title: "API ключ", desc: "Для интеграции с приложением" },
   { href: "/cabinet/settings", icon: Settings, title: "Настройки профиля", desc: "Редактировать данные и пароль" },
@@ -344,7 +344,7 @@ export default function CabinetDashboardPage() {
                     }
                   >
                     <List className="h-4 w-4 shrink-0" />
-                    Операции
+                    История операций
                   </Link>
                   <Link
                     href="/cabinet/transactions#waiter-card"
@@ -417,9 +417,9 @@ export default function CabinetDashboardPage() {
                         <div className="mb-1 flex justify-between text-sm">
                           <span
                             className="cabinet-limits-label text-[var(--color-text-secondary)]"
-                            title={cabinetLimitLabelTitle(limitPcts?.dayCount ?? 0, "Заявок в сутки")}
+                            title={cabinetLimitLabelTitle(limitPcts?.dayCount ?? 0, "Транзакций в сутки")}
                           >
-                            Заявок в сутки
+                            Транзакций в сутки
                           </span>
                           <span className="font-medium text-[var(--color-text)]">
                             {payoutUsageToday?.count ?? 0} из {payoutLimits.dailyLimitCount}
@@ -460,9 +460,9 @@ export default function CabinetDashboardPage() {
                           <div className="mb-1 flex justify-between text-sm">
                             <span
                               className="cabinet-limits-label text-[var(--color-text-secondary)]"
-                              title={cabinetLimitLabelTitle(limitPcts?.incomingMonthSum ?? 0, "Поступления за месяц")}
+                              title={cabinetLimitLabelTitle(limitPcts?.incomingMonthSum ?? 0, "Чаевые за месяц")}
                             >
-                              Поступления за месяц
+                              Чаевые за месяц
                             </span>
                             <span className="font-medium text-[var(--color-text)]">
                               {formatMoney(BigInt(incomingMonthSuccessSumKop))} из{" "}
@@ -511,9 +511,9 @@ export default function CabinetDashboardPage() {
                             <div className="mb-1 flex justify-between text-sm">
                               <span
                                 className="cabinet-limits-label text-[var(--color-text-secondary)]"
-                                title={cabinetLimitLabelTitle(limitPcts?.monthSum ?? 0, "Сумма в месяц")}
+                                title={cabinetLimitLabelTitle(limitPcts?.monthSum ?? 0, "Сумма чаевых в месяц")}
                               >
-                                Сумма в месяц
+                                Сумма чаевых в месяц
                               </span>
                               <span className="font-medium text-[var(--color-text)]">
                                 {formatMoney(BigInt(payoutUsageMonth?.sumKop ?? 0))} из {formatMoney(BigInt(payoutLimits.monthlyLimitKop))}
@@ -547,7 +547,7 @@ export default function CabinetDashboardPage() {
             {tipLink && (
               <div className="cabinet-block-inner mb-6 rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 p-4">
                 <div className="mb-2 text-sm font-semibold text-[var(--color-text)]">
-                  Код официанта
+                  Ваш ID для чаевых
                 </div>
                 {tipWaiterCode ? (
                   <div className="cabinet-input-window mb-3 min-w-0 max-w-full break-all rounded-lg bg-[var(--color-bg-sides)] px-3 py-2 font-mono text-sm font-semibold tracking-wide text-[var(--color-text)]">
@@ -570,7 +570,7 @@ export default function CabinetDashboardPage() {
                     }
                   >
                     <ExternalLink className="h-4 w-4" />
-                    Перейти по ссылке
+                    Открыть страницу чаевых
                   </a>
                   <button
                     type="button"

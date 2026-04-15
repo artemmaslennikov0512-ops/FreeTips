@@ -39,7 +39,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   }, [mounted, pathname, theme]);
 
   /*
-   * Next иногда пересоздаёт meta theme-color после первого layout — двойной rAF подстраховывает Safari.
+   * Next иногда пересоздаёт meta theme-color после первого layout — двойной rAF подстраховывает head (в т.ч. ЛК без theme-color).
    */
   useEffect(() => {
     if (!mounted) return;
@@ -56,20 +56,45 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   }, [pathname, mounted, theme]);
 
   /*
-   * Любое изменение <head> (в т.ч. поздние meta от Next) — снова нормализуем theme-color и data-theme.
-   * Один раз на приложение; не нужно «точечно» ловить каждый маршрут.
+   * Только meta theme-color / color-scheme в <head>: при любой вставке <link> и т.п. Next при навигации
+   * иначе сотни мутаций → applyDocumentShellChrome в середине коммита React → «Cannot read properties of null (reading 'removeChild')».
    */
   useEffect(() => {
     if (!mounted || typeof MutationObserver === "undefined") return;
     let frame = 0;
-    const schedule = () => {
+    const touchesShellChromeMeta = (records: MutationRecord[]) => {
+      for (const r of records) {
+        if (r.type === "attributes" && r.target instanceof HTMLMetaElement) {
+          const n = r.target.getAttribute("name");
+          if (n === "theme-color" || n === "color-scheme") return true;
+        }
+        for (const n of r.addedNodes) {
+          if (n instanceof HTMLMetaElement) {
+            const name = n.getAttribute("name");
+            if (name === "theme-color" || name === "color-scheme") return true;
+          }
+          if (n instanceof Element && typeof n.querySelector === "function") {
+            if (n.querySelector('meta[name="theme-color"], meta[name="color-scheme"]')) return true;
+          }
+        }
+        for (const n of r.removedNodes) {
+          if (n instanceof HTMLMetaElement) {
+            const name = n.getAttribute("name");
+            if (name === "theme-color" || name === "color-scheme") return true;
+          }
+        }
+      }
+      return false;
+    };
+    const schedule = (records: MutationRecord[]) => {
+      if (!touchesShellChromeMeta(records)) return;
       if (frame) cancelAnimationFrame(frame);
       frame = requestAnimationFrame(() => {
         frame = 0;
         applyDocumentShellChrome(pathnameRef.current, themeRef.current);
       });
     };
-    const obs = new MutationObserver(schedule);
+    const obs = new MutationObserver((records) => schedule(records));
     obs.observe(document.head, {
       childList: true,
       subtree: true,

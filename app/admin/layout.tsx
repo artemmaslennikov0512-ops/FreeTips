@@ -97,10 +97,10 @@ const NAV_GROUPS: AdminNavGroup[] = [
 const ADMIN_LG_SIDEBAR_COLLAPSED_KEY = "admin-lg-sidebar-collapsed";
 
 const LG_SIDEBAR_COLLAPSE_BTN =
-  "cabinet-lg-sidebar-toggle cabinet-lg-sidebar-toggle--collapse relative z-30 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/25 bg-white/10 text-white shadow-none transition-[color,background-color,border-color] duration-200 hover:border-white/40 hover:bg-white/15 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white/35 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent";
+  "cabinet-lg-sidebar-toggle cabinet-lg-sidebar-toggle--collapse relative z-30 inline-flex h-8 min-h-8 w-[2.125rem] shrink-0 items-center justify-center rounded-md border border-white/20 bg-white/10 px-0 text-[var(--color-text)] shadow-none transition-[color,background-color,border-color] duration-200 hover:border-white/35 hover:bg-white/[0.14] hover:text-[var(--color-text)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-gold)]/35 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent";
 
 const LG_SIDEBAR_EXPAND_BTN =
-  "cabinet-lg-sidebar-toggle cabinet-lg-sidebar-toggle--expand fixed left-0 top-1/2 z-[35] hidden h-9 w-9 -translate-y-1/2 translate-x-1/2 items-center justify-center rounded-full border border-white/25 bg-[var(--color-navy)] text-white shadow-none transition-[color,background-color,border-color] duration-200 hover:border-white/40 hover:bg-white/[0.12] hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white/35 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent lg:flex";
+  "cabinet-lg-sidebar-toggle cabinet-lg-sidebar-toggle--expand fixed left-0 top-1/2 z-[35] hidden h-8 min-h-8 w-[2.125rem] -translate-y-1/2 translate-x-1/2 items-center justify-center rounded-md border border-white/20 bg-[var(--color-navy)] px-0 text-[var(--color-text)] shadow-none transition-[color,background-color,border-color] duration-200 hover:border-white/35 hover:bg-white/[0.08] hover:text-[var(--color-text)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-gold)]/35 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent lg:inline-flex";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -297,7 +297,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             : "lg:relative lg:z-10 lg:w-[236px] lg:overflow-hidden"
         }`}
       >
-        <aside className="admin-sidebar cabinet-sidebar relative flex min-h-0 w-[236px] min-w-[236px] flex-col overflow-hidden rounded-[10px] border border-white/10 bg-[var(--color-navy)] py-4 shadow-sm backdrop-blur-xl lg:static lg:h-auto lg:max-h-[calc(100vh-2rem)] lg:overflow-y-auto lg:overflow-x-hidden">
+        <aside className="admin-sidebar cabinet-sidebar relative flex min-h-0 w-[236px] min-w-[236px] flex-col overflow-hidden rounded-[10px] border border-white/10 bg-transparent py-4 shadow-sm backdrop-blur-xl lg:static lg:h-auto lg:max-h-[calc(100vh-2rem)] lg:overflow-y-auto lg:overflow-x-hidden">
         <div className="flex min-h-0 min-w-0 flex-col overflow-hidden">
           <div className="cabinet-sidebar-profile cabinet-block-inner mx-3 mb-3 rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2.5">
             <div className="flex items-center gap-3">
@@ -305,14 +305,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 {(user.login || "A").charAt(0).toUpperCase()}
               </div>
               <div className="min-w-0 flex-1">
-                <div className="truncate font-semibold text-white">{user.login}</div>
-                <div className="text-sm text-white/80">Админ</div>
+                <div className="truncate font-semibold text-[var(--color-text)]">{user.login}</div>
+                <div className="text-sm text-[var(--color-text-secondary)]">Админ</div>
               </div>
             </div>
           </div>
           <div className="mb-2 flex h-9 shrink-0 items-center px-3">
             <span className="w-9 shrink-0 select-none" aria-hidden />
-            <span className="cabinet-nav-label min-w-0 flex-1 text-center text-xs font-medium uppercase leading-none tracking-wider text-white/50">
+            <span className="cabinet-nav-label min-w-0 flex-1 text-center text-xs font-medium uppercase leading-none tracking-wider text-[var(--color-text)]/50">
               Навигация
             </span>
             <div className="flex h-9 w-9 shrink-0 items-center justify-end">
@@ -323,7 +323,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 aria-label="Скрыть боковое меню"
                 title="Скрыть меню"
               >
-                <ChevronLeft className="h-5 w-5 shrink-0 text-white" strokeWidth={2} aria-hidden />
+                <ChevronLeft className="h-5 w-5 shrink-0 text-[var(--color-text)]" strokeWidth={2} aria-hidden />
               </button>
             </div>
           </div>
@@ -401,7 +401,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           aria-label="Показать боковое меню"
           title="Меню"
         >
-          <ChevronRight className="h-5 w-5 shrink-0 text-white" strokeWidth={2} aria-hidden />
+          <ChevronRight className="h-5 w-5 shrink-0 text-[var(--color-text)]" strokeWidth={2} aria-hidden />
         </button>
       )}
 

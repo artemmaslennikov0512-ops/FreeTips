@@ -169,7 +169,7 @@ export function CabinetMobileNavPortals() {
 
   useMobileDarkChromeOverlay(sidebarOpen);
 
-  /* WebKit после открытия шторки: двойной apply подстраховывает meta theme-color (см. ThemeProvider). */
+  /* WebKit после открытия шторки: двойной apply подстраховывает document shell (см. ThemeProvider). */
   useLayoutEffect(() => {
     if (!sidebarOpen) return;
     applyDocumentShellChrome(pathname, theme);

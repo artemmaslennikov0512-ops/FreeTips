@@ -73,16 +73,16 @@ type CabinetNavGroup = { title: string; items: CabinetNavItem[] };
 
 const NAV_GROUPS: CabinetNavGroup[] = [
   {
-    title: "Обзор и работа",
+    title: "Обзор",
     items: [
       { label: "Дашборд", href: "/cabinet", icon: LayoutDashboard },
       { label: "Зал", href: "/cabinet/floor", icon: LayoutGrid, waiterFloorOnly: true },
-      { label: "Операции", href: "/cabinet/transactions", icon: List },
+      { label: "История операций", href: "/cabinet/transactions", icon: List },
       { label: "Моя ссылка", href: "/cabinet/link", icon: Link2 },
     ],
   },
   {
-    title: "Заведение",
+    title: "Моё заведение",
     items: [
       {
         label: "Подключиться к заведению",
@@ -99,13 +99,16 @@ const NAV_GROUPS: CabinetNavGroup[] = [
     ],
   },
   {
-    title: "Профиль и поддержка",
+    title: "Профиль",
     items: [
       { label: "Верификация", href: "/cabinet/verification", icon: ShieldCheck },
-      { label: "Поддержка", href: "/cabinet/support", icon: MessageCircle },
       { label: "Сессии", href: "/cabinet/sessions", icon: Laptop },
       { label: "Настройки профиля", href: "/cabinet/settings", icon: Settings },
     ],
+  },
+  {
+    title: "Поддержка",
+    items: [{ label: "Поддержка", href: "/cabinet/support", icon: MessageCircle }],
   },
 ];
 

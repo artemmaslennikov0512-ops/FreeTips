@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useMobileDarkChromeOverlay } from "@/lib/use-mobile-dark-chrome-overlay";
 
-/** Скролл body + Escape + тёмный Safari theme-color для простой шторки (не как `CabinetMobileNavPortals` с fixed body). */
+/** Скролл body + Escape + тёмный color-scheme при открытой шторке (не как `CabinetMobileNavPortals` с fixed body). */
 export function usePanelMobileSimpleDrawerEffects(open: boolean, onRequestClose: () => void): void {
   useMobileDarkChromeOverlay(open);
 

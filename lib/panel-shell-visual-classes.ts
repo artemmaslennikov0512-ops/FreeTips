@@ -15,9 +15,9 @@ const PANEL_NAV_WRAP_ROUNDED = "rounded-[10px]";
 /** Общая «коробка» навигации в сайдбаре (фон задаёт вариант). */
 const PANEL_NAV_WRAP_BASE = `flex flex-col gap-0 ${PANEL_NAV_WRAP_ROUNDED} ${PANEL_BORDER_GOLD_15} p-1.5 pb-2 shadow-[var(--shadow-subtle)]`;
 
-export const PANEL_NAV_WRAP_ADMIN = `${PANEL_NAV_WRAP_BASE} bg-white/5`;
-
 export const PANEL_NAV_WRAP_CABINET = `${PANEL_NAV_WRAP_BASE} bg-[var(--color-dark-gray)]/5`;
+
+export const PANEL_NAV_WRAP_ADMIN = PANEL_NAV_WRAP_CABINET;
 
 /** Линия под мобильной полоской (тема + меню) */
 export const PANEL_TOP_SHELL_GOLD_DIVIDER =
@@ -31,49 +31,46 @@ export const PANEL_MOBILE_BACK_DIVIDER = "shrink-0 border-b border-white/10 lg:h
 export const PANEL_SIDEBAR_NAV_LINK_ROW =
   "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[0.9375rem] font-normal transition-colors";
 
-export const PANEL_SIDEBAR_NAV_LINK_INACTIVE_ADMIN =
-  "border border-transparent text-white/80 hover:bg-[var(--color-dark-gray)]/10 hover:text-white";
-
 export const PANEL_SIDEBAR_NAV_LINK_INACTIVE_CABINET =
   "border border-transparent text-[var(--color-text)]/80 hover:bg-[var(--color-dark-gray)]/10 hover:text-[var(--color-text)]";
 
-export const PANEL_SIDEBAR_NAV_GROUP_TITLE_ADMIN =
-  "px-2.5 pb-1.5 pt-0.5 text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-white/40";
-
-export const PANEL_SIDEBAR_NAV_GROUP_SEPARATOR_ADMIN =
-  "mt-3 border-t border-white/[0.08] pt-3 first:mt-0 first:border-t-0 first:pt-0";
+export const PANEL_SIDEBAR_NAV_LINK_INACTIVE_ADMIN = PANEL_SIDEBAR_NAV_LINK_INACTIVE_CABINET;
 
 export const PANEL_SIDEBAR_NAV_GROUP_SEPARATOR_CABINET =
   "mt-3 border-t border-[var(--color-brand-gold)]/12 pt-3 first:mt-0 first:border-t-0 first:pt-2";
 
+export const PANEL_SIDEBAR_NAV_GROUP_SEPARATOR_ADMIN = PANEL_SIDEBAR_NAV_GROUP_SEPARATOR_CABINET;
+
+export const PANEL_SIDEBAR_NAV_GROUP_TITLE_ADMIN =
+  "px-2.5 pb-1.5 pt-0.5 text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-[var(--color-text)]/45";
+
 export const PANEL_SIDEBAR_NAV_ICON = "cabinet-nav-item-icon h-[18px] w-[18px] shrink-0";
 
-export const PANEL_SIDEBAR_NAV_ACTIVE_ADMIN =
-  "cabinet-nav-active border border-[#0a192f]/25 bg-[#0a192f]/10 text-[#0a192f] font-medium";
+export const PANEL_SIDEBAR_NAV_ACTIVE_ADMIN = "cabinet-nav-active border font-medium";
 
 /** Кнопка «Выйти» в сайдбаре заведения (моб.) */
 export const PANEL_ESTABLISHMENT_SIDEBAR_LOGOUT =
-  "establishment-sidebar-logout mt-3 shrink-0 flex w-full items-center justify-center gap-2 rounded-md px-2 py-2 text-[0.8125rem] font-medium text-white/80 transition-colors hover:bg-[var(--color-dark-gray)]/10 hover:text-white";
+  "establishment-sidebar-logout mt-3 shrink-0 flex w-full items-center justify-center gap-2 rounded-md px-2 py-2 text-[0.8125rem] font-medium text-[var(--color-text)]/80 transition-colors hover:bg-[var(--color-dark-gray)]/10 hover:text-[var(--color-text)]";
 
 // --- Кабинет заведения: «Назад»
 
 export const PANEL_ESTABLISHMENT_BACK_BTN_BLOCK =
-  `inline-flex items-center gap-2 rounded-xl ${PANEL_BORDER_GOLD_40} bg-white/[0.08] px-3 py-2 text-sm font-medium text-white hover:bg-white/[0.12]`;
+  `inline-flex items-center gap-2 rounded-xl ${PANEL_BORDER_GOLD_40} bg-[var(--color-dark-gray)]/5 px-3 py-2 text-sm font-medium text-[var(--color-text)] hover:bg-[var(--color-dark-gray)]/10`;
 
 export const PANEL_ESTABLISHMENT_BACK_BTN_TOOLBAR =
-  `inline-flex h-11 min-h-[44px] shrink-0 items-center gap-1.5 rounded-xl ${PANEL_BORDER_GOLD_40} bg-white/[0.08] px-2.5 text-sm font-medium text-white hover:bg-white/[0.12] sm:px-3`;
+  `inline-flex h-11 min-h-[44px] shrink-0 items-center gap-1.5 rounded-xl ${PANEL_BORDER_GOLD_40} bg-[var(--color-dark-gray)]/5 px-2.5 text-sm font-medium text-[var(--color-text)] hover:bg-[var(--color-dark-gray)]/10 sm:px-3`;
 
 // --- Основная карточка контента (glass + скругление + сброс на max-lg где нужно)
 
 export const PANEL_APP_MAIN_SURFACE_ADMIN =
-  "admin-main-block cabinet-main-block app-panel-main-surface relative z-10 mt-0 mr-0 mb-3 ml-0 flex min-h-0 w-full min-w-0 max-w-full flex-1 flex-col rounded-lg border-x border-b border-white/10 bg-white/[0.06] backdrop-blur-xl md:rounded-[10px] lg:z-0 lg:mr-3 lg:ml-3 max-lg:mb-0 max-lg:ml-0 max-lg:mr-0 max-lg:rounded-none max-lg:border-0 max-lg:bg-transparent max-lg:shadow-none max-lg:backdrop-blur-none";
+  "admin-main-block cabinet-main-block app-panel-main-surface relative z-10 mt-0 mr-0 mb-3 ml-0 flex min-h-0 w-full min-w-0 max-w-full flex-1 flex-col rounded-lg border-x border-b border-white/10 backdrop-blur-xl md:rounded-[10px] lg:z-0 lg:mr-3 lg:ml-3 max-lg:mb-0 max-lg:ml-0 max-lg:mr-0 max-lg:rounded-none max-lg:border-0 max-lg:bg-transparent max-lg:shadow-none max-lg:backdrop-blur-none";
 
 /** Фон задаётся через style (бренд); класс без bg-white */
 export const PANEL_APP_MAIN_SURFACE_CABINET =
   "cabinet-main-block app-panel-main-surface relative z-10 mt-0 mr-0 mb-3 ml-0 flex min-h-0 w-full max-w-full flex-1 flex-col rounded-lg border-x border-b border-white/10 backdrop-blur-xl md:rounded-[10px] lg:z-0 lg:mr-3 lg:ml-3 max-lg:mb-0 max-lg:ml-0 max-lg:mr-0 max-lg:rounded-none max-lg:border-0 max-lg:bg-transparent max-lg:shadow-none max-lg:backdrop-blur-none";
 
 export const PANEL_APP_MAIN_SURFACE_ESTABLISHMENT =
-  "cabinet-main-block app-panel-main-surface relative z-10 mt-0 mr-0 mb-3 ml-0 flex min-h-0 flex-1 flex-col rounded-lg border-x border-b border-white/10 bg-white/[0.06] backdrop-blur-xl md:rounded-[10px] lg:z-0 lg:mr-0 lg:ml-3 lg:rounded-[10px]";
+  "cabinet-main-block app-panel-main-surface relative z-10 mt-0 mr-0 mb-3 ml-0 flex min-h-0 flex-1 flex-col rounded-lg border-x border-b border-white/10 backdrop-blur-xl md:rounded-[10px] lg:z-0 lg:mr-0 lg:ml-3 lg:rounded-[10px]";
 
 export const PANEL_MAIN_CONTENT_INNER_ADMIN_CABINET =
   "flex min-h-0 min-w-0 flex-1 flex-col overflow-x-hidden px-4 py-3 sm:px-6 md:py-6 lg:p-8";
@@ -85,33 +82,33 @@ export const PANEL_MAIN_CONTENT_INNER_ESTABLISHMENT =
 
 const PLAYFAIR = "font-[family:var(--font-playfair)]";
 
-/** Админка: h1 на стекле */
-export const PANEL_PAGE_TITLE_ADMIN = `${PLAYFAIR} text-xl font-semibold text-white sm:text-2xl`;
+/** Админка: h1 (светлая/тёмная тема — через --color-text) */
+export const PANEL_PAGE_TITLE_ADMIN = `${PLAYFAIR} text-xl font-semibold text-[var(--color-text)] sm:text-2xl`;
 
 export const PANEL_PAGE_TITLE_ADMIN_CENTERED = `text-center ${PANEL_PAGE_TITLE_ADMIN}`;
 
-export const PANEL_PAGE_TITLE_ADMIN_XL_CENTERED = `text-center ${PLAYFAIR} text-2xl font-semibold text-white`;
+export const PANEL_PAGE_TITLE_ADMIN_XL_CENTERED = `text-center ${PLAYFAIR} text-2xl font-semibold text-[var(--color-text)]`;
 
 export const PANEL_PAGE_TITLE_ADMIN_ON_DARK_CENTERED = `text-center ${PLAYFAIR} text-xl font-semibold text-[var(--color-on-dark)] sm:text-2xl`;
 
 /** Заведение: герой-заголовок раздела (тёмная зона) */
 export const PANEL_PAGE_TITLE_ESTABLISHMENT_HERO_ON_DARK = `cabinet-dashboard-name-hero ${PLAYFAIR} text-[var(--color-on-dark)]`;
 
-export const PANEL_PAGE_TITLE_ESTABLISHMENT_HERO_WHITE = `cabinet-dashboard-name-hero ${PLAYFAIR} text-white`;
+export const PANEL_PAGE_TITLE_ESTABLISHMENT_HERO_WHITE = `cabinet-dashboard-name-hero ${PLAYFAIR} text-[var(--color-text)]`;
 
-/** Заведение: компактный белый заголовок экрана */
-export const PANEL_PAGE_TITLE_ESTABLISHMENT_WHITE_LG = `${PLAYFAIR} text-lg font-semibold text-white text-center`;
+/** Заведение: компактный заголовок экрана */
+export const PANEL_PAGE_TITLE_ESTABLISHMENT_WHITE_LG = `${PLAYFAIR} text-lg font-semibold text-[var(--color-text)] text-center`;
 
-export const PANEL_PAGE_TITLE_ESTABLISHMENT_WHITE_LG_FLUSH = `${PLAYFAIR} text-lg font-semibold text-white`;
+export const PANEL_PAGE_TITLE_ESTABLISHMENT_WHITE_LG_FLUSH = `${PLAYFAIR} text-lg font-semibold text-[var(--color-text)]`;
 
-export const PANEL_PAGE_TITLE_ESTABLISHMENT_WHITE_LG_FLEX_ROW = `${PLAYFAIR} text-lg font-semibold text-white flex w-full items-center justify-center gap-2`;
+export const PANEL_PAGE_TITLE_ESTABLISHMENT_WHITE_LG_FLEX_ROW = `${PLAYFAIR} text-lg font-semibold text-[var(--color-text)] flex w-full items-center justify-center gap-2`;
 
 /** Подпись под компактным заголовком заведения (join / leave и т.п.) */
-export const PANEL_PAGE_SUBTITLE_ESTABLISHMENT_INTRO = "mt-1.5 text-xs leading-relaxed text-white/75";
+export const PANEL_PAGE_SUBTITLE_ESTABLISHMENT_INTRO = "mt-1.5 text-xs leading-relaxed text-[var(--color-text-secondary)]";
 
 /** Заголовок в шапке выезжающего сайдбара заведения */
 export const PANEL_ESTABLISHMENT_SIDEBAR_TITLE_LINE =
-  "inline-block font-[family:var(--font-playfair)] text-[1.0625rem] font-bold leading-tight text-white";
+  "inline-block font-[family:var(--font-playfair)] text-[1.0625rem] font-bold leading-tight text-[var(--color-text)]";
 
 /** ЛК: заголовок страницы */
 export const PANEL_PAGE_TITLE_CABINET = `${PLAYFAIR} text-xl font-semibold text-[var(--color-text)] sm:text-2xl`;
@@ -144,11 +141,11 @@ export const PANEL_SECTION_CARD_FORM_SPACE = "cabinet-section-header space-y-4 r
 export const PANEL_ADMIN_ESTABLISHMENTS_TABLE_WRAP =
   "admin-establishments-table cabinet-section-header max-lg:hidden overflow-x-auto rounded-xl border-0";
 
-/** Подзаголовок под h1 на стекле админки */
-export const PANEL_PAGE_SUBTITLE_ADMIN_MUTED = "max-w-lg text-sm text-white/75";
+/** Подзаголовок под h1 в админке */
+export const PANEL_PAGE_SUBTITLE_ADMIN_MUTED = "max-w-lg text-sm text-[var(--color-text-secondary)]";
 
 export const PANEL_SECTION_CARD_ROUNDED_XL_EMPTY_WHITE =
-  "cabinet-section-header rounded-xl border-0 px-6 py-8 text-center text-white/90";
+  "cabinet-section-header rounded-xl border-0 px-6 py-8 text-center text-[var(--color-text-secondary)]";
 
 export const PANEL_SECTION_TABLE_DESKTOP_WRAP = "cabinet-section-header max-lg:hidden overflow-x-auto rounded-xl border-0";
 

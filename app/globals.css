@@ -1913,20 +1913,14 @@ html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-compe
 }
 html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-nav-dropdown .cabinet-sidebar-profile {
   color: #0a192f !important;
-  background: #ffffff !important;
-  border: none !important;
-  box-shadow:
-    0 1px 2px rgba(10, 25, 47, 0.05),
-    0 10px 32px rgba(10, 25, 47, 0.08),
-    0 2px 8px rgba(10, 25, 47, 0.04);
+  background: var(--cabinet-block-bg, #f0ebe3) !important;
+  border: 1px solid rgba(197, 165, 114, 0.55) !important;
+  box-shadow: var(--shadow-subtle);
 }
 html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-nav-dropdown nav {
-  background: #ffffff !important;
-  border: none !important;
-  box-shadow:
-    0 1px 2px rgba(10, 25, 47, 0.05),
-    0 10px 32px rgba(10, 25, 47, 0.08),
-    0 2px 8px rgba(10, 25, 47, 0.04) !important;
+  background: var(--cabinet-block-bg, #f0ebe3) !important;
+  border: 1px solid rgba(197, 165, 114, 0.55) !important;
+  box-shadow: var(--shadow-subtle) !important;
 }
 
 /* Тёмная тема: мобильное меню — как сайдбар */
@@ -2026,12 +2020,9 @@ html:not([data-theme="dark"]) .cabinet-mobile-nav-dialog:not([data-cabinet-theme
   box-shadow: 0 1px 2px rgba(10, 25, 47, 0.05), 0 12px 40px rgba(10, 25, 47, 0.1) !important;
 }
 html:not([data-theme="dark"]) .cabinet-mobile-nav-dialog:not([data-cabinet-theme="m5-competition"]) .cabinet-sidebar-profile {
-  background: #ffffff !important;
-  border: none !important;
-  box-shadow:
-    0 1px 2px rgba(10, 25, 47, 0.05),
-    0 10px 32px rgba(10, 25, 47, 0.08),
-    0 2px 8px rgba(10, 25, 47, 0.04);
+  background: var(--cabinet-block-bg, #f0ebe3) !important;
+  border: 1px solid rgba(197, 165, 114, 0.55) !important;
+  box-shadow: var(--shadow-subtle);
   color: #0a192f !important;
 }
 html:not([data-theme="dark"]) .cabinet-mobile-nav-dialog:not([data-cabinet-theme="m5-competition"]) .cabinet-nav-label {
@@ -2039,12 +2030,9 @@ html:not([data-theme="dark"]) .cabinet-mobile-nav-dialog:not([data-cabinet-theme
 }
 html:not([data-theme="dark"]) .cabinet-mobile-nav-dialog:not([data-cabinet-theme="m5-competition"]) nav,
 html:not([data-theme="dark"]) .cabinet-mobile-nav-dialog:not([data-cabinet-theme="m5-competition"]) .cabinet-mobile-nav-dialog__nav {
-  background: #ffffff !important;
-  border: none !important;
-  box-shadow:
-    0 1px 2px rgba(10, 25, 47, 0.05),
-    0 10px 32px rgba(10, 25, 47, 0.08),
-    0 2px 8px rgba(10, 25, 47, 0.04) !important;
+  background: var(--cabinet-block-bg, #f0ebe3) !important;
+  border: 1px solid rgba(197, 165, 114, 0.55) !important;
+  box-shadow: var(--shadow-subtle) !important;
 }
 html:not([data-theme="dark"]) .cabinet-mobile-nav-dialog:not([data-cabinet-theme="m5-competition"]) a,
 html:not([data-theme="dark"]) .cabinet-mobile-nav-dialog:not([data-cabinet-theme="m5-competition"]) button {
@@ -2210,21 +2198,20 @@ html:not([data-theme="dark"]) .admin-mobile-nav-dialog .cabinet-nav-active {
   box-shadow: none !important;
 }
 
-/* Блок навигации в сайдбаре — светлая тема: тот же белый + тень, что у карточек (без бежевого «колодца») */
+/* Блок навигации в сайдбаре — светлая тема: как плитки «Быстрые действия» на дашборде */
 html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-sidebar:not(.admin-sidebar) .cabinet-nav-block nav {
-  background: #ffffff !important;
-  border: none !important;
-  box-shadow:
-    0 1px 2px rgba(10, 25, 47, 0.05),
-    0 10px 32px rgba(10, 25, 47, 0.08),
-    0 2px 8px rgba(10, 25, 47, 0.04);
+  background: var(--cabinet-block-bg, #f0ebe3) !important;
+  border: 1px solid rgba(197, 165, 114, 0.55) !important;
+  box-shadow: var(--shadow-subtle);
 }
 html:not([data-theme="dark"])
   .cabinet-premium[data-brand-active]:not([data-cabinet-theme="m5-competition"])
   .cabinet-sidebar:not(.admin-sidebar)
   .cabinet-nav-block
   nav {
-  background: var(--color-bg-sides, #ffffff) !important;
+  background: var(--cabinet-block-bg, #f0ebe3) !important;
+  border: 1px solid var(--cabinet-border-color, rgba(197, 165, 114, 0.55)) !important;
+  box-shadow: var(--shadow-subtle);
 }
 html:not([data-theme="dark"]) .admin-panel .admin-sidebar .cabinet-nav-block nav {
   background: rgba(255, 255, 255, 0.15) !important;
@@ -2333,19 +2320,18 @@ html:not([data-theme="dark"]) .admin-panel .admin-sidebar .cabinet-sidebar-profi
   color: #fff !important;
 }
 
-/* Светлая тема: блок профиля в сайдбаре — как белые карточки контента */
+/* Светлая тема: блок профиля — как плитки «Быстрые действия» (cabinet-block-inner + золотая рамка + shadow-subtle) */
 html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-sidebar-profile {
-  background: #ffffff !important;
-  border: none !important;
-  box-shadow:
-    0 1px 2px rgba(10, 25, 47, 0.05),
-    0 10px 32px rgba(10, 25, 47, 0.08),
-    0 2px 8px rgba(10, 25, 47, 0.04);
+  background: var(--cabinet-block-bg, #f0ebe3) !important;
+  border: 1px solid rgba(197, 165, 114, 0.55) !important;
+  box-shadow: var(--shadow-subtle);
 }
 html:not([data-theme="dark"])
   .cabinet-premium[data-brand-active]:not([data-cabinet-theme="m5-competition"])
   .cabinet-sidebar-profile {
-  background: var(--color-bg-sides, #ffffff) !important;
+  background: var(--cabinet-block-bg, #f0ebe3) !important;
+  border: 1px solid var(--cabinet-border-color, rgba(197, 165, 114, 0.55)) !important;
+  box-shadow: var(--shadow-subtle);
 }
 html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-sidebar-avatar {
   background: var(--color-brand-gold) !important;
@@ -5346,12 +5332,9 @@ html:not([data-theme="dark"]) body.establishment-page .establishment-panel .esta
   color: #0a192f !important;
 }
 html:not([data-theme="dark"]) body.establishment-page .establishment-panel .establishment-mobile-sidebar nav {
-  background: #ffffff !important;
-  border: none !important;
-  box-shadow:
-    0 1px 2px rgba(10, 25, 47, 0.05),
-    0 10px 32px rgba(10, 25, 47, 0.08),
-    0 2px 8px rgba(10, 25, 47, 0.04);
+  background: var(--cabinet-block-bg, #f0ebe3) !important;
+  border: 1px solid rgba(197, 165, 114, 0.55) !important;
+  box-shadow: var(--shadow-subtle);
 }
 html:not([data-theme="dark"]) body.establishment-page .establishment-panel .establishment-mobile-sidebar nav [role="group"] {
   border-color: rgba(10, 25, 47, 0.1) !important;

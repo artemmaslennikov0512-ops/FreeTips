@@ -166,15 +166,20 @@ html:not([data-theme="dark"])
   --color-muted: #64748b;
 }
 
-/* Моб. полоска ЛК / админка: светлая тема — чуть светлее фона страницы + тень вниз (отделение от контента) */
+/* Моб. полоска ЛК / заведение: светлая тема — чуть светлее фона страницы + тень вниз (отделение от контента) */
 html:not([data-theme="dark"]) body.cabinet-page .cabinet-mobile-top-shell,
-html:not([data-theme="dark"]) body.establishment-page .cabinet-mobile-top-shell,
-html:not([data-theme="dark"]) body.admin-page .cabinet-mobile-top-shell {
+html:not([data-theme="dark"]) body.establishment-page .cabinet-mobile-top-shell {
   color: var(--color-navy);
   background: var(--cabinet-chrome-elevated-bg, #faf8f5);
   box-shadow:
     0 6px 24px rgba(10, 25, 47, 0.08),
     0 1px 0 rgba(197, 165, 114, 0.35);
+}
+/* Админка: фон полоски = фону страницы, без отдельной «шапки» светлее контента */
+html:not([data-theme="dark"]) body.admin-page .cabinet-mobile-top-shell {
+  color: var(--color-navy);
+  background: var(--color-bg, #f4f1eb);
+  box-shadow: 0 1px 0 rgba(197, 165, 114, 0.28);
 }
 html:not([data-theme="dark"]) body.cabinet-page .cabinet-mobile-top-shell .theme-toggle-btn,
 html:not([data-theme="dark"]) body.establishment-page .cabinet-mobile-top-shell .theme-toggle-btn,
@@ -203,6 +208,28 @@ html:not([data-theme="dark"]) body.admin-page .cabinet-mobile-top-shell .cabinet
   border-color: rgba(197, 165, 114, 0.55) !important;
   background: rgba(255, 255, 255, 0.95) !important;
   box-shadow: 0 2px 8px rgba(10, 25, 47, 0.08), 0 1px 2px rgba(10, 25, 47, 0.05);
+}
+/* Админка: круг и золото как в ЛК — глобальные .cabinet-waiter-btn не цепляются (см. :not(.admin-panel) ниже), белый фон выше перебиваем */
+html:not([data-theme="dark"]) body.admin-page .cabinet-mobile-top-shell .cabinet-menu-btn.cabinet-waiter-btn {
+  border-radius: 9999px !important;
+  border: 1px solid rgba(197, 165, 114, 0.55) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: #c5a572 !important;
+  -webkit-text-fill-color: #c5a572;
+}
+[data-theme="dark"] body.admin-page .cabinet-mobile-top-shell {
+  background: #0d0e12;
+  color: rgba(250, 250, 250, 0.92);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+[data-theme="dark"] body.admin-page .cabinet-mobile-top-shell .cabinet-menu-btn.cabinet-waiter-btn {
+  border-radius: 9999px !important;
+  border: 1px solid rgba(197, 165, 114, 0.45) !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+  box-shadow: none !important;
+  color: #c5a572 !important;
+  -webkit-text-fill-color: #c5a572;
 }
 
 html:not([data-theme="dark"]) body.cabinet-page .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-mobile-top-shell {
@@ -2272,9 +2299,9 @@ html:not([data-theme="dark"]) .admin-mobile-nav-dialog [role="group"] {
   color: #fafafa !important;
 }
 [data-theme="dark"] .admin-mobile-nav-dialog .cabinet-nav-active {
-  border-color: rgba(255, 255, 255, 0.25) !important;
-  background: rgba(255, 255, 255, 0.12) !important;
-  color: #fafafa !important;
+  border-color: rgba(197, 165, 114, 0.45) !important;
+  background: rgba(197, 165, 114, 0.12) !important;
+  color: rgba(250, 250, 250, 0.98) !important;
 }
 [data-theme="dark"] .admin-mobile-nav-dialog nav {
   background: rgba(0, 0, 0, 0.25) !important;
@@ -2817,13 +2844,13 @@ body.establishment-page .establishment-panel.cabinet-premium {
   }
 }
 
-/* Светлая тема: шапка ЛК официанта, заведения и админки — одна приподнятая плита */
+/* Светлая тема: шапка ЛК — тот же elevated фон/обводка/тень, что сайдбар и main lg */
 html:not([data-theme="dark"]) body.cabinet-page:not(.admin-page) .site-header,
 html:not([data-theme="dark"]) body.establishment-page .site-header,
 html:not([data-theme="dark"]) body.admin-page .site-header {
   background: var(--cabinet-chrome-elevated-bg, #faf8f5) !important;
   border: 1px solid var(--cabinet-chrome-border, rgba(197, 165, 114, 0.45));
-  box-shadow: var(--cabinet-chrome-shadow);
+  box-shadow: var(--cabinet-chrome-shadow-strong);
   color: #0a192f;
 }
 html:not([data-theme="dark"]) body.cabinet-page:not(.admin-page) .site-header .site-header-logo-text,
@@ -2987,7 +3014,7 @@ html:not([data-theme="dark"]) body.establishment-page .establishment-panel.cabin
     background: var(--cabinet-chrome-elevated-bg, #faf8f5) !important;
     border: 1px solid var(--cabinet-chrome-border, rgba(197, 165, 114, 0.45)) !important;
     border-radius: 10px !important;
-    box-shadow: var(--cabinet-chrome-shadow) !important;
+    box-shadow: var(--cabinet-chrome-shadow-strong) !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
   }
@@ -2996,7 +3023,7 @@ html:not([data-theme="dark"]) body.establishment-page .establishment-panel.cabin
     background: var(--cabinet-chrome-elevated-bg, #faf8f5) !important;
     border: 1px solid var(--cabinet-chrome-border, rgba(197, 165, 114, 0.45)) !important;
     border-radius: 10px !important;
-    box-shadow: var(--cabinet-chrome-shadow) !important;
+    box-shadow: var(--cabinet-chrome-shadow-strong) !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
   }
@@ -5554,6 +5581,12 @@ html:not([data-theme="dark"]) body.admin-page .admin-panel .admin-sidebar .cabin
   background: rgba(197, 165, 114, 0.14) !important;
   color: #0a192f !important;
 }
+/* Тёмная тема: активный пункт сайдбара админки — тот же золотистый wash, что у ЛК (без :not(.admin-sidebar) в общем блоке выше) */
+[data-theme="dark"] body.admin-page .admin-panel .admin-sidebar .cabinet-nav-active {
+  border-color: rgba(197, 165, 114, 0.45) !important;
+  background: rgba(197, 165, 114, 0.12) !important;
+  color: rgba(250, 250, 250, 0.98) !important;
+}
 html:not([data-theme="dark"]) body.admin-page .admin-panel .admin-sidebar .cabinet-nav-group-title,
 html:not([data-theme="dark"]) body.admin-page .admin-panel .admin-sidebar [role="group"] > div:first-child {
   color: #64748b !important;
@@ -6113,6 +6146,44 @@ html:not([data-theme="dark"]) body.admin-page .admin-panel .admin-btn--neutral:h
   outline-offset: 2px;
 }
 
+/* Админка: те же капсулы .cabinet-waiter-btn, что в ЛК (корень — .admin-panel.cabinet-premium, не подходит :not(.admin-panel) выше) */
+.admin-panel.cabinet-premium .cabinet-waiter-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3125rem;
+  box-sizing: border-box;
+  border-radius: 9999px;
+  border: 1px solid rgba(197, 165, 114, 0.55);
+  background: transparent;
+  color: #c5a572 !important;
+  -webkit-text-fill-color: #c5a572;
+  font-weight: 500;
+  font-size: 0.8125rem;
+  line-height: 1.25;
+  padding: 0.4375rem 0.875rem;
+  font-family: var(--font-inter, system-ui, sans-serif);
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    opacity 0.15s ease,
+    color 0.15s ease;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.admin-panel.cabinet-premium .cabinet-waiter-btn:hover:not(:disabled) {
+  background: rgba(197, 165, 114, 0.12);
+}
+.admin-panel.cabinet-premium .cabinet-waiter-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+.admin-panel.cabinet-premium .cabinet-waiter-btn:focus-visible {
+  outline: 2px solid rgba(197, 165, 114, 0.45);
+  outline-offset: 2px;
+}
+
 /* Поле поиска в админке «Пользователи»: в тёмной теме сайта — белый ввод */
 .admin-panel .admin-users-search-input {
   color: #ffffff !important;
@@ -6336,6 +6407,29 @@ html:not([data-theme="dark"]) .admin-panel .fraud-signals-panel .admin-fraud-sig
 html:not([data-theme="dark"]) body.admin-page .admin-panel .fraud-signals-panel .fraud-signals-panel-meta strong,
 html:not([data-theme="dark"]) body.admin-page .admin-panel .fraud-signals-panel .fraud-signals-panel-meta .fraud-signals-panel-meta-num {
   color: #0a192f !important;
+}
+/* Светлая тема: заголовок и мета панели сигналов — тёплая плита antifraud-inner, не белый кегль */
+html:not([data-theme="dark"]) body.admin-page .admin-panel .fraud-signals-panel .fraud-signals-panel-title {
+  color: #0a192f !important;
+}
+html:not([data-theme="dark"]) body.admin-page .admin-panel .fraud-signals-panel .fraud-signals-panel-meta {
+  color: #64748b !important;
+}
+/* Светлая тема: уведомления 2FA (ЛК, заведение, админка) — тёмный кегль на пастельных плашках */
+html:not([data-theme="dark"]) body.cabinet-page:not(.admin-page) .profile-totp-flash--ok,
+html:not([data-theme="dark"]) body.establishment-page .profile-totp-flash--ok,
+html:not([data-theme="dark"]) body.admin-page .admin-panel #main-content .profile-totp-flash--ok {
+  color: #065f46 !important;
+}
+html:not([data-theme="dark"]) body.cabinet-page:not(.admin-page) .profile-totp-flash--err,
+html:not([data-theme="dark"]) body.establishment-page .profile-totp-flash--err,
+html:not([data-theme="dark"]) body.admin-page .admin-panel #main-content .profile-totp-flash--err {
+  color: #991b1b !important;
+}
+html:not([data-theme="dark"]) body.cabinet-page:not(.admin-page) .profile-totp-pending,
+html:not([data-theme="dark"]) body.establishment-page .profile-totp-pending,
+html:not([data-theme="dark"]) body.admin-page .admin-panel #main-content .profile-totp-pending {
+  color: #b45309 !important;
 }
 html:not([data-theme="dark"]) body.admin-page .admin-panel .fraud-signals-panel .admin-fraud-signals-table-wrap {
   background: rgba(10, 25, 47, 0.04) !important;

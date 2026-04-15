@@ -61,6 +61,37 @@ export function ProfileTotpSection({
     void refreshProfile();
   }, [refreshProfile]);
 
+  // #region agent log
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (!message && !error) return;
+    const id = window.requestAnimationFrame(() => {
+      const okEl = document.querySelector(".profile-totp-flash--ok");
+      const errEl = document.querySelector(".profile-totp-flash--err");
+      const target = okEl ?? errEl;
+      const flashColor = target ? getComputedStyle(target as Element).color : null;
+      fetch("http://127.0.0.1:7890/ingest/cd2a2298-7657-41e9-9b5d-ade1447c8041", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "59f249" },
+        body: JSON.stringify({
+          sessionId: "59f249",
+          location: "ProfileTotpSection.tsx:flash",
+          message: "totp flash computed color",
+          data: {
+            hypothesisId: "H2",
+            variant,
+            theme: document.documentElement.getAttribute("data-theme"),
+            flashColor,
+            kind: okEl ? "ok" : errEl ? "err" : "none",
+          },
+          timestamp: Date.now(),
+        }),
+      }).catch(() => {});
+    });
+    return () => window.cancelAnimationFrame(id);
+  }, [message, error, variant]);
+  // #endregion
+
   const v = variantStyles(variant);
 
   const startSetup = async () => {
@@ -205,12 +236,12 @@ export function ProfileTotpSection({
       )}
 
       {message && (
-        <div className={v.msgOk} role="status">
+        <div className={`${v.msgOk} profile-totp-flash profile-totp-flash--ok`} role="status">
           {message}
         </div>
       )}
       {error && (
-        <div className={v.msgErr} role="alert">
+        <div className={`${v.msgErr} profile-totp-flash profile-totp-flash--err`} role="alert">
           {error}
         </div>
       )}
@@ -269,7 +300,11 @@ export function ProfileTotpSection({
           </div>
         ) : (
           <div className={formStackClass}>
-            {pending && !showQr && <p className={v.textPending}>Настройка начата, но не завершена. Нажмите «Новый QR» или отмените.</p>}
+            {pending && !showQr && (
+              <p className={`${v.textPending} profile-totp-pending`}>
+                Настройка начата, но не завершена. Нажмите «Новый QR» или отмените.
+              </p>
+            )}
             {showQr && (
               <div className="flex flex-col items-center gap-3">
                 <div className="rounded-lg bg-white p-2">
@@ -352,7 +387,7 @@ function totpDisableButtonClass(variant: ProfileTotpVariant): string {
   if (variant === "establishment") {
     return "w-full rounded-xl bg-[var(--color-brand-gold)] px-4 py-2.5 font-medium text-[#0a192f] hover:opacity-90 disabled:opacity-50";
   }
-  return "mx-auto flex w-full max-w-md items-center justify-center rounded-full border-2 border-red-400/75 bg-red-600 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-red-500 disabled:cursor-not-allowed disabled:opacity-50";
+  return "mx-auto flex w-full max-w-md items-center justify-center rounded-full border-2 border-red-400/75 bg-red-600 py-2.5 text-sm font-semibold text-[#ffffff] shadow-sm transition-colors hover:bg-red-500 disabled:cursor-not-allowed disabled:opacity-50";
 }
 
 function totpPrimaryFlexClass(variant: ProfileTotpVariant): string {

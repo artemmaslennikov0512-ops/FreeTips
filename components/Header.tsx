@@ -311,22 +311,24 @@ export function Header() {
             <button
               type="button"
               onClick={handleLogout}
-              className={`site-header-logout-btn min-h-[44px] inline-flex w-max max-w-full shrink-0 items-center justify-center gap-2 rounded-xl bg-[var(--color-brand-gold)] px-4 py-2.5 text-[12px] font-semibold text-[#0a192f] hover:opacity-90 hover:-translate-y-0.5 transition-all shadow-[var(--shadow-subtle)]${isCabinetM5Header ? " site-header-m5-logout" : ""}`}
+              className="site-header-logout-btn min-h-[44px] inline-flex w-max max-w-full shrink-0 items-center justify-center gap-2 rounded-xl bg-[var(--color-brand-gold)] px-4 py-2.5 text-[12px] font-semibold text-[#0a192f] hover:opacity-90 hover:-translate-y-0.5 transition-all shadow-[var(--shadow-subtle)]"
             >
               <LogOut className="h-3.5 w-3.5 shrink-0" />
               <span className="whitespace-nowrap">Выйти</span>
             </button>
           ) : (
             <>
-              <Link
-                href={site.register.href}
-                className="site-header-register min-h-[44px] inline-flex items-center justify-center rounded-xl border-0 px-4 py-2.5 text-[14px] font-semibold text-[var(--color-navy)] hover:opacity-90 transition-all"
-              >
-                {site.register.label}
-              </Link>
+              {!hideMobileSiteNav && (
+                <Link
+                  href={site.register.href}
+                  className="site-header-register min-h-[44px] inline-flex items-center justify-center rounded-xl border-0 px-4 py-2.5 text-[14px] font-semibold text-[var(--color-navy)] hover:opacity-90 transition-all"
+                >
+                  {site.register.label}
+                </Link>
+              )}
               <Link
                 href={site.cta.href}
-                className="site-header-cta min-h-[44px] inline-flex items-center justify-center rounded-xl bg-[var(--color-navy)] px-4 py-2.5 text-[14px] font-semibold text-[var(--color-white)] hover:opacity-90 hover:-translate-y-0.5 transition-all shadow-[var(--shadow-subtle)]"
+                className="site-header-cta min-h-[44px] inline-flex items-center justify-center rounded-xl bg-[#0a192f] px-4 py-2.5 text-[14px] font-semibold text-white hover:opacity-90 hover:-translate-y-0.5 transition-all shadow-[var(--shadow-subtle)]"
               >
                 {site.cta.label}
               </Link>
@@ -422,20 +424,22 @@ export function Header() {
                     <button
                       type="button"
                       onClick={handleLogout}
-                      className="w-full flex items-center justify-center gap-2 rounded-xl bg-white/10 px-4 py-3 text-[14px] font-semibold text-white hover:bg-white/20 transition-all"
+                      className="w-full flex items-center justify-center gap-2 rounded-xl bg-[var(--color-brand-gold)] px-4 py-3 text-[14px] font-semibold text-[#0a192f] hover:opacity-90 transition-all"
                     >
                       <LogOut className="h-3.5 w-3.5" />
                       Выйти
                     </button>
                   ) : (
                     <>
-                      <Link
-                        href={site.register.href}
-                        onClick={close}
-                        className="block rounded-xl border-0 px-4 py-3 text-center text-[14px] font-semibold text-white hover:bg-white/10 transition-all"
-                      >
-                        {site.register.label}
-                      </Link>
+                      {!hideMobileSiteNav && (
+                        <Link
+                          href={site.register.href}
+                          onClick={close}
+                          className="block rounded-xl border-0 px-4 py-3 text-center text-[14px] font-semibold text-white hover:bg-white/10 transition-all"
+                        >
+                          {site.register.label}
+                        </Link>
+                      )}
                       <Link
                         href={site.cta.href}
                         onClick={close}

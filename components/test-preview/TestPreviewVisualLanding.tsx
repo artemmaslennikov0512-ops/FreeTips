@@ -207,8 +207,8 @@ export function TestPreviewVisualLanding() {
                 </label>
                 <textarea id="tpa-demo-msg" className="tpa-textarea" rows={3} placeholder="Необязательно" />
               </div>
-              <label className="tpa-check">
-                <input type="checkbox" defaultChecked />
+              <label className="tpa-check" htmlFor="tpa-demo-consent">
+                <input id="tpa-demo-consent" name="demoConsent" type="checkbox" defaultChecked />
                 <span>Согласен с обработкой данных (макет поля)</span>
               </label>
               <div className="flex flex-wrap gap-3 pt-2">

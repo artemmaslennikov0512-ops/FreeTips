@@ -15,6 +15,7 @@
 - **Доменные хелперы:** `lib/balance.ts`, `lib/payout-limits.ts`, `lib/validations.ts`, `lib/payment/paygine-fee.ts`.
 - **Конфиг:** `lib/config.ts` — единая точка входа с Zod-валидацией env (NODE_ENV, DATABASE_URL, JWT_*, PAYGINE_*, REDIS_URL, NEXT_PUBLIC_APP_URL).
 - **Безопасность:** `lib/security/csrf.ts`, `lib/auth/`, `lib/middleware/auth.ts`, `lib/api-key-auth.ts`, `lib/auth-or-api-key.ts`.
+- **Сборка:** локально и в Docker единый вход `npm run build` (`prisma generate` + `next build --webpack`); CI в `.github/workflows/ci.yml` — две стадии (`ci:checks` без БД, затем сборка и тесты с Postgres). См. README, раздел «Сборка и проверки».
 - **Презентационные константы (без I/O):** длинные цепочки Tailwind для панелей и оплаты вынесены в `lib/panel-shell-visual-classes.ts`, `lib/panel-mobile-ui.ts`, `lib/pay-ui-classes.ts`; маркетинговый лендинг — `lib/landing-ui-classes.ts` (контейнер секций, декоративная сетка, типовые отступы); пользовательские короткие тексты ошибок — в `lib/copy/` (например `client-facing-messages.ts`). Их не смешивать с Prisma, платежами и env.
 
 ### 1.2 Потоки

@@ -617,12 +617,15 @@ export default function PayPageClient() {
               <p className="pay-page-label">Выберите сумму или введите свою (не больше 1 000 ₽)</p>
               <div className="pay-page-input-wrap custom-amount pay-page-custom-amount-row">
                 <input
+                  id="pay-custom-amount-rub"
+                  name="customAmountRub"
                   type="text"
                   inputMode="decimal"
                   placeholder="100"
                   value={customAmount}
                   onChange={(e) => setCustomAmount(e.target.value)}
                   disabled={!acceptPayments}
+                  autoComplete="off"
                   aria-label="Своя сумма в рублях, не больше 1 000"
                 />
               </div>
@@ -639,6 +642,8 @@ export default function PayPageClient() {
           <p className="pay-page-section-title">Отзыв (необязательно)</p>
           <div className="pay-page-input-wrap">
             <textarea
+              id="pay-review-comment"
+              name="reviewComment"
               className="review-textarea"
               rows={2}
               value={comment}
@@ -646,6 +651,7 @@ export default function PayPageClient() {
               maxLength={500}
               disabled={!acceptPayments}
               placeholder="Спасибо за отличный сервис!"
+              autoComplete="off"
               aria-label="Отзыв"
             />
           </div>

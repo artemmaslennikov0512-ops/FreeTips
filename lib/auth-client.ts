@@ -24,8 +24,50 @@ function withDeviceClientHeader(headers: Record<string, string>): Record<string,
 
 function withCsrfForMutating(method: string, headers: Record<string, string>): Record<string, string> {
   const m = (method || "GET").toUpperCase();
-  if (m === "GET" || m === "HEAD") return headers;
+  if (m === "GET" || m === "HEAD" || m === "OPTIONS") return headers;
   return { ...getCsrfHeader(), ...headers };
+}
+
+const JSON_MEDIA_TYPE = "application/json";
+
+/**
+ * В proxy.ts для POST/PUT/… без Bearer проверяется CSRF и `Content-Type: application/json`.
+ * Cookie-сессия: подставляем JSON и пустое тело `{}`, если клиент не передал тело (heartbeat, TOTP start и т.д.).
+ * FormData / multipart не трогаем.
+ */
+function mergeInitForProxyJsonRule(
+  method: string,
+  init: RequestInit | undefined,
+  headersRecord: Record<string, string>,
+): RequestInit {
+  const m = (method || "GET").toUpperCase();
+  if (m === "GET" || m === "HEAD" || m === "OPTIONS") {
+    return { ...init, method, headers: headersRecord };
+  }
+  if (getAccessToken()) {
+    return { ...init, method, headers: headersRecord };
+  }
+  const body = init?.body;
+  if (body instanceof FormData) {
+    return { ...init, method, headers: headersRecord };
+  }
+  const h = new Headers(headersRecord as HeadersInit);
+  const ct = h.get("Content-Type") ?? h.get("content-type");
+  if (ct?.toLowerCase().includes("multipart/")) {
+    return { ...init, method, headers: headersRecord };
+  }
+  if (!ct?.toLowerCase().startsWith(JSON_MEDIA_TYPE)) {
+    h.set("Content-Type", JSON_MEDIA_TYPE);
+  }
+  const outHeaders: Record<string, string> = {};
+  h.forEach((v, k) => {
+    outHeaders[k] = v;
+  });
+  const next: RequestInit = { ...init, method, headers: outHeaders };
+  if (body === undefined) {
+    next.body = "{}";
+  }
+  return next;
 }
 
 /** Обновление access+refresh по httpOnly refresh-cookie; требует CSRF (см. POST /api/auth/refresh). */
@@ -118,17 +160,23 @@ export async function proactiveRefreshAccessToken(): Promise<boolean> {
  */
 export async function fetchWithAuth(url: string, init?: RequestInit): Promise<Response> {
   const method = init?.method ?? "GET";
-  const baseHeaders = withDeviceClientHeader({
-    ...authHeaders(),
-    ...(init?.headers as Record<string, string> | undefined),
-  });
-  const headersWithCsrf = withCsrfForMutating(method, baseHeaders);
-  let res = await fetch(url, {
-    ...init,
-    method,
-    credentials: init?.credentials ?? "include",
-    headers: headersWithCsrf,
-  });
+  const runFetch = () => {
+    const headersWithCsrf = withCsrfForMutating(
+      method,
+      withDeviceClientHeader({
+        ...authHeaders(),
+        ...(init?.headers as Record<string, string> | undefined),
+      }),
+    );
+    const merged = mergeInitForProxyJsonRule(method, init, headersWithCsrf);
+    return fetch(url, {
+      ...init,
+      ...merged,
+      credentials: init?.credentials ?? "include",
+    });
+  };
+
+  let res = await runFetch();
   if (res.status === 401) {
     if (typeof window !== "undefined" && isCabinetImpersonating()) {
       const { returnPath } = drainImpersonationState();
@@ -137,15 +185,7 @@ export async function fetchWithAuth(url: string, init?: RequestInit): Promise<Re
     }
     const refreshRes = await postSessionRefresh();
     if (refreshRes.ok) {
-      res = await fetch(url, {
-        ...init,
-        method,
-        credentials: init?.credentials ?? "include",
-        headers: withCsrfForMutating(method, withDeviceClientHeader({
-          ...authHeaders(),
-          ...(init?.headers as Record<string, string> | undefined),
-        })),
-      });
+      res = await runFetch();
     }
   }
   return res;

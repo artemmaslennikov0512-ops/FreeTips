@@ -12,6 +12,24 @@
 
 См. [STACK.md](./STACK.md).
 
+## Сборка и проверки
+
+| Команда | Назначение |
+|---------|------------|
+| `npm run lint` | ESLint по проекту |
+| `npm run typecheck` | `tsc --noEmit` без сборки Next |
+| `npm run knip` / `npm run knip:all` | Неиспользуемые файлы/зависимости (полный режим — `knip:all`) |
+| `npm run ci:checks` | Линт + типы + knip (как первая стадия CI) |
+| `npm run build` | `prisma generate` и `next build --webpack` (флаг webpack зафиксирован в `package.json`) |
+| `npm run build:next` | Только Next.js (если клиент Prisma уже сгенерирован) |
+| `npm run test` | Юнит- и интеграционные тесты (`tsx --test`) |
+| `npm run prepush` | Полный прогон перед пушем: `ci:checks` → `build` → `test` |
+| `npm run prepush:quick` | Быстрее: линт + типы + тесты (без knip и без production build) |
+
+**CI (GitHub Actions):** джоба `checks` (без Postgres) — `prisma generate`, линт, типы, knip; джоба `build` — Postgres, `npm run build`, тесты. Двойного `prisma generate` перед `build` в одной джобе нет. Кэшируется `.next/cache`.
+
+**Прод-образ:** в `Dockerfile` сборка идёт через `npm run build` с теми же заглушками `DATABASE_URL` / JWT, что и раньше.
+
 ## Установка и запуск
 
 1. **Скопируй `.env.example` в `.env`:**

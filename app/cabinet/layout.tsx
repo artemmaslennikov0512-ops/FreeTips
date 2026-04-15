@@ -347,11 +347,16 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
 
   const mainBlockStyle = useMemo<React.CSSProperties>(() => {
     if (isM5Cabinet) return {};
+    const brandExtras =
+      brandBorder && applyEstablishmentBrand ? { borderColor: brandBorder as string } : {};
+    if (theme === "light") {
+      return mainBlockBg ? { backgroundColor: mainBlockBg, ...brandExtras } : { ...brandExtras };
+    }
     return {
       backgroundColor: mainBlockBg ?? "rgba(255,255,255,0.06)",
-      ...(brandBorder && applyEstablishmentBrand ? { borderColor: brandBorder } : {}),
+      ...brandExtras,
     };
-  }, [isM5Cabinet, mainBlockBg, brandBorder, applyEstablishmentBrand]);
+  }, [isM5Cabinet, mainBlockBg, brandBorder, applyEstablishmentBrand, theme]);
 
   const profileBlockStyle = useMemo<React.CSSProperties>(() => {
     if (!isM5Cabinet && sidebarBg) return { backgroundColor: sidebarBg };

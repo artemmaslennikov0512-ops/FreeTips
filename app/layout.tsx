@@ -78,11 +78,12 @@ export const viewport = {
   initialScale: 1,
   maximumScale: 5,
   viewportFit: "cover",
-  // Должен совпадать с фоном body ЛК/админки в тёмной теме (#0d0e12 в globals), иначе iOS Safari даёт артефакты в области статус-бара
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#d4d8de" },
-    { media: "(prefers-color-scheme: dark)", color: "#0d0e12" },
-  ],
+  /*
+   * themeColor здесь не задаём: Next встраивает соответствующие <meta> в управляемое дерево head,
+   * а `SHELL_CHROME_BOOT_SCRIPT` + `applyDocumentShellChrome` удаляют/пересоздают meta для Safari —
+   * в итоге гонка с reconciler и `Cannot read properties of null (reading 'removeChild')`.
+   * Цвета строки состояния задаются только скриптом + ThemeProvider (см. lib/document-shell-chrome.ts).
+   */
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
@@ -91,8 +92,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <head>
         <link rel="sitemap" type="application/xml" href={`${baseUrl}/sitemap.xml`} title="Sitemap" />
         {/*
-          После метаданных Next (viewport / theme-color): одна theme-color без media под localStorage — иначе iOS Safari
-          оставляет светлую панель при системной светлой теме и тёмном ЛК.
+          До гидрации: data-theme, app-shell-panel, одна meta theme-color / color-scheme (без дублей Next viewport).
         */}
         <script
           dangerouslySetInnerHTML={{

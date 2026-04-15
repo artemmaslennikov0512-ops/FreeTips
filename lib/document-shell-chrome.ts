@@ -8,9 +8,8 @@
 
 export const THEME_STORAGE_KEY = "theme";
 
-/** Лендинг / сайт вне панели (совпадает с app/layout viewport themeColor light) */
+/** Лендинг / сайт вне панели (дефолтный theme-color для светлой темы в boot / apply) */
 export const THEME_COLOR_LIGHT_SITE = "#d4d8de";
-/** Светлый холст панели в CSS (html/body, ~#f4f1eb). В `theme-color` на маршрутах ЛК не подставляем. */
 /** Тёмная тема сайта и панели (совпадает с html.app-shell-panel[data-theme=dark]) */
 export const THEME_COLOR_DARK = "#0d0e12";
 
@@ -81,6 +80,7 @@ function syncThemeColorMeta(content: string | null): void {
   }
   existing.forEach((meta) => meta.remove());
   const meta = document.createElement("meta");
+  meta.setAttribute("data-ft-doc-chrome", "");
   meta.setAttribute("name", "theme-color");
   meta.setAttribute("content", content);
   document.head?.appendChild(meta);
@@ -93,6 +93,7 @@ function syncColorSchemeMeta(scheme: "light" | "dark"): void {
   }
   existing.forEach((m) => m.remove());
   const m = document.createElement("meta");
+  m.setAttribute("data-ft-doc-chrome", "");
   m.setAttribute("name", "color-scheme");
   m.setAttribute("content", scheme);
   document.head?.appendChild(m);

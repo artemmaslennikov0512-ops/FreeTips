@@ -20,11 +20,11 @@ if(tc===null){
   if(mtcs.length)mtcs.forEach(function(m){m.remove();});
 }else{
   var okTc=mtcs.length===1&&mtcs[0].getAttribute('content')===tc&&!mtcs[0].hasAttribute('media');
-  if(!okTc){mtcs.forEach(function(m){m.remove();});var mtc=document.createElement('meta');mtc.setAttribute('name','theme-color');mtc.setAttribute('content',tc);document.head.appendChild(mtc);}
+  if(!okTc){mtcs.forEach(function(m){m.remove();});var mtc=document.createElement('meta');mtc.setAttribute('data-ft-doc-chrome','');mtc.setAttribute('name','theme-color');mtc.setAttribute('content',tc);document.head.appendChild(mtc);}
 }
 var mcss=document.querySelectorAll('meta[name="color-scheme"]');
 var okCs=mcss.length===1&&mcss[0].getAttribute('content')===cs;
-if(!okCs){mcss.forEach(function(m){m.remove();});var mcs=document.createElement('meta');mcs.setAttribute('name','color-scheme');mcs.setAttribute('content',cs);document.head.appendChild(mcs);}
+if(!okCs){mcss.forEach(function(m){m.remove();});var mcs=document.createElement('meta');mcs.setAttribute('data-ft-doc-chrome','');mcs.setAttribute('name','color-scheme');mcs.setAttribute('content',cs);document.head.appendChild(mcs);}
 document.documentElement.style.colorScheme=cs;
 }
 shellChromeBoot();

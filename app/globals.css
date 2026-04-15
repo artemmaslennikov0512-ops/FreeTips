@@ -1785,32 +1785,39 @@ html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competitio
   }
 }
 
-/* Светлая тема: сайдбар — однотонный navy (не M5 — у M5 свой карбон выше по файлу) */
+/* Светлая тема: сайдбар ЛК / заведения — белая колонка как карточки (не M5) */
 html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-sidebar:not(.admin-sidebar) {
-  background: #1e2a3a !important;
-  border: 0.5px solid rgba(197, 165, 114, 0.4) !important;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.08);
-  color: rgba(255, 255, 255, 0.92);
+  background: #ffffff !important;
+  border: 1px solid rgba(10, 25, 47, 0.1) !important;
+  box-shadow: 0 1px 2px rgba(10, 25, 47, 0.05), 0 6px 20px rgba(10, 25, 47, 0.06);
+  color: #0a192f;
 }
 html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-sidebar:not(.admin-sidebar) a,
 html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-sidebar:not(.admin-sidebar) button {
-  color: rgba(255, 255, 255, 0.92);
+  color: #334155 !important;
 }
 
-/* Светлая тема: свернуть/развернуть сайдбар (lg) — плоская кнопка на navy, без «стекла» и градиента */
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-lg-sidebar-toggle {
-  background: rgba(255, 255, 255, 0.1) !important;
-  border-color: rgba(255, 255, 255, 0.24) !important;
-  color: rgba(255, 255, 255, 0.92) !important;
+/* Светлая тема: свернуть/развернуть сайдбар (lg) */
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-lg-sidebar-toggle {
+  background: rgba(10, 25, 47, 0.05) !important;
+  border-color: rgba(10, 25, 47, 0.12) !important;
+  color: #0a192f !important;
   box-shadow: none !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 }
 
-html:not([data-theme="dark"]) .cabinet-premium .cabinet-lg-sidebar-toggle:hover {
-  background: rgba(255, 255, 255, 0.14) !important;
-  border-color: rgba(255, 255, 255, 0.34) !important;
-  color: #ffffff !important;
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-lg-sidebar-toggle:hover {
+  background: rgba(197, 165, 114, 0.12) !important;
+  border-color: rgba(197, 165, 114, 0.35) !important;
+  color: #0a192f !important;
+}
+
+/* Развернуть меню (lg): в разметке bg-[var(--color-navy)] — на светлой теме белая плитка */
+html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-lg-sidebar-toggle--expand {
+  background: #ffffff !important;
+  border-color: rgba(10, 25, 47, 0.12) !important;
+  color: #0a192f !important;
 }
 
 html:not([data-theme="dark"]) .cabinet-premium .cabinet-lg-sidebar-toggle svg {
@@ -1824,18 +1831,18 @@ html:not([data-theme="dark"]) .cabinet-premium .cabinet-lg-sidebar-toggle svg {
   border-width: 0.5px;
 }
 
-/* Светлая тема: блок пользователя в сайдбаре — светлый текст на navy */
+/* Светлая тема: блок пользователя в сайдбаре — тёмный кегль */
 html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-sidebar-profile {
-  color: rgba(255, 255, 255, 0.95) !important;
+  color: #0a192f !important;
 }
 
-/* ЛК официанта (не M5): активный пункт — золотистый wash + светлый текст (сайдбар, dropdown, моб. меню) */
+/* ЛК официанта (не M5): активный пункт — золотистый wash + тёмный текст */
 html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-sidebar:not(.admin-sidebar) .cabinet-nav-active,
 html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-nav-dropdown .cabinet-nav-active,
 html:not([data-theme="dark"]) .cabinet-mobile-nav-dialog:not([data-cabinet-theme="m5-competition"]) .cabinet-nav-active {
   border-color: rgba(197, 165, 114, 0.52) !important;
-  background: rgba(197, 165, 114, 0.16) !important;
-  color: rgba(255, 255, 255, 0.98) !important;
+  background: rgba(197, 165, 114, 0.14) !important;
+  color: #0a192f !important;
 }
 
 [data-theme="dark"] .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-sidebar:not(.admin-sidebar) .cabinet-nav-active,
@@ -1871,8 +1878,8 @@ html:not([data-theme="dark"]) .cabinet-mobile-nav-dialog:not([data-cabinet-theme
   border-radius: 1px;
 }
 html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-nav-dropdown::before {
-  background: #1e2a3a;
-  border-color: rgba(197, 165, 114, 0.4);
+  background: #ffffff;
+  border-color: rgba(10, 25, 47, 0.1);
 }
 [data-theme="dark"] .cabinet-premium .cabinet-nav-dropdown::before {
   display: none;
@@ -1887,31 +1894,31 @@ html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-compe
   gap: 0 !important;
   justify-content: center !important;
 }
-/* Светлая тема: мобильное меню — как сайдбар (не M5 — у M5 свои правила) */
+/* Светлая тема: мобильное выпадающее меню — светлая карточка */
 html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-nav-dropdown {
-  background: #1e2a3a !important;
-  color: rgba(255, 255, 255, 0.92);
-  border: 0.5px solid rgba(197, 165, 114, 0.4) !important;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.08) !important;
+  background: #ffffff !important;
+  color: #0a192f;
+  border: 1px solid rgba(10, 25, 47, 0.1) !important;
+  box-shadow: 0 1px 2px rgba(10, 25, 47, 0.05), 0 8px 24px rgba(10, 25, 47, 0.08) !important;
 }
 html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-nav-dropdown a,
 html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-nav-dropdown button {
   color: inherit;
 }
 html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-nav-dropdown .cabinet-nav-label {
-  color: rgba(255, 255, 255, 0.8) !important;
+  color: #64748b !important;
 }
 html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-nav-dropdown .cabinet-sidebar-profile {
-  color: rgba(255, 255, 255, 0.95) !important;
-  background: rgba(255, 255, 255, 0.1) !important;
+  color: #0a192f !important;
+  background: #f0ebe3 !important;
   border-width: 0.5px !important;
-  border-color: rgba(197, 165, 114, 0.4) !important;
+  border-color: rgba(10, 25, 47, 0.1) !important;
 }
 html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-nav-dropdown nav {
-  background: rgba(255, 255, 255, 0.1) !important;
+  background: #f8f6f2 !important;
   border-width: 0.5px !important;
   border-style: solid !important;
-  border-color: rgba(197, 165, 114, 0.45) !important;
+  border-color: rgba(10, 25, 47, 0.08) !important;
   box-shadow: none !important;
 }
 
@@ -1992,45 +1999,45 @@ html.cabinet-mobile-drawer-lock {
   touch-action: none;
 }
 html:not([data-theme="dark"]) .cabinet-mobile-nav-overlay {
-  background: linear-gradient(rgba(8, 12, 22, 0.72), rgba(8, 12, 22, 0.72)), #e0dfdc;
+  background: linear-gradient(rgba(10, 25, 47, 0.35), rgba(10, 25, 47, 0.35)), #f4f1eb;
 }
 [data-theme="dark"] .cabinet-mobile-nav-overlay {
   background: linear-gradient(rgba(0, 0, 0, 0.78), rgba(0, 0, 0, 0.78)), #0d0e12;
 }
 
 /*
- * ЛК официанта: мобильное меню — createPortal на body, вне .cabinet-premium (как admin-mobile-nav-dialog).
- * Светлая тема: то же «стекло» + blur, что в тёмной (не сплошной #1e2a3a).
+ * ЛК официанта: мобильное меню — createPortal на body.
+ * Светлая тема: светлая панель в стиле карточек.
  */
 html:not([data-theme="dark"]) .cabinet-mobile-nav-dialog:not([data-cabinet-theme="m5-competition"]) {
-  background: rgba(30, 42, 58, 0.88) !important;
+  background: rgba(255, 255, 255, 0.96) !important;
   -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);
   isolation: isolate;
-  color: rgba(255, 255, 255, 0.95) !important;
-  border: 1px solid rgba(197, 165, 114, 0.45) !important;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.08) !important;
+  color: #0a192f !important;
+  border: 1px solid rgba(10, 25, 47, 0.1) !important;
+  box-shadow: 0 1px 2px rgba(10, 25, 47, 0.05), 0 12px 40px rgba(10, 25, 47, 0.1) !important;
 }
 html:not([data-theme="dark"]) .cabinet-mobile-nav-dialog:not([data-cabinet-theme="m5-competition"]) .cabinet-sidebar-profile {
-  background: rgba(255, 255, 255, 0.15) !important;
+  background: #f0ebe3 !important;
   border-width: 0.5px !important;
   border-style: solid !important;
-  border-color: rgba(197, 165, 114, 0.5) !important;
-  color: #fff !important;
+  border-color: rgba(10, 25, 47, 0.1) !important;
+  color: #0a192f !important;
 }
 html:not([data-theme="dark"]) .cabinet-mobile-nav-dialog:not([data-cabinet-theme="m5-competition"]) .cabinet-nav-label {
-  color: rgba(255, 255, 255, 0.8) !important;
+  color: #64748b !important;
 }
 html:not([data-theme="dark"]) .cabinet-mobile-nav-dialog:not([data-cabinet-theme="m5-competition"]) nav {
-  background: rgba(255, 255, 255, 0.15) !important;
+  background: #f8f6f2 !important;
   border-width: 0.5px !important;
   border-style: solid !important;
-  border-color: rgba(197, 165, 114, 0.5) !important;
+  border-color: rgba(10, 25, 47, 0.08) !important;
   box-shadow: none !important;
 }
 html:not([data-theme="dark"]) .cabinet-mobile-nav-dialog:not([data-cabinet-theme="m5-competition"]) a,
 html:not([data-theme="dark"]) .cabinet-mobile-nav-dialog:not([data-cabinet-theme="m5-competition"]) button {
-  color: rgba(255, 255, 255, 0.92) !important;
+  color: #334155 !important;
 }
 html:not([data-theme="dark"]) .cabinet-mobile-nav-dialog[data-cabinet-theme="m5-competition"] {
   background:
@@ -2192,12 +2199,12 @@ html:not([data-theme="dark"]) .admin-mobile-nav-dialog .cabinet-nav-active {
   box-shadow: none !important;
 }
 
-/* Блок навигации в сайдбаре — те же заливка и обводка, что у блока профиля (из .cabinet-sidebar-profile) */
+/* Блок навигации в сайдбаре — светлая тема: вложенный блок */
 html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-sidebar:not(.admin-sidebar) .cabinet-nav-block nav {
-  background: rgba(255, 255, 255, 0.1) !important;
+  background: #f8f6f2 !important;
   border-width: 0.5px !important;
   border-style: solid !important;
-  border-color: rgba(197, 165, 114, 0.45) !important;
+  border-color: rgba(10, 25, 47, 0.08) !important;
   box-shadow: none;
 }
 html:not([data-theme="dark"]) .admin-panel .admin-sidebar .cabinet-nav-block nav {
@@ -2223,14 +2230,14 @@ html:not([data-theme="dark"]) .admin-panel .admin-sidebar .cabinet-nav-block nav
 }
 /* Светлая тема: подпись «Навигация» в сайдбаре */
 html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-sidebar:not(.admin-sidebar) .cabinet-nav-label {
-  color: rgba(255, 255, 255, 0.8) !important;
+  color: #64748b !important;
 }
 
-/* Светлая тема ЛК официанта: заголовки групп (ОБЗОР…, ЗАВЕДЕНИЕ…) — светлый кегль на navy, не --color-text/40 (тёмный на тёмном) */
+/* Светлая тема ЛК официанта: заголовки групп навигации */
 html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-sidebar:not(.admin-sidebar) .cabinet-nav-group-title,
 html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-nav-dropdown .cabinet-nav-group-title,
 html:not([data-theme="dark"]) .cabinet-mobile-nav-dialog:not([data-cabinet-theme="m5-competition"]) .cabinet-nav-group-title {
-  color: rgba(255, 255, 255, 0.82) !important;
+  color: #64748b !important;
 }
 
 /* Тёмная тема: те же заголовки — чуть выше контраст к фону nav */
@@ -2307,12 +2314,12 @@ html:not([data-theme="dark"]) .admin-panel .admin-sidebar .cabinet-sidebar-profi
   color: #fff !important;
 }
 
-/* Светлая тема: блок профиля в сайдбаре — белый фон, обводка тоньше; аватар — золотой фон, тёмные инициалы (не M5) */
+/* Светлая тема: блок профиля в сайдбаре — тёплый вложенный фон (не M5) */
 html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-sidebar-profile {
-  background: rgba(255, 255, 255, 0.1) !important;
+  background: #f0ebe3 !important;
   border-width: 0.5px !important;
   border-style: solid !important;
-  border-color: rgba(197, 165, 114, 0.45) !important;
+  border-color: rgba(10, 25, 47, 0.1) !important;
   box-shadow: none;
 }
 html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-sidebar-avatar {
@@ -2398,7 +2405,7 @@ html:not([data-theme="dark"]) .cabinet-premium[data-brand-active] .cabinet-sideb
   color: var(--color-text) !important;
 }
 html:not([data-theme="dark"]) .cabinet-premium[data-brand-active] .cabinet-sidebar .cabinet-nav-active {
-  color: rgba(255, 255, 255, 0.98) !important;
+  color: var(--color-text) !important;
 }
 
 /* Тёмная тема: при бренде не перебивать переменные — текст и фон из настроек */
@@ -2679,28 +2686,36 @@ body.establishment-page .establishment-panel.cabinet-premium {
   }
 }
 
-/* Светлая тема: шапка — фон как у виртуальной карты (градиент navy) */
-/* Светлая тема: шапка — однотонный navy с контрастом, без градиента */
+/* Светлая тема: шапка ЛК официанта и заведения — как основной блок; админка — navy */
 html:not([data-theme="dark"]) body.cabinet-page .site-header,
-html:not([data-theme="dark"]) body.admin-page .site-header,
 html:not([data-theme="dark"]) body.establishment-page .site-header {
+  background: #faf8f5 !important;
+  border: 1px solid rgba(10, 25, 47, 0.08);
+  box-shadow: 0 1px 2px rgba(10, 25, 47, 0.04), 0 8px 24px rgba(10, 25, 47, 0.06);
+  color: #0a192f;
+}
+html:not([data-theme="dark"]) body.admin-page .site-header {
   background: #1e2a3a !important;
   border: none;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.08);
   color: rgba(255, 255, 255, 0.95);
 }
 html:not([data-theme="dark"]) body.cabinet-page .site-header .site-header-logo-text,
-html:not([data-theme="dark"]) body.admin-page .site-header .site-header-logo-text,
 html:not([data-theme="dark"]) body.establishment-page .site-header .site-header-logo-text,
 html:not([data-theme="dark"]) body.cabinet-page .site-header a:not([class*="bg-"]),
-html:not([data-theme="dark"]) body.admin-page .site-header a:not([class*="bg-"]),
 html:not([data-theme="dark"]) body.establishment-page .site-header a:not([class*="bg-"]) {
+  color: #0a192f !important;
+}
+html:not([data-theme="dark"]) body.admin-page .site-header .site-header-logo-text,
+html:not([data-theme="dark"]) body.admin-page .site-header a:not([class*="bg-"]) {
   color: rgba(255, 255, 255, 0.95);
 }
-/* Светлая тема: в шапке «Free» — белый */
+/* ЛК / заведение: акцент «Free» — золото; админка: белый на navy */
 html:not([data-theme="dark"]) body.cabinet-page .site-header .site-header-logo-free,
-html:not([data-theme="dark"]) body.admin-page .site-header .site-header-logo-free,
 html:not([data-theme="dark"]) body.establishment-page .site-header .site-header-logo-free {
+  color: var(--color-brand-gold) !important;
+}
+html:not([data-theme="dark"]) body.admin-page .site-header .site-header-logo-free {
   color: #ffffff !important;
 }
 /* Светлая тема: иконка FT в логотипе — тёмно-синий фон, белый текст (лендинг, авторизация и т.д.) */
@@ -2711,20 +2726,24 @@ html:not([data-theme="dark"]) .site-header .site-header-logo-icon {
 html:not([data-theme="dark"]) .site-header .site-header-logo-icon span {
   color: inherit;
 }
-/* Светлая тема: в ЛК и админке — белый фон иконки, тёмно-синий FT */
+/* Светлая тема: иконка FT — ЛК/заведение: светлая плитка; админка: как раньше */
 html:not([data-theme="dark"]) body.cabinet-page .site-header .site-header-logo-icon,
-html:not([data-theme="dark"]) body.admin-page .site-header .site-header-logo-icon,
 html:not([data-theme="dark"]) body.establishment-page .site-header .site-header-logo-icon {
+  background: #ffffff !important;
+  border: 1px solid rgba(10, 25, 47, 0.1);
+  color: #0a192f !important;
+}
+html:not([data-theme="dark"]) body.admin-page .site-header .site-header-logo-icon {
   background: #ffffff !important;
   color: #0a192f !important;
 }
 html:not([data-theme="dark"]) body.cabinet-page .site-header .site-header-logo-icon span,
-html:not([data-theme="dark"]) body.admin-page .site-header .site-header-logo-icon span,
-html:not([data-theme="dark"]) body.establishment-page .site-header .site-header-logo-icon span {
+html:not([data-theme="dark"]) body.establishment-page .site-header .site-header-logo-icon span,
+html:not([data-theme="dark"]) body.admin-page .site-header .site-header-logo-icon span {
   color: inherit;
 }
 
-/* M5 Competition + светлая тема сайта: перекрыть общую шапку ЛК (#1e2a3a) и белый FT — как у main-block */
+/* M5 Competition + светлая тема сайта: перекрыть светлую шапку ЛК — карбон как у main-block */
 html:not([data-theme="dark"]) body.cabinet-page:has(.cabinet-premium[data-cabinet-theme="m5-competition"]) header.site-header.site-header--cabinet-m5,
 html:not([data-theme="dark"]) body.cabinet-page:has(.cabinet-premium[data-cabinet-theme="m5-competition"]) header.site-header:not(.site-header-landing) {
   background:
@@ -5170,16 +5189,16 @@ html:not([data-theme="dark"]) .cabinet-premium .cabinet-verification-status .tex
 .establishment-panel .cabinet-sidebar {
   margin-left: 0 !important;
 }
-/* Светлая тема: сайдбар заведения — плотный navy и белый текст (как шапка ЛК), не «стекло» на сером фоне */
+/* Светлая тема: сайдбар заведения — как у официанта */
 html:not([data-theme="dark"]) body.establishment-page .establishment-panel .cabinet-sidebar {
-  background: #1e2a3a !important;
-  border-color: rgba(197, 165, 114, 0.4) !important;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.08) !important;
+  background: #ffffff !important;
+  border-color: rgba(10, 25, 47, 0.1) !important;
+  box-shadow: 0 1px 2px rgba(10, 25, 47, 0.05), 0 6px 20px rgba(10, 25, 47, 0.06) !important;
 }
 html:not([data-theme="dark"]) body.establishment-page .establishment-panel .cabinet-sidebar .cabinet-nav-active {
   border-color: rgba(197, 165, 114, 0.52) !important;
-  background: rgba(197, 165, 114, 0.16) !important;
-  color: rgba(255, 255, 255, 0.98) !important;
+  background: rgba(197, 165, 114, 0.14) !important;
+  color: #0a192f !important;
 }
 [data-theme="dark"] .admin-panel main {
   background: transparent;
@@ -5746,9 +5765,9 @@ html:not([data-theme="dark"]) .admin-panel .cabinet-main-block h4 {
   color: #ffffff !important;
 }
 
-/* Светлая тема: заголовок в сайдбаре — белым (не M5 — там имя/акценты M5) */
+/* Светлая тема: заголовок в сайдбаре (имя и т.д.) */
 html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-sidebar .font-bold {
-  color: #ffffff !important;
+  color: #0a192f !important;
 }
 
 /* Светлая тема: блок антифрода в карточке — контейнер и поля значений темнее */

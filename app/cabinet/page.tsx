@@ -379,14 +379,14 @@ export default function CabinetDashboardPage() {
                           <ShieldAlert className="h-[18px] w-[18px]" />
                         </div>
                         <div>
-                          <p className="font-semibold text-white">Заявка на рассмотрении</p>
-                          <p className="text-sm text-white/90">Ожидайте результата проверки документов.</p>
+                          <p className="font-semibold text-[var(--color-text)]">Заявка на рассмотрении</p>
+                          <p className="text-sm text-[var(--color-text)]/90">Ожидайте результата проверки документов.</p>
                         </div>
                       </div>
                     ) : (
                       <div className="flex flex-col items-center text-center">
-                        <p className="mb-2 font-semibold text-white">Уважаемый клиент,</p>
-                        <p className="mb-3 text-sm text-white/90">
+                        <p className="mb-2 font-semibold text-[var(--color-text)]">Уважаемый клиент,</p>
+                        <p className="mb-3 text-sm text-[var(--color-text)]/90">
                           Чтобы пользоваться услугами сервиса, вам необходимо пройти верификацию.
                         </p>
                         <Link
@@ -674,7 +674,7 @@ export default function CabinetDashboardPage() {
             Скопируйте ключ и вставьте его в приложение FreeTips для Android — так вы сможете пользоваться личным кабинетом официанта с телефона.
           </p>
           <p className="mb-4 flex flex-wrap items-center gap-2 sm:gap-3">
-            <span className="text-white">Приложение для Android:</span>
+            <span className="text-[var(--color-text)]">Приложение для Android:</span>
             <a
               href={`${getBaseUrl()}/freetips.apk`}
               download="freetips.apk"
@@ -690,7 +690,7 @@ export default function CabinetDashboardPage() {
           </p>
           <div className="cabinet-block-inner rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/6 px-3 py-3 sm:px-4 sm:py-3.5">
             <div className="mb-2 text-sm font-semibold text-[var(--color-text)]">Ваш API ключ</div>
-            <div className="cabinet-input-window cabinet-block-inner mb-3 break-all rounded-md border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-2.5 py-2 font-mono text-sm text-[var(--color-text-secondary)]">
+            <div className="cabinet-input-window cabinet-block-inner mb-3 break-all rounded-md border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-2.5 py-2 font-mono text-sm text-[var(--color-text)]">
               {apiKey ?? (hasApiKey ? "••••••••••••••••" : "Ключ не создан")}
             </div>
             {apiKey && (

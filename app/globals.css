@@ -145,6 +145,9 @@ html:not([data-theme="dark"])
   --color-text-secondary: #334155;
   --color-muted: #64748b;
   --cabinet-block-bg: #f0ebe3;
+  /* В разметке админки часто text-[var(--color-on-dark)] «как на стекле»; на белых карточках иначе белый на белом */
+  --color-on-dark: #0a192f;
+  --color-on-dark-muted: #64748b;
 }
 html:not([data-theme="dark"])
   body.cabinet-page:not(.establishment-page)
@@ -3126,7 +3129,9 @@ html:not([data-theme="dark"])
 /* Светлая тема: админка — дашборд и таблицы: тёмный кегль на светлом main */
 html:not([data-theme="dark"]) body.admin-page .admin-panel .admin-dashboard-card p,
 html:not([data-theme="dark"]) body.admin-page .admin-panel .admin-dashboard-table th,
-html:not([data-theme="dark"]) body.admin-page .admin-panel .admin-dashboard-table td {
+html:not([data-theme="dark"]) body.admin-page .admin-panel .admin-dashboard-table td,
+html:not([data-theme="dark"]) body.admin-page .admin-panel table tbody td,
+html:not([data-theme="dark"]) body.admin-page .admin-panel table tbody th {
   color: #334155 !important;
 }
 
@@ -3136,6 +3141,27 @@ html:not([data-theme="dark"]) body.admin-page .admin-panel table thead {
 }
 html:not([data-theme="dark"]) body.admin-page .admin-panel table thead th {
   color: #0a192f !important;
+}
+
+/* Светлая тема: админка — сетка таблиц (полупрозрачные border-white на белом фоне не видны) */
+html:not([data-theme="dark"]) body.admin-page .admin-panel table :where(thead, tbody, tr, th, td) {
+  border-color: rgba(10, 25, 47, 0.12) !important;
+}
+
+/* Светлая тема: админка — те же границы у карточек/строк вне table (разделители border-white/…) */
+html:not([data-theme="dark"]) body.admin-page .admin-panel #main-content [class*="border-white/"] {
+  border-color: rgba(10, 25, 47, 0.12) !important;
+}
+
+/*
+ * Светлая тема: админка — явный text-white / text-white/… в #main-content (страницы заточены под «стекло»).
+ * Сайдбар вне #main-content — без изменений (бейджи на красном и т.п.).
+ */
+html:not([data-theme="dark"]) body.admin-page .admin-panel #main-content :where(.text-white) {
+  color: #0a192f !important;
+}
+html:not([data-theme="dark"]) body.admin-page .admin-panel #main-content [class*="text-white/"] {
+  color: #475569 !important;
 }
 html:not([data-theme="dark"]) body.admin-page .admin-panel .admin-users-token-btn {
   background: var(--cabinet-block-bg, #f0ebe3) !important;
@@ -3177,6 +3203,23 @@ html:not([data-theme="dark"]) body.admin-page .admin-panel .admin-users-token-bt
   background: rgba(248, 113, 113, 0.22) !important;
   color: #fee2e2 !important;
   border-color: rgba(252, 165, 165, 0.45) !important;
+}
+/* Светлая тема: пастельный фон бейджа + светлый текст = ноль контраста — тёмный кегль */
+html:not([data-theme="dark"]) .admin-panel .admin-payout-status--created {
+  color: #92400e !important;
+  border-color: rgba(180, 83, 9, 0.45) !important;
+}
+html:not([data-theme="dark"]) .admin-panel .admin-payout-status--processing {
+  color: #075985 !important;
+  border-color: rgba(2, 132, 199, 0.42) !important;
+}
+html:not([data-theme="dark"]) .admin-panel .admin-payout-status--completed {
+  color: #166534 !important;
+  border-color: rgba(21, 128, 61, 0.42) !important;
+}
+html:not([data-theme="dark"]) .admin-panel .admin-payout-status--rejected {
+  color: #991b1b !important;
+  border-color: rgba(185, 28, 28, 0.4) !important;
 }
 html:not([data-theme="dark"]) .admin-panel .admin-payout-status {
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
@@ -5188,11 +5231,11 @@ html:not([data-theme="dark"]) .support-chat-block {
   display: none;
 }
 
-/* Админка: раздел поддержки — заголовки и текст белые на тёмном фоне */
+/* Админка: раздел поддержки — заголовки и текст белые на тёмном main (кнопки .admin-btn — свои цвета) */
 .admin-panel .admin-support-page h1,
 .admin-panel .admin-support-page p,
 .admin-panel .admin-support-thread a,
-.admin-panel .admin-support-thread button {
+.admin-panel .admin-support-thread button:not(.admin-btn) {
   color: #fff !important;
 }
 .admin-panel .admin-support-thread .support-chat-input {
@@ -5201,19 +5244,46 @@ html:not([data-theme="dark"]) .support-chat-block {
 .admin-panel .admin-support-thread .support-chat-input::placeholder {
   color: rgba(255, 255, 255, 0.6) !important;
 }
+/* Светлая тема: поддержка — тёмный кегль и поле ввода как у остальной админки */
+html:not([data-theme="dark"]) body.admin-page .admin-panel .admin-support-page h1,
+html:not([data-theme="dark"]) body.admin-page .admin-panel .admin-support-page p,
+html:not([data-theme="dark"]) body.admin-page .admin-panel .admin-support-thread a,
+html:not([data-theme="dark"]) body.admin-page .admin-panel .admin-support-thread button:not(.admin-btn) {
+  color: #0a192f !important;
+}
+html:not([data-theme="dark"]) body.admin-page .admin-panel .admin-support-thread .support-chat-input {
+  color: #0a192f !important;
+  border-color: rgba(10, 25, 47, 0.18) !important;
+  background-color: #f8fafc !important;
+  -webkit-text-fill-color: #0a192f !important;
+  caret-color: #0a192f;
+}
+html:not([data-theme="dark"]) body.admin-page .admin-panel .admin-support-thread .support-chat-input::placeholder {
+  color: rgba(15, 23, 42, 0.45) !important;
+}
 [data-theme="dark"] .admin-panel .admin-support-thread .support-chat-input:-webkit-autofill,
 [data-theme="dark"] .admin-panel .admin-support-thread .support-chat-input:-webkit-autofill:hover,
 [data-theme="dark"] .admin-panel .admin-support-thread .support-chat-input:-webkit-autofill:focus,
-[data-theme="dark"] .admin-panel .admin-support-thread .support-chat-input:autofill,
-html:not([data-theme="dark"]) .admin-panel .admin-support-thread .support-chat-input:-webkit-autofill,
-html:not([data-theme="dark"]) .admin-panel .admin-support-thread .support-chat-input:-webkit-autofill:hover,
-html:not([data-theme="dark"]) .admin-panel .admin-support-thread .support-chat-input:-webkit-autofill:focus,
-html:not([data-theme="dark"]) .admin-panel .admin-support-thread .support-chat-input:autofill {
+[data-theme="dark"] .admin-panel .admin-support-thread .support-chat-input:autofill {
   color: #fff !important;
   -webkit-text-fill-color: #fff !important;
   caret-color: #fff;
   border: 1px solid rgba(255, 255, 255, 0.22) !important;
   box-shadow: 0 0 0 1000px rgba(255, 255, 255, 0.08) inset !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  filter: none !important;
+  transition: background-color 99999s ease-out 0s !important;
+}
+html:not([data-theme="dark"]) body.admin-page .admin-panel .admin-support-thread .support-chat-input:-webkit-autofill,
+html:not([data-theme="dark"]) body.admin-page .admin-panel .admin-support-thread .support-chat-input:-webkit-autofill:hover,
+html:not([data-theme="dark"]) body.admin-page .admin-panel .admin-support-thread .support-chat-input:-webkit-autofill:focus,
+html:not([data-theme="dark"]) body.admin-page .admin-panel .admin-support-thread .support-chat-input:autofill {
+  color: #0a192f !important;
+  -webkit-text-fill-color: #0a192f !important;
+  caret-color: #0a192f;
+  border: 1px solid rgba(10, 25, 47, 0.22) !important;
+  box-shadow: 0 0 0 1000px #f1f5f9 inset !important;
   background-color: transparent !important;
   background-image: none !important;
   filter: none !important;
@@ -6043,12 +6113,22 @@ html:not([data-theme="dark"]) body.admin-page .admin-panel .admin-btn--neutral:h
   outline-offset: 2px;
 }
 
-/* Поле поиска в админке «Пользователи» — белый текст ввода */
+/* Поле поиска в админке «Пользователи»: в тёмной теме сайта — белый ввод */
 .admin-panel .admin-users-search-input {
   color: #ffffff !important;
 }
 .admin-panel .admin-users-search-input::placeholder {
   color: rgba(255, 255, 255, 0.7) !important;
+}
+/* Светлая тема: иначе белый текст на белой карточке (правила выше с !important) */
+html:not([data-theme="dark"]) body.admin-page .admin-panel .admin-users-search-input {
+  color: #0a192f !important;
+  -webkit-text-fill-color: #0a192f;
+  caret-color: #0a192f;
+}
+html:not([data-theme="dark"]) body.admin-page .admin-panel .admin-users-search-input::placeholder {
+  color: #64748b !important;
+  -webkit-text-fill-color: #64748b;
 }
 
 /* Заголовки в разделах на тёмном фоне — белым шрифтом (тёмная тема: основной блок, карточки, секции тёмные) */
@@ -6111,6 +6191,26 @@ html:not([data-theme="dark"]) body.admin-page .admin-panel .antifraud-inner {
 html:not([data-theme="dark"]) body.admin-page .admin-panel .antifraud-inner .antifraud-value,
 html:not([data-theme="dark"]) body.admin-page .admin-panel .antifraud-inner .antifraud-limit-row .font-medium {
   color: #0a192f !important;
+}
+
+/* Светлая тема: бейджи правил в «Подозрительная активность» — светлый Tailwind-кегль на пастели плохо читается */
+html:not([data-theme="dark"]) body.admin-page .admin-panel .fraud-signals-panel [class*="text-amber-100"] {
+  color: #78350f !important;
+}
+html:not([data-theme="dark"]) body.admin-page .admin-panel .fraud-signals-panel [class*="text-orange-50"] {
+  color: #9a3412 !important;
+}
+html:not([data-theme="dark"]) body.admin-page .admin-panel .fraud-signals-panel [class*="text-emerald-50"] {
+  color: #065f46 !important;
+}
+html:not([data-theme="dark"]) body.admin-page .admin-panel .fraud-signals-panel [class*="text-emerald-100"] {
+  color: #065f46 !important;
+}
+html:not([data-theme="dark"]) body.admin-page .admin-panel .fraud-signals-panel [class*="text-violet-100"] {
+  color: #5b21b6 !important;
+}
+html:not([data-theme="dark"]) body.admin-page .admin-panel .fraud-signals-panel [class*="text-rose-100"] {
+  color: #9f1239 !important;
 }
 html:not([data-theme="dark"]) .admin-panel .antifraud-input {
   background: #ffffff !important;
@@ -7546,21 +7646,21 @@ button {
   color: var(--lk-fg);
 }
 
-/* Светлая тема: ЛК официанта/заведения — тёмное стекло main, светлый текст */
+/* Светлая тема: ЛК официанта/заведения — светлые карточки main (как остальной #main-content) */
 html:not([data-theme="dark"])
   .cabinet-premium:not(.admin-panel):not([data-cabinet-theme="m5-competition"])
   .lk-sessions {
-  --lk-fg: rgba(255, 255, 255, 0.96);
-  --lk-fg-muted: rgba(255, 255, 255, 0.78);
-  --lk-border: rgba(197, 165, 114, 0.42);
-  --lk-row-border: rgba(255, 255, 255, 0.12);
-  --lk-error-fg: #fecaca;
-  --lk-error-bg: rgba(248, 113, 113, 0.14);
-  --lk-error-border: rgba(252, 165, 165, 0.45);
-  --lk-success-fg: #6ee7b7;
-  --lk-success-bg: rgba(16, 185, 129, 0.16);
-  --lk-success-border: rgba(52, 211, 153, 0.42);
-  --lk-mobile-card-bg: rgba(255, 255, 255, 0.07);
+  --lk-fg: var(--color-text);
+  --lk-fg-muted: var(--color-text-secondary);
+  --lk-border: rgba(197, 165, 114, 0.32);
+  --lk-row-border: color-mix(in srgb, var(--color-text) 12%, transparent);
+  --lk-error-fg: var(--color-accent-red);
+  --lk-error-bg: rgba(220, 38, 38, 0.1);
+  --lk-error-border: rgba(220, 38, 38, 0.35);
+  --lk-success-fg: #059669;
+  --lk-success-bg: rgba(16, 185, 129, 0.12);
+  --lk-success-border: rgba(16, 185, 129, 0.38);
+  --lk-mobile-card-bg: color-mix(in srgb, var(--color-text) 6%, transparent);
 }
 
 /* Светлая тема + бренд заведения: текст из fontColor (как остальной #main-content) */
@@ -7621,6 +7721,21 @@ html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competitio
   --lk-success-bg: rgba(6, 78, 59, 0.35);
   --lk-success-border: rgba(52, 211, 153, 0.4);
   --lk-mobile-card-bg: rgba(255, 255, 255, 0.05);
+}
+
+/* Светлая тема сайта: админка — белые карточки, те же токены что у .lk-sessions в ЛК */
+html:not([data-theme="dark"]) body.admin-page .admin-panel .lk-sessions {
+  --lk-fg: #0a192f;
+  --lk-fg-muted: #64748b;
+  --lk-border: rgba(10, 25, 47, 0.12);
+  --lk-row-border: rgba(10, 25, 47, 0.1);
+  --lk-error-fg: #b91c1c;
+  --lk-error-bg: rgba(254, 226, 226, 0.85);
+  --lk-error-border: rgba(220, 38, 38, 0.35);
+  --lk-success-fg: #047857;
+  --lk-success-bg: rgba(209, 250, 229, 0.9);
+  --lk-success-border: rgba(5, 150, 105, 0.35);
+  --lk-mobile-card-bg: rgba(10, 25, 47, 0.05);
 }
 
 [data-theme="dark"] .admin-panel .lk-sessions {

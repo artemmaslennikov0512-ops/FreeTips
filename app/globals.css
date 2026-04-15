@@ -2706,6 +2706,14 @@ body.establishment-page .site-header {
   box-sizing: border-box;
 }
 
+/* Десктоп: официант и заведение — шапка ближе к контенту, основной блок визуально на уровне сайдбара */
+@media (min-width: 1024px) {
+  body.cabinet-page:not(.admin-page) .site-header,
+  body.establishment-page .site-header {
+    margin-top: 0.5rem;
+  }
+}
+
 /* Тема / гамбургер только до lg: на десктопе сайдбар уже есть — дублирующая строка скрыта жёстко */
 @media (min-width: 1024px) {
   body.cabinet-page header.site-header .panel-shell-mobile-only,
@@ -2757,12 +2765,12 @@ body.establishment-page .establishment-panel.cabinet-premium {
   }
 }
 
-/* Светлая тема: шапка ЛК официанта и заведения — как основной блок; админка — navy */
-html:not([data-theme="dark"]) body.cabinet-page .site-header,
+/* Светлая тема: шапка ЛК официанта и заведения — тот же тёплый фон, что у body (без отдельной «белой карты»); админка — navy */
+html:not([data-theme="dark"]) body.cabinet-page:not(.admin-page) .site-header,
 html:not([data-theme="dark"]) body.establishment-page .site-header {
-  background: #faf8f5 !important;
-  border: 1px solid rgba(10, 25, 47, 0.08);
-  box-shadow: 0 1px 2px rgba(10, 25, 47, 0.04), 0 8px 24px rgba(10, 25, 47, 0.06);
+  background: #f4f1eb !important;
+  border: 1px solid rgba(197, 165, 114, 0.38);
+  box-shadow: 0 1px 2px rgba(10, 25, 47, 0.04), 0 6px 18px rgba(10, 25, 47, 0.05);
   color: #0a192f;
 }
 html:not([data-theme="dark"]) body.admin-page .site-header {
@@ -2771,9 +2779,9 @@ html:not([data-theme="dark"]) body.admin-page .site-header {
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.08);
   color: rgba(255, 255, 255, 0.95);
 }
-html:not([data-theme="dark"]) body.cabinet-page .site-header .site-header-logo-text,
+html:not([data-theme="dark"]) body.cabinet-page:not(.admin-page) .site-header .site-header-logo-text,
 html:not([data-theme="dark"]) body.establishment-page .site-header .site-header-logo-text,
-html:not([data-theme="dark"]) body.cabinet-page .site-header a:not([class*="bg-"]),
+html:not([data-theme="dark"]) body.cabinet-page:not(.admin-page) .site-header a:not([class*="bg-"]),
 html:not([data-theme="dark"]) body.establishment-page .site-header a:not([class*="bg-"]) {
   color: #0a192f !important;
 }
@@ -2782,7 +2790,7 @@ html:not([data-theme="dark"]) body.admin-page .site-header a:not([class*="bg-"])
   color: rgba(255, 255, 255, 0.95);
 }
 /* ЛК / заведение: акцент «Free» — золото; админка: белый на navy */
-html:not([data-theme="dark"]) body.cabinet-page .site-header .site-header-logo-free,
+html:not([data-theme="dark"]) body.cabinet-page:not(.admin-page) .site-header .site-header-logo-free,
 html:not([data-theme="dark"]) body.establishment-page .site-header .site-header-logo-free {
   color: var(--color-brand-gold) !important;
 }
@@ -2797,10 +2805,10 @@ html:not([data-theme="dark"]) .site-header .site-header-logo-icon {
 html:not([data-theme="dark"]) .site-header .site-header-logo-icon span {
   color: inherit;
 }
-/* Светлая тема: иконка FT — ЛК/заведение: светлая плитка; админка: как раньше */
-html:not([data-theme="dark"]) body.cabinet-page .site-header .site-header-logo-icon,
+/* Светлая тема: иконка FT — ЛК официанта/заведение: золото как на лендинге (без белой вставки); админка — отдельным блоком ниже */
+html:not([data-theme="dark"]) body.cabinet-page:not(.admin-page) .site-header .site-header-logo-icon,
 html:not([data-theme="dark"]) body.establishment-page .site-header .site-header-logo-icon {
-  background: #ffffff !important;
+  background: var(--color-brand-gold) !important;
   border: 1px solid rgba(10, 25, 47, 0.1);
   color: #0a192f !important;
 }
@@ -2808,7 +2816,7 @@ html:not([data-theme="dark"]) body.admin-page .site-header .site-header-logo-ico
   background: #ffffff !important;
   color: #0a192f !important;
 }
-html:not([data-theme="dark"]) body.cabinet-page .site-header .site-header-logo-icon span,
+html:not([data-theme="dark"]) body.cabinet-page:not(.admin-page) .site-header .site-header-logo-icon span,
 html:not([data-theme="dark"]) body.establishment-page .site-header .site-header-logo-icon span,
 html:not([data-theme="dark"]) body.admin-page .site-header .site-header-logo-icon span {
   color: inherit;

@@ -435,7 +435,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
     <ProactiveAccessRefresh />
     <LkPresenceHeartbeat />
     <div
-      className={`cabinet-premium flex min-h-screen w-full max-w-full flex-col overflow-x-hidden font-[family:var(--font-inter)] text-[var(--color-text)] pt-2 lg:flex-row lg:pt-4 ${isM5Cabinet ? "bg-transparent" : "bg-[var(--color-bg)]"}`}
+      className={`cabinet-premium flex min-h-screen w-full max-w-full flex-col overflow-x-hidden font-[family:var(--font-inter)] text-[var(--color-text)] pt-2 lg:flex-row lg:pt-2 ${isM5Cabinet ? "bg-transparent" : "bg-[var(--color-bg)]"}`}
       data-brand-active={applyEstablishmentBrand ? "true" : undefined}
       data-cabinet-theme={isM5Cabinet ? "m5-competition" : undefined}
       style={Object.keys(brandStyle).length ? brandStyle : undefined}
@@ -449,7 +449,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
       />
       {/* Левое меню (lg+): сворачиваемая колонка; на мобильном — портал меню */}
       <div
-        className={`hidden shrink-0 transition-[width] duration-300 ease-out lg:mt-2 lg:flex lg:self-start ${
+        className={`hidden shrink-0 transition-[width] duration-300 ease-out lg:mt-0 lg:flex lg:self-start ${
           lgSidebarCollapsed
             ? "lg:w-0 lg:pointer-events-none lg:overflow-hidden"
             : "lg:relative lg:z-10 lg:w-[236px] lg:overflow-hidden"
@@ -617,7 +617,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
         </button>
       )}
 
-      <main className="relative min-h-screen min-w-0 flex-1 px-0 max-lg:pt-0 pt-1.5 pb-3 lg:px-0 lg:pt-2 lg:pr-3 lg:ml-0 lg:mr-0 flex flex-col">
+      <main className="relative min-h-screen min-w-0 flex-1 px-0 max-lg:pt-0 pt-1.5 pb-3 lg:px-0 lg:pt-0 lg:pr-3 lg:ml-0 lg:mr-0 flex flex-col">
         <div className={PANEL_APP_MAIN_SURFACE_CABINET} style={mainBlockStyle}>
           <div className={PANEL_MAIN_CONTENT_INNER_ADMIN_CABINET} id="main-content">
             {children}

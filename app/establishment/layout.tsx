@@ -202,7 +202,7 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
   const isActive = (href: string) => pathname === href || (href !== "/establishment" && pathname.startsWith(href));
 
   return (
-    <div className="establishment-panel cabinet-premium flex min-h-screen w-full min-w-0 max-w-full flex-col overflow-x-hidden bg-[var(--color-bg)] font-[family:var(--font-inter)] text-[var(--color-text)] pt-0 lg:flex-row lg:pt-3">
+    <div className="establishment-panel cabinet-premium flex min-h-screen w-full min-w-0 max-w-full flex-col overflow-x-hidden bg-[var(--color-bg)] font-[family:var(--font-inter)] text-[var(--color-text)] pt-0 lg:flex-row lg:pt-2">
       <PanelShellMobileCorner
         ariaControls="establishment-mobile-nav"
         ariaHaspopup="true"
@@ -226,7 +226,7 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
       {/* Сайдбар выше затемнения (fixed + z); на lg остаётся в потоке */}
       <aside
         id="establishment-mobile-nav"
-        className={`cabinet-sidebar establishment-mobile-sidebar fixed ${PANEL_MOBILE_Z_ESTABLISHMENT_DRAWER} flex min-h-0 flex-col overflow-hidden rounded-[10px] border border-white/10 shadow-2xl backdrop-blur-xl transition-[transform] duration-300 ease-out bg-white/[0.06] max-lg:left-[max(0.5rem,env(safe-area-inset-left,0px))] max-lg:top-[max(0.5rem,env(safe-area-inset-top,0px))] max-lg:bottom-[max(0.5rem,env(safe-area-inset-bottom,0px))] max-lg:w-[min(19.25rem,calc(100vw-1.25rem-max(env(safe-area-inset-left,0px),0.5rem)-max(env(safe-area-inset-right,0px),0.5rem)))] max-lg:max-w-none max-lg:py-2 max-lg:min-w-0 lg:static lg:left-auto lg:top-auto lg:bottom-auto lg:ml-0 lg:mt-1.5 lg:mr-0 lg:mb-0 lg:max-h-none lg:z-auto lg:w-[14.75rem] lg:max-w-none lg:translate-x-0 lg:border lg:self-start lg:py-3 ${
+        className={`cabinet-sidebar establishment-mobile-sidebar fixed ${PANEL_MOBILE_Z_ESTABLISHMENT_DRAWER} flex min-h-0 flex-col overflow-hidden rounded-[10px] border border-white/10 shadow-2xl backdrop-blur-xl transition-[transform] duration-300 ease-out bg-white/[0.06] max-lg:left-[max(0.5rem,env(safe-area-inset-left,0px))] max-lg:top-[max(0.5rem,env(safe-area-inset-top,0px))] max-lg:bottom-[max(0.5rem,env(safe-area-inset-bottom,0px))] max-lg:w-[min(19.25rem,calc(100vw-1.25rem-max(env(safe-area-inset-left,0px),0.5rem)-max(env(safe-area-inset-right,0px),0.5rem)))] max-lg:max-w-none max-lg:py-2 max-lg:min-w-0 lg:static lg:left-auto lg:top-auto lg:bottom-auto lg:ml-0 lg:mt-0 lg:mr-0 lg:mb-0 lg:max-h-none lg:z-auto lg:w-[14.75rem] lg:max-w-none lg:translate-x-0 lg:border lg:self-start lg:py-3 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full max-lg:pointer-events-none"
         }`}
       >
@@ -279,7 +279,7 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
         </div>
       </aside>
 
-      <main className="relative min-h-0 min-w-0 flex-1 px-0 pt-1.5 pb-3 lg:pt-2 lg:pl-0 lg:pr-0 lg:ml-0 flex flex-col">
+      <main className="relative min-h-0 min-w-0 flex-1 px-0 pt-1.5 pb-3 lg:pt-0 lg:pl-0 lg:pr-0 lg:ml-0 flex flex-col">
         <div className={PANEL_APP_MAIN_SURFACE_ESTABLISHMENT}>
           <div className={PANEL_MAIN_CONTENT_INNER_ESTABLISHMENT} id="main-content">
             {children}

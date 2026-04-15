@@ -90,13 +90,17 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="ru" className={`${inter.className} ${inter.variable} ${syne.variable} ${playfair.variable}`} suppressHydrationWarning>
       <head>
         <link rel="sitemap" type="application/xml" href={`${baseUrl}/sitemap.xml`} title="Sitemap" />
-      </head>
-      <body className="min-h-screen w-full max-w-full overflow-x-hidden flex flex-col font-sans antialiased bg-[var(--color-bg)] text-[var(--color-text)]">
+        {/*
+          После метаданных Next (viewport / theme-color): одна theme-color без media под localStorage — иначе iOS Safari
+          оставляет светлую панель при системной светлой теме и тёмном ЛК.
+        */}
         <script
           dangerouslySetInnerHTML={{
             __html: SHELL_CHROME_BOOT_SCRIPT,
           }}
         />
+      </head>
+      <body className="min-h-screen w-full max-w-full overflow-x-hidden flex flex-col font-sans antialiased bg-[var(--color-bg)] text-[var(--color-text)]">
         <GridCursorEffect />
         <a href="#main-content" className="sr-only">Перейти к основному содержимому</a>
         <ThemeProvider>

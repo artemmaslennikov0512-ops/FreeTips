@@ -61,10 +61,35 @@ function resolvedThemeColor(pathname: string | null, preference: SiteThemePrefer
 }
 
 function syncThemeColorMeta(content: string): void {
-  document.querySelectorAll('meta[name="theme-color"]').forEach((meta) => {
-    meta.removeAttribute("media");
-    meta.setAttribute("content", content);
-  });
+  /*
+   * Safari / iOS: несколько theme-color с media=(prefers-color-scheme) от Next оставляют светлую панель
+   * при системной светлой теме, даже если data-theme="dark" из localStorage. Удаляем все и вешаем одну мету без media.
+   */
+  const existing = document.querySelectorAll('meta[name="theme-color"]');
+  if (
+    existing.length === 1 &&
+    existing[0].getAttribute("content") === content &&
+    !existing[0].hasAttribute("media")
+  ) {
+    return;
+  }
+  existing.forEach((meta) => meta.remove());
+  const meta = document.createElement("meta");
+  meta.setAttribute("name", "theme-color");
+  meta.setAttribute("content", content);
+  document.head.appendChild(meta);
+}
+
+function syncColorSchemeMeta(scheme: "light" | "dark"): void {
+  const existing = document.querySelectorAll('meta[name="color-scheme"]');
+  if (existing.length === 1 && existing[0].getAttribute("content") === scheme) {
+    return;
+  }
+  existing.forEach((m) => m.remove());
+  const m = document.createElement("meta");
+  m.setAttribute("name", "color-scheme");
+  m.setAttribute("content", scheme);
+  document.head.appendChild(m);
 }
 
 /** Счётчик открытых тёмных шторок: Safari тянет `theme-color` из сохранённой светлой темы — без override полосы у краёв. */
@@ -75,6 +100,7 @@ export function pushOverlaySafariChromeDark(): void {
   overlaySafariChromeDarkDepth += 1;
   if (overlaySafariChromeDarkDepth !== 1) return;
   syncThemeColorMeta(THEME_COLOR_DARK);
+  syncColorSchemeMeta("dark");
   document.documentElement.style.colorScheme = "dark";
 }
 
@@ -111,6 +137,7 @@ export function applyDocumentShellChrome(pathname: string | null, preference: Si
   const forceDarkChrome = overlaySafariChromeDarkDepth > 0;
   const metaContent = forceDarkChrome ? THEME_COLOR_DARK : resolvedThemeColor(pathname, preference);
   syncThemeColorMeta(metaContent);
+  syncColorSchemeMeta(forceDarkChrome || effective === "dark" ? "dark" : "light");
 
   if (forceDarkChrome) {
     document.documentElement.style.colorScheme = "dark";

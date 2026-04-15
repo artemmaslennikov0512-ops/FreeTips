@@ -10,6 +10,7 @@ import {
  * Цвета подставляются из document-shell-chrome.ts — менять hex только там.
  */
 export const SHELL_CHROME_BOOT_SCRIPT = `(function(){
+function shellChromeBoot(){
 var p=typeof location!=='undefined'?location.pathname:'';
 var authOnly=p.startsWith('/zayavka')||p.startsWith('/login')||p.startsWith('/register')||p.startsWith('/forgot-password')||p.startsWith('/change-password')||p.startsWith('/reset-password');
 var scope=!authOnly&&(p.startsWith('/cabinet')||p.startsWith('/admin')||p.startsWith('/establishment')||p.startsWith('/pay'));
@@ -18,6 +19,15 @@ document.documentElement.setAttribute('data-theme',authOnly?'dark':t==='dark'?'d
 document.documentElement.classList.toggle('app-shell-panel',!!scope);
 var eff=document.documentElement.getAttribute('data-theme');
 var tc=eff==='dark'?'${THEME_COLOR_DARK}':scope?'${THEME_COLOR_LIGHT_PANEL}':'${THEME_COLOR_LIGHT_SITE}';
-document.querySelectorAll('meta[name="theme-color"]').forEach(function(m){m.removeAttribute('media');m.setAttribute('content',tc);});
-document.documentElement.style.colorScheme=eff==='dark'?'dark':'light';
+var cs=eff==='dark'?'dark':'light';
+var mtcs=document.querySelectorAll('meta[name="theme-color"]');
+var okTc=mtcs.length===1&&mtcs[0].getAttribute('content')===tc&&!mtcs[0].hasAttribute('media');
+if(!okTc){mtcs.forEach(function(m){m.remove();});var mtc=document.createElement('meta');mtc.setAttribute('name','theme-color');mtc.setAttribute('content',tc);document.head.appendChild(mtc);}
+var mcss=document.querySelectorAll('meta[name="color-scheme"]');
+var okCs=mcss.length===1&&mcss[0].getAttribute('content')===cs;
+if(!okCs){mcss.forEach(function(m){m.remove();});var mcs=document.createElement('meta');mcs.setAttribute('name','color-scheme');mcs.setAttribute('content',cs);document.head.appendChild(mcs);}
+document.documentElement.style.colorScheme=cs;
+}
+shellChromeBoot();
+if(typeof requestAnimationFrame!=='undefined')requestAnimationFrame(shellChromeBoot);
 })();`;

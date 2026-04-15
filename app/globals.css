@@ -1913,16 +1913,20 @@ html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-compe
 }
 html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-nav-dropdown .cabinet-sidebar-profile {
   color: #0a192f !important;
-  background: #f0ebe3 !important;
-  border-width: 0.5px !important;
-  border-color: rgba(10, 25, 47, 0.1) !important;
+  background: #ffffff !important;
+  border: none !important;
+  box-shadow:
+    0 1px 2px rgba(10, 25, 47, 0.05),
+    0 10px 32px rgba(10, 25, 47, 0.08),
+    0 2px 8px rgba(10, 25, 47, 0.04);
 }
 html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-nav-dropdown nav {
-  background: #f8f6f2 !important;
-  border-width: 0.5px !important;
-  border-style: solid !important;
-  border-color: rgba(10, 25, 47, 0.08) !important;
-  box-shadow: none !important;
+  background: #ffffff !important;
+  border: none !important;
+  box-shadow:
+    0 1px 2px rgba(10, 25, 47, 0.05),
+    0 10px 32px rgba(10, 25, 47, 0.08),
+    0 2px 8px rgba(10, 25, 47, 0.04) !important;
 }
 
 /* Тёмная тема: мобильное меню — как сайдбар */
@@ -2022,10 +2026,12 @@ html:not([data-theme="dark"]) .cabinet-mobile-nav-dialog:not([data-cabinet-theme
   box-shadow: 0 1px 2px rgba(10, 25, 47, 0.05), 0 12px 40px rgba(10, 25, 47, 0.1) !important;
 }
 html:not([data-theme="dark"]) .cabinet-mobile-nav-dialog:not([data-cabinet-theme="m5-competition"]) .cabinet-sidebar-profile {
-  background: #f0ebe3 !important;
-  border-width: 0.5px !important;
-  border-style: solid !important;
-  border-color: rgba(10, 25, 47, 0.1) !important;
+  background: #ffffff !important;
+  border: none !important;
+  box-shadow:
+    0 1px 2px rgba(10, 25, 47, 0.05),
+    0 10px 32px rgba(10, 25, 47, 0.08),
+    0 2px 8px rgba(10, 25, 47, 0.04);
   color: #0a192f !important;
 }
 html:not([data-theme="dark"]) .cabinet-mobile-nav-dialog:not([data-cabinet-theme="m5-competition"]) .cabinet-nav-label {
@@ -2033,11 +2039,12 @@ html:not([data-theme="dark"]) .cabinet-mobile-nav-dialog:not([data-cabinet-theme
 }
 html:not([data-theme="dark"]) .cabinet-mobile-nav-dialog:not([data-cabinet-theme="m5-competition"]) nav,
 html:not([data-theme="dark"]) .cabinet-mobile-nav-dialog:not([data-cabinet-theme="m5-competition"]) .cabinet-mobile-nav-dialog__nav {
-  background: #f0ebe3 !important;
-  border-width: 0.5px !important;
-  border-style: solid !important;
-  border-color: rgba(10, 25, 47, 0.1) !important;
-  box-shadow: none !important;
+  background: #ffffff !important;
+  border: none !important;
+  box-shadow:
+    0 1px 2px rgba(10, 25, 47, 0.05),
+    0 10px 32px rgba(10, 25, 47, 0.08),
+    0 2px 8px rgba(10, 25, 47, 0.04) !important;
 }
 html:not([data-theme="dark"]) .cabinet-mobile-nav-dialog:not([data-cabinet-theme="m5-competition"]) a,
 html:not([data-theme="dark"]) .cabinet-mobile-nav-dialog:not([data-cabinet-theme="m5-competition"]) button {
@@ -2203,13 +2210,21 @@ html:not([data-theme="dark"]) .admin-mobile-nav-dialog .cabinet-nav-active {
   box-shadow: none !important;
 }
 
-/* Блок навигации в сайдбаре — светлая тема: вложенный блок */
+/* Блок навигации в сайдбаре — светлая тема: тот же белый + тень, что у карточек (без бежевого «колодца») */
 html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-sidebar:not(.admin-sidebar) .cabinet-nav-block nav {
-  background: #f8f6f2 !important;
-  border-width: 0.5px !important;
-  border-style: solid !important;
-  border-color: rgba(10, 25, 47, 0.08) !important;
-  box-shadow: none;
+  background: #ffffff !important;
+  border: none !important;
+  box-shadow:
+    0 1px 2px rgba(10, 25, 47, 0.05),
+    0 10px 32px rgba(10, 25, 47, 0.08),
+    0 2px 8px rgba(10, 25, 47, 0.04);
+}
+html:not([data-theme="dark"])
+  .cabinet-premium[data-brand-active]:not([data-cabinet-theme="m5-competition"])
+  .cabinet-sidebar:not(.admin-sidebar)
+  .cabinet-nav-block
+  nav {
+  background: var(--color-bg-sides, #ffffff) !important;
 }
 html:not([data-theme="dark"]) .admin-panel .admin-sidebar .cabinet-nav-block nav {
   background: rgba(255, 255, 255, 0.15) !important;
@@ -2318,13 +2333,19 @@ html:not([data-theme="dark"]) .admin-panel .admin-sidebar .cabinet-sidebar-profi
   color: #fff !important;
 }
 
-/* Светлая тема: блок профиля в сайдбаре — тёплый вложенный фон (не M5) */
+/* Светлая тема: блок профиля в сайдбаре — как белые карточки контента */
 html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-sidebar-profile {
-  background: #f0ebe3 !important;
-  border-width: 0.5px !important;
-  border-style: solid !important;
-  border-color: rgba(10, 25, 47, 0.1) !important;
-  box-shadow: none;
+  background: #ffffff !important;
+  border: none !important;
+  box-shadow:
+    0 1px 2px rgba(10, 25, 47, 0.05),
+    0 10px 32px rgba(10, 25, 47, 0.08),
+    0 2px 8px rgba(10, 25, 47, 0.04);
+}
+html:not([data-theme="dark"])
+  .cabinet-premium[data-brand-active]:not([data-cabinet-theme="m5-competition"])
+  .cabinet-sidebar-profile {
+  background: var(--color-bg-sides, #ffffff) !important;
 }
 html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-sidebar-avatar {
   background: var(--color-brand-gold) !important;
@@ -5325,8 +5346,12 @@ html:not([data-theme="dark"]) body.establishment-page .establishment-panel .esta
   color: #0a192f !important;
 }
 html:not([data-theme="dark"]) body.establishment-page .establishment-panel .establishment-mobile-sidebar nav {
-  background: #f0ebe3 !important;
-  border-color: rgba(10, 25, 47, 0.1) !important;
+  background: #ffffff !important;
+  border: none !important;
+  box-shadow:
+    0 1px 2px rgba(10, 25, 47, 0.05),
+    0 10px 32px rgba(10, 25, 47, 0.08),
+    0 2px 8px rgba(10, 25, 47, 0.04);
 }
 html:not([data-theme="dark"]) body.establishment-page .establishment-panel .establishment-mobile-sidebar nav [role="group"] {
   border-color: rgba(10, 25, 47, 0.1) !important;

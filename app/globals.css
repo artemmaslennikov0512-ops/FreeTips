@@ -2344,17 +2344,36 @@ html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-compe
   background: transparent;
 }
 
+/* Тёмная тема: одна толщина/цвет обводки и тени для шапки, сайдбара и основного блока (M5 — отдельные правила выше) */
+[data-theme="dark"] body:is(.cabinet-page, .establishment-page, .admin-page) {
+  --lk-chrome-border-color: rgba(255, 255, 255, 0.14);
+  --lk-chrome-shadow:
+    0 4px 14px rgba(0, 0, 0, 0.3),
+    0 2px 6px rgba(0, 0, 0, 0.2),
+    0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+
 /* Тёмная тема: основной блок ЛК — тот же фон, что у сайдбара */
 [data-theme="dark"] .cabinet-premium .cabinet-main-block {
   background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3), 0 2px 6px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--lk-chrome-border-color, rgba(255, 255, 255, 0.14));
+  box-shadow: var(
+    --lk-chrome-shadow,
+    0 4px 14px rgba(0, 0, 0, 0.3),
+    0 2px 6px rgba(0, 0, 0, 0.2),
+    0 0 0 1px rgba(255, 255, 255, 0.06)
+  );
 }
 
 [data-theme="dark"] .cabinet-premium .cabinet-sidebar {
   background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3), 0 2px 6px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--lk-chrome-border-color, rgba(255, 255, 255, 0.14));
+  box-shadow: var(
+    --lk-chrome-shadow,
+    0 4px 14px rgba(0, 0, 0, 0.3),
+    0 2px 6px rgba(0, 0, 0, 0.2),
+    0 0 0 1px rgba(255, 255, 255, 0.06)
+  );
   color: #fafafa;
 }
 [data-theme="dark"] .cabinet-premium .cabinet-sidebar a,
@@ -5121,14 +5140,20 @@ html:not([data-theme="dark"]) .cabinet-premium .cabinet-verification-status .tex
 }
 
 /* Тёмная тема: шторка ЛК (официант и админ) — тот же фон, что у сайдбара */
-/* Тёмная тема: шапка ЛК/админки — как сайдбар и основной блок (матовое стекло, размытие) */
-[data-theme="dark"] body.cabinet-page .site-header,
+/* Тёмная тема: шапка ЛК / заведения / админки — те же border + shadow, что у сайдбара и основного блока (M5 — отдельно) */
+[data-theme="dark"] body.cabinet-page:not(:has(.cabinet-premium[data-cabinet-theme="m5-competition"])) .site-header,
+[data-theme="dark"] body.establishment-page .site-header,
 [data-theme="dark"] body.admin-page .site-header {
   background: rgba(255, 255, 255, 0.06);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(192, 192, 192, 0.4);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3), 0 2px 6px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(192, 192, 192, 0.08);
+  border: 1px solid var(--lk-chrome-border-color, rgba(255, 255, 255, 0.14));
+  box-shadow: var(
+    --lk-chrome-shadow,
+    0 4px 14px rgba(0, 0, 0, 0.3),
+    0 2px 6px rgba(0, 0, 0, 0.2),
+    0 0 0 1px rgba(255, 255, 255, 0.06)
+  );
 }
 
 /* В ЛК (официант и админ) текст логотипа «FreeTips» — золотой; «Free» — белый для контраста на тёмном фоне (M5 — градиент на span, блоки выше) */
@@ -5215,8 +5240,13 @@ html:not([data-theme="dark"]) .cabinet-premium .cabinet-verification-status .tex
 /* Тёмная тема: сайдбар админки — тот же фон и обводка, что у основного блока */
 [data-theme="dark"] .admin-panel .admin-sidebar {
   background: rgba(255, 255, 255, 0.06) !important;
-  border: 1px solid rgba(192, 192, 192, 0.4) !important;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3), 0 2px 6px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(192, 192, 192, 0.08);
+  border: 1px solid var(--lk-chrome-border-color, rgba(255, 255, 255, 0.14)) !important;
+  box-shadow: var(
+    --lk-chrome-shadow,
+    0 4px 14px rgba(0, 0, 0, 0.3),
+    0 2px 6px rgba(0, 0, 0, 0.2),
+    0 0 0 1px rgba(255, 255, 255, 0.06)
+  ) !important;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }

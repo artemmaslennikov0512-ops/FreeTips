@@ -1024,11 +1024,86 @@ body.cabinet-page:has(.cabinet-premium[data-cabinet-theme="m5-competition"])
     inset 0 1px 0 rgba(255, 255, 255, 0.08),
     0 0 20px rgba(28, 105, 212, 0.08);
 }
-/* Светлая тема ЛК официанта: плашка ФИО как «Операции» / «Вывод» (.cabinet-waiter-btn) */
+/*
+ * ЛК официанта / заведение: плашка ФИО — тёплый фон под тему, без обводки, чёрный кегль (M5 — классы --m5).
+ * Админка: ниже — прежний золотой акцент.
+ */
+html:not([data-theme="dark"]) body.cabinet-page:not(.admin-page) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-dashboard-name-hero__pill,
 html:not([data-theme="dark"])
-  body.cabinet-page
-  .cabinet-premium:not([data-cabinet-theme="m5-competition"])
+  body.establishment-page
+  .establishment-panel.cabinet-premium:not([data-cabinet-theme="m5-competition"])
   .cabinet-dashboard-name-hero__pill {
+  border: none !important;
+  box-shadow: var(--shadow-subtle);
+  background: var(--cabinet-block-bg, #f0ebe3);
+  padding: 0.4375rem 0.875rem;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+html:not([data-theme="dark"]) body.cabinet-page:not(.admin-page) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-dashboard-name-hero__pill:hover,
+html:not([data-theme="dark"])
+  body.establishment-page
+  .establishment-panel.cabinet-premium:not([data-cabinet-theme="m5-competition"])
+  .cabinet-dashboard-name-hero__pill:hover {
+  background: #e8e2d8;
+}
+html:not([data-theme="dark"]) body.cabinet-page:not(.admin-page) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-dashboard-name-hero__text:not(.cabinet-dashboard-name-hero__text--m5),
+html:not([data-theme="dark"])
+  body.establishment-page
+  .establishment-panel.cabinet-premium:not([data-cabinet-theme="m5-competition"])
+  .cabinet-dashboard-name-hero__text:not(.cabinet-dashboard-name-hero__text--m5) {
+  background-image: none !important;
+  -webkit-background-clip: unset !important;
+  background-clip: unset !important;
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
+  filter: none !important;
+  font-weight: 600;
+  font-size: 0.8125rem;
+  line-height: 1.25;
+  font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+[data-theme="dark"] body.cabinet-page:not(.admin-page) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-dashboard-name-hero__pill,
+[data-theme="dark"]
+  body.establishment-page
+  .establishment-panel.cabinet-premium:not([data-cabinet-theme="m5-competition"])
+  .cabinet-dashboard-name-hero__pill {
+  border: none !important;
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.35),
+    0 12px 28px rgba(0, 0, 0, 0.25);
+  background: #ebe6dc;
+  padding: 0.4375rem 0.875rem;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+[data-theme="dark"] body.cabinet-page:not(.admin-page) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-dashboard-name-hero__pill:hover,
+[data-theme="dark"]
+  body.establishment-page
+  .establishment-panel.cabinet-premium:not([data-cabinet-theme="m5-competition"])
+  .cabinet-dashboard-name-hero__pill:hover {
+  background: #e5dfd4;
+}
+[data-theme="dark"] body.cabinet-page:not(.admin-page) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-dashboard-name-hero__text:not(.cabinet-dashboard-name-hero__text--m5),
+[data-theme="dark"]
+  body.establishment-page
+  .establishment-panel.cabinet-premium:not([data-cabinet-theme="m5-competition"])
+  .cabinet-dashboard-name-hero__text:not(.cabinet-dashboard-name-hero__text--m5) {
+  background-image: none !important;
+  -webkit-background-clip: unset !important;
+  background-clip: unset !important;
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
+  filter: none !important;
+  font-weight: 600;
+  font-size: 0.8125rem;
+  line-height: 1.25;
+  font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+}
+
+/* Админка: плашка заголовка — прежний золотой акцент и обводка */
+html:not([data-theme="dark"]) body.admin-page .cabinet-premium .cabinet-dashboard-name-hero__pill {
   border: 1px solid rgba(197, 165, 114, 0.55);
   background: transparent;
   box-shadow: none;
@@ -1036,16 +1111,10 @@ html:not([data-theme="dark"])
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
 }
-html:not([data-theme="dark"])
-  body.cabinet-page
-  .cabinet-premium:not([data-cabinet-theme="m5-competition"])
-  .cabinet-dashboard-name-hero__pill:hover {
+html:not([data-theme="dark"]) body.admin-page .cabinet-premium .cabinet-dashboard-name-hero__pill:hover {
   background: rgba(197, 165, 114, 0.12);
 }
-html:not([data-theme="dark"])
-  body.cabinet-page
-  .cabinet-premium:not([data-cabinet-theme="m5-competition"])
-  .cabinet-dashboard-name-hero__text:not(.cabinet-dashboard-name-hero__text--m5) {
+html:not([data-theme="dark"]) body.admin-page .cabinet-premium .cabinet-dashboard-name-hero__text:not(.cabinet-dashboard-name-hero__text--m5) {
   background-image: none;
   -webkit-background-clip: unset;
   background-clip: unset;
@@ -1057,8 +1126,31 @@ html:not([data-theme="dark"])
   line-height: 1.25;
   font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
+[data-theme="dark"] body.admin-page .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-dashboard-name-hero__pill {
+  border: 1px solid rgba(197, 165, 114, 0.55);
+  background: transparent;
+  box-shadow: none;
+  padding: 0.4375rem 0.875rem;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+[data-theme="dark"] body.admin-page .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-dashboard-name-hero__pill:hover {
+  background: rgba(197, 165, 114, 0.12);
+}
+[data-theme="dark"] body.admin-page .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-dashboard-name-hero__text:not(.cabinet-dashboard-name-hero__text--m5) {
+  background-image: none !important;
+  -webkit-background-clip: unset !important;
+  background-clip: unset !important;
+  color: #c5a572 !important;
+  -webkit-text-fill-color: #c5a572 !important;
+  filter: none !important;
+  font-weight: 500;
+  font-size: 0.8125rem;
+  line-height: 1.25;
+  font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+}
 
-/* Тёмная тема: ФИО на дашборде — без градиентного «вырезания» (админка, заведение и т.д. — светлый текст) */
+/* Тёмная тема: прочие панели с этим классом (без body-фильтра выше) — светлый текст на стекле */
 [data-theme="dark"] .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-dashboard-name-hero__text:not(.cabinet-dashboard-name-hero__text--m5) {
   background-image: none !important;
   -webkit-background-clip: unset !important;
@@ -1067,26 +1159,6 @@ html:not([data-theme="dark"])
   -webkit-text-fill-color: rgba(250, 250, 250, 0.96) !important;
   filter: none !important;
   font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
-}
-
-/* Тёмная тема ЛК официанта: плашка ФИО как «Операции» / «Вывод» (перебивает блок выше) */
-[data-theme="dark"] body.cabinet-page .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-dashboard-name-hero__pill {
-  border: 1px solid rgba(197, 165, 114, 0.55);
-  background: transparent;
-  box-shadow: none;
-  padding: 0.4375rem 0.875rem;
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-}
-[data-theme="dark"] body.cabinet-page .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-dashboard-name-hero__pill:hover {
-  background: rgba(197, 165, 114, 0.12);
-}
-[data-theme="dark"] body.cabinet-page .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-dashboard-name-hero__text:not(.cabinet-dashboard-name-hero__text--m5) {
-  color: #c5a572 !important;
-  -webkit-text-fill-color: #c5a572 !important;
-  font-weight: 500;
-  font-size: 0.8125rem;
-  line-height: 1.25;
 }
 @media (prefers-reduced-motion: reduce) {
   .cabinet-dashboard-name-hero__pill,

@@ -97,11 +97,11 @@ function getLegacyAccessTokenFromStorage(): string | null {
  * «Есть ли что отправить в Authorization» — только режим impersonation (Bearer цели).
  * Наличие httpOnly-сессии из JS не видно.
  */
-export function getAccessToken(): string | null {
+function getAccessToken(): string | null {
   return getImpersonationTargetBearer();
 }
 
-export function authHeaders(): Record<string, string> {
+function authHeaders(): Record<string, string> {
   const imp = getImpersonationTargetBearer();
   return imp ? { Authorization: `Bearer ${imp}` } : {};
 }

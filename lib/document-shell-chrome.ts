@@ -10,8 +10,7 @@ export const THEME_STORAGE_KEY = "theme";
 
 /** Лендинг / сайт вне панели (совпадает с app/layout viewport themeColor light) */
 export const THEME_COLOR_LIGHT_SITE = "#d4d8de";
-/** Светлый холст панели в CSS (html/body). В `theme-color` на маршрутах ЛК не подставляем — ни светлая, ни тёмная тема. */
-export const THEME_COLOR_LIGHT_PANEL = "#f4f1eb";
+/** Светлый холст панели в CSS (html/body, ~#f4f1eb). В `theme-color` на маршрутах ЛК не подставляем. */
 /** Тёмная тема сайта и панели (совпадает с html.app-shell-panel[data-theme=dark]) */
 export const THEME_COLOR_DARK = "#0d0e12";
 
@@ -189,7 +188,7 @@ function applyDocumentShellChromeNow(pathname: string | null, preference: SiteTh
 }
 
 /** Сразу (после закрытия оверлея и т.п.). Отменяет отложенный вызов, если он висел в очереди. */
-export function applyDocumentShellChromeSync(pathname: string | null, preference: SiteThemePreference): void {
+function applyDocumentShellChromeSync(pathname: string | null, preference: SiteThemePreference): void {
   if (typeof document === "undefined") return;
   cancelDeferredDocumentShellChrome();
   applyDocumentShellChromeNow(pathname, preference);

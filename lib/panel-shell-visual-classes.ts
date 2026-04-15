@@ -17,8 +17,6 @@ const PANEL_NAV_WRAP_BASE = `flex flex-col gap-0 ${PANEL_NAV_WRAP_ROUNDED} ${PAN
 
 export const PANEL_NAV_WRAP_CABINET = `${PANEL_NAV_WRAP_BASE} bg-[var(--color-dark-gray)]/5`;
 
-export const PANEL_NAV_WRAP_ADMIN = PANEL_NAV_WRAP_CABINET;
-
 /** Линия под мобильной полоской (тема + меню) */
 export const PANEL_TOP_SHELL_GOLD_DIVIDER =
   "mx-0 h-0 w-full shrink-0 border-0 border-t border-[var(--color-brand-gold)]/45";
@@ -34,12 +32,8 @@ export const PANEL_SIDEBAR_NAV_LINK_ROW =
 export const PANEL_SIDEBAR_NAV_LINK_INACTIVE_CABINET =
   "border border-transparent text-[var(--color-text)]/80 hover:bg-[var(--color-dark-gray)]/10 hover:text-[var(--color-text)]";
 
-export const PANEL_SIDEBAR_NAV_LINK_INACTIVE_ADMIN = PANEL_SIDEBAR_NAV_LINK_INACTIVE_CABINET;
-
 export const PANEL_SIDEBAR_NAV_GROUP_SEPARATOR_CABINET =
   "mt-3 border-t border-[var(--color-brand-gold)]/12 pt-3 first:mt-0 first:border-t-0 first:pt-2";
-
-export const PANEL_SIDEBAR_NAV_GROUP_SEPARATOR_ADMIN = PANEL_SIDEBAR_NAV_GROUP_SEPARATOR_CABINET;
 
 export const PANEL_SIDEBAR_NAV_GROUP_TITLE_ADMIN =
   "px-2.5 pb-1.5 pt-0.5 text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-[var(--color-text)]/45";

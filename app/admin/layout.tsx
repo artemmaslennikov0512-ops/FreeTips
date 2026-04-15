@@ -33,12 +33,12 @@ import { PanelShellMobileCorner } from "@/components/PanelShellMobileCorner";
 import {
   PANEL_APP_MAIN_SURFACE_ADMIN,
   PANEL_MAIN_CONTENT_INNER_ADMIN_CABINET,
-  PANEL_NAV_WRAP_ADMIN,
+  PANEL_NAV_WRAP_CABINET,
   PANEL_SIDEBAR_NAV_ACTIVE_ADMIN,
-  PANEL_SIDEBAR_NAV_GROUP_SEPARATOR_ADMIN,
+  PANEL_SIDEBAR_NAV_GROUP_SEPARATOR_CABINET,
   PANEL_SIDEBAR_NAV_GROUP_TITLE_ADMIN,
   PANEL_SIDEBAR_NAV_ICON,
-  PANEL_SIDEBAR_NAV_LINK_INACTIVE_ADMIN,
+  PANEL_SIDEBAR_NAV_LINK_INACTIVE_CABINET,
   PANEL_SIDEBAR_NAV_LINK_ROW,
 } from "@/lib/panel-shell-visual-classes";
 
@@ -328,11 +328,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </div>
           </div>
           <div className="cabinet-nav-block flex min-h-0 min-w-0 flex-col overflow-x-hidden px-3 pb-2 lg:flex-none">
-            <nav className={PANEL_NAV_WRAP_ADMIN} aria-label="Навигация админ-панели">
+            <nav className={PANEL_NAV_WRAP_CABINET} aria-label="Навигация админ-панели">
               {NAV_GROUPS.map((group) => (
                 <div
                   key={group.title}
-                  className={PANEL_SIDEBAR_NAV_GROUP_SEPARATOR_ADMIN}
+                  className={PANEL_SIDEBAR_NAV_GROUP_SEPARATOR_CABINET}
                   role="group"
                   aria-label={group.title}
                 >
@@ -353,7 +353,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                           href={href}
                           onClick={closeSidebar}
                           className={`${PANEL_SIDEBAR_NAV_LINK_ROW} ${
-                            isActive(href) ? PANEL_SIDEBAR_NAV_ACTIVE_ADMIN : PANEL_SIDEBAR_NAV_LINK_INACTIVE_ADMIN
+                            isActive(href) ? PANEL_SIDEBAR_NAV_ACTIVE_ADMIN : PANEL_SIDEBAR_NAV_LINK_INACTIVE_CABINET
                           }`}
                         >
                           <Icon className={`${PANEL_SIDEBAR_NAV_ICON} ${iconClass}`} aria-hidden />

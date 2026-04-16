@@ -27,6 +27,7 @@ import {
 } from "@/lib/panel-mobile-ui";
 import { PanelMobileTopChrome } from "@/components/PanelMobileTopChrome";
 import { PanelSidebarThemeSwitch } from "@/components/PanelSidebarThemeSwitch";
+import { CabinetSidebarPaySnippet } from "@/components/cabinet/CabinetSidebarPaySnippet";
 import { useTheme } from "@/lib/theme-context";
 import { applyDocumentShellChrome } from "@/lib/document-shell-chrome";
 import { usePanelMobileSimpleDrawerEffects } from "@/lib/use-panel-mobile-simple-drawer-effects";
@@ -64,6 +65,9 @@ export type CabinetMobileNavContextValue = {
   sidebarDisplayLabel: string;
   /** Первое слово ФИО — для стиля M5 как в десктоп-сайдбаре */
   sidebarFirstName: string | null;
+  /** Код и ссылка /pay/{slug} для блока в шторке (как в lg-сайдбаре) */
+  cabinetPaySlug: string | null;
+  cabinetPayLink: string | null;
 };
 
 const CabinetMobileNavContext = createContext<CabinetMobileNavContextValue | null>(null);
@@ -131,6 +135,8 @@ export function CabinetMobileNavPortals() {
     brandFont,
     sidebarDisplayLabel,
     sidebarFirstName,
+    cabinetPaySlug,
+    cabinetPayLink,
   } = useCabinetMobileNav();
 
   /* Тот же стек, что админка / заведение: scroll lock + chrome + Escape — см. usePanelMobileSimpleDrawerEffects. */
@@ -205,6 +211,11 @@ export function CabinetMobileNavPortals() {
               </div>
             </div>
           </div>
+          <CabinetSidebarPaySnippet
+            paySlug={cabinetPaySlug}
+            payLink={cabinetPayLink}
+            onNavigate={closeSidebar}
+          />
           <p className="cabinet-nav-label mb-1.5 shrink-0 px-3 text-center text-[0.6875rem] font-medium uppercase tracking-wider text-[var(--color-text)]/50">
             Навигация
           </p>

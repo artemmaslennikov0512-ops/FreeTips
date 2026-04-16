@@ -36,12 +36,14 @@ import {
   CabinetMobileNavMobileCorner,
   type CabinetMobileNavContextValue,
 } from "@/components/cabinet/CabinetMobileNav";
+import { CabinetSidebarPaySnippet } from "@/components/cabinet/CabinetSidebarPaySnippet";
 import { usePanelMobileMenu } from "@/components/PanelMobileMenuContext";
 import { LkPresenceHeartbeat } from "@/components/LkPresenceHeartbeat";
 import { ProactiveAccessRefresh } from "@/components/ProactiveAccessRefresh";
 import { PanelMobileBackButton } from "@/components/PanelMobileBackButton";
 import { PanelSidebarThemeSwitch } from "@/components/PanelSidebarThemeSwitch";
 import { readCabinetNavRoleCache, writeCabinetNavRoleCache } from "@/lib/cabinet-nav-role-cache";
+import { getBaseUrl } from "@/lib/get-base-url";
 import { useTheme } from "@/lib/theme-context";
 import {
   PANEL_APP_MAIN_SURFACE_CABINET,
@@ -144,6 +146,8 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
   const [supportUnreadCount, setSupportUnreadCount] = useState(0);
   const [lgSidebarCollapsed, setLgSidebarCollapsed] = useState(false);
   const [adminCabinetView, setAdminCabinetView] = useState(false);
+  const [cabinetPaySlug, setCabinetPaySlug] = useState<string | null>(null);
+  const [cabinetPayLink, setCabinetPayLink] = useState<string | null>(null);
 
   useEffect(() => setMounted(true), []);
 
@@ -227,7 +231,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
         }
         return res.ok ? res.json() : null;
       })
-      .then((data) => {
+      .then(async (data) => {
         if (data?.role === "ADMIN" || data?.role === "SUPERADMIN") {
           writeCabinetNavRoleCache(data.role);
           router.replace("/admin/dashboard");
@@ -248,6 +252,24 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
             employeePhotoUrl: data.employeePhotoUrl ?? null,
             establishmentBrand: data.establishmentBrand ?? null,
           });
+          const linksRes = await fetchWithAuth("/api/links");
+          if (linksRes.ok) {
+            const linksData = (await linksRes.json()) as { links?: { slug: string }[] };
+            if (linksData.links?.length) {
+              const code = linksData.links[0]!.slug;
+              setCabinetPaySlug(code);
+              setCabinetPayLink(`${getBaseUrl()}/pay/${code}`);
+            } else {
+              setCabinetPaySlug(null);
+              setCabinetPayLink(null);
+            }
+          } else {
+            setCabinetPaySlug(null);
+            setCabinetPayLink(null);
+          }
+        } else {
+          setCabinetPaySlug(null);
+          setCabinetPayLink(null);
         }
       })
       .catch(() => {}));
@@ -401,6 +423,8 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
       brandFont,
       sidebarDisplayLabel,
       sidebarFirstName,
+      cabinetPaySlug,
+      cabinetPayLink,
     }),
     [
       sidebarOpen,
@@ -421,6 +445,8 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
       brandFont,
       sidebarDisplayLabel,
       sidebarFirstName,
+      cabinetPaySlug,
+      cabinetPayLink,
     ],
   );
 
@@ -514,6 +540,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
             </div>
           </div>
         </div>
+        <CabinetSidebarPaySnippet paySlug={cabinetPaySlug} payLink={cabinetPayLink} />
         <div className="mb-2 mt-4 flex h-8 shrink-0 items-center px-3">
           <span className="w-8 shrink-0 select-none" aria-hidden />
           <span className="cabinet-nav-label min-w-0 flex-1 text-center text-xs font-medium uppercase leading-none tracking-wider text-[var(--color-text)]/50">

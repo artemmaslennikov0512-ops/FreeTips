@@ -238,7 +238,7 @@ html:not([data-theme="dark"]) body.admin-page .cabinet-mobile-top-shell .theme-t
   box-shadow: none !important;
 }
 [data-theme="dark"] body.admin-page .cabinet-mobile-top-shell {
-  background: #0d0e12;
+  background: #12161f;
   color: rgba(250, 250, 250, 0.92);
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.08);
 }
@@ -364,7 +364,7 @@ html:not([data-theme="dark"]) body.cabinet-page .cabinet-premium[data-cabinet-th
     body.cabinet-page:not(.establishment-page):not(.admin-page):not(
         :has(.cabinet-premium[data-brand-active="true"])
       ):not(:has(.cabinet-premium[data-cabinet-theme="m5-competition"])) {
-    background: #0d0e12;
+    background: #12161f;
   }
 
   html:not([data-theme="dark"])
@@ -377,7 +377,7 @@ html:not([data-theme="dark"]) body.cabinet-page .cabinet-premium[data-cabinet-th
   html[data-theme="dark"]
     body.cabinet-page:not(.establishment-page):not(.admin-page)
     .cabinet-premium:not([data-cabinet-theme="m5-competition"]):not([data-brand-active="true"]) {
-    background-color: #0d0e12 !important;
+    background-color: #12161f !important;
   }
 
   html:not([data-theme="dark"])
@@ -1995,9 +1995,11 @@ html:not([data-theme="dark"]) .cabinet-mobile-nav-dialog:not([data-cabinet-theme
 [data-theme="dark"] .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-sidebar:not(.admin-sidebar) .cabinet-nav-active,
 [data-theme="dark"] .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-nav-dropdown .cabinet-nav-active,
 [data-theme="dark"] .cabinet-mobile-nav-dialog:not([data-cabinet-theme="m5-competition"]) .cabinet-nav-active {
-  border-color: rgba(197, 165, 114, 0.45) !important;
-  background: rgba(197, 165, 114, 0.12) !important;
+  border: none !important;
+  outline: none !important;
+  background: rgba(255, 255, 255, 0.1) !important;
   color: rgba(250, 250, 250, 0.98) !important;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.22) !important;
 }
 
 /*
@@ -2034,6 +2036,10 @@ html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-compe
 .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-menu-btn[aria-expanded="true"] {
   border-color: rgba(197, 165, 114, 0.45);
   background: rgba(197, 165, 114, 0.12);
+}
+[data-theme="dark"] .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-menu-btn[aria-expanded="true"] {
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  background: rgba(255, 255, 255, 0.08) !important;
 }
 /* Моб. кнопка меню: глобальные стили .cabinet-waiter-btn задают padding/gap — убираем, центр задаёт внутренний span */
 .cabinet-premium .cabinet-menu-btn.cabinet-waiter-btn {
@@ -2110,7 +2116,7 @@ html:not([data-theme="dark"]) .admin-mobile-nav-overlay {
   background: linear-gradient(rgba(10, 25, 47, 0.35), rgba(10, 25, 47, 0.35)), #f4f1eb;
 }
 [data-theme="dark"] .admin-mobile-nav-overlay {
-  background: linear-gradient(rgba(0, 0, 0, 0.78), rgba(0, 0, 0, 0.78)), #0d0e12;
+  background: linear-gradient(rgba(0, 0, 0, 0.78), rgba(0, 0, 0, 0.78)), #12161f;
 }
 
 /*
@@ -2149,7 +2155,7 @@ html:not([data-theme="dark"]) .cabinet-mobile-nav-overlay {
   background: linear-gradient(rgba(10, 25, 47, 0.35), rgba(10, 25, 47, 0.35)), #f4f1eb;
 }
 [data-theme="dark"] .cabinet-mobile-nav-overlay {
-  background: linear-gradient(rgba(0, 0, 0, 0.78), rgba(0, 0, 0, 0.78)), #0d0e12;
+  background: linear-gradient(rgba(0, 0, 0, 0.78), rgba(0, 0, 0, 0.78)), #12161f;
 }
 
 /*
@@ -2335,9 +2341,11 @@ html:not([data-theme="dark"]) .admin-mobile-nav-dialog [role="group"] {
   color: #fafafa !important;
 }
 [data-theme="dark"] .admin-mobile-nav-dialog .cabinet-nav-active {
-  border-color: rgba(197, 165, 114, 0.45) !important;
-  background: rgba(197, 165, 114, 0.12) !important;
+  border: none !important;
+  outline: none !important;
+  background: rgba(255, 255, 255, 0.1) !important;
   color: rgba(250, 250, 250, 0.98) !important;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.22) !important;
 }
 [data-theme="dark"] .admin-mobile-nav-dialog nav {
   background: rgba(0, 0, 0, 0.25) !important;
@@ -2345,6 +2353,21 @@ html:not([data-theme="dark"]) .admin-mobile-nav-dialog [role="group"] {
   border-style: solid !important;
   border-color: rgba(255, 255, 255, 0.15) !important;
   box-shadow: none !important;
+}
+
+/* Тёмная панель: моб. меню — Tailwind-рамки brand-gold → нейтральный хром */
+[data-theme="dark"] .cabinet-mobile-nav-dialog--modal.cabinet-mobile-nav-dialog,
+[data-theme="dark"] .admin-mobile-nav-dialog.admin-nav-dropdown {
+  border-color: rgba(255, 255, 255, 0.14) !important;
+}
+[data-theme="dark"] .cabinet-mobile-nav-dialog--modal .cabinet-sidebar-profile.cabinet-block-inner,
+[data-theme="dark"] .cabinet-mobile-nav-dialog--modal .cabinet-mobile-nav-dialog__nav,
+[data-theme="dark"] .admin-mobile-nav-dialog .cabinet-sidebar-profile.cabinet-block-inner,
+[data-theme="dark"] .admin-mobile-nav-dialog nav {
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+[data-theme="dark"] .cabinet-mobile-nav-dialog__nav .border-t {
+  border-top-color: rgba(255, 255, 255, 0.1) !important;
 }
 
 /* Блок навигации в сайдбаре — светлая тема: как плитки «Быстрые действия» на дашборде */
@@ -2481,16 +2504,15 @@ html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-compe
     0 0 0 1px rgba(255, 255, 255, 0.06);
 }
 
-/* Тёмная тема: основной блок ЛК — тот же фон, что у сайдбара */
-[data-theme="dark"] .cabinet-premium .cabinet-main-block {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid var(--lk-chrome-border-color, rgba(255, 255, 255, 0.14));
-  box-shadow: var(
-    --lk-chrome-shadow,
-    0 4px 14px rgba(0, 0, 0, 0.3),
-    0 2px 6px rgba(0, 0, 0, 0.2),
-    0 0 0 1px rgba(255, 255, 255, 0.06)
-  );
+/* Тёмная тема: основной блок — без отдельной «плиты» (контент на фоне страницы) */
+[data-theme="dark"] .cabinet-premium .cabinet-main-block,
+[data-theme="dark"] body.admin-page .admin-panel .cabinet-main-block.admin-main-block,
+[data-theme="dark"] body.establishment-page .establishment-panel .cabinet-main-block {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
 
 [data-theme="dark"] .cabinet-premium .cabinet-sidebar {
@@ -2516,11 +2538,12 @@ html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-compe
 }
 
 [data-theme="dark"] .cabinet-premium .cabinet-card {
-  background: #161616;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  /* Чуть светлее холста #12161f — блоки не сливаются с фоном */
+  background: #1c222d;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow:
-    0 0 0 1px rgba(0, 0, 0, 0.45),
-    0 8px 28px rgba(0, 0, 0, 0.38);
+    0 0 0 1px rgba(0, 0, 0, 0.35),
+    0 10px 32px rgba(0, 0, 0, 0.42);
 }
 
 [data-theme="dark"] .cabinet-premium .cabinet-card input[type="file"] {
@@ -2684,6 +2707,32 @@ html:not([data-theme="dark"]) .cabinet-premium .premium-card:not(.premium-card--
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, transparent 50%, rgba(0, 0, 0, 0.18) 100%) !important;
 }
 
+/* Тёмная тема: виртуальная карта внутри .cabinet-card — кольцо и глубина, чтобы не сливалась с плиткой */
+[data-theme="dark"] .cabinet-premium .cabinet-card .premium-card:not(.premium-card--m5),
+[data-theme="dark"] .admin-panel .cabinet-card .premium-card:not(.premium-card--m5) {
+  position: relative;
+  z-index: 1;
+  isolation: isolate;
+  border-radius: 12px;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.11),
+    0 20px 48px -14px rgba(0, 0, 0, 0.72),
+    0 0 42px -12px rgba(15, 138, 125, 0.16);
+}
+
+/* M5: та же отстройка от плитки .cabinet-card */
+[data-theme="dark"] .cabinet-premium .cabinet-card .premium-card--m5,
+[data-theme="dark"] .admin-panel .cabinet-card .premium-card--m5 {
+  position: relative;
+  z-index: 1;
+  isolation: isolate;
+  border-radius: 12px;
+  box-shadow:
+    0 0 0 1px rgba(28, 105, 212, 0.24),
+    0 20px 48px -14px rgba(0, 0, 0, 0.78),
+    0 0 44px -12px rgba(28, 105, 212, 0.14);
+}
+
 /* Лицевая карта: <p> с суммой — flex, иначе line-box под inline-block .premium-card-balance-plate поднимает сумму выше FreeTips */
 .cabinet-premium .premium-card .premium-card-balance-text {
   display: flex;
@@ -2748,7 +2797,7 @@ html:not([data-theme="dark"]) .cabinet-premium .premium-card:not(.premium-card--
 }
 
 [data-theme="dark"] .cabinet-premium .cabinet-overlay {
-  background: linear-gradient(rgba(0, 0, 0, 0.82), rgba(0, 0, 0, 0.82)), #0d0e12 !important;
+  background: linear-gradient(rgba(0, 0, 0, 0.82), rgba(0, 0, 0, 0.82)), #12161f !important;
   border-color: rgba(255, 255, 255, 0.1);
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08);
 }
@@ -3249,16 +3298,48 @@ html:not([data-theme="dark"])
   color: var(--color-text) !important;
 }
 
-/* Светлая тема: карточки — белые плитки без серой обводки; отделение только тенью */
-html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-card,
-html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-section-header {
-  background: #ffffff;
-  border: none;
+/*
+ * Светлая тема: карточки main — бирюзовое «стекло» в тон виртуальной карты (средний #11998e),
+ * один слой rgba без градиента; блюр фона за карточкой. Не M5 / не админка / без бренда заведения.
+ */
+html:not([data-theme="dark"])
+  .cabinet-premium:not([data-cabinet-theme="m5-competition"]):not(.admin-panel):not([data-brand-active="true"])
+  .cabinet-card,
+html:not([data-theme="dark"])
+  .cabinet-premium:not([data-cabinet-theme="m5-competition"]):not(.admin-panel):not([data-brand-active="true"])
+  .cabinet-section-header {
+  background: rgba(17, 153, 142, 0.22) !important;
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.52) !important;
   border-radius: 1rem;
   box-shadow:
-    0 1px 2px rgba(10, 25, 47, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.38),
+    0 1px 2px rgba(10, 25, 47, 0.06),
     0 10px 32px rgba(10, 25, 47, 0.08),
-    0 2px 8px rgba(10, 25, 47, 0.04);
+    0 0 0 1px rgba(12, 95, 89, 0.12);
+}
+
+html:not([data-theme="dark"])
+  .cabinet-premium:not([data-cabinet-theme="m5-competition"]):not(.admin-panel):not([data-brand-active="true"])
+  .cabinet-card:hover,
+html:not([data-theme="dark"])
+  .cabinet-premium:not([data-cabinet-theme="m5-competition"]):not(.admin-panel):not([data-brand-active="true"])
+  .cabinet-section-header:hover {
+  background: rgba(17, 153, 142, 0.3) !important;
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  html:not([data-theme="dark"])
+    .cabinet-premium:not([data-cabinet-theme="m5-competition"]):not(.admin-panel):not([data-brand-active="true"])
+    .cabinet-card,
+  html:not([data-theme="dark"])
+    .cabinet-premium:not([data-cabinet-theme="m5-competition"]):not(.admin-panel):not([data-brand-active="true"])
+    .cabinet-section-header {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background: rgba(17, 153, 142, 0.88) !important;
+  }
 }
 
 /* Светлая тема + бренд заведения: убираем рамку карточек из переменных — остаётся только тень */
@@ -5724,8 +5805,9 @@ html:not([data-theme="dark"]) body.establishment-page .establishment-panel .esta
 }
 html:not([data-theme="dark"]) body.establishment-page .establishment-panel .establishment-mobile-sidebar nav {
   background: var(--cabinet-block-bg, #f0ebe3) !important;
-  border: 1px solid rgba(197, 165, 114, 0.55) !important;
-  box-shadow: var(--shadow-subtle);
+  border: none !important;
+  outline: none !important;
+  box-shadow: var(--admin-chrome-shadow, 0 2px 10px rgba(10, 25, 47, 0.045), 0 12px 36px rgba(10, 25, 47, 0.065));
 }
 html:not([data-theme="dark"]) body.establishment-page .establishment-panel .establishment-mobile-sidebar nav [role="group"] {
   border-color: rgba(10, 25, 47, 0.1) !important;
@@ -7205,10 +7287,10 @@ html {
  * Раньше было [data-theme="dark"] html.app-shell-panel — так не матчится (у html нет предка с data-theme).
  */
 html.app-shell-panel[data-theme="dark"] {
-  background-color: #0d0e12;
+  background-color: #12161f;
   color-scheme: dark;
   /* Единый «холст» с body (Tailwind bg-[var(--color-bg)]) и theme-color — иначе iOS даёт швы при SPA/смене темы */
-  --color-bg: #0d0e12;
+  --color-bg: #12161f;
 }
 html.app-shell-panel[data-theme="light"] {
   /* Тёплый слоновый как у body ЛК — иначе на мобильном серый html даёт швы у safe-area / rubber-band */
@@ -7269,16 +7351,16 @@ html {
 
 /* Тёмная тема: фон страницы — однотонный тёмный, без фото; матовое стекло блоков сохраняется */
 [data-theme="dark"] body.cabinet-page {
-  background: #0d0e12;
+  background: #12161f;
 }
 
 /* ЛК админа — тот же однотонный фон */
 [data-theme="dark"] body.admin-page {
-  background: #0d0e12 !important;
+  background: #12161f !important;
   min-height: 100vh;
 }
 [data-theme="dark"] body.establishment-page {
-  background: #0d0e12 !important;
+  background: #12161f !important;
   min-height: 100vh;
 }
 [data-theme="dark"] body.admin-page .admin-panel {
@@ -7287,7 +7369,7 @@ html {
 }
 /*
  * Панели контента заведения (--establishment-charcoal):
- * — Тёмная тема: плотный фон #0d0e12.
+ * — Тёмная тема: плотный фон холста #12161f.
  * — Светлая тема: тёплый вложенный оттенок / белая карточка дашборда (см. правила ниже).
  */
 body.establishment-page .establishment-panel {
@@ -7305,7 +7387,7 @@ html:not([data-theme="dark"]) body.establishment-page .establishment-panel {
   }
 }
 [data-theme="dark"] body.establishment-page .establishment-panel {
-  --establishment-charcoal: #0d0e12;
+  --establishment-charcoal: #12161f;
   background: transparent;
 }
 
@@ -8317,7 +8399,8 @@ html:not([data-theme="dark"]) body.admin-page .admin-panel .lk-sessions {
    перекрытие только для [data-cabinet-theme="m5-competition"].
    ============================================================================= */
 [data-theme="dark"] body.cabinet-page:has(.cabinet-premium[data-cabinet-theme="m5-competition"]) {
-  background: #08090b !important;
+  /* Чуть теплее общего холста #12161f, без «чистого» чёрного */
+  background: #10131c !important;
 }
 
 [data-theme="dark"] .cabinet-premium[data-cabinet-theme="m5-competition"] {
@@ -8326,7 +8409,7 @@ html:not([data-theme="dark"]) body.admin-page .admin-panel .lk-sessions {
   --cabinet-accent-gold: #1c69d4;
   --cabinet-accent-emerald: #059669;
   --cabinet-accent-red: #dc2626;
-  --color-bg: #08090b;
+  --color-bg: #10131c;
   --color-text: #e8eaef;
   --color-text-secondary: #b8bcc6;
   --color-muted: #7c8290;
@@ -8373,23 +8456,13 @@ html:not([data-theme="dark"]) body.admin-page .admin-panel .lk-sessions {
   color: rgba(184, 188, 198, 0.75) !important;
 }
 
+/* Как в обычном ЛК: без отдельной «плиты» main — карточки и M5-стили задают рельеф */
 [data-theme="dark"] .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-main-block:not(.admin-main-block) {
-  background:
-    linear-gradient(165deg, #14161c 0%, #0e1014 55%, #12141a 100%),
-    linear-gradient(
-      118deg,
-      transparent 0%,
-      rgba(28, 105, 212, 0.04) 22%,
-      transparent 45%,
-      rgba(229, 37, 42, 0.06) 72%,
-      transparent 100%
-    ) !important;
-  background-size: 100% 100%, 160% 160% !important;
-  background-position: 0 0, 62% 42% !important;
-  border: 1px solid rgba(28, 105, 212, 0.28) !important;
-  box-shadow:
-    0 0 0 1px rgba(0, 0, 0, 0.4),
-    0 12px 40px rgba(0, 0, 0, 0.35) !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
 
 [data-theme="dark"] .cabinet-premium[data-cabinet-theme="m5-competition"] .cabinet-main-block #main-content {

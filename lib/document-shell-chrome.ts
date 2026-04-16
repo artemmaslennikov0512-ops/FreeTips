@@ -11,7 +11,7 @@ export const THEME_STORAGE_KEY = "theme";
 /** Лендинг / сайт вне панели (дефолтный theme-color для светлой темы в boot / apply) */
 export const THEME_COLOR_LIGHT_SITE = "#d4d8de";
 /** Тёмная тема сайта и панели (совпадает с html.app-shell-panel[data-theme=dark]) */
-export const THEME_COLOR_DARK = "#0d0e12";
+export const THEME_COLOR_DARK = "#12161f";
 
 export type SiteThemePreference = "light" | "dark";
 

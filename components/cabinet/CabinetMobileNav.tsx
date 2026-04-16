@@ -157,7 +157,7 @@ export function CabinetMobileNavPortals() {
           role="dialog"
           aria-modal="false"
           aria-label="Меню навигации"
-          className={`cabinet-premium cabinet-mobile-nav-dialog cabinet-nav-dropdown cabinet-mobile-nav-dialog--drawer-left pointer-events-auto flex h-full min-h-0 ${PANEL_MOBILE_LEFT_DRAWER_WIDTH_CLASS} max-w-full flex-col overflow-hidden rounded-r-xl border border-[var(--color-brand-gold)]/25 shadow-[var(--shadow-card)] transition-transform duration-300 ease-out ${
+          className={`cabinet-premium cabinet-mobile-nav-dialog cabinet-nav-dropdown cabinet-mobile-nav-dialog--drawer-left pointer-events-auto flex h-full min-h-0 ${PANEL_MOBILE_LEFT_DRAWER_WIDTH_CLASS} max-w-full flex-col overflow-hidden rounded-xl border border-[var(--color-brand-gold)]/25 shadow-[var(--shadow-card)] transition-transform duration-300 ease-out ${
             sidebarOpen ? "translate-x-0" : `pointer-events-none ${PANEL_MOBILE_LEFT_DRAWER_CLOSED_TRANSLATE_CLASS}`
           }`}
           data-cabinet-theme={isM5Cabinet ? "m5-competition" : undefined}

@@ -222,7 +222,7 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
       />
 
       {/* Сайдбар только lg+; на мобильном — портал как в ЛК официанта */}
-      <aside className="cabinet-sidebar establishment-desktop-sidebar relative hidden min-h-0 w-[14.75rem] min-w-[14.75rem] shrink-0 flex-col overflow-hidden rounded-[10px] border border-white/10 bg-transparent py-3 shadow-2xl backdrop-blur-xl lg:mt-9 lg:mb-3 lg:flex lg:max-h-[calc(100vh-0.5rem-2.25rem-0.75rem)] lg:self-start">
+      <aside className="cabinet-lg-sidebar-rail cabinet-sidebar establishment-desktop-sidebar relative hidden min-h-0 w-[14.75rem] min-w-[14.75rem] shrink-0 flex-col overflow-hidden rounded-[1rem] border-0 bg-transparent py-3 shadow-2xl backdrop-blur-xl lg:mt-11 lg:mb-3 lg:flex lg:max-h-[calc(100vh-0.5rem-2.75rem-0.75rem)] lg:self-start lg:overflow-hidden">
         <div className="mb-2 w-full shrink-0 px-2.5 text-center">
           <span className={PANEL_ESTABLISHMENT_SIDEBAR_TITLE_LINE}>Кабинет заведения</span>
         </div>

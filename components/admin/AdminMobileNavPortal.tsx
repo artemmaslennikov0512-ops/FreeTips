@@ -72,7 +72,7 @@ export function AdminMobileNavPortal({
         role="dialog"
         aria-modal="false"
         aria-label="Меню навигации"
-        className={`admin-mobile-nav-dialog cabinet-nav-dropdown admin-nav-dropdown cabinet-mobile-nav-dialog--drawer-left pointer-events-auto flex h-full min-h-0 ${PANEL_MOBILE_LEFT_DRAWER_WIDTH_CLASS} max-w-full flex-col overflow-hidden rounded-r-xl shadow-[var(--shadow-card)] transition-transform duration-300 ease-out ${
+        className={`admin-mobile-nav-dialog cabinet-nav-dropdown admin-nav-dropdown cabinet-mobile-nav-dialog--drawer-left pointer-events-auto flex h-full min-h-0 ${PANEL_MOBILE_LEFT_DRAWER_WIDTH_CLASS} max-w-full flex-col overflow-hidden rounded-xl shadow-[var(--shadow-card)] transition-transform duration-300 ease-out ${
           sidebarOpen ? "translate-x-0" : `pointer-events-none ${PANEL_MOBILE_LEFT_DRAWER_CLOSED_TRANSLATE_CLASS}`
         }`}
         aria-hidden={!sidebarOpen}

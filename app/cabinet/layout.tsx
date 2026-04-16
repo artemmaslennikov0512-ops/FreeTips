@@ -452,14 +452,14 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
       />
       {/* Левое меню (lg+): сворачиваемая колонка; на мобильном — портал меню */}
       <div
-        className={`hidden shrink-0 transition-[width] duration-300 ease-out lg:mt-9 lg:mb-3 lg:flex lg:self-start ${
+        className={`cabinet-lg-sidebar-rail hidden shrink-0 transition-[width] duration-300 ease-out lg:mt-11 lg:mb-3 lg:flex lg:self-start ${
           lgSidebarCollapsed
             ? "lg:w-0 lg:pointer-events-none lg:overflow-hidden"
             : "lg:relative lg:z-10 lg:w-[236px] lg:overflow-hidden"
         }`}
       >
         <div
-          className="cabinet-sidebar relative flex min-h-0 w-[236px] min-w-[236px] flex-col overflow-hidden border-0 border-r border-white/10 py-4 shadow-2xl backdrop-blur-xl lg:static lg:h-auto lg:max-h-[calc(100vh-0.5rem-2.25rem-0.75rem)] lg:rounded-[10px] lg:border-x lg:border-b lg:border-t-0 lg:border-white/10"
+          className="cabinet-sidebar relative flex min-h-0 w-[236px] min-w-[236px] flex-col overflow-hidden border-0 py-4 shadow-2xl backdrop-blur-xl lg:static lg:h-auto lg:max-h-[calc(100vh-0.5rem-2.75rem-0.75rem)] lg:overflow-hidden lg:rounded-[1rem]"
           style={sidebarStyle}
         >
         <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-x-hidden overflow-y-auto">

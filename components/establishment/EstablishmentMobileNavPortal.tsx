@@ -70,7 +70,7 @@ export function EstablishmentMobileNavPortal({
         role="dialog"
         aria-modal="false"
         aria-label="Меню кабинета заведения"
-        className={`cabinet-sidebar establishment-mobile-sidebar pointer-events-auto flex min-h-0 flex-col overflow-hidden rounded-r-xl border border-white/10 bg-white/[0.06] shadow-2xl backdrop-blur-xl transition-[transform] duration-300 ease-out max-lg:h-full max-lg:max-h-none max-lg:py-2 ${PANEL_MOBILE_LEFT_DRAWER_WIDTH_CLASS} max-w-full ${
+        className={`cabinet-sidebar establishment-mobile-sidebar pointer-events-auto flex min-h-0 flex-col overflow-hidden rounded-xl border border-white/10 bg-white/[0.06] shadow-2xl backdrop-blur-xl transition-[transform] duration-300 ease-out max-lg:h-full max-lg:max-h-none max-lg:py-2 ${PANEL_MOBILE_LEFT_DRAWER_WIDTH_CLASS} max-w-full ${
           sidebarOpen ? "translate-x-0" : `pointer-events-none ${PANEL_MOBILE_LEFT_DRAWER_CLOSED_TRANSLATE_CLASS}`
         }`}
       >

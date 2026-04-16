@@ -103,14 +103,14 @@ html:not([data-theme="dark"]) body.establishment-page {
   background: #e5e9e7 !important;
 }
 
-/* Светлая тема: хром панелей. Холст #e5e9e7 (не трогаем); карточки — белые; вложенные блоки — #dbe4ea (плинтус, не сливается с #fff). */
+/* Светлая тема: хром панелей. Холст #e5e9e7 (не трогаем); карточки — белые; блоки и панель сайдбара — #dbe4ea (--cabinet-block-bg / --cabinet-sidebar-surface-bg). */
 html:not([data-theme="dark"]) body.cabinet-page:not(.admin-page),
 html:not([data-theme="dark"]) body.establishment-page,
 html:not([data-theme="dark"]) body.admin-page {
   --cabinet-surface-card-bg: #ffffff;
   --cabinet-surface-card-hover-bg: #f1f5f9;
   --cabinet-chrome-elevated-bg: #e5e9e7;
-  --cabinet-sidebar-surface-bg: #ffffff;
+  --cabinet-sidebar-surface-bg: #dbe4ea;
   --cabinet-chrome-border: rgba(197, 165, 114, 0.45);
   --cabinet-chrome-shadow:
     0 1px 2px rgba(10, 25, 47, 0.07),
@@ -2010,10 +2010,10 @@ html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competitio
 
 /* Светлая тема: сайдбар ЛК / заведения — золотая обводка 1px (как толщина рамки в тёмной: 1px solid) + тень хрома (не M5) */
 html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-sidebar:not(.admin-sidebar) {
-  background: var(--cabinet-sidebar-surface-bg, #ffffff) !important;
+  background: var(--cabinet-sidebar-surface-bg, #dbe4ea) !important;
   border: 1px solid rgba(197, 165, 114, 0.58) !important;
   outline: none !important;
-  border-radius: 0.625rem;
+  border-radius: 1rem !important;
   box-shadow: var(
     --cabinet-chrome-shadow-strong,
     0 2px 4px rgba(10, 25, 47, 0.07),
@@ -2052,7 +2052,7 @@ html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-compe
 
 /* Развернуть меню (lg): в разметке bg-[var(--color-navy)] — на светлой теме как поверхность сайдбара */
 html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-lg-sidebar-toggle--expand {
-  background: var(--cabinet-sidebar-surface-bg, #ffffff) !important;
+  background: var(--cabinet-sidebar-surface-bg, #dbe4ea) !important;
   border: none !important;
   outline: none !important;
   color: #0a192f !important;
@@ -2519,9 +2519,9 @@ html:not([data-theme="dark"]) .establishment-mobile-nav-shell .establishment-mob
   backdrop-filter: none !important;
 }
 
-/* Блок навигации в сайдбаре — светлая тема: без серой заливки, только рамка и тень как у блока ФИО (.cabinet-sidebar-profile) */
+/* Блок навигации в сайдбаре — светлая тема: белая «карточка» на фоне панели */
 html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-sidebar:not(.admin-sidebar) .cabinet-nav-block nav {
-  background: transparent !important;
+  background: #ffffff !important;
   border: 1px solid rgba(197, 165, 114, 0.55) !important;
   outline: none !important;
   box-shadow: var(--shadow-subtle) !important;
@@ -2531,14 +2531,14 @@ html:not([data-theme="dark"])
   .cabinet-sidebar:not(.admin-sidebar)
   .cabinet-nav-block
   nav {
-  background: transparent !important;
+  background: #ffffff !important;
   border: 1px solid var(--cabinet-border-color, rgba(197, 165, 114, 0.55)) !important;
   outline: none !important;
   box-shadow: var(--shadow-subtle) !important;
 }
 html:not([data-theme="dark"]) .admin-panel .admin-sidebar .cabinet-nav-block nav {
-  background: transparent !important;
-  border: 1px solid rgba(10, 25, 47, 0.1) !important;
+  background: #ffffff !important;
+  border: 1px solid rgba(197, 165, 114, 0.55) !important;
   outline: none !important;
   box-shadow: var(--shadow-subtle) !important;
 }
@@ -2609,9 +2609,9 @@ html:not([data-theme="dark"]) .cabinet-mobile-nav-dialog:not([data-cabinet-theme
 
 /* Светлая тема: сайдбар админки — см. блок `body.admin-page .admin-panel .admin-sidebar` ниже по файлу */
 
-/* Светлая тема: блок профиля в сайдбаре — без заливки, только обводка */
+/* Светлая тема: блок профиля — белая плитка на фоне сайдбара (#dbe4ea), не сливается с панелью */
 html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-sidebar-profile {
-  background: transparent !important;
+  background: #ffffff !important;
   border: 1px solid rgba(197, 165, 114, 0.55) !important;
   box-shadow: none !important;
 }
@@ -2666,6 +2666,7 @@ html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-compe
 
 [data-theme="dark"] .cabinet-premium .cabinet-sidebar {
   background: rgba(255, 255, 255, 0.06);
+  border-radius: 1rem;
   border: 1px solid var(--lk-chrome-border-color, rgba(255, 255, 255, 0.14));
   box-shadow: var(
     --lk-chrome-shadow,
@@ -2694,9 +2695,16 @@ html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-compe
   background: #1c222d;
   border: none !important;
   box-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.25),
-    0 10px 32px rgba(0, 0, 0, 0.45),
-    0 2px 8px rgba(0, 0, 0, 0.2);
+    0 1px 2px rgba(0, 0, 0, 0.18),
+    0 10px 28px rgba(0, 0, 0, 0.32),
+    0 2px 6px rgba(0, 0, 0, 0.14);
+}
+
+/* Тёмная тема: внешние вложенные блоки — та же 1px обводка, что у сайдбара (не чип профиля в сайдбаре/шторке) */
+[data-theme="dark"] .cabinet-premium:not([data-cabinet-theme="m5-competition"]):not([data-brand-active="true"]) .cabinet-block-inner:not(.cabinet-sidebar-profile),
+[data-theme="dark"] .cabinet-premium:not([data-cabinet-theme="m5-competition"]):not([data-brand-active="true"]) .cabinet-limits-block {
+  border: 1px solid var(--lk-chrome-border-color, rgba(255, 255, 255, 0.14)) !important;
+  box-shadow: none !important;
 }
 
 [data-theme="dark"] .cabinet-premium .cabinet-card input[type="file"] {
@@ -3503,8 +3511,8 @@ html:not([data-theme="dark"])
   outline: none !important;
   border-radius: var(--admin-surface-card-radius, 1.25rem) !important;
   box-shadow:
-    0 2px 10px rgba(0, 0, 0, 0.28),
-    0 14px 44px rgba(0, 0, 0, 0.38) !important;
+    0 2px 8px rgba(0, 0, 0, 0.22),
+    0 12px 36px rgba(0, 0, 0, 0.28) !important;
 }
 
 [data-theme="dark"] body.admin-page .admin-panel #main-content .cabinet-section-header:hover,
@@ -3521,8 +3529,8 @@ html:not([data-theme="dark"])
   #main-content
   .cabinet-section-header:hover {
   box-shadow:
-    0 4px 16px rgba(0, 0, 0, 0.32),
-    0 22px 56px rgba(0, 0, 0, 0.42) !important;
+    0 4px 12px rgba(0, 0, 0, 0.24),
+    0 18px 48px rgba(0, 0, 0, 0.32) !important;
 }
 
 /* ЛК официанта: при включённом бренде заведения текст в основном блоке использует цвет бренда (fontColor) */
@@ -6068,6 +6076,7 @@ html:not([data-theme="dark"]) .cabinet-premium .cabinet-verification-status .tex
 /* Тёмная тема: сайдбар админки — тот же фон и обводка, что у основного блока */
 [data-theme="dark"] .admin-panel .admin-sidebar {
   background: rgba(255, 255, 255, 0.06) !important;
+  border-radius: 1rem;
   border: 1px solid var(--lk-chrome-border-color, rgba(255, 255, 255, 0.14)) !important;
   box-shadow: var(
     --lk-chrome-shadow,
@@ -6087,10 +6096,10 @@ html:not([data-theme="dark"]) .cabinet-premium .cabinet-verification-status .tex
 }
 /* Светлая тема: сайдбар заведения — золотая обводка 1px (как в тёмной по толщине) */
 html:not([data-theme="dark"]) body.establishment-page .establishment-panel .cabinet-sidebar {
-  background: var(--cabinet-sidebar-surface-bg, #ffffff) !important;
+  background: var(--cabinet-sidebar-surface-bg, #dbe4ea) !important;
   border: 1px solid rgba(197, 165, 114, 0.58) !important;
   outline: none !important;
-  border-radius: 0.625rem;
+  border-radius: 1rem !important;
   box-shadow: var(
     --cabinet-chrome-shadow-strong,
     0 2px 4px rgba(10, 25, 47, 0.07),
@@ -6149,10 +6158,10 @@ html:not([data-theme="dark"]) body.establishment-page .establishment-panel .esta
 
 /* Светлая тема: сайдбар админки — золотая обводка 1px (как толщина рамки в тёмной) + тень */
 html:not([data-theme="dark"]) body.admin-page .admin-panel .admin-sidebar {
-  background: var(--cabinet-sidebar-surface-bg, #ffffff) !important;
+  background: var(--cabinet-sidebar-surface-bg, #dbe4ea) !important;
   border: 1px solid rgba(197, 165, 114, 0.58) !important;
   outline: none !important;
-  border-radius: 0.625rem;
+  border-radius: 1rem !important;
   box-shadow: var(
     --cabinet-chrome-shadow-strong,
     0 2px 4px rgba(10, 25, 47, 0.07),
@@ -6167,7 +6176,7 @@ html:not([data-theme="dark"]) body.admin-page .admin-panel .admin-sidebar {
 }
 html:not([data-theme="dark"]) body.admin-page .admin-panel .admin-sidebar .cabinet-sidebar-profile {
   color: #0a192f !important;
-  background: transparent !important;
+  background: #ffffff !important;
   border: 1px solid rgba(197, 165, 114, 0.55) !important;
   outline: none !important;
   box-shadow: none !important;
@@ -6225,7 +6234,7 @@ html:not([data-theme="dark"]) body.admin-page .admin-panel .cabinet-lg-sidebar-t
   color: #0a192f !important;
 }
 html:not([data-theme="dark"]) body.admin-page .admin-panel .cabinet-lg-sidebar-toggle--expand {
-  background: var(--cabinet-sidebar-surface-bg, #ffffff) !important;
+  background: var(--cabinet-sidebar-surface-bg, #dbe4ea) !important;
   border: none !important;
   outline: none !important;
   box-shadow: var(
@@ -6249,9 +6258,9 @@ html:not([data-theme="dark"]) body.admin-page .admin-panel .cabinet-lg-sidebar-t
   border: 1px solid rgba(197, 165, 114, 0.28) !important;
   border-radius: 10px;
   box-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.25),
-    0 10px 32px rgba(0, 0, 0, 0.45),
-    0 2px 8px rgba(0, 0, 0, 0.2);
+    0 1px 2px rgba(0, 0, 0, 0.18),
+    0 10px 28px rgba(0, 0, 0, 0.32),
+    0 2px 6px rgba(0, 0, 0, 0.14);
 }
 [data-theme="dark"] .admin-panel .admin-establishments-table thead tr {
   border-bottom: 1px solid rgba(197, 165, 114, 0.35);

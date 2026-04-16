@@ -9,11 +9,11 @@ type PanelShellMobileCornerProps = {
   /** Для aria-haspopup: сайдбар заведения — не dialog */
   ariaHaspopup?: "dialog" | "true";
   menuButtonClassName?: string;
-  /** Например «Назад» — слева в одной строке с темой и меню */
+  /** Например «Назад» — слева; без слота гамбургер слева (`start`), со слотом — как в ЛК при подстранице (`end`). */
   leadingSlot?: ReactNode;
 };
 
-/** Фиксированная зона: «Назад» + меню; тема в сайдбаре (админка, ЛК, заведение). */
+/** Фиксированная зона: на корнях разделов — меню слева; на подстраницах — «Назад» слева, меню справа. */
 export function PanelShellMobileCorner({
   ariaControls,
   ariaHaspopup = "dialog",
@@ -31,6 +31,7 @@ export function PanelShellMobileCorner({
       ariaControls={ariaControls}
       ariaHaspopup={ariaHaspopup}
       menuButtonExtraClassName={menuButtonClassName}
+      menuPlacement={leadingSlot ? "end" : "start"}
     />
   );
 }

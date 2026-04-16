@@ -7,13 +7,19 @@ import type { SiteThemePreference } from "@/lib/document-shell-chrome";
 type PanelSidebarThemeSwitchProps = {
   /** M5 ЛК: холодные акценты вместо золота */
   variant?: "default" | "m5";
+  /** Компактный ряд для моб. шапки: без подписи «Тема», меньше отступы */
+  density?: "default" | "toolbar";
   className?: string;
 };
 
 /**
  * Выбор темы в сайдбаре: две опции с «вдавленным» активным состоянием (inset-shadow + translate).
  */
-export function PanelSidebarThemeSwitch({ variant = "default", className = "" }: PanelSidebarThemeSwitchProps) {
+export function PanelSidebarThemeSwitch({
+  variant = "default",
+  density = "default",
+  className = "",
+}: PanelSidebarThemeSwitchProps) {
   const { theme, setTheme } = useTheme();
 
   const onPick = useCallback(
@@ -24,15 +30,17 @@ export function PanelSidebarThemeSwitch({ variant = "default", className = "" }:
   );
 
   const isM5 = variant === "m5";
+  const isToolbar = density === "toolbar";
 
   const labelClass = isM5
     ? "mb-1.5 px-0.5 text-[0.65rem] font-semibold uppercase tracking-wider text-white/45"
     : "mb-1.5 px-0.5 text-[0.65rem] font-semibold uppercase tracking-wider text-[var(--color-text)]/45";
 
-  const rowClass = "flex gap-2";
+  const rowClass = isToolbar ? "flex min-w-0 gap-1" : "flex gap-2";
 
-  const baseBtn =
-    "flex-1 rounded-lg px-2 py-2.5 text-center text-sm font-medium transition-[transform,box-shadow,background-color,border-color,color] duration-150 ease-out outline-none focus-visible:ring-2 focus-visible:ring-offset-1";
+  const baseBtn = isToolbar
+    ? "min-h-[40px] min-w-0 flex-1 rounded-md px-1.5 py-1 text-center text-[0.6875rem] font-semibold leading-tight transition-[transform,box-shadow,background-color,border-color,color] duration-150 ease-out outline-none focus-visible:ring-2 focus-visible:ring-offset-1 sm:text-xs"
+    : "flex-1 rounded-lg px-2 py-2.5 text-center text-sm font-medium transition-[transform,box-shadow,background-color,border-color,color] duration-150 ease-out outline-none focus-visible:ring-2 focus-visible:ring-offset-1";
 
   const inactive = isM5
     ? `${baseBtn} border border-white/12 bg-white/[0.06] text-white/75 shadow-[0_1px_0_rgba(255,255,255,0.06)] hover:bg-white/10 active:translate-y-px active:shadow-inner`
@@ -48,7 +56,7 @@ export function PanelSidebarThemeSwitch({ variant = "default", className = "" }:
 
   return (
     <div className={`panel-sidebar-theme-switch shrink-0 ${className}`.trim()} role="group" aria-label="Тема оформления">
-      <div className={labelClass}>Тема</div>
+      {!isToolbar && <div className={labelClass}>Тема</div>}
       <div className={rowClass}>
         <button
           type="button"

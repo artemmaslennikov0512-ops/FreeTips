@@ -5,7 +5,8 @@
 
 // --- Золото / нейтральные границы
 
-const PANEL_BORDER_GOLD_15 = "border border-[var(--color-brand-gold)]/15";
+/** Как плитки «Быстрые действия» в ЛК (рамка золота ~55%) */
+const PANEL_BORDER_GOLD_QUICK_TILE = "border border-[rgba(197,165,114,0.55)]";
 
 /** Обводка вторичных кнопок «как у заведения» / тулбар */
 const PANEL_BORDER_GOLD_40 = "border border-[var(--color-brand-gold)]/40";
@@ -13,7 +14,7 @@ const PANEL_BORDER_GOLD_40 = "border border-[var(--color-brand-gold)]/40";
 const PANEL_NAV_WRAP_ROUNDED = "rounded-[10px]";
 
 /** Общая «коробка» навигации в сайдбаре (фон задаёт вариант). */
-const PANEL_NAV_WRAP_BASE = `flex flex-col gap-0 ${PANEL_NAV_WRAP_ROUNDED} ${PANEL_BORDER_GOLD_15} p-1.5 pb-2 shadow-[var(--shadow-subtle)]`;
+const PANEL_NAV_WRAP_BASE = `flex flex-col gap-0 ${PANEL_NAV_WRAP_ROUNDED} ${PANEL_BORDER_GOLD_QUICK_TILE} p-1.5 pb-2 shadow-[var(--shadow-subtle)]`;
 
 export const PANEL_NAV_WRAP_CABINET = `${PANEL_NAV_WRAP_BASE} bg-[var(--color-dark-gray)]/5`;
 

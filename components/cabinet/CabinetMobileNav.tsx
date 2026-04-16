@@ -2,7 +2,6 @@
 
 import {
   createContext,
-  useCallback,
   useContext,
   useEffect,
   useSyncExternalStore,
@@ -19,13 +18,7 @@ import Image from "next/image";
 import type { LucideIcon } from "lucide-react";
 import { LogOut, User, BadgeCheck, Building2 } from "lucide-react";
 import { CABINET_WAITER_BTN } from "@/lib/cabinet-button-classes";
-import {
-  PANEL_MOBILE_NAV_OVERLAY_TRANSITION,
-  PANEL_MOBILE_NAV_SHELL_TRANSITION,
-  PANEL_MOBILE_PORTAL_SAFE_PADDING_COMPACT,
-  PANEL_MOBILE_Z_NAV_PORTAL_LAYER,
-  PANEL_MOBILE_Z_NAV_PORTAL_SHELL,
-} from "@/lib/panel-mobile-ui";
+import { PANEL_MOBILE_Z_NAV_PORTAL_SHELL } from "@/lib/panel-mobile-ui";
 import { PanelMobileTopChrome } from "@/components/PanelMobileTopChrome";
 import { PanelSidebarThemeSwitch } from "@/components/PanelSidebarThemeSwitch";
 import { useTheme } from "@/lib/theme-context";
@@ -93,16 +86,20 @@ export function CabinetMobileNavMobileCorner({ leadingSlot }: { leadingSlot?: Re
   return (
     <PanelMobileTopChrome
       leadingSlot={leadingSlot}
+      trailingSlot={
+        <PanelSidebarThemeSwitch variant={isM5Cabinet ? "m5" : "default"} density="toolbar" className="min-w-0" />
+      }
       menuButtonRef={menuButtonRef}
       sidebarOpen={sidebarOpen}
       setSidebarOpen={setSidebarOpen}
       ariaControls="cabinet-nav-dropdown"
       menuButtonExtraClassName={isM5Cabinet ? "site-header-m5-menu-btn" : ""}
+      menuPlacement={leadingSlot ? "end" : "start"}
     />
   );
 }
 
-/** Затемнение + панель по центру экрана (вне stacking context карточки) */
+/** Моб. меню: панель слева без затемнения фона (портал на body) */
 export function CabinetMobileNavPortals() {
   const mounted = useSyncExternalStore(
     () => () => {},
@@ -139,47 +136,33 @@ export function CabinetMobileNavPortals() {
     applyDocumentShellChrome(pathname, theme);
   }, [sidebarOpen, pathname, theme]);
 
-  const onOverlayDown = useCallback(
-    (e: React.MouseEvent) => {
-      if (e.target === e.currentTarget) closeSidebar();
-    },
-    [closeSidebar],
-  );
-
   if (!mounted || typeof document === "undefined") return null;
 
   return createPortal(
-    <>
-      <div
-        className={`cabinet-mobile-nav-overlay mobile-drawer-screen-bleed fixed ${PANEL_MOBILE_Z_NAV_PORTAL_LAYER} ${PANEL_MOBILE_NAV_OVERLAY_TRANSITION} ${
-          sidebarOpen ? "opacity-100" : "pointer-events-none opacity-0"
-        }`}
-        onClick={onOverlayDown}
-        role="presentation"
-        aria-hidden={!sidebarOpen}
-      />
-      <div
-        className={`cabinet-mobile-nav-shell mobile-drawer-screen-bleed pointer-events-none fixed ${PANEL_MOBILE_Z_NAV_PORTAL_SHELL} flex items-center justify-center px-3 py-1 ${PANEL_MOBILE_NAV_SHELL_TRANSITION} sm:px-4 ${
-          sidebarOpen ? "opacity-100" : "opacity-0"
-        }`}
-        style={PANEL_MOBILE_PORTAL_SAFE_PADDING_COMPACT}
-        aria-hidden={!sidebarOpen}
-      >
+    <div
+      className={`cabinet-mobile-nav-shell pointer-events-none fixed inset-y-0 left-0 flex max-w-full flex-col lg:hidden ${PANEL_MOBILE_Z_NAV_PORTAL_SHELL}`}
+      style={{
+        paddingTop: "max(0.35rem, env(safe-area-inset-top, 0px))",
+        paddingBottom: "max(0.35rem, env(safe-area-inset-bottom, 0px))",
+        paddingLeft: "max(0.35rem, env(safe-area-inset-left, 0px))",
+      }}
+      aria-hidden={!sidebarOpen}
+    >
         <div
           id="cabinet-nav-dropdown"
           role="dialog"
-          aria-modal="true"
+          aria-modal="false"
           aria-label="Меню навигации"
-          className={`cabinet-mobile-nav-dialog cabinet-nav-dropdown cabinet-mobile-nav-dialog--modal pointer-events-auto flex h-auto max-h-[min(calc(100svh-0.5rem),calc(100dvh-0.5rem))] min-h-0 w-[min(22rem,calc(100vw-1.5rem))] max-w-full flex-col overflow-hidden rounded-xl border border-[var(--color-brand-gold)]/25 shadow-[var(--shadow-card)] backdrop-blur-xl transition-[opacity,transform] duration-200 ${
-            sidebarOpen ? "scale-100 opacity-100" : "pointer-events-none scale-95 opacity-0"
+          className={`cabinet-mobile-nav-dialog cabinet-nav-dropdown cabinet-mobile-nav-dialog--drawer-left pointer-events-auto flex h-full min-h-0 w-[min(22rem,calc(100vw-0.75rem-max(env(safe-area-inset-left,0px),0.35rem)-max(env(safe-area-inset-right,0px),0px)))] max-w-full flex-col overflow-hidden rounded-r-xl border border-[var(--color-brand-gold)]/25 shadow-[var(--shadow-card)] transition-transform duration-300 ease-out ${
+            sidebarOpen ? "translate-x-0" : "pointer-events-none -translate-x-full"
           }`}
           data-cabinet-theme={isM5Cabinet ? "m5-competition" : undefined}
           style={sidebarStyle}
           aria-hidden={!sidebarOpen}
         >
-        <div className="cabinet-nav-dropdown-inner flex min-h-0 flex-col overflow-hidden px-3 pb-[max(0.35rem,env(safe-area-inset-bottom,0px))] pt-2.5">
+        <div className="cabinet-nav-dropdown-inner flex min-h-0 flex-1 flex-col overflow-hidden px-3 pb-[max(0.35rem,env(safe-area-inset-bottom,0px))] pt-2.5">
           <div
-            className={`cabinet-sidebar-profile cabinet-block-inner mb-2 shrink-0 rounded-[10px] border border-[var(--color-brand-gold)]/20 px-3 py-2 ${!sidebarBg ? "bg-[var(--color-dark-gray)]/10" : ""}`}
+            className={`cabinet-sidebar-profile cabinet-block-inner mb-2 shrink-0 rounded-[10px] border border-[rgba(197,165,114,0.55)] px-3 py-2 ${!sidebarBg ? "bg-[var(--color-dark-gray)]/10" : ""}`}
             style={Object.keys(profileBlockStyle).length ? profileBlockStyle : undefined}
           >
             <div className="flex items-center gap-2.5">
@@ -222,7 +205,7 @@ export function CabinetMobileNavPortals() {
             Навигация
           </p>
           <nav
-            className="cabinet-mobile-nav-dialog__nav flex min-h-0 max-h-[min(22rem,calc(100dvh-12rem))] flex-col gap-0 overflow-y-auto overscroll-contain rounded-[10px] border border-[var(--color-brand-gold)]/15 bg-[var(--color-dark-gray)]/5 p-1 pb-1.5 shadow-[var(--shadow-subtle)]"
+            className="cabinet-mobile-nav-dialog__nav flex min-h-0 flex-1 flex-col gap-0 overflow-y-auto overscroll-contain rounded-[10px] border border-[var(--color-brand-gold)]/15 bg-[var(--color-dark-gray)]/5 p-1 pb-1.5 shadow-[var(--shadow-subtle)]"
             role="none"
           >
             {navGroups.map((group) => (
@@ -281,7 +264,6 @@ export function CabinetMobileNavPortals() {
               </div>
             )}
           </nav>
-          <PanelSidebarThemeSwitch variant={isM5Cabinet ? "m5" : "default"} className="mt-3 px-0" />
           <button
             type="button"
             onClick={() => {
@@ -296,8 +278,7 @@ export function CabinetMobileNavPortals() {
           </button>
         </div>
         </div>
-      </div>
-    </>,
+    </div>,
     document.body,
   );
 }

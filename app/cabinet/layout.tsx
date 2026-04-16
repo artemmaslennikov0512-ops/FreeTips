@@ -52,6 +52,7 @@ import {
   PANEL_SIDEBAR_NAV_LINK_INACTIVE_CABINET,
   PANEL_SIDEBAR_NAV_LINK_ROW,
 } from "@/lib/panel-shell-visual-classes";
+import { flattenPanelNavRootHrefs, isPanelMobileSubsectionPath } from "@/lib/panel-mobile-subsection";
 
 const CABINET_LG_SIDEBAR_COLLAPSED_KEY = "cabinet-lg-sidebar-collapsed";
 
@@ -112,6 +113,8 @@ const NAV_GROUPS: CabinetNavGroup[] = [
     items: [{ label: "Поддержка", href: "/cabinet/support", icon: MessageCircle }],
   },
 ];
+
+const CABINET_MOBILE_NAV_ROOTS = flattenPanelNavRootHrefs(NAV_GROUPS);
 
 export default function CabinetLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -425,33 +428,35 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
     return <LoadingSpinner message="Загрузка…" className="min-h-[60vh]" />;
   }
 
+  const showMobileSubsectionBack = isPanelMobileSubsectionPath(pathname, CABINET_MOBILE_NAV_ROOTS);
+
   return (
     <CabinetMobileNavProvider value={mobileNavValue}>
     <ProactiveAccessRefresh />
     <LkPresenceHeartbeat />
     <div
-      className={`cabinet-premium flex min-h-screen w-full max-w-full flex-col overflow-x-hidden font-[family:var(--font-inter)] text-[var(--color-text)] pt-2 lg:flex-row lg:pt-2 ${isM5Cabinet ? "bg-transparent" : "bg-[var(--color-bg)]"}`}
+      className={`cabinet-premium flex min-h-screen w-full max-w-full flex-col overflow-x-hidden font-[family:var(--font-inter)] text-[var(--color-text)] max-lg:pt-0 lg:flex-row lg:pt-2 ${isM5Cabinet ? "bg-transparent" : "bg-[var(--color-bg)]"}`}
       data-brand-active={applyEstablishmentBrand ? "true" : undefined}
       data-cabinet-theme={isM5Cabinet ? "m5-competition" : undefined}
       style={Object.keys(brandStyle).length ? brandStyle : undefined}
     >
       <CabinetMobileNavMobileCorner
         leadingSlot={
-          pathname !== "/cabinet" ? (
+          showMobileSubsectionBack ? (
             <PanelMobileBackButton variant="cabinet" fallbackHref="/cabinet" placement="mobileToolbar" />
           ) : undefined
         }
       />
       {/* Левое меню (lg+): сворачиваемая колонка; на мобильном — портал меню */}
       <div
-        className={`hidden shrink-0 transition-[width] duration-300 ease-out lg:mt-0 lg:flex lg:self-start ${
+        className={`hidden shrink-0 transition-[width] duration-300 ease-out lg:mt-9 lg:mb-3 lg:flex lg:self-start ${
           lgSidebarCollapsed
             ? "lg:w-0 lg:pointer-events-none lg:overflow-hidden"
             : "lg:relative lg:z-10 lg:w-[236px] lg:overflow-hidden"
         }`}
       >
         <div
-          className="cabinet-sidebar relative flex min-h-0 w-[236px] min-w-[236px] flex-col overflow-hidden border-0 border-r border-white/10 py-4 shadow-2xl backdrop-blur-xl lg:static lg:h-auto lg:max-h-[calc(100vh-2rem)] lg:rounded-[10px] lg:border-x lg:border-b lg:border-t-0 lg:border-white/10"
+          className="cabinet-sidebar relative flex min-h-0 w-[236px] min-w-[236px] flex-col overflow-hidden border-0 border-r border-white/10 py-4 shadow-2xl backdrop-blur-xl lg:static lg:h-auto lg:max-h-[calc(100vh-0.5rem-2.25rem-0.75rem)] lg:rounded-[10px] lg:border-x lg:border-b lg:border-t-0 lg:border-white/10"
           style={sidebarStyle}
         >
         <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-x-hidden overflow-y-auto">
@@ -469,7 +474,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
           </div>
         )}
         <div
-          className={`cabinet-sidebar-profile cabinet-block-inner mx-3 rounded-[10px] border border-[var(--color-brand-gold)]/20 px-3 py-2.5 ${!sidebarBg ? "bg-[var(--color-dark-gray)]/10" : ""}`}
+          className={`cabinet-sidebar-profile cabinet-block-inner mx-3 rounded-[10px] border border-[rgba(197,165,114,0.55)] px-3 py-2.5 ${!sidebarBg ? "bg-[var(--color-dark-gray)]/10" : ""}`}
           style={Object.keys(profileBlockStyle).length ? profileBlockStyle : undefined}
         >
           <div className="flex items-center gap-2.5">

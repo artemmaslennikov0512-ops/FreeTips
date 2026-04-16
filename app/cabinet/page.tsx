@@ -334,28 +334,28 @@ export default function CabinetDashboardPage() {
                     />
                   </div>
                 </div>
-                <div className="grid w-full max-w-[320px] shrink-0 grid-cols-1 gap-3 sm:grid-cols-2">
+                <div className="flex w-full max-w-md shrink-0 flex-wrap justify-center gap-2">
                   <Link
                     href="/cabinet/transactions#operations-history"
                     className={
                       isM5Cabinet
-                        ? `${m5BtnNavLike} w-full justify-center text-sm`
-                        : `${CABINET_WAITER_BTN_INLINE} flex w-full items-center justify-center gap-2 px-4 py-2.5 text-sm`
+                        ? "cabinet-m5-btn-nav-like inline-flex min-h-0 min-w-[min(100%,14rem)] flex-1 basis-[14rem] items-center justify-center gap-1.5 whitespace-nowrap rounded-[10px] px-3 py-1.5 text-sm font-semibold leading-tight transition-all"
+                        : `${CABINET_WAITER_BTN_INLINE} flex min-h-0 min-w-[min(100%,14rem)] flex-1 basis-[14rem] items-center justify-center gap-1.5 whitespace-nowrap !px-3 !py-1.5 text-sm !leading-tight`
                     }
                   >
-                    <List className="h-4 w-4 shrink-0" />
+                    <List className="h-3.5 w-3.5 shrink-0" aria-hidden />
                     История операций
                   </Link>
                   <Link
                     href="/cabinet/transactions#waiter-card"
                     className={
                       isM5Cabinet
-                        ? `${m5BtnNavLike} w-full justify-center text-sm`
-                        : `${CABINET_WAITER_BTN_INLINE} flex w-full items-center justify-center gap-2 px-4 py-2.5 text-sm`
+                        ? "cabinet-m5-btn-nav-like inline-flex min-h-0 min-w-[min(100%,14rem)] flex-1 basis-[14rem] items-center justify-center gap-1.5 whitespace-nowrap rounded-[10px] px-3 py-1.5 text-sm font-semibold leading-tight transition-all"
+                        : `${CABINET_WAITER_BTN_INLINE} flex min-h-0 min-w-[min(100%,14rem)] flex-1 basis-[14rem] items-center justify-center gap-1.5 whitespace-nowrap !px-3 !py-1.5 text-sm !leading-tight`
                     }
                     title="Вывод на карту через страницу Paygine"
                   >
-                    <Send className="h-4 w-4 shrink-0" />
+                    <Send className="h-3.5 w-3.5 shrink-0" aria-hidden />
                     Вывод
                   </Link>
                 </div>

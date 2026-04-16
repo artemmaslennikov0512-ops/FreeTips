@@ -103,7 +103,7 @@ html:not([data-theme="dark"]) body.establishment-page {
   background: #e5e9e7 !important;
 }
 
-/* Светлая тема: хром панелей. Холст #e5e9e7; блоки — стекло; карточки — мята #9dd2c8 (отличима от блоков). */
+/* Светлая тема: хром панелей. Холст #e5e9e7; вложенные блоки — белые; карточки — мята #9dd2c8. */
 html:not([data-theme="dark"]) body.cabinet-page:not(.admin-page),
 html:not([data-theme="dark"]) body.establishment-page,
 html:not([data-theme="dark"]) body.admin-page {
@@ -152,7 +152,7 @@ html:not([data-theme="dark"])
   body.admin-page
   .admin-panel.cabinet-premium:not([data-brand-active="true"]):not([data-cabinet-theme="m5-competition"]) {
   --color-bg-sides: #ffffff;
-  --cabinet-block-bg: rgba(255, 255, 255, 0.55);
+  --cabinet-block-bg: #ffffff;
 }
 html:not([data-theme="dark"])
   body.admin-page
@@ -160,7 +160,7 @@ html:not([data-theme="dark"])
   --color-text: #0a192f;
   --color-text-secondary: #334155;
   --color-muted: #64748b;
-  --cabinet-block-bg: rgba(255, 255, 255, 0.55);
+  --cabinet-block-bg: #ffffff;
   /* В разметке админки часто text-[var(--color-on-dark)] «как на стекле»; на белых карточках иначе белый на белом */
   --color-on-dark: #0a192f;
   --color-on-dark-muted: #64748b;
@@ -415,7 +415,7 @@ html:not([data-theme="dark"]) body.cabinet-page .cabinet-premium[data-cabinet-th
     .cabinet-premium:not([data-cabinet-theme="m5-competition"]):not([data-brand-active="true"]) {
     background-color: #e5e9e7 !important;
     --color-bg-sides: #ffffff;
-    --cabinet-block-bg: rgba(255, 255, 255, 0.55);
+    --cabinet-block-bg: #ffffff;
   }
   html[data-theme="dark"]
     body.cabinet-page:not(.establishment-page):not(.admin-page)
@@ -501,7 +501,7 @@ html:not([data-theme="dark"]) body.cabinet-page .cabinet-premium[data-cabinet-th
   html:not([data-theme="dark"]) body.admin-page .admin-panel.cabinet-premium:not([data-cabinet-theme="m5-competition"]) {
     background-color: #e5e9e7 !important;
     --color-bg-sides: #ffffff;
-    --cabinet-block-bg: rgba(255, 255, 255, 0.55);
+    --cabinet-block-bg: #ffffff;
   }
   html[data-theme="dark"] body.admin-page .admin-panel.cabinet-premium:not([data-cabinet-theme="m5-competition"]) {
     background-color: #12161f !important;
@@ -544,7 +544,7 @@ html:not([data-theme="dark"]) body.cabinet-page .cabinet-premium[data-cabinet-th
   html:not([data-theme="dark"]) body.establishment-page .establishment-panel.cabinet-premium:not([data-cabinet-theme="m5-competition"]) {
     background-color: #e5e9e7 !important;
     --color-bg-sides: #ffffff;
-    --cabinet-block-bg: rgba(255, 255, 255, 0.55);
+    --cabinet-block-bg: #ffffff;
   }
   html[data-theme="dark"] body.establishment-page .establishment-panel.cabinet-premium:not([data-cabinet-theme="m5-competition"]) {
     background-color: #12161f !important;
@@ -1238,10 +1238,8 @@ html:not([data-theme="dark"])
 html:not([data-theme="dark"]) body.admin-page .admin-panel.cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-dashboard-name-hero__pill {
   border: none !important;
   box-shadow: var(--shadow-subtle);
-  background: var(--cabinet-block-bg, rgba(255, 255, 255, 0.55));
+  background: var(--cabinet-block-bg, #ffffff);
   padding: 0.4375rem 0.875rem;
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
 }
 html:not([data-theme="dark"]) body.cabinet-page:not(.admin-page) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-dashboard-name-hero__pill:hover,
 html:not([data-theme="dark"])
@@ -1249,7 +1247,7 @@ html:not([data-theme="dark"])
   .establishment-panel.cabinet-premium:not([data-cabinet-theme="m5-competition"])
   .cabinet-dashboard-name-hero__pill:hover,
 html:not([data-theme="dark"]) body.admin-page .admin-panel.cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-dashboard-name-hero__pill:hover {
-  background: rgba(255, 255, 255, 0.72);
+  background: #f1f5f9;
 }
 html:not([data-theme="dark"]) body.cabinet-page:not(.admin-page) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-dashboard-name-hero__text:not(.cabinet-dashboard-name-hero__text--m5),
 html:not([data-theme="dark"])
@@ -2441,7 +2439,7 @@ html:not([data-theme="dark"]) .admin-mobile-nav-dialog .cabinet-nav-label {
   color: #64748b !important;
 }
 html:not([data-theme="dark"]) .admin-mobile-nav-dialog nav {
-  background: var(--cabinet-block-bg, rgba(255, 255, 255, 0.55)) !important;
+  background: var(--cabinet-block-bg, #ffffff) !important;
   border: 1px solid rgba(197, 165, 114, 0.55) !important;
   box-shadow: var(--shadow-subtle) !important;
 }
@@ -3312,7 +3310,7 @@ html:not([data-theme="dark"])
  */
 @media (min-width: 1024px) {
   html:not([data-theme="dark"]) body.admin-page .admin-panel .admin-main-block.cabinet-main-block {
-    background: rgba(255, 255, 255, 0.55) !important;
+    background: #ffffff !important;
     border: 1px solid var(--cabinet-chrome-border, rgba(197, 165, 114, 0.45)) !important;
     border-radius: 0.625rem !important;
     box-shadow: var(
@@ -3320,8 +3318,8 @@ html:not([data-theme="dark"])
       0 2px 10px rgba(10, 25, 47, 0.045),
       0 12px 36px rgba(10, 25, 47, 0.065)
     ) !important;
-    backdrop-filter: blur(20px) !important;
-    -webkit-backdrop-filter: blur(20px) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
   }
 }
 
@@ -3586,7 +3584,7 @@ html:not([data-theme="dark"])
 }
 
 /*
- * Светлая тема: карточки main — плотная мята (--cabinet-surface-card-bg), отличима от стеклянных блоков.
+ * Светлая тема: карточки main — плотная мята (--cabinet-surface-card-bg), отличима от белых блоков.
  * Не M5 / не админка / без бренда заведения (перебивается правилами с #main-content / lg+ при необходимости).
  */
 html:not([data-theme="dark"])
@@ -3753,7 +3751,7 @@ html:not([data-theme="dark"]) body.admin-page .admin-panel #main-content [class*
   color: #475569 !important;
 }
 html:not([data-theme="dark"]) body.admin-page .admin-panel .admin-users-token-btn {
-  background: var(--cabinet-block-bg, rgba(255, 255, 255, 0.55)) !important;
+  background: var(--cabinet-block-bg, #ffffff) !important;
   color: #0a192f !important;
   border: none !important;
   outline: none !important;
@@ -5257,7 +5255,7 @@ html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-compe
 
 /* Светлая тема: вложенные блоки — нейтральный фон без серой обводки */
 html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-block-inner {
-  background: var(--cabinet-block-bg, rgba(255, 255, 255, 0.55)) !important;
+  background: var(--cabinet-block-bg, #ffffff) !important;
   border: none;
   box-shadow: 0 1px 3px rgba(10, 25, 47, 0.05);
   color: #0a192f;
@@ -5943,16 +5941,16 @@ html:not([data-theme="dark"]) body.admin-page .admin-panel .admin-support-thread
   transition: background-color 99999s ease-out 0s !important;
 }
 
-/* Светлая тема: блок «Доступные лимиты» — вложенная подложка на белой карточке (не стекло страницы) */
+/* Светлая тема: блок «Доступные лимиты» — та же подложка, что у .cabinet-block-inner (не отдельный #eef2f1) */
 html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-limits-block {
-  background: #eef2f1 !important;
+  background: var(--cabinet-block-bg, #ffffff) !important;
   border: none;
-  box-shadow: 0 1px 3px rgba(10, 25, 47, 0.04);
+  box-shadow: 0 1px 3px rgba(10, 25, 47, 0.05);
 }
 html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-card .cabinet-limits-block {
-  background: #eef2f1 !important;
+  background: var(--cabinet-block-bg, #ffffff) !important;
   border: none;
-  box-shadow: 0 1px 3px rgba(10, 25, 47, 0.04);
+  box-shadow: 0 1px 3px rgba(10, 25, 47, 0.05);
 }
 html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-limits-block .cabinet-limits-track {
   background: rgba(10, 25, 47, 0.08) !important;
@@ -6916,7 +6914,7 @@ html:not([data-theme="dark"]) body.admin-page .admin-panel .antifraud-page-title
 
 /* Светлая тема: блок антифрода — та же плита блоков, что в ЛК */
 html:not([data-theme="dark"]) body.admin-page .admin-panel .antifraud-inner {
-  background: var(--cabinet-block-bg, rgba(255, 255, 255, 0.55)) !important;
+  background: var(--cabinet-block-bg, #ffffff) !important;
   border: 1px solid rgba(197, 165, 114, 0.45) !important;
   color: #0a192f;
 }

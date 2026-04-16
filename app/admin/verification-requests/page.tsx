@@ -299,11 +299,6 @@ export default function AdminVerificationRequestsPage() {
           pendingConnection={mainTabNewConnection}
           className="pt-1"
         />
-        <div
-          role="separator"
-          aria-hidden="true"
-          className="admin-requests-main-tabs-divider self-stretch"
-        />
       </div>
 
       <div

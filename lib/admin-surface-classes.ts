@@ -18,19 +18,19 @@ export const ADMIN_PANEL_PAGE_NARROW =
 
 /** Широкая колонка (списки, несколько карточек). */
 export const ADMIN_PANEL_PAGE_WIDE =
-  "mx-auto w-full max-w-3xl space-y-6 px-4 py-8 text-center text-white";
+  "mx-auto w-full max-w-3xl space-y-8 px-4 py-8 text-center text-white";
 
 /** Очень широкая колонка (таблицы сессий и т.п.). */
 export const ADMIN_PANEL_PAGE_XL =
-  "mx-auto w-full max-w-7xl space-y-6 px-4 py-8 text-center text-white";
+  "mx-auto w-full max-w-7xl space-y-8 px-4 py-8 text-center text-white";
 
 /** Карточка секции на всю ширину родителя (внутри PAGE_WIDE). */
 export const ADMIN_PANEL_CARD =
-  "cabinet-section-header rounded-2xl border-0 p-6 text-center text-white shadow-[var(--shadow-card)]";
+  "cabinet-section-header rounded-3xl border-0 p-8 text-center text-white";
 
 /** Узкая карточка по центру (форма 2FA и т.п.). */
 export const ADMIN_PANEL_CARD_NARROW =
-  `${ADMIN_PANEL_CARD} mx-auto mt-6 w-full max-w-lg sm:p-8`;
+  `${ADMIN_PANEL_CARD} mx-auto mt-6 w-full max-w-lg sm:p-10`;
 
 export const ADMIN_PANEL_INPUT = `mx-auto max-w-md ${FIELD_BASE} text-left`;
 
@@ -47,14 +47,14 @@ export const ADMIN_PANEL_INPUT_OTP =
 export const ADMIN_PANEL_TEXTAREA = `mt-2 w-full min-h-[120px] ${FIELD_BASE} text-left font-mono`;
 
 export const ADMIN_PANEL_ALERT_OK =
-  "rounded-xl border border-emerald-400/45 bg-emerald-950/35 px-4 py-3 text-sm text-emerald-50";
+  "rounded-xl border-0 bg-emerald-950/35 px-5 py-3.5 text-sm text-emerald-50 shadow-[0_2px_14px_rgba(16,185,129,0.22)]";
 
 export const ADMIN_PANEL_ALERT_ERR =
-  "rounded-xl border border-red-400/45 bg-red-950/35 px-4 py-3 text-sm text-red-50";
+  "rounded-xl border-0 bg-red-950/35 px-5 py-3.5 text-sm text-red-50 shadow-[0_2px_14px_rgba(248,113,113,0.22)]";
 
 /** Предупреждение (например сохранено с неизвестными логинами). */
 export const ADMIN_PANEL_ALERT_WARN =
-  "rounded-xl border border-amber-400/50 bg-amber-950/40 px-4 py-3 text-sm text-amber-50";
+  "rounded-xl border-0 bg-amber-950/40 px-5 py-3.5 text-sm text-amber-50 shadow-[0_2px_14px_rgba(251,191,36,0.2)]";
 
 /** Обёртка для экранов «загрузка» / «ошибка» по центру страницы админки. */
 export const ADMIN_PANEL_STATE_CENTER = "flex min-h-[60vh] items-center justify-center px-4";

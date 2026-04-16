@@ -302,15 +302,6 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
     [pathname],
   );
 
-  useEffect(() => {
-    if (!sidebarOpen) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") closeSidebar();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [sidebarOpen, closeSidebar]);
-
   const trimmedFullName = user?.fullName?.trim() ?? "";
   const sidebarFirstName = trimmedFullName ? trimmedFullName.split(/\s+/)[0]! : null;
   const sidebarDisplayLabel = sidebarFirstName ?? user?.login ?? "";
@@ -459,9 +450,10 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
         }`}
       >
         <div
-          className="cabinet-sidebar relative flex min-h-0 w-[236px] min-w-[236px] flex-col overflow-hidden border-0 border-r border-white/10 py-4 shadow-2xl backdrop-blur-xl lg:static lg:h-auto lg:max-h-[calc(100vh-2rem)] lg:overflow-y-auto lg:overflow-x-hidden lg:rounded-[10px] lg:border-x lg:border-b lg:border-t-0 lg:border-white/10"
+          className="cabinet-sidebar relative flex min-h-0 w-[236px] min-w-[236px] flex-col overflow-hidden border-0 border-r border-white/10 py-4 shadow-2xl backdrop-blur-xl lg:static lg:h-auto lg:max-h-[calc(100vh-2rem)] lg:rounded-[10px] lg:border-x lg:border-b lg:border-t-0 lg:border-white/10"
           style={sidebarStyle}
         >
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-x-hidden overflow-y-auto">
         {user?.establishmentBrand?.logoUrl && (
           <div className="mx-3 mb-2 flex justify-center">
             <Image
@@ -601,6 +593,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
             <LogOut className="h-4 w-4 shrink-0 text-[var(--color-brand-gold)]" aria-hidden />
             <span>{adminCabinetView ? "Выйти из просмотра" : "Выйти"}</span>
           </button>
+        </div>
         </div>
         </div>
       </div>

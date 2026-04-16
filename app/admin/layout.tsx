@@ -220,81 +220,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     return () => window.removeEventListener(ADMIN_REQUESTS_COUNTS_CHANGED, onCountsChanged);
   }, [refreshRequestsPendingTotal]);
 
-  // #region agent log
-  useEffect(() => {
-    if (!user || user.role !== "SUPERADMIN" || typeof window === "undefined") return;
-    const send = (reason: string) => {
-      const probe = document.createElement("div");
-      probe.style.cssText =
-        "position:absolute;left:-9999px;top:0;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);";
-      document.body.appendChild(probe);
-      const csProbe = getComputedStyle(probe);
-      const safeTop = csProbe.paddingTop;
-      const safeBottom = csProbe.paddingBottom;
-      document.body.removeChild(probe);
-      const shell = document.querySelector(".cabinet-mobile-top-shell");
-      const shellBg = shell ? getComputedStyle(shell).backgroundColor : null;
-      const tc = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
-      const cookieBanner = document.querySelector<HTMLElement>(
-        '[aria-label="Уведомление об использовании cookies"]',
-      );
-      const cookieDisplay = cookieBanner ? getComputedStyle(cookieBanner).display : "absent";
-      fetch("http://127.0.0.1:7890/ingest/cd2a2298-7657-41e9-9b5d-ade1447c8041", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "b3e5f1" },
-        body: JSON.stringify({
-          sessionId: "b3e5f1",
-          location: "app/admin/layout.tsx:iosShellSnapshot",
-          message: reason,
-          hypothesisId: "H1-H5",
-          data: {
-            dataTheme: document.documentElement.getAttribute("data-theme"),
-            htmlBg: getComputedStyle(document.documentElement).backgroundColor,
-            bodyBg: getComputedStyle(document.body).backgroundColor,
-            themeColorMeta: tc ? tc.getAttribute("content") : null,
-            colorSchemeMeta: document.querySelector('meta[name="color-scheme"]')?.getAttribute("content") ?? null,
-            appShellPanel: document.documentElement.classList.contains("app-shell-panel"),
-            innerH: window.innerHeight,
-            vvh: window.visualViewport?.height ?? null,
-            dpr: window.devicePixelRatio,
-            safeTopProbe: safeTop,
-            safeBottomProbe: safeBottom,
-            cookieBannerDisplay: cookieDisplay,
-            shellBgComputed: shellBg,
-          },
-          timestamp: Date.now(),
-        }),
-      }).catch(() => {});
-    };
-    send("admin-mounted");
-    const el = document.documentElement;
-    const mo = new MutationObserver(() => send("html-data-theme-changed"));
-    mo.observe(el, { attributes: true, attributeFilter: ["data-theme"] });
-    return () => mo.disconnect();
-  }, [user]);
-
-  useEffect(() => {
-    if (!user || user.role !== "SUPERADMIN" || typeof window === "undefined") return;
-    const root = document.querySelector(".admin-mobile-nav-root");
-    fetch("http://127.0.0.1:7890/ingest/cd2a2298-7657-41e9-9b5d-ade1447c8041", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "b3e5f1" },
-      body: JSON.stringify({
-        sessionId: "b3e5f1",
-        location: "app/admin/layout.tsx:drawerSnapshot",
-        message: "sidebar-state",
-        hypothesisId: "H5",
-        data: {
-          sidebarOpen,
-          navRootFound: Boolean(root),
-          navRootZ: root ? getComputedStyle(root).zIndex : null,
-        },
-        timestamp: Date.now(),
-      }),
-    }).catch(() => {});
-  }, [user, sidebarOpen]);
-  // #endregion
-
   const handleLogout = async () => {
     try {
       await fetch("/api/auth/logout", {
@@ -342,7 +267,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   return (
-    <div className="admin-panel cabinet-premium flex min-h-screen w-full min-w-0 max-w-full flex-col overflow-x-hidden bg-[var(--color-bg)] font-[family:var(--font-inter)] text-[var(--color-text)] pt-2 lg:flex-row lg:pt-2">
+    <div className="admin-panel cabinet-premium flex min-h-screen w-full min-w-0 max-w-full flex-col overflow-x-hidden bg-[var(--color-bg)] font-[family:var(--font-inter)] text-[var(--color-text)] pt-2 lg:flex-row lg:pt-0">
       <PanelShellMobileCorner
         ariaControls="admin-nav-dropdown"
         leadingSlot={
@@ -372,8 +297,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             : "lg:relative lg:z-10 lg:w-[236px] lg:overflow-hidden"
         }`}
       >
-        <aside className="admin-sidebar cabinet-sidebar relative flex min-h-0 w-[236px] min-w-[236px] flex-col overflow-hidden rounded-[10px] border border-white/10 bg-transparent py-4 shadow-sm backdrop-blur-xl lg:static lg:h-auto lg:max-h-[calc(100vh-2rem)] lg:overflow-y-auto lg:overflow-x-hidden">
-        <div className="flex min-h-0 min-w-0 flex-col overflow-hidden">
+        <aside className="admin-sidebar cabinet-sidebar relative flex min-h-0 w-[236px] min-w-[236px] flex-col overflow-hidden rounded-[10px] bg-transparent py-4 shadow-sm backdrop-blur-xl lg:static lg:h-auto lg:max-h-[calc(100vh-2rem)] lg:border-t-0">
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-x-hidden overflow-y-auto">
           <div className="cabinet-sidebar-profile cabinet-block-inner mx-3 mb-3 rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2.5">
             <div className="flex items-center gap-3">
               <div className="cabinet-sidebar-avatar flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--color-brand-gold)] font-semibold text-[#0a192f] text-sm">

@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useSyncExternalStore } from "react";
+import { usePathname } from "next/navigation";
 import { usePanelMobileSimpleDrawerEffects } from "@/lib/use-panel-mobile-simple-drawer-effects";
 import { createPortal } from "react-dom";
 import Link from "next/link";
@@ -10,7 +11,10 @@ import { ADMIN_BTN } from "@/lib/admin-button-classes";
 import {
   PANEL_MOBILE_PORTAL_SAFE_PADDING_RELAXED,
   PANEL_MOBILE_Z_NAV_PORTAL_LAYER,
+  PANEL_MOBILE_Z_NAV_PORTAL_SHELL,
 } from "@/lib/panel-mobile-ui";
+import { applyDocumentShellChrome } from "@/lib/document-shell-chrome";
+import { useTheme } from "@/lib/theme-context";
 
 type NavItem = { label: string; href: string; icon: LucideIcon; iconClass: string };
 type NavGroup = { title: string; items: NavItem[] };
@@ -36,6 +40,8 @@ export function AdminMobileNavPortal({
   payoutsAwaitingTotal: number | null;
   handleLogout: () => Promise<void>;
 }) {
+  const pathname = usePathname();
+  const { theme } = useTheme();
   const mounted = useSyncExternalStore(
     () => () => {},
     () => true,
@@ -43,6 +49,11 @@ export function AdminMobileNavPortal({
   );
 
   usePanelMobileSimpleDrawerEffects(sidebarOpen, closeSidebar);
+
+  useEffect(() => {
+    if (!sidebarOpen) return;
+    applyDocumentShellChrome(pathname, theme);
+  }, [sidebarOpen, pathname, theme]);
 
   const onOverlayDown = useCallback(
     (e: React.MouseEvent) => {
@@ -54,20 +65,21 @@ export function AdminMobileNavPortal({
   if (!mounted || typeof document === "undefined") return null;
 
   return createPortal(
-    <div
-      className={`admin-mobile-nav-root mobile-drawer-screen-bleed fixed ${PANEL_MOBILE_Z_NAV_PORTAL_LAYER} lg:hidden ${sidebarOpen ? "" : "pointer-events-none"}`}
-      aria-hidden={!sidebarOpen}
-    >
+    <>
       <div
-        className={`admin-mobile-nav-overlay absolute inset-0 transition-opacity duration-300 ${
+        className={`admin-mobile-nav-overlay mobile-drawer-screen-bleed fixed ${PANEL_MOBILE_Z_NAV_PORTAL_LAYER} transition-opacity duration-300 lg:hidden ${
           sidebarOpen ? "opacity-100" : "pointer-events-none opacity-0"
         }`}
         onClick={onOverlayDown}
         role="presentation"
+        aria-hidden={!sidebarOpen}
       />
       <div
-        className="pointer-events-none absolute inset-0 flex items-center justify-center px-3"
+        className={`admin-mobile-nav-shell mobile-drawer-screen-bleed pointer-events-none fixed ${PANEL_MOBILE_Z_NAV_PORTAL_SHELL} flex items-center justify-center px-3 transition-opacity duration-200 lg:hidden ${
+          sidebarOpen ? "opacity-100" : "pointer-events-none opacity-0"
+        }`}
         style={PANEL_MOBILE_PORTAL_SAFE_PADDING_RELAXED}
+        aria-hidden={!sidebarOpen}
       >
         <div
           id="admin-nav-dropdown"
@@ -166,7 +178,7 @@ export function AdminMobileNavPortal({
           </div>
         </div>
       </div>
-    </div>,
+    </>,
     document.body,
   );
 }

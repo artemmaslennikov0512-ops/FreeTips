@@ -32,6 +32,8 @@ import { PanelMobileBackButton } from "@/components/PanelMobileBackButton";
 import { LkPresenceHeartbeat } from "@/components/LkPresenceHeartbeat";
 import { ProactiveAccessRefresh } from "@/components/ProactiveAccessRefresh";
 import { usePanelMobileSimpleDrawerEffects } from "@/lib/use-panel-mobile-simple-drawer-effects";
+import { applyDocumentShellChrome } from "@/lib/document-shell-chrome";
+import { useTheme } from "@/lib/theme-context";
 import {
   PANEL_MOBILE_NAV_OVERLAY_TRANSITION,
   PANEL_MOBILE_Z_ESTABLISHMENT_DRAWER,
@@ -100,6 +102,7 @@ const NAV_GROUPS: EstablishmentNavGroup[] = [
 export default function EstablishmentLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
+  const { theme } = useTheme();
   const { sidebarOpen, closeSidebar } = usePanelMobileMenu();
   const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -115,6 +118,11 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
   }, []);
 
   usePanelMobileSimpleDrawerEffects(sidebarOpen, closeSidebar);
+
+  useEffect(() => {
+    if (!sidebarOpen) return;
+    applyDocumentShellChrome(pathname, theme);
+  }, [sidebarOpen, pathname, theme]);
 
   useEffect(() => {
     if (!mounted || typeof window === "undefined") return;

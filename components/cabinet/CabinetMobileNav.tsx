@@ -29,7 +29,7 @@ import {
 import { PanelMobileTopChrome } from "@/components/PanelMobileTopChrome";
 import { useTheme } from "@/lib/theme-context";
 import { applyDocumentShellChrome } from "@/lib/document-shell-chrome";
-import { useMobileDarkChromeOverlay } from "@/lib/use-mobile-dark-chrome-overlay";
+import { usePanelMobileSimpleDrawerEffects } from "@/lib/use-panel-mobile-simple-drawer-effects";
 
 export type CabinetMobileNavUser = {
   login?: string;
@@ -130,43 +130,8 @@ export function CabinetMobileNavPortals() {
     sidebarFirstName,
   } = useCabinetMobileNav();
 
-  /*
-   * iOS Safari: только overflow:hidden на body даёт сдвиг на ширину скроллбара / «вспышку» по краям при открытии шторки.
-   * Фиксируем body с сохранением scrollY + блокируем html — без скачка вёрстки.
-   */
-  useEffect(() => {
-    if (!sidebarOpen) return;
-    const html = document.documentElement;
-    const body = document.body;
-    const scrollY = window.scrollY;
-    const prevBodyOverflow = body.style.overflow;
-    const prevBodyPosition = body.style.position;
-    const prevBodyTop = body.style.top;
-    const prevBodyLeft = body.style.left;
-    const prevBodyRight = body.style.right;
-    const prevBodyWidth = body.style.width;
-
-    html.classList.add("cabinet-mobile-drawer-lock");
-    body.style.overflow = "hidden";
-    body.style.position = "fixed";
-    body.style.top = `-${scrollY}px`;
-    body.style.left = "0";
-    body.style.right = "0";
-    body.style.width = "100%";
-
-    return () => {
-      html.classList.remove("cabinet-mobile-drawer-lock");
-      body.style.overflow = prevBodyOverflow;
-      body.style.position = prevBodyPosition;
-      body.style.top = prevBodyTop;
-      body.style.left = prevBodyLeft;
-      body.style.right = prevBodyRight;
-      body.style.width = prevBodyWidth;
-      window.scrollTo(0, scrollY);
-    };
-  }, [sidebarOpen]);
-
-  useMobileDarkChromeOverlay(sidebarOpen);
+  /* Тот же стек, что админка / заведение: scroll lock + chrome + Escape — см. usePanelMobileSimpleDrawerEffects. */
+  usePanelMobileSimpleDrawerEffects(sidebarOpen, closeSidebar);
 
   /* После открытия шторки — один отложенный apply (двойной rAF внутри document-shell-chrome). */
   useEffect(() => {

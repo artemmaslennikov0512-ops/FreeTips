@@ -2,8 +2,8 @@
  * Хром документа: `data-theme`, `app-shell-panel`, `meta theme-color`, `color-scheme`.
  * Публичный `applyDocumentShellChrome` откладывает правки `<head>` на два кадра — иначе при навигации Next/React
  * можно поймать `removeChild` на null. Синхронно только `applyDocumentShellChromeSync` (например после `popOverlaySafariChromeDark`).
- * Тёмные шторки: `pushOverlaySafariChromeDark` / `popOverlaySafariChromeDark`; на панели `theme-color` не ставим.
- * Простая мобильная шторка: `usePanelMobileSimpleDrawerEffects`. ЛК — фиксация body в `CabinetMobileNavPortals`.
+ * Тёмные шторки: `pushOverlaySafariChromeDark` / `popOverlaySafariChromeDark`; пока открыты — `theme-color` = `THEME_COLOR_DARK` (единый холст с оверлеем в Safari).
+ * Мобильные шторки: `usePanelMobileSimpleDrawerEffects` (ЛК, админка, заведение).
  */
 
 export const THEME_STORAGE_KEY = "theme";
@@ -106,7 +106,8 @@ export function pushOverlaySafariChromeDark(): void {
   if (typeof document === "undefined") return;
   overlaySafariChromeDarkDepth += 1;
   if (overlaySafariChromeDarkDepth !== 1) return;
-  syncThemeColorMeta(null);
+  /* Единая заливка с тёмным оверлеем: на панели раньше было null — Safari оставлял светлые полосы у safe-area. */
+  syncThemeColorMeta(THEME_COLOR_DARK);
   syncColorSchemeMeta("dark");
   document.documentElement.style.colorScheme = "dark";
 }
@@ -172,11 +173,7 @@ function applyDocumentShellChromeNow(pathname: string | null, preference: SiteTh
   }
 
   const forceDarkChrome = overlaySafariChromeDarkDepth > 0;
-  const metaContent = forceDarkChrome
-    ? isPanelThemeScope(pathname)
-      ? null
-      : THEME_COLOR_DARK
-    : resolvedThemeColor(pathname, preference);
+  const metaContent = forceDarkChrome ? THEME_COLOR_DARK : resolvedThemeColor(pathname, preference);
   syncThemeColorMeta(metaContent);
   syncColorSchemeMeta(forceDarkChrome || effective === "dark" ? "dark" : "light");
 

@@ -2,7 +2,6 @@
 
 import type { Dispatch, ReactNode, RefObject, SetStateAction } from "react";
 import { Menu } from "lucide-react";
-import { ThemeToggle } from "@/components/ThemeToggle";
 import { PANEL_MOBILE_MENU_BTN_CLASS } from "@/lib/panel-mobile-ui";
 import { PANEL_TOP_SHELL_GOLD_DIVIDER } from "@/lib/panel-shell-visual-classes";
 
@@ -15,10 +14,9 @@ type PanelMobileTopChromeProps = {
   ariaHaspopup?: "dialog" | "true";
   /** Доп. классы на кнопку меню (например `site-header-m5-menu-btn`) */
   menuButtonExtraClassName?: string;
-  themeToggleVariant?: "default" | "m5";
 };
 
-/** Общая мобильная полоска: safe-area, «Назад» слева, тема + меню справа, золотая линия снизу. */
+/** Мобильная полоска: safe-area, «Назад» слева, меню справа; тема — в сайдбаре. */
 export function PanelMobileTopChrome({
   leadingSlot,
   menuButtonRef,
@@ -27,14 +25,12 @@ export function PanelMobileTopChrome({
   ariaControls,
   ariaHaspopup = "dialog",
   menuButtonExtraClassName = "",
-  themeToggleVariant = "default",
 }: PanelMobileTopChromeProps) {
   return (
     <div className="cabinet-mobile-top-shell relative z-10 flex w-full shrink-0 flex-col pb-3 lg:hidden">
       <div className="flex w-full min-w-0 items-center gap-2 px-3 pb-3 pt-[max(0.35rem,env(safe-area-inset-top,0px))]">
         <div className="flex min-w-0 flex-1 items-center justify-start">{leadingSlot}</div>
         <div className="flex shrink-0 items-center gap-1.5">
-          <ThemeToggle variant={themeToggleVariant} />
           <button
             ref={menuButtonRef}
             type="button"

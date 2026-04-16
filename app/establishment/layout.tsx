@@ -29,6 +29,7 @@ import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { usePanelMobileMenu } from "@/components/PanelMobileMenuContext";
 import { PanelShellMobileCorner } from "@/components/PanelShellMobileCorner";
 import { PanelMobileBackButton } from "@/components/PanelMobileBackButton";
+import { PanelSidebarThemeSwitch } from "@/components/PanelSidebarThemeSwitch";
 import { LkPresenceHeartbeat } from "@/components/LkPresenceHeartbeat";
 import { ProactiveAccessRefresh } from "@/components/ProactiveAccessRefresh";
 import { usePanelMobileSimpleDrawerEffects } from "@/lib/use-panel-mobile-simple-drawer-effects";
@@ -276,6 +277,7 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
               </div>
             ))}
           </nav>
+          <PanelSidebarThemeSwitch className="mt-3 px-2.5" />
           <button
             type="button"
             onClick={handleLogout}

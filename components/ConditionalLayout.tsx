@@ -25,7 +25,8 @@ export function ConditionalLayout({ children }: { children: React.ReactNode }) {
   const isZayavka = pathname === "/zayavka";
   const isLoginPage = pathname === "/login" || pathname.startsWith("/login/");
   const isForgotPassword = pathname.startsWith("/forgot-password");
-  const hideHeader = isPayPage || isZayavka || isLoginPage || isForgotPassword;
+  /* В ЛК / админке / заведении шапка сайта не показываем — навигация и тема в сайдбаре. */
+  const hideHeader = isPayPage || isZayavka || isLoginPage || isForgotPassword || isPanelShell;
   const widthClass =
     isCabinet || isAdmin || isEstablishment
       ? "max-w-none bg-transparent"

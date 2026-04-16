@@ -30,6 +30,7 @@ import { LkPresenceHeartbeat } from "@/components/LkPresenceHeartbeat";
 import { ProactiveAccessRefresh } from "@/components/ProactiveAccessRefresh";
 import { PanelMobileBackButton } from "@/components/PanelMobileBackButton";
 import { PanelShellMobileCorner } from "@/components/PanelShellMobileCorner";
+import { PanelSidebarThemeSwitch } from "@/components/PanelSidebarThemeSwitch";
 import {
   PANEL_APP_MAIN_SURFACE_ADMIN,
   PANEL_MAIN_CONTENT_INNER_ADMIN_CABINET,
@@ -380,10 +381,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 </div>
               ))}
             </nav>
+            <PanelSidebarThemeSwitch className="mt-4 px-0" />
             <button
               type="button"
               onClick={handleLogout}
-              className={`mt-4 ${ADMIN_BTN} w-full !justify-center gap-2.5 px-3 py-2 text-sm`}
+              className={`mt-3 ${ADMIN_BTN} w-full !justify-center gap-2.5 px-3 py-2 text-sm`}
             >
               <LogOut className="h-4 w-4 shrink-0 text-[var(--color-brand-gold)]" aria-hidden />
               <span>Выйти</span>

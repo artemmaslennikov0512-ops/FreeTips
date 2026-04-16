@@ -27,6 +27,7 @@ import {
   PANEL_MOBILE_Z_NAV_PORTAL_SHELL,
 } from "@/lib/panel-mobile-ui";
 import { PanelMobileTopChrome } from "@/components/PanelMobileTopChrome";
+import { PanelSidebarThemeSwitch } from "@/components/PanelSidebarThemeSwitch";
 import { useTheme } from "@/lib/theme-context";
 import { applyDocumentShellChrome } from "@/lib/document-shell-chrome";
 import { usePanelMobileSimpleDrawerEffects } from "@/lib/use-panel-mobile-simple-drawer-effects";
@@ -97,7 +98,6 @@ export function CabinetMobileNavMobileCorner({ leadingSlot }: { leadingSlot?: Re
       setSidebarOpen={setSidebarOpen}
       ariaControls="cabinet-nav-dropdown"
       menuButtonExtraClassName={isM5Cabinet ? "site-header-m5-menu-btn" : ""}
-      themeToggleVariant={isM5Cabinet ? "m5" : "default"}
     />
   );
 }
@@ -281,6 +281,7 @@ export function CabinetMobileNavPortals() {
               </div>
             )}
           </nav>
+          <PanelSidebarThemeSwitch variant={isM5Cabinet ? "m5" : "default"} className="mt-3 px-0" />
           <button
             type="button"
             onClick={() => {

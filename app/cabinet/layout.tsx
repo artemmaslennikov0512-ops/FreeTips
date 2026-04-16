@@ -40,6 +40,7 @@ import { usePanelMobileMenu } from "@/components/PanelMobileMenuContext";
 import { LkPresenceHeartbeat } from "@/components/LkPresenceHeartbeat";
 import { ProactiveAccessRefresh } from "@/components/ProactiveAccessRefresh";
 import { PanelMobileBackButton } from "@/components/PanelMobileBackButton";
+import { PanelSidebarThemeSwitch } from "@/components/PanelSidebarThemeSwitch";
 import { readCabinetNavRoleCache, writeCabinetNavRoleCache } from "@/lib/cabinet-nav-role-cache";
 import { useTheme } from "@/lib/theme-context";
 import {
@@ -585,10 +586,11 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
               </div>
             )}
           </nav>
+          <PanelSidebarThemeSwitch variant={isM5Cabinet ? "m5" : "default"} className="mt-4 px-3" />
           <button
             type="button"
             onClick={handleLogout}
-            className={`mt-4 flex shrink-0 ${CABINET_WAITER_BTN} w-full !justify-center gap-2.5 px-3 py-2 text-sm`}
+            className={`mt-3 flex shrink-0 ${CABINET_WAITER_BTN} w-full !justify-center gap-2.5 px-3 py-2 text-sm`}
           >
             <LogOut className="h-4 w-4 shrink-0 text-[var(--color-brand-gold)]" aria-hidden />
             <span>{adminCabinetView ? "Выйти из просмотра" : "Выйти"}</span>

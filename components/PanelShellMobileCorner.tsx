@@ -13,7 +13,7 @@ type PanelShellMobileCornerProps = {
   leadingSlot?: ReactNode;
 };
 
-/** Фиксированная зона: тема + меню, под ними золотая полоса на всю ширину (админка, кабинет заведения). */
+/** Фиксированная зона: «Назад» + меню; тема в сайдбаре (админка, ЛК, заведение). */
 export function PanelShellMobileCorner({
   ariaControls,
   ariaHaspopup = "dialog",
@@ -31,7 +31,6 @@ export function PanelShellMobileCorner({
       ariaControls={ariaControls}
       ariaHaspopup={ariaHaspopup}
       menuButtonExtraClassName={menuButtonClassName}
-      themeToggleVariant="default"
     />
   );
 }

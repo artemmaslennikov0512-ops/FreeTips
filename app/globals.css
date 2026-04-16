@@ -103,10 +103,12 @@ html:not([data-theme="dark"]) body.establishment-page {
   background: #e5e9e7 !important;
 }
 
-/* Светлая тема: хром панелей. Холст #e5e9e7; сайдбар и блоки — полупрозрачное «стекло»; карточки — белые плитки. */
+/* Светлая тема: хром панелей. Холст #e5e9e7; блоки — стекло; карточки — мята #9dd2c8 (отличима от блоков). */
 html:not([data-theme="dark"]) body.cabinet-page:not(.admin-page),
 html:not([data-theme="dark"]) body.establishment-page,
 html:not([data-theme="dark"]) body.admin-page {
+  --cabinet-surface-card-bg: #9dd2c8;
+  --cabinet-surface-card-hover-bg: #8fc4bb;
   --cabinet-chrome-elevated-bg: #e5e9e7;
   --cabinet-sidebar-surface-bg: rgba(255, 255, 255, 0.55);
   --cabinet-chrome-border: rgba(197, 165, 114, 0.45);
@@ -178,7 +180,7 @@ html:not([data-theme="dark"])
   --color-text: #0a192f;
   --color-text-secondary: #334155;
   --color-muted: #64748b;
-  background-color: #ffffff !important;
+  background-color: var(--cabinet-surface-card-bg, #9dd2c8) !important;
 }
 
 /* Моб. полоска ЛК / заведение: светлая тема — фон как у страницы; мягкая тень без второй «золотой» линии */
@@ -256,25 +258,31 @@ html:not([data-theme="dark"]) body.admin-page .cabinet-mobile-top-shell .theme-t
   background: #08090b;
 }
 
-/* Админка /admin/verification-requests: золота полоска как раньше (~35% золота); только светлая тема.
-   В разметке нужен self-stretch: родитель — flex-col + items-center, иначе полоска может схлопнуться по ширине. */
-html:not([data-theme="dark"]) body.admin-page .admin-requests-main-tabs-divider {
+/*
+ * Админка /admin/verification-requests: золотая полоска под основными вкладками — светлая и тёмная, в т.ч. моб.
+ * Раньше в тёмной было display:none (из-за «серебристой» линии) — убрано.
+ * Линия через border-top: надёжнее background на flex + items-center; в разметке оставить self-stretch.
+ */
+body.admin-page .admin-requests-main-tabs-divider {
   position: relative;
   z-index: 1;
-  margin-top: 0;
-  height: 1px;
-  min-height: 1px;
+  display: block;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  align-self: stretch;
   width: 100%;
   max-width: 42rem;
   margin-left: auto;
   margin-right: auto;
-  flex-shrink: 0;
+  height: 0;
+  margin-top: 0;
+  padding: 0;
   border: 0;
-  background: rgba(197, 165, 114, 0.35);
-  background: color-mix(in srgb, var(--color-brand-gold) 35%, transparent);
+  border-top: 1px solid rgba(197, 165, 114, 0.38);
+  background: transparent;
 }
 [data-theme="dark"] body.admin-page .admin-requests-main-tabs-divider {
-  display: none;
+  border-top-color: rgba(197, 165, 114, 0.52);
 }
 
 [data-theme="dark"] body.admin-page .cabinet-mobile-top-shell .cabinet-menu-btn.cabinet-waiter-btn {
@@ -441,7 +449,7 @@ html:not([data-theme="dark"]) body.cabinet-page .cabinet-premium[data-cabinet-th
     .cabinet-premium:not([data-cabinet-theme="m5-competition"]):not([data-brand-active="true"])
     .cabinet-main-block
     :is(.cabinet-card, .cabinet-section-header) {
-    background: #ffffff !important;
+    background: var(--cabinet-surface-card-bg, #9dd2c8) !important;
     border: none !important;
     border-radius: 0.625rem;
     box-shadow:
@@ -508,7 +516,7 @@ html:not([data-theme="dark"]) body.cabinet-page .cabinet-premium[data-cabinet-th
   }
   html:not([data-theme="dark"]) body.admin-page .admin-panel.cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-main-block
     :is(.cabinet-card, .cabinet-section-header) {
-    background: #ffffff !important;
+    background: var(--cabinet-surface-card-bg, #9dd2c8) !important;
     border: none !important;
     border-radius: 0.625rem;
     box-shadow:
@@ -551,7 +559,7 @@ html:not([data-theme="dark"]) body.cabinet-page .cabinet-premium[data-cabinet-th
   }
   html:not([data-theme="dark"]) body.establishment-page .establishment-panel.cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-main-block
     :is(.cabinet-card, .cabinet-section-header) {
-    background: #ffffff !important;
+    background: var(--cabinet-surface-card-bg, #9dd2c8) !important;
     border: none !important;
     border-radius: 0.625rem;
     box-shadow:
@@ -3412,7 +3420,7 @@ html:not([data-theme="dark"])
   .cabinet-main-block
   #main-content
   :is(.cabinet-card, .cabinet-section-header) {
-  background: #ffffff !important;
+  background: var(--cabinet-surface-card-bg, #9dd2c8) !important;
   border: none !important;
   outline: none !important;
   border-radius: var(--admin-surface-card-radius, 1.25rem) !important;
@@ -3461,6 +3469,7 @@ html:not([data-theme="dark"])
 }
 
 html:not([data-theme="dark"]) body.admin-page .admin-panel #main-content .admin-dashboard-card {
+  background: var(--cabinet-surface-card-bg, #9dd2c8) !important;
   border: none !important;
   outline: none !important;
   box-shadow: var(
@@ -3577,8 +3586,8 @@ html:not([data-theme="dark"])
 }
 
 /*
- * Светлая тема: карточки main — бирюзовое «стекло» в тон виртуальной карты (средний #11998e),
- * один слой rgba без градиента; блюр фона за карточкой. Не M5 / не админка / без бренда заведения.
+ * Светлая тема: карточки main — плотная мята (--cabinet-surface-card-bg), отличима от стеклянных блоков.
+ * Не M5 / не админка / без бренда заведения (перебивается правилами с #main-content / lg+ при необходимости).
  */
 html:not([data-theme="dark"])
   .cabinet-premium:not([data-cabinet-theme="m5-competition"]):not(.admin-panel):not([data-brand-active="true"])
@@ -3586,16 +3595,15 @@ html:not([data-theme="dark"])
 html:not([data-theme="dark"])
   .cabinet-premium:not([data-cabinet-theme="m5-competition"]):not(.admin-panel):not([data-brand-active="true"])
   .cabinet-section-header {
-  background: rgba(17, 153, 142, 0.22) !important;
-  -webkit-backdrop-filter: blur(18px);
-  backdrop-filter: blur(18px);
-  border: 1px solid rgba(255, 255, 255, 0.52) !important;
+  background: var(--cabinet-surface-card-bg, #9dd2c8) !important;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  border: 1px solid rgba(10, 25, 47, 0.08) !important;
   border-radius: 1rem;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.38),
     0 1px 2px rgba(10, 25, 47, 0.06),
     0 10px 32px rgba(10, 25, 47, 0.08),
-    0 0 0 1px rgba(12, 95, 89, 0.12);
+    0 0 0 1px rgba(12, 95, 89, 0.1);
 }
 
 html:not([data-theme="dark"])
@@ -3604,7 +3612,7 @@ html:not([data-theme="dark"])
 html:not([data-theme="dark"])
   .cabinet-premium:not([data-cabinet-theme="m5-competition"]):not(.admin-panel):not([data-brand-active="true"])
   .cabinet-section-header:hover {
-  background: rgba(17, 153, 142, 0.3) !important;
+  background: var(--cabinet-surface-card-hover-bg, #8fc4bb) !important;
 }
 
 @media (prefers-reduced-transparency: reduce) {
@@ -3616,7 +3624,7 @@ html:not([data-theme="dark"])
     .cabinet-section-header {
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
-    background: rgba(17, 153, 142, 0.88) !important;
+    background: var(--cabinet-surface-card-bg, #9dd2c8) !important;
   }
 }
 
@@ -3644,7 +3652,7 @@ html:not([data-theme="dark"]) .cabinet-premium[data-brand-active]:not([data-cabi
     .cabinet-premium:not([data-cabinet-theme="m5-competition"]):not([data-brand-active="true"])
     .cabinet-main-block
     :is(.cabinet-card, .cabinet-section-header) {
-    background: #ffffff !important;
+    background: var(--cabinet-surface-card-bg, #9dd2c8) !important;
     border: none !important;
     border-radius: 1rem;
     box-shadow:
@@ -3657,7 +3665,7 @@ html:not([data-theme="dark"]) .cabinet-premium[data-brand-active]:not([data-cabi
     .establishment-panel.cabinet-premium:not([data-cabinet-theme="m5-competition"])
     .cabinet-main-block
     :is(.cabinet-card, .cabinet-section-header) {
-    background: #ffffff !important;
+    background: var(--cabinet-surface-card-bg, #9dd2c8) !important;
     border: none !important;
     border-radius: 1rem;
     box-shadow:
@@ -3670,7 +3678,7 @@ html:not([data-theme="dark"]) .cabinet-premium[data-brand-active]:not([data-cabi
     .admin-panel.cabinet-premium:not([data-cabinet-theme="m5-competition"])
     .cabinet-main-block
     :is(.cabinet-card, .cabinet-section-header) {
-    background: #ffffff !important;
+    background: var(--cabinet-surface-card-bg, #9dd2c8) !important;
     border: none !important;
     border-radius: 1rem;
     box-shadow:
@@ -5282,7 +5290,7 @@ html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-compe
   color: #64748b !important;
 }
 
-/* Светлая тема: настройки профиля — тёмный кегль на белой карточке */
+/* Светлая тема: настройки профиля — тёмный кегль на карточке (--cabinet-surface-card-bg / поля остаются белыми) */
 html:not([data-theme="dark"]) .cabinet-premium #settings-profile.cabinet-card h2,
 html:not([data-theme="dark"]) .cabinet-premium #settings-profile.cabinet-card h3,
 html:not([data-theme="dark"]) .cabinet-premium #settings-profile.cabinet-card label,

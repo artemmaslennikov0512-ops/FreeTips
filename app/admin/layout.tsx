@@ -273,7 +273,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const showMobileSubsectionBack = isPanelMobileSubsectionPath(pathname, ADMIN_MOBILE_NAV_ROOTS);
 
   return (
-    <div className="admin-panel cabinet-premium flex min-h-screen w-full min-w-0 max-w-full flex-col overflow-x-hidden bg-[var(--color-bg)] font-[family:var(--font-inter)] text-[var(--color-text)] max-lg:pt-0 lg:pt-0">
+    <div className="admin-panel cabinet-premium flex min-h-screen w-full min-w-0 max-w-full flex-col overflow-x-hidden bg-[var(--color-bg)] font-[family:var(--font-inter)] text-[var(--color-text)] max-lg:pt-0 lg:pt-[max(0.5rem,env(safe-area-inset-top,0px))]">
       <PanelShellMobileCorner
         ariaControls="admin-nav-dropdown"
         trailingSlot={<PanelSidebarThemeSwitch density="toolbar" className="min-w-0" />}
@@ -299,13 +299,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {/* Боковая панель — lg+; сворачивание как в ЛК официанта; на мобильном — модалка */}
       <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-x-hidden lg:flex-row">
         <div
-          className={`hidden shrink-0 transition-[width] duration-300 ease-out lg:mt-3 lg:mb-3 lg:flex lg:self-start ${
+          className={`hidden shrink-0 transition-[width] duration-300 ease-out lg:mt-9 lg:mb-3 lg:flex lg:self-start ${
           lgSidebarCollapsed
             ? "lg:w-0 lg:pointer-events-none lg:overflow-hidden"
             : "lg:relative lg:z-10 lg:w-[236px] lg:overflow-hidden"
         }`}
         >
-          <aside className="admin-sidebar cabinet-sidebar relative flex min-h-0 w-[236px] min-w-[236px] flex-col overflow-hidden rounded-[10px] bg-transparent py-4 shadow-sm backdrop-blur-xl lg:static lg:h-auto lg:max-h-[calc(100vh-2.25rem-0.75rem)] lg:border-t-0">
+          <aside className="admin-sidebar cabinet-sidebar relative flex min-h-0 w-[236px] min-w-[236px] flex-col overflow-hidden rounded-[10px] bg-transparent py-4 shadow-sm backdrop-blur-xl lg:static lg:h-auto lg:max-h-[calc(100vh-0.5rem-2.25rem-0.75rem)] lg:border-t-0">
             <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-x-hidden overflow-y-auto">
               <div className="cabinet-sidebar-profile cabinet-block-inner mx-3 mb-3 rounded-[10px] border border-[var(--color-brand-gold)]/20 px-3 py-2.5">
                 <div className="flex items-center gap-3">

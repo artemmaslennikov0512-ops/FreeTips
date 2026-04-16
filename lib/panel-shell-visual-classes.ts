@@ -65,7 +65,7 @@ export const PANEL_APP_MAIN_SURFACE_CABINET =
   "cabinet-main-block app-panel-main-surface relative z-10 mt-0 mr-0 mb-3 ml-0 flex min-h-0 w-full max-w-full flex-1 flex-col rounded-lg border-x border-b border-white/10 backdrop-blur-xl md:rounded-[10px] lg:z-0 lg:mr-3 lg:ml-3 max-lg:mb-0 max-lg:ml-0 max-lg:mr-0 max-lg:rounded-none max-lg:border-0 max-lg:bg-transparent max-lg:shadow-none max-lg:backdrop-blur-none";
 
 export const PANEL_APP_MAIN_SURFACE_ESTABLISHMENT =
-  "cabinet-main-block app-panel-main-surface relative z-10 mt-0 mr-0 mb-3 ml-0 flex min-h-0 flex-1 flex-col rounded-lg border-x border-b border-white/10 backdrop-blur-xl md:rounded-[10px] lg:z-0 lg:mr-0 lg:ml-3 lg:rounded-[10px]";
+  "cabinet-main-block app-panel-main-surface relative z-10 mt-0 mr-0 mb-3 ml-0 flex min-h-0 flex-1 flex-col rounded-lg border-x border-b border-white/10 backdrop-blur-xl md:rounded-[10px] lg:z-0 lg:mr-0 lg:ml-3 lg:rounded-[10px] max-lg:mb-0 max-lg:ml-0 max-lg:mr-0 max-lg:rounded-none max-lg:border-0 max-lg:bg-transparent max-lg:shadow-none max-lg:backdrop-blur-none";
 
 export const PANEL_MAIN_CONTENT_INNER_ADMIN_CABINET =
   "flex min-h-0 min-w-0 flex-1 flex-col overflow-x-hidden px-4 py-3 sm:px-6 md:py-6 lg:p-8";

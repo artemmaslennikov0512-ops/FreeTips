@@ -438,7 +438,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
     <ProactiveAccessRefresh />
     <LkPresenceHeartbeat />
     <div
-      className={`cabinet-premium flex min-h-screen w-full max-w-full flex-col overflow-x-hidden font-[family:var(--font-inter)] text-[var(--color-text)] max-lg:pt-0 lg:flex-row lg:pt-2 ${isM5Cabinet ? "bg-transparent" : "bg-[var(--color-bg)]"}`}
+      className={`cabinet-premium flex min-h-screen w-full max-w-full flex-col overflow-x-hidden font-[family:var(--font-inter)] text-[var(--color-text)] max-lg:pt-0 lg:flex-row lg:pt-[max(0.5rem,env(safe-area-inset-top,0px))] ${isM5Cabinet ? "bg-transparent" : "bg-[var(--color-bg)]"}`}
       data-brand-active={applyEstablishmentBrand ? "true" : undefined}
       data-cabinet-theme={isM5Cabinet ? "m5-competition" : undefined}
       style={Object.keys(brandStyle).length ? brandStyle : undefined}

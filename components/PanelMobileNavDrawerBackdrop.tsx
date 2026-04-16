@@ -16,7 +16,7 @@ export function PanelMobileNavDrawerBackdrop({ open, onClose }: PanelMobileNavDr
     <div
       role="presentation"
       aria-hidden={!open}
-      className={`fixed inset-0 cursor-pointer bg-black/25 backdrop-blur-sm ${PANEL_MOBILE_Z_NAV_PORTAL_LAYER} ${PANEL_MOBILE_NAV_OVERLAY_TRANSITION} ${
+      className={`fixed mobile-drawer-screen-bleed cursor-pointer bg-black/25 backdrop-blur-sm ${PANEL_MOBILE_Z_NAV_PORTAL_LAYER} ${PANEL_MOBILE_NAV_OVERLAY_TRANSITION} ${
         open ? "opacity-100" : "pointer-events-none opacity-0"
       }`}
       onClick={onClose}

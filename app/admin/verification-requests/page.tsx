@@ -302,7 +302,7 @@ export default function AdminVerificationRequestsPage() {
         <div
           role="separator"
           aria-hidden="true"
-          className="h-px w-full max-w-2xl shrink-0 bg-[var(--color-brand-gold)]/35"
+          className="admin-requests-main-tabs-divider self-stretch"
         />
       </div>
 

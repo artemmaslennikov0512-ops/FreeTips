@@ -201,7 +201,7 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
   const showMobileSubsectionBack = isPanelMobileSubsectionPath(pathname, ESTABLISHMENT_MOBILE_NAV_ROOTS);
 
   return (
-    <div className="establishment-panel cabinet-premium flex min-h-screen w-full min-w-0 max-w-full flex-col overflow-x-hidden bg-[var(--color-bg)] font-[family:var(--font-inter)] text-[var(--color-text)] pt-0 lg:flex-row lg:pt-2">
+    <div className="establishment-panel cabinet-premium flex min-h-screen w-full min-w-0 max-w-full flex-col overflow-x-hidden bg-[var(--color-bg)] font-[family:var(--font-inter)] text-[var(--color-text)] pt-0 lg:flex-row lg:pt-[max(0.5rem,env(safe-area-inset-top,0px))]">
       <PanelShellMobileCorner
         ariaControls="establishment-mobile-nav"
         ariaHaspopup="true"
@@ -222,7 +222,7 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
       />
 
       {/* Сайдбар только lg+; на мобильном — портал как в ЛК официанта */}
-      <aside className="cabinet-sidebar establishment-desktop-sidebar relative hidden min-h-0 w-[14.75rem] min-w-[14.75rem] shrink-0 flex-col overflow-hidden rounded-[10px] border border-white/10 bg-white/[0.06] py-3 shadow-2xl backdrop-blur-xl lg:mt-8 lg:mb-3 lg:flex lg:max-h-[calc(100vh-0.5rem-2rem-0.75rem)] lg:self-start">
+      <aside className="cabinet-sidebar establishment-desktop-sidebar relative hidden min-h-0 w-[14.75rem] min-w-[14.75rem] shrink-0 flex-col overflow-hidden rounded-[10px] border border-white/10 bg-white/[0.06] py-3 shadow-2xl backdrop-blur-xl lg:mt-9 lg:mb-3 lg:flex lg:max-h-[calc(100vh-0.5rem-2.25rem-0.75rem)] lg:self-start">
         <div className="mb-2 w-full shrink-0 px-2.5 text-center">
           <span className={PANEL_ESTABLISHMENT_SIDEBAR_TITLE_LINE}>Кабинет заведения</span>
         </div>

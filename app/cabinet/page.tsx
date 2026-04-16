@@ -609,7 +609,7 @@ export default function CabinetDashboardPage() {
               </div>
               {savingFor && !savingForEditing ? (
                 <div className="flex flex-col items-center text-center">
-                  <div className="cabinet-goal-display mb-3 w-max max-w-full rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-4 py-3 text-center">
+                  <div className="cabinet-goal-display mb-3 w-full max-w-full rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2 text-center">
                     <p className="text-[14px] font-medium text-[var(--color-text)]">{savingFor}</p>
                   </div>
                   <button

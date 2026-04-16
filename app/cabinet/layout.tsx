@@ -455,7 +455,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
         className={`cabinet-lg-sidebar-rail hidden shrink-0 transition-[width] duration-300 ease-out lg:mt-11 lg:mb-3 lg:flex lg:self-start ${
           lgSidebarCollapsed
             ? "lg:w-0 lg:pointer-events-none lg:overflow-hidden"
-            : "lg:relative lg:z-10 lg:w-[236px] lg:overflow-hidden"
+            : "lg:relative lg:z-10 lg:w-[236px] lg:overflow-hidden lg:rounded-[1rem]"
         }`}
       >
         <div

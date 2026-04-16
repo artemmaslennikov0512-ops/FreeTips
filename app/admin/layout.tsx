@@ -302,7 +302,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           className={`cabinet-lg-sidebar-rail hidden shrink-0 transition-[width] duration-300 ease-out lg:mt-11 lg:mb-3 lg:flex lg:self-start ${
           lgSidebarCollapsed
             ? "lg:w-0 lg:pointer-events-none lg:overflow-hidden"
-            : "lg:relative lg:z-10 lg:w-[236px] lg:overflow-hidden"
+            : "lg:relative lg:z-10 lg:w-[236px] lg:overflow-hidden lg:rounded-[1rem]"
         }`}
         >
           <aside className="admin-sidebar cabinet-sidebar relative flex min-h-0 w-[236px] min-w-[236px] flex-col overflow-hidden rounded-[1rem] bg-transparent py-4 shadow-sm backdrop-blur-xl lg:static lg:h-auto lg:max-h-[calc(100vh-0.5rem-2.75rem-0.75rem)] lg:overflow-hidden">

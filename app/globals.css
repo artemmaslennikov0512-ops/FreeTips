@@ -2264,7 +2264,7 @@ html:not([data-theme="dark"]) .cabinet-mobile-nav-overlay {
  * Светлая тема: панель как сайдбар на десктопе — белая «плита» на фоне #eee.
  */
 html:not([data-theme="dark"]) .cabinet-mobile-nav-dialog:not([data-cabinet-theme="m5-competition"]) {
-  background: #ffffff !important;
+  background: var(--cabinet-sidebar-surface-bg, #dbe4ea) !important;
   -webkit-backdrop-filter: none !important;
   backdrop-filter: none !important;
   isolation: isolate;
@@ -2519,28 +2519,28 @@ html:not([data-theme="dark"]) .establishment-mobile-nav-shell .establishment-mob
   backdrop-filter: none !important;
 }
 
-/* Блок навигации в сайдбаре — светлая тема: белая «карточка» на фоне панели */
+/* Блок навигации в сайдбаре — светлая тема: та же заливка, что у панели (#dbe4ea), только рамка */
 html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-sidebar:not(.admin-sidebar) .cabinet-nav-block nav {
-  background: #ffffff !important;
+  background: var(--cabinet-sidebar-surface-bg, #dbe4ea) !important;
   border: 1px solid rgba(197, 165, 114, 0.55) !important;
   outline: none !important;
-  box-shadow: var(--shadow-subtle) !important;
+  box-shadow: none !important;
 }
 html:not([data-theme="dark"])
   .cabinet-premium[data-brand-active]:not([data-cabinet-theme="m5-competition"])
   .cabinet-sidebar:not(.admin-sidebar)
   .cabinet-nav-block
   nav {
-  background: #ffffff !important;
+  background: transparent !important;
   border: 1px solid var(--cabinet-border-color, rgba(197, 165, 114, 0.55)) !important;
   outline: none !important;
-  box-shadow: var(--shadow-subtle) !important;
+  box-shadow: none !important;
 }
 html:not([data-theme="dark"]) .admin-panel .admin-sidebar .cabinet-nav-block nav {
-  background: #ffffff !important;
+  background: var(--cabinet-sidebar-surface-bg, #dbe4ea) !important;
   border: 1px solid rgba(197, 165, 114, 0.55) !important;
   outline: none !important;
-  box-shadow: var(--shadow-subtle) !important;
+  box-shadow: none !important;
 }
 [data-theme="dark"] .cabinet-premium .cabinet-sidebar .cabinet-nav-block nav,
 [data-theme="dark"] .admin-panel .admin-sidebar .cabinet-nav-block nav {
@@ -2609,9 +2609,9 @@ html:not([data-theme="dark"]) .cabinet-mobile-nav-dialog:not([data-cabinet-theme
 
 /* Светлая тема: сайдбар админки — см. блок `body.admin-page .admin-panel .admin-sidebar` ниже по файлу */
 
-/* Светлая тема: блок профиля — белая плитка на фоне сайдбара (#dbe4ea), не сливается с панелью */
+/* Светлая тема: блок профиля — заливка как у панели сайдбара, отделение только рамкой */
 html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-sidebar-profile {
-  background: #ffffff !important;
+  background: var(--cabinet-sidebar-surface-bg, #dbe4ea) !important;
   border: 1px solid rgba(197, 165, 114, 0.55) !important;
   box-shadow: none !important;
 }
@@ -6176,7 +6176,7 @@ html:not([data-theme="dark"]) body.admin-page .admin-panel .admin-sidebar {
 }
 html:not([data-theme="dark"]) body.admin-page .admin-panel .admin-sidebar .cabinet-sidebar-profile {
   color: #0a192f !important;
-  background: #ffffff !important;
+  background: var(--cabinet-sidebar-surface-bg, #dbe4ea) !important;
   border: 1px solid rgba(197, 165, 114, 0.55) !important;
   outline: none !important;
   box-shadow: none !important;

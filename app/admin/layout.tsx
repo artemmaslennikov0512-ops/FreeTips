@@ -296,10 +296,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         handleLogout={handleLogout}
       />
 
-      <div className="admin-desktop-top-toolbar hidden w-full shrink-0 items-center justify-end gap-2 px-4 py-2.5 lg:flex">
-        <PanelSidebarThemeSwitch density="toolbar" className="min-w-0 max-w-[min(18rem,46vw)]" />
-      </div>
-
       {/* Боковая панель — lg+; сворачивание как в ЛК официанта; на мобильном — модалка */}
       <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-x-hidden lg:flex-row">
         <div
@@ -311,7 +307,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         >
           <aside className="admin-sidebar cabinet-sidebar relative flex min-h-0 w-[236px] min-w-[236px] flex-col overflow-hidden rounded-[10px] bg-transparent py-4 shadow-sm backdrop-blur-xl lg:static lg:h-auto lg:max-h-[calc(100vh-2.25rem-0.75rem)] lg:border-t-0">
             <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-x-hidden overflow-y-auto">
-              <div className="cabinet-sidebar-profile cabinet-block-inner mx-3 mb-3 rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2.5">
+              <div className="cabinet-sidebar-profile cabinet-block-inner mx-3 mb-3 rounded-[10px] border border-[var(--color-brand-gold)]/20 px-3 py-2.5">
                 <div className="flex items-center gap-3">
                   <div className="cabinet-sidebar-avatar flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--color-brand-gold)] font-semibold text-[#0a192f] text-sm">
                     {(user.login || "A").charAt(0).toUpperCase()}
@@ -392,6 +388,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     </div>
                   ))}
                 </nav>
+                <PanelSidebarThemeSwitch className="mt-3 px-3" />
                 <button
                   type="button"
                   onClick={handleLogout}

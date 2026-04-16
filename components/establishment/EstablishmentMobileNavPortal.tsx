@@ -101,7 +101,7 @@ export function EstablishmentMobileNavPortal({
                       onClick={closeSidebar}
                       className={`flex items-center gap-2.5 rounded-md px-2 py-[0.4375rem] text-sm font-normal leading-snug transition-colors ${
                         isActive(href)
-                          ? "cabinet-nav-active border border-[#0a192f]/35 bg-[#0a192f]/12 text-[#0a192f] font-medium"
+                          ? "cabinet-nav-active border font-medium text-white/90 max-lg:text-[#0a192f]"
                           : "border border-transparent text-white/80 hover:bg-[var(--color-dark-gray)]/10 hover:text-white"
                       }`}
                     >

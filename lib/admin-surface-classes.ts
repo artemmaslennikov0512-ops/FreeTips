@@ -3,14 +3,14 @@
  *
  * Важно: не задавать фон через `bg-[var(--color-navy)]` или `bg-[var(--color-dark-gray)]` для таких блоков —
  * в `[data-theme="dark"]` эти переменные в :root становятся светлыми, и блок «ломается» визуально.
- * Здесь — фиксированные тёмные поля (#363636) и карточка `cabinet-section-header` (глобальные стили
+ * Здесь — фиксированные тёмные поля (#3c414a, как --dark-form-surface-bg) и карточка `cabinet-section-header` (глобальные стили
  * уже подстраивают светлую/тёмную тему сайта для админки).
  *
  * Новые страницы админки: импортируйте отсюда карточку/инпуты вместо дублирования длинных строк Tailwind.
  */
 
 const FIELD_BASE =
-  "w-full rounded-lg border border-white/20 bg-[#363636] px-3 py-2.5 text-sm text-white placeholder:text-white/50 focus:outline-none focus:border-[var(--color-brand-gold)] focus:ring-1 focus:ring-[var(--color-brand-gold)]/35";
+  "w-full rounded-lg border border-white/20 bg-[#3c414a] px-3 py-2.5 text-sm text-white placeholder:text-white/50 focus:outline-none focus:border-[var(--color-brand-gold)] focus:ring-1 focus:ring-[var(--color-brand-gold)]/35";
 
 /** Узкая колонка страницы (2FA, похожие формы). */
 export const ADMIN_PANEL_PAGE_NARROW =

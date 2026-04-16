@@ -166,7 +166,7 @@ export function CabinetMobileNavPortals() {
         >
         <div className="cabinet-nav-dropdown-inner flex min-h-0 flex-1 flex-col overflow-hidden px-3 pb-[max(0.35rem,env(safe-area-inset-bottom,0px))] pt-2.5">
           <div
-            className={`cabinet-sidebar-profile cabinet-block-inner mb-2 shrink-0 rounded-[10px] border border-[rgba(197,165,114,0.55)] px-3 py-2 ${!sidebarBg ? "bg-[var(--color-dark-gray)]/10" : ""}`}
+            className="cabinet-sidebar-profile cabinet-block-inner mb-2 shrink-0 rounded-[10px] border border-[rgba(197,165,114,0.55)] px-3 py-2"
             style={Object.keys(profileBlockStyle).length ? profileBlockStyle : undefined}
           >
             <div className="flex items-center gap-2.5">

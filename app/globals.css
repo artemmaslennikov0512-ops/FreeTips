@@ -92,9 +92,9 @@
   --landing-page-bg: #171717;
   /* Заголовки в секциях с тёмным фоном: в тёмной теме фон светлый, текст тёмный */
   --section-dark-heading: #171717;
-  /* Поля ввода: фон как у холста ЛК/админки (#12161f), рамка без синего отлива */
-  --dark-form-surface-bg: #12161f;
-  --dark-form-surface-border: rgba(255, 255, 255, 0.12);
+  /* Поля ввода: тёмно-серый «хром», светлая обводка (единый вид во всех формах) */
+  --dark-form-surface-bg: #3c414a;
+  --dark-form-surface-border: rgba(255, 255, 255, 0.22);
 }
 
 /* Светлая тема: ЛК официанта, заведение и админка — нейтральный фон страницы #eee */
@@ -197,10 +197,7 @@ html:not([data-theme="dark"]) body.cabinet-page .cabinet-mobile-top-shell .cabin
 html:not([data-theme="dark"]) body.establishment-page .cabinet-mobile-top-shell .cabinet-mobile-top-shell__gold {
   display: none;
 }
-/* Убираем золотую разделительную черту мобильной полоски в админке */
-body.admin-page .cabinet-mobile-top-shell .cabinet-mobile-top-shell__gold {
-  display: none;
-}
+/* Админка: золотая линия под моб. полоской (меню + тема), как в ЛК официанта */
 html:not([data-theme="dark"]) body.cabinet-page .cabinet-mobile-top-shell .theme-toggle-btn,
 html:not([data-theme="dark"]) body.establishment-page .cabinet-mobile-top-shell .theme-toggle-btn,
 html:not([data-theme="dark"]) body.admin-page .cabinet-mobile-top-shell .theme-toggle-btn {
@@ -2017,20 +2014,6 @@ html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-compe
   color: #0a192f;
 }
 
-/* ЛК официанта / заведение без бренда: фон сайдбара = фон страницы (#eeeeee), без «второй плиты» и blur */
-html:not([data-theme="dark"])
-  body.cabinet-page:not(.establishment-page)
-  .cabinet-premium:not([data-cabinet-theme="m5-competition"]):not([data-brand-active="true"])
-  .cabinet-sidebar:not(.admin-sidebar),
-html:not([data-theme="dark"])
-  body.establishment-page
-  .establishment-panel.cabinet-premium:not([data-cabinet-theme="m5-competition"]):not([data-brand-active="true"])
-  .cabinet-sidebar:not(.admin-sidebar) {
-  background: #eeeeee !important;
-  box-shadow: none !important;
-  -webkit-backdrop-filter: none !important;
-  backdrop-filter: none !important;
-}
 html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-sidebar:not(.admin-sidebar) a,
 html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-sidebar:not(.admin-sidebar) button {
   color: #334155 !important;
@@ -2083,25 +2066,25 @@ html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-compe
   color: #0a192f !important;
 }
 
-/* ЛК официанта (не M5): активный пункт — золотистый wash + тёмный текст (без рамки, как в админке) */
+/* ЛК официанта (не M5): активный пункт — без заливки, только обводка */
 html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-sidebar:not(.admin-sidebar) .cabinet-nav-active,
 html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-nav-dropdown .cabinet-nav-active,
 html:not([data-theme="dark"]) .cabinet-mobile-nav-dialog:not([data-cabinet-theme="m5-competition"]) .cabinet-nav-active {
-  border: none !important;
   outline: none !important;
-  background: rgba(197, 165, 114, 0.18) !important;
+  background: transparent !important;
+  border: 1px solid rgba(197, 165, 114, 0.65) !important;
   color: #0a192f !important;
-  box-shadow: 0 1px 5px rgba(10, 25, 47, 0.06) !important;
+  box-shadow: none !important;
 }
 
 [data-theme="dark"] .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-sidebar:not(.admin-sidebar) .cabinet-nav-active,
 [data-theme="dark"] .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-nav-dropdown .cabinet-nav-active,
 [data-theme="dark"] .cabinet-mobile-nav-dialog:not([data-cabinet-theme="m5-competition"]) .cabinet-nav-active {
-  border: none !important;
   outline: none !important;
-  background: rgba(255, 255, 255, 0.1) !important;
+  background: transparent !important;
+  border: 1px solid rgba(255, 255, 255, 0.28) !important;
   color: rgba(250, 250, 250, 0.98) !important;
-  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.22) !important;
+  box-shadow: none !important;
 }
 
 /*
@@ -2165,9 +2148,9 @@ html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-compe
 }
 html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-nav-dropdown .cabinet-sidebar-profile {
   color: #0a192f !important;
-  background: var(--cabinet-block-bg, #eeeeee) !important;
+  background: transparent !important;
   border: 1px solid rgba(197, 165, 114, 0.55) !important;
-  box-shadow: var(--shadow-subtle);
+  box-shadow: none;
 }
 html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-nav-dropdown nav {
   background: transparent !important;
@@ -2190,10 +2173,13 @@ html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-compe
 [data-theme="dark"] .cabinet-premium .cabinet-nav-dropdown .cabinet-nav-label {
   color: rgba(250, 250, 250, 0.5) !important;
 }
-[data-theme="dark"] .cabinet-premium .cabinet-nav-dropdown .cabinet-sidebar-profile {
-  background: rgba(0, 0, 0, 0.25) !important;
-  border-color: rgba(255, 255, 255, 0.15) !important;
+[data-theme="dark"] .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-nav-dropdown .cabinet-sidebar-profile {
+  background: transparent !important;
+  border-width: 0.5px !important;
+  border-style: solid !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
   color: #fafafa !important;
+  box-shadow: none !important;
 }
 [data-theme="dark"] .cabinet-premium .cabinet-nav-dropdown nav {
   background: transparent !important;
@@ -2275,10 +2261,9 @@ html:not([data-theme="dark"]) .cabinet-mobile-nav-dialog:not([data-cabinet-theme
   box-shadow: var(--shadow-subtle) !important;
 }
 html:not([data-theme="dark"]) .cabinet-mobile-nav-dialog:not([data-cabinet-theme="m5-competition"]) .cabinet-sidebar-profile {
-  /* без !important: при бренде заведения фон задаётся inline из layout (profileBlockStyle) */
-  background: color-mix(in srgb, var(--color-dark-gray, #2d3748) 10%, transparent);
+  background: transparent !important;
   border: 1px solid rgba(197, 165, 114, 0.55) !important;
-  box-shadow: var(--shadow-subtle);
+  box-shadow: none;
   color: #0a192f !important;
 }
 html:not([data-theme="dark"]) .cabinet-mobile-nav-dialog:not([data-cabinet-theme="m5-competition"]) .cabinet-nav-label {
@@ -2347,9 +2332,12 @@ html:not([data-theme="dark"]) .cabinet-mobile-nav-dialog[data-cabinet-theme="m5-
   color: rgba(250, 250, 250, 0.5) !important;
 }
 [data-theme="dark"] .cabinet-mobile-nav-dialog:not([data-cabinet-theme="m5-competition"]) .cabinet-sidebar-profile {
-  background: rgba(0, 0, 0, 0.25) !important;
-  border-color: rgba(255, 255, 255, 0.15) !important;
+  background: transparent !important;
+  border-width: 0.5px !important;
+  border-style: solid !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
   color: #fafafa !important;
+  box-shadow: none !important;
 }
 [data-theme="dark"] .cabinet-mobile-nav-dialog:not([data-cabinet-theme="m5-competition"]) nav {
   background: transparent !important;
@@ -2403,10 +2391,10 @@ html:not([data-theme="dark"]) .admin-mobile-nav-dialog {
   box-shadow: var(--cabinet-chrome-shadow-strong) !important;
 }
 html:not([data-theme="dark"]) .admin-mobile-nav-dialog .cabinet-sidebar-profile {
-  background: var(--cabinet-block-bg, #eeeeee) !important;
+  background: transparent !important;
   border: 1px solid rgba(197, 165, 114, 0.55) !important;
   color: #0a192f !important;
-  box-shadow: var(--shadow-subtle);
+  box-shadow: none;
 }
 html:not([data-theme="dark"]) .admin-mobile-nav-dialog .cabinet-nav-label {
   color: #64748b !important;
@@ -2420,9 +2408,10 @@ html:not([data-theme="dark"]) .admin-mobile-nav-dialog a {
   color: #334155 !important;
 }
 html:not([data-theme="dark"]) .admin-mobile-nav-dialog .cabinet-nav-active {
-  border-color: rgba(197, 165, 114, 0.52) !important;
-  background: rgba(197, 165, 114, 0.14) !important;
+  border: 1px solid rgba(197, 165, 114, 0.55) !important;
+  background: transparent !important;
   color: #0a192f !important;
+  box-shadow: none !important;
 }
 html:not([data-theme="dark"]) .admin-mobile-nav-dialog [role="group"] > div:first-child {
   color: #64748b !important;
@@ -2448,16 +2437,19 @@ html:not([data-theme="dark"]) .admin-mobile-nav-dialog [role="group"] {
   color: rgba(250, 250, 250, 0.5) !important;
 }
 [data-theme="dark"] .admin-mobile-nav-dialog .cabinet-sidebar-profile {
-  background: rgba(0, 0, 0, 0.25) !important;
-  border-color: rgba(255, 255, 255, 0.15) !important;
+  background: transparent !important;
+  border-width: 0.5px !important;
+  border-style: solid !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
   color: #fafafa !important;
+  box-shadow: none !important;
 }
 [data-theme="dark"] .admin-mobile-nav-dialog .cabinet-nav-active {
-  border: none !important;
   outline: none !important;
-  background: rgba(255, 255, 255, 0.1) !important;
+  background: transparent !important;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
   color: rgba(250, 250, 250, 0.98) !important;
-  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.22) !important;
+  box-shadow: none !important;
 }
 [data-theme="dark"] .admin-mobile-nav-dialog nav {
   background: rgba(0, 0, 0, 0.25) !important;
@@ -2572,18 +2564,18 @@ html:not([data-theme="dark"]) .cabinet-mobile-nav-dialog:not([data-cabinet-theme
 
 /* Светлая тема: сайдбар админки — см. блок `body.admin-page .admin-panel .admin-sidebar` ниже по файлу */
 
-/* Светлая тема: блок профиля — как плитки «Быстрые действия» (cabinet-block-inner + золотая рамка + shadow-subtle) */
+/* Светлая тема: блок профиля в сайдбаре — без заливки, только обводка */
 html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-sidebar-profile {
-  background: color-mix(in srgb, var(--color-dark-gray, #2d3748) 10%, transparent) !important;
+  background: transparent !important;
   border: 1px solid rgba(197, 165, 114, 0.55) !important;
-  box-shadow: var(--shadow-subtle);
+  box-shadow: none !important;
 }
 html:not([data-theme="dark"])
   .cabinet-premium[data-brand-active]:not([data-cabinet-theme="m5-competition"])
   .cabinet-sidebar-profile {
-  background: var(--cabinet-block-bg, #eeeeee) !important;
+  background: transparent !important;
   border: 1px solid var(--cabinet-border-color, rgba(197, 165, 114, 0.55)) !important;
-  box-shadow: var(--shadow-subtle);
+  box-shadow: none !important;
 }
 html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-sidebar-avatar {
   background: var(--color-brand-gold) !important;
@@ -2642,11 +2634,13 @@ html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-compe
 [data-theme="dark"] .cabinet-premium .cabinet-sidebar button {
   color: rgba(250, 250, 250, 0.9);
 }
-[data-theme="dark"] .cabinet-premium .cabinet-sidebar .cabinet-sidebar-profile {
-  background: rgba(0, 0, 0, 0.25) !important;
+[data-theme="dark"] .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-sidebar .cabinet-sidebar-profile {
+  background: transparent !important;
   border-width: 0.5px !important;
-  border-color: rgba(255, 255, 255, 0.15) !important;
+  border-style: solid !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
   color: #fafafa !important;
+  box-shadow: none !important;
 }
 
 [data-theme="dark"] .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-card,
@@ -3237,17 +3231,13 @@ html:not([data-theme="dark"])
   border-radius: 0 !important;
 }
 
-/* Светлая тема, lg+: основной блок снова как отдельная карта рядом с сайдбаром (на <lg плоский холст без изменений) */
+/*
+ * Светлая тема, lg+: отдельная «карта» только у основного блока админки.
+ * ЛК официанта и кабинет заведения: основной блок остаётся плоским (секции — .cabinet-card / .cabinet-section-header),
+ * визуальный блок — сайдбар (правила выше по .cabinet-sidebar).
+ */
 @media (min-width: 1024px) {
-  html:not([data-theme="dark"]) body.admin-page .admin-panel .admin-main-block.cabinet-main-block,
-  html:not([data-theme="dark"])
-    body.cabinet-page:not(.admin-page)
-    .cabinet-premium:not([data-cabinet-theme="m5-competition"]):not([data-brand-active="true"]):not(.admin-panel)
-    .cabinet-main-block:not(.admin-main-block),
-  html:not([data-theme="dark"])
-    body.establishment-page
-    .establishment-panel.cabinet-premium:not([data-cabinet-theme="m5-competition"])
-    .cabinet-main-block:not(.admin-main-block) {
+  html:not([data-theme="dark"]) body.admin-page .admin-panel .admin-main-block.cabinet-main-block {
     background: #ffffff !important;
     border: 1px solid var(--cabinet-chrome-border, rgba(197, 165, 114, 0.45)) !important;
     border-radius: 0.625rem !important;
@@ -3947,9 +3937,9 @@ html:not([data-theme="dark"]) .pay-page {
 }
 
 [data-theme="dark"] .pay-page {
-  /* Поля на фоне карточки оплаты (#161616), без отдельной «синей плиты» */
-  --dark-form-surface-bg: #161616;
-  --dark-form-surface-border: rgba(255, 255, 255, 0.12);
+  /* Поля на карточке оплаты — тот же токен, что и в ЛК */
+  --dark-form-surface-bg: #3c414a;
+  --dark-form-surface-border: rgba(255, 255, 255, 0.22);
   --pay-page-accent: #ffffff;
   --pay-page-card-bg: #161616;
   --pay-page-card-border: 1px solid rgba(192, 192, 192, 0.3);
@@ -5303,11 +5293,11 @@ html:not([data-theme="dark"]) .cabinet-premium #quick-actions.cabinet-card .cabi
   color: #0a192f !important;
 }
 
-/* Поле цели — в тёмной теме тот же полупрозрачный фон, что у блока «Ваша ссылка для чаевых», а не сплошной серый */
+/* Поле цели — в тёмной теме тот же фон полей, что и в остальных формах */
 [data-theme="dark"] .cabinet-premium #quick-actions .cabinet-goal-input.cabinet-input-window,
 [data-theme="dark"] .cabinet-premium #quick-actions .cabinet-goal-display {
-  background: rgba(255, 255, 255, 0.06) !important;
-  border-color: var(--dark-form-surface-border) !important;
+  background: var(--dark-form-surface-bg) !important;
+  border: 1px solid var(--dark-form-surface-border) !important;
 }
 
 /* Поле «цель»: без второго светлого контура (глобальный focus box-shadow на .cabinet-input-window + ring в разметке) */
@@ -5464,7 +5454,7 @@ html:not([data-theme="dark"])
   -webkit-text-fill-color: var(--color-muted);
 }
 
-/* Тёмная тема: поля ввода — тёмно-синий фон, светлый текст, плейсхолдер #8e8e8e */
+/* Тёмная тема: поля ввода — тёмно-серый фон, светлый текст, плейсхолдер #8e8e8e */
 [data-theme="dark"] .cabinet-premium input,
 [data-theme="dark"] .cabinet-premium textarea {
   color: #ffffff !important;
@@ -5549,7 +5539,7 @@ html:not([data-theme="dark"]) .admin-panel textarea::placeholder {
   -webkit-text-fill-color: #5a5a5a;
 }
 
-/* ЛК / админка: автозаполнение — как обычные поля (тёмно-синяя подложка), без жёлтой подложки */
+/* ЛК / админка: автозаполнение — как обычные поля (--dark-form-surface-bg), без жёлтой подложки */
 [data-theme="dark"] .cabinet-premium input:-webkit-autofill,
 [data-theme="dark"] .cabinet-premium input:-webkit-autofill:hover,
 [data-theme="dark"] .cabinet-premium input:-webkit-autofill:focus,
@@ -6038,11 +6028,11 @@ html:not([data-theme="dark"]) body.establishment-page .establishment-panel .cabi
   ) !important;
 }
 html:not([data-theme="dark"]) body.establishment-page .establishment-panel .cabinet-sidebar .cabinet-nav-active {
-  border: none !important;
   outline: none !important;
-  background: rgba(197, 165, 114, 0.18) !important;
+  background: transparent !important;
+  border: 1px solid rgba(197, 165, 114, 0.55) !important;
   color: #0a192f !important;
-  box-shadow: 0 1px 5px rgba(10, 25, 47, 0.06) !important;
+  box-shadow: none !important;
 }
 
 /* Светлая тема: мобильный сайдбар заведения — навигация и подписи (в разметке утилиты text-white) */
@@ -6096,14 +6086,10 @@ html:not([data-theme="dark"]) body.admin-page .admin-panel .admin-sidebar {
 }
 html:not([data-theme="dark"]) body.admin-page .admin-panel .admin-sidebar .cabinet-sidebar-profile {
   color: #0a192f !important;
-  background: var(--cabinet-block-bg, #eeeeee) !important;
-  border: none !important;
+  background: transparent !important;
+  border: 1px solid rgba(197, 165, 114, 0.55) !important;
   outline: none !important;
-  box-shadow: var(
-    --admin-chrome-shadow,
-    0 2px 10px rgba(10, 25, 47, 0.045),
-    0 12px 36px rgba(10, 25, 47, 0.065)
-  ) !important;
+  box-shadow: none !important;
 }
 html:not([data-theme="dark"]) body.admin-page .admin-panel .admin-sidebar .cabinet-sidebar-profile .font-semibold {
   color: #0a192f !important;
@@ -6118,17 +6104,19 @@ html:not([data-theme="dark"]) body.admin-page .admin-panel .admin-sidebar nav a:
   color: #334155 !important;
 }
 html:not([data-theme="dark"]) body.admin-page .admin-panel .admin-sidebar .cabinet-nav-active {
-  border: none !important;
   outline: none !important;
-  background: rgba(197, 165, 114, 0.18) !important;
+  background: transparent !important;
+  border: 1px solid rgba(197, 165, 114, 0.55) !important;
   color: #0a192f !important;
-  box-shadow: 0 1px 5px rgba(10, 25, 47, 0.06) !important;
+  box-shadow: none !important;
 }
-/* Тёмная тема: активный пункт сайдбара админки — тот же золотистый wash, что у ЛК (без :not(.admin-sidebar) в общем блоке выше) */
+/* Тёмная тема: активный пункт сайдбара админки — только обводка */
 [data-theme="dark"] body.admin-page .admin-panel .admin-sidebar .cabinet-nav-active {
-  border-color: rgba(197, 165, 114, 0.45) !important;
-  background: rgba(197, 165, 114, 0.12) !important;
+  outline: none !important;
+  background: transparent !important;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
   color: rgba(250, 250, 250, 0.98) !important;
+  box-shadow: none !important;
 }
 html:not([data-theme="dark"]) body.admin-page .admin-panel .admin-sidebar .cabinet-nav-group-title,
 html:not([data-theme="dark"]) body.admin-page .admin-panel .admin-sidebar [role="group"] > div:first-child {
@@ -6207,6 +6195,7 @@ html:not([data-theme="dark"]) body.admin-page .admin-panel .cabinet-lg-sidebar-t
 [data-theme="dark"] .admin-panel select {
   background: var(--dark-form-surface-bg) !important;
   color: #fafafa !important;
+  border: 1px solid var(--dark-form-surface-border) !important;
   font-family: var(--font-inter), system-ui, sans-serif;
 }
 [data-theme="dark"] .admin-panel select option {
@@ -6429,7 +6418,7 @@ html:not([data-theme="dark"]) .establishment-team-table .establishment-team-tabl
 }
 
 /* Модалка «Редактировать сотрудника» — всегда тёмная (и в светлой теме кабинета заведения).
-   Префикс body…panel перебивает [data-theme="dark"] .cabinet-premium .cabinet-input-window { тёмно-синий фон }. */
+   Префикс body…panel перебивает общие правила .cabinet-input-window в тёмной теме сайта. */
 body.establishment-page .establishment-panel .establishment-edit-modal {
   background-color: #1e2a3a !important;
 }
@@ -6468,68 +6457,68 @@ body.establishment-page .establishment-panel .establishment-edit-modal .cabinet-
 }
 
 [data-theme="dark"] body.establishment-page .establishment-panel .establishment-edit-modal .cabinet-input-window {
-  background: #ffffff !important;
-  border-color: rgba(197, 165, 114, 0.38) !important;
-  color: #0a192f !important;
-  -webkit-text-fill-color: #0a192f !important;
+  background: var(--dark-form-surface-bg) !important;
+  border: 1px solid var(--dark-form-surface-border) !important;
+  color: #f1f5f9 !important;
+  -webkit-text-fill-color: #f1f5f9 !important;
 }
 [data-theme="dark"] body.establishment-page .establishment-panel .establishment-edit-modal .cabinet-input-window::placeholder {
-  color: rgba(10, 25, 47, 0.45) !important;
-  -webkit-text-fill-color: rgba(10, 25, 47, 0.45) !important;
+  color: #8e8e8e !important;
+  -webkit-text-fill-color: #8e8e8e !important;
 }
 
 /*
- * Тёмная тема сайта: ЛК заведения — поля в контенте: белая подложка, тёмный кегль (в т.ч. в модалках внутри #main-content).
+ * Тёмная тема сайта: ЛК заведения — поля в контенте: тот же тёмно-серый хром, что в ЛК официанта и админке.
  */
 [data-theme="dark"] body.establishment-page .establishment-panel.cabinet-premium #main-content input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="hidden"]):not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="range"]):not([type="color"]),
 [data-theme="dark"] body.establishment-page .establishment-panel.cabinet-premium #main-content textarea,
 [data-theme="dark"] body.establishment-page .establishment-panel.cabinet-premium #main-content select {
-  background: #ffffff !important;
-  background-color: #ffffff !important;
-  border: 1px solid rgba(197, 165, 114, 0.38) !important;
-  color: #0a192f !important;
-  -webkit-text-fill-color: #0a192f !important;
-  caret-color: #0a192f;
+  background: var(--dark-form-surface-bg) !important;
+  background-color: var(--dark-form-surface-bg) !important;
+  border: 1px solid var(--dark-form-surface-border) !important;
+  color: #f1f5f9 !important;
+  -webkit-text-fill-color: #f1f5f9 !important;
+  caret-color: #f1f5f9;
 }
 [data-theme="dark"] body.establishment-page .establishment-panel.cabinet-premium #main-content input::placeholder,
 [data-theme="dark"] body.establishment-page .establishment-panel.cabinet-premium #main-content textarea::placeholder {
-  color: rgba(10, 25, 47, 0.45) !important;
-  -webkit-text-fill-color: rgba(10, 25, 47, 0.45) !important;
+  color: #8e8e8e !important;
+  -webkit-text-fill-color: #8e8e8e !important;
   opacity: 1;
 }
 [data-theme="dark"] body.establishment-page .establishment-panel.cabinet-premium #main-content .cabinet-input-window:not(input):not(textarea) {
-  background: #ffffff !important;
-  border: 1px solid rgba(197, 165, 114, 0.38) !important;
+  background: var(--dark-form-surface-bg) !important;
+  border: 1px solid var(--dark-form-surface-border) !important;
 }
 [data-theme="dark"] body.establishment-page .establishment-panel.cabinet-premium #main-content .cabinet-input-window input,
 [data-theme="dark"] body.establishment-page .establishment-panel.cabinet-premium #main-content .cabinet-input-window textarea {
   background: transparent !important;
   border: none !important;
-  color: #0a192f !important;
-  -webkit-text-fill-color: #0a192f !important;
-  caret-color: #0a192f;
+  color: #f1f5f9 !important;
+  -webkit-text-fill-color: #f1f5f9 !important;
+  caret-color: #f1f5f9;
 }
 [data-theme="dark"] body.establishment-page .establishment-panel.cabinet-premium #main-content .cabinet-input-window input::placeholder,
 [data-theme="dark"] body.establishment-page .establishment-panel.cabinet-premium #main-content .cabinet-input-window textarea::placeholder {
-  color: rgba(10, 25, 47, 0.45) !important;
-  -webkit-text-fill-color: rgba(10, 25, 47, 0.45) !important;
+  color: #8e8e8e !important;
+  -webkit-text-fill-color: #8e8e8e !important;
 }
 /* input сам несёт класс .cabinet-input-window — те же правила, что у обычного input */
 [data-theme="dark"] body.establishment-page .establishment-panel.cabinet-premium #main-content input.cabinet-input-window,
 [data-theme="dark"] body.establishment-page .establishment-panel.cabinet-premium #main-content textarea.cabinet-input-window {
-  background: #ffffff !important;
-  color: #0a192f !important;
-  -webkit-text-fill-color: #0a192f !important;
-  caret-color: #0a192f;
+  background: var(--dark-form-surface-bg) !important;
+  color: #f1f5f9 !important;
+  -webkit-text-fill-color: #f1f5f9 !important;
+  caret-color: #f1f5f9;
 }
 [data-theme="dark"] body.establishment-page .establishment-panel.cabinet-premium #main-content input.cabinet-input-window::placeholder,
 [data-theme="dark"] body.establishment-page .establishment-panel.cabinet-premium #main-content textarea.cabinet-input-window::placeholder {
-  color: rgba(10, 25, 47, 0.45) !important;
-  -webkit-text-fill-color: rgba(10, 25, 47, 0.45) !important;
+  color: #8e8e8e !important;
+  -webkit-text-fill-color: #8e8e8e !important;
 }
 [data-theme="dark"] body.establishment-page .establishment-panel.cabinet-premium #main-content select option {
-  background: #ffffff;
-  color: #0a192f;
+  background: var(--dark-form-surface-bg);
+  color: #f1f5f9;
 }
 [data-theme="dark"] body.establishment-page .establishment-panel.cabinet-premium #main-content input:-webkit-autofill,
 [data-theme="dark"] body.establishment-page .establishment-panel.cabinet-premium #main-content input:-webkit-autofill:hover,
@@ -6539,13 +6528,13 @@ body.establishment-page .establishment-panel .establishment-edit-modal .cabinet-
 [data-theme="dark"] body.establishment-page .establishment-panel.cabinet-premium #main-content textarea:-webkit-autofill:focus,
 [data-theme="dark"] body.establishment-page .establishment-panel.cabinet-premium #main-content input:autofill,
 [data-theme="dark"] body.establishment-page .establishment-panel.cabinet-premium #main-content textarea:autofill {
-  background-color: #ffffff !important;
+  background-color: var(--dark-form-surface-bg) !important;
   background-image: none !important;
-  color: #0a192f !important;
-  border: 1px solid rgba(197, 165, 114, 0.38) !important;
-  -webkit-text-fill-color: #0a192f !important;
-  caret-color: #0a192f;
-  box-shadow: 0 0 0 1000px #ffffff inset !important;
+  color: #f1f5f9 !important;
+  border: 1px solid var(--dark-form-surface-border) !important;
+  -webkit-text-fill-color: #f1f5f9 !important;
+  caret-color: #f1f5f9;
+  box-shadow: 0 0 0 1000px var(--dark-form-surface-bg) inset !important;
   filter: none !important;
   transition: background-color 99999s ease-out 0s !important;
 }
@@ -7028,6 +7017,20 @@ html:not([data-theme="dark"]) .auth-page-card {
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05);
 }
 
+/* Поля в .auth-page без обёртки layout-login (смена пароля и др.) — тот же хром, что в ЛК */
+[data-theme="dark"] .auth-page input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="submit"]):not([type="button"]):not([type="reset"]),
+[data-theme="dark"] .auth-page textarea {
+  background: var(--dark-form-surface-bg) !important;
+  color: #f1f5f9 !important;
+  border: 1px solid var(--dark-form-surface-border) !important;
+  -webkit-text-fill-color: #f1f5f9;
+}
+[data-theme="dark"] .auth-page input::placeholder,
+[data-theme="dark"] .auth-page textarea::placeholder {
+  color: #8e8e8e !important;
+  -webkit-text-fill-color: #8e8e8e;
+}
+
 /* Блок заявки — фон как основной блок ЛК */
 html:not([data-theme="dark"]) .zayavka-card.auth-page-card {
   background: linear-gradient(135deg, #0a192f 0%, color-mix(in srgb, #0a192f 85%, white) 50%, #0a192f 100%) !important;
@@ -7107,8 +7110,8 @@ html:not([data-theme="dark"]) .zayavka-page .zayavka-card a:not(.auth-btn-primar
   border-radius: 10px;
 }
 [data-theme="dark"] .layout-zayavka .zayavka-select-wrap {
-  background: rgba(255, 255, 255, 0.08) !important;
-  border-color: rgba(197, 165, 114, 0.35) !important;
+  background: var(--dark-form-surface-bg) !important;
+  border: 1px solid var(--dark-form-surface-border) !important;
 }
 [data-theme="dark"] .layout-zayavka .zayavka-select {
   color: #fafafa !important;
@@ -7129,7 +7132,7 @@ html:not([data-theme="dark"]) .zayavka-page .zayavka-card a:not(.auth-btn-primar
   background: rgba(255, 255, 255, 0.08);
 }
 
-/* Страницы заявки, входа, регистрации, восстановления/сброса пароля — поля ввода: белый фон, чёрный шрифт */
+/* Страницы заявки, входа, регистрации, восстановления пароля — те же поля, что в ЛК (тёмная тема) */
 [data-theme="dark"] .layout-zayavka input,
 [data-theme="dark"] .layout-zayavka textarea,
 [data-theme="dark"] .layout-login input,
@@ -7138,10 +7141,10 @@ html:not([data-theme="dark"]) .zayavka-page .zayavka-card a:not(.auth-btn-primar
 [data-theme="dark"] .layout-auth textarea,
 [data-theme="dark"] .forgot-password-page input,
 [data-theme="dark"] .forgot-password-page textarea {
-  background: #ffffff !important;
-  color: #0a192f !important;
-  border-color: rgba(10, 25, 47, 0.2) !important;
-  -webkit-text-fill-color: #0a192f;
+  background: var(--dark-form-surface-bg) !important;
+  color: #f1f5f9 !important;
+  border: 1px solid var(--dark-form-surface-border) !important;
+  -webkit-text-fill-color: #f1f5f9;
 }
 [data-theme="dark"] .layout-zayavka input::placeholder,
 [data-theme="dark"] .layout-zayavka textarea::placeholder,
@@ -7151,8 +7154,8 @@ html:not([data-theme="dark"]) .zayavka-page .zayavka-card a:not(.auth-btn-primar
 [data-theme="dark"] .layout-auth textarea::placeholder,
 [data-theme="dark"] .forgot-password-page input::placeholder,
 [data-theme="dark"] .forgot-password-page textarea::placeholder {
-  color: #64748b !important;
-  -webkit-text-fill-color: #64748b;
+  color: #8e8e8e !important;
+  -webkit-text-fill-color: #8e8e8e;
 }
 
 /*
@@ -7210,14 +7213,22 @@ html:not([data-theme="dark"]) .layout-zayavka .zayavka-page .zayavka-card input[
 [data-theme="dark"] .layout-zayavka .zayavka-page .zayavka-card input[type="date"].zayavka-date-input:not(.zayavka-date-input--empty)::-webkit-datetime-edit-month-field,
 [data-theme="dark"] .layout-zayavka .zayavka-page .zayavka-card input[type="date"].zayavka-date-input:not(.zayavka-date-input--empty)::-webkit-datetime-edit-day-field,
 [data-theme="dark"] .layout-zayavka .zayavka-page .zayavka-card input[type="date"].zayavka-date-input:not(.zayavka-date-input--empty)::-webkit-datetime-edit-year-field {
-  color: #0a192f !important;
-  -webkit-text-fill-color: #0a192f !important;
+  color: #f1f5f9 !important;
+  -webkit-text-fill-color: #f1f5f9 !important;
 }
 
 /*
  * Автозаполнение (логин/пароль и др.): без жёлтого/синего фона и смены цвета текста —
  * WebKit (-webkit-autofill) и стандартный :autofill (Firefox и др.).
  */
+[data-theme="dark"] .auth-page input:-webkit-autofill,
+[data-theme="dark"] .auth-page input:-webkit-autofill:hover,
+[data-theme="dark"] .auth-page input:-webkit-autofill:focus,
+[data-theme="dark"] .auth-page textarea:-webkit-autofill,
+[data-theme="dark"] .auth-page textarea:-webkit-autofill:hover,
+[data-theme="dark"] .auth-page textarea:-webkit-autofill:focus,
+[data-theme="dark"] .auth-page input:autofill,
+[data-theme="dark"] .auth-page textarea:autofill,
 [data-theme="dark"] .layout-auth input:-webkit-autofill,
 [data-theme="dark"] .layout-auth input:-webkit-autofill:hover,
 [data-theme="dark"] .layout-auth input:-webkit-autofill:focus,
@@ -7250,13 +7261,13 @@ html:not([data-theme="dark"]) .layout-zayavka .zayavka-page .zayavka-card input[
 [data-theme="dark"] .layout-zayavka textarea:autofill,
 [data-theme="dark"] .forgot-password-page input:autofill,
 [data-theme="dark"] .forgot-password-page textarea:autofill {
-  background-color: #ffffff !important;
+  background-color: var(--dark-form-surface-bg) !important;
   background-image: none !important;
-  color: #0a192f !important;
-  border: 1px solid rgba(10, 25, 47, 0.2) !important;
-  -webkit-text-fill-color: #0a192f !important;
-  caret-color: #0a192f;
-  box-shadow: 0 0 0 1000px #ffffff inset !important;
+  color: #f1f5f9 !important;
+  border: 1px solid var(--dark-form-surface-border) !important;
+  -webkit-text-fill-color: #f1f5f9 !important;
+  caret-color: #f1f5f9;
+  box-shadow: 0 0 0 1000px var(--dark-form-surface-bg) inset !important;
   filter: none !important;
   transition: background-color 99999s ease-out 0s !important;
 }
@@ -7305,21 +7316,21 @@ html:not([data-theme="dark"]) .forgot-password-page textarea:autofill {
 }
 
 [data-theme="dark"] .layout-zayavka .zayavka-select-wrap {
-  background: #ffffff !important;
-  border-color: rgba(10, 25, 47, 0.2) !important;
+  background: var(--dark-form-surface-bg) !important;
+  border: 1px solid var(--dark-form-surface-border) !important;
 }
 [data-theme="dark"] .layout-zayavka .zayavka-select {
-  color: #0a192f !important;
+  color: #f1f5f9 !important;
 }
 [data-theme="dark"] .layout-zayavka .zayavka-custom-dropdown-panel {
-  background: #ffffff !important;
-  border-color: rgba(10, 25, 47, 0.15) !important;
+  background: var(--dark-form-surface-bg) !important;
+  border: 1px solid var(--dark-form-surface-border) !important;
 }
 [data-theme="dark"] .layout-zayavka .zayavka-custom-dropdown-option {
-  color: #0a192f;
+  color: #f1f5f9;
 }
 [data-theme="dark"] .layout-zayavka .zayavka-custom-dropdown-option:hover {
-  background: rgba(10, 25, 47, 0.06);
+  background: rgba(255, 255, 255, 0.06);
 }
 [data-theme="dark"] .layout-zayavka .zayavka-custom-dropdown-option[aria-selected="true"] {
   background: rgba(197, 165, 114, 0.2) !important;

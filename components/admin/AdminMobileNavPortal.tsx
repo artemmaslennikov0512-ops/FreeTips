@@ -8,7 +8,6 @@ import Link from "next/link";
 import type { LucideIcon } from "lucide-react";
 import { LogOut } from "lucide-react";
 import { ADMIN_BTN } from "@/lib/admin-button-classes";
-import { PanelSidebarThemeSwitch } from "@/components/PanelSidebarThemeSwitch";
 import { PanelMobileNavDrawerBackdrop } from "@/components/PanelMobileNavDrawerBackdrop";
 import {
   PANEL_MOBILE_LEFT_DRAWER_CLOSED_TRANSLATE_CLASS,
@@ -155,7 +154,6 @@ export function AdminMobileNavPortal({
             ))}
             </nav>
           </div>
-          <PanelSidebarThemeSwitch className="mt-3 shrink-0 px-0" />
           <button
             type="button"
             onClick={() => {

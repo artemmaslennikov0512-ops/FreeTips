@@ -474,7 +474,7 @@ export default function CabinetLayout({ children }: { children: React.ReactNode 
           </div>
         )}
         <div
-          className={`cabinet-sidebar-profile cabinet-block-inner mx-3 rounded-[10px] border border-[rgba(197,165,114,0.55)] px-3 py-2.5 ${!sidebarBg ? "bg-[var(--color-dark-gray)]/10" : ""}`}
+          className="cabinet-sidebar-profile cabinet-block-inner mx-3 rounded-[10px] border border-[rgba(197,165,114,0.55)] px-3 py-2.5"
           style={Object.keys(profileBlockStyle).length ? profileBlockStyle : undefined}
         >
           <div className="flex items-center gap-2.5">

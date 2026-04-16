@@ -103,11 +103,12 @@ html:not([data-theme="dark"]) body.establishment-page {
   background: #eeeeee !important;
 }
 
-/* Светлая тема: хром панелей (сайдбар, моб. полоска, модалки навигации). Глобальная шапка в ЛК/админке/заведении не показывается — фон как у страницы #eee, отличие за счёт теней. */
+/* Светлая тема: хром панелей. Страница и полоска — #eee; сайдбар — белая плита (--cabinet-sidebar-surface-bg), иначе сливается с фоном. */
 html:not([data-theme="dark"]) body.cabinet-page:not(.admin-page),
 html:not([data-theme="dark"]) body.establishment-page,
 html:not([data-theme="dark"]) body.admin-page {
   --cabinet-chrome-elevated-bg: #eeeeee;
+  --cabinet-sidebar-surface-bg: #ffffff;
   --cabinet-chrome-border: rgba(197, 165, 114, 0.45);
   --cabinet-chrome-shadow:
     0 1px 2px rgba(10, 25, 47, 0.07),
@@ -2001,9 +2002,9 @@ html:not([data-theme="dark"]) .cabinet-premium[data-cabinet-theme="m5-competitio
   }
 }
 
-/* Светлая тема: сайдбар ЛК / заведения — без обводки, мягкая тень (не M5) */
+/* Светлая тема: сайдбар ЛК / заведения — белая поверхность на #eee холсте, мягкая тень (не M5) */
 html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-sidebar:not(.admin-sidebar) {
-  background: var(--cabinet-chrome-elevated-bg, #eeeeee) !important;
+  background: var(--cabinet-sidebar-surface-bg, #ffffff) !important;
   border: none !important;
   outline: none !important;
   box-shadow: var(
@@ -2037,9 +2038,9 @@ html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-compe
   color: #0a192f !important;
 }
 
-/* Развернуть меню (lg): в разметке bg-[var(--color-navy)] — на светлой теме как elevated-хром панели */
+/* Развернуть меню (lg): в разметке bg-[var(--color-navy)] — на светлой теме как поверхность сайдбара */
 html:not([data-theme="dark"]) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-lg-sidebar-toggle--expand {
-  background: var(--cabinet-chrome-elevated-bg, #eeeeee) !important;
+  background: var(--cabinet-sidebar-surface-bg, #ffffff) !important;
   border: none !important;
   outline: none !important;
   color: #0a192f !important;
@@ -2248,11 +2249,10 @@ html:not([data-theme="dark"]) .cabinet-mobile-nav-overlay {
 
 /*
  * ЛК официанта: мобильное меню — createPortal на body.
- * Светлая тема: светлая панель в стиле карточек.
+ * Светлая тема: панель как сайдбар на десктопе — белая «плита» на фоне #eee.
  */
 html:not([data-theme="dark"]) .cabinet-mobile-nav-dialog:not([data-cabinet-theme="m5-competition"]) {
-  /* Тот же фон страницы, что у body.cabinet-page — без отдельной «кремовой плиты» */
-  background: #eeeeee !important;
+  background: #ffffff !important;
   -webkit-backdrop-filter: none !important;
   backdrop-filter: none !important;
   isolation: isolate;

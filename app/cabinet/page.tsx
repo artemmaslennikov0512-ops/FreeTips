@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Link2, List, Key, Copy, RotateCw, Settings, ExternalLink, ShieldCheck, ShieldAlert, Download, Eye, Send } from "lucide-react";
+import { Link2, List, Key, Copy, RotateCw, Settings, ShieldCheck, ShieldAlert, Download, Eye, Send } from "lucide-react";
 import { PremiumCard } from "./PremiumCard";
 import { formatMoney } from "@/lib/utils";
 import { getBaseUrl } from "@/lib/get-base-url";
@@ -54,9 +54,6 @@ export default function CabinetDashboardPage() {
   const [incomingMonthlyLimitKop, setIncomingMonthlyLimitKop] = useState<number | null>(null);
   const [incomingMonthSuccessSumKop, setIncomingMonthSuccessSumKop] = useState<number>(0);
   const [error, setError] = useState<string | null>(null);
-  const [tipLink, setTipLink] = useState<string | null>(null);
-  const [tipWaiterCode, setTipWaiterCode] = useState<string | null>(null);
-  const [linkCopied, setLinkCopied] = useState(false);
   const [verificationStatus, setVerificationStatus] = useState<string | null>(null);
   const [savingFor, setSavingFor] = useState<string | null>(null);
   const [savingForEdit, setSavingForEdit] = useState("");
@@ -124,18 +121,6 @@ export default function CabinetDashboardPage() {
         typeof profile.incomingMonthSuccessSumKop === "number" ? profile.incomingMonthSuccessSumKop : 0,
       );
       setVerificationStatus(profile.verificationStatus ?? null);
-      const linksRes = await fetchWithAuth("/api/links");
-      if (linksRes.ok) {
-        const linksData = (await linksRes.json()) as { links: { slug: string }[] };
-        if (linksData.links?.length > 0) {
-          const code = linksData.links[0].slug;
-          setTipWaiterCode(code);
-          setTipLink(`${getBaseUrl()}/pay/${code}`);
-        } else {
-          setTipWaiterCode(null);
-          setTipLink(null);
-        }
-      }
     } catch {
       setError("Ошибка соединения");
     } finally {
@@ -161,17 +146,6 @@ export default function CabinetDashboardPage() {
     document.addEventListener("visibilitychange", onVisible);
     return () => document.removeEventListener("visibilitychange", onVisible);
   }, [fetchProfileAndData]);
-
-  const copyTipLink = useCallback(async () => {
-    if (!tipLink) return;
-    try {
-      await navigator.clipboard.writeText(tipLink);
-      setLinkCopied(true);
-      setTimeout(() => setLinkCopied(false), 2000);
-    } catch {
-      /* ignore */
-    }
-  }, [tipLink]);
 
   const saveSavingFor = useCallback(async () => {
     const value = savingForEdit.trim() || null;
@@ -543,52 +517,7 @@ export default function CabinetDashboardPage() {
             <h3 className="cabinet-dashboard-card-title mb-3 text-center font-[family:var(--font-playfair)] text-lg font-semibold text-[var(--color-text)]">
               Быстрые действия
             </h3>
-            {/* 1. Your link for tea — сверху */}
-            {tipLink && (
-              <div className="cabinet-block-inner mb-6 rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 p-4">
-                <div className="mb-2 text-sm font-semibold text-[var(--color-text)]">
-                  Ваш ID для чаевых
-                </div>
-                {tipWaiterCode ? (
-                  <div className="cabinet-input-window mb-3 min-w-0 max-w-full break-all rounded-lg bg-[var(--color-bg-sides)] px-3 py-2 font-mono text-sm font-semibold tracking-wide text-[var(--color-text)]">
-                    {tipWaiterCode}
-                  </div>
-                ) : null}
-                <div className="mb-1 text-xs font-medium text-[var(--color-text)]/80">Ссылка для гостей</div>
-                <div className="cabinet-input-window mb-3 min-w-0 max-w-full break-all rounded-lg bg-[var(--color-bg-sides)] px-3 py-2 font-mono text-xs text-[var(--color-text)]/90">
-                  {tipLink}
-                </div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <a
-                    href={tipLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={
-                      isM5Cabinet
-                        ? `cabinet-card-btn-link ${m5BtnPairBlue}`
-                        : `cabinet-card-btn-link ${CABINET_WAITER_BTN_INLINE} px-4 py-2 text-[14px]`
-                    }
-                  >
-                    <ExternalLink className="h-4 w-4" />
-                    Открыть страницу чаевых
-                  </a>
-                  <button
-                    type="button"
-                    onClick={copyTipLink}
-                    className={
-                      isM5Cabinet
-                        ? m5BtnPairRed
-                        : `${CABINET_WAITER_BTN_INLINE} px-4 py-2 text-[14px]`
-                    }
-                  >
-                    <Copy className="h-4 w-4" />
-                    {linkCopied ? "Скопировано!" : "Копировать ссылку"}
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* 2. Four quick action cards */}
+            {/* Быстрые карточки */}
             <div className="mb-6 grid min-w-0 grid-cols-2 gap-4">
               {QUICK_ACTIONS.map(({ href, icon: Icon, title, desc }) => (
                 <Link
@@ -609,7 +538,7 @@ export default function CabinetDashboardPage() {
               ))}
             </div>
 
-            {/* 3. Goal card — внизу, с фоном, заголовок и контент по центру */}
+            {/* Цель — внизу карточки «Быстрые действия» */}
             <div className="cabinet-goal-card cabinet-block-inner flex flex-col items-center rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/20 p-5 shadow-[var(--shadow-subtle)]">
               <div className="mb-4 w-full text-center text-base font-semibold text-[var(--color-text)]">
                 Укажите цель, на которую собираете 🎯

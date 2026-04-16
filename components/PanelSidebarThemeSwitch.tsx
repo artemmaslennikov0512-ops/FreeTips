@@ -33,14 +33,14 @@ export function PanelSidebarThemeSwitch({
   const isToolbar = density === "toolbar";
 
   const labelClass = isM5
-    ? "mb-1.5 px-0.5 text-[0.65rem] font-semibold uppercase tracking-wider text-white/45"
-    : "mb-1.5 px-0.5 text-[0.65rem] font-semibold uppercase tracking-wider text-[var(--color-text)]/45";
+    ? "mb-1 px-0.5 text-[0.65rem] font-semibold uppercase tracking-wider text-white/45"
+    : "mb-1 px-0.5 text-[0.65rem] font-semibold uppercase tracking-wider text-[var(--color-text)]/45";
 
-  const rowClass = isToolbar ? "flex min-w-0 gap-1" : "flex gap-2";
+  const rowClass = isToolbar ? "flex min-w-0 gap-1" : "flex gap-1.5";
 
   const baseBtn = isToolbar
-    ? "min-h-[40px] min-w-0 flex-1 rounded-md px-1.5 py-1 text-center text-[0.6875rem] font-semibold leading-tight transition-[transform,box-shadow,background-color,border-color,color] duration-150 ease-out outline-none focus-visible:ring-2 focus-visible:ring-offset-1 sm:text-xs"
-    : "flex-1 rounded-lg px-2 py-2.5 text-center text-sm font-medium transition-[transform,box-shadow,background-color,border-color,color] duration-150 ease-out outline-none focus-visible:ring-2 focus-visible:ring-offset-1";
+    ? "min-h-0 min-h-[34px] min-w-0 flex-1 whitespace-nowrap rounded-md px-2 py-1 text-center text-[0.6875rem] font-semibold leading-none transition-[transform,box-shadow,background-color,border-color,color] duration-150 ease-out outline-none focus-visible:ring-2 focus-visible:ring-offset-1 sm:min-h-[36px] sm:px-2.5 sm:text-xs sm:leading-tight"
+    : "min-h-0 flex-1 rounded-full px-2.5 py-1 text-center text-xs font-medium leading-none transition-[transform,box-shadow,background-color,border-color,color] duration-150 ease-out outline-none focus-visible:ring-2 focus-visible:ring-offset-1";
 
   const inactive = isM5
     ? `${baseBtn} border border-white/12 bg-white/[0.06] text-white/75 shadow-[0_1px_0_rgba(255,255,255,0.06)] hover:bg-white/10 active:translate-y-px active:shadow-inner`

@@ -54,13 +54,17 @@ export function PanelMobileTopChrome({
           <>
             <div className="flex shrink-0 items-center">{menuBtn}</div>
             <div className="flex min-w-0 flex-1 items-center justify-start">{leadingSlot}</div>
-            {trailingSlot ? <div className="flex max-w-[min(12.5rem,46vw)] shrink-0 items-center">{trailingSlot}</div> : null}
+            {trailingSlot ? (
+              <div className="flex max-w-[min(17.5rem,62vw)] shrink-0 items-center">{trailingSlot}</div>
+            ) : null}
           </>
         ) : (
           <>
             <div className="flex min-w-0 flex-1 items-center justify-start">{leadingSlot}</div>
-            <div className="flex shrink-0 items-center gap-1.5">
-              {trailingSlot}
+            <div className="flex min-w-0 shrink-0 items-center gap-1.5">
+              {trailingSlot ? (
+                <div className="flex max-w-[min(17.5rem,62vw)] shrink-0 items-center">{trailingSlot}</div>
+              ) : null}
               {menuBtn}
             </div>
           </>

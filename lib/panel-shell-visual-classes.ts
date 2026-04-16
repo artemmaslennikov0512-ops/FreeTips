@@ -13,10 +13,10 @@ const PANEL_BORDER_GOLD_40 = "border border-[var(--color-brand-gold)]/40";
 
 const PANEL_NAV_WRAP_ROUNDED = "rounded-[10px]";
 
-/** Общая «коробка» навигации в сайдбаре (фон задаёт вариант). */
+/** Общая «коробка» навигации в сайдбаре: рамка и тень без заливки (как блок ФИО; детали в globals.css). */
 const PANEL_NAV_WRAP_BASE = `flex flex-col gap-0 ${PANEL_NAV_WRAP_ROUNDED} ${PANEL_BORDER_GOLD_QUICK_TILE} p-1.5 pb-2 shadow-[var(--shadow-subtle)]`;
 
-export const PANEL_NAV_WRAP_CABINET = `${PANEL_NAV_WRAP_BASE} bg-[var(--color-dark-gray)]/5`;
+export const PANEL_NAV_WRAP_CABINET = PANEL_NAV_WRAP_BASE;
 
 /** Линия под мобильной полоской (тема + меню) */
 export const PANEL_TOP_SHELL_GOLD_DIVIDER =

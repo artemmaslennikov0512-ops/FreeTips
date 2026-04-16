@@ -32,14 +32,7 @@ import { PanelMobileBackButton } from "@/components/PanelMobileBackButton";
 import { PanelSidebarThemeSwitch } from "@/components/PanelSidebarThemeSwitch";
 import { LkPresenceHeartbeat } from "@/components/LkPresenceHeartbeat";
 import { ProactiveAccessRefresh } from "@/components/ProactiveAccessRefresh";
-import { usePanelMobileSimpleDrawerEffects } from "@/lib/use-panel-mobile-simple-drawer-effects";
-import { applyDocumentShellChrome } from "@/lib/document-shell-chrome";
-import { useTheme } from "@/lib/theme-context";
-import {
-  PANEL_MOBILE_NAV_OVERLAY_TRANSITION,
-  PANEL_MOBILE_Z_ESTABLISHMENT_DRAWER,
-  PANEL_MOBILE_Z_ESTABLISHMENT_OVERLAY,
-} from "@/lib/panel-mobile-ui";
+import { EstablishmentMobileNavPortal } from "@/components/establishment/EstablishmentMobileNavPortal";
 import {
   PANEL_APP_MAIN_SURFACE_ESTABLISHMENT,
   PANEL_ESTABLISHMENT_SIDEBAR_LOGOUT,
@@ -106,7 +99,6 @@ const ESTABLISHMENT_MOBILE_NAV_ROOTS = flattenPanelNavRootHrefs(NAV_GROUPS);
 export default function EstablishmentLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
-  const { theme } = useTheme();
   const { sidebarOpen, closeSidebar } = usePanelMobileMenu();
   const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -120,13 +112,6 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
     document.body.classList.add("cabinet-page", "establishment-page");
     return () => document.body.classList.remove("cabinet-page", "establishment-page");
   }, []);
-
-  usePanelMobileSimpleDrawerEffects(sidebarOpen, closeSidebar);
-
-  useEffect(() => {
-    if (!sidebarOpen) return;
-    applyDocumentShellChrome(pathname, theme);
-  }, [sidebarOpen, pathname, theme]);
 
   useEffect(() => {
     if (!mounted || typeof window === "undefined") return;
@@ -228,28 +213,22 @@ export default function EstablishmentLayout({ children }: { children: React.Reac
       />
       <ProactiveAccessRefresh />
       <LkPresenceHeartbeat />
-      {/* Шторка на мобильном */}
-      <div
-        className={`cabinet-overlay mobile-drawer-screen-bleed fixed ${PANEL_MOBILE_Z_ESTABLISHMENT_OVERLAY} backdrop-blur-xl ${PANEL_MOBILE_NAV_OVERLAY_TRANSITION} ${
-          sidebarOpen ? "opacity-100" : "opacity-0 pointer-events-none"
-        }`}
-        onClick={closeSidebar}
-        aria-hidden
+      <EstablishmentMobileNavPortal
+        sidebarOpen={sidebarOpen}
+        closeSidebar={closeSidebar}
+        navGroups={NAV_GROUPS}
+        isActive={isActive}
+        handleLogout={handleLogout}
       />
 
-      {/* Сайдбар выше затемнения (fixed + z); на lg остаётся в потоке */}
-      <aside
-        id="establishment-mobile-nav"
-        className={`cabinet-sidebar establishment-mobile-sidebar fixed ${PANEL_MOBILE_Z_ESTABLISHMENT_DRAWER} flex min-h-0 flex-col overflow-hidden rounded-[10px] border border-white/10 shadow-2xl backdrop-blur-xl transition-[transform] duration-300 ease-out bg-white/[0.06] max-lg:left-[max(0.5rem,env(safe-area-inset-left,0px))] max-lg:top-[max(0.5rem,env(safe-area-inset-top,0px))] max-lg:bottom-[max(0.5rem,env(safe-area-inset-bottom,0px))] max-lg:w-[min(19.25rem,calc(100vw-1.25rem-max(env(safe-area-inset-left,0px),0.5rem)-max(env(safe-area-inset-right,0px),0.5rem)))] max-lg:max-w-none max-lg:py-2 max-lg:min-w-0 lg:static lg:left-auto lg:top-auto lg:bottom-auto lg:ml-0 lg:mr-0 lg:mt-8 lg:mb-3 lg:max-h-[calc(100vh-0.5rem-2rem-0.75rem)] lg:z-auto lg:w-[14.75rem] lg:max-w-none lg:translate-x-0 lg:border lg:self-start lg:py-3 ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full max-lg:pointer-events-none"
-        }`}
-      >
-        <div className="mb-2 w-full shrink-0 px-2.5 text-center max-lg:mb-1.5">
+      {/* Сайдбар только lg+; на мобильном — портал как в ЛК официанта */}
+      <aside className="cabinet-sidebar establishment-desktop-sidebar relative hidden min-h-0 w-[14.75rem] min-w-[14.75rem] shrink-0 flex-col overflow-hidden rounded-[10px] border border-white/10 bg-white/[0.06] py-3 shadow-2xl backdrop-blur-xl lg:mt-8 lg:mb-3 lg:flex lg:max-h-[calc(100vh-0.5rem-2rem-0.75rem)] lg:self-start">
+        <div className="mb-2 w-full shrink-0 px-2.5 text-center">
           <span className={PANEL_ESTABLISHMENT_SIDEBAR_TITLE_LINE}>Кабинет заведения</span>
         </div>
-        <div className="cabinet-nav-block flex min-h-0 min-w-0 flex-col overflow-x-hidden overscroll-y-contain px-2.5 pb-1.5 max-lg:min-h-0 max-lg:flex-1 max-lg:overflow-hidden lg:flex-none">
+        <div className="cabinet-nav-block flex min-h-0 min-w-0 flex-col overflow-x-hidden overscroll-y-contain px-2.5 pb-1.5 lg:flex-none">
           <nav
-            className="flex flex-col gap-0 rounded-lg border border-[var(--color-brand-gold)]/15 bg-[var(--color-dark-gray)]/5 p-1 pb-1.5 shadow-[var(--shadow-subtle)] max-lg:min-h-0 max-lg:flex-1 max-lg:overflow-y-auto"
+            className="flex flex-col gap-0 rounded-lg border border-[var(--color-brand-gold)]/15 bg-transparent p-1 pb-1.5 shadow-[var(--shadow-subtle)]"
             aria-label="Навигация по кабинету заведения"
           >
             {NAV_GROUPS.map((group) => (

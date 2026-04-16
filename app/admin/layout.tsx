@@ -273,9 +273,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const showMobileSubsectionBack = isPanelMobileSubsectionPath(pathname, ADMIN_MOBILE_NAV_ROOTS);
 
   return (
-    <div className="admin-panel cabinet-premium flex min-h-screen w-full min-w-0 max-w-full flex-col overflow-x-hidden bg-[var(--color-bg)] font-[family:var(--font-inter)] text-[var(--color-text)] max-lg:pt-0 lg:flex-row lg:pt-0">
+    <div className="admin-panel cabinet-premium flex min-h-screen w-full min-w-0 max-w-full flex-col overflow-x-hidden bg-[var(--color-bg)] font-[family:var(--font-inter)] text-[var(--color-text)] max-lg:pt-0 lg:pt-0">
       <PanelShellMobileCorner
         ariaControls="admin-nav-dropdown"
+        trailingSlot={<PanelSidebarThemeSwitch density="toolbar" className="min-w-0" />}
         leadingSlot={
           showMobileSubsectionBack ? (
             <PanelMobileBackButton variant="admin" fallbackHref="/admin/dashboard" placement="mobileToolbar" />
@@ -295,130 +296,135 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         handleLogout={handleLogout}
       />
 
+      <div className="admin-desktop-top-toolbar hidden w-full shrink-0 items-center justify-end gap-2 px-4 py-2.5 lg:flex">
+        <PanelSidebarThemeSwitch density="toolbar" className="min-w-0 max-w-[min(18rem,46vw)]" />
+      </div>
+
       {/* Боковая панель — lg+; сворачивание как в ЛК официанта; на мобильном — модалка */}
-      <div
-        className={`hidden shrink-0 transition-[width] duration-300 ease-out lg:mt-9 lg:mb-3 lg:flex lg:self-start ${
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-x-hidden lg:flex-row">
+        <div
+          className={`hidden shrink-0 transition-[width] duration-300 ease-out lg:mt-3 lg:mb-3 lg:flex lg:self-start ${
           lgSidebarCollapsed
             ? "lg:w-0 lg:pointer-events-none lg:overflow-hidden"
             : "lg:relative lg:z-10 lg:w-[236px] lg:overflow-hidden"
         }`}
-      >
-        <aside className="admin-sidebar cabinet-sidebar relative flex min-h-0 w-[236px] min-w-[236px] flex-col overflow-hidden rounded-[10px] bg-transparent py-4 shadow-sm backdrop-blur-xl lg:static lg:h-auto lg:max-h-[calc(100vh-2.25rem-0.75rem)] lg:border-t-0">
-        <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-x-hidden overflow-y-auto">
-          <div className="cabinet-sidebar-profile cabinet-block-inner mx-3 mb-3 rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2.5">
-            <div className="flex items-center gap-3">
-              <div className="cabinet-sidebar-avatar flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--color-brand-gold)] font-semibold text-[#0a192f] text-sm">
-                {(user.login || "A").charAt(0).toUpperCase()}
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="truncate font-semibold text-[var(--color-text)]">{user.login}</div>
-                <div className="text-sm text-[var(--color-text-secondary)]">Админ</div>
-              </div>
-            </div>
-          </div>
-          <div className="mb-2 flex h-9 shrink-0 items-center px-3">
-            <span className="w-9 shrink-0 select-none" aria-hidden />
-            <span className="cabinet-nav-label min-w-0 flex-1 text-center text-xs font-medium uppercase leading-none tracking-wider text-[var(--color-text)]/50">
-              Навигация
-            </span>
-            <div className="flex h-9 w-9 shrink-0 items-center justify-end">
-              <button
-                type="button"
-                onClick={() => setSidebarCollapsedPersisted(true)}
-                className={LG_SIDEBAR_COLLAPSE_BTN}
-                aria-label="Скрыть боковое меню"
-                title="Скрыть меню"
-              >
-                <ChevronLeft className="h-5 w-5 shrink-0 text-[var(--color-text)]" strokeWidth={2} aria-hidden />
-              </button>
-            </div>
-          </div>
-          <div className="cabinet-nav-block flex min-h-0 min-w-0 flex-col overflow-x-hidden px-3 pb-2 lg:flex-none">
-            <nav className={PANEL_NAV_WRAP_CABINET} aria-label="Навигация админ-панели">
-              {NAV_GROUPS.map((group) => (
-                <div
-                  key={group.title}
-                  className={PANEL_SIDEBAR_NAV_GROUP_SEPARATOR_CABINET}
-                  role="group"
-                  aria-label={group.title}
-                >
-                  <div className={PANEL_SIDEBAR_NAV_GROUP_TITLE_ADMIN}>{group.title}</div>
-                  <div className="flex flex-col gap-0.5">
-                    {group.items.map(({ label, href, icon: Icon, iconClass }) => {
-                      const showRequestsBadge =
-                        href === "/admin/verification-requests" &&
-                        requestsPendingTotal != null &&
-                        requestsPendingTotal > 0;
-                      const requestsBadgeN = requestsPendingTotal ?? 0;
-                      const showPayoutsBadge =
-                        href === "/admin/payouts" && payoutsAwaitingTotal != null && payoutsAwaitingTotal > 0;
-                      const payoutsBadgeN = payoutsAwaitingTotal ?? 0;
-                      return (
-                        <Link
-                          key={href}
-                          href={href}
-                          onClick={closeSidebar}
-                          className={`${PANEL_SIDEBAR_NAV_LINK_ROW} ${
-                            isActive(href) ? PANEL_SIDEBAR_NAV_ACTIVE_ADMIN : PANEL_SIDEBAR_NAV_LINK_INACTIVE_CABINET
-                          }`}
-                        >
-                          <Icon className={`${PANEL_SIDEBAR_NAV_ICON} ${iconClass}`} aria-hidden />
-                          <span className="flex min-w-0 flex-1 items-center gap-2 break-words">
-                            {label}
-                            {showRequestsBadge && (
-                              <span className="inline-flex min-h-[1.25rem] min-w-[1.25rem] shrink-0 items-center justify-center rounded-full bg-[var(--color-accent-red)] px-1.5 text-[11px] font-bold leading-none text-white tabular-nums">
-                                {requestsBadgeN > 99 ? "99+" : requestsBadgeN}
-                              </span>
-                            )}
-                            {showPayoutsBadge && (
-                              <span
-                                className="inline-flex min-h-[1.25rem] min-w-[1.25rem] shrink-0 items-center justify-center rounded-full bg-amber-500 px-1.5 text-[11px] font-bold leading-none text-[#0a192f] tabular-nums ring-1 ring-amber-200/40"
-                                title="Заявки на вывод в работе"
-                              >
-                                {payoutsBadgeN > 99 ? "99+" : payoutsBadgeN}
-                              </span>
-                            )}
-                          </span>
-                        </Link>
-                      );
-                    })}
+        >
+          <aside className="admin-sidebar cabinet-sidebar relative flex min-h-0 w-[236px] min-w-[236px] flex-col overflow-hidden rounded-[10px] bg-transparent py-4 shadow-sm backdrop-blur-xl lg:static lg:h-auto lg:max-h-[calc(100vh-2.25rem-0.75rem)] lg:border-t-0">
+            <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-x-hidden overflow-y-auto">
+              <div className="cabinet-sidebar-profile cabinet-block-inner mx-3 mb-3 rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 px-3 py-2.5">
+                <div className="flex items-center gap-3">
+                  <div className="cabinet-sidebar-avatar flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--color-brand-gold)] font-semibold text-[#0a192f] text-sm">
+                    {(user.login || "A").charAt(0).toUpperCase()}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate font-semibold text-[var(--color-text)]">{user.login}</div>
+                    <div className="text-sm text-[var(--color-text-secondary)]">Админ</div>
                   </div>
                 </div>
-              ))}
-            </nav>
-            <PanelSidebarThemeSwitch className="mt-4 px-0" />
-            <button
-              type="button"
-              onClick={handleLogout}
-              className={`mt-3 ${ADMIN_BTN} w-full !justify-center gap-2.5 px-3 py-2 text-sm`}
-            >
-              <LogOut className="h-4 w-4 shrink-0 text-[var(--color-brand-gold)]" aria-hidden />
-              <span>Выйти</span>
-            </button>
-          </div>
+              </div>
+              <div className="mb-2 flex h-9 shrink-0 items-center px-3">
+                <span className="w-9 shrink-0 select-none" aria-hidden />
+                <span className="cabinet-nav-label min-w-0 flex-1 text-center text-xs font-medium uppercase leading-none tracking-wider text-[var(--color-text)]/50">
+                  Навигация
+                </span>
+                <div className="flex h-9 w-9 shrink-0 items-center justify-end">
+                  <button
+                    type="button"
+                    onClick={() => setSidebarCollapsedPersisted(true)}
+                    className={LG_SIDEBAR_COLLAPSE_BTN}
+                    aria-label="Скрыть боковое меню"
+                    title="Скрыть меню"
+                  >
+                    <ChevronLeft className="h-5 w-5 shrink-0 text-[var(--color-text)]" strokeWidth={2} aria-hidden />
+                  </button>
+                </div>
+              </div>
+              <div className="cabinet-nav-block flex min-h-0 min-w-0 flex-col overflow-x-hidden px-3 pb-2 lg:flex-none">
+                <nav className={PANEL_NAV_WRAP_CABINET} aria-label="Навигация админ-панели">
+                  {NAV_GROUPS.map((group) => (
+                    <div
+                      key={group.title}
+                      className={PANEL_SIDEBAR_NAV_GROUP_SEPARATOR_CABINET}
+                      role="group"
+                      aria-label={group.title}
+                    >
+                      <div className={PANEL_SIDEBAR_NAV_GROUP_TITLE_ADMIN}>{group.title}</div>
+                      <div className="flex flex-col gap-0.5">
+                        {group.items.map(({ label, href, icon: Icon, iconClass }) => {
+                          const showRequestsBadge =
+                            href === "/admin/verification-requests" &&
+                            requestsPendingTotal != null &&
+                            requestsPendingTotal > 0;
+                          const requestsBadgeN = requestsPendingTotal ?? 0;
+                          const showPayoutsBadge =
+                            href === "/admin/payouts" && payoutsAwaitingTotal != null && payoutsAwaitingTotal > 0;
+                          const payoutsBadgeN = payoutsAwaitingTotal ?? 0;
+                          return (
+                            <Link
+                              key={href}
+                              href={href}
+                              onClick={closeSidebar}
+                              className={`${PANEL_SIDEBAR_NAV_LINK_ROW} ${
+                                isActive(href) ? PANEL_SIDEBAR_NAV_ACTIVE_ADMIN : PANEL_SIDEBAR_NAV_LINK_INACTIVE_CABINET
+                              }`}
+                            >
+                              <Icon className={`${PANEL_SIDEBAR_NAV_ICON} ${iconClass}`} aria-hidden />
+                              <span className="flex min-w-0 flex-1 items-center gap-2 break-words">
+                                {label}
+                                {showRequestsBadge && (
+                                  <span className="inline-flex min-h-[1.25rem] min-w-[1.25rem] shrink-0 items-center justify-center rounded-full bg-[var(--color-accent-red)] px-1.5 text-[11px] font-bold leading-none text-white tabular-nums">
+                                    {requestsBadgeN > 99 ? "99+" : requestsBadgeN}
+                                  </span>
+                                )}
+                                {showPayoutsBadge && (
+                                  <span
+                                    className="inline-flex min-h-[1.25rem] min-w-[1.25rem] shrink-0 items-center justify-center rounded-full bg-amber-500 px-1.5 text-[11px] font-bold leading-none text-[#0a192f] tabular-nums ring-1 ring-amber-200/40"
+                                    title="Заявки на вывод в работе"
+                                  >
+                                    {payoutsBadgeN > 99 ? "99+" : payoutsBadgeN}
+                                  </span>
+                                )}
+                              </span>
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </nav>
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className={`mt-3 ${ADMIN_BTN} w-full !justify-center gap-2.5 px-3 py-2 text-sm`}
+                >
+                  <LogOut className="h-4 w-4 shrink-0 text-[var(--color-brand-gold)]" aria-hidden />
+                  <span>Выйти</span>
+                </button>
+              </div>
+            </div>
+          </aside>
         </div>
-        </aside>
+
+        {lgSidebarCollapsed && (
+          <button
+            type="button"
+            onClick={() => setSidebarCollapsedPersisted(false)}
+            className={LG_SIDEBAR_EXPAND_BTN}
+            aria-label="Показать боковое меню"
+            title="Меню"
+          >
+            <ChevronRight className="h-5 w-5 shrink-0 text-[var(--color-text)]" strokeWidth={2} aria-hidden />
+          </button>
+        )}
+
+        <main className="relative min-h-screen min-w-0 flex-1 px-0 max-lg:pt-0 pt-1.5 pb-3 lg:relative lg:z-0 lg:pt-0 lg:pl-0 lg:pr-3 lg:ml-0 lg:mr-0 flex flex-col">
+          <div className={PANEL_APP_MAIN_SURFACE_ADMIN}>
+            <div className={PANEL_MAIN_CONTENT_INNER_ADMIN_CABINET} id="main-content">
+              {children}
+            </div>
+          </div>
+        </main>
       </div>
-
-      {lgSidebarCollapsed && (
-        <button
-          type="button"
-          onClick={() => setSidebarCollapsedPersisted(false)}
-          className={LG_SIDEBAR_EXPAND_BTN}
-          aria-label="Показать боковое меню"
-          title="Меню"
-        >
-          <ChevronRight className="h-5 w-5 shrink-0 text-[var(--color-text)]" strokeWidth={2} aria-hidden />
-        </button>
-      )}
-
-      <main className="relative min-h-screen min-w-0 flex-1 px-0 max-lg:pt-0 pt-1.5 pb-3 lg:relative lg:z-0 lg:pt-0 lg:pl-0 lg:pr-3 lg:ml-0 lg:mr-0 flex flex-col">
-        <div className={PANEL_APP_MAIN_SURFACE_ADMIN}>
-          <div className={PANEL_MAIN_CONTENT_INNER_ADMIN_CABINET} id="main-content">
-            {children}
-          </div>
-        </div>
-      </main>
     </div>
   );
 }

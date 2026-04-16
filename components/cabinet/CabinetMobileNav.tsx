@@ -18,7 +18,13 @@ import Image from "next/image";
 import type { LucideIcon } from "lucide-react";
 import { LogOut, User, BadgeCheck, Building2 } from "lucide-react";
 import { CABINET_WAITER_BTN } from "@/lib/cabinet-button-classes";
-import { PANEL_MOBILE_Z_NAV_PORTAL_SHELL } from "@/lib/panel-mobile-ui";
+import { PanelMobileNavDrawerBackdrop } from "@/components/PanelMobileNavDrawerBackdrop";
+import {
+  PANEL_MOBILE_LEFT_DRAWER_CLOSED_TRANSLATE_CLASS,
+  PANEL_MOBILE_LEFT_DRAWER_SHELL_STYLE,
+  PANEL_MOBILE_LEFT_DRAWER_WIDTH_CLASS,
+  PANEL_MOBILE_Z_NAV_PORTAL_SHELL,
+} from "@/lib/panel-mobile-ui";
 import { PanelMobileTopChrome } from "@/components/PanelMobileTopChrome";
 import { PanelSidebarThemeSwitch } from "@/components/PanelSidebarThemeSwitch";
 import { useTheme } from "@/lib/theme-context";
@@ -79,7 +85,7 @@ function useCabinetMobileNav(): CabinetMobileNavContextValue {
 }
 
 /**
- * Мобильный ЛК: в потоке документа (уезжает при прокрутке) — тема + меню, одна золотая полоска снизу.
+ * Мобильный ЛК: в потоке документа (уезжает при прокрутке) — тема + меню; разделитель снизу скрыт в светлой теме (см. globals.css).
  */
 export function CabinetMobileNavMobileCorner({ leadingSlot }: { leadingSlot?: ReactNode }) {
   const { menuButtonRef, sidebarOpen, setSidebarOpen, isM5Cabinet } = useCabinetMobileNav();
@@ -99,7 +105,7 @@ export function CabinetMobileNavMobileCorner({ leadingSlot }: { leadingSlot?: Re
   );
 }
 
-/** Моб. меню: панель слева без затемнения фона (портал на body) */
+/** Моб. меню: панель слева + затемнение на весь экран, тап по фону закрывает (портал на body) */
 export function CabinetMobileNavPortals() {
   const mounted = useSyncExternalStore(
     () => () => {},
@@ -139,13 +145,11 @@ export function CabinetMobileNavPortals() {
   if (!mounted || typeof document === "undefined") return null;
 
   return createPortal(
+    <>
+      <PanelMobileNavDrawerBackdrop open={sidebarOpen} onClose={closeSidebar} />
     <div
-      className={`cabinet-mobile-nav-shell pointer-events-none fixed inset-y-0 left-0 flex max-w-full flex-col lg:hidden ${PANEL_MOBILE_Z_NAV_PORTAL_SHELL}`}
-      style={{
-        paddingTop: "max(0.35rem, env(safe-area-inset-top, 0px))",
-        paddingBottom: "max(0.35rem, env(safe-area-inset-bottom, 0px))",
-        paddingLeft: "max(0.35rem, env(safe-area-inset-left, 0px))",
-      }}
+      className={`cabinet-mobile-nav-shell pointer-events-none fixed inset-y-0 left-0 flex max-w-full flex-col overflow-x-hidden lg:hidden ${PANEL_MOBILE_Z_NAV_PORTAL_SHELL}`}
+      style={PANEL_MOBILE_LEFT_DRAWER_SHELL_STYLE}
       aria-hidden={!sidebarOpen}
     >
         <div
@@ -153,8 +157,8 @@ export function CabinetMobileNavPortals() {
           role="dialog"
           aria-modal="false"
           aria-label="Меню навигации"
-          className={`cabinet-mobile-nav-dialog cabinet-nav-dropdown cabinet-mobile-nav-dialog--drawer-left pointer-events-auto flex h-full min-h-0 w-[min(22rem,calc(100vw-0.75rem-max(env(safe-area-inset-left,0px),0.35rem)-max(env(safe-area-inset-right,0px),0px)))] max-w-full flex-col overflow-hidden rounded-r-xl border border-[var(--color-brand-gold)]/25 shadow-[var(--shadow-card)] transition-transform duration-300 ease-out ${
-            sidebarOpen ? "translate-x-0" : "pointer-events-none -translate-x-full"
+          className={`cabinet-premium cabinet-mobile-nav-dialog cabinet-nav-dropdown cabinet-mobile-nav-dialog--drawer-left pointer-events-auto flex h-full min-h-0 ${PANEL_MOBILE_LEFT_DRAWER_WIDTH_CLASS} max-w-full flex-col overflow-hidden rounded-r-xl border border-[var(--color-brand-gold)]/25 shadow-[var(--shadow-card)] transition-transform duration-300 ease-out ${
+            sidebarOpen ? "translate-x-0" : `pointer-events-none ${PANEL_MOBILE_LEFT_DRAWER_CLOSED_TRANSLATE_CLASS}`
           }`}
           data-cabinet-theme={isM5Cabinet ? "m5-competition" : undefined}
           style={sidebarStyle}
@@ -204,10 +208,11 @@ export function CabinetMobileNavPortals() {
           <p className="cabinet-nav-label mb-1.5 shrink-0 px-3 text-center text-[0.6875rem] font-medium uppercase tracking-wider text-[var(--color-text)]/50">
             Навигация
           </p>
-          <nav
-            className="cabinet-mobile-nav-dialog__nav flex min-h-0 flex-1 flex-col gap-0 overflow-y-auto overscroll-contain rounded-[10px] border border-[var(--color-brand-gold)]/15 bg-[var(--color-dark-gray)]/5 p-1 pb-1.5 shadow-[var(--shadow-subtle)]"
-            role="none"
-          >
+          <div className="cabinet-mobile-nav-dialog__nav-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain">
+            <nav
+              className="cabinet-mobile-nav-dialog__nav flex flex-col gap-0 rounded-[10px] border border-[var(--color-brand-gold)]/15 bg-transparent p-1 pb-1.5 shadow-[var(--shadow-subtle)]"
+              role="none"
+            >
             {navGroups.map((group) => (
               <div
                 key={group.title}
@@ -263,7 +268,8 @@ export function CabinetMobileNavPortals() {
                 </div>
               </div>
             )}
-          </nav>
+            </nav>
+          </div>
           <button
             type="button"
             onClick={() => {
@@ -278,7 +284,8 @@ export function CabinetMobileNavPortals() {
           </button>
         </div>
         </div>
-    </div>,
+    </div>
+    </>,
     document.body,
   );
 }

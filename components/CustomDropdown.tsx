@@ -31,7 +31,7 @@ const variantStyles = {
       "custom-dropdown-trigger-admin cabinet-section-header w-full flex items-center justify-between gap-2 rounded-xl border-0 px-4 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-white/30 cursor-pointer",
     panel:
       "custom-dropdown-panel custom-dropdown-panel-admin absolute left-0 right-0 top-full z-20 mt-1 rounded-xl border border-white/10 bg-[#0a192f] shadow-xl overflow-hidden",
-    option: "w-full flex items-center px-4 py-3 text-left text-sm font-medium transition-colors text-white/90 hover:bg-white/10",
+    option: "w-full flex items-center px-4 py-2 text-left text-sm font-medium transition-colors text-white/90 hover:bg-white/10",
     optionSelected: "bg-[var(--color-brand-gold)] text-[#0a192f] hover:bg-[var(--color-brand-gold)]/90",
   },
   establishment: {

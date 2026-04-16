@@ -17,6 +17,23 @@ export const PANEL_MOBILE_PORTAL_SAFE_PADDING_COMPACT: CSSProperties = {
   paddingBottom: "max(0.35rem, env(safe-area-inset-bottom, 0px))",
 };
 
+/** Левая выдвижная шторка (ЛК, админка, кабинет заведения): отступы под safe-area. */
+export const PANEL_MOBILE_LEFT_DRAWER_SHELL_STYLE: CSSProperties = {
+  paddingTop: "max(0.35rem, env(safe-area-inset-top, 0px))",
+  paddingBottom: "max(0.35rem, env(safe-area-inset-bottom, 0px))",
+  paddingLeft: "max(0.35rem, env(safe-area-inset-left, 0px))",
+};
+
+/** Единая ширина левой мобильной шторки. */
+export const PANEL_MOBILE_LEFT_DRAWER_WIDTH_CLASS =
+  "w-[min(22rem,calc(100vw-0.75rem-max(env(safe-area-inset-left,0px),0.35rem)-max(env(safe-area-inset-right,0px),0px)))]";
+
+/**
+ * Закрытое состояние: чуть дальше -100% — убирает субпиксельный «зазор» и тень на iOS Safari.
+ * Используйте вместе с `translate-x-0` при открытии.
+ */
+export const PANEL_MOBILE_LEFT_DRAWER_CLOSED_TRANSLATE_CLASS = "-translate-x-[calc(100%+12px)]";
+
 // --- Z-order: портал ЛК/админ (2000+) выше in-layout шторки заведения (90/100)
 
 /** createPortal: полноэкранный корень / оверлей меню на body */

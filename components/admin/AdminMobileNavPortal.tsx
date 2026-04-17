@@ -160,7 +160,7 @@ export function AdminMobileNavPortal({
               closeSidebar();
               void handleLogout();
             }}
-            className={`mt-3 shrink-0 ${ADMIN_BTN} w-full !justify-center gap-2.5 px-2.5 py-2.5 text-sm`}
+            className={`mt-3 flex shrink-0 ${ADMIN_BTN} w-full items-center justify-center gap-2.5 px-2.5 py-2.5 text-sm`}
             role="menuitem"
           >
             <LogOut className="h-4 w-4 shrink-0 text-[var(--color-brand-gold)]" aria-hidden />

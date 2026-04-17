@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { ExternalLink, RefreshCw, ShieldAlert, Ban } from "lucide-react";
+import { RefreshCw, ShieldAlert, Ban } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { fetchWithAuth } from "@/lib/auth-client";
 import { ADMIN_BTN, ADMIN_BTN_DANGER, ADMIN_BTN_PRIMARY, ADMIN_BTN_SM } from "@/lib/admin-button-classes";
@@ -181,10 +181,9 @@ export function FraudSignalsSection() {
         )}
 
         {data && data.groups.length > 0 && (
-          <div className="fraud-signals-table-shell min-w-0 w-full overflow-hidden rounded-xl border border-[rgba(10,25,47,0.16)] shadow-[0_1px_4px_rgba(10,25,47,0.06)] dark:border-white/14 dark:shadow-none">
-            <div className="min-w-0 overflow-x-auto">
+          <div className="fraud-signals-table-shell min-w-0 w-full overflow-x-auto rounded-xl border border-[rgba(10,25,47,0.16)] shadow-[0_1px_4px_rgba(10,25,47,0.06)] dark:border-white/14 dark:shadow-none">
               <table
-                className="fraud-signals-table admin-dashboard-table w-full border-collapse text-left text-xs sm:text-sm"
+                className="fraud-signals-table fraud-signals-table--stacked admin-dashboard-table w-full border-collapse text-left text-xs sm:text-sm"
                 aria-label="Сигналы по пользователям"
               >
               <thead>
@@ -198,7 +197,7 @@ export function FraudSignalsSection() {
                   <th scope="col" className="whitespace-nowrap px-3 py-2.5 text-xs font-semibold uppercase tracking-wide">
                     Последний сигнал
                   </th>
-                  <th scope="col" className="min-w-[12rem] px-3 py-2.5 text-xs font-semibold uppercase tracking-wide">
+                  <th scope="col" className="min-w-0 px-3 py-2.5 text-xs font-semibold uppercase tracking-wide lg:min-w-[12rem]">
                     Сигналы
                   </th>
                   <th scope="col" className="w-[1%] whitespace-nowrap px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide">
@@ -209,14 +208,26 @@ export function FraudSignalsSection() {
               <tbody>
                 {data.groups.map((g) => (
                   <tr key={g.userId} className="align-top">
-                    <td className="px-3 py-3">
-                      <p className="break-words font-semibold text-[var(--color-text)]">{g.login}</p>
+                    <td
+                      data-label="Пользователь"
+                      className="min-w-0 max-w-full px-3 py-2 align-top lg:max-w-[18rem]"
+                    >
+                      <Link
+                        href={`/admin/users/${g.userId}`}
+                        className="break-words text-xs font-medium text-[var(--color-brand-gold)] underline-offset-2 hover:underline sm:text-[13px]"
+                      >
+                        {g.login}
+                      </Link>
                       {g.email ? (
-                        <p className="break-all text-xs text-[var(--color-text-secondary)]">{g.email}</p>
+                        <p className="mt-0.5 break-all text-[11px] leading-snug text-[var(--color-text-secondary)]">
+                          {g.email}
+                        </p>
                       ) : null}
-                      <p className="text-xs text-[var(--color-muted)]">{g.role}</p>
+                      <p className="mt-0.5 font-mono text-[10px] uppercase tracking-wide text-[var(--color-muted)]">
+                        {g.role}
+                      </p>
                     </td>
-                    <td className="whitespace-nowrap px-3 py-3">
+                    <td data-label="Статус" className="px-3 py-2 align-top lg:whitespace-nowrap">
                       {g.isBlocked ? (
                         <span className="fraud-signal-status-badge inline-flex rounded-full border border-rose-600/40 bg-rose-200 px-2.5 py-1 text-xs font-semibold !text-rose-950 dark:border-rose-400/35 dark:bg-rose-500/20 dark:!text-rose-100">
                           Заблокирован
@@ -227,10 +238,13 @@ export function FraudSignalsSection() {
                         </span>
                       )}
                     </td>
-                    <td className="whitespace-nowrap px-3 py-3 text-[var(--color-text)]">
+                    <td
+                      data-label="Последний сигнал"
+                      className="px-3 py-2 align-top text-[var(--color-text)] lg:whitespace-nowrap"
+                    >
                       {formatDate(g.lastSignalAt, { includeYear: true })}
                     </td>
-                    <td className="min-w-0 px-3 py-3">
+                    <td data-label="Сигналы" className="min-w-0 px-3 py-2 align-top">
                       <ul className="m-0 list-none space-y-2 p-0">
                         {g.signals.map((s) => {
                           const badge = ruleKindBadge(s.ruleCode);
@@ -253,33 +267,32 @@ export function FraudSignalsSection() {
                         })}
                       </ul>
                     </td>
-                    <td className="px-3 py-3">
-                      <div className="fraud-signals-actions flex flex-col items-stretch gap-2 sm:items-end">
+                    <td data-label="Действия" className="px-3 py-2 align-top">
+                      <div className="fraud-signals-actions flex justify-start lg:justify-end">
                         {canShowBlock(g.role, g.isBlocked) && (
                           <button
                             type="button"
                             disabled={blockingUserId === g.userId}
                             onClick={() => void handleBlockUser(g.userId, g.login)}
-                            className={`${ADMIN_BTN} ${ADMIN_BTN_DANGER} ${ADMIN_BTN_SM} inline-flex items-center justify-center gap-1.5 font-semibold disabled:opacity-50`}
+                            title="Заблокировать"
+                            aria-label={`Заблокировать пользователя ${g.login}`}
+                            className={`${ADMIN_BTN} ${ADMIN_BTN_DANGER} admin-btn--icon admin-btn--sm inline-flex items-center justify-center disabled:opacity-50`}
                           >
-                            <Ban className="h-3.5 w-3.5 shrink-0" strokeWidth={2.25} aria-hidden />
-                            {blockingUserId === g.userId ? "Блокируем…" : "Заблокировать"}
+                            {blockingUserId === g.userId ? (
+                              <span className="text-[11px] leading-none" aria-live="polite">
+                                …
+                              </span>
+                            ) : (
+                              <Ban className="h-4 w-4 shrink-0" strokeWidth={2.25} aria-hidden />
+                            )}
                           </button>
                         )}
-                        <Link
-                          href={`/admin/users/${g.userId}`}
-                          className={`${ADMIN_BTN} ${ADMIN_BTN_SM} inline-flex items-center justify-center gap-1.5 font-semibold`}
-                        >
-                          Карточка
-                          <ExternalLink className="h-3.5 w-3.5 shrink-0" strokeWidth={2.25} aria-hidden />
-                        </Link>
                       </div>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
-            </div>
           </div>
         )}
       </div>

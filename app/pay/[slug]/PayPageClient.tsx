@@ -36,8 +36,6 @@ import {
   PAY_SUCCESS_FLOW_OUTER,
 } from "@/lib/pay-ui-classes";
 
-const PRESETS = [50, 100, 200, 500] as const;
-
 const PAYMENT_MAX_ERROR = "Максимальная сумма пополнения — 1 000 ₽";
 
 /** POST на прокси Paygine без промежуточной страницы `/pay/redirect`. */
@@ -106,7 +104,6 @@ export default function PayPageClient() {
   const [paymentUnavailableReason, setPaymentUnavailableReason] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const [amount, setAmount] = useState<number>(100);
   const [customAmount, setCustomAmount] = useState("");
   const [comment, setComment] = useState("");
   const [paying, setPaying] = useState(false);
@@ -198,12 +195,10 @@ export default function PayPageClient() {
   const amountKop = useCallback((): number => {
     if (lockedAmountKop != null) return lockedAmountKop;
     const custom = customAmount.trim();
-    if (custom) {
-      const n = parseFloat(custom.replace(",", "."));
-      return !isNaN(n) && n > 0 ? toKopecks(n) : 0;
-    }
-    return toKopecks(amount);
-  }, [lockedAmountKop, amount, customAmount]);
+    if (!custom) return 0;
+    const n = parseFloat(custom.replace(",", "."));
+    return !isNaN(n) && n > 0 ? toKopecks(n) : 0;
+  }, [lockedAmountKop, customAmount]);
 
   const handlePay = async () => {
     const kop = amountKop();
@@ -376,7 +371,6 @@ export default function PayPageClient() {
               onClick={() => {
                 setResult(null);
                 setResultError(null);
-                setAmount(100);
                 setCustomAmount("");
                 setComment("");
                 if (slug) router.replace(`/pay/${slug}`);
@@ -440,7 +434,6 @@ export default function PayPageClient() {
               onClick={() => {
                 setResult(null);
                 setResultError(null);
-                setAmount(100);
                 setCustomAmount("");
                 setComment("");
                 if (slug) router.replace(`/pay/${slug}`);
@@ -592,42 +585,26 @@ export default function PayPageClient() {
             </>
           ) : (
             <>
-              <div className="pay-page-amounts">
-                {PRESETS.map((r) => {
-                  const numCustom = customAmount.trim() ? Number(customAmount.replace(",", ".")) : null;
-                  const isSelected =
-                    (numCustom != null && !Number.isNaN(numCustom) && numCustom === r) ||
-                    (numCustom == null && amount === r);
-                  return (
-                    <button
-                      key={r}
-                      type="button"
-                      disabled={!acceptPayments}
-                      onClick={() => {
-                        setAmount(r);
-                        setCustomAmount(String(r));
-                      }}
-                      className={`pay-page-amount-btn amount-btn ${isSelected ? "is-active active" : ""}`}
-                    >
-                      {r} ₽
-                    </button>
-                  );
-                })}
-              </div>
-              <p className="pay-page-label">Выберите сумму или введите свою (не больше 1 000 ₽)</p>
+              <p className="pay-page-section-title text-center">Сумма чаевых</p>
+              <p className="pay-page-label">
+                Введите свою сумму в форму ниже, но не выше 1000 ₽
+              </p>
               <div className="pay-page-input-wrap custom-amount pay-page-custom-amount-row">
                 <input
                   id="pay-custom-amount-rub"
                   name="customAmountRub"
                   type="text"
                   inputMode="decimal"
-                  placeholder="100"
+                  placeholder="Введите свою сумму"
                   value={customAmount}
                   onChange={(e) => setCustomAmount(e.target.value)}
                   disabled={!acceptPayments}
                   autoComplete="off"
-                  aria-label="Своя сумма в рублях, не больше 1 000"
+                  aria-label="Сумма в рублях, не больше 1 000"
                 />
+                <span className="pay-page-amount-suffix" aria-hidden>
+                  ₽
+                </span>
               </div>
               {kop > PAYMENT_MAX_AMOUNT_KOP && <PayInlineError>{PAYMENT_MAX_ERROR}</PayInlineError>}
             </>

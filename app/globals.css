@@ -4908,6 +4908,16 @@ html:not([data-theme="dark"]) .pay-page.pay-page--m5-competition .pay-page-unava
   width: 100%;
   margin-top: 0.25rem;
 }
+.pay-page-custom-amount-row .pay-page-amount-suffix {
+  flex-shrink: 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--pay-page-text-muted);
+}
+.pay-page.pay-page--m5-competition .pay-page-custom-amount-row .pay-page-amount-suffix {
+  color: rgba(232, 234, 239, 0.72);
+}
 .pay-page-input-wrap.has-icon {
   position: relative;
   width: 100%;

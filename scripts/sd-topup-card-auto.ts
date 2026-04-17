@@ -276,7 +276,9 @@ async function main(): Promise<void> {
     if (payPageUrl) {
       await page.goto(payPageUrl, { waitUntil: "domcontentloaded", timeout: PAGE_WAIT_MS });
       if (amountKop !== 10000) {
-        const customInput = page.getByLabel(/Своя сумма|своя сумма/i).or(page.locator('input[placeholder="100"]'));
+        const customInput = page
+          .getByLabel(/Сумма в рублях|своя сумма/i)
+          .or(page.locator('input[placeholder="Введите свою сумму"]'));
         await customInput.first().fill(String(amountKop / 100));
       }
       await page.getByRole("button", { name: /Оплатить картой/i }).click();

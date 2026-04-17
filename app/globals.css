@@ -4877,17 +4877,24 @@ html:not([data-theme="dark"]) .pay-page.pay-page--m5-competition .pay-page-unava
   margin-bottom: 0.375rem;
 }
 .pay-page-label-with-arrow {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.2rem;
   margin-bottom: 0.45rem;
 }
-/* Цвет как у текста подписи на карточке (в т.ч. правила .pay-page-card.card .pay-page-label с !important) */
-.pay-page-label-with-arrow .pay-page-label-arrow {
-  width: 1.35rem;
-  height: 1.35rem;
+.pay-page-label-hint-text {
+  display: inline-block;
+  max-width: 100%;
+}
+/* Стрелка сразу после слова «ниже», в одной строке с подсказкой */
+.pay-page-label-niche-with-arrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.1em;
+  vertical-align: middle;
+}
+.pay-page-label-niche-with-arrow .pay-page-label-arrow {
+  width: 1.05em;
+  height: 1.05em;
   flex-shrink: 0;
+  margin-top: 0.05em;
   color: inherit;
   stroke: currentColor;
   opacity: 0.95;
@@ -4930,14 +4937,19 @@ html:not([data-theme="dark"]) .pay-page.pay-page--m5-competition .pay-page-unava
   font-weight: 700;
   line-height: 1;
   letter-spacing: 0.02em;
-  color: var(--pay-page-text);
+  /* На карточке текст часто светлый (--pay-page-text при светлом html остаётся тёмным) — см. правила ниже */
+  color: inherit;
   font-variant-numeric: tabular-nums;
 }
-[data-theme="dark"] .pay-page:not(.pay-page--m5-competition) .pay-page-custom-amount-row .pay-page-amount-prefix {
-  color: rgba(255, 255, 255, 0.92);
+/* Как у .pay-page-card.card .pay-page-label: светлый текст на тёмной карточке при светлой теме документа */
+html:not([data-theme="dark"]) .pay-page:not(.pay-page--m5-competition) .pay-page-card.card .pay-page-custom-amount-row .pay-page-amount-prefix {
+  color: rgba(255, 255, 255, 0.95) !important;
+}
+[data-theme="dark"] .pay-page:not(.pay-page--m5-competition) .pay-page-card.card .pay-page-custom-amount-row .pay-page-amount-prefix {
+  color: rgba(255, 255, 255, 0.92) !important;
 }
 .pay-page.pay-page--m5-competition .pay-page-custom-amount-row .pay-page-amount-prefix {
-  color: rgba(232, 234, 239, 0.95);
+  color: rgba(232, 234, 239, 0.95) !important;
   text-shadow: 0 0 12px rgba(28, 105, 212, 0.25);
 }
 /* Префикс «₽ =» + поле: инпут тянется, без фикс. 280px как у одиночных полей */

@@ -587,8 +587,13 @@ export default function PayPageClient() {
             <>
               <p className="pay-page-section-title text-center">Сумма чаевых</p>
               <p className="pay-page-label pay-page-label-with-arrow">
-                <span>Введите свою сумму в форму ниже</span>
-                <ChevronDown className="pay-page-label-arrow" aria-hidden strokeWidth={2.5} />
+                <span className="pay-page-label-hint-text">
+                  Введите свою сумму в форму{" "}
+                  <span className="pay-page-label-niche-with-arrow">
+                    ниже
+                    <ChevronDown className="pay-page-label-arrow" aria-hidden strokeWidth={2.5} />
+                  </span>
+                </span>
               </p>
               <div className="pay-page-input-wrap custom-amount pay-page-custom-amount-row">
                 <span className="pay-page-amount-prefix" aria-hidden>

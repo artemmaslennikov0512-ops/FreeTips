@@ -314,24 +314,27 @@ export default function AdminUsersPage() {
           {blockAllError}
         </div>
       )}
-      <div className="mb-6 grid gap-4 lg:grid-cols-[1fr_auto]">
-        <div className="relative flex max-w-md items-center">
-          <Search className="pointer-events-none absolute left-3 h-5 w-5 text-white/80" style={{top:"50%",transform:"translateY(-50%)"}} />
+      <div className="admin-users-toolbar mb-6 flex min-w-0 flex-col gap-3 sm:gap-3.5 lg:flex-row lg:items-start">
+        <div className="relative w-full shrink-0 lg:max-w-md">
+          <Search
+            className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--color-muted)]"
+            aria-hidden
+          />
           <input
             type="text"
             placeholder="Логин, email или код оплаты"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="admin-users-search-input cabinet-section-header w-full rounded-xl border-0 py-2.5 pl-10 pr-4 text-sm text-white placeholder:text-white/70 focus:outline-none"
+            className="admin-users-search-input h-9 w-full rounded-lg border-0 py-0 pl-9 pr-3 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-gold)]/40"
           />
         </div>
-        <div className="cabinet-section-header rounded-2xl border-0 bg-[var(--color-light-gray)] p-4 text-sm text-[var(--color-text-secondary)]">
-          <div className="flex flex-wrap items-center gap-3">
+        <div className="min-w-0 flex-1 text-sm text-[var(--color-text-secondary)]">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
             <button
               type="button"
               onClick={handleCreateToken}
               disabled={tokenLoading}
-              className={`admin-users-token-btn ${ADMIN_BTN} ${ADMIN_BTN_PRIMARY} gap-2 px-4 py-2.5 text-[14px] font-semibold disabled:opacity-60`}
+              className={`admin-users-token-btn ${ADMIN_BTN} ${ADMIN_BTN_PRIMARY} gap-2 px-3 py-2 text-[14px] font-semibold disabled:opacity-60`}
             >
               {tokenLoading ? "Создание..." : "Выдать токен регистрации"}
             </button>
@@ -339,7 +342,7 @@ export default function AdminUsersPage() {
               type="button"
               onClick={handleBlockAll}
               disabled={blockAllLoading}
-              className={`${ADMIN_BTN} ${ADMIN_BTN_DANGER} gap-1.5 px-4 py-2.5 text-[14px] font-semibold`}
+              className={`${ADMIN_BTN} ${ADMIN_BTN_DANGER} gap-1.5 px-3 py-2 text-[14px] font-semibold`}
             >
               <Lock className="h-4 w-4" />
               {blockAllLoading ? "Выполняется..." : "Заблокировать всех"}
@@ -361,7 +364,7 @@ export default function AdminUsersPage() {
             )}
           </div>
           {registrationLink && (
-            <div className="mt-3 flex items-stretch gap-2">
+            <div className="mt-2.5 flex items-stretch gap-2">
               <input
                 type="text"
                 readOnly
@@ -370,7 +373,7 @@ export default function AdminUsersPage() {
                 onClick={(e) => e.currentTarget.select()}
                 title="Кликните в поле — ссылка выделится, затем Ctrl+C"
                 aria-label="Ссылка регистрации"
-                className="min-w-0 flex-1 cursor-text rounded-lg border border-white/10 bg-black/20 px-3 py-2 font-mono text-xs text-white/90 break-all outline-none focus:ring-2 focus:ring-emerald-500/50"
+                className="admin-users-reg-link-field min-w-0 flex-1 cursor-text rounded-lg px-3 py-2 font-mono text-xs break-all outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
               />
               <button
                 type="button"

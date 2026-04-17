@@ -265,16 +265,17 @@ export default function AdminPaymentAcceptPage() {
               type="button"
               role="switch"
               aria-checked={globalOff}
+              aria-label={globalOff ? "Стоп приёма включён — нажмите, чтобы выключить" : "Стоп приёма выключен — нажмите, чтобы включить"}
               disabled={saving}
               onClick={() => {
                 const next = !globalOff;
                 setGlobalOff(next);
                 void save({ globalPaymentsDisabled: next });
               }}
-              className={`relative h-9 w-16 shrink-0 rounded-full transition-colors ${globalOff ? "bg-[var(--color-accent-red)]" : "bg-white/25"} disabled:opacity-50`}
+              className="admin-payment-global-switch relative h-9 w-16 shrink-0 rounded-full border transition-colors disabled:opacity-50"
             >
               <span
-                className={`absolute top-1 left-1 h-7 w-7 rounded-full bg-white shadow transition-transform ${globalOff ? "translate-x-7" : "translate-x-0"}`}
+                className={`admin-payment-global-switch-thumb pointer-events-none absolute top-1 left-1 h-7 w-7 rounded-full shadow transition-transform ${globalOff ? "translate-x-7" : "translate-x-0"}`}
               />
             </button>
             <span className="text-sm font-medium text-white">{globalOff ? "Включён" : "Выключен"}</span>

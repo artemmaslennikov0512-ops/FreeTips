@@ -5984,6 +5984,31 @@ html:not([data-theme="dark"]) .support-chat-block {
   display: none;
 }
 
+/*
+ * Список обращений (/admin/support): в светлой теме #main-content глобально сбрасывает border-white/…
+ * и сводит text-white/… к одному серому — здесь явная плитка и кегль через переменные.
+ */
+.admin-panel .admin-support-thread-row {
+  border-radius: 0.75rem;
+  border: 1px solid rgba(10, 25, 47, 0.1);
+  background: var(--cabinet-surface-card-bg, #ffffff);
+  box-shadow: 0 1px 6px rgba(10, 25, 47, 0.06);
+  transition:
+    background-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+html:not([data-theme="dark"]) body.admin-page .admin-panel #main-content .admin-support-thread-row:hover {
+  background: var(--cabinet-surface-card-hover-bg, #f1f5f9) !important;
+}
+[data-theme="dark"] body.admin-page .admin-panel #main-content .admin-support-thread-row {
+  border-color: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: none;
+}
+[data-theme="dark"] body.admin-page .admin-panel #main-content .admin-support-thread-row:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
 /* Админка: раздел поддержки — заголовки и текст белые на тёмном main (кнопки .admin-btn — свои цвета) */
 .admin-panel .admin-support-page h1,
 .admin-panel .admin-support-page p,
@@ -6937,9 +6962,31 @@ html:not([data-theme="dark"]) body.admin-page .admin-panel .admin-btn--neutral:h
   outline-offset: 2px;
 }
 
-/* Поле поиска в админке «Пользователи»: в тёмной теме сайта — белый ввод */
+/* «Пользователи»: один компактный бар вместо двух тяжёлых cabinet-section-header */
+.admin-panel .admin-users-toolbar {
+  border-radius: 0.75rem;
+  border: 1px solid rgba(10, 25, 47, 0.1);
+  background: var(--cabinet-surface-card-bg, #ffffff);
+  padding: 0.625rem 0.75rem;
+  box-shadow: 0 1px 5px rgba(10, 25, 47, 0.055);
+}
+@media (min-width: 640px) {
+  .admin-panel .admin-users-toolbar {
+    padding: 0.75rem 1rem;
+  }
+}
+[data-theme="dark"] body.admin-page .admin-panel .admin-users-toolbar {
+  border-color: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: none;
+}
+
+/* Поле поиска: свой фон/обводка без cabinet-section-header */
 .admin-panel .admin-users-search-input {
   color: #ffffff !important;
+  background: #3c414a !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  box-shadow: none !important;
 }
 .admin-panel .admin-users-search-input::placeholder {
   color: rgba(255, 255, 255, 0.7) !important;
@@ -6949,10 +6996,55 @@ html:not([data-theme="dark"]) body.admin-page .admin-panel .admin-users-search-i
   color: #0a192f !important;
   -webkit-text-fill-color: #0a192f;
   caret-color: #0a192f;
+  background: #f1f5f9 !important;
+  border: 1px solid rgba(10, 25, 47, 0.12) !important;
 }
 html:not([data-theme="dark"]) body.admin-page .admin-panel .admin-users-search-input::placeholder {
   color: #64748b !important;
   -webkit-text-fill-color: #64748b;
+}
+
+/* Поле одноразовой ссылки: не border-white/… (в светлой #main-content сбрасывается) */
+.admin-panel .admin-users-reg-link-field {
+  color: rgba(255, 255, 255, 0.92) !important;
+  background: rgba(0, 0, 0, 0.22) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
+html:not([data-theme="dark"]) body.admin-page .admin-panel .admin-users-reg-link-field {
+  color: #0a192f !important;
+  -webkit-text-fill-color: #0a192f;
+  background: #eef2f7 !important;
+  border: 1px solid rgba(10, 25, 47, 0.12) !important;
+}
+
+/*
+ * «Приём по ссылкам»: переключатель «Стоп приёма» — в выключенном состоянии не bg-white/25 на белой карточке.
+ */
+.admin-panel button.admin-payment-global-switch[aria-checked="false"] {
+  background-color: rgba(10, 25, 47, 0.1) !important;
+  border-color: rgba(10, 25, 47, 0.22) !important;
+  box-shadow: inset 0 1px 2px rgba(10, 25, 47, 0.06);
+}
+[data-theme="dark"] body.admin-page .admin-panel button.admin-payment-global-switch[aria-checked="false"] {
+  background-color: rgba(255, 255, 255, 0.16) !important;
+  border-color: rgba(255, 255, 255, 0.28) !important;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+.admin-panel button.admin-payment-global-switch[aria-checked="true"] {
+  background-color: var(--color-accent-red, #dc2626) !important;
+  border-color: rgba(185, 28, 28, 0.55) !important;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.12);
+}
+.admin-panel button.admin-payment-global-switch .admin-payment-global-switch-thumb {
+  background-color: #ffffff !important;
+  border: 1px solid rgba(10, 25, 47, 0.14);
+  box-shadow:
+    0 1px 2px rgba(10, 25, 47, 0.12),
+    0 1px 3px rgba(10, 25, 47, 0.08);
+}
+[data-theme="dark"] body.admin-page .admin-panel button.admin-payment-global-switch .admin-payment-global-switch-thumb {
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
 }
 
 /* Заголовки в разделах на тёмном фоне — белым шрифтом (тёмная тема: основной блок, карточки, секции тёмные) */

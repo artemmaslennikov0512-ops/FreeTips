@@ -80,22 +80,26 @@ function LkPresenceCell({ user }: { user: User }) {
   }
   if (user.lastSeenAt) {
     return (
-      <span className="inline-flex max-w-[9rem] items-center gap-2 text-white/65" title={title}>
+      <span className="inline-flex max-w-[9rem] items-center gap-2 text-[var(--color-text-secondary)]" title={title}>
         <LkPresenceDot online={false} />
         <span className="truncate text-xs">{formatRelativeTimeAgo(user.lastSeenAt)}</span>
       </span>
     );
   }
   return (
-    <span className="inline-flex items-center gap-2 text-white/40" title={title}>
+    <span className="inline-flex items-center gap-2 text-[var(--color-muted)]" title={title}>
       <LkPresenceDot online={false} />
       <span className="text-xs">—</span>
     </span>
   );
 }
 
+const PAGE_SIZE = 10;
+
 export default function AdminUsersPage() {
   const [users, setUsers] = useState<User[]>([]);
+  const [usersTotal, setUsersTotal] = useState(0);
+  const [page, setPage] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
@@ -117,6 +121,8 @@ export default function AdminUsersPage() {
     setError(null);
     try {
       const qp = new URLSearchParams();
+      qp.set("limit", String(PAGE_SIZE));
+      qp.set("offset", String(page * PAGE_SIZE));
       if (search) qp.set("search", search);
       if (roleFilter) qp.set("role", roleFilter);
       if (blockedFilter) qp.set("blocked", blockedFilter);
@@ -124,22 +130,34 @@ export default function AdminUsersPage() {
       if (sortBy) qp.set("sortBy", sortBy);
       if (sortOrder) qp.set("sortOrder", sortOrder);
       const qs = qp.toString();
-      const url = `/api/admin/users${qs ? `?${qs}` : ""}`;
+      const url = `/api/admin/users?${qs}`;
       const res = await fetchWithAuth(url);
 
       if (!res.ok) {
         setError("Ошибка загрузки пользователей");
+        setUsersTotal(0);
         return;
       }
 
       const data: UsersResponse = await res.json();
       setUsers(data.users);
+      setUsersTotal(typeof data.total === "number" ? data.total : 0);
     } catch {
       setError("Ошибка загрузки пользователей");
+      setUsersTotal(0);
     } finally {
       setLoading(false);
     }
+  }, [search, roleFilter, blockedFilter, lkActiveFilter, sortBy, sortOrder, page]);
+
+  useEffect(() => {
+    setPage(0);
   }, [search, roleFilter, blockedFilter, lkActiveFilter, sortBy, sortOrder]);
+
+  useEffect(() => {
+    const lastPage = usersTotal <= 0 ? 0 : Math.max(0, Math.ceil(usersTotal / PAGE_SIZE) - 1);
+    if (page > lastPage) setPage(lastPage);
+  }, [usersTotal, page]);
 
   useLayoutEffect(() => {
     const v = new URLSearchParams(window.location.search).get("lkActive");
@@ -160,7 +178,7 @@ export default function AdminUsersPage() {
   const adminGoldPill =
     "border border-[var(--color-brand-gold)]/35 bg-[var(--color-brand-gold)]/12 text-[var(--color-brand-gold)] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] transition-colors hover:border-[var(--color-brand-gold)]/50 hover:bg-[var(--color-brand-gold)]/18";
 
-  const getRoleBadge = (role: string) => {
+  const getRoleBadge = (role: string, layout: "table" | "mobile" = "table") => {
     const styles = {
       RECIPIENT: adminGoldPill,
       ADMIN: adminGoldPill,
@@ -175,8 +193,14 @@ export default function AdminUsersPage() {
       ESTABLISHMENT_ADMIN: "Управляющий заведения",
       EMPLOYEE: "Официант",
     };
+    const layoutClass =
+      layout === "mobile"
+        ? "max-w-full whitespace-normal break-words px-2.5 py-1 text-center text-[11px] leading-snug [overflow-wrap:anywhere]"
+        : "whitespace-nowrap px-3 py-1 text-xs";
     return (
-      <span className={`inline-block whitespace-nowrap rounded-full px-3 py-1 text-xs font-medium ${styles[role as keyof typeof styles] || styles.RECIPIENT}`}>
+      <span
+        className={`inline-block rounded-full font-medium ${layoutClass} ${styles[role as keyof typeof styles] || styles.RECIPIENT}`}
+      >
         {labels[role as keyof typeof labels] || role}
       </span>
     );
@@ -479,6 +503,7 @@ export default function AdminUsersPage() {
               setLkActiveFilter("");
               setSortBy("createdAt");
               setSortOrder("desc");
+              setPage(0);
             }}
             className={`col-span-2 w-full sm:col-auto sm:w-auto ${ADMIN_BTN} ${ADMIN_BTN_SM} admin-btn--neutral`}
           >
@@ -488,15 +513,12 @@ export default function AdminUsersPage() {
       </div>
 
       {/* Мобильная версия: карточки вместо таблицы */}
-      <div className="cabinet-section-header space-y-3 rounded-xl border-0 p-4 lg:hidden">
+      <div className="admin-users-mobile-shell space-y-3 rounded-xl p-3 sm:p-4 lg:hidden">
         {sortedUsers.length === 0 ? (
-          <p className="py-8 text-center text-sm text-white/90">Пользователей не найдено</p>
+          <p className="py-8 text-center text-sm text-[var(--color-text-secondary)]">Пользователей не найдено</p>
         ) : (
           sortedUsers.map((user) => (
-            <div
-              key={user.id}
-              className="flex flex-col gap-3 rounded-xl border border-white/10 bg-[var(--color-dark-gray)]/20 p-4"
-            >
+            <div key={user.id} className="admin-users-mobile-card flex flex-col gap-3 rounded-xl border p-4">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <Link
                   href={`/admin/users/${user.id}`}
@@ -504,13 +526,13 @@ export default function AdminUsersPage() {
                 >
                   {user.login}
                 </Link>
-                <span className="shrink-0 text-xs font-mono text-white/70">#{user.uniqueId}</span>
+                <span className="shrink-0 text-xs font-mono text-[var(--color-text-secondary)]">#{user.uniqueId}</span>
               </div>
-              <div className="flex items-center justify-end gap-2 text-sm">
+              <div className="flex items-center justify-end gap-2 text-sm text-[var(--color-text)]">
                 <LkPresenceCell user={user} />
               </div>
-              <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
-                <span className="text-white/60">Код оплаты</span>
+              <div className="admin-users-mobile-fields grid gap-x-2 gap-y-1.5 text-sm [grid-template-columns:minmax(0,auto)_minmax(0,1fr)]">
+                <span className="shrink-0 pt-0.5 text-[var(--color-text-secondary)]">Код оплаты</span>
                 <div className="min-w-0 space-y-1.5 font-mono text-xs">
                   {user.tipSlugs.length ? (
                     user.tipSlugs.map((slug) => (
@@ -524,21 +546,25 @@ export default function AdminUsersPage() {
                       </Link>
                     ))
                   ) : (
-                    <span className="text-white/90">—</span>
+                    <span className="text-[var(--color-text)]">—</span>
                   )}
                 </div>
-                <span className="text-white/60">Email</span>
-                <span className="min-w-0 truncate text-white/90" title={user.email || undefined}>{user.email || "—"}</span>
-                <span className="text-white/60">Роль</span>
-                <span>{getRoleBadge(user.role)}</span>
-                <span className="text-white/60">Баланс</span>
-                <span className="text-white">{formatMoneyCompact(user.stats.balanceKop)}</span>
-                <span className="text-white/60">Получено</span>
-                <span className="text-white">{formatMoneyCompact(user.stats.totalReceivedKop)}</span>
-                <span className="text-white/60">Регистрация</span>
-                <span className="text-white/80">{formatDate(user.createdAt)}</span>
+                <span className="shrink-0 pt-0.5 text-[var(--color-text-secondary)]">Email</span>
+                <span className="min-w-0 truncate text-[var(--color-text)]" title={user.email || undefined}>
+                  {user.email || "—"}
+                </span>
+                <span className="shrink-0 self-start pt-1 text-[var(--color-text-secondary)]">Роль</span>
+                <div className="admin-users-mobile-role -ml-1 min-w-0 max-w-full">
+                  {getRoleBadge(user.role, "mobile")}
+                </div>
+                <span className="shrink-0 text-[var(--color-text-secondary)]">Баланс</span>
+                <span className="min-w-0 font-medium text-[var(--color-text)]">{formatMoneyCompact(user.stats.balanceKop)}</span>
+                <span className="shrink-0 text-[var(--color-text-secondary)]">Получено</span>
+                <span className="min-w-0 font-medium text-[var(--color-text)]">{formatMoneyCompact(user.stats.totalReceivedKop)}</span>
+                <span className="shrink-0 text-[var(--color-text-secondary)]">Регистрация</span>
+                <span className="min-w-0 text-[var(--color-text-secondary)]">{formatDate(user.createdAt)}</span>
               </div>
-              <div className="flex justify-end border-t border-white/10 pt-3">
+              <div className="admin-users-mobile-card-footer flex justify-end border-t pt-3">
                 <button
                   type="button"
                   onClick={() => handleToggleBlocked(user)}
@@ -555,8 +581,8 @@ export default function AdminUsersPage() {
 
       {/* Десктоп: таблица с горизонтальным скроллом */}
       <div className="admin-users-table cabinet-section-header overflow-x-auto rounded-xl border-0 max-lg:hidden">
-        <table className="w-full min-w-[1120px]">
-          <thead className="border-0 bg-[var(--color-brand-gold)]">
+        <table className="admin-users-data-table w-full min-w-[1120px] border-collapse">
+          <thead className="bg-[var(--color-brand-gold)]">
             <tr>
               <th className="whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">ID</th>
               <th className="whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">Логин</th>
@@ -578,13 +604,13 @@ export default function AdminUsersPage() {
           <tbody>
             {sortedUsers.length === 0 ? (
               <tr>
-                <td colSpan={12} className="px-4 py-8 text-center text-white/90">
+                <td colSpan={12} className="px-4 py-8 text-center text-[var(--color-text-secondary)]">
                   Пользователей не найдено
                 </td>
               </tr>
             ) : (
               sortedUsers.map((user) => (
-                <tr key={user.id} className="border-0 hover:bg-[var(--color-brand-gold)]/15 transition-colors">
+                <tr key={user.id} className="admin-users-data-row transition-colors hover:bg-[var(--color-brand-gold)]/12">
                   <td className="whitespace-nowrap px-4 py-3 text-sm font-mono text-white/90">#{user.uniqueId}</td>
                   <td className="min-w-[120px] whitespace-nowrap px-4 py-3">
                     <Link
@@ -626,6 +652,44 @@ export default function AdminUsersPage() {
           </tbody>
         </table>
       </div>
+
+      {usersTotal > 0 && (
+        <div className="mt-4 flex min-w-0 flex-col items-center justify-center gap-3 px-2 sm:flex-row sm:flex-wrap sm:gap-4">
+          <p className="text-center text-sm text-[var(--color-text-secondary)]">
+            Показано{" "}
+            <span className="font-medium tabular-nums text-[var(--color-text)]">
+              {page * PAGE_SIZE + 1}–{Math.min((page + 1) * PAGE_SIZE, usersTotal)}
+            </span>{" "}
+            из{" "}
+            <span className="font-medium tabular-nums text-[var(--color-text)]">{usersTotal}</span>
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            <button
+              type="button"
+              disabled={page <= 0 || loading}
+              onClick={() => setPage((p) => Math.max(0, p - 1))}
+              className={`${ADMIN_BTN} ${ADMIN_BTN_SM} admin-btn--neutral min-w-[7rem] disabled:opacity-50`}
+            >
+              Назад
+            </button>
+            <span className="text-xs text-[var(--color-muted)] sm:text-sm">
+              Страница{" "}
+              <span className="font-semibold tabular-nums text-[var(--color-text)]">{page + 1}</span> /{" "}
+              <span className="font-semibold tabular-nums text-[var(--color-text)]">
+                {Math.max(1, Math.ceil(usersTotal / PAGE_SIZE))}
+              </span>
+            </span>
+            <button
+              type="button"
+              disabled={loading || (page + 1) * PAGE_SIZE >= usersTotal}
+              onClick={() => setPage((p) => p + 1)}
+              className={`${ADMIN_BTN} ${ADMIN_BTN_SM} admin-btn--neutral min-w-[7rem] disabled:opacity-50`}
+            >
+              Вперёд
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

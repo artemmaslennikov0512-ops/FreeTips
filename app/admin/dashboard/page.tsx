@@ -179,13 +179,7 @@ export default function AdminDashboardPage() {
               {cards.map((card) => {
                 const Icon = card.icon;
                 const body = (
-                  <div
-                    className={
-                      card.onlineAccent
-                        ? "admin-dashboard-card cabinet-section-header rounded-2xl border border-emerald-500/25 bg-emerald-950/20 p-6 shadow-[0_0_24px_-8px_rgba(16,185,129,0.25)]"
-                        : "admin-dashboard-stat-tile admin-dashboard-card cabinet-section-header rounded-2xl border border-transparent p-6"
-                    }
-                  >
+                  <div className="admin-dashboard-stat-tile admin-dashboard-card cabinet-section-header rounded-2xl border border-transparent p-6">
                     <div className="flex items-center justify-between gap-3">
                       <div className="min-w-0">
                         <p className="text-sm font-medium text-white/90">{card.title}</p>

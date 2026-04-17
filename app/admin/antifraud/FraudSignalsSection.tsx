@@ -32,41 +32,41 @@ interface FraudSignalsResponse {
 }
 
 const BADGE_BASE =
-  "mb-1 inline-flex shrink-0 rounded-full border px-2 py-0.5 text-[10px] font-semibold tracking-wide";
+  "fraud-signal-rule-badge inline-flex shrink-0 rounded-full border px-2 py-0.5 text-[10px] font-semibold tracking-wide";
 
-/** Бейджи типа сигнала: светлая тема — пастель/тёмный кегль; тёмная — как раньше. */
+/** Бейджи типа сигнала: `!text-*` — перебивает глобальные правила таблиц в админке; без `text-white/` в классе (иначе #main-content заливает серым). */
 function ruleKindBadge(ruleCode: string): { label: string; className: string; title: string } {
   if (ruleCode.startsWith("LOGIN_")) {
     return {
       label: "Вход",
-      className: `${BADGE_BASE} border-amber-400/50 bg-amber-100 text-amber-950 dark:border-amber-400/45 dark:bg-amber-500/22 dark:text-amber-100`,
+      className: `${BADGE_BASE} border-amber-400/50 bg-amber-100 !text-amber-950 dark:border-amber-400/45 dark:bg-amber-500/22 dark:!text-amber-100`,
       title: "Вход в аккаунт",
     };
   }
   if (ruleCode.startsWith("PAYOUT_")) {
     return {
       label: "− Вывод",
-      className: `${BADGE_BASE} border-orange-400/50 bg-orange-100 text-orange-950 dark:border-orange-400/50 dark:bg-orange-600/30 dark:text-orange-50`,
+      className: `${BADGE_BASE} border-orange-400/50 bg-orange-100 !text-orange-950 dark:border-orange-400/50 dark:bg-orange-600/30 dark:!text-orange-50`,
       title: "Заявка на вывод",
     };
   }
   if (ruleCode.startsWith("PAY_")) {
     return {
       label: "+ Оплата",
-      className: `${BADGE_BASE} border-emerald-500/45 bg-emerald-100 text-emerald-950 dark:border-emerald-400/50 dark:bg-emerald-600/28 dark:text-emerald-50`,
+      className: `${BADGE_BASE} border-emerald-500/45 bg-emerald-100 !text-emerald-950 dark:border-emerald-400/50 dark:bg-emerald-600/28 dark:!text-emerald-50`,
       title: "Оплата в пользу получателя",
     };
   }
   if (ruleCode.startsWith("ACCOUNT_")) {
     return {
       label: "Аккаунт",
-      className: `${BADGE_BASE} border-violet-400/45 bg-violet-100 text-violet-950 dark:border-violet-400/40 dark:bg-violet-500/22 dark:text-violet-100`,
+      className: `${BADGE_BASE} border-violet-400/45 bg-violet-100 !text-violet-950 dark:border-violet-400/40 dark:bg-violet-500/22 dark:!text-violet-100`,
       title: "Событие аккаунта",
     };
   }
   return {
     label: "Другое",
-    className: `${BADGE_BASE} border-slate-300 bg-slate-100 text-slate-800 dark:border-white/25 dark:bg-white/10 dark:text-white/85`,
+    className: `${BADGE_BASE} border-slate-300 bg-slate-100 !text-slate-800 dark:border-white/25 dark:bg-white/10 dark:!text-slate-200`,
     title: "Прочее",
   };
 }
@@ -181,9 +181,9 @@ export function FraudSignalsSection() {
         )}
 
         {data && data.groups.length > 0 && (
-          <div className="min-w-0 overflow-x-auto">
+          <div className="mx-auto min-w-0 max-w-4xl overflow-x-auto">
             <table
-              className="fraud-signals-table admin-dashboard-table w-full min-w-[720px] border-collapse text-left text-sm"
+              className="fraud-signals-table admin-dashboard-table w-full min-w-0 max-w-full border-collapse text-left text-xs sm:text-sm"
               aria-label="Сигналы по пользователям"
             >
               <thead>
@@ -217,11 +217,11 @@ export function FraudSignalsSection() {
                     </td>
                     <td className="whitespace-nowrap px-3 py-3">
                       {g.isBlocked ? (
-                        <span className="inline-flex rounded-full border border-rose-400/45 bg-rose-100 px-2.5 py-1 text-xs font-medium text-rose-900 dark:border-rose-400/35 dark:bg-rose-500/20 dark:text-rose-100">
+                        <span className="fraud-signal-status-badge inline-flex rounded-full border border-rose-400/45 bg-rose-100 px-2.5 py-1 text-xs font-medium !text-rose-900 dark:border-rose-400/35 dark:bg-rose-500/20 dark:!text-rose-100">
                           Заблокирован
                         </span>
                       ) : (
-                        <span className="inline-flex rounded-full border border-emerald-500/40 bg-emerald-100 px-2.5 py-1 text-xs font-medium text-emerald-900 dark:border-emerald-400/35 dark:bg-emerald-500/15 dark:text-emerald-100">
+                        <span className="fraud-signal-status-badge inline-flex rounded-full border border-emerald-500/40 bg-emerald-100 px-2.5 py-1 text-xs font-medium !text-emerald-900 dark:border-emerald-400/35 dark:bg-emerald-500/15 dark:!text-emerald-100">
                           Активен
                         </span>
                       )}
@@ -230,23 +230,23 @@ export function FraudSignalsSection() {
                       {formatDate(g.lastSignalAt, { includeYear: true })}
                     </td>
                     <td className="min-w-0 px-3 py-3">
-                      <ul className="m-0 list-none space-y-2.5 p-0">
+                      <ul className="m-0 list-none space-y-2 p-0">
                         {g.signals.map((s) => {
                           const badge = ruleKindBadge(s.ruleCode);
                           return (
-                            <li key={s.id} className="min-w-0">
+                            <li key={s.id} className="flex min-w-0 gap-2.5">
                               <span title={badge.title} className={badge.className}>
                                 {badge.label}
                               </span>
-                              <p className="mt-1 break-words text-sm leading-relaxed text-[var(--color-text)] dark:text-white/[0.92]">
-                                <span className="text-[var(--color-muted)] dark:text-white/45">
+                              <div className="fraud-signal-line min-w-0 flex-1 break-words leading-relaxed">
+                                <span className="fraud-signal-line-meta">
                                   {formatDate(s.createdAt, { includeYear: true })} —{" "}
                                 </span>
                                 {s.message}
-                                <span className="ml-1 font-mono text-[11px] text-[var(--color-muted)] dark:text-white/35">
+                                <span className="fraud-signal-line-rulecode ml-1 font-mono text-[11px]">
                                   ({s.ruleCode})
                                 </span>
-                              </p>
+                              </div>
                             </li>
                           );
                         })}

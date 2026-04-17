@@ -7017,6 +7017,56 @@ html:not([data-theme="dark"]) body.admin-page .admin-panel .admin-users-reg-link
   border: 1px solid rgba(10, 25, 47, 0.12) !important;
 }
 
+/* «Пользователи»: сетка таблицы (перебивает общее «без линий» у .admin-panel table в светлой теме) */
+html:not([data-theme="dark"]) body.admin-page .admin-panel .admin-users-table table.admin-users-data-table {
+  border-collapse: collapse !important;
+  border-spacing: 0 !important;
+}
+html:not([data-theme="dark"]) body.admin-page .admin-panel .admin-users-table table.admin-users-data-table :where(th, td) {
+  border: 1px solid #0a192f !important;
+  vertical-align: top;
+}
+[data-theme="dark"] body.admin-page .admin-panel .admin-users-table table.admin-users-data-table {
+  border-collapse: collapse !important;
+  border-spacing: 0 !important;
+}
+[data-theme="dark"] body.admin-page .admin-panel .admin-users-table table.admin-users-data-table :where(th, td) {
+  border: 1px solid rgba(197, 165, 114, 0.38) !important;
+  vertical-align: top;
+}
+
+/* «Пользователи»: мобильный список — фон блока ЛК, карточки читаемые в светлой теме */
+html:not([data-theme="dark"]) body.admin-page .admin-panel .admin-users-mobile-shell {
+  background: var(--cabinet-block-bg, #dbe4ea) !important;
+  border: 1px solid rgba(10, 25, 47, 0.1);
+  box-shadow: 0 1px 5px rgba(10, 25, 47, 0.05);
+}
+html:not([data-theme="dark"]) body.admin-page .admin-panel .admin-users-mobile-card {
+  background: #ffffff !important;
+  border-color: rgba(10, 25, 47, 0.14) !important;
+  box-shadow: 0 1px 4px rgba(10, 25, 47, 0.07);
+}
+html:not([data-theme="dark"]) body.admin-page .admin-panel .admin-users-mobile-card-footer {
+  border-top: 1px solid rgba(10, 25, 47, 0.1) !important;
+}
+[data-theme="dark"] body.admin-page .admin-panel .admin-users-mobile-shell {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+[data-theme="dark"] body.admin-page .admin-panel .admin-users-mobile-card {
+  background: rgba(30, 36, 48, 0.96) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+[data-theme="dark"] body.admin-page .admin-panel .admin-users-mobile-card-footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Моб. «Пользователи»: роль не вылезает за карточку — вторая колонка сжимается, бейдж переносится */
+.admin-panel .admin-users-mobile-card .admin-users-mobile-role span {
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
 /*
  * «Приём по ссылкам»: переключатель «Стоп приёма» — в выключенном состоянии не bg-white/25 на белой карточке.
  */
@@ -7206,9 +7256,10 @@ html:not([data-theme="dark"]) body.admin-page .admin-panel .fraud-signals-panel 
 html:not([data-theme="dark"]) body.admin-page .admin-panel .fraud-signals-table {
   border-collapse: collapse !important;
   border-spacing: 0 !important;
+  background-color: var(--cabinet-block-bg, #dbe4ea) !important;
 }
 html:not([data-theme="dark"]) body.admin-page .admin-panel .fraud-signals-table thead {
-  background: transparent !important;
+  background-color: color-mix(in srgb, var(--cabinet-block-bg, #dbe4ea) 88%, #ffffff) !important;
 }
 html:not([data-theme="dark"]) body.admin-page .admin-panel .fraud-signals-table :where(th, td) {
   border: 1px solid rgba(10, 25, 47, 0.12) !important;
@@ -7217,13 +7268,23 @@ html:not([data-theme="dark"]) body.admin-page .admin-panel .fraud-signals-table 
 html:not([data-theme="dark"]) body.admin-page .admin-panel .fraud-signals-table thead th {
   color: #0a192f !important;
 }
+html:not([data-theme="dark"]) body.admin-page .admin-panel .fraud-signals-table .fraud-signal-line {
+  color: #0f172a !important;
+  -webkit-text-fill-color: #0f172a;
+}
+html:not([data-theme="dark"]) body.admin-page .admin-panel .fraud-signals-table .fraud-signal-line-meta,
+html:not([data-theme="dark"]) body.admin-page .admin-panel .fraud-signals-table .fraud-signal-line-rulecode {
+  color: #64748b !important;
+  -webkit-text-fill-color: #64748b;
+}
 
 [data-theme="dark"] body.admin-page .admin-panel .fraud-signals-table {
   border-collapse: collapse !important;
   border-spacing: 0 !important;
+  background-color: rgba(255, 255, 255, 0.05) !important;
 }
 [data-theme="dark"] body.admin-page .admin-panel .fraud-signals-table thead {
-  background: transparent !important;
+  background-color: rgba(255, 255, 255, 0.07) !important;
 }
 [data-theme="dark"] body.admin-page .admin-panel .fraud-signals-table :where(th, td) {
   border: 1px solid rgba(255, 255, 255, 0.12) !important;
@@ -7231,6 +7292,15 @@ html:not([data-theme="dark"]) body.admin-page .admin-panel .fraud-signals-table 
 }
 [data-theme="dark"] body.admin-page .admin-panel .fraud-signals-table thead th {
   color: rgba(255, 255, 255, 0.72) !important;
+}
+[data-theme="dark"] body.admin-page .admin-panel .fraud-signals-table .fraud-signal-line {
+  color: rgba(255, 255, 255, 0.92) !important;
+  -webkit-text-fill-color: rgba(255, 255, 255, 0.92);
+}
+[data-theme="dark"] body.admin-page .admin-panel .fraud-signals-table .fraud-signal-line-meta,
+[data-theme="dark"] body.admin-page .admin-panel .fraud-signals-table .fraud-signal-line-rulecode {
+  color: rgba(255, 255, 255, 0.48) !important;
+  -webkit-text-fill-color: rgba(255, 255, 255, 0.48);
 }
 
 /* Светлая тема: уведомления 2FA (ЛК, заведение, админка) — тёмный кегль на пастельных плашках */

@@ -200,7 +200,7 @@ export function FraudSignalsSection() {
                   <th scope="col" className="min-w-0 px-3 py-2.5 text-xs font-semibold uppercase tracking-wide lg:min-w-[12rem]">
                     Сигналы
                   </th>
-                  <th scope="col" className="w-[1%] whitespace-nowrap px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide">
+                  <th scope="col" className="w-[1%] whitespace-nowrap px-3 py-2.5 text-center text-xs font-semibold uppercase tracking-wide">
                     Действия
                   </th>
                 </tr>
@@ -267,8 +267,8 @@ export function FraudSignalsSection() {
                         })}
                       </ul>
                     </td>
-                    <td data-label="Действия" className="px-3 py-2 align-top">
-                      <div className="fraud-signals-actions flex justify-start lg:justify-end">
+                    <td data-label="Действия" className="px-3 py-2 align-middle">
+                      <div className="fraud-signals-actions flex w-full items-center justify-center">
                         {canShowBlock(g.role, g.isBlocked) && (
                           <button
                             type="button"

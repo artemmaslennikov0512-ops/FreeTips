@@ -78,7 +78,7 @@ export default function AdminDashboardPage() {
   if (loading) {
     return (
       <div className={ADMIN_PANEL_STATE_CENTER}>
-        <div className="text-center text-white/90">Загрузка…</div>
+        <div className="text-center text-[var(--color-text)] dark:text-white/90">Загрузка…</div>
       </div>
     );
   }
@@ -86,7 +86,9 @@ export default function AdminDashboardPage() {
   if (error || !stats) {
     return (
       <div className={ADMIN_PANEL_STATE_CENTER}>
-        <div className="max-w-md text-center text-white/90">{error || "Ошибка загрузки"}</div>
+        <div className="max-w-md text-center text-[var(--color-text)] dark:text-white/90">
+          {error || "Ошибка загрузки"}
+        </div>
       </div>
     );
   }
@@ -182,12 +184,14 @@ export default function AdminDashboardPage() {
                   <div className="admin-dashboard-stat-tile admin-dashboard-card cabinet-section-header rounded-2xl border border-transparent p-6">
                     <div className="flex items-center justify-between gap-3">
                       <div className="min-w-0">
-                        <p className="text-sm font-medium text-white/90">{card.title}</p>
+                        <p className="admin-dashboard-stat-label text-sm font-medium text-[var(--color-text-secondary)] dark:text-white/90">
+                          {card.title}
+                        </p>
                         <p
                           className={
                             card.onlineAccent
-                              ? "mt-2 text-xl font-bold tabular-nums text-emerald-300"
-                              : "mt-2 text-xl font-bold text-white"
+                              ? "admin-dashboard-stat-value admin-dashboard-stat-value--online mt-2 text-xl font-bold tabular-nums text-emerald-700 dark:text-emerald-300"
+                              : "admin-dashboard-stat-value mt-2 text-xl font-bold tabular-nums text-[var(--color-text)] dark:text-white"
                           }
                         >
                           {card.value}
@@ -196,13 +200,15 @@ export default function AdminDashboardPage() {
                       <div
                         className={
                           card.onlineAccent
-                            ? "shrink-0 rounded-xl bg-emerald-500/20 p-3 ring-1 ring-emerald-400/30"
-                            : "shrink-0 rounded-xl bg-white/20 p-3"
+                            ? "shrink-0 rounded-xl bg-emerald-500/15 p-3 ring-1 ring-emerald-500/25 dark:bg-emerald-500/20 dark:ring-emerald-400/30"
+                            : "shrink-0 rounded-xl bg-[var(--color-brand-gold)]/12 p-3 dark:bg-white/20"
                         }
                       >
                         <Icon
                           className={
-                            card.onlineAccent ? "h-6 w-6 text-emerald-400" : "h-6 w-6 text-[var(--color-brand-gold)]"
+                            card.onlineAccent
+                              ? "h-6 w-6 text-emerald-600 dark:text-emerald-400"
+                              : "h-6 w-6 text-[var(--color-brand-gold)]"
                           }
                         />
                       </div>

@@ -1243,48 +1243,6 @@ html:not([data-theme="dark"])
   font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
-/* Админка — дашборд, светлая тема: плашка «Панель администратора» как в тёмной (тот же хром, не голубая плитка ЛК) */
-html:not([data-theme="dark"])
-  body.admin-page
-  .admin-panel
-  #main-content
-  .admin-dashboard-shell
-  .cabinet-dashboard-name-hero__pill {
-  border: none !important;
-  box-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.18),
-    0 10px 28px rgba(0, 0, 0, 0.32),
-    0 2px 6px rgba(0, 0, 0, 0.14) !important;
-  background: #1c222d !important;
-  -webkit-backdrop-filter: none !important;
-  backdrop-filter: none !important;
-}
-html:not([data-theme="dark"])
-  body.admin-page
-  .admin-panel
-  #main-content
-  .admin-dashboard-shell
-  .cabinet-dashboard-name-hero__pill:hover {
-  background: #252b38 !important;
-}
-html:not([data-theme="dark"])
-  body.admin-page
-  .admin-panel
-  #main-content
-  .admin-dashboard-shell
-  .cabinet-dashboard-name-hero__text:not(.cabinet-dashboard-name-hero__text--m5) {
-  background-image: none !important;
-  -webkit-background-clip: unset !important;
-  background-clip: unset !important;
-  color: rgba(250, 250, 250, 0.96) !important;
-  -webkit-text-fill-color: rgba(250, 250, 250, 0.96) !important;
-  filter: none !important;
-  font-weight: 600;
-  font-size: 0.8125rem;
-  line-height: 1.25;
-  font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-}
-
 /* Тёмная тема: плашка как поверхность карточки (#1c222d — см. .cabinet-card), без белой «вспышки» */
 [data-theme="dark"] body.cabinet-page:not(.admin-page) .cabinet-premium:not([data-cabinet-theme="m5-competition"]) .cabinet-dashboard-name-hero__pill,
 [data-theme="dark"]
@@ -3614,13 +3572,11 @@ html:not([data-theme="dark"]) body.admin-page .admin-panel #main-content .admin-
   box-shadow: none !important;
 }
 html:not([data-theme="dark"]) body.admin-page .admin-panel #main-content .admin-dashboard-stat-tile.cabinet-section-header {
-  /* Как в тёмной теме: тёмная плитка на светлом холсте админки */
-  background: #262d3d !important;
-  border: 1px solid rgba(197, 165, 114, 0.24) !important;
+  background: var(--cabinet-surface-card-bg, #ffffff) !important;
+  border: 1px solid rgba(10, 25, 47, 0.1) !important;
   box-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.22),
-    0 10px 28px rgba(0, 0, 0, 0.32),
-    0 2px 6px rgba(0, 0, 0, 0.18) !important;
+    0 2px 10px rgba(10, 25, 47, 0.06),
+    0 12px 36px rgba(10, 25, 47, 0.08) !important;
 }
 
 /* Дашборд админки: полосы уведомлений — явные цвета (светлая тема не тянет тёмные rose/amber-слои) */
@@ -3653,73 +3609,6 @@ html:not([data-theme="dark"]) body.admin-page .admin-panel #main-content a.admin
 }
 html:not([data-theme="dark"]) body.admin-page .admin-panel #main-content a.admin-dashboard-alert--pending .admin-dashboard-alert__accent {
   color: #92400e !important;
-}
-
-/* Светлая тема, только карточка дашборда: алерты как в тёмной (единый тон с плитками) */
-html:not([data-theme="dark"])
-  body.admin-page
-  .admin-panel
-  #main-content
-  .admin-dashboard-shell
-  a.admin-dashboard-alert--fraud {
-  background: rgba(136, 19, 55, 0.42) !important;
-  border: 1px solid rgba(251, 113, 133, 0.35) !important;
-  color: rgba(255, 255, 255, 0.95) !important;
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.28) !important;
-}
-html:not([data-theme="dark"])
-  body.admin-page
-  .admin-panel
-  #main-content
-  .admin-dashboard-shell
-  a.admin-dashboard-alert--fraud:hover {
-  background: rgba(159, 18, 57, 0.52) !important;
-}
-html:not([data-theme="dark"])
-  body.admin-page
-  .admin-panel
-  #main-content
-  .admin-dashboard-shell
-  a.admin-dashboard-alert--fraud
-  .admin-dashboard-alert__icon {
-  color: #fda4af !important;
-}
-html:not([data-theme="dark"])
-  body.admin-page
-  .admin-panel
-  #main-content
-  .admin-dashboard-shell
-  a.admin-dashboard-alert--fraud
-  .admin-dashboard-alert__accent {
-  color: #fff7f7 !important;
-}
-html:not([data-theme="dark"])
-  body.admin-page
-  .admin-panel
-  #main-content
-  .admin-dashboard-shell
-  a.admin-dashboard-alert--pending {
-  background: rgba(120, 53, 15, 0.45) !important;
-  border: 1px solid rgba(252, 211, 77, 0.35) !important;
-  color: rgba(255, 251, 235, 0.96) !important;
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.26) !important;
-}
-html:not([data-theme="dark"])
-  body.admin-page
-  .admin-panel
-  #main-content
-  .admin-dashboard-shell
-  a.admin-dashboard-alert--pending:hover {
-  background: rgba(146, 64, 14, 0.5) !important;
-}
-html:not([data-theme="dark"])
-  body.admin-page
-  .admin-panel
-  #main-content
-  .admin-dashboard-shell
-  a.admin-dashboard-alert--pending
-  .admin-dashboard-alert__accent {
-  color: #fef3c7 !important;
 }
 
 [data-theme="dark"] body.admin-page .admin-panel #main-content a.admin-dashboard-alert--fraud {
@@ -3924,13 +3813,42 @@ html:not([data-theme="dark"])
   --color-text-secondary: #475569;
 }
 
-/* Светлая тема: админка — дашборд и таблицы: тёмный кегль на светлом main (не плитки статистики — там тёмный фон как в тёмной теме) */
-html:not([data-theme="dark"]) body.admin-page .admin-panel .admin-dashboard-card:not(.admin-dashboard-stat-tile) p,
+/* Светлая тема: админка — дашборд и таблицы: тёмный кегль на светлом main */
+html:not([data-theme="dark"]) body.admin-page .admin-panel .admin-dashboard-card p,
 html:not([data-theme="dark"]) body.admin-page .admin-panel .admin-dashboard-table th,
 html:not([data-theme="dark"]) body.admin-page .admin-panel .admin-dashboard-table td,
 html:not([data-theme="dark"]) body.admin-page .admin-panel table tbody td,
 html:not([data-theme="dark"]) body.admin-page .admin-panel table tbody th {
   color: #334155 !important;
+}
+
+/* Светлая тема: плитки статистики дашборда — кегль (перебой общего .admin-dashboard-card p) */
+html:not([data-theme="dark"])
+  body.admin-page
+  .admin-panel
+  #main-content
+  .admin-dashboard-stat-tile
+  .admin-dashboard-stat-label {
+  color: #64748b !important;
+  -webkit-text-fill-color: #64748b;
+}
+html:not([data-theme="dark"])
+  body.admin-page
+  .admin-panel
+  #main-content
+  .admin-dashboard-stat-tile
+  .admin-dashboard-stat-value {
+  color: #0a192f !important;
+  -webkit-text-fill-color: #0a192f;
+}
+html:not([data-theme="dark"])
+  body.admin-page
+  .admin-panel
+  #main-content
+  .admin-dashboard-stat-tile
+  .admin-dashboard-stat-value.admin-dashboard-stat-value--online {
+  color: #047857 !important;
+  -webkit-text-fill-color: #047857;
 }
 
 /* Светлая тема: админка — шапка таблиц и кнопка токена */
@@ -7553,6 +7471,8 @@ html:not([data-theme="dark"]) body.admin-page .admin-panel .fraud-signals-action
   }
   body.admin-page .admin-panel .fraud-signals-table.fraud-signals-table--stacked tbody td:last-child {
     border-bottom: none !important;
+    align-items: center;
+    text-align: center;
   }
 }
 

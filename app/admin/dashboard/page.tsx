@@ -126,7 +126,7 @@ export default function AdminDashboardPage() {
             : null;
 
   return (
-    <div className="cabinet-card flex min-h-0 min-w-0 w-full max-w-full flex-col rounded-[10px] border-0 bg-[var(--color-bg-sides)] shadow-[var(--shadow-subtle)] overflow-hidden lg:min-h-[min(56vh,560px)]">
+    <div className="admin-dashboard-shell cabinet-card flex min-h-0 min-w-0 w-full max-w-full flex-col overflow-hidden rounded-[10px] border-0 lg:min-h-[min(56vh,560px)]">
       <div className="flex min-h-0 flex-1 flex-col px-4 py-4 sm:px-5 sm:py-5">
         <div className="flex min-h-0 w-full flex-1 flex-col items-center justify-between gap-6">
           <div className="flex w-full shrink-0 flex-col items-center gap-8">
@@ -142,11 +142,11 @@ export default function AdminDashboardPage() {
             {stats.fraudFlaggedUsers30d != null && stats.fraudFlaggedUsers30d > 0 && (
               <Link
                 href="/admin/antifraud"
-                className="flex w-full items-center justify-center gap-2 rounded-2xl border border-rose-500/40 bg-rose-950/30 px-4 py-3 text-center text-sm text-rose-100 transition-colors hover:bg-rose-950/45"
+                className="flex w-full items-center justify-center gap-2 rounded-2xl border border-rose-500/35 bg-rose-500/10 px-4 py-3 text-center text-sm text-[var(--color-text)] transition-colors hover:bg-rose-500/15 dark:border-rose-500/40 dark:bg-rose-950/30 dark:text-rose-100 dark:hover:bg-rose-950/45"
               >
-                <ShieldAlert className="h-4 w-4 shrink-0 text-rose-300" aria-hidden />
+                <ShieldAlert className="h-4 w-4 shrink-0 text-rose-600 dark:text-rose-300" aria-hidden />
                 <span>
-                  <span className="font-semibold tabular-nums text-rose-50">{stats.fraudFlaggedUsers30d}</span>{" "}
+                  <span className="font-semibold tabular-nums text-rose-800 dark:text-rose-50">{stats.fraudFlaggedUsers30d}</span>{" "}
                   {stats.fraudFlaggedUsers30d % 10 === 1 && stats.fraudFlaggedUsers30d % 100 !== 11
                     ? "аккаунт"
                     : stats.fraudFlaggedUsers30d % 10 >= 2 &&
@@ -161,9 +161,9 @@ export default function AdminDashboardPage() {
             {pendingRequestsTotal != null && pendingRequestsTotal > 0 && (
               <Link
                 href="/admin/verification-requests"
-                className="block w-full rounded-2xl border border-amber-500/45 bg-amber-500/15 px-4 py-3 text-center text-sm text-amber-100 transition-colors hover:bg-amber-500/25"
+                className="block w-full rounded-2xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-center text-sm text-[var(--color-text)] transition-colors hover:bg-amber-500/15 dark:border-amber-500/45 dark:bg-amber-500/15 dark:text-amber-100 dark:hover:bg-amber-500/25"
               >
-                <span className="font-semibold tabular-nums text-amber-50">{pendingRequestsTotal}</span>{" "}
+                <span className="font-semibold tabular-nums text-amber-900 dark:text-amber-50">{pendingRequestsTotal}</span>{" "}
                 {pendingRequestsTotal % 10 === 1 && pendingRequestsTotal % 100 !== 11
                   ? "новая заявка"
                   : pendingRequestsTotal % 10 >= 2 &&
@@ -183,7 +183,7 @@ export default function AdminDashboardPage() {
                     className={
                       card.onlineAccent
                         ? "admin-dashboard-card cabinet-section-header rounded-2xl border border-emerald-500/25 bg-emerald-950/20 p-6 shadow-[0_0_24px_-8px_rgba(16,185,129,0.25)]"
-                        : "admin-dashboard-card cabinet-section-header rounded-2xl border-0 p-6"
+                        : "admin-dashboard-stat-tile admin-dashboard-card cabinet-section-header rounded-2xl border border-transparent p-6"
                     }
                   >
                     <div className="flex items-center justify-between gap-3">

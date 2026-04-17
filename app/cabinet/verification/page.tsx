@@ -209,16 +209,18 @@ export default function CabinetVerificationPage() {
         <h1 className={PANEL_PAGE_TITLE_CABINET_CENTERED_TIGHT}>
           Верификация
         </h1>
-        <div className="mx-auto w-full min-w-0 max-w-full rounded-xl border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 p-6 text-center sm:max-w-xl">
+        <div className="mx-auto flex w-full min-w-0 max-w-full flex-col items-center rounded-xl border border-emerald-600/35 bg-emerald-600/10 p-6 text-center sm:max-w-xl">
           <div className="flex flex-col items-center justify-center gap-3 px-1 text-center">
             <div
-              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-green-600/20 text-green-500"
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-emerald-600/20 text-emerald-600 dark:text-emerald-400"
               aria-hidden={true}
             >
               <ShieldCheck className="h-6 w-6" />
             </div>
-            <p className="mb-0 text-center text-base font-semibold leading-snug text-white">Аккаунт верифицирован</p>
-            <p className="mb-0 max-w-md text-center text-sm leading-relaxed text-white/90">
+            <p className="mb-0 text-center text-base font-semibold leading-snug text-[var(--color-text)]">
+              Аккаунт верифицирован
+            </p>
+            <p className="mb-0 max-w-md text-center text-sm leading-relaxed text-[var(--color-text-secondary)]">
               Ваша личность подтверждена. Вы можете пользоваться всеми услугами сервиса.
             </p>
           </div>

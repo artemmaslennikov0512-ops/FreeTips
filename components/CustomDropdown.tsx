@@ -26,12 +26,13 @@ interface CustomDropdownProps {
 
 const variantStyles = {
   admin: {
-    wrap: "custom-dropdown-admin rounded-xl border-0 overflow-visible",
+    wrap: "custom-dropdown-admin rounded-lg border-0 overflow-visible",
     trigger:
-      "custom-dropdown-trigger-admin cabinet-section-header w-full flex items-center justify-between gap-2 rounded-xl border-0 px-4 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-white/30 cursor-pointer",
+      "custom-dropdown-trigger-admin w-full flex min-h-[2.25rem] items-center justify-between gap-2 rounded-lg border px-3 py-1.5 text-left text-sm font-medium leading-snug focus:outline-none focus:ring-2 focus:ring-[var(--color-brand-gold)]/35 focus-visible:ring-offset-1 cursor-pointer",
     panel:
-      "custom-dropdown-panel custom-dropdown-panel-admin absolute left-0 right-0 top-full z-20 mt-1 rounded-xl border border-white/10 bg-[#0a192f] shadow-xl overflow-hidden",
-    option: "w-full flex items-center px-4 py-2 text-left text-sm font-medium transition-colors text-white/90 hover:bg-white/10",
+      "custom-dropdown-panel custom-dropdown-panel-admin absolute left-0 right-0 top-full z-[1] mt-1 overflow-hidden rounded-lg border",
+    option:
+      "w-full flex items-center px-3 py-1.5 text-left text-sm font-normal transition-colors hover:bg-black/[0.06] dark:hover:bg-white/10",
     optionSelected: "bg-[var(--color-brand-gold)] text-[#0a192f] hover:bg-[var(--color-brand-gold)]/90",
   },
   establishment: {
@@ -96,13 +97,19 @@ export function CustomDropdown({
         <label
           id={id ? `${id}-label` : undefined}
           htmlFor={id}
-          className={`mb-1.5 block text-sm font-medium ${variant === "admin" || variant === "establishment" ? "text-white/90" : "text-[var(--color-text)]"}`}
+          className={`mb-1.5 block text-sm font-medium ${
+            variant === "establishment"
+              ? "text-white/90"
+              : variant === "admin"
+                ? "text-[var(--color-text-secondary)]"
+                : "text-[var(--color-text)]"
+          }`}
         >
           {label}
         </label>
       )}
       {/* Якорь только для кнопки + панели: иначе top-full считается от всего блока с лейблом и на части макетов визуально «плывёт» */}
-      <div className="relative z-10 min-w-0 w-full">
+      <div className={`relative min-w-0 w-full ${open ? "z-[240]" : "z-10"}`}>
         <button
           type="button"
           id={id}
@@ -114,13 +121,18 @@ export function CustomDropdown({
           aria-describedby={describedBy}
         >
           <span className="min-w-0 truncate">{displayLabel}</span>
-          <ChevronDown className={`h-5 w-5 shrink-0 transition-transform duration-200 ${open ? "rotate-180" : ""}`} aria-hidden />
+          <ChevronDown
+            className={`shrink-0 opacity-70 transition-transform duration-200 ${open ? "rotate-180" : ""} ${
+              variant === "admin" ? "h-3.5 w-3.5 sm:h-4 sm:w-4" : "h-4 w-4"
+            }`}
+            aria-hidden
+          />
         </button>
         <div
           role="listbox"
           aria-labelledby={label && id ? `${id}-label` : undefined}
           id={id ? `${id}-listbox` : undefined}
-          className={`${styles.panel} z-50 transition-[opacity,transform] duration-200 ${
+          className={`${styles.panel} transition-[opacity,transform] duration-200 ${
             open ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1 pointer-events-none invisible"
           }`}
         >

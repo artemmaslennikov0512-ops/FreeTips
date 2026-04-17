@@ -571,7 +571,7 @@ export default function AdminAntifraudPage() {
 
       {observeEffective != null && (
         <section className={PANEL_SECTION_CARD_SM}>
-          <div className="antifraud-inner cabinet-block-inner min-w-0 rounded-xl border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/85 p-3 sm:p-4">
+          <div className="antifraud-inner cabinet-block-inner min-w-0 rounded-xl border border-[var(--color-brand-gold)]/20 p-3 sm:p-4">
             <h2 className="mb-3 text-center text-sm font-semibold text-white">Пороги сигналов</h2>
             <div className="space-y-3 text-xs text-white/90">
               <div className="flex w-full max-w-full flex-col items-center gap-2 text-center">
@@ -693,7 +693,7 @@ export default function AdminAntifraudPage() {
       )}
 
       <section className={PANEL_SECTION_CARD_SM}>
-        <div className="antifraud-inner cabinet-block-inner min-w-0 rounded-xl border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/85 p-3 sm:p-4">
+        <div className="antifraud-inner cabinet-block-inner min-w-0 rounded-xl border border-[var(--color-brand-gold)]/20 p-3 sm:p-4">
           {antifraudMessage && (
             <p className="mb-3 text-center text-sm text-white">
               {antifraudMessage.text}

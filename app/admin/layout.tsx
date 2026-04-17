@@ -33,7 +33,7 @@ import { PanelShellMobileCorner } from "@/components/PanelShellMobileCorner";
 import { PanelSidebarThemeSwitch } from "@/components/PanelSidebarThemeSwitch";
 import {
   PANEL_APP_MAIN_SURFACE_ADMIN,
-  PANEL_MAIN_CONTENT_INNER_ADMIN_CABINET,
+  PANEL_MAIN_CONTENT_INNER_ADMIN_APP,
   PANEL_NAV_WRAP_CABINET,
   PANEL_SIDEBAR_NAV_ACTIVE_ADMIN,
   PANEL_SIDEBAR_NAV_GROUP_SEPARATOR_CABINET,
@@ -416,7 +416,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
         <main className="relative min-h-screen min-w-0 flex-1 px-0 max-lg:pt-0 pt-1.5 pb-3 lg:relative lg:z-0 lg:pt-0 lg:pl-0 lg:pr-3 lg:ml-0 lg:mr-0 flex flex-col">
           <div className={PANEL_APP_MAIN_SURFACE_ADMIN}>
-            <div className={PANEL_MAIN_CONTENT_INNER_ADMIN_CABINET} id="main-content">
+            <div className={PANEL_MAIN_CONTENT_INNER_ADMIN_APP} id="main-content">
               {children}
             </div>
           </div>

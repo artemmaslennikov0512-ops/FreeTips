@@ -58,7 +58,7 @@ export const PANEL_ESTABLISHMENT_BACK_BTN_TOOLBAR =
 // --- Основная карточка контента (glass + скругление + сброс на max-lg где нужно)
 
 export const PANEL_APP_MAIN_SURFACE_ADMIN =
-  "admin-main-block cabinet-main-block app-panel-main-surface relative z-10 mt-0 mr-0 mb-3 ml-0 flex min-h-0 w-full min-w-0 max-w-full flex-1 flex-col rounded-lg border-x border-b border-white/10 backdrop-blur-xl md:rounded-[10px] lg:z-0 lg:mr-3 lg:ml-3 max-lg:mb-0 max-lg:ml-0 max-lg:mr-0 max-lg:rounded-none max-lg:border-0 max-lg:bg-transparent max-lg:shadow-none max-lg:backdrop-blur-none";
+  "admin-main-block cabinet-main-block app-panel-main-surface relative z-10 mt-0 mr-0 mb-3 ml-0 flex min-h-0 w-full min-w-0 max-w-full flex-1 flex-col rounded-lg border-x border-b border-white/10 backdrop-blur-xl md:rounded-[10px] lg:z-0 lg:mr-3 lg:ml-3 lg:rounded-none lg:border-0 lg:bg-transparent lg:shadow-none lg:backdrop-blur-none max-lg:mb-0 max-lg:ml-0 max-lg:mr-0 max-lg:rounded-none max-lg:border-0 max-lg:bg-transparent max-lg:shadow-none max-lg:backdrop-blur-none";
 
 /** Фон задаётся через style (бренд); класс без bg-white */
 export const PANEL_APP_MAIN_SURFACE_CABINET =
@@ -69,6 +69,10 @@ export const PANEL_APP_MAIN_SURFACE_ESTABLISHMENT =
 
 export const PANEL_MAIN_CONTENT_INNER_ADMIN_CABINET =
   "flex min-h-0 min-w-0 flex-1 flex-col overflow-x-hidden px-4 py-3 sm:px-6 md:py-6 lg:p-8";
+
+/** Только приложение админки: без `overflow-x-hidden`, чтобы выпадающие списки не попадали под соседние блоки / не обрезались. */
+export const PANEL_MAIN_CONTENT_INNER_ADMIN_APP =
+  "flex min-h-0 min-w-0 flex-1 flex-col overflow-x-visible px-4 py-3 sm:px-6 md:py-6 lg:p-8";
 
 export const PANEL_MAIN_CONTENT_INNER_ESTABLISHMENT =
   "flex min-h-0 min-w-0 flex-1 flex-col px-4 py-2 sm:px-6 sm:py-3 md:py-4 lg:px-8 lg:py-5";

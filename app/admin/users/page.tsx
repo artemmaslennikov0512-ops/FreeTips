@@ -392,12 +392,12 @@ export default function AdminUsersPage() {
         </div>
       </div>
 
-      <div className="mb-6 flex flex-wrap items-center gap-3">
-        <div className="flex items-center gap-2 text-sm text-white/90">
-          <Filter className="h-4 w-4" />
+      <div className="mb-4 grid grid-cols-2 gap-2 sm:mb-6 sm:flex sm:flex-wrap sm:items-center sm:gap-3">
+        <div className="col-span-2 flex items-center gap-2 text-sm text-[var(--color-text-secondary)] sm:col-span-1 sm:w-auto">
+          <Filter className="h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4" aria-hidden />
           <span>Фильтры:</span>
         </div>
-        <div className="min-w-[10rem]">
+        <div className="min-w-0 sm:min-w-[10rem]">
           <CustomDropdown
             id="admin-users-role"
             variant="admin"
@@ -413,7 +413,7 @@ export default function AdminUsersPage() {
             ]}
           />
         </div>
-        <div className="min-w-[10rem]">
+        <div className="min-w-0 sm:min-w-[10rem]">
           <CustomDropdown
             id="admin-users-blocked"
             variant="admin"
@@ -427,7 +427,7 @@ export default function AdminUsersPage() {
             ]}
           />
         </div>
-        <div className="min-w-[11rem]">
+        <div className="min-w-0 sm:min-w-[11rem]">
           <CustomDropdown
             id="admin-users-lk-active"
             variant="admin"
@@ -441,9 +441,9 @@ export default function AdminUsersPage() {
             ]}
           />
         </div>
-        <div className="flex items-center gap-2">
-          <ArrowUpDown className="h-4 w-4 text-white/80" />
-          <div className="min-w-[10rem]">
+        <div className="col-span-2 flex min-w-0 flex-wrap items-center gap-2 sm:col-span-1 sm:w-auto">
+          <ArrowUpDown className="h-4 w-4 shrink-0 text-[var(--color-text-secondary)]" aria-hidden />
+          <div className="min-w-0 flex-1 sm:min-w-[10rem] sm:flex-initial">
             <CustomDropdown
               id="admin-users-sort"
               variant="admin"
@@ -462,7 +462,7 @@ export default function AdminUsersPage() {
           <button
             type="button"
             onClick={() => setSortOrder((o) => (o === "desc" ? "asc" : "desc"))}
-            className={`cabinet-section-header ${ADMIN_BTN} admin-btn--neutral px-3 py-2 text-sm`}
+            className={`${ADMIN_BTN} admin-btn--neutral px-2.5 py-1.5 text-xs sm:px-3 sm:py-2 sm:text-sm`}
           >
             {sortOrder === "desc" ? "↓ Убыв." : "↑ Возр."}
           </button>
@@ -477,7 +477,7 @@ export default function AdminUsersPage() {
               setSortBy("createdAt");
               setSortOrder("desc");
             }}
-            className={`cabinet-section-header ${ADMIN_BTN} ${ADMIN_BTN_SM} admin-btn--neutral`}
+            className={`col-span-2 w-full sm:col-auto sm:w-auto ${ADMIN_BTN} ${ADMIN_BTN_SM} admin-btn--neutral`}
           >
             Сбросить
           </button>

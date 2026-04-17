@@ -5,7 +5,7 @@ import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useTipSettlementConfirmation } from "@/lib/hooks/use-tip-settlement-confirmation";
 import Link from "next/link";
 import Image from "next/image";
-import { CheckCircle2, XCircle, Loader2, User } from "lucide-react";
+import { CheckCircle2, ChevronDown, XCircle, Loader2, User } from "lucide-react";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import QRCode from "qrcode";
@@ -36,7 +36,7 @@ import {
   PAY_SUCCESS_FLOW_OUTER,
 } from "@/lib/pay-ui-classes";
 
-const PAYMENT_MAX_ERROR = "Максимальная сумма пополнения — 1 000 ₽";
+const PAYMENT_MAX_ERROR = "Сумма не может превышать 1000 ₽";
 
 /** POST на прокси Paygine без промежуточной страницы `/pay/redirect`. */
 function postPayRedirectProxy(tid: string, redirectToken: string): void {
@@ -586,10 +586,14 @@ export default function PayPageClient() {
           ) : (
             <>
               <p className="pay-page-section-title text-center">Сумма чаевых</p>
-              <p className="pay-page-label">
-                Введите свою сумму в форму ниже, но не выше 1000 ₽
+              <p className="pay-page-label pay-page-label-with-arrow">
+                <span>Введите свою сумму в форму ниже</span>
+                <ChevronDown className="pay-page-label-arrow" aria-hidden strokeWidth={2.5} />
               </p>
               <div className="pay-page-input-wrap custom-amount pay-page-custom-amount-row">
+                <span className="pay-page-amount-prefix" aria-hidden>
+                  ₽&nbsp;=
+                </span>
                 <input
                   id="pay-custom-amount-rub"
                   name="customAmountRub"
@@ -602,9 +606,6 @@ export default function PayPageClient() {
                   autoComplete="off"
                   aria-label="Сумма в рублях, не больше 1 000"
                 />
-                <span className="pay-page-amount-suffix" aria-hidden>
-                  ₽
-                </span>
               </div>
               {kop > PAYMENT_MAX_AMOUNT_KOP && <PayInlineError>{PAYMENT_MAX_ERROR}</PayInlineError>}
             </>

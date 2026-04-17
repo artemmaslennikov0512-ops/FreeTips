@@ -513,71 +513,69 @@ export default function AdminUsersPage() {
       </div>
 
       {/* Мобильная версия: карточки вместо таблицы */}
-      <div className="admin-users-mobile-shell space-y-3 rounded-xl p-3 sm:p-4 lg:hidden">
-        {sortedUsers.length === 0 ? (
-          <p className="py-8 text-center text-sm text-[var(--color-text-secondary)]">Пользователей не найдено</p>
-        ) : (
-          sortedUsers.map((user) => (
-            <div key={user.id} className="admin-users-mobile-card flex flex-col gap-3 rounded-xl border p-4">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <Link
-                  href={`/admin/users/${user.id}`}
-                  className={`${ADMIN_BTN} min-w-0 flex-1 px-3 py-2 text-sm font-medium break-all`}
-                >
-                  {user.login}
-                </Link>
-                <span className="shrink-0 text-xs font-mono text-[var(--color-text-secondary)]">#{user.uniqueId}</span>
-              </div>
-              <div className="flex items-center justify-end gap-2 text-sm text-[var(--color-text)]">
-                <LkPresenceCell user={user} />
-              </div>
-              <div className="admin-users-mobile-fields grid gap-x-2 gap-y-1.5 text-sm [grid-template-columns:minmax(0,auto)_minmax(0,1fr)]">
-                <span className="shrink-0 pt-0.5 text-[var(--color-text-secondary)]">Код оплаты</span>
-                <div className="min-w-0 space-y-1.5 font-mono text-xs">
-                  {user.tipSlugs.length ? (
-                    user.tipSlugs.map((slug) => (
-                      <Link
-                        key={slug}
-                        href={`/pay/${encodeURIComponent(slug)}`}
-                        className="block break-all text-[var(--color-brand-gold)] underline-offset-2 transition-opacity hover:underline hover:opacity-90"
-                        title={`Оплата /pay/${slug}`}
-                      >
-                        {slug}
-                      </Link>
-                    ))
-                  ) : (
-                    <span className="text-[var(--color-text)]">—</span>
-                  )}
-                </div>
-                <span className="shrink-0 pt-0.5 text-[var(--color-text-secondary)]">Email</span>
-                <span className="min-w-0 truncate text-[var(--color-text)]" title={user.email || undefined}>
-                  {user.email || "—"}
-                </span>
-                <span className="shrink-0 self-start pt-1 text-[var(--color-text-secondary)]">Роль</span>
-                <div className="admin-users-mobile-role -ml-1 min-w-0 max-w-full">
-                  {getRoleBadge(user.role, "mobile")}
-                </div>
-                <span className="shrink-0 text-[var(--color-text-secondary)]">Баланс</span>
-                <span className="min-w-0 font-medium text-[var(--color-text)]">{formatMoneyCompact(user.stats.balanceKop)}</span>
-                <span className="shrink-0 text-[var(--color-text-secondary)]">Получено</span>
-                <span className="min-w-0 font-medium text-[var(--color-text)]">{formatMoneyCompact(user.stats.totalReceivedKop)}</span>
-                <span className="shrink-0 text-[var(--color-text-secondary)]">Регистрация</span>
-                <span className="min-w-0 text-[var(--color-text-secondary)]">{formatDate(user.createdAt)}</span>
-              </div>
-              <div className="admin-users-mobile-card-footer flex justify-end border-t pt-3">
-                <button
-                  type="button"
-                  onClick={() => handleToggleBlocked(user)}
-                  disabled={updatingId === user.id}
-                  className={`${ADMIN_BTN} ${ADMIN_BTN_SM} whitespace-nowrap font-semibold disabled:opacity-60 ${updatingId === user.id ? "opacity-60" : ""}`}
-                >
-                  {user.isBlocked ? "Разблокировать" : "Ограничить"}
-                </button>
-              </div>
+      {sortedUsers.length === 0 ? (
+        <p className="py-8 text-center text-sm text-[var(--color-text-secondary)] lg:hidden">Пользователей не найдено</p>
+      ) : (
+        sortedUsers.map((user) => (
+          <div key={user.id} className="admin-users-mobile-card mb-3 flex flex-col gap-3 rounded-xl border p-4 lg:hidden">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <Link
+                href={`/admin/users/${user.id}`}
+                className={`${ADMIN_BTN} min-w-0 flex-1 px-3 py-2 text-sm font-medium break-all`}
+              >
+                {user.login}
+              </Link>
+              <span className="shrink-0 text-xs font-mono text-[var(--color-text-secondary)]">#{user.uniqueId}</span>
             </div>
-          ))
-        )}
-      </div>
+            <div className="flex items-center justify-end gap-2 text-sm text-[var(--color-text)]">
+              <LkPresenceCell user={user} />
+            </div>
+            <div className="admin-users-mobile-fields grid gap-x-2 gap-y-1.5 text-sm [grid-template-columns:minmax(0,auto)_minmax(0,1fr)]">
+              <span className="shrink-0 pt-0.5 text-[var(--color-text-secondary)]">Код оплаты</span>
+              <div className="min-w-0 space-y-1.5 font-mono text-xs">
+                {user.tipSlugs.length ? (
+                  user.tipSlugs.map((slug) => (
+                    <Link
+                      key={slug}
+                      href={`/pay/${encodeURIComponent(slug)}`}
+                      className="block break-all text-[var(--color-brand-gold)] underline-offset-2 transition-opacity hover:underline hover:opacity-90"
+                      title={`Оплата /pay/${slug}`}
+                    >
+                      {slug}
+                    </Link>
+                  ))
+                ) : (
+                  <span className="text-[var(--color-text)]">—</span>
+                )}
+              </div>
+              <span className="shrink-0 pt-0.5 text-[var(--color-text-secondary)]">Email</span>
+              <span className="min-w-0 truncate text-[var(--color-text)]" title={user.email || undefined}>
+                {user.email || "—"}
+              </span>
+              <span className="shrink-0 self-start pt-1 text-[var(--color-text-secondary)]">Роль</span>
+              <div className="admin-users-mobile-role -ml-1 min-w-0 max-w-full">
+                {getRoleBadge(user.role, "mobile")}
+              </div>
+              <span className="shrink-0 text-[var(--color-text-secondary)]">Баланс</span>
+              <span className="min-w-0 font-medium text-[var(--color-text)]">{formatMoneyCompact(user.stats.balanceKop)}</span>
+              <span className="shrink-0 text-[var(--color-text-secondary)]">Получено</span>
+              <span className="min-w-0 font-medium text-[var(--color-text)]">{formatMoneyCompact(user.stats.totalReceivedKop)}</span>
+              <span className="shrink-0 text-[var(--color-text-secondary)]">Регистрация</span>
+              <span className="min-w-0 text-[var(--color-text-secondary)]">{formatDate(user.createdAt)}</span>
+            </div>
+            <div className="admin-users-mobile-card-footer flex justify-end border-t pt-3">
+              <button
+                type="button"
+                onClick={() => handleToggleBlocked(user)}
+                disabled={updatingId === user.id}
+                className={`${ADMIN_BTN} ${ADMIN_BTN_SM} whitespace-nowrap font-semibold disabled:opacity-60 ${updatingId === user.id ? "opacity-60" : ""}`}
+              >
+                {user.isBlocked ? "Разблокировать" : "Ограничить"}
+              </button>
+            </div>
+          </div>
+        ))
+      )}
 
       {/* Десктоп: таблица с горизонтальным скроллом */}
       <div className="admin-users-table cabinet-section-header overflow-x-auto rounded-xl border-0 max-lg:hidden">

@@ -7035,12 +7035,7 @@ html:not([data-theme="dark"]) body.admin-page .admin-panel .admin-users-table ta
   vertical-align: top;
 }
 
-/* «Пользователи»: мобильный список — фон блока ЛК, карточки читаемые в светлой теме */
-html:not([data-theme="dark"]) body.admin-page .admin-panel .admin-users-mobile-shell {
-  background: var(--cabinet-block-bg, #dbe4ea) !important;
-  border: 1px solid rgba(10, 25, 47, 0.1);
-  box-shadow: 0 1px 5px rgba(10, 25, 47, 0.05);
-}
+/* «Пользователи»: мобильные карточки (без общей оболочки в разметке) */
 html:not([data-theme="dark"]) body.admin-page .admin-panel .admin-users-mobile-card {
   background: #ffffff !important;
   border-color: rgba(10, 25, 47, 0.14) !important;
@@ -7048,10 +7043,6 @@ html:not([data-theme="dark"]) body.admin-page .admin-panel .admin-users-mobile-c
 }
 html:not([data-theme="dark"]) body.admin-page .admin-panel .admin-users-mobile-card-footer {
   border-top: 1px solid rgba(10, 25, 47, 0.1) !important;
-}
-[data-theme="dark"] body.admin-page .admin-panel .admin-users-mobile-shell {
-  background: rgba(255, 255, 255, 0.05) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12);
 }
 [data-theme="dark"] body.admin-page .admin-panel .admin-users-mobile-card {
   background: rgba(30, 36, 48, 0.96) !important;
@@ -7262,11 +7253,16 @@ html:not([data-theme="dark"]) body.admin-page .admin-panel .fraud-signals-table 
   background-color: color-mix(in srgb, var(--cabinet-block-bg, #dbe4ea) 88%, #ffffff) !important;
 }
 html:not([data-theme="dark"]) body.admin-page .admin-panel .fraud-signals-table :where(th, td) {
-  border: 1px solid rgba(10, 25, 47, 0.12) !important;
+  border: 1px solid rgba(10, 25, 47, 0.34) !important;
   vertical-align: top;
 }
 html:not([data-theme="dark"]) body.admin-page .admin-panel .fraud-signals-table thead th {
   color: #0a192f !important;
+}
+/* Светлая тема: кегль в ячейках (перебой «бледного» наследования и prefers-color-scheme dark:) */
+html:not([data-theme="dark"]) body.admin-page .admin-panel .fraud-signals-table tbody td {
+  color: #0f172a !important;
+  -webkit-text-fill-color: #0f172a;
 }
 html:not([data-theme="dark"]) body.admin-page .admin-panel .fraud-signals-table .fraud-signal-line {
   color: #0f172a !important;
@@ -7276,6 +7272,36 @@ html:not([data-theme="dark"]) body.admin-page .admin-panel .fraud-signals-table 
 html:not([data-theme="dark"]) body.admin-page .admin-panel .fraud-signals-table .fraud-signal-line-rulecode {
   color: #64748b !important;
   -webkit-text-fill-color: #64748b;
+}
+/* Кнопки в таблице антифрода — читаемые на голубой подложке */
+html:not([data-theme="dark"]) body.admin-page .admin-panel .fraud-signals-actions .admin-btn--danger {
+  color: #991b1b !important;
+  border-color: rgba(153, 27, 27, 0.55) !important;
+  -webkit-text-fill-color: #991b1b;
+}
+html:not([data-theme="dark"]) body.admin-page .admin-panel .fraud-signals-actions .admin-btn--danger:hover:not(:disabled) {
+  background: rgba(153, 27, 27, 0.08) !important;
+}
+html:not([data-theme="dark"]) body.admin-page .admin-panel .fraud-signals-actions a.admin-btn,
+html:not([data-theme="dark"]) body.admin-page .admin-panel .fraud-signals-actions button.admin-btn:not(.admin-btn--danger) {
+  color: #0a192f !important;
+  border-color: rgba(10, 25, 47, 0.28) !important;
+  -webkit-text-fill-color: #0a192f;
+}
+html:not([data-theme="dark"]) body.admin-page .admin-panel .fraud-signals-actions a.admin-btn:hover,
+html:not([data-theme="dark"]) body.admin-page .admin-panel .fraud-signals-actions button.admin-btn:not(.admin-btn--danger):hover:not(:disabled) {
+  background: rgba(10, 25, 47, 0.06) !important;
+}
+html:not([data-theme="dark"]) body.admin-page .admin-panel .fraud-signals-actions .admin-btn svg {
+  opacity: 1 !important;
+}
+[data-theme="dark"] body.admin-page .admin-panel .fraud-signals-actions .admin-btn svg {
+  opacity: 1 !important;
+}
+[data-theme="dark"] body.admin-page .admin-panel .fraud-signals-actions .admin-btn--danger {
+  color: #fecaca !important;
+  border-color: rgba(254, 202, 202, 0.55) !important;
+  -webkit-text-fill-color: #fecaca;
 }
 
 [data-theme="dark"] body.admin-page .admin-panel .fraud-signals-table {
@@ -7292,6 +7318,10 @@ html:not([data-theme="dark"]) body.admin-page .admin-panel .fraud-signals-table 
 }
 [data-theme="dark"] body.admin-page .admin-panel .fraud-signals-table thead th {
   color: rgba(255, 255, 255, 0.72) !important;
+}
+[data-theme="dark"] body.admin-page .admin-panel .fraud-signals-table tbody td {
+  color: rgba(255, 255, 255, 0.9) !important;
+  -webkit-text-fill-color: rgba(255, 255, 255, 0.9);
 }
 [data-theme="dark"] body.admin-page .admin-panel .fraud-signals-table .fraud-signal-line {
   color: rgba(255, 255, 255, 0.92) !important;

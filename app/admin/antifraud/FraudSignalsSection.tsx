@@ -142,7 +142,7 @@ export function FraudSignalsSection() {
 
   return (
     <section className={PANEL_SECTION_CARD_SM}>
-      <div className="fraud-signals-panel antifraud-inner cabinet-block-inner min-w-0 rounded-xl border border-[var(--color-brand-gold)]/20 p-3 sm:p-4">
+      <div className="fraud-signals-panel min-w-0 rounded-xl border border-[var(--color-brand-gold)]/25 p-3 sm:p-4">
         <div className="mb-3 flex flex-col items-center gap-2 text-center sm:flex-row sm:justify-between sm:gap-4 sm:text-left">
           <h2 className="fraud-signals-panel-title text-sm font-semibold text-[var(--color-text)]">
             Подозрительная активность
@@ -170,7 +170,7 @@ export function FraudSignalsSection() {
 
         {data && data.groups.length === 0 && !loading && (
           <div
-            className="flex flex-col items-center justify-center gap-2 rounded-lg border border-[rgba(10,25,47,0.1)] bg-[rgba(10,25,47,0.03)] px-3 py-6 text-center dark:border-white/10 dark:bg-black/20"
+            className="flex flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-[rgba(10,25,47,0.18)] px-3 py-6 text-center dark:border-white/18"
             role="status"
           >
             <ShieldAlert className="h-8 w-8 text-emerald-600 dark:text-emerald-400/90" aria-hidden />
@@ -181,23 +181,41 @@ export function FraudSignalsSection() {
         )}
 
         {data && data.groups.length > 0 && (
-          <ul className="min-w-0 space-y-3" aria-label="Сигналы по пользователям">
-            {data.groups.map((g) => (
-              <li
-                key={g.userId}
-                className="min-w-0 rounded-xl border border-[rgba(10,25,47,0.1)] bg-white p-4 shadow-sm dark:border-white/12 dark:bg-black/25 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]"
-              >
-                <div className="flex flex-col gap-4 xl:grid xl:grid-cols-[minmax(0,14rem)_minmax(0,1fr)_auto] xl:items-start xl:gap-6">
-                  <div className="min-w-0">
-                    <p className="text-[10px] font-medium uppercase tracking-wide text-[var(--color-muted)] dark:text-white/50">
-                      Пользователь
-                    </p>
-                    <p className="break-words font-semibold text-[var(--color-text)] dark:text-white">{g.login}</p>
-                    {g.email ? (
-                      <p className="break-all text-xs text-[var(--color-text-secondary)] dark:text-white/55">{g.email}</p>
-                    ) : null}
-                    <p className="text-xs text-[var(--color-muted)] dark:text-white/45">{g.role}</p>
-                    <div className="mt-2">
+          <div className="min-w-0 overflow-x-auto">
+            <table
+              className="fraud-signals-table admin-dashboard-table w-full min-w-[720px] border-collapse text-left text-sm"
+              aria-label="Сигналы по пользователям"
+            >
+              <thead>
+                <tr>
+                  <th scope="col" className="px-3 py-2.5 text-xs font-semibold uppercase tracking-wide">
+                    Пользователь
+                  </th>
+                  <th scope="col" className="whitespace-nowrap px-3 py-2.5 text-xs font-semibold uppercase tracking-wide">
+                    Статус
+                  </th>
+                  <th scope="col" className="whitespace-nowrap px-3 py-2.5 text-xs font-semibold uppercase tracking-wide">
+                    Последний сигнал
+                  </th>
+                  <th scope="col" className="min-w-[12rem] px-3 py-2.5 text-xs font-semibold uppercase tracking-wide">
+                    Сигналы
+                  </th>
+                  <th scope="col" className="w-[1%] whitespace-nowrap px-3 py-2.5 text-right text-xs font-semibold uppercase tracking-wide">
+                    Действия
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.groups.map((g) => (
+                  <tr key={g.userId} className="align-top">
+                    <td className="px-3 py-3">
+                      <p className="break-words font-semibold text-[var(--color-text)] dark:text-white">{g.login}</p>
+                      {g.email ? (
+                        <p className="break-all text-xs text-[var(--color-text-secondary)] dark:text-white/60">{g.email}</p>
+                      ) : null}
+                      <p className="text-xs text-[var(--color-muted)] dark:text-white/45">{g.role}</p>
+                    </td>
+                    <td className="whitespace-nowrap px-3 py-3">
                       {g.isBlocked ? (
                         <span className="inline-flex rounded-full border border-rose-400/45 bg-rose-100 px-2.5 py-1 text-xs font-medium text-rose-900 dark:border-rose-400/35 dark:bg-rose-500/20 dark:text-rose-100">
                           Заблокирован
@@ -207,66 +225,60 @@ export function FraudSignalsSection() {
                           Активен
                         </span>
                       )}
-                    </div>
-                  </div>
-
-                  <div className="min-w-0 border-t border-[rgba(10,25,47,0.08)] pt-3 dark:border-white/10 xl:border-t-0 xl:pt-0">
-                    <p className="text-[10px] font-medium uppercase tracking-wide text-[var(--color-muted)] dark:text-white/50">
-                      Последний сигнал
-                    </p>
-                    <p className="mb-3 text-sm text-[var(--color-text)] dark:text-white/85">
+                    </td>
+                    <td className="whitespace-nowrap px-3 py-3 text-[var(--color-text)] dark:text-white/90">
                       {formatDate(g.lastSignalAt, { includeYear: true })}
-                    </p>
-                    <p className="mb-1.5 text-[10px] font-medium uppercase tracking-wide text-[var(--color-muted)] dark:text-white/50">
-                      Сигналы
-                    </p>
-                    <ul className="m-0 list-none space-y-3 p-0 text-left">
-                      {g.signals.map((s) => {
-                        const badge = ruleKindBadge(s.ruleCode);
-                        return (
-                          <li key={s.id} className="min-w-0">
-                            <span title={badge.title} className={badge.className}>
-                              {badge.label}
-                            </span>
-                            <p className="mt-1 break-words text-sm leading-relaxed text-[var(--color-text)] dark:text-white/[0.92]">
-                              <span className="text-[var(--color-muted)] dark:text-white/45">
-                                {formatDate(s.createdAt, { includeYear: true })} —{" "}
+                    </td>
+                    <td className="min-w-0 px-3 py-3">
+                      <ul className="m-0 list-none space-y-2.5 p-0">
+                        {g.signals.map((s) => {
+                          const badge = ruleKindBadge(s.ruleCode);
+                          return (
+                            <li key={s.id} className="min-w-0">
+                              <span title={badge.title} className={badge.className}>
+                                {badge.label}
                               </span>
-                              {s.message}
-                              <span className="ml-1 font-mono text-[11px] text-[var(--color-muted)] dark:text-white/35">
-                                ({s.ruleCode})
-                              </span>
-                            </p>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  </div>
-
-                  <div className="flex w-full flex-col gap-2 border-t border-[rgba(10,25,47,0.08)] pt-3 sm:flex-row sm:flex-wrap sm:justify-end xl:w-auto xl:flex-col xl:border-t-0 xl:pt-0 xl:pl-2">
-                    {canShowBlock(g.role, g.isBlocked) && (
-                      <button
-                        type="button"
-                        disabled={blockingUserId === g.userId}
-                        onClick={() => void handleBlockUser(g.userId, g.login)}
-                        className={`${ADMIN_BTN} ${ADMIN_BTN_DANGER} ${ADMIN_BTN_SM} flex w-full items-center justify-center gap-1.5 sm:w-auto xl:w-full disabled:opacity-50`}
-                      >
-                        <Ban className="h-3.5 w-3.5 shrink-0" aria-hidden />
-                        {blockingUserId === g.userId ? "Блокируем…" : "Заблокировать"}
-                      </button>
-                    )}
-                    <Link
-                      href={`/admin/users/${g.userId}`}
-                      className={`${ADMIN_BTN} ${ADMIN_BTN_SM} flex w-full items-center justify-center gap-1.5 sm:w-auto xl:w-full`}
-                    >
-                      Карточка пользователя
-                      <ExternalLink className="h-3.5 w-3.5 shrink-0 opacity-90" aria-hidden />
-                    </Link>
-                  </div>
-                </div>
-              </li>
-            ))}
-          </ul>
+                              <p className="mt-1 break-words text-sm leading-relaxed text-[var(--color-text)] dark:text-white/[0.92]">
+                                <span className="text-[var(--color-muted)] dark:text-white/45">
+                                  {formatDate(s.createdAt, { includeYear: true })} —{" "}
+                                </span>
+                                {s.message}
+                                <span className="ml-1 font-mono text-[11px] text-[var(--color-muted)] dark:text-white/35">
+                                  ({s.ruleCode})
+                                </span>
+                              </p>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </td>
+                    <td className="px-3 py-3">
+                      <div className="flex flex-col items-stretch gap-2 sm:items-end">
+                        {canShowBlock(g.role, g.isBlocked) && (
+                          <button
+                            type="button"
+                            disabled={blockingUserId === g.userId}
+                            onClick={() => void handleBlockUser(g.userId, g.login)}
+                            className={`${ADMIN_BTN} ${ADMIN_BTN_DANGER} ${ADMIN_BTN_SM} inline-flex items-center justify-center gap-1.5 disabled:opacity-50`}
+                          >
+                            <Ban className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                            {blockingUserId === g.userId ? "Блокируем…" : "Заблокировать"}
+                          </button>
+                        )}
+                        <Link
+                          href={`/admin/users/${g.userId}`}
+                          className={`${ADMIN_BTN} ${ADMIN_BTN_SM} inline-flex items-center justify-center gap-1.5`}
+                        >
+                          Карточка
+                          <ExternalLink className="h-3.5 w-3.5 shrink-0 opacity-90" aria-hidden />
+                        </Link>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </section>

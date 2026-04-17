@@ -142,11 +142,11 @@ export default function AdminDashboardPage() {
             {stats.fraudFlaggedUsers30d != null && stats.fraudFlaggedUsers30d > 0 && (
               <Link
                 href="/admin/antifraud"
-                className="flex w-full items-center justify-center gap-2 rounded-2xl border border-rose-500/35 bg-rose-500/10 px-4 py-3 text-center text-sm text-[var(--color-text)] transition-colors hover:bg-rose-500/15 dark:border-rose-500/40 dark:bg-rose-950/30 dark:text-rose-100 dark:hover:bg-rose-950/45"
+                className="admin-dashboard-alert admin-dashboard-alert--fraud flex w-full items-center justify-center gap-2 rounded-2xl px-4 py-3 text-center text-sm transition-colors"
               >
-                <ShieldAlert className="h-4 w-4 shrink-0 text-rose-600 dark:text-rose-300" aria-hidden />
+                <ShieldAlert className="admin-dashboard-alert__icon h-4 w-4 shrink-0" aria-hidden />
                 <span>
-                  <span className="font-semibold tabular-nums text-rose-800 dark:text-rose-50">{stats.fraudFlaggedUsers30d}</span>{" "}
+                  <span className="admin-dashboard-alert__accent font-semibold tabular-nums">{stats.fraudFlaggedUsers30d}</span>{" "}
                   {stats.fraudFlaggedUsers30d % 10 === 1 && stats.fraudFlaggedUsers30d % 100 !== 11
                     ? "аккаунт"
                     : stats.fraudFlaggedUsers30d % 10 >= 2 &&
@@ -161,9 +161,9 @@ export default function AdminDashboardPage() {
             {pendingRequestsTotal != null && pendingRequestsTotal > 0 && (
               <Link
                 href="/admin/verification-requests"
-                className="block w-full rounded-2xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-center text-sm text-[var(--color-text)] transition-colors hover:bg-amber-500/15 dark:border-amber-500/45 dark:bg-amber-500/15 dark:text-amber-100 dark:hover:bg-amber-500/25"
+                className="admin-dashboard-alert admin-dashboard-alert--pending block w-full rounded-2xl px-4 py-3 text-center text-sm transition-colors"
               >
-                <span className="font-semibold tabular-nums text-amber-900 dark:text-amber-50">{pendingRequestsTotal}</span>{" "}
+                <span className="admin-dashboard-alert__accent font-semibold tabular-nums">{pendingRequestsTotal}</span>{" "}
                 {pendingRequestsTotal % 10 === 1 && pendingRequestsTotal % 100 !== 11
                   ? "новая заявка"
                   : pendingRequestsTotal % 10 >= 2 &&

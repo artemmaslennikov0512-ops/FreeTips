@@ -27,6 +27,12 @@ function isAuthOnlyPath(pathname: string | null): boolean {
   );
 }
 
+/** Публичные страницы оплаты — только тёмная тема (не следовать светлой из localStorage). */
+function isPayPublicPath(pathname: string | null): boolean {
+  if (!pathname) return false;
+  return pathname.startsWith("/pay");
+}
+
 /** Где действует переключатель темы из localStorage */
 function isPanelThemeScope(pathname: string | null): boolean {
   if (!pathname) return false;
@@ -48,6 +54,7 @@ export function readThemePreference(): SiteThemePreference {
 /** Значение `data-theme` на <html> с учётом маршрута */
 function effectiveDocumentTheme(pathname: string | null, preference: SiteThemePreference): SiteThemePreference {
   if (isAuthOnlyPath(pathname)) return "dark";
+  if (isPayPublicPath(pathname)) return "dark";
   if (isPanelThemeScope(pathname)) return preference;
   return "light";
 }

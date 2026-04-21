@@ -792,7 +792,7 @@ export default function PayPageClient() {
                     </div>
                   </div>
                   <p className="pay-page-netmonet-amount-hint mt-1.5 text-center font-normal leading-snug">
-                    Выберите сумму или введите свою
+                    Введите свою сумму
                   </p>
                 </div>
               )}

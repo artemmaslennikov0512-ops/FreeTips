@@ -8,11 +8,12 @@ export const SHELL_CHROME_BOOT_SCRIPT = `(function(){
 function shellChromeBoot(){
 var p=typeof location!=='undefined'?location.pathname:'';
 var authOnly=p.startsWith('/zayavka')||p.startsWith('/login')||p.startsWith('/register')||p.startsWith('/forgot-password')||p.startsWith('/change-password')||p.startsWith('/reset-password');
-var scope=!authOnly&&(p.startsWith('/cabinet')||p.startsWith('/admin')||p.startsWith('/establishment')||p.startsWith('/pay'));
-var t=authOnly?'dark':scope?localStorage.getItem('${THEME_STORAGE_KEY}'):null;
-document.documentElement.setAttribute('data-theme',authOnly?'dark':t==='dark'?'dark':'light');
+var payOnly=p.startsWith('/pay');
+var scope=!authOnly&&(p.startsWith('/cabinet')||p.startsWith('/admin')||p.startsWith('/establishment')||payOnly);
+var t=scope?localStorage.getItem('${THEME_STORAGE_KEY}'):null;
+var eff=authOnly||payOnly?'dark':t==='dark'?'dark':'light';
+document.documentElement.setAttribute('data-theme',eff);
 document.documentElement.classList.toggle('app-shell-panel',!!scope);
-var eff=document.documentElement.getAttribute('data-theme');
 var tc=scope?null:(eff==='dark'?'${THEME_COLOR_DARK}':'${THEME_COLOR_LIGHT_SITE}');
 var cs=eff==='dark'?'dark':'light';
 var mtcs=document.querySelectorAll('meta[name="theme-color"]');

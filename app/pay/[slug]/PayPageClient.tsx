@@ -674,7 +674,7 @@ export default function PayPageClient() {
                 Отправка…
               </span>
             ) : (
-              `Оплатить ${rub.toFixed(rub >= 1 ? 0 : 2)} ₽`
+              "Оплатить картой"
             )}
           </button>
         </div>
@@ -682,7 +682,7 @@ export default function PayPageClient() {
           </>
         ) : (
           <>
-            <header className="mb-5 flex items-center justify-center">
+            <header className="mb-10 flex items-center justify-center">
               <div className="min-w-0 shrink">
                 {branding?.logoUrl ? (
                   <Image
@@ -695,7 +695,7 @@ export default function PayPageClient() {
                     style={{ opacity: branding?.logoOpacityPercent != null ? branding.logoOpacityPercent / 100 : 1 }}
                   />
                 ) : (
-                  <div className="flex items-center gap-3.5">
+                  <div className="flex items-center gap-4">
                     <span className="pay-page-logo-ft logo-ft-abbr flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--color-brand-gold)] text-sm text-[#0a192f]">
                       FT
                     </span>
@@ -776,8 +776,7 @@ export default function PayPageClient() {
                         aria-label="Сумма чаевых в рублях, от 1 до 1000"
                         className="pay-page-netmonet-amount-input min-w-0 flex-1 bg-transparent text-center text-[var(--color-text)] placeholder:text-[var(--color-muted)]/55 disabled:opacity-50"
                       />
-                      <div className="flex shrink-0 items-end gap-0.5 pb-0.5">
-                        <span className="text-lg font-semibold tabular-nums text-[var(--color-text)]">₽</span>
+                      <div className="flex shrink-0 items-end gap-1.5 pb-0.5">
                         {customAmount.trim() !== "" && acceptPayments ? (
                           <button
                             type="button"
@@ -788,6 +787,7 @@ export default function PayPageClient() {
                             <X className="h-3 w-3" strokeWidth={2.5} />
                           </button>
                         ) : null}
+                        <span className="text-lg font-semibold tabular-nums text-[var(--color-text)]">₽</span>
                       </div>
                     </div>
                   </div>
@@ -863,7 +863,7 @@ export default function PayPageClient() {
                     Отправка…
                   </span>
                 ) : (
-                  `Оплатить ${rub.toFixed(rub >= 1 ? 0 : 2)} ₽`
+                  "Оплатить картой"
                 )}
               </button>
             </section>

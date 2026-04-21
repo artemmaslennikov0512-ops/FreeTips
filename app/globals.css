@@ -5246,6 +5246,19 @@ html:not([data-theme="dark"]) .pay-page:not(.pay-page--m5-competition) .pay-page
   box-shadow: none;
 }
 
+/* Цель «Коплю на…» — над карточкой оплаты, мельче чем раньше (было text-xs) */
+.pay-page--netmonet .pay-page-netmonet-saving-goal {
+  font-size: 0.625rem;
+  line-height: 1.35;
+  letter-spacing: 0.015em;
+  font-weight: 500;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  max-width: min(100%, 26rem);
+  margin-left: auto;
+  margin-right: auto;
+}
+
 /* Упрощённая оплата: один лист (как референс), тёмная/светлая тема сайта */
 .pay-page--netmonet .pay-page-netmonet-amount-input {
   font-size: clamp(1.75rem, 8.5vw, 2.65rem);
@@ -5260,6 +5273,13 @@ html:not([data-theme="dark"]) .pay-page:not(.pay-page--m5-competition) .pay-page
   line-height: 1.1;
   letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
+}
+.pay-page--netmonet .pay-page-netmonet-rating-prompt {
+  font-size: 0.6875rem;
+  line-height: 1.35;
+  letter-spacing: 0.01em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 .pay-page--netmonet .pay-page-netmonet-amount-hint {
   font-size: 0.6875rem;
@@ -5325,67 +5345,12 @@ html:not([data-theme="dark"]) .pay-page--netmonet .pay-page-netmonet-note {
   color: #f7fafc;
 }
 
-/* Netmonet: пресеты сумм — компактнее, фон/тень как у кнопки «Оплатить» */
-.pay-page--netmonet .pay-page-netmonet-presets .pay-page-amount-btn {
-  min-height: 32px;
-  min-width: 42px;
-  padding: 4px 0.6rem;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  border-radius: 8px;
-  border: none;
-  color: rgba(255, 255, 255, 0.96);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
-  touch-action: manipulation;
-  transition: background 0.2s, filter 0.2s, box-shadow 0.2s, color 0.2s, border-color 0.2s;
-  transform: none;
-}
-html:not([data-theme="dark"]) .pay-page--netmonet .pay-page-netmonet-presets .pay-page-amount-btn {
-  background: linear-gradient(145deg, #0c5f59 0%, #14a89a 52%, #0f756c 100%);
-  box-shadow:
-    0 2px 12px rgba(17, 153, 142, 0.32),
-    0 4px 22px rgba(15, 138, 125, 0.18),
-    inset 0 1px 0 rgba(255, 255, 255, 0.12);
-}
-html:not([data-theme="dark"]) .pay-page--netmonet .pay-page-netmonet-presets .pay-page-amount-btn:hover:not(:disabled) {
-  background: linear-gradient(145deg, #0d6d66 0%, #16b5a5 52%, #11887c 100%);
-  filter: brightness(1.03);
-  box-shadow:
-    0 4px 16px rgba(17, 153, 142, 0.38),
-    0 6px 28px rgba(15, 138, 125, 0.22),
-    inset 0 1px 0 rgba(255, 255, 255, 0.14);
-}
-[data-theme="dark"] .pay-page--netmonet .pay-page-netmonet-presets .pay-page-amount-btn {
-  background: linear-gradient(145deg, #0c5a54 0%, #129489 48%, #0e6d64 100%);
-  box-shadow:
-    0 2px 12px rgba(17, 153, 142, 0.38),
-    0 4px 22px rgba(15, 138, 125, 0.28),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
-}
-[data-theme="dark"] .pay-page--netmonet .pay-page-netmonet-presets .pay-page-amount-btn:hover:not(:disabled) {
-  background: linear-gradient(145deg, #0d655e 0%, #14a898 48%, #107a6f 100%);
-  filter: brightness(1.04);
-  box-shadow:
-    0 4px 16px rgba(17, 153, 142, 0.45),
-    0 6px 28px rgba(15, 138, 125, 0.32),
-    inset 0 1px 0 rgba(255, 255, 255, 0.12);
-}
-.pay-page--netmonet .pay-page-netmonet-presets .pay-page-amount-btn.is-active.active {
-  background: var(--color-brand-gold) !important;
-  color: #0a192f !important;
-  border: 1px solid rgba(197, 165, 114, 0.85) !important;
-  text-shadow: none;
-  filter: none;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.22);
-}
-.pay-page--netmonet .pay-page-netmonet-presets .pay-page-amount-btn:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-}
-
 .pay-page--netmonet .pay-page-netmonet-support-wrap .pay-support-callout {
   margin-top: 0;
   border-radius: 12px;
+  text-align: center;
+  align-items: center;
+  padding: 10px 12px;
 }
 html:not([data-theme="dark"]) .pay-page--netmonet .pay-page-netmonet-support-wrap .pay-support-callout {
   background: rgba(255, 251, 235, 0.55);
@@ -5404,29 +5369,27 @@ html:not([data-theme="dark"]) .pay-page--netmonet .pay-page-netmonet-support-wra
   color: var(--color-text);
 }
 
-/* Netmonet: текст поддержки на всю ширину вложенной карточки (без узкой колонки 22rem) */
-.pay-page--netmonet .pay-page-netmonet-support-wrap .pay-support-callout {
-  text-align: left;
-  align-items: stretch;
-  padding: 10px 12px;
-}
+/* Netmonet: содержимое карточки поддержки по центру, без узкой колонки 22rem */
 .pay-page--netmonet .pay-page-netmonet-support-wrap .pay-support-callout h2.pay-support-callout-title,
 .pay-page--netmonet .pay-page-netmonet-support-wrap .pay-support-callout h2 {
   max-width: none;
   width: 100%;
-  margin-left: 0;
-  margin-right: 0;
-  text-align: left;
-  text-wrap: pretty;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  text-wrap: balance;
 }
 .pay-page--netmonet .pay-page-netmonet-support-wrap .pay-support-callout p,
 .pay-page--netmonet .pay-page-netmonet-support-wrap .pay-support-callout p.pay-support-callout-body {
   max-width: none;
   width: 100%;
-  margin-left: 0;
-  margin-right: 0;
-  text-align: left;
-  text-wrap: pretty;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  text-wrap: balance;
+}
+.pay-page--netmonet .pay-page-netmonet-support-wrap .pay-support-callout .pay-support-telegram-btn {
+  align-self: center;
 }
 
 /* Netmonet: на телефоне — не «висеть» по центру при длинной форме, отступы под вырез/жест */
@@ -5442,12 +5405,6 @@ html:not([data-theme="dark"]) .pay-page--netmonet .pay-page-netmonet-support-wra
     min-height: 40px;
     min-width: 40px;
     touch-action: manipulation;
-  }
-  .pay-page--netmonet .pay-page-netmonet-presets .pay-page-amount-btn {
-    min-height: 30px;
-    min-width: 38px;
-    padding: 3px 0.5rem;
-    font-size: 0.75rem;
   }
 }
 

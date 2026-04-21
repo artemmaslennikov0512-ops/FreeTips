@@ -38,9 +38,6 @@ import {
 
 const PAYMENT_MAX_ERROR = "Сумма не может превышать 1000 ₽";
 
-/** Быстрый выбор суммы (до лимита одного платежа), в духе пресетов на экране оплаты. */
-const PAY_PAGE_PRESET_RUB = [100, 200, 300, 500, 1000].filter((r) => r <= PAYMENT_MAX_AMOUNT_KOP / 100);
-
 /** POST на прокси Paygine без промежуточной страницы `/pay/redirect`. */
 function postPayRedirectProxy(tid: string, redirectToken: string): void {
   const form = document.createElement("form");
@@ -476,13 +473,6 @@ export default function PayPageClient() {
 
   const kop = amountKop();
   const rub = kop / 100;
-  const activePresetRub =
-    lockedAmountKop == null && customAmount.trim() !== ""
-      ? PAY_PAGE_PRESET_RUB.find((p) => {
-          const v = parseFloat(customAmount.replace(",", "."));
-          return Number.isFinite(v) && Math.abs(v - p) < 1e-6;
-        }) ?? null
-      : null;
 
   const hex = (s: string | undefined) => (s && /^#[0-9A-Fa-f]{6}$/i.test(s) ? s : undefined);
   const primary = hex(branding?.primaryColor);
@@ -737,7 +727,7 @@ export default function PayPageClient() {
                   </div>
                 )}
               </div>
-              <h2 className="mt-6 text-lg font-bold text-[var(--color-text)]" style={{ color: fontClr ?? undefined }}>
+              <h2 className="mt-10 text-lg font-bold text-[var(--color-text)] antialiased" style={{ color: fontClr ?? undefined }}>
                 {recipientName}
               </h2>
             </div>
@@ -752,13 +742,14 @@ export default function PayPageClient() {
               </div>
             )}
 
+            <p className="pay-page-netmonet-saving-goal mb-2 text-center text-[var(--color-text-secondary)]">
+              {savingFor?.trim() ? `Коплю на: ${savingFor}` : "Коплю на большое счастье"}
+            </p>
+
             <section
               className="pay-page-netmonet-sheet rounded-2xl px-3 pb-3 pt-3 shadow-[var(--shadow-card)] sm:px-4 sm:pb-4 sm:pt-4"
               style={Object.keys(cardStyle).length ? cardStyle : undefined}
             >
-              <p className="pay-page-netmonet-saving-goal mb-2 text-center text-xs leading-snug text-[var(--color-text-secondary)]">
-                {savingFor?.trim() ? `Коплю на: ${savingFor}` : "Коплю на большое счастье"}
-              </p>
               <p className="mb-2 text-center text-xs font-medium text-[var(--color-muted)]">
                 {lockedAmountKop != null ? "Сумма по ссылке" : "Сумма чаевых"}
               </p>
@@ -807,29 +798,15 @@ export default function PayPageClient() {
                 </div>
               )}
 
-              {lockedAmountKop == null ? (
-                <div className="pay-page-netmonet-presets mt-2 flex flex-wrap justify-center gap-1.5">
-                  {PAY_PAGE_PRESET_RUB.map((rubPreset) => (
-                    <button
-                      key={rubPreset}
-                      type="button"
-                      disabled={!acceptPayments}
-                      className={`pay-page-amount-btn shrink-0 ${activePresetRub === rubPreset ? "is-active active" : ""}`}
-                      onClick={() => setCustomAmount(String(rubPreset))}
-                    >
-                      {rubPreset} ₽
-                    </button>
-                  ))}
-                </div>
-              ) : null}
-
               {lockedAmountKop == null && kop > PAYMENT_MAX_AMOUNT_KOP ? (
                 <div className="mt-3">
                   <PayInlineError>{PAYMENT_MAX_ERROR}</PayInlineError>
                 </div>
               ) : null}
 
-              <p className="mb-1.5 mt-4 text-center text-sm font-medium text-[var(--color-text)]">Вам всё понравилось?</p>
+              <p className="pay-page-netmonet-rating-prompt mb-2 mt-6 text-center font-medium text-[var(--color-text)]">
+                Вам всё понравилось?
+              </p>
               <div className="pay-page-netmonet-stars flex flex-wrap justify-center gap-1" role="group" aria-label="Оценка">
                 {[1, 2, 3, 4, 5].map((n) => (
                   <button

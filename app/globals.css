@@ -5130,13 +5130,14 @@ html:not([data-theme="dark"]) .pay-page:not(.pay-page--m5-competition) .pay-page
 /* Светлая тема: кнопка «Оплатить» — как лицевая виртуальная карта в ЛК (teal) */
 html:not([data-theme="dark"]) .pay-page:not(.pay-page--m5-competition) .pay-button.pay-page-submit,
 html:not([data-theme="dark"]) .pay-page:not(.pay-page--m5-competition) .pay-page-submit {
-  background: linear-gradient(145deg, #0c5f59 0%, #11998e 55%, #0a1f19 100%) !important;
+  background: linear-gradient(145deg, #0c5f59 0%, #14a89a 52%, #0f756c 100%) !important;
   color: rgba(255, 255, 255, 0.96) !important;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.22);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
   border: none !important;
   box-shadow:
-    0 14px 36px -12px rgba(0, 0, 0, 0.22),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+    0 2px 12px rgba(17, 153, 142, 0.32),
+    0 4px 22px rgba(15, 138, 125, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
 .pay-page:not(.pay-page--m5-competition) .pay-button.pay-page-submit:hover:not(:disabled),
 .pay-page:not(.pay-page--m5-competition) .pay-page-submit:hover:not(:disabled) {
@@ -5146,35 +5147,34 @@ html:not([data-theme="dark"]) .pay-page:not(.pay-page--m5-competition) .pay-page
 }
 html:not([data-theme="dark"]) .pay-page:not(.pay-page--m5-competition) .pay-button.pay-page-submit:hover:not(:disabled),
 html:not([data-theme="dark"]) .pay-page:not(.pay-page--m5-competition) .pay-page-submit:hover:not(:disabled) {
-  background: linear-gradient(145deg, #0d6d66 0%, #14b5a5 55%, #0c241f 100%) !important;
+  background: linear-gradient(145deg, #0d6d66 0%, #16b5a5 52%, #11887c 100%) !important;
   color: rgba(255, 255, 255, 0.98) !important;
-  filter: brightness(1.04);
+  filter: brightness(1.03);
   box-shadow:
-    0 16px 40px -10px rgba(0, 0, 0, 0.28),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+    0 4px 16px rgba(17, 153, 142, 0.38),
+    0 6px 28px rgba(15, 138, 125, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14);
 }
 [data-theme="dark"] .pay-page:not(.pay-page--m5-competition) .pay-button.pay-page-submit,
 [data-theme="dark"] .pay-page:not(.pay-page--m5-competition) .pay-page-submit {
-  background: linear-gradient(145deg, #0a4d48 0%, #0f8a7d 52%, #071a17 100%) !important;
+  background: linear-gradient(145deg, #0c5a54 0%, #129489 48%, #0e6d64 100%) !important;
   color: rgba(255, 255, 255, 0.96) !important;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.22);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
   border: none !important;
   box-shadow:
-    0 14px 36px -12px rgba(0, 0, 0, 0.45),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.07),
-    inset 0 -10px 24px rgba(0, 0, 0, 0.18),
-    0 0 28px -10px rgba(15, 138, 125, 0.18);
+    0 2px 12px rgba(17, 153, 142, 0.38),
+    0 4px 22px rgba(15, 138, 125, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 [data-theme="dark"] .pay-page:not(.pay-page--m5-competition) .pay-button.pay-page-submit:hover:not(:disabled),
 [data-theme="dark"] .pay-page:not(.pay-page--m5-competition) .pay-page-submit:hover:not(:disabled) {
-  background: linear-gradient(145deg, #0c5c55 0%, #12a395 52%, #0a221e 100%) !important;
+  background: linear-gradient(145deg, #0d655e 0%, #14a898 48%, #107a6f 100%) !important;
   color: rgba(255, 255, 255, 0.98) !important;
-  filter: brightness(1.05);
+  filter: brightness(1.04);
   box-shadow:
-    0 16px 40px -10px rgba(0, 0, 0, 0.5),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.09),
-    inset 0 -10px 24px rgba(0, 0, 0, 0.2),
-    0 0 32px -8px rgba(15, 138, 125, 0.22);
+    0 4px 16px rgba(17, 153, 142, 0.45),
+    0 6px 28px rgba(15, 138, 125, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
 [data-theme="dark"] .pay-page.pay-page--m5-competition .pay-page-submit:hover:not(:disabled) {
   filter: brightness(1.06) !important;
@@ -5248,18 +5248,48 @@ html:not([data-theme="dark"]) .pay-page:not(.pay-page--m5-competition) .pay-page
 
 /* Упрощённая оплата: один лист (как референс), тёмная/светлая тема сайта */
 .pay-page--netmonet .pay-page-netmonet-amount-input {
-  font-size: clamp(2rem, 10vw, 2.85rem);
+  font-size: clamp(1.75rem, 8.5vw, 2.65rem);
   font-weight: 700;
   line-height: 1.05;
   letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
 }
 .pay-page--netmonet .pay-page-netmonet-amount-readonly {
-  font-size: clamp(2rem, 10vw, 2.85rem);
+  font-size: clamp(1.75rem, 8.5vw, 2.65rem);
   font-weight: 700;
   line-height: 1.1;
   letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
+}
+.pay-page--netmonet .pay-page-netmonet-amount-hint {
+  font-size: 0.6875rem;
+  letter-spacing: 0.01em;
+}
+html:not([data-theme="dark"]) .pay-page--netmonet .pay-page-netmonet-amount-hint {
+  color: rgba(51, 65, 85, 0.88);
+}
+[data-theme="dark"] .pay-page--netmonet .pay-page-netmonet-amount-hint {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Кнопка сброса суммы: круглый фон, отдельная колонка — не наезжает на ₽ */
+.pay-page--netmonet .pay-page-netmonet-amount-clear {
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: rgba(255, 255, 255, 0.92) !important;
+}
+.pay-page--netmonet .pay-page-netmonet-amount-clear:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.28);
+  border-color: rgba(255, 255, 255, 0.32);
+}
+html:not([data-theme="dark"]) .pay-page--netmonet .pay-page-netmonet-amount-clear {
+  background: rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  color: rgba(51, 65, 85, 0.95) !important;
+}
+html:not([data-theme="dark"]) .pay-page--netmonet .pay-page-netmonet-amount-clear:hover:not(:disabled) {
+  background: rgba(15, 23, 42, 0.12);
+  border-color: rgba(15, 23, 42, 0.18);
 }
 html:not([data-theme="dark"]) .pay-page--netmonet .pay-page-netmonet-sheet {
   background: rgba(255, 255, 255, 0.97);
@@ -5276,11 +5306,13 @@ html:not([data-theme="dark"]) .pay-page--netmonet .pay-page-netmonet-sheet {
 .pay-page--netmonet .pay-page-netmonet-note {
   width: 100%;
   border-radius: 10px;
-  padding: 10px 12px;
-  font-size: 0.875rem;
+  padding: 8px 10px;
+  min-height: 0;
+  font-size: 0.8125rem;
   font-family: inherit;
   resize: none;
   text-align: center;
+  line-height: 1.35;
 }
 html:not([data-theme="dark"]) .pay-page--netmonet .pay-page-netmonet-note {
   border: 0.5px solid rgba(197, 165, 114, 0.22);
@@ -5292,6 +5324,65 @@ html:not([data-theme="dark"]) .pay-page--netmonet .pay-page-netmonet-note {
   background: var(--dark-form-surface-bg);
   color: #f7fafc;
 }
+
+/* Netmonet: пресеты сумм — компактнее, фон/тень как у кнопки «Оплатить» */
+.pay-page--netmonet .pay-page-netmonet-presets .pay-page-amount-btn {
+  min-height: 32px;
+  min-width: 42px;
+  padding: 4px 0.6rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  border-radius: 8px;
+  border: none;
+  color: rgba(255, 255, 255, 0.96);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
+  touch-action: manipulation;
+  transition: background 0.2s, filter 0.2s, box-shadow 0.2s, color 0.2s, border-color 0.2s;
+  transform: none;
+}
+html:not([data-theme="dark"]) .pay-page--netmonet .pay-page-netmonet-presets .pay-page-amount-btn {
+  background: linear-gradient(145deg, #0c5f59 0%, #14a89a 52%, #0f756c 100%);
+  box-shadow:
+    0 2px 12px rgba(17, 153, 142, 0.32),
+    0 4px 22px rgba(15, 138, 125, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+html:not([data-theme="dark"]) .pay-page--netmonet .pay-page-netmonet-presets .pay-page-amount-btn:hover:not(:disabled) {
+  background: linear-gradient(145deg, #0d6d66 0%, #16b5a5 52%, #11887c 100%);
+  filter: brightness(1.03);
+  box-shadow:
+    0 4px 16px rgba(17, 153, 142, 0.38),
+    0 6px 28px rgba(15, 138, 125, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+}
+[data-theme="dark"] .pay-page--netmonet .pay-page-netmonet-presets .pay-page-amount-btn {
+  background: linear-gradient(145deg, #0c5a54 0%, #129489 48%, #0e6d64 100%);
+  box-shadow:
+    0 2px 12px rgba(17, 153, 142, 0.38),
+    0 4px 22px rgba(15, 138, 125, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+[data-theme="dark"] .pay-page--netmonet .pay-page-netmonet-presets .pay-page-amount-btn:hover:not(:disabled) {
+  background: linear-gradient(145deg, #0d655e 0%, #14a898 48%, #107a6f 100%);
+  filter: brightness(1.04);
+  box-shadow:
+    0 4px 16px rgba(17, 153, 142, 0.45),
+    0 6px 28px rgba(15, 138, 125, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+.pay-page--netmonet .pay-page-netmonet-presets .pay-page-amount-btn.is-active.active {
+  background: var(--color-brand-gold) !important;
+  color: #0a192f !important;
+  border: 1px solid rgba(197, 165, 114, 0.85) !important;
+  text-shadow: none;
+  filter: none;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.22);
+}
+.pay-page--netmonet .pay-page-netmonet-presets .pay-page-amount-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
 .pay-page--netmonet .pay-page-netmonet-support-wrap .pay-support-callout {
   margin-top: 0;
   border-radius: 12px;
@@ -5313,6 +5404,31 @@ html:not([data-theme="dark"]) .pay-page--netmonet .pay-page-netmonet-support-wra
   color: var(--color-text);
 }
 
+/* Netmonet: текст поддержки на всю ширину вложенной карточки (без узкой колонки 22rem) */
+.pay-page--netmonet .pay-page-netmonet-support-wrap .pay-support-callout {
+  text-align: left;
+  align-items: stretch;
+  padding: 10px 12px;
+}
+.pay-page--netmonet .pay-page-netmonet-support-wrap .pay-support-callout h2.pay-support-callout-title,
+.pay-page--netmonet .pay-page-netmonet-support-wrap .pay-support-callout h2 {
+  max-width: none;
+  width: 100%;
+  margin-left: 0;
+  margin-right: 0;
+  text-align: left;
+  text-wrap: pretty;
+}
+.pay-page--netmonet .pay-page-netmonet-support-wrap .pay-support-callout p,
+.pay-page--netmonet .pay-page-netmonet-support-wrap .pay-support-callout p.pay-support-callout-body {
+  max-width: none;
+  width: 100%;
+  margin-left: 0;
+  margin-right: 0;
+  text-align: left;
+  text-wrap: pretty;
+}
+
 /* Netmonet: на телефоне — не «висеть» по центру при длинной форме, отступы под вырез/жест */
 @media (max-width: 640px) {
   .pay-page.pay-page--netmonet.pay-page--cards {
@@ -5323,9 +5439,15 @@ html:not([data-theme="dark"]) .pay-page--netmonet .pay-page-netmonet-support-wra
     padding-bottom: max(1.5rem, env(safe-area-inset-bottom, 0px));
   }
   .pay-page--netmonet .pay-page-netmonet-stars button {
-    min-height: 44px;
-    min-width: 44px;
+    min-height: 40px;
+    min-width: 40px;
     touch-action: manipulation;
+  }
+  .pay-page--netmonet .pay-page-netmonet-presets .pay-page-amount-btn {
+    min-height: 30px;
+    min-width: 38px;
+    padding: 3px 0.5rem;
+    font-size: 0.75rem;
   }
 }
 

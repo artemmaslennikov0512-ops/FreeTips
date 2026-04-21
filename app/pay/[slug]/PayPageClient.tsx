@@ -121,11 +121,15 @@ export default function PayPageClient() {
   }, [slug]);
 
   useEffect(() => {
+    if (!payM5Shell) {
+      setQrDataUrl(null);
+      return;
+    }
     if (typeof window !== "undefined" && slug) {
       const url = `${getBaseUrl()}/pay/${slug}`;
       QRCode.toDataURL(url, { width: 128, margin: 1 }).then(setQrDataUrl).catch(() => {});
     }
-  }, [slug]);
+  }, [slug, payM5Shell]);
 
   const tidFromUrl = searchParams.get("tid");
   const outcomeFromUrl = searchParams.get("outcome");
@@ -503,7 +507,7 @@ export default function PayPageClient() {
       className={`pay-page pay-page--cards flex min-h-screen w-full flex-col justify-center px-4 py-8${m5c}${!payM5Shell ? " pay-page--netmonet" : ""}`}
       style={wrapperStyle}
     >
-      <div className="mx-auto w-full max-w-md">
+      <div className={`mx-auto w-full ${payM5Shell ? "max-w-md" : "max-w-xl"}`}>
         {payM5Shell ? (
           <>
         {/* Основной блок со скруглёнными краями и отступами — внутри все карточки */}
@@ -688,7 +692,7 @@ export default function PayPageClient() {
           </>
         ) : (
           <>
-            <header className="mb-6 flex items-center justify-between gap-3">
+            <header className="mb-4 flex items-center justify-center">
               <div className="min-w-0 shrink">
                 {branding?.logoUrl ? (
                   <Image
@@ -712,34 +716,30 @@ export default function PayPageClient() {
                   </div>
                 )}
               </div>
-              <ThemeToggle variant="default" compact />
             </header>
 
-            <div className="mb-6 flex flex-col items-center text-center">
+            <div className="mb-4 flex flex-col items-center text-center">
               <div
-                className={`relative shrink-0 rounded-full p-0.5 ${recipientPhotoUrl ? "ring-2 ring-[var(--color-brand-gold)] ring-offset-2 ring-offset-[var(--color-bg)]" : "ring-2 ring-[var(--color-brand-gold)]/80 ring-offset-2 ring-offset-[var(--color-bg)]"}`}
+                className={`relative shrink-0 rounded-full p-0.5 ${recipientPhotoUrl ? "ring-2 ring-[var(--color-brand-gold)] ring-offset-1 ring-offset-[var(--color-bg)]" : "ring-2 ring-[var(--color-brand-gold)]/80 ring-offset-1 ring-offset-[var(--color-bg)]"}`}
               >
                 {recipientPhotoUrl ? (
                   <Image
                     src={recipientPhotoUrl}
                     alt=""
-                    width={72}
-                    height={72}
+                    width={64}
+                    height={64}
                     unoptimized
-                    className="h-[72px] w-[72px] rounded-full object-cover"
+                    className="h-16 w-16 rounded-full object-cover"
                   />
                 ) : (
-                  <div className="flex h-[72px] w-[72px] items-center justify-center rounded-full bg-[var(--color-bg-sides)] text-[var(--color-brand-gold)]">
-                    <User className="h-9 w-9" aria-hidden />
+                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[var(--color-bg-sides)] text-[var(--color-brand-gold)]">
+                    <User className="h-8 w-8" aria-hidden />
                   </div>
                 )}
               </div>
-              <h2 className="mt-4 text-lg font-bold text-[var(--color-text)]" style={{ color: fontClr ?? undefined }}>
+              <h2 className="mt-6 text-lg font-bold text-[var(--color-text)]" style={{ color: fontClr ?? undefined }}>
                 {recipientName}
               </h2>
-              <p className="mt-1 max-w-[280px] text-sm leading-snug text-[var(--color-text-secondary)]">
-                {savingFor?.trim() ? `Коплю на: ${savingFor}` : "Коплю на большое счастье"}
-              </p>
             </div>
 
             {!acceptPayments && (
@@ -753,10 +753,13 @@ export default function PayPageClient() {
             )}
 
             <section
-              className="pay-page-netmonet-sheet rounded-2xl px-4 pb-5 pt-5 shadow-[var(--shadow-card)]"
+              className="pay-page-netmonet-sheet rounded-2xl px-3 pb-3 pt-3 shadow-[var(--shadow-card)] sm:px-4 sm:pb-4 sm:pt-4"
               style={Object.keys(cardStyle).length ? cardStyle : undefined}
             >
-              <p className="mb-3 text-center text-xs font-medium text-[var(--color-muted)]">
+              <p className="pay-page-netmonet-saving-goal mb-2 text-center text-xs leading-snug text-[var(--color-text-secondary)]">
+                {savingFor?.trim() ? `Коплю на: ${savingFor}` : "Коплю на большое счастье"}
+              </p>
+              <p className="mb-2 text-center text-xs font-medium text-[var(--color-muted)]">
                 {lockedAmountKop != null ? "Сумма по ссылке" : "Сумма чаевых"}
               </p>
 
@@ -766,36 +769,46 @@ export default function PayPageClient() {
                   <span className="text-[0.65em] font-semibold opacity-90">₽</span>
                 </p>
               ) : (
-                <div className="relative mx-auto flex max-w-[min(100%,280px)] items-end justify-center gap-1 border-b-2 border-[var(--color-brand-gold)] pb-1">
-                  <input
-                    id="pay-custom-amount-rub"
-                    name="customAmountRub"
-                    type="text"
-                    inputMode="decimal"
-                    placeholder="0"
-                    value={customAmount}
-                    onChange={(e) => setCustomAmount(e.target.value)}
-                    disabled={!acceptPayments}
-                    autoComplete="off"
-                    aria-label="Сумма чаевых в рублях, от 1 до 1000"
-                    className="pay-page-netmonet-amount-input min-w-0 flex-1 bg-transparent text-center text-[var(--color-text)] placeholder:text-[var(--color-muted)]/55 disabled:opacity-50"
-                  />
-                  <span className="shrink-0 pb-0.5 text-lg font-semibold tabular-nums text-[var(--color-text)]">₽</span>
-                  {customAmount.trim() !== "" && acceptPayments ? (
-                    <button
-                      type="button"
-                      className="absolute -right-1 bottom-1 rounded-full p-1 text-[var(--color-muted)] hover:bg-[var(--color-muted)]/15 hover:text-[var(--color-text)]"
-                      onClick={() => setCustomAmount("")}
-                      aria-label="Очистить сумму"
-                    >
-                      <X className="h-4 w-4" strokeWidth={2.5} />
-                    </button>
-                  ) : null}
+                <div className="mx-auto w-full max-w-[min(100%,360px)]">
+                  <div className="grid w-full grid-cols-[2.25rem_minmax(0,1fr)_2.25rem] items-end gap-x-0 border-b-2 border-[var(--color-brand-gold)] pb-0.5">
+                    <span className="block min-h-[2rem] min-w-0" aria-hidden />
+                    <div className="flex min-w-0 w-full items-end justify-center gap-1">
+                      <input
+                        id="pay-custom-amount-rub"
+                        name="customAmountRub"
+                        type="text"
+                        inputMode="decimal"
+                        placeholder="0"
+                        value={customAmount}
+                        onChange={(e) => setCustomAmount(e.target.value)}
+                        disabled={!acceptPayments}
+                        autoComplete="off"
+                        aria-label="Сумма чаевых в рублях, от 1 до 1000"
+                        className="pay-page-netmonet-amount-input min-w-0 flex-1 bg-transparent text-center text-[var(--color-text)] placeholder:text-[var(--color-muted)]/55 disabled:opacity-50"
+                      />
+                      <span className="shrink-0 pb-0.5 text-lg font-semibold tabular-nums text-[var(--color-text)]">₽</span>
+                    </div>
+                    <div className="flex min-h-[2rem] items-end justify-center pb-0.5">
+                      {customAmount.trim() !== "" && acceptPayments ? (
+                        <button
+                          type="button"
+                          className="pay-page-netmonet-amount-clear flex h-8 w-8 shrink-0 items-center justify-center rounded-full shadow-sm transition-colors"
+                          onClick={() => setCustomAmount("")}
+                          aria-label="Очистить сумму"
+                        >
+                          <X className="h-4 w-4" strokeWidth={2.5} />
+                        </button>
+                      ) : null}
+                    </div>
+                  </div>
+                  <p className="pay-page-netmonet-amount-hint mt-1.5 text-center font-normal leading-snug">
+                    Выберите сумму или введите свою
+                  </p>
                 </div>
               )}
 
               {lockedAmountKop == null ? (
-                <div className="pay-page-netmonet-presets mt-4 flex flex-wrap justify-center gap-2">
+                <div className="pay-page-netmonet-presets mt-2 flex flex-wrap justify-center gap-1.5">
                   {PAY_PAGE_PRESET_RUB.map((rubPreset) => (
                     <button
                       key={rubPreset}
@@ -816,7 +829,7 @@ export default function PayPageClient() {
                 </div>
               ) : null}
 
-              <p className="mb-2 mt-6 text-center text-sm font-medium text-[var(--color-text)]">Вам всё понравилось?</p>
+              <p className="mb-1.5 mt-4 text-center text-sm font-medium text-[var(--color-text)]">Вам всё понравилось?</p>
               <div className="pay-page-netmonet-stars flex flex-wrap justify-center gap-1" role="group" aria-label="Оценка">
                 {[1, 2, 3, 4, 5].map((n) => (
                   <button
@@ -836,7 +849,7 @@ export default function PayPageClient() {
                 ))}
               </div>
 
-              <label htmlFor="pay-review-comment" className="mb-1 mt-5 block text-center text-xs text-[var(--color-muted)]">
+              <label htmlFor="pay-review-comment" className="mb-0.5 mt-3 block text-center text-xs text-[var(--color-muted)]">
                 Сообщение (необязательно)
               </label>
               <textarea
@@ -852,7 +865,7 @@ export default function PayPageClient() {
                 autoComplete="off"
               />
 
-              <div className="pay-page-netmonet-support-wrap mt-4">
+              <div className="pay-page-netmonet-support-wrap mt-3">
                 <PayTelegramSupportBlock />
               </div>
 
@@ -866,7 +879,7 @@ export default function PayPageClient() {
                 type="button"
                 onClick={handlePay}
                 disabled={!acceptPayments || paying || kop < PAYMENT_MIN_AMOUNT_KOP || kop > PAYMENT_MAX_AMOUNT_KOP}
-                className="pay-button pay-page-submit mt-5 w-full"
+                className="pay-button pay-page-submit mt-3 w-full"
               >
                 {paying ? (
                   <span className="inline-flex items-center justify-center gap-2">
@@ -878,20 +891,6 @@ export default function PayPageClient() {
                 )}
               </button>
             </section>
-
-            {qrDataUrl ? (
-              <div className="mt-6 flex flex-col items-center gap-2">
-                <p className="text-center text-xs text-[var(--color-muted)]">Ссылка на эту страницу</p>
-                <Image
-                  src={qrDataUrl}
-                  alt="QR этой страницы оплаты"
-                  width={96}
-                  height={96}
-                  unoptimized
-                  className="rounded-lg border border-[var(--color-muted)]/25 bg-[var(--color-bg-sides)] p-1 shadow-sm"
-                />
-              </div>
-            ) : null}
           </>
         )}
       </div>

@@ -96,7 +96,7 @@ export async function GET(request: NextRequest, { params }: Params) {
     : undefined;
 
   const estName = (est?.name ?? "").trim() || "Заведение";
-  let recipientName = "Официант";
+  let recipientName = "Получатель";
   let recipientPhotoUrl: string | undefined;
   let savingFor: string | undefined;
   let paymentUnavailableReason: string | undefined;
@@ -122,7 +122,7 @@ export async function GET(request: NextRequest, { params }: Params) {
           })()
         : "";
     const displayName = firstNameFromFullName || employeeName || login || "";
-    recipientName = displayName ? `Официант, ${displayName}` : "Официант";
+    recipientName = displayName || "Получатель";
     savingFor = waiterProfile?.savingFor?.trim() || undefined;
     recipientPhotoUrl =
       tipLink.employee?.photoUrl && tipLink.employee?.id
@@ -149,7 +149,7 @@ export async function GET(request: NextRequest, { params }: Params) {
           })()
         : "";
     const displayName = firstNameFromFullName || login || "";
-    recipientName = displayName ? `Официант, ${displayName}` : "Официант";
+    recipientName = displayName || "Получатель";
     savingFor = u.savingFor?.trim() || undefined;
     recipientPhotoUrl = u.profilePhotoUrl
       ? `${baseUrl.replace(/\/$/, "")}/api/profile/photo/${u.id}`

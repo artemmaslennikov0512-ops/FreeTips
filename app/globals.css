@@ -5292,10 +5292,10 @@ html:not([data-theme="dark"]) .pay-page--netmonet .pay-page-netmonet-amount-hint
   color: rgba(255, 255, 255, 0.9);
 }
 
-/* Кнопка сброса суммы: круглый фон, отдельная колонка — не наезжает на ₽ */
+/* Кнопка сброса суммы: компактный круг сразу у ₽ */
 .pay-page--netmonet .pay-page-netmonet-amount-clear {
   background: rgba(255, 255, 255, 0.18);
-  border: 1px solid rgba(255, 255, 255, 0.22);
+  border: 0.5px solid rgba(255, 255, 255, 0.22);
   color: rgba(255, 255, 255, 0.92) !important;
 }
 .pay-page--netmonet .pay-page-netmonet-amount-clear:hover:not(:disabled) {
@@ -5304,7 +5304,7 @@ html:not([data-theme="dark"]) .pay-page--netmonet .pay-page-netmonet-amount-hint
 }
 html:not([data-theme="dark"]) .pay-page--netmonet .pay-page-netmonet-amount-clear {
   background: rgba(15, 23, 42, 0.08);
-  border: 1px solid rgba(15, 23, 42, 0.12);
+  border: 0.5px solid rgba(15, 23, 42, 0.12);
   color: rgba(51, 65, 85, 0.95) !important;
 }
 html:not([data-theme="dark"]) .pay-page--netmonet .pay-page-netmonet-amount-clear:hover:not(:disabled) {
@@ -5392,13 +5392,17 @@ html:not([data-theme="dark"]) .pay-page--netmonet .pay-page-netmonet-support-wra
   align-self: center;
 }
 
-/* Netmonet: на телефоне — не «висеть» по центру при длинной форме, отступы под вырез/жест */
+/* Netmonet: шапка у верха экрана (не vertical center), верхний отступ с safe-area */
+.pay-page.pay-page--cards.pay-page--netmonet {
+  justify-content: flex-start;
+  padding-top: max(0.75rem, env(safe-area-inset-top, 0px));
+  padding-bottom: max(2rem, env(safe-area-inset-bottom, 0px));
+  padding-left: max(1rem, env(safe-area-inset-left, 0px));
+  padding-right: max(1rem, env(safe-area-inset-right, 0px));
+}
 @media (max-width: 640px) {
-  .pay-page.pay-page--netmonet.pay-page--cards {
-    justify-content: flex-start;
-    padding-left: max(1rem, env(safe-area-inset-left, 0px));
-    padding-right: max(1rem, env(safe-area-inset-right, 0px));
-    padding-top: max(1.25rem, env(safe-area-inset-top, 0px));
+  .pay-page.pay-page--cards.pay-page--netmonet {
+    padding-top: max(0.5rem, env(safe-area-inset-top, 0px));
     padding-bottom: max(1.5rem, env(safe-area-inset-bottom, 0px));
   }
   .pay-page--netmonet .pay-page-netmonet-stars button {

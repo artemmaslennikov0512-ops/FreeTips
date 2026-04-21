@@ -494,7 +494,7 @@ export default function PayPageClient() {
 
   return (
     <div
-      className={`pay-page pay-page--cards flex min-h-screen w-full flex-col justify-center px-4 py-8${m5c}${!payM5Shell ? " pay-page--netmonet" : ""}`}
+      className={`pay-page pay-page--cards flex min-h-screen w-full flex-col px-4 ${payM5Shell ? "justify-center py-8" : "justify-start"}${m5c}${!payM5Shell ? " pay-page--netmonet" : ""}`}
       style={wrapperStyle}
     >
       <div className={`mx-auto w-full ${payM5Shell ? "max-w-md" : "max-w-xl"}`}>
@@ -682,7 +682,7 @@ export default function PayPageClient() {
           </>
         ) : (
           <>
-            <header className="mb-4 flex items-center justify-center">
+            <header className="mb-5 flex items-center justify-center">
               <div className="min-w-0 shrink">
                 {branding?.logoUrl ? (
                   <Image
@@ -695,7 +695,7 @@ export default function PayPageClient() {
                     style={{ opacity: branding?.logoOpacityPercent != null ? branding.logoOpacityPercent / 100 : 1 }}
                   />
                 ) : (
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-3.5">
                     <span className="pay-page-logo-ft logo-ft-abbr flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--color-brand-gold)] text-sm text-[#0a192f]">
                       FT
                     </span>
@@ -708,7 +708,7 @@ export default function PayPageClient() {
               </div>
             </header>
 
-            <div className="mb-4 flex flex-col items-center text-center">
+            <div className="mb-4 flex flex-col items-center gap-y-16 text-center">
               <div
                 className={`relative shrink-0 rounded-full p-0.5 ${recipientPhotoUrl ? "ring-2 ring-[var(--color-brand-gold)] ring-offset-1 ring-offset-[var(--color-bg)]" : "ring-2 ring-[var(--color-brand-gold)]/80 ring-offset-1 ring-offset-[var(--color-bg)]"}`}
               >
@@ -727,7 +727,7 @@ export default function PayPageClient() {
                   </div>
                 )}
               </div>
-              <h2 className="mt-10 text-lg font-bold text-[var(--color-text)] antialiased" style={{ color: fontClr ?? undefined }}>
+              <h2 className="text-lg font-bold leading-tight text-[var(--color-text)] antialiased" style={{ color: fontClr ?? undefined }}>
                 {recipientName}
               </h2>
             </div>
@@ -761,9 +761,8 @@ export default function PayPageClient() {
                 </p>
               ) : (
                 <div className="mx-auto w-full max-w-[min(100%,360px)]">
-                  <div className="grid w-full grid-cols-[2.25rem_minmax(0,1fr)_2.25rem] items-end gap-x-0 border-b-2 border-[var(--color-brand-gold)] pb-0.5">
-                    <span className="block min-h-[2rem] min-w-0" aria-hidden />
-                    <div className="flex min-w-0 w-full items-end justify-center gap-1">
+                  <div className="flex min-h-[2rem] items-end justify-center border-b-2 border-[var(--color-brand-gold)] pb-0.5">
+                    <div className="flex min-w-0 max-w-full items-end justify-center gap-1">
                       <input
                         id="pay-custom-amount-rub"
                         name="customAmountRub"
@@ -777,19 +776,19 @@ export default function PayPageClient() {
                         aria-label="Сумма чаевых в рублях, от 1 до 1000"
                         className="pay-page-netmonet-amount-input min-w-0 flex-1 bg-transparent text-center text-[var(--color-text)] placeholder:text-[var(--color-muted)]/55 disabled:opacity-50"
                       />
-                      <span className="shrink-0 pb-0.5 text-lg font-semibold tabular-nums text-[var(--color-text)]">₽</span>
-                    </div>
-                    <div className="flex min-h-[2rem] items-end justify-center pb-0.5">
-                      {customAmount.trim() !== "" && acceptPayments ? (
-                        <button
-                          type="button"
-                          className="pay-page-netmonet-amount-clear flex h-8 w-8 shrink-0 items-center justify-center rounded-full shadow-sm transition-colors"
-                          onClick={() => setCustomAmount("")}
-                          aria-label="Очистить сумму"
-                        >
-                          <X className="h-4 w-4" strokeWidth={2.5} />
-                        </button>
-                      ) : null}
+                      <div className="flex shrink-0 items-end gap-0.5 pb-0.5">
+                        <span className="text-lg font-semibold tabular-nums text-[var(--color-text)]">₽</span>
+                        {customAmount.trim() !== "" && acceptPayments ? (
+                          <button
+                            type="button"
+                            className="pay-page-netmonet-amount-clear mb-px flex h-6 w-6 shrink-0 items-center justify-center rounded-full shadow-sm transition-colors"
+                            onClick={() => setCustomAmount("")}
+                            aria-label="Очистить сумму"
+                          >
+                            <X className="h-3 w-3" strokeWidth={2.5} />
+                          </button>
+                        ) : null}
+                      </div>
                     </div>
                   </div>
                   <p className="pay-page-netmonet-amount-hint mt-1.5 text-center font-normal leading-snug">

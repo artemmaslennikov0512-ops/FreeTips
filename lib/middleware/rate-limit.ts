@@ -127,6 +127,12 @@ async function checkRateLimitWithRedis(
   return checkRateLimitRedis(fullKey, windowMs, maxRequests);
 }
 
+/** Временно отключает все лимиты из `checkRateLimitByIP` (миграция IP, отладка). Не держите в проде без необходимости. */
+function isIpRateLimitDisabled(): boolean {
+  const v = process.env.DISABLE_IP_RATE_LIMIT;
+  return v === "true" || v === "1";
+}
+
 /**
  * Проверяет rate limit по IP (async: при REDIS_URL используется Redis).
  */
@@ -135,6 +141,9 @@ export async function checkRateLimitByIP(
   options?: RateLimitOptions,
 ): Promise<RateLimitResult> {
   const resolved = resolveOptions(options);
+  if (isIpRateLimitDisabled()) {
+    return { allowed: true, remaining: resolved.maxRequests, resetAt: Date.now() + resolved.windowMs };
+  }
   const key = buildKey(resolved.keyPrefix, ip);
 
   if (getRedisUrl()) {

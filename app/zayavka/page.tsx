@@ -109,7 +109,7 @@ export default function ZayavkaPage() {
   }
 
   const inputBase =
-    "w-full rounded-xl border-0 bg-[var(--color-light-gray)] py-2.5 pl-10 pr-4 text-[var(--color-text)] placeholder:text-[var(--color-muted)] caret-[var(--color-text)] focus:outline-none";
+    "w-full rounded-xl border-0 bg-white py-2.5 pl-10 pr-4 text-[var(--color-text)] placeholder:text-[var(--color-muted)] caret-[var(--color-text)] focus:outline-none";
 
   return (
     <AuthPageShell>

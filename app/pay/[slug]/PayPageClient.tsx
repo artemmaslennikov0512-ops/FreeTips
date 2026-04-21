@@ -5,7 +5,7 @@ import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useTipSettlementConfirmation } from "@/lib/hooks/use-tip-settlement-confirmation";
 import Link from "next/link";
 import Image from "next/image";
-import { CheckCircle2, ChevronDown, XCircle, Loader2, User } from "lucide-react";
+import { CheckCircle2, ChevronDown, XCircle, Loader2, User, Star, X } from "lucide-react";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import QRCode from "qrcode";
@@ -37,6 +37,9 @@ import {
 } from "@/lib/pay-ui-classes";
 
 const PAYMENT_MAX_ERROR = "Сумма не может превышать 1000 ₽";
+
+/** Быстрый выбор суммы (до лимита одного платежа), в духе пресетов на экране оплаты. */
+const PAY_PAGE_PRESET_RUB = [100, 200, 300, 500, 1000].filter((r) => r <= PAYMENT_MAX_AMOUNT_KOP / 100);
 
 /** POST на прокси Paygine без промежуточной страницы `/pay/redirect`. */
 function postPayRedirectProxy(tid: string, redirectToken: string): void {
@@ -106,6 +109,8 @@ export default function PayPageClient() {
 
   const [customAmount, setCustomAmount] = useState("");
   const [comment, setComment] = useState("");
+  /** 0 — не выбрано; при оплате добавляется строкой к комментарию для получателя. */
+  const [tipRating, setTipRating] = useState(0);
   const [paying, setPaying] = useState(false);
   const [result, setResult] = useState<"success" | "fail" | null>(null);
   const [resultError, setResultError] = useState<string | null>(null);
@@ -220,13 +225,21 @@ export default function PayPageClient() {
     const idempotencyKey = `pay-${slug}-${crypto.randomUUID()}`;
     let leaveForPaygine = false;
 
+    const commentTrim = comment.trim();
+    const combinedComment =
+      tipRating > 0 && commentTrim
+        ? `Оценка: ${tipRating}/5\n${commentTrim}`
+        : tipRating > 0
+          ? `Оценка: ${tipRating}/5`
+          : commentTrim || undefined;
+
     try {
       const res = await fetch(`/api/pay/${slug}`, {
         method: "POST",
         headers: { "Content-Type": "application/json", ...getCsrfHeader() },
         body: JSON.stringify({
           amountKop: kop,
-          comment: comment.trim() || undefined,
+          comment: combinedComment,
           idempotencyKey,
         }),
       });
@@ -373,6 +386,7 @@ export default function PayPageClient() {
                 setResultError(null);
                 setCustomAmount("");
                 setComment("");
+                setTipRating(0);
                 if (slug) router.replace(`/pay/${slug}`);
               }}
               className="pay-m5-cta-secondary rounded-xl border border-[#0a192f]/35 bg-transparent px-5 py-2.5 text-sm font-medium text-[#0a192f] hover:bg-[#0a192f]/8 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a192f]/25"
@@ -436,6 +450,7 @@ export default function PayPageClient() {
                 setResultError(null);
                 setCustomAmount("");
                 setComment("");
+                setTipRating(0);
                 if (slug) router.replace(`/pay/${slug}`);
               }}
               className="pay-m5-cta-secondary rounded-xl border border-[#0a192f]/35 bg-transparent px-5 py-2.5 text-sm font-medium text-[#0a192f] hover:bg-[#0a192f]/8 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0a192f]/25"
@@ -457,6 +472,13 @@ export default function PayPageClient() {
 
   const kop = amountKop();
   const rub = kop / 100;
+  const activePresetRub =
+    lockedAmountKop == null && customAmount.trim() !== ""
+      ? PAY_PAGE_PRESET_RUB.find((p) => {
+          const v = parseFloat(customAmount.replace(",", "."));
+          return Number.isFinite(v) && Math.abs(v - p) < 1e-6;
+        }) ?? null
+      : null;
 
   const hex = (s: string | undefined) => (s && /^#[0-9A-Fa-f]{6}$/i.test(s) ? s : undefined);
   const primary = hex(branding?.primaryColor);
@@ -478,10 +500,12 @@ export default function PayPageClient() {
 
   return (
     <div
-      className={`pay-page pay-page--cards flex min-h-screen w-full flex-col justify-center px-4 py-8${m5c}`}
+      className={`pay-page pay-page--cards flex min-h-screen w-full flex-col justify-center px-4 py-8${m5c}${!payM5Shell ? " pay-page--netmonet" : ""}`}
       style={wrapperStyle}
     >
       <div className="mx-auto w-full max-w-md">
+        {payM5Shell ? (
+          <>
         {/* Основной блок со скруглёнными краями и отступами — внутри все карточки */}
         <div
           className="pay-page-outer-block rounded-2xl border-0 px-4 pt-5 pb-5 shadow-[var(--shadow-card)]"
@@ -661,6 +685,215 @@ export default function PayPageClient() {
           </button>
         </div>
       </div>
+          </>
+        ) : (
+          <>
+            <header className="mb-6 flex items-center justify-between gap-3">
+              <div className="min-w-0 shrink">
+                {branding?.logoUrl ? (
+                  <Image
+                    src={branding.logoUrl}
+                    alt=""
+                    width={120}
+                    height={36}
+                    unoptimized
+                    className="h-9 w-auto max-w-[140px] object-contain"
+                    style={{ opacity: branding?.logoOpacityPercent != null ? branding.logoOpacityPercent / 100 : 1 }}
+                  />
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <span className="pay-page-logo-ft logo-ft-abbr flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--color-brand-gold)] text-sm text-[#0a192f]">
+                      FT
+                    </span>
+                    <span className="font-[family:var(--font-playfair)] text-lg font-bold text-[var(--color-text)]">
+                      <span className="opacity-95">Free</span>
+                      <span className="text-[var(--color-brand-gold)]">Tips</span>
+                    </span>
+                  </div>
+                )}
+              </div>
+              <ThemeToggle variant="default" compact />
+            </header>
+
+            <div className="mb-6 flex flex-col items-center text-center">
+              <div
+                className={`relative shrink-0 rounded-full p-0.5 ${recipientPhotoUrl ? "ring-2 ring-[var(--color-brand-gold)] ring-offset-2 ring-offset-[var(--color-bg)]" : "ring-2 ring-[var(--color-brand-gold)]/80 ring-offset-2 ring-offset-[var(--color-bg)]"}`}
+              >
+                {recipientPhotoUrl ? (
+                  <Image
+                    src={recipientPhotoUrl}
+                    alt=""
+                    width={72}
+                    height={72}
+                    unoptimized
+                    className="h-[72px] w-[72px] rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="flex h-[72px] w-[72px] items-center justify-center rounded-full bg-[var(--color-bg-sides)] text-[var(--color-brand-gold)]">
+                    <User className="h-9 w-9" aria-hidden />
+                  </div>
+                )}
+              </div>
+              <h2 className="mt-4 text-lg font-bold text-[var(--color-text)]" style={{ color: fontClr ?? undefined }}>
+                {recipientName}
+              </h2>
+              <p className="mt-1 max-w-[280px] text-sm leading-snug text-[var(--color-text-secondary)]">
+                {savingFor?.trim() ? `Коплю на: ${savingFor}` : "Коплю на большое счастье"}
+              </p>
+            </div>
+
+            {!acceptPayments && (
+              <div className="pay-page-unavailable-alert pay-page-card card mb-4" role="alert">
+                <p className="pay-page-section-title pay-page-unavailable-alert-title">Приём временно недоступен</p>
+                <p className="pay-page-unavailable-alert-body mt-2 text-center text-sm">
+                  {paymentUnavailableReason ??
+                    "Перевод по этой ссылке сейчас отключён администратором. Страница открывается, но оплату отправить нельзя — попробуйте позже."}
+                </p>
+              </div>
+            )}
+
+            <section
+              className="pay-page-netmonet-sheet rounded-2xl px-4 pb-5 pt-5 shadow-[var(--shadow-card)]"
+              style={Object.keys(cardStyle).length ? cardStyle : undefined}
+            >
+              <p className="mb-3 text-center text-xs font-medium text-[var(--color-muted)]">
+                {lockedAmountKop != null ? "Сумма по ссылке" : "Сумма чаевых"}
+              </p>
+
+              {lockedAmountKop != null ? (
+                <p className="pay-page-netmonet-amount-readonly text-center tabular-nums text-[var(--color-text)]">
+                  {rub.toFixed(rub % 1 === 0 ? 0 : 2)}{" "}
+                  <span className="text-[0.65em] font-semibold opacity-90">₽</span>
+                </p>
+              ) : (
+                <div className="relative mx-auto flex max-w-[min(100%,280px)] items-end justify-center gap-1 border-b-2 border-[var(--color-brand-gold)] pb-1">
+                  <input
+                    id="pay-custom-amount-rub"
+                    name="customAmountRub"
+                    type="text"
+                    inputMode="decimal"
+                    placeholder="0"
+                    value={customAmount}
+                    onChange={(e) => setCustomAmount(e.target.value)}
+                    disabled={!acceptPayments}
+                    autoComplete="off"
+                    aria-label="Сумма чаевых в рублях, от 1 до 1000"
+                    className="pay-page-netmonet-amount-input min-w-0 flex-1 bg-transparent text-center text-[var(--color-text)] placeholder:text-[var(--color-muted)]/55 disabled:opacity-50"
+                  />
+                  <span className="shrink-0 pb-0.5 text-lg font-semibold tabular-nums text-[var(--color-text)]">₽</span>
+                  {customAmount.trim() !== "" && acceptPayments ? (
+                    <button
+                      type="button"
+                      className="absolute -right-1 bottom-1 rounded-full p-1 text-[var(--color-muted)] hover:bg-[var(--color-muted)]/15 hover:text-[var(--color-text)]"
+                      onClick={() => setCustomAmount("")}
+                      aria-label="Очистить сумму"
+                    >
+                      <X className="h-4 w-4" strokeWidth={2.5} />
+                    </button>
+                  ) : null}
+                </div>
+              )}
+
+              {lockedAmountKop == null ? (
+                <div className="pay-page-netmonet-presets mt-4 flex flex-wrap justify-center gap-2">
+                  {PAY_PAGE_PRESET_RUB.map((rubPreset) => (
+                    <button
+                      key={rubPreset}
+                      type="button"
+                      disabled={!acceptPayments}
+                      className={`pay-page-amount-btn shrink-0 ${activePresetRub === rubPreset ? "is-active active" : ""}`}
+                      onClick={() => setCustomAmount(String(rubPreset))}
+                    >
+                      {rubPreset} ₽
+                    </button>
+                  ))}
+                </div>
+              ) : null}
+
+              {lockedAmountKop == null && kop > PAYMENT_MAX_AMOUNT_KOP ? (
+                <div className="mt-3">
+                  <PayInlineError>{PAYMENT_MAX_ERROR}</PayInlineError>
+                </div>
+              ) : null}
+
+              <p className="mb-2 mt-6 text-center text-sm font-medium text-[var(--color-text)]">Вам всё понравилось?</p>
+              <div className="pay-page-netmonet-stars flex flex-wrap justify-center gap-1" role="group" aria-label="Оценка">
+                {[1, 2, 3, 4, 5].map((n) => (
+                  <button
+                    key={n}
+                    type="button"
+                    disabled={!acceptPayments}
+                    className="rounded-md p-1.5 text-[var(--color-muted)] transition-colors hover:bg-[var(--color-muted)]/10 disabled:opacity-50"
+                    aria-label={`Оценка ${n} из 5`}
+                    aria-pressed={tipRating === n}
+                    onClick={() => setTipRating(tipRating === n ? 0 : n)}
+                  >
+                    <Star
+                      className={`h-7 w-7 ${n <= tipRating ? "fill-[var(--color-brand-gold)] text-[var(--color-brand-gold)]" : ""}`}
+                      strokeWidth={n <= tipRating ? 0 : 1.5}
+                    />
+                  </button>
+                ))}
+              </div>
+
+              <label htmlFor="pay-review-comment" className="mb-1 mt-5 block text-center text-xs text-[var(--color-muted)]">
+                Сообщение (необязательно)
+              </label>
+              <textarea
+                id="pay-review-comment"
+                name="reviewComment"
+                className="pay-page-netmonet-note"
+                rows={2}
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                maxLength={500}
+                disabled={!acceptPayments}
+                placeholder="Спасибо за отличный сервис!"
+                autoComplete="off"
+              />
+
+              <div className="pay-page-netmonet-support-wrap mt-4">
+                <PayTelegramSupportBlock />
+              </div>
+
+              {result === "fail" && resultError ? (
+                <div className="mt-3">
+                  <PayInlineError>{resultError}</PayInlineError>
+                </div>
+              ) : null}
+
+              <button
+                type="button"
+                onClick={handlePay}
+                disabled={!acceptPayments || paying || kop < PAYMENT_MIN_AMOUNT_KOP || kop > PAYMENT_MAX_AMOUNT_KOP}
+                className="pay-button pay-page-submit mt-5 w-full"
+              >
+                {paying ? (
+                  <span className="inline-flex items-center justify-center gap-2">
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                    Отправка…
+                  </span>
+                ) : (
+                  `Оплатить ${rub.toFixed(rub >= 1 ? 0 : 2)} ₽`
+                )}
+              </button>
+            </section>
+
+            {qrDataUrl ? (
+              <div className="mt-6 flex flex-col items-center gap-2">
+                <p className="text-center text-xs text-[var(--color-muted)]">Ссылка на эту страницу</p>
+                <Image
+                  src={qrDataUrl}
+                  alt="QR этой страницы оплаты"
+                  width={96}
+                  height={96}
+                  unoptimized
+                  className="rounded-lg border border-[var(--color-muted)]/25 bg-[var(--color-bg-sides)] p-1 shadow-sm"
+                />
+              </div>
+            ) : null}
+          </>
+        )}
       </div>
     </div>
   );

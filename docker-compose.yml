@@ -1,6 +1,7 @@
 services:
   web:
     build: .
+    restart: unless-stopped
     # Подбирает завершившиеся дочерние процессы (иначе после `node … &` возможны zombie в отчёте Docker).
     init: true
     ports:
@@ -21,6 +22,7 @@ services:
   # PostgreSQL — для БД (auth, транзакции, чаевые)
   db:
     image: postgres:16-alpine
+    restart: unless-stopped
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-app}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}

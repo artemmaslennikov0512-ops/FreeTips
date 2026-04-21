@@ -4144,24 +4144,22 @@ html:not([data-theme="dark"]) .pay-page {
   --pay-page-amounts-wrap-bg: rgba(0, 0, 0, 0.05);
 }
 
-[data-theme="dark"] .pay-page {
-  /* Поля на карточке оплаты — тот же токен, что и в ЛК */
-  --dark-form-surface-bg: #3c414a;
-  --dark-form-surface-border: rgba(255, 255, 255, 0.22);
-  --pay-page-accent: #ffffff;
-  --pay-page-card-bg: #161616;
-  --pay-page-card-border: 1px solid rgba(192, 192, 192, 0.3);
+/* Обычная /pay (не M5): те же токены и акценты, что в тёмном ЛК */
+[data-theme="dark"] .pay-page:not(.pay-page--m5-competition) {
+  --pay-page-accent: var(--color-brand-gold);
+  --pay-page-card-bg: #12161f;
+  --pay-page-card-border: 1px solid rgba(255, 255, 255, 0.14);
   --pay-page-gold-border: 1px solid rgba(197, 165, 114, 0.45);
-  --pay-page-text: #fafafa;
-  --pay-page-text-muted: rgba(255, 255, 255, 0.75);
+  --pay-page-text: var(--color-text);
+  --pay-page-text-muted: var(--color-text-secondary);
   --pay-page-input-bg: var(--dark-form-surface-bg);
   --pay-page-input-border: 1px solid var(--dark-form-surface-border);
-  --pay-page-input-focus-ring: rgba(255, 255, 255, 0.35);
-  --pay-page-amount-btn-bg: rgba(28, 105, 212, 0.12);
+  --pay-page-input-focus-ring: rgba(197, 165, 114, 0.45);
+  --pay-page-amount-btn-bg: rgba(197, 165, 114, 0.1);
   --pay-page-amounts-wrap-bg: transparent;
-  --pay-page-amount-btn-active-bg: rgba(28, 105, 212, 0.22);
-  --pay-page-amount-btn-active-border: rgba(74, 159, 255, 0.55);
-  --pay-page-footer-color: rgba(255, 255, 255, 0.5);
+  --pay-page-amount-btn-active-bg: rgba(197, 165, 114, 0.22);
+  --pay-page-amount-btn-active-border: var(--color-brand-gold);
+  --pay-page-footer-color: var(--color-muted);
 }
 
 .pay-page .pay-block.pay-block--page {
@@ -4179,10 +4177,13 @@ html:not([data-theme="dark"]) .pay-page .pay-page-outer-block {
   background: linear-gradient(135deg, #0a192f 0%, color-mix(in srgb, #0a192f 85%, white) 50%, #0a192f 100%) !important;
   box-shadow: var(--shadow-card);
 }
-[data-theme="dark"] .pay-page .pay-page-outer-block {
-  background: #161616 !important;
-  border: 1px solid rgba(197, 165, 114, 0.45) !important;
-  box-shadow: var(--shadow-card);
+[data-theme="dark"] .pay-page:not(.pay-page--m5-competition) .pay-page-outer-block {
+  background: #12161f !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.18),
+    0 10px 28px rgba(0, 0, 0, 0.32),
+    0 2px 6px rgba(0, 0, 0, 0.14);
 }
 
 /* Светлая тема: логотип FreeTips на фоне блока (бренд заведения: --pay-font / --pay-brand-primary) */
@@ -4228,6 +4229,10 @@ html:not([data-theme="dark"]) .pay-page:not(.pay-page--m5-competition) .pay-page
 /* Фон страницы оплаты (светлая тема): как у блока с суммами — тот же градиент navy */
 html:not([data-theme="dark"]) .layout-pay {
   background: linear-gradient(135deg, #0a192f 0%, color-mix(in srgb, #0a192f 85%, white) 50%, #0a192f 100%) !important;
+}
+/* Тёмная тема: фон вокруг оплаты — как у body в ЛК официанта */
+[data-theme="dark"] .layout-pay {
+  background: #12161f !important;
 }
 /* Страница «Оставить заявку» — один общий фон, один цвет. Менять только здесь (или переменную в :root). */
 :root {
@@ -4650,15 +4655,19 @@ html:not([data-theme="dark"]) .pay-page:not(.pay-page--m5-competition) .pay-page
   background: rgba(255, 255, 255, 0.08);
 }
 [data-theme="dark"] .pay-page:not(.pay-page--m5-competition) .pay-page-card.card {
-  background: rgba(255, 255, 255, 0.04) !important;
-  border: 0.5px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+  background: #1c222d !important;
+  border: none !important;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.18),
+    0 10px 28px rgba(0, 0, 0, 0.32),
+    0 2px 6px rgba(0, 0, 0, 0.14);
 }
 [data-theme="dark"] .pay-page:not(.pay-page--m5-competition) .pay-page-recipient-card.pay-page-card.card {
-  background: rgba(255, 255, 255, 0.04) !important;
+  background: #1c222d !important;
 }
 [data-theme="dark"] .pay-page:not(.pay-page--m5-competition) .pay-page-card.card .info-block {
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 /*
@@ -4748,7 +4757,12 @@ html:not([data-theme="dark"]) .pay-page.pay-page--m5-competition .pay-page-unava
   border-radius: 10px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
-[data-theme="dark"] .pay-page .pay-page-recipient-bordered {
+[data-theme="dark"] .pay-page:not(.pay-page--m5-competition) .pay-page-recipient-bordered {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+[data-theme="dark"] .pay-page.pay-page--m5-competition .pay-page-recipient-bordered {
   border: 0.5px solid rgba(255, 255, 255, 0.12);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
@@ -5113,12 +5127,16 @@ html:not([data-theme="dark"]) .pay-page:not(.pay-page--m5-competition) .pay-page
   transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
   box-shadow: 0 8px 16px rgba(74, 111, 165, 0.3);
 }
-/* Светлая тема: кнопка «Оплатить» — золотая (не M5 — там градиентная рамка выше) */
+/* Светлая тема: кнопка «Оплатить» — как лицевая виртуальная карта в ЛК (teal) */
 html:not([data-theme="dark"]) .pay-page:not(.pay-page--m5-competition) .pay-button.pay-page-submit,
 html:not([data-theme="dark"]) .pay-page:not(.pay-page--m5-competition) .pay-page-submit {
-  background: var(--color-brand-gold) !important;
-  color: #0a192f !important;
-  box-shadow: 0 4px 12px rgba(197, 165, 114, 0.35);
+  background: linear-gradient(145deg, #0c5f59 0%, #11998e 55%, #0a1f19 100%) !important;
+  color: rgba(255, 255, 255, 0.96) !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.22);
+  border: none !important;
+  box-shadow:
+    0 14px 36px -12px rgba(0, 0, 0, 0.22),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08);
 }
 .pay-page:not(.pay-page--m5-competition) .pay-button.pay-page-submit:hover:not(:disabled),
 .pay-page:not(.pay-page--m5-competition) .pay-page-submit:hover:not(:disabled) {
@@ -5128,20 +5146,35 @@ html:not([data-theme="dark"]) .pay-page:not(.pay-page--m5-competition) .pay-page
 }
 html:not([data-theme="dark"]) .pay-page:not(.pay-page--m5-competition) .pay-button.pay-page-submit:hover:not(:disabled),
 html:not([data-theme="dark"]) .pay-page:not(.pay-page--m5-competition) .pay-page-submit:hover:not(:disabled) {
-  background: color-mix(in srgb, var(--color-brand-gold) 85%, #0a192f) !important;
-  box-shadow: 0 6px 16px rgba(197, 165, 114, 0.4);
+  background: linear-gradient(145deg, #0d6d66 0%, #14b5a5 55%, #0c241f 100%) !important;
+  color: rgba(255, 255, 255, 0.98) !important;
+  filter: brightness(1.04);
+  box-shadow:
+    0 16px 40px -10px rgba(0, 0, 0, 0.28),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.1);
 }
 [data-theme="dark"] .pay-page:not(.pay-page--m5-competition) .pay-button.pay-page-submit,
 [data-theme="dark"] .pay-page:not(.pay-page--m5-competition) .pay-page-submit {
-  background: var(--color-brand-gold) !important;
-  color: #0a192f !important;
-  border: none;
-  box-shadow: 0 4px 12px rgba(197, 165, 114, 0.35);
+  background: linear-gradient(145deg, #0a4d48 0%, #0f8a7d 52%, #071a17 100%) !important;
+  color: rgba(255, 255, 255, 0.96) !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.22);
+  border: none !important;
+  box-shadow:
+    0 14px 36px -12px rgba(0, 0, 0, 0.45),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.07),
+    inset 0 -10px 24px rgba(0, 0, 0, 0.18),
+    0 0 28px -10px rgba(15, 138, 125, 0.18);
 }
 [data-theme="dark"] .pay-page:not(.pay-page--m5-competition) .pay-button.pay-page-submit:hover:not(:disabled),
 [data-theme="dark"] .pay-page:not(.pay-page--m5-competition) .pay-page-submit:hover:not(:disabled) {
-  background: color-mix(in srgb, var(--color-brand-gold) 85%, #0a192f) !important;
-  box-shadow: 0 6px 16px rgba(197, 165, 114, 0.4);
+  background: linear-gradient(145deg, #0c5c55 0%, #12a395 52%, #0a221e 100%) !important;
+  color: rgba(255, 255, 255, 0.98) !important;
+  filter: brightness(1.05);
+  box-shadow:
+    0 16px 40px -10px rgba(0, 0, 0, 0.5),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.09),
+    inset 0 -10px 24px rgba(0, 0, 0, 0.2),
+    0 0 32px -8px rgba(15, 138, 125, 0.22);
 }
 [data-theme="dark"] .pay-page.pay-page--m5-competition .pay-page-submit:hover:not(:disabled) {
   filter: brightness(1.06) !important;
@@ -5207,10 +5240,93 @@ html:not([data-theme="dark"]) .pay-page:not(.pay-page--m5-competition) .pay-page
   flex-shrink: 0;
 }
 [data-theme="dark"] .pay-page:not(.pay-page--m5-competition) .info-block {
-  background: #2d3748;
-  border: 0.5px solid rgba(255, 255, 255, 0.12);
-  color: #a0aec0;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--color-text-secondary);
+  box-shadow: none;
+}
+
+/* Упрощённая оплата: один лист (как референс), тёмная/светлая тема сайта */
+.pay-page--netmonet .pay-page-netmonet-amount-input {
+  font-size: clamp(2rem, 10vw, 2.85rem);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.pay-page--netmonet .pay-page-netmonet-amount-readonly {
+  font-size: clamp(2rem, 10vw, 2.85rem);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+html:not([data-theme="dark"]) .pay-page--netmonet .pay-page-netmonet-sheet {
+  background: rgba(255, 255, 255, 0.97);
+  border: 1px solid rgba(10, 25, 47, 0.1);
+}
+[data-theme="dark"] .pay-page--netmonet .pay-page-netmonet-sheet {
+  background: #1c222d;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.18),
+    0 10px 28px rgba(0, 0, 0, 0.28),
+    0 2px 6px rgba(0, 0, 0, 0.14);
+}
+.pay-page--netmonet .pay-page-netmonet-note {
+  width: 100%;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 0.875rem;
+  font-family: inherit;
+  resize: none;
+  text-align: center;
+}
+html:not([data-theme="dark"]) .pay-page--netmonet .pay-page-netmonet-note {
+  border: 0.5px solid rgba(197, 165, 114, 0.22);
+  background: #f8fafc;
+  color: var(--color-text);
+}
+[data-theme="dark"] .pay-page--netmonet .pay-page-netmonet-note {
+  border: 0.5px solid rgba(255, 255, 255, 0.14);
+  background: var(--dark-form-surface-bg);
+  color: #f7fafc;
+}
+.pay-page--netmonet .pay-page-netmonet-support-wrap .pay-support-callout {
+  margin-top: 0;
+  border-radius: 12px;
+}
+html:not([data-theme="dark"]) .pay-page--netmonet .pay-page-netmonet-support-wrap .pay-support-callout {
+  background: rgba(255, 251, 235, 0.55);
+  border: 1px solid rgba(197, 165, 114, 0.42);
+  color: #334155;
+}
+html:not([data-theme="dark"]) .pay-page--netmonet .pay-page-netmonet-support-wrap .pay-support-callout h2 {
+  color: #0a192f;
+}
+[data-theme="dark"] .pay-page--netmonet .pay-page-netmonet-support-wrap .pay-support-callout {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(197, 165, 114, 0.42);
+  color: var(--color-text-secondary);
+}
+[data-theme="dark"] .pay-page--netmonet .pay-page-netmonet-support-wrap .pay-support-callout h2 {
+  color: var(--color-text);
+}
+
+/* Netmonet: на телефоне — не «висеть» по центру при длинной форме, отступы под вырез/жест */
+@media (max-width: 640px) {
+  .pay-page.pay-page--netmonet.pay-page--cards {
+    justify-content: flex-start;
+    padding-left: max(1rem, env(safe-area-inset-left, 0px));
+    padding-right: max(1rem, env(safe-area-inset-right, 0px));
+    padding-top: max(1.25rem, env(safe-area-inset-top, 0px));
+    padding-bottom: max(1.5rem, env(safe-area-inset-bottom, 0px));
+  }
+  .pay-page--netmonet .pay-page-netmonet-stars button {
+    min-height: 44px;
+    min-width: 44px;
+    touch-action: manipulation;
+  }
 }
 
 /* Мягкое «подмигивание» заголовка блока поддержки — без резкого мигания */
@@ -7683,15 +7799,13 @@ html:not([data-theme="dark"]) .zayavka-page .zayavka-card a:not(.auth-btn-primar
   background: rgba(255, 255, 255, 0.08);
 }
 
-/* Страницы заявки, входа, регистрации, восстановления пароля — те же поля, что в ЛК (тёмная тема) */
+/* Страницы заявки, входа, регистрации — те же поля, что в ЛК (тёмная тема) */
 [data-theme="dark"] .layout-zayavka input,
 [data-theme="dark"] .layout-zayavka textarea,
 [data-theme="dark"] .layout-login input,
 [data-theme="dark"] .layout-login textarea,
 [data-theme="dark"] .layout-auth input,
-[data-theme="dark"] .layout-auth textarea,
-[data-theme="dark"] .forgot-password-page input,
-[data-theme="dark"] .forgot-password-page textarea {
+[data-theme="dark"] .layout-auth textarea {
   background: var(--dark-form-surface-bg) !important;
   color: #f1f5f9 !important;
   border: 1px solid var(--dark-form-surface-border) !important;
@@ -7702,11 +7816,27 @@ html:not([data-theme="dark"]) .zayavka-page .zayavka-card a:not(.auth-btn-primar
 [data-theme="dark"] .layout-login input::placeholder,
 [data-theme="dark"] .layout-login textarea::placeholder,
 [data-theme="dark"] .layout-auth input::placeholder,
-[data-theme="dark"] .layout-auth textarea::placeholder,
-[data-theme="dark"] .forgot-password-page input::placeholder,
-[data-theme="dark"] .forgot-password-page textarea::placeholder {
+[data-theme="dark"] .layout-auth textarea::placeholder {
   color: #8e8e8e !important;
   -webkit-text-fill-color: #8e8e8e;
+}
+
+/* Восстановление пароля и новый пароль по ссылке — белые поля в тёмной теме */
+[data-theme="dark"] .forgot-password-page input,
+[data-theme="dark"] .forgot-password-page textarea,
+[data-theme="dark"] .auth-page .reset-password-page input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="submit"]):not([type="button"]):not([type="reset"]),
+[data-theme="dark"] .auth-page .reset-password-page textarea {
+  background: #ffffff !important;
+  color: #0a192f !important;
+  border: 1px solid rgba(10, 25, 47, 0.18) !important;
+  -webkit-text-fill-color: #0a192f;
+}
+[data-theme="dark"] .forgot-password-page input::placeholder,
+[data-theme="dark"] .forgot-password-page textarea::placeholder,
+[data-theme="dark"] .auth-page .reset-password-page input::placeholder,
+[data-theme="dark"] .auth-page .reset-password-page textarea::placeholder {
+  color: #64748b !important;
+  -webkit-text-fill-color: #64748b;
 }
 
 /*
@@ -7798,20 +7928,12 @@ html:not([data-theme="dark"]) .layout-zayavka .zayavka-page .zayavka-card input[
 [data-theme="dark"] .layout-zayavka textarea:-webkit-autofill,
 [data-theme="dark"] .layout-zayavka textarea:-webkit-autofill:hover,
 [data-theme="dark"] .layout-zayavka textarea:-webkit-autofill:focus,
-[data-theme="dark"] .forgot-password-page input:-webkit-autofill,
-[data-theme="dark"] .forgot-password-page input:-webkit-autofill:hover,
-[data-theme="dark"] .forgot-password-page input:-webkit-autofill:focus,
-[data-theme="dark"] .forgot-password-page textarea:-webkit-autofill,
-[data-theme="dark"] .forgot-password-page textarea:-webkit-autofill:hover,
-[data-theme="dark"] .forgot-password-page textarea:-webkit-autofill:focus,
 [data-theme="dark"] .layout-auth input:autofill,
 [data-theme="dark"] .layout-auth textarea:autofill,
 [data-theme="dark"] .layout-login input:autofill,
 [data-theme="dark"] .layout-login textarea:autofill,
 [data-theme="dark"] .layout-zayavka input:autofill,
-[data-theme="dark"] .layout-zayavka textarea:autofill,
-[data-theme="dark"] .forgot-password-page input:autofill,
-[data-theme="dark"] .forgot-password-page textarea:autofill {
+[data-theme="dark"] .layout-zayavka textarea:autofill {
   background-color: var(--dark-form-surface-bg) !important;
   background-image: none !important;
   color: #f1f5f9 !important;
@@ -7819,6 +7941,34 @@ html:not([data-theme="dark"]) .layout-zayavka .zayavka-page .zayavka-card input[
   -webkit-text-fill-color: #f1f5f9 !important;
   caret-color: #f1f5f9;
   box-shadow: 0 0 0 1000px var(--dark-form-surface-bg) inset !important;
+  filter: none !important;
+  transition: background-color 99999s ease-out 0s !important;
+}
+
+/* Восстановление / новый пароль: автозаполнение на белом фоне (как у полей без автозаполнения) */
+[data-theme="dark"] .forgot-password-page input:-webkit-autofill,
+[data-theme="dark"] .forgot-password-page input:-webkit-autofill:hover,
+[data-theme="dark"] .forgot-password-page input:-webkit-autofill:focus,
+[data-theme="dark"] .forgot-password-page textarea:-webkit-autofill,
+[data-theme="dark"] .forgot-password-page textarea:-webkit-autofill:hover,
+[data-theme="dark"] .forgot-password-page textarea:-webkit-autofill:focus,
+[data-theme="dark"] .forgot-password-page input:autofill,
+[data-theme="dark"] .forgot-password-page textarea:autofill,
+[data-theme="dark"] .auth-page .reset-password-page input:-webkit-autofill,
+[data-theme="dark"] .auth-page .reset-password-page input:-webkit-autofill:hover,
+[data-theme="dark"] .auth-page .reset-password-page input:-webkit-autofill:focus,
+[data-theme="dark"] .auth-page .reset-password-page textarea:-webkit-autofill,
+[data-theme="dark"] .auth-page .reset-password-page textarea:-webkit-autofill:hover,
+[data-theme="dark"] .auth-page .reset-password-page textarea:-webkit-autofill:focus,
+[data-theme="dark"] .auth-page .reset-password-page input:autofill,
+[data-theme="dark"] .auth-page .reset-password-page textarea:autofill {
+  background-color: #ffffff !important;
+  background-image: none !important;
+  color: #0a192f !important;
+  border: 1px solid rgba(10, 25, 47, 0.18) !important;
+  -webkit-text-fill-color: #0a192f !important;
+  caret-color: #0a192f;
+  box-shadow: 0 0 0 1000px #ffffff inset !important;
   filter: none !important;
   transition: background-color 99999s ease-out 0s !important;
 }
@@ -7841,20 +7991,12 @@ html:not([data-theme="dark"]) .layout-zayavka input:-webkit-autofill:focus,
 html:not([data-theme="dark"]) .layout-zayavka textarea:-webkit-autofill,
 html:not([data-theme="dark"]) .layout-zayavka textarea:-webkit-autofill:hover,
 html:not([data-theme="dark"]) .layout-zayavka textarea:-webkit-autofill:focus,
-html:not([data-theme="dark"]) .forgot-password-page input:-webkit-autofill,
-html:not([data-theme="dark"]) .forgot-password-page input:-webkit-autofill:hover,
-html:not([data-theme="dark"]) .forgot-password-page input:-webkit-autofill:focus,
-html:not([data-theme="dark"]) .forgot-password-page textarea:-webkit-autofill,
-html:not([data-theme="dark"]) .forgot-password-page textarea:-webkit-autofill:hover,
-html:not([data-theme="dark"]) .forgot-password-page textarea:-webkit-autofill:focus,
 html:not([data-theme="dark"]) .layout-auth input:autofill,
 html:not([data-theme="dark"]) .layout-auth textarea:autofill,
 html:not([data-theme="dark"]) .layout-login input:autofill,
 html:not([data-theme="dark"]) .layout-login textarea:autofill,
 html:not([data-theme="dark"]) .layout-zayavka input:autofill,
-html:not([data-theme="dark"]) .layout-zayavka textarea:autofill,
-html:not([data-theme="dark"]) .forgot-password-page input:autofill,
-html:not([data-theme="dark"]) .forgot-password-page textarea:autofill {
+html:not([data-theme="dark"]) .layout-zayavka textarea:autofill {
   background-color: var(--color-light-gray) !important;
   background-image: none !important;
   color: #0a192f !important;
@@ -7862,6 +8004,33 @@ html:not([data-theme="dark"]) .forgot-password-page textarea:autofill {
   -webkit-text-fill-color: #0a192f !important;
   caret-color: #0a192f;
   box-shadow: 0 0 0 1000px var(--color-light-gray) inset !important;
+  filter: none !important;
+  transition: background-color 99999s ease-out 0s !important;
+}
+
+html:not([data-theme="dark"]) .forgot-password-page input:-webkit-autofill,
+html:not([data-theme="dark"]) .forgot-password-page input:-webkit-autofill:hover,
+html:not([data-theme="dark"]) .forgot-password-page input:-webkit-autofill:focus,
+html:not([data-theme="dark"]) .forgot-password-page textarea:-webkit-autofill,
+html:not([data-theme="dark"]) .forgot-password-page textarea:-webkit-autofill:hover,
+html:not([data-theme="dark"]) .forgot-password-page textarea:-webkit-autofill:focus,
+html:not([data-theme="dark"]) .forgot-password-page input:autofill,
+html:not([data-theme="dark"]) .forgot-password-page textarea:autofill,
+html:not([data-theme="dark"]) .auth-page .reset-password-page input:-webkit-autofill,
+html:not([data-theme="dark"]) .auth-page .reset-password-page input:-webkit-autofill:hover,
+html:not([data-theme="dark"]) .auth-page .reset-password-page input:-webkit-autofill:focus,
+html:not([data-theme="dark"]) .auth-page .reset-password-page textarea:-webkit-autofill,
+html:not([data-theme="dark"]) .auth-page .reset-password-page textarea:-webkit-autofill:hover,
+html:not([data-theme="dark"]) .auth-page .reset-password-page textarea:-webkit-autofill:focus,
+html:not([data-theme="dark"]) .auth-page .reset-password-page input:autofill,
+html:not([data-theme="dark"]) .auth-page .reset-password-page textarea:autofill {
+  background-color: #ffffff !important;
+  background-image: none !important;
+  color: #0a192f !important;
+  border: 1px solid rgba(10, 25, 47, 0.18) !important;
+  -webkit-text-fill-color: #0a192f !important;
+  caret-color: #0a192f;
+  box-shadow: 0 0 0 1000px #ffffff inset !important;
   filter: none !important;
   transition: background-color 99999s ease-out 0s !important;
 }

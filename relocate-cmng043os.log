@@ -1,0 +1,11 @@
+ВНИМАНИЕ: в БД FAILED — приложение уже получило ошибку перелива. Повтор возможен только если в Paygine деньги ещё на paygineOrderSdRef заказа, а не на кубышке официанта.
+Транзакция: cmng043os0001qm165ouj7yc8 сумма: 10000 коп. 
+С кубышки заказа: 1tips_t_cmng043os0001qm165ou_mng043ow → официант: FreeTips_w_cmn349rqe002imt1623foac4l 10000 коп.
+Ожидание 3 с перед Register...
+SDRelocateFunds: ответ ПЦ (фрагмент): <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<error>
+    <description>Sector does not support operation</description>
+    <code>167</code>
+</error>
+Ошибка перевода на кубышку официанта.
+relocateStartedAt сброшен — можно повторить позже или вызвать POST /api/pay/sync-transaction

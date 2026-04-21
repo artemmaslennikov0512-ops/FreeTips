@@ -1,0 +1,100 @@
+ Image 1tips-web Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 458B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 2.80kB done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/node:20-slim
+#3 DONE 1.7s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 182B done
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 DONE 0.0s
+
+#6 [deps 1/4] FROM docker.io/library/node:20-slim@sha256:1e85773c98c31d4fe5b545e4cb17379e617b348832fb3738b22a08f68dec30f3
+#6 resolve docker.io/library/node:20-slim@sha256:1e85773c98c31d4fe5b545e4cb17379e617b348832fb3738b22a08f68dec30f3 0.0s done
+#6 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 42.73kB 0.1s done
+#5 DONE 0.2s
+
+#7 [runner 10/15] COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@prisma ./node_modules/@prisma
+#7 CACHED
+
+#8 [runner 12/15] COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
+#8 CACHED
+
+#9 [builder 6/7] RUN npx prisma generate
+#9 CACHED
+
+#10 [runner 11/15] COPY --from=builder /app/node_modules/ws ./node_modules/ws
+#10 CACHED
+
+#11 [runner  5/15] RUN npm install -g prisma@6
+#11 CACHED
+
+#12 [deps 4/4] RUN npm ci
+#12 CACHED
+
+#13 [runner  8/15] COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+#13 CACHED
+
+#14 [builder 5/7] COPY . .
+#14 CACHED
+
+#15 [builder 3/7] RUN apt-get update -y && apt-get install -y openssl ca-certificates && rm -rf /var/lib/apt/lists/*
+#15 CACHED
+
+#16 [builder 7/7] RUN npx next build --webpack
+#16 CACHED
+
+#17 [runner 14/15] COPY --from=builder /app/package.json /app/package-lock.json ./
+#17 CACHED
+
+#18 [runner  4/15] RUN groupadd --system --gid 1001 nodejs     && useradd --system --uid 1001 --gid nodejs nextjs
+#18 CACHED
+
+#19 [runner  9/15] COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.prisma ./node_modules/.prisma
+#19 CACHED
+
+#20 [deps 2/4] WORKDIR /app
+#20 CACHED
+
+#21 [runner 13/15] COPY --from=builder /app/scripts ./scripts
+#21 CACHED
+
+#22 [runner  6/15] COPY --from=builder /app/public ./public
+#22 CACHED
+
+#23 [deps 3/4] COPY package.json package-lock.json* ./
+#23 CACHED
+
+#24 [builder 4/7] COPY --from=deps /app/node_modules ./node_modules
+#24 CACHED
+
+#25 [runner  7/15] COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+#25 CACHED
+
+#26 [runner 15/15] RUN npm config set fetch-retries 5 && npm config set fetch-retry-mintimeout 20000 && npm config set fetch-timeout 120000     && npm install tsx bcryptjs --omit=dev --ignore-scripts && chown -R nextjs:nodejs /app/node_modules     && mkdir -p /app/storage && chown -R nextjs:nodejs /app/storage
+#26 CACHED
+
+#27 exporting to image
+#27 exporting layers 0.0s done
+#27 exporting manifest sha256:0730f13fa412b8801d6087126cbc8bab05830a48fd954dd55d19999764efbe28 done
+#27 exporting config sha256:7cacd3ae8095752fac97ca14c943be4f7f13beb5590fbd526b66e85064014ef1 done
+#27 exporting attestation manifest sha256:a5b30d2f711d9fe2bf007655a297257f6f382634bd11d27ba16442e71a0f8042 0.0s done
+#27 exporting manifest list sha256:a9b6da0646163c59e3be8784c4dc161da81f41e86c83eaf2a0bb246d95d0575c done
+#27 naming to docker.io/library/1tips-web:latest done
+#27 unpacking to docker.io/library/1tips-web:latest 0.0s done
+#27 DONE 0.1s
+
+#28 resolving provenance for metadata file
+#28 DONE 0.0s
+ Image 1tips-web Built 

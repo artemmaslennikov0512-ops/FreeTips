@@ -56,7 +56,8 @@ data class PayoutUsage(
 
 class HomeFragment : Fragment() {
 
-    private val refreshIntervalMs = 5_000L
+    /** Автообновление баланса раз в минуту (swipe и возврат на вкладку — сразу). */
+    private val refreshIntervalMs = 60_000L
     private val handler = Handler(Looper.getMainLooper())
     private var refreshRunnable: Runnable? = null
     private var balanceUpdatedReceiver: BroadcastReceiver? = null

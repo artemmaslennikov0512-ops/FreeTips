@@ -20,6 +20,8 @@ import com.freetips.app.data.SecurePrefs
 import com.freetips.app.databinding.FragmentTransactionsBinding
 import com.freetips.app.databinding.ItemTransactionBinding
 import com.freetips.app.ui.home.ProfileResponse
+import com.freetips.app.util.BalanceCache
+import com.freetips.app.util.formatKopToRub
 import com.freetips.app.worker.BalanceRefreshWorker
 import com.google.gson.Gson
 import okhttp3.Call
@@ -46,9 +48,11 @@ private fun typeLabel(op: OperationItem): String =
 
 class TransactionsFragment : Fragment() {
 
-    private val refreshIntervalMs = 5_000L
+    /** Автообновление раз в минуту (swipe и смена вкладки по-прежнему обновляют сразу). */
+    private val refreshIntervalMs = 60_000L
     private val handler = Handler(Looper.getMainLooper())
     private var refreshRunnable: Runnable? = null
+    private var rateLimitRetryRunnable: Runnable? = null
     private var balanceUpdatedReceiver: BroadcastReceiver? = null
 
     private var _binding: FragmentTransactionsBinding? = null
@@ -80,6 +84,7 @@ class TransactionsFragment : Fragment() {
     override fun onPause() {
         unregisterBalanceUpdatedReceiver()
         stopPeriodicRefresh()
+        cancelRateLimitRetry()
         super.onPause()
     }
 
@@ -124,6 +129,21 @@ class TransactionsFragment : Fragment() {
         refreshRunnable = null
     }
 
+    private fun cancelRateLimitRetry() {
+        rateLimitRetryRunnable?.let { handler.removeCallbacks(it) }
+        rateLimitRetryRunnable = null
+    }
+
+    /** После 429 тихое обновление не показывает ошибку — один повтор через паузу, чтобы подтянуть историю/баланс. */
+    private fun scheduleSilentRetryAfterRateLimit() {
+        if (rateLimitRetryRunnable != null) return
+        rateLimitRetryRunnable = Runnable {
+            rateLimitRetryRunnable = null
+            if (_binding != null) load(silent = true)
+        }
+        handler.postDelayed(rateLimitRetryRunnable!!, 12_000L)
+    }
+
     private fun parseRubToKop(input: String): Long? {
         val s = input.trim().replace(",", ".")
         if (s.isEmpty()) return null
@@ -161,13 +181,15 @@ class TransactionsFragment : Fragment() {
         ApiClient(apiKey, baseUrl).getProfile().enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) { /* optional */ }
             override fun onResponse(call: Call, response: Response) {
+                if (silent && response.code == 429) scheduleSilentRetryAfterRateLimit()
                 if (!response.isSuccessful) return
                 val body = response.body?.string() ?: return
                 activity?.runOnUiThread {
                     try {
                         val profile = Gson().fromJson(body, ProfileResponse::class.java)
                         profile.stats?.let { s ->
-                            binding.virtualCardInclude.cardBalance.text = com.freetips.app.util.formatKopToRub(s.balanceKop)
+                            binding.virtualCardInclude.cardBalance.text = formatKopToRub(s.balanceKop)
+                            BalanceCache.save(binding.root.context.applicationContext, s.balanceKop)
                             com.freetips.app.util.BalanceNotificationHelper.showIfNeeded(
                                 binding.root.context.applicationContext,
                                 s.balanceKop,
@@ -203,9 +225,14 @@ class TransactionsFragment : Fragment() {
                             allOperations = data.operations
                             applyFilter()
                         } catch (_: Exception) {}
-                    } else if (!silent) {
-                        binding.errorText.visibility = View.VISIBLE
-                        binding.errorText.text = "Ошибка ${response.code}"
+                    } else {
+                        if (!silent) {
+                            binding.errorText.visibility = View.VISIBLE
+                            binding.errorText.text = "Ошибка ${response.code}"
+                        }
+                        if (silent && response.code == 429) {
+                            scheduleSilentRetryAfterRateLimit()
+                        }
                     }
                 }
             }
@@ -213,6 +240,7 @@ class TransactionsFragment : Fragment() {
     }
 
     override fun onDestroyView() {
+        cancelRateLimitRetry()
         _binding = null
         super.onDestroyView()
     }

@@ -1,13 +1,15 @@
 /**
  * Выгрузка RECIPIENT: код официанта (TipLink.slug), логин, пароль.
- * Пароль только из файла bulk-seed (в БД — хэш).
+ * Пароль: из файла сида и/или из карты fix (колонки new_login + password), если карту собрали с SEED_FIX_CREDENTIALS_FILE.
  *
  *   SEED_EXPORT_CREDENTIALS_FILE=./seed-bulk-recipients-credentials.txt \\
  *   SEED_EXPORT_OUT=./waiters.tsv \\
  *   npx tsx scripts/export-waiter-code-login-password.ts
  *
- * Опционально: SEED_EXPORT_MAP_FILE=./fix-login-map.tsv
- *              SEED_EXPORT_CREATED_AFTER=2026-03-01
+ * Только карта с паролями (без сид-файла):
+ *   SEED_EXPORT_MAP_FILE=./fix-login-map.tsv SEED_EXPORT_OUT=./waiters.tsv npx tsx ...
+ *
+ * Опционально: SEED_EXPORT_MAP_FILE, SEED_EXPORT_CREATED_AFTER=2026-03-01
  */
 
 import "dotenv/config";
@@ -34,31 +36,65 @@ function loadCredentialsByLogin(filePath: string): Map<string, string> {
   return map;
 }
 
-function loadNewLoginToOldLogin(mapPath: string): Map<string, string> {
-  const raw = fs.readFileSync(mapPath, "utf8");
-  const m = new Map<string, string>();
-  let first = true;
-  for (const line of raw.split(/\r?\n/)) {
-    const t = line.trim();
-    if (!t) continue;
-    if (first) {
-      first = false;
-      if (t.toLowerCase().includes("old_login") && t.toLowerCase().includes("new_login")) continue;
+function splitMapLine(line: string): string[] {
+  const t = line.trim();
+  if (t.includes("\t")) return t.split("\t").map((c) => c.trim());
+  if (/[,;]/.test(t)) return t.split(/[,;]/).map((c) => c.trim());
+  return [t];
+}
+
+/** Карта из fix-login-map.tsv: new→old для сид-файла; опционально password по new_login. */
+function loadLoginMapFile(mapPath: string): { newToOld: Map<string, string>; passwordByNewLogin: Map<string, string> } {
+  let raw = fs.readFileSync(mapPath, "utf8");
+  if (raw.charCodeAt(0) === 0xfeff) raw = raw.slice(1);
+  const newToOld = new Map<string, string>();
+  const passwordByNewLogin = new Map<string, string>();
+  const lines = raw.split(/\r?\n/).map((l) => l.trim()).filter((l) => l.length > 0);
+
+  let oldIdx = 1;
+  let newIdx = 2;
+  let pwdIdx = -1;
+  let startRow = 0;
+
+  if (lines.length > 0) {
+    const h = splitMapLine(lines[0]!);
+    const lower = h.map((c) => c.toLowerCase().replace(/\s+/g, "_"));
+    const oi = lower.findIndex((c) => c === "old_login");
+    const ni = lower.findIndex((c) => c === "new_login");
+    const pi = lower.findIndex((c) => c === "password");
+    if (oi >= 0 && ni >= 0) {
+      oldIdx = oi;
+      newIdx = ni;
+      pwdIdx = pi;
+      startRow = 1;
     }
-    const parts = t.split("\t");
-    if (parts.length < 3) continue;
-    const oldLogin = parts[1]!.trim();
-    const newLogin = parts[2]!.trim();
-    if (newLogin && oldLogin) m.set(newLogin, oldLogin);
   }
-  return m;
+
+  for (let i = startRow; i < lines.length; i++) {
+    const t = lines[i]!;
+    if (t.startsWith("#")) continue;
+    const parts = splitMapLine(t);
+    if (parts.length <= Math.max(oldIdx, newIdx)) continue;
+    const oldLogin = (parts[oldIdx] ?? "").trim();
+    const newLogin = (parts[newIdx] ?? "").trim();
+    if (newLogin && oldLogin) newToOld.set(newLogin, oldLogin);
+    if (pwdIdx >= 0 && parts.length > pwdIdx) {
+      const pwd = (parts[pwdIdx] ?? "").trim();
+      if (pwd && newLogin) passwordByNewLogin.set(newLogin, pwd);
+    }
+  }
+
+  return { newToOld, passwordByNewLogin };
 }
 
 function resolvePassword(
   login: string,
   creds: Map<string, string>,
   newToOld: Map<string, string> | null,
+  passwordByNewLogin: Map<string, string> | null,
 ): string {
+  const fromMap = passwordByNewLogin?.get(login);
+  if (fromMap) return fromMap;
   const direct = creds.get(login);
   if (direct !== undefined) return direct;
   const old = newToOld?.get(login);
@@ -78,14 +114,30 @@ export async function runExportWaiterCredentials(): Promise<void> {
 
     console.error("[export-waiter-code-login-password] колонки: waiter_code, login, password");
 
-    if (!credPath || !fs.existsSync(credPath)) {
-      throw new Error("Укажи SEED_EXPORT_CREDENTIALS_FILE — txt сида (login\\temail\\tpassword\\t…).");
+    let newToOld: Map<string, string> | null = null;
+    let passwordByNewLogin: Map<string, string> | null = null;
+    if (mapPath) {
+      if (!fs.existsSync(mapPath)) {
+        console.error(`SEED_EXPORT_MAP_FILE: файл не найден (${mapPath}), карта не используется.`);
+      } else {
+        const parsed = loadLoginMapFile(mapPath);
+        newToOld = parsed.newToOld.size ? parsed.newToOld : null;
+        passwordByNewLogin = parsed.passwordByNewLogin.size ? parsed.passwordByNewLogin : null;
+        if (!parsed.newToOld.size) {
+          console.error(
+            "SEED_EXPORT_MAP_FILE: нет пар old_login/new_login (проверь заголовок и табы). Пароль из карты — только если есть колонка password и совпадение new_login.",
+          );
+        }
+      }
     }
 
-    const creds = loadCredentialsByLogin(credPath);
-    const newToOld = mapPath && fs.existsSync(mapPath) ? loadNewLoginToOldLogin(mapPath) : null;
-    if (mapPath && !newToOld?.size) {
-      throw new Error("SEED_EXPORT_MAP_FILE задан, но не разобран (нужны old_login, new_login).");
+    const creds =
+      credPath && fs.existsSync(credPath) ? loadCredentialsByLogin(credPath) : new Map<string, string>();
+
+    if (creds.size === 0 && (!passwordByNewLogin || passwordByNewLogin.size === 0)) {
+      throw new Error(
+        "Нужен SEED_EXPORT_CREDENTIALS_FILE (txt сида) или карта с колонками old_login, new_login и password (см. fix-bulk-seed-login-email + SEED_FIX_CREDENTIALS_FILE).",
+      );
     }
 
     const where: Prisma.UserWhereInput = { role: "RECIPIENT" };
@@ -117,7 +169,7 @@ export async function runExportWaiterCredentials(): Promise<void> {
         missingSlug += 1;
         continue;
       }
-      const password = resolvePassword(r.login, creds, newToOld);
+      const password = resolvePassword(r.login, creds, newToOld, passwordByNewLogin);
       if (!password) missingPassword += 1;
       lines.push(`${slug}\t${r.login}\t${password}`);
     }

@@ -8,8 +8,11 @@
  * Применить:
  *   CONFIRM_FIX_BULK_SEED_LOGINS=YES npx tsx scripts/fix-bulk-seed-login-email.ts
  *
- * Карта для склейки с файлом паролей (старый логин = первый столбец сида):
- *   SEED_FIX_MAP_FILE=./fix-login-map.tsv CONFIRM_FIX_BULK_SEED_LOGINS=YES npx tsx scripts/fix-bulk-seed-login-email.ts
+ * Карта (полный набор для ЛК): waiter_code, new_login, password, user_id, old_login, old_email, new_email.
+ * Пароль подставляется из файла сида по old_login; код официанта — первый TipLink.slug в БД.
+ *   SEED_FIX_MAP_FILE=./fix-login-map.tsv \\
+ *   SEED_FIX_CREDENTIALS_FILE=./seed-bulk-recipients-credentials.txt \\
+ *   CONFIRM_FIX_BULK_SEED_LOGINS=YES npx tsx scripts/fix-bulk-seed-login-email.ts
  *
  * Критерий: role = RECIPIENT и login ~* '_t[0-9]' (PostgreSQL).
  */
@@ -59,6 +62,21 @@ async function uniqueLoginCandidate(base: string, excludeUserId: string, rng: ()
   throw new Error(`Не удалось подобрать уникальный логин для ${excludeUserId}`);
 }
 
+function loadSeedPasswordByLogin(filePath: string): Map<string, string> {
+  const raw = fs.readFileSync(filePath, "utf8");
+  const map = new Map<string, string>();
+  for (const line of raw.split(/\r?\n/)) {
+    const t = line.trim();
+    if (!t || t.startsWith("#")) continue;
+    const parts = t.split("\t");
+    if (parts.length < 3) continue;
+    const login = parts[0]!.trim();
+    const password = parts[2]!.trim();
+    if (login) map.set(login, password);
+  }
+  return map;
+}
+
 async function uniqueEmailCandidate(
   baseLocal: string,
   domain: string,
@@ -101,9 +119,35 @@ async function main() {
   const rng = mulberry32(0xfeed1234);
 
   const mapPath = process.env.SEED_FIX_MAP_FILE?.trim();
+  const credPath =
+    process.env.SEED_FIX_CREDENTIALS_FILE?.trim() ||
+    process.env.SEED_BULK_CREDENTIALS_FILE?.trim() ||
+    process.env.SEED_EXPORT_CREDENTIALS_FILE?.trim();
+  const credByLogin =
+    credPath && fs.existsSync(credPath) ? loadSeedPasswordByLogin(credPath) : null;
+  if (mapPath && (!credByLogin || credByLogin.size === 0)) {
+    console.warn(
+      "SEED_FIX_MAP_FILE задан, но нет SEED_FIX_CREDENTIALS_FILE (или пустой файл) — в карте колонка password будет пустой. Укажи тот же txt, что при bulk-seed.",
+    );
+  }
+
+  const userIds = rows.map((r) => r.id);
+  const tipRows =
+    userIds.length > 0
+      ? await prisma.tipLink.findMany({
+          where: { userId: { in: userIds } },
+          select: { userId: true, slug: true, createdAt: true },
+          orderBy: [{ userId: "asc" }, { createdAt: "asc" }],
+        })
+      : [];
+  const waiterCodeByUserId = new Map<string, string>();
+  for (const tl of tipRows) {
+    if (!waiterCodeByUserId.has(tl.userId)) waiterCodeByUserId.set(tl.userId, tl.slug);
+  }
+
   const mapLines: string[] = [];
   if (mapPath) {
-    mapLines.push("user_id\told_login\tnew_login\told_email\tnew_email");
+    mapLines.push("waiter_code\tnew_login\tpassword\tuser_id\told_login\told_email\tnew_email");
   }
 
   for (const row of rows) {
@@ -123,7 +167,11 @@ async function main() {
     console.log(`${dry ? "[dry] " : ""}${oldLogin} → ${newLogin}${oldEmail && newEmail ? `   |   ${oldEmail} → ${newEmail}` : ""}`);
 
     if (mapPath) {
-      mapLines.push(`${row.id}\t${oldLogin}\t${newLogin}\t${oldEmail ?? ""}\t${newEmail ?? ""}`);
+      const waiterCode = waiterCodeByUserId.get(row.id) ?? "";
+      const password = credByLogin?.get(oldLogin) ?? "";
+      mapLines.push(
+        `${waiterCode}\t${newLogin}\t${password}\t${row.id}\t${oldLogin}\t${oldEmail ?? ""}\t${newEmail ?? ""}`,
+      );
     }
 
     if (!dry) {

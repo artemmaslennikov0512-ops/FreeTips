@@ -50,6 +50,9 @@ next-env.d.ts
 # вывод скриптов (pay-auto, pay-card HTML/PNG)
 scripts/out/
 
+# учётные данные массовой заливки (scripts/seed-bulk-recipients.ts)
+seed-bulk-recipients-credentials*.txt
+
 # Android (мобильное приложение)
 /android/local.properties
 /android/build

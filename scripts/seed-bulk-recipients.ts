@@ -18,9 +18,10 @@
  */
 
 import "dotenv/config";
+import { randomUUID } from "node:crypto";
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { PrismaClient, RegistrationRequestStatus } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 import { hashPassword } from "../lib/auth/password";
 import {
   generateRegistrationToken,
@@ -363,24 +364,51 @@ async function main() {
             select: { id: true },
           });
 
-          // requestType не передаём: см. @default("individual") в схеме.
-          // Связь с токеном через connect — старые Prisma Client не принимают registrationTokenId в .create().
-          await tx.registrationRequest.create({
-            data: {
-              fullName,
-              dateOfBirth: birthDate,
-              establishment,
-              phone,
-              activityType,
-              email: emailTry,
-              status: RegistrationRequestStatus.APPROVED,
-              registrationToken: { connect: { id: regTok.id } },
-              reviewedAt,
-              reviewedByUserId: superAdmin.id,
-              createdAt: requestCreatedAt,
-              rejectionReason: null,
-            },
-          });
+          // INSERT сырьём: на сервере старый Prisma Client не принимает reviewedAt / registrationTokenId в .create().
+          const registrationRequestId = randomUUID();
+          await tx.$executeRaw`
+            INSERT INTO "registration_requests" (
+              "id",
+              "requestType",
+              "fullName",
+              "dateOfBirth",
+              "establishment",
+              "phone",
+              "activityType",
+              "email",
+              "status",
+              "rejectionReason",
+              "reviewedAt",
+              "reviewedByUserId",
+              "registrationTokenId",
+              "createdAt",
+              "companyName",
+              "companyRole",
+              "employeeCount",
+              "adminFullName",
+              "adminContactPhone"
+            ) VALUES (
+              ${registrationRequestId},
+              ${"individual"},
+              ${fullName},
+              ${birthDate},
+              ${establishment},
+              ${phone},
+              ${activityType},
+              ${emailTry},
+              ${Prisma.raw(`'APPROVED'::"RegistrationRequestStatus"`)},
+              NULL,
+              ${reviewedAt},
+              ${superAdmin.id},
+              ${regTok.id},
+              ${requestCreatedAt},
+              NULL,
+              NULL,
+              NULL,
+              NULL,
+              NULL
+            )
+          `;
 
           const user = await tx.user.create({
             data: {

@@ -21,6 +21,13 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
+/** Как в fix-bulk-seed-login-email: убрать _t + цифры (сид-логин → часто такой же логин в БД после правки). */
+function stripTArtifact(s: string): string {
+  let t = s.replace(/_t[0-9]+/gi, "");
+  t = t.replace(/__+/g, "_").replace(/^_+|_+$/g, "");
+  return t;
+}
+
 type SeedCreds = {
   /** как в файле */
   byLoginExact: Map<string, string>;
@@ -68,6 +75,17 @@ function pickSeedPassword(login: string, email: string | null, creds: SeedCreds)
     const b = creds.byEmailLower.get(email.trim().toLowerCase());
     if (b !== undefined) return b;
   }
+  /** Логин в БД = stripT(логин в сиде), а в файле ещё старый вариант с _t… — ищем единственное совпадение. */
+  const ldb = login.toLowerCase();
+  let fallbackPwd: string | undefined;
+  let n = 0;
+  for (const seedLogin of creds.byLoginExact.keys()) {
+    if (stripTArtifact(seedLogin).toLowerCase() === ldb) {
+      fallbackPwd = creds.byLoginExact.get(seedLogin);
+      n += 1;
+    }
+  }
+  if (n === 1 && fallbackPwd !== undefined) return fallbackPwd;
   return undefined;
 }
 

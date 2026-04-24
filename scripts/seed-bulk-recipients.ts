@@ -363,7 +363,8 @@ async function main() {
             select: { id: true },
           });
 
-          // requestType не передаём: на старых Prisma Client без поля в create — падает валидация; в БД с колонкой сработает @default("individual").
+          // requestType не передаём: см. @default("individual") в схеме.
+          // Связь с токеном через connect — старые Prisma Client не принимают registrationTokenId в .create().
           await tx.registrationRequest.create({
             data: {
               fullName,
@@ -373,7 +374,7 @@ async function main() {
               activityType,
               email: emailTry,
               status: RegistrationRequestStatus.APPROVED,
-              registrationTokenId: regTok.id,
+              registrationToken: { connect: { id: regTok.id } },
               reviewedAt,
               reviewedByUserId: superAdmin.id,
               createdAt: requestCreatedAt,

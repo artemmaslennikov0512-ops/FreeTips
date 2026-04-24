@@ -410,31 +410,74 @@ async function main() {
             )
           `;
 
-          const user = await tx.user.create({
-            data: {
-              login: loginTry,
-              email: emailTry,
-              passwordHash,
-              recoveryCodewordHash,
-              recoveryCodewordEnc,
-              role: "RECIPIENT",
-              fullName,
-              birthDate,
-              clientNickname: nick.slice(0, 120),
-              clientJobTitle: clientJobTitle.slice(0, 120),
-              savingFor: savingFor.slice(0, 500),
-              createdAt: userAt,
-            },
-            select: { id: true },
-          });
+          // Пользователь — INSERT сырьём: старый Prisma Client не принимает recoveryCodeword* и часть полей в .create().
+          const userId = randomUUID();
+          const paygineSdRef = getWaiterPaygineSdRef(userId);
+          const ldc = limits.payoutDailyLimitCount as number | null | undefined;
+          const ldk = limits.payoutDailyLimitKop as bigint | null | undefined;
+          const lmc = limits.payoutMonthlyLimitCount as number | null | undefined;
+          const lmk = limits.payoutMonthlyLimitKop as bigint | null | undefined;
+          const imk = limits.incomingMonthlyLimitKop as bigint | null | undefined;
+          const acp = Boolean(limits.autoConfirmPayouts ?? false);
+          const act = limits.autoConfirmPayoutThresholdKop as bigint | null | undefined;
 
-          await tx.user.update({
-            where: { id: user.id },
-            data: {
-              paygineSdRef: getWaiterPaygineSdRef(user.id),
-              ...limits,
-            },
-          });
+          await tx.$executeRaw`
+            INSERT INTO "users" (
+              "id",
+              "login",
+              "email",
+              "passwordHash",
+              "recoveryCodewordHash",
+              "recoveryCodewordEnc",
+              "role",
+              "mustChangePassword",
+              "isBlocked",
+              "fullName",
+              "birthDate",
+              "savingFor",
+              "clientNickname",
+              "clientJobTitle",
+              "payoutDailyLimitCount",
+              "payoutDailyLimitKop",
+              "payoutMonthlyLimitCount",
+              "payoutMonthlyLimitKop",
+              "incomingMonthlyLimitKop",
+              "autoConfirmPayouts",
+              "autoConfirmPayoutThresholdKop",
+              "paygineSdRef",
+              "verificationStatus",
+              "createdAt",
+              "updatedAt"
+            ) VALUES (
+              ${userId},
+              ${loginTry},
+              ${emailTry},
+              ${passwordHash},
+              ${recoveryCodewordHash},
+              ${recoveryCodewordEnc},
+              ${Prisma.raw(`'RECIPIENT'::"UserRole"`)},
+              false,
+              false,
+              ${fullName},
+              ${birthDate},
+              ${savingFor.slice(0, 500)},
+              ${nick.slice(0, 120)},
+              ${clientJobTitle.slice(0, 120)},
+              ${ldc ?? null},
+              ${ldk ?? null},
+              ${lmc ?? null},
+              ${lmk ?? null},
+              ${imk ?? null},
+              ${acp},
+              ${act ?? null},
+              ${paygineSdRef},
+              ${Prisma.raw(`'NONE'::"VerificationStatus"`)},
+              ${userAt},
+              ${userAt}
+            )
+          `;
+
+          const user = { id: userId };
 
           await tx.tipLink.create({
             data: {

@@ -14,6 +14,7 @@ import { cabinetInputClassName } from "../shared";
 import { CABINET_WAITER_BTN_INLINE } from "@/lib/cabinet-button-classes";
 import { PANEL_SECTION_TITLE_CABINET_LG, PANEL_SECTION_TITLE_CABINET_LG_ON_DARK } from "@/lib/panel-shell-visual-classes";
 import { toDateInputValueFromApi } from "@/lib/utils";
+import { formatPayRecipientClientLabel } from "@/lib/pay-recipient-display";
 
 /** Одна пробельная норма для сравнения с сервером (убирает «двойные» пробелы в ФИО из БД). */
 function normalizeFullNameSpaced(s: string): string {
@@ -28,6 +29,8 @@ type Profile = {
   fullName?: string | null;
   birthDate?: string | null;
   establishment?: string | null;
+  clientNickname?: string | null;
+  clientJobTitle?: string | null;
   role: string;
   employeePhotoUrl?: string | null;
   verificationStatus?: string;
@@ -47,6 +50,8 @@ export default function CabinetSettingsPage() {
   const [editPatronymic, setEditPatronymic] = useState("");
   const [editBirthDate, setEditBirthDate] = useState("");
   const [editEstablishment, setEditEstablishment] = useState("");
+  const [editClientNickname, setEditClientNickname] = useState("");
+  const [editClientJobTitle, setEditClientJobTitle] = useState("");
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [saveOk, setSaveOk] = useState(false);
@@ -75,9 +80,9 @@ export default function CabinetSettingsPage() {
     setEditPatronymic(parts.slice(2).join(" "));
     setEditBirthDate(toDateInputValueFromApi(data.birthDate));
     setEditEstablishment(data.establishment ?? "");
+    setEditClientNickname(data.clientNickname ?? "");
+    setEditClientJobTitle(data.clientJobTitle ?? "");
   }, []);
-
-  const identityLocked = (user?.verificationStatus ?? "").toUpperCase() === "VERIFIED";
 
   useEffect(() => {
     let cancelled = false;
@@ -133,17 +138,23 @@ export default function CabinetSettingsPage() {
     const payload: Record<string, unknown> = {};
     if (editLogin.trim() !== user.login) payload.login = editLogin.trim();
     if (editEmail.trim() !== (user.email ?? "")) payload.email = editEmail.trim() || "";
-    if (!identityLocked) {
-      if (normalizeFullNameSpaced(combinedFullName) !== normalizeFullNameSpaced(user.fullName ?? "")) {
-        payload.fullName = combinedFullName || "";
-      }
-      const serverBirthInput = toDateInputValueFromApi(user.birthDate);
-      if (editBirthDate.trim() !== serverBirthInput) {
-        payload.birthDate = editBirthDate.trim() || "";
-      }
+    if (normalizeFullNameSpaced(combinedFullName) !== normalizeFullNameSpaced(user.fullName ?? "")) {
+      payload.fullName = combinedFullName || "";
+    }
+    const serverBirthInput = toDateInputValueFromApi(user.birthDate);
+    if (editBirthDate.trim() !== serverBirthInput) {
+      payload.birthDate = editBirthDate.trim() || "";
     }
     if (editEstablishment.trim() !== (user.establishment ?? "").trim()) {
       payload.establishment = editEstablishment.trim() || "";
+    }
+    const serverNick = (user.clientNickname ?? "").trim();
+    const serverJob = (user.clientJobTitle ?? "").trim();
+    if (editClientNickname.trim() !== serverNick) {
+      payload.clientNickname = editClientNickname.trim() || "";
+    }
+    if (editClientJobTitle.trim() !== serverJob) {
+      payload.clientJobTitle = editClientJobTitle.trim() || "";
     }
 
     const parsed = patchProfileSchema.safeParse(payload);
@@ -280,13 +291,22 @@ export default function CabinetSettingsPage() {
 
   const combinedFullNameForCompare = [editLastName.trim(), editFirstName.trim(), editPatronymic.trim()].filter(Boolean).join(" ");
   const serverBirthForCompare = toDateInputValueFromApi(user?.birthDate);
+  const payPreviewFullName = combinedFullNameForCompare;
+  const payPreviewLogin = editLogin.trim() || (user?.login ?? "");
+  const payPreviewLine = formatPayRecipientClientLabel({
+    clientNickname: editClientNickname,
+    clientJobTitle: editClientJobTitle,
+    fullName: payPreviewFullName,
+    login: payPreviewLogin,
+  });
   const hasProfileChanges =
     editLogin.trim() !== (user?.login ?? "") ||
     editEmail.trim() !== (user?.email ?? "") ||
-    (!identityLocked &&
-      (normalizeFullNameSpaced(combinedFullNameForCompare) !== normalizeFullNameSpaced(user?.fullName ?? "") ||
-        editBirthDate.trim() !== serverBirthForCompare)) ||
-    editEstablishment.trim() !== (user?.establishment ?? "");
+    normalizeFullNameSpaced(combinedFullNameForCompare) !== normalizeFullNameSpaced(user?.fullName ?? "") ||
+    editBirthDate.trim() !== serverBirthForCompare ||
+    editEstablishment.trim() !== (user?.establishment ?? "") ||
+    editClientNickname.trim() !== (user?.clientNickname ?? "").trim() ||
+    editClientJobTitle.trim() !== (user?.clientJobTitle ?? "").trim();
 
   if (loading) {
     return <LoadingSpinner message="Загрузка профиля…" />;
@@ -460,11 +480,6 @@ export default function CabinetSettingsPage() {
 
         <div className="mt-6">
           <h3 className="text-sm font-semibold text-[var(--color-text)]">Анкета</h3>
-          {identityLocked && (
-            <p className="mt-2 text-sm text-[var(--color-text-secondary)]">
-              ФИО и дата рождения совпадают с данными верификации и недоступны для самостоятельного изменения. Правки вносит администратор сервиса.
-            </p>
-          )}
           <div className="mt-3 grid gap-4 sm:grid-cols-2">
             <div>
               <label htmlFor="settings-lastName" className="mb-1 block text-sm font-medium text-[var(--color-text)]">Фамилия</label>
@@ -473,14 +488,12 @@ export default function CabinetSettingsPage() {
                 name="lastName"
                 type="text"
                 value={editLastName}
-                readOnly={identityLocked}
-                disabled={identityLocked}
                 onChange={(e) => {
                   profileFormTouchedRef.current = true;
                   setEditLastName(e.target.value);
                 }}
                 placeholder="Иванов"
-                className={`${cabinetInputClassName(!!profileFieldErrors.fullName)} ${identityLocked ? "cursor-not-allowed opacity-80" : ""}`}
+                className={cabinetInputClassName(!!profileFieldErrors.fullName)}
               />
               {profileFieldErrors.fullName && <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{profileFieldErrors.fullName}</p>}
             </div>
@@ -491,14 +504,12 @@ export default function CabinetSettingsPage() {
                 name="firstName"
                 type="text"
                 value={editFirstName}
-                readOnly={identityLocked}
-                disabled={identityLocked}
                 onChange={(e) => {
                   profileFormTouchedRef.current = true;
                   setEditFirstName(e.target.value);
                 }}
                 placeholder="Иван"
-                className={`${cabinetInputClassName(false)} ${identityLocked ? "cursor-not-allowed opacity-80" : ""}`}
+                className={cabinetInputClassName(false)}
               />
             </div>
             <div className="sm:col-span-2">
@@ -508,14 +519,12 @@ export default function CabinetSettingsPage() {
                 name="patronymic"
                 type="text"
                 value={editPatronymic}
-                readOnly={identityLocked}
-                disabled={identityLocked}
                 onChange={(e) => {
                   profileFormTouchedRef.current = true;
                   setEditPatronymic(e.target.value);
                 }}
                 placeholder="Иванович"
-                className={`${cabinetInputClassName(false)} ${identityLocked ? "cursor-not-allowed opacity-80" : ""}`}
+                className={cabinetInputClassName(false)}
               />
             </div>
             <div>
@@ -525,13 +534,11 @@ export default function CabinetSettingsPage() {
                 name="birthDate"
                 type="date"
                 value={editBirthDate}
-                readOnly={identityLocked}
-                disabled={identityLocked}
                 onChange={(e) => {
                   profileFormTouchedRef.current = true;
                   setEditBirthDate(e.target.value);
                 }}
-                className={`${cabinetInputClassName(!!profileFieldErrors.birthDate)} ${identityLocked ? "cursor-not-allowed opacity-80" : ""}`}
+                className={cabinetInputClassName(!!profileFieldErrors.birthDate)}
               />
               {profileFieldErrors.birthDate && <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{profileFieldErrors.birthDate}</p>}
             </div>
@@ -552,6 +559,63 @@ export default function CabinetSettingsPage() {
               {profileFieldErrors.establishment && <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">{profileFieldErrors.establishment}</p>}
             </div>
           </div>
+        </div>
+
+        <div className="mt-8 border-t border-[var(--color-dark-gray)]/10 pt-6">
+          <h3 className="text-sm font-semibold text-[var(--color-text)]">Как видят вас гости на странице оплаты</h3>
+          <p className="mt-1 text-xs text-[var(--color-text-secondary)]">
+            Имя в скобках: если поле пустое — из анкеты берётся имя; если ФИО не заполнено — показывается логин. Должность по умолчанию — «Официант», если не указали свою.
+          </p>
+          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            <div className="sm:col-span-2">
+              <label htmlFor="settings-clientJobTitle" className="mb-1 block text-sm font-medium text-[var(--color-text)]">
+                Должность (как вас представить)
+              </label>
+              <input
+                id="settings-clientJobTitle"
+                name="clientJobTitle"
+                type="text"
+                value={editClientJobTitle}
+                onChange={(e) => {
+                  profileFormTouchedRef.current = true;
+                  setEditClientJobTitle(e.target.value);
+                }}
+                placeholder="Официант"
+                className={cabinetInputClassName(!!profileFieldErrors.clientJobTitle)}
+              />
+              {profileFieldErrors.clientJobTitle && (
+                <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">
+                  {profileFieldErrors.clientJobTitle}
+                </p>
+              )}
+            </div>
+            <div className="sm:col-span-2">
+              <label htmlFor="settings-clientNickname" className="mb-1 block text-sm font-medium text-[var(--color-text)]">
+                Имя или ник для гостей (необязательно)
+              </label>
+              <input
+                id="settings-clientNickname"
+                name="clientNickname"
+                type="text"
+                value={editClientNickname}
+                onChange={(e) => {
+                  profileFormTouchedRef.current = true;
+                  setEditClientNickname(e.target.value);
+                }}
+                placeholder="Как к вам обращаться на чеке благодарности"
+                className={cabinetInputClassName(!!profileFieldErrors.clientNickname)}
+              />
+              {profileFieldErrors.clientNickname && (
+                <p className="mt-1 text-xs text-[var(--color-accent-red)]" role="alert">
+                  {profileFieldErrors.clientNickname}
+                </p>
+              )}
+            </div>
+          </div>
+          <p className="mt-4 rounded-lg bg-[var(--color-dark-gray)]/5 px-3 py-2 text-sm text-[var(--color-text)]">
+            <span className="text-[var(--color-text-secondary)]">Сейчас гости увидят: </span>
+            <span className="font-medium">{payPreviewLine}</span>
+          </p>
         </div>
 
         <button

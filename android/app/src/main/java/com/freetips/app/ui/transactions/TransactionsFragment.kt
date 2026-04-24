@@ -21,6 +21,7 @@ import com.freetips.app.databinding.FragmentTransactionsBinding
 import com.freetips.app.databinding.ItemTransactionBinding
 import com.freetips.app.ui.home.ProfileResponse
 import com.freetips.app.util.BalanceCache
+import com.freetips.app.util.MoscowDateTime
 import com.freetips.app.util.formatKopToRub
 import com.freetips.app.worker.BalanceRefreshWorker
 import com.google.gson.Gson
@@ -258,7 +259,7 @@ class OpAdapter(private val items: List<OperationItem>) : RecyclerView.Adapter<O
         val displayRub = if (op.type == "payout") -rub else rub
         holder.binding.amount.text = com.freetips.app.util.formatRub(displayRub, signed = true)
         holder.binding.typeLabel.text = typeLabel(op)
-        holder.binding.date.text = op.createdAt.replace("T", " ").take(16)
+        holder.binding.date.text = MoscowDateTime.formatOperationCreatedAt(op.createdAt)
         val iconRes = when (statusKind(op)) {
             "success" -> R.drawable.ic_status_success
             "pending" -> R.drawable.ic_status_pending

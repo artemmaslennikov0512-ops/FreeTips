@@ -15,6 +15,7 @@ import com.freetips.app.data.ApiClient
 import com.freetips.app.data.SecurePrefs
 import com.freetips.app.databinding.FragmentPayoutsBinding
 import com.freetips.app.databinding.ItemPayoutBinding
+import com.freetips.app.util.MoscowDateTime
 import com.google.gson.Gson
 import okhttp3.Call
 import okhttp3.Callback
@@ -163,7 +164,7 @@ class PayoutAdapter(private val items: List<PayoutItem>) : RecyclerView.Adapter<
         val p = items[position]
         holder.binding.amount.text = com.freetips.app.util.formatKopToRub(p.amountKop)
         holder.binding.statusLabel.text = payoutStatusLabel(p.status)
-        holder.binding.date.text = p.createdAt.take(10)
+        holder.binding.date.text = MoscowDateTime.formatCreatedAtDateOnly(p.createdAt)
         val iconRes = when (payoutStatusKind(p.status)) {
             "success" -> R.drawable.ic_status_success
             "pending" -> R.drawable.ic_status_pending

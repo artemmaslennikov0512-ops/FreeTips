@@ -231,6 +231,16 @@ export const patchProfileSchema = z.object({
     .optional()
     .transform((v) => (v == null || (typeof v === "string" && v.trim() === "") ? null : (v ?? "").trim()))
     .refine((v) => v === null || v.length <= 500, "Не более 500 символов"),
+  clientNickname: z
+    .union([z.string(), z.null()])
+    .optional()
+    .transform((v) => (v == null || (typeof v === "string" && v.trim() === "") ? null : (v ?? "").trim()))
+    .refine((v) => v === null || v.length <= 120, "Не более 120 символов"),
+  clientJobTitle: z
+    .union([z.string(), z.null()])
+    .optional()
+    .transform((v) => (v == null || (typeof v === "string" && v.trim() === "") ? null : (v ?? "").trim()))
+    .refine((v) => v === null || v.length <= 120, "Не более 120 символов"),
 });
 
 // Сообщение в чат поддержки: 1–4000 символов

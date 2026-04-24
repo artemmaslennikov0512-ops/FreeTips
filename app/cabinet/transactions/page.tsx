@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo, Fragment, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { CheckCircle2, Clock, XCircle, ChevronLeft, ChevronRight } from "lucide-react";
-import { formatMoney, formatDate } from "@/lib/utils";
+import { formatMoney, formatDate, toMoscowDateKey, formatMoscowCalendarDayLabel } from "@/lib/utils";
 import { fetchWithAuth, clearAccessToken } from "@/lib/auth-client";
 import { PAYOUT_MIN_AMOUNT_KOP } from "@/lib/payout-amount-bounds";
 import { FEE_MIN_PAYOUT_KOP, FEE_PERCENT_PAYOUT_CARD, feeKopForPayout } from "@/lib/payment/paygine-fee";
@@ -64,15 +64,11 @@ function StatusIcon({ op }: { op: Operation }) {
 const PER_PAGE = 10;
 
 function getDateKey(iso: string): string {
-  return iso.slice(0, 10);
+  return toMoscowDateKey(iso);
 }
 
 function formatDayLabel(isoDateKey: string): string {
-  return new Intl.DateTimeFormat("ru-RU", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  }).format(new Date(isoDateKey + "T12:00:00"));
+  return formatMoscowCalendarDayLabel(isoDateKey);
 }
 
 /** Парсинг суммы в ₽ из поля ввода → копейки; пусто/мусор → null. */

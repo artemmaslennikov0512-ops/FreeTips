@@ -2,13 +2,43 @@
  * Утилиты для отображения денежных сумм и дат.
  */
 
+const MOSCOW_TZ = "Europe/Moscow";
+
+/** Календарная дата (YYYY-MM-DD) по московскому времени — для группировки операций и т.п. */
+export function toMoscowDateKey(iso: string): string {
+  const t = new Date(iso).getTime();
+  if (Number.isNaN(t)) {
+    const m = /^(\d{4}-\d{2}-\d{2})/.exec(String(iso).trim());
+    return m ? m[1]! : "";
+  }
+  return new Intl.DateTimeFormat("sv-SE", {
+    timeZone: MOSCOW_TZ,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date(t));
+}
+
+/** Подпись дня для заголовков: «24 апреля 2026 г.» по календарю МСК (ymd — из toMoscowDateKey). */
+export function formatMoscowCalendarDayLabel(ymd: string): string {
+  const d = new Date(`${ymd}T12:00:00Z`);
+  return new Intl.DateTimeFormat("ru-RU", {
+    timeZone: MOSCOW_TZ,
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(d);
+}
+
 export function formatDate(iso: string, opts?: { includeYear?: boolean }): string {
   return new Intl.DateTimeFormat("ru-RU", {
+    timeZone: MOSCOW_TZ,
     day: "2-digit",
     month: "2-digit",
     ...(opts?.includeYear && { year: "numeric" }),
     hour: "2-digit",
     minute: "2-digit",
+    hour12: false,
   }).format(new Date(iso));
 }
 

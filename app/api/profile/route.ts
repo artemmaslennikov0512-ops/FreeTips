@@ -1,12 +1,11 @@
 /**
  * GET /api/profile
  * Данные текущего пользователя (login, email, role) и статистика (баланс, всего получено, кол-во платежей, заявок на вывод).
- * PATCH /api/profile — обновление login, email.
+ * PATCH /api/profile — обновление полей профиля (login, email, ФИО, дата рождения и др.).
  * Требует: Authorization: Bearer <access_token>
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { VerificationStatus } from "@prisma/client";
 import { requireAuthOrApiKey } from "@/lib/auth-or-api-key";
 import { db } from "@/lib/db";
 import { getPaygineConfig } from "@/lib/config";
@@ -97,6 +96,8 @@ export async function GET(request: NextRequest) {
             verificationStatus: true,
             verificationRejectionReason: true,
             savingFor: true,
+            clientNickname: true,
+            clientJobTitle: true,
             profilePhotoUrl: true,
             totpEnabled: true,
             totpSecretEnc: true,
@@ -253,6 +254,8 @@ export async function GET(request: NextRequest) {
       verificationStatus: String(profile.verificationStatus),
       verificationRejectionReason: profile.verificationRejectionReason != null ? String(profile.verificationRejectionReason) : null,
       savingFor: profile.savingFor != null ? String(profile.savingFor) : null,
+      clientNickname: profile.clientNickname != null ? String(profile.clientNickname) : null,
+      clientJobTitle: profile.clientJobTitle != null ? String(profile.clientJobTitle) : null,
       totpEnabled: Boolean(profile.totpEnabled),
       totpEnrollmentPending: Boolean(profile.totpSecretEnc && !profile.totpEnabled),
       /** Фото для ЛК (страница оплаты и сайдбар): EMPLOYEE — из Employee, RECIPIENT — из User.profilePhotoUrl. */
@@ -301,33 +304,28 @@ export async function PATCH(request: NextRequest) {
   }
 
   const data = parsed.data;
-  const allowedKeys = ["login", "email", "fullName", "birthDate", "establishment", "savingFor"] as const;
+  const allowedKeys = [
+    "login",
+    "email",
+    "fullName",
+    "birthDate",
+    "establishment",
+    "savingFor",
+    "clientNickname",
+    "clientJobTitle",
+  ] as const;
   const update = Object.fromEntries(
     allowedKeys.filter((k) => data[k] !== undefined).map((k) => [k, data[k]])
-  ) as { login?: string; email?: string | null; fullName?: string | null; birthDate?: string | null; establishment?: string | null; savingFor?: string | null };
-
-  const identityTouched = data.fullName !== undefined || data.birthDate !== undefined;
-  if (identityTouched) {
-    const me = await db.user.findUnique({
-      where: { id: auth.userId },
-      select: { verificationStatus: true },
-    });
-    if (me?.verificationStatus === VerificationStatus.VERIFIED) {
-      delete update.fullName;
-      delete update.birthDate;
-      logInfo("profile.patch.identity_blocked_verified", {
-        userId: auth.userId,
-        hadFullName: data.fullName !== undefined,
-        hadBirthDate: data.birthDate !== undefined,
-      });
-      if (Object.keys(update).length === 0) {
-        return jsonError(
-          403,
-          "После верификации ФИО и дату рождения может изменить только администратор. Остальные поля профиля доступны для редактирования.",
-        );
-      }
-    }
-  }
+  ) as {
+    login?: string;
+    email?: string | null;
+    fullName?: string | null;
+    birthDate?: string | null;
+    establishment?: string | null;
+    savingFor?: string | null;
+    clientNickname?: string | null;
+    clientJobTitle?: string | null;
+  };
 
   if (Object.keys(update).length === 0) {
     logInfo("profile.patch.nothing_to_update", { userId: auth.userId });
@@ -364,7 +362,19 @@ export async function PATCH(request: NextRequest) {
     const profile = await db.user.update({
       where: { id: auth.userId },
       data: update,
-      select: { id: true, uniqueId: true, login: true, email: true, role: true, fullName: true, birthDate: true, establishment: true, savingFor: true },
+      select: {
+        id: true,
+        uniqueId: true,
+        login: true,
+        email: true,
+        role: true,
+        fullName: true,
+        birthDate: true,
+        establishment: true,
+        savingFor: true,
+        clientNickname: true,
+        clientJobTitle: true,
+      },
     });
     logInfo("profile.patch.ok", { userId: auth.userId, uniqueId: profile.uniqueId, updatedKeys: Object.keys(update) });
     return NextResponse.json(profile);

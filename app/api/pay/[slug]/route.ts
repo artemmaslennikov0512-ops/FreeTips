@@ -42,6 +42,7 @@ import {
   loadTipLinkForPaySlug,
   resolvePayInitForSlug,
 } from "@/lib/pay-slug-resolve";
+import { formatPayRecipientClientLabel } from "@/lib/pay-recipient-display";
 import { routingModeForTipLink, TIP_ROUTING_EMPLOYEE_QR, TIP_ROUTING_POOL_QR } from "@/lib/tip-routing";
 
 const DEMO_SLUG = resolveDemoPaySlug();
@@ -114,15 +115,13 @@ export async function GET(request: NextRequest, { params }: Params) {
     const fullName = waiterProfile?.fullName?.trim() || "";
     const employeeName = tipLink.employee?.name?.trim() || "";
     const login = waiterProfile?.login || "";
-    const firstNameFromFullName =
-      fullName && fullName.length > 0
-        ? (() => {
-            const parts = fullName.split(/\s+/).filter(Boolean);
-            return parts.length >= 2 ? parts[1]! : parts[0] ?? fullName;
-          })()
-        : "";
-    const displayName = firstNameFromFullName || employeeName || login || "";
-    recipientName = displayName || "Получатель";
+    recipientName = formatPayRecipientClientLabel({
+      clientNickname: waiterProfile?.clientNickname,
+      clientJobTitle: waiterProfile?.clientJobTitle,
+      fullName,
+      employeeName,
+      login,
+    });
     savingFor = waiterProfile?.savingFor?.trim() || undefined;
     recipientPhotoUrl =
       tipLink.employee?.photoUrl && tipLink.employee?.id
@@ -141,15 +140,12 @@ export async function GET(request: NextRequest, { params }: Params) {
     const u = tipLink.user;
     const fullName = u.fullName?.trim() || "";
     const login = u.login || "";
-    const firstNameFromFullName =
-      fullName && fullName.length > 0
-        ? (() => {
-            const parts = fullName.split(/\s+/).filter(Boolean);
-            return parts.length >= 2 ? parts[1]! : parts[0] ?? fullName;
-          })()
-        : "";
-    const displayName = firstNameFromFullName || login || "";
-    recipientName = displayName || "Получатель";
+    recipientName = formatPayRecipientClientLabel({
+      clientNickname: u.clientNickname,
+      clientJobTitle: u.clientJobTitle,
+      fullName,
+      login,
+    });
     savingFor = u.savingFor?.trim() || undefined;
     recipientPhotoUrl = u.profilePhotoUrl
       ? `${baseUrl.replace(/\/$/, "")}/api/profile/photo/${u.id}`

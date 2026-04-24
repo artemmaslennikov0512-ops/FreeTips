@@ -890,7 +890,7 @@ export default function AdminUserDetailsPage() {
         <div className="cabinet-section-header min-w-0 overflow-hidden rounded-2xl border-0 p-6">
           <h2 className="text-center text-base font-semibold text-white">Анкета</h2>
           <p className="mt-3 text-center text-xs text-white/55">
-            После верификации ФИО и дату рождения пользователь в ЛК не редактирует — правки только здесь.
+            Пользователь может менять ФИО и дату рождения в личном кабинете; здесь — правка от администратора при необходимости.
           </p>
           <dl className="mt-4 grid gap-3 text-sm text-white/90">
             <div className="flex justify-between gap-4">

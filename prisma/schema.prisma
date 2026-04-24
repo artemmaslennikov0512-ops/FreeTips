@@ -100,6 +100,10 @@ model User {
   verificationStatus VerificationStatus @default(NONE)
   verificationRejectionReason String?   @db.VarChar(1000) // причина отказа (видна клиенту)
   savingFor         String?   @db.VarChar(500) // на что копит официант — показывается на странице оплаты
+  /// Имя или ник для гостей на странице оплаты; пусто — имя из ФИО, иначе логин
+  clientNickname    String?   @db.VarChar(120)
+  /// Должность для гостей (свободный текст); пусто — при показе подставляется «Официант»
+  clientJobTitle    String?   @db.VarChar(120)
   profilePhotoUrl   String?   @db.VarChar(512) // фото получателя (RECIPIENT): страница оплаты и ЛК (путь в storage)
   lastAuthIp        String?   @db.VarChar(64) // последний IP входа/регистрации (наблюдение: несколько аккаунтов с одного IP)
   /** TOTP (Google Authenticator) для любого ЛК: секрет в БД только в зашифрованном виде */

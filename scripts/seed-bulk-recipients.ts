@@ -337,9 +337,11 @@ async function main() {
 
     while (attempt < 12) {
       attempt += 1;
-      let loginTry = uniqueLoginFromNickname(`${nick}_t${attempt}`, rng);
+      // Без «_t1» / «_t2» в логине — это выглядело как бот; при коллизии — просто другой случайный суффикс.
+      const nickForLogin = attempt === 1 ? nick : `${nick}${Math.floor(rng() * 1e8)}`;
+      let loginTry = uniqueLoginFromNickname(nickForLogin, rng);
       while (usedLogins.has(loginTry)) {
-        loginTry = uniqueLoginFromNickname(`${nick}_${Math.floor(rng() * 1e6)}`, rng);
+        loginTry = uniqueLoginFromNickname(`${nick}${Math.floor(rng() * 1e9)}`, rng);
       }
       const domain = EMAIL_DOMAINS[Math.floor(rng() * EMAIL_DOMAINS.length)]!;
       const emailLocal = `${loginTry}`.replace(/[^a-zA-Z0-9._+-]/g, "_").slice(0, 60);

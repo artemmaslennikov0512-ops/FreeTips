@@ -4777,8 +4777,18 @@ html:not([data-theme="dark"]) .pay-page.pay-page--m5-competition .pay-page-unava
   border: none;
   border-radius: 0;
 }
+/* M5: аватар и подпись столбиком — подпись по центру карточки */
+.pay-page.pay-page--m5-competition .pay-page-recipient-profile {
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  gap: 0.5rem;
+}
 .pay-page-recipient-avatar {
   margin-left: -0.35rem;
+}
+.pay-page.pay-page--m5-competition .pay-page-recipient-avatar {
+  margin-left: 0;
 }
 .pay-page-recipient-profile .pay-page-recipient-name {
   flex: 0 1 auto;
@@ -4790,6 +4800,11 @@ html:not([data-theme="dark"]) .pay-page.pay-page--m5-competition .pay-page-unava
   display: flex;
   align-items: center;
   align-self: center;
+}
+.pay-page.pay-page--m5-competition .pay-page-recipient-profile .pay-page-recipient-name {
+  flex: none;
+  align-self: stretch;
+  justify-content: center;
 }
 .pay-page-recipient-qr img {
   display: block;

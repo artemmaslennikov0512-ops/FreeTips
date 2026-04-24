@@ -612,9 +612,9 @@ export default function CabinetSettingsPage() {
               )}
             </div>
           </div>
-          <p className="mt-4 rounded-lg bg-[var(--color-dark-gray)]/5 px-3 py-2 text-sm text-[var(--color-text)]">
-            <span className="text-[var(--color-text-secondary)]">Сейчас гости увидят: </span>
-            <span className="font-medium">{payPreviewLine}</span>
+          <p className="mt-4 rounded-lg bg-[var(--color-dark-gray)]/5 px-3 py-2 text-center text-sm text-[var(--color-text)]">
+            <span className="block text-[var(--color-text-secondary)]">Сейчас гости увидят:</span>
+            <span className="mt-0.5 block font-medium">{payPreviewLine}</span>
           </p>
         </div>
 

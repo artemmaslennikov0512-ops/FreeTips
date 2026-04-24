@@ -555,7 +555,10 @@ export default function PayPageClient() {
                     <User className="h-6 w-6" />
                   </div>
                 )}
-                <p className="pay-page-recipient-name min-w-0 truncate flex items-center" style={{ color: fontClr ?? undefined }}>
+                <p
+                  className="pay-page-recipient-name min-w-0 w-full max-w-full flex items-center justify-center text-center break-words"
+                  style={{ color: fontClr ?? undefined }}
+                >
                   {recipientName}
                 </p>
               </div>

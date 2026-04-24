@@ -21,19 +21,54 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-function loadCredentialsByLogin(filePath: string): Map<string, string> {
-  const raw = fs.readFileSync(filePath, "utf8");
-  const map = new Map<string, string>();
+type SeedCreds = {
+  /** как в файле */
+  byLoginExact: Map<string, string>;
+  byLoginLower: Map<string, string>;
+  /** email из 2-й колонки сида → пароль (если логин в БД уже другой, а почта та же) */
+  byEmailLower: Map<string, string>;
+};
+
+function splitSeedLine(line: string): string[] {
+  const t = line.trim();
+  if (!t) return [];
+  if (t.includes("\t")) return t.split("\t").map((s) => s.trim());
+  if (t.includes(",")) return t.split(",").map((s) => s.trim().replace(/^"|"$/g, ""));
+  return [];
+}
+
+function loadSeedCreds(filePath: string): SeedCreds {
+  let raw = fs.readFileSync(filePath, "utf8");
+  if (raw.charCodeAt(0) === 0xfeff) raw = raw.slice(1);
+  const byLoginExact = new Map<string, string>();
+  const byLoginLower = new Map<string, string>();
+  const byEmailLower = new Map<string, string>();
   for (const line of raw.split(/\r?\n/)) {
     const t = line.trim();
     if (!t || t.startsWith("#")) continue;
-    const parts = t.split("\t");
+    const parts = splitSeedLine(t);
     if (parts.length < 3) continue;
     const login = parts[0]!.trim();
+    const email = (parts[1] ?? "").trim();
     const password = parts[2]!.trim();
-    if (login) map.set(login, password);
+    if (!password) continue;
+    if (login) {
+      byLoginExact.set(login, password);
+      byLoginLower.set(login.toLowerCase(), password);
+    }
+    if (email.includes("@")) byEmailLower.set(email.toLowerCase(), password);
   }
-  return map;
+  return { byLoginExact, byLoginLower, byEmailLower };
+}
+
+function pickSeedPassword(login: string, email: string | null, creds: SeedCreds): string | undefined {
+  const a = creds.byLoginExact.get(login) ?? creds.byLoginLower.get(login.toLowerCase());
+  if (a !== undefined) return a;
+  if (email?.includes("@")) {
+    const b = creds.byEmailLower.get(email.trim().toLowerCase());
+    if (b !== undefined) return b;
+  }
+  return undefined;
 }
 
 function splitMapLine(line: string): string[] {
@@ -89,17 +124,18 @@ function loadLoginMapFile(mapPath: string): { newToOld: Map<string, string>; pas
 
 function resolvePassword(
   login: string,
-  creds: Map<string, string>,
+  email: string | null,
+  creds: SeedCreds,
   newToOld: Map<string, string> | null,
   passwordByNewLogin: Map<string, string> | null,
 ): string {
   const fromMap = passwordByNewLogin?.get(login);
   if (fromMap) return fromMap;
-  const direct = creds.get(login);
+  const direct = pickSeedPassword(login, email, creds);
   if (direct !== undefined) return direct;
   const old = newToOld?.get(login);
   if (old !== undefined) {
-    const p = creds.get(old);
+    const p = pickSeedPassword(old, null, creds);
     if (p !== undefined) return p;
   }
   return "";
@@ -131,12 +167,15 @@ export async function runExportWaiterCredentials(): Promise<void> {
       }
     }
 
-    const creds =
-      credPath && fs.existsSync(credPath) ? loadCredentialsByLogin(credPath) : new Map<string, string>();
+    const creds: SeedCreds =
+      credPath && fs.existsSync(credPath) ? loadSeedCreds(credPath) : { byLoginExact: new Map(), byLoginLower: new Map(), byEmailLower: new Map() };
 
-    if (creds.size === 0 && (!passwordByNewLogin || passwordByNewLogin.size === 0)) {
+    const credRows = creds.byLoginExact.size;
+    if (credRows > 0) console.error(`Из сида загружено паролей по логину: ${credRows}`);
+
+    if (credRows === 0 && (!passwordByNewLogin || passwordByNewLogin.size === 0)) {
       throw new Error(
-        "Нужен SEED_EXPORT_CREDENTIALS_FILE (txt сида) или карта с колонками old_login, new_login и password (см. fix-bulk-seed-login-email + SEED_FIX_CREDENTIALS_FILE).",
+        "В файле сида не найдено ни одной строки login+password (проверь табы между колонками). Либо укажи карту с password. Либо SEED_EXPORT_MAP_FILE с old_login/new_login.",
       );
     }
 
@@ -153,6 +192,7 @@ export async function runExportWaiterCredentials(): Promise<void> {
       where,
       select: {
         login: true,
+        email: true,
         tipLinks: { select: { slug: true }, orderBy: { createdAt: "asc" }, take: 1 },
       },
       orderBy: { createdAt: "asc" },
@@ -169,7 +209,7 @@ export async function runExportWaiterCredentials(): Promise<void> {
         missingSlug += 1;
         continue;
       }
-      const password = resolvePassword(r.login, creds, newToOld, passwordByNewLogin);
+      const password = resolvePassword(r.login, r.email, creds, newToOld, passwordByNewLogin);
       if (!password) missingPassword += 1;
       lines.push(`${slug}\t${r.login}\t${password}`);
     }
@@ -184,7 +224,11 @@ export async function runExportWaiterCredentials(): Promise<void> {
     }
 
     if (missingSlug) console.error(`Пропущено без TipLink: ${missingSlug}`);
-    if (missingPassword) console.error(`Строк без пароля (проверь логины/карту): ${missingPassword}`);
+    if (missingPassword) {
+      console.error(
+        `Строк без пароля: ${missingPassword}. Часто логин в БД уже не совпадает с 1-й колонкой сида — тогда нужен SEED_EXPORT_MAP_FILE (old_login → new_login) или карта с колонкой password.`,
+      );
+    }
   } finally {
     await prisma.$disconnect();
   }

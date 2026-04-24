@@ -234,6 +234,20 @@ async function main() {
     process.exit(1);
   }
 
+  try {
+    await prisma.$executeRawUnsafe(`
+      INSERT INTO "waiter_code_sequence" ("id", "lastAllocated")
+      VALUES ('global', 0)
+      ON CONFLICT ("id") DO NOTHING
+    `);
+  } catch (e) {
+    console.error(
+      "Таблица waiter_code_sequence недоступна (часто — не применены миграции). Выполните: npx prisma migrate deploy",
+      e,
+    );
+    process.exit(1);
+  }
+
   const limits = await loadDefaultLimits();
   const now = new Date();
   const { rangeStart, rangeEnd } = registrationWindowMsk(now);

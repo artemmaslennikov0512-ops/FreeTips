@@ -52,11 +52,19 @@ const MAX_ALLOCATION_ATTEMPTS = 50_000;
  */
 export async function allocateNextGlobalWaiterCode(tx: Prisma.TransactionClient): Promise<string> {
   for (let i = 0; i < MAX_ALLOCATION_ATTEMPTS; i++) {
-    const row = await tx.waiterCodeSequence.update({
-      where: { id: GLOBAL_SEQ_ID },
-      data: { lastAllocated: { increment: 1 } },
-      select: { lastAllocated: true },
-    });
+    // Через $queryRaw: в интерактивной транзакции делегат tx.waiterCodeSequence у части сборок Prisma бывает undefined.
+    const rows = await tx.$queryRaw<Array<{ lastAllocated: number }>>`
+      UPDATE "waiter_code_sequence"
+      SET "lastAllocated" = "lastAllocated" + 1
+      WHERE "id" = ${GLOBAL_SEQ_ID}
+      RETURNING "lastAllocated"
+    `;
+    const row = rows[0];
+    if (row == null) {
+      throw new Error(
+        `Нет строки waiter_code_sequence id="${GLOBAL_SEQ_ID}". Выполните на БД: npx prisma migrate deploy`,
+      );
+    }
     if (row.lastAllocated > MAX_GLOBAL_SERIAL) {
       throw new WaiterQrIdentifierExhaustedError();
     }

@@ -34,14 +34,22 @@ export function parseGlobalWaiterCodeString(code: string): number | null {
   return n;
 }
 
+/**
+ * Занят ли код глобально (сотрудник / личная ссылка / пул заведения / стол).
+ * Через $queryRaw: в интерактивной транзакции у части окружений делегаты tx.employee / tx.tipLink и т.д. бывают undefined.
+ */
 async function isWaiterCodeTakenGlobally(tx: Prisma.TransactionClient, code: string): Promise<boolean> {
-  const [emp, link, est, table] = await Promise.all([
-    tx.employee.findUnique({ where: { qrCodeIdentifier: code } }),
-    tx.tipLink.findFirst({ where: { slug: code } }),
-    tx.establishment.findUnique({ where: { uniqueSlug: code }, select: { id: true } }),
-    tx.establishmentTable.findFirst({ where: { tablePaySlug: code }, select: { id: true } }),
-  ]);
-  return !!(emp || link || est || table);
+  const rows = await tx.$queryRaw<Array<{ taken: bigint | number }>>`
+    SELECT (
+      (SELECT COUNT(*)::int FROM "employees" WHERE "qrCodeIdentifier" = ${code})
+      + (SELECT COUNT(*)::int FROM "tip_links" WHERE "slug" = ${code})
+      + (SELECT COUNT(*)::int FROM "establishments" WHERE "uniqueSlug" = ${code})
+      + (SELECT COUNT(*)::int FROM "establishment_tables" WHERE "tablePaySlug" = ${code})
+    ) AS taken
+  `;
+  const raw = rows[0]?.taken;
+  const n = typeof raw === "bigint" ? Number(raw) : Number(raw ?? 0);
+  return n > 0;
 }
 
 const MAX_ALLOCATION_ATTEMPTS = 50_000;

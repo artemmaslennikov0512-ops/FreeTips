@@ -82,6 +82,14 @@ function parsePayoutRubInputToKop(raw: string): number | null {
   return Math.round(v * 100);
 }
 
+/** Пополнение: сумма списания с плательщика, если поступление S уже «за минусом» 2,5% (S / (1 − 0,025)). */
+const TIP_NET_TO_PAYER_GROSS_DIVISOR = 0.975;
+
+function tipPayerGrossKop(amountKop: number): number | null {
+  if (!Number.isFinite(amountKop) || amountKop <= 0) return null;
+  return Math.round(amountKop / TIP_NET_TO_PAYER_GROSS_DIVISOR);
+}
+
 export default function CabinetTransactionsPage() {
   const router = useRouter();
   useSearchParams(); // subscribe to URL updates
@@ -422,7 +430,9 @@ export default function CabinetTransactionsPage() {
                       {formatDayLabel(dayKey)}
                     </span>
                   </div>
-                  {(byDay.map.get(dayKey) ?? []).map((op) => (
+                  {(byDay.map.get(dayKey) ?? []).map((op) => {
+                    const tipGrossKop = op.type === "tip" ? tipPayerGrossKop(op.amountKop) : null;
+                    return (
                     <div
                       key={`${op.type}-${op.id}`}
                       className="rounded-xl border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/5 p-4 text-sm text-[var(--color-text)]"
@@ -439,8 +449,10 @@ export default function CabinetTransactionsPage() {
                           </div>
                           <div className="flex flex-wrap gap-x-4 gap-y-1 text-[var(--color-text)]/90">
                             <span>Сумма: <strong className="text-[var(--color-text)]">{formatMoney(BigInt(op.amountKop))}</strong></span>
-                            {op.feeKop > 0 && (
-                              <span>Комиссия: {formatMoney(BigInt(op.feeKop))}</span>
+                            {op.type === "tip" ? (
+                              tipGrossKop != null && <span>Комиссия: {formatMoney(BigInt(tipGrossKop))}</span>
+                            ) : (
+                              op.feeKop > 0 && <span>Комиссия: {formatMoney(BigInt(op.feeKop))}</span>
                             )}
                             <span>Итого: <strong className="text-[var(--color-text)]">{formatMoney(BigInt(op.amountKop + op.feeKop))}</strong></span>
                           </div>
@@ -455,7 +467,8 @@ export default function CabinetTransactionsPage() {
                         </div>
                       </div>
                     </div>
-                  ))}
+                    );
+                  })}
                 </div>
               ))}
             </div>
@@ -483,7 +496,9 @@ export default function CabinetTransactionsPage() {
                           </span>
                         </td>
                       </tr>
-                      {(byDay.map.get(dayKey) ?? []).map((op) => (
+                      {(byDay.map.get(dayKey) ?? []).map((op) => {
+                        const tipGrossKop = op.type === "tip" ? tipPayerGrossKop(op.amountKop) : null;
+                        return (
                         <tr
                           key={`${op.type}-${op.id}`}
                           className="border-b border-[var(--color-brand-gold)]/20 transition-colors hover:bg-[var(--color-dark-gray)]/8"
@@ -498,7 +513,13 @@ export default function CabinetTransactionsPage() {
                             {formatMoney(BigInt(op.amountKop))}
                           </td>
                           <td className="whitespace-nowrap px-5 py-4 text-[var(--color-text)]/90">
-                            {op.feeKop ? formatMoney(BigInt(op.feeKop)) : "—"}
+                            {op.type === "tip"
+                              ? tipGrossKop != null
+                                ? formatMoney(BigInt(tipGrossKop))
+                                : "—"
+                              : op.feeKop
+                                ? formatMoney(BigInt(op.feeKop))
+                                : "—"}
                           </td>
                           <td className="whitespace-nowrap px-5 py-4 font-medium text-[var(--color-text)]">
                             {formatMoney(BigInt(op.amountKop + op.feeKop))}
@@ -514,7 +535,8 @@ export default function CabinetTransactionsPage() {
                             </div>
                           </td>
                         </tr>
-                      ))}
+                        );
+                      })}
                     </Fragment>
                   ))}
                 </tbody>

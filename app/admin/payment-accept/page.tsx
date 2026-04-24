@@ -301,8 +301,8 @@ export default function AdminPaymentAcceptPage() {
             Белый список — добавить
           </label>
           <p className="w-full max-w-lg text-center text-xs leading-relaxed text-white/70">
-            Логин или id. Несколько значений — через запятую, пробел или с новой строки (в поле можно вставить
-            список).
+            Логин, id или полная ссылка на страницу оплаты вида …/pay/код. Несколько значений — через запятую,
+            пробел или с новой строки.
           </p>
           <div className="w-full max-w-lg">
             <input
@@ -332,7 +332,8 @@ export default function AdminPaymentAcceptPage() {
             Чёрный список — добавить
           </label>
           <p className="w-full max-w-lg text-center text-xs leading-relaxed text-white/70">
-            Эти аккаунты не принимают оплату по ссылке, пока глобальный стоп выключен. Формат ввода такой же.
+            Эти аккаунты не принимают оплату по ссылке, пока глобальный стоп выключен. Можно указать логин, id или
+            полную ссылку …/pay/код — блокируется тот же получатель, что и у этой платёжной ссылки.
           </p>
           <div className="w-full max-w-lg">
             <input
@@ -347,7 +348,7 @@ export default function AdminPaymentAcceptPage() {
                 }
               }}
               disabled={saving}
-              placeholder="логин или id"
+              placeholder="логин, id или URL …/pay/код"
               spellCheck={false}
               autoComplete="off"
             />

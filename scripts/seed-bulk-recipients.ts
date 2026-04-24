@@ -363,9 +363,9 @@ async function main() {
             select: { id: true },
           });
 
+          // requestType не передаём: на старых Prisma Client без поля в create — падает валидация; в БД с колонкой сработает @default("individual").
           await tx.registrationRequest.create({
             data: {
-              requestType: "individual",
               fullName,
               dateOfBirth: birthDate,
               establishment,

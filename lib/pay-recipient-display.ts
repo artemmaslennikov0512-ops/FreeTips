@@ -2,14 +2,14 @@
 
 const DEFAULT_PAY_JOB_TITLE = "Официант";
 
-export function firstNameFromFullName(fullName: string | null | undefined): string {
+function firstNameFromFullName(fullName: string | null | undefined): string {
   const t = (fullName ?? "").trim();
   if (!t) return "";
   const parts = t.split(/\s+/).filter(Boolean);
   return parts.length >= 2 ? parts[1]! : parts[0] ?? t;
 }
 
-export function resolvePayClientNickPart(opts: {
+function resolvePayClientNickPart(opts: {
   clientNickname?: string | null;
   fullName?: string | null;
   employeeName?: string | null;
@@ -26,7 +26,7 @@ export function resolvePayClientNickPart(opts: {
   return "Получатель";
 }
 
-export function resolvePayClientJobTitle(clientJobTitle?: string | null): string {
+function resolvePayClientJobTitle(clientJobTitle?: string | null): string {
   const t = clientJobTitle?.trim();
   return t || DEFAULT_PAY_JOB_TITLE;
 }

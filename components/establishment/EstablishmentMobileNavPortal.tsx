@@ -22,7 +22,7 @@ import {
   PANEL_ESTABLISHMENT_SIDEBAR_TITLE_LINE,
 } from "@/lib/panel-shell-visual-classes";
 
-export type EstablishmentMobileNavGroup = {
+type EstablishmentMobileNavGroup = {
   title: string;
   items: { label: string; href: string; icon: LucideIcon }[];
 };

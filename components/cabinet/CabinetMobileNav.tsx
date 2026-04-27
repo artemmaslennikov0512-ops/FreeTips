@@ -126,7 +126,6 @@ export function CabinetMobileNavPortals() {
     logoutButtonLabel,
     sidebarStyle,
     profileBlockStyle,
-    sidebarBg,
     isM5Cabinet,
     brandFont,
     sidebarDisplayLabel,

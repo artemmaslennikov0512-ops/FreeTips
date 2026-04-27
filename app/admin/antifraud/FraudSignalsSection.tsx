@@ -5,7 +5,7 @@ import Link from "next/link";
 import { RefreshCw, ShieldAlert, Ban } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { fetchWithAuth } from "@/lib/auth-client";
-import { ADMIN_BTN, ADMIN_BTN_DANGER, ADMIN_BTN_PRIMARY, ADMIN_BTN_SM } from "@/lib/admin-button-classes";
+import { ADMIN_BTN, ADMIN_BTN_DANGER, ADMIN_BTN_PRIMARY } from "@/lib/admin-button-classes";
 import { PANEL_SECTION_CARD_SM } from "@/lib/panel-shell-visual-classes";
 
 interface FraudSignalRow {

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { CheckCircle2, XCircle, ArrowRight, HelpCircle, Loader2 } from "lucide-react";
+import { CheckCircle2, XCircle, ArrowRight, HelpCircle, Loader2, Menu } from "lucide-react";
 import { formatMoney } from "@/lib/utils";
 import { fetchWithAuth, clearAccessToken } from "@/lib/auth-client";
 import { PANEL_CARD_TITLE_CABINET_XL } from "@/lib/panel-shell-visual-classes";
@@ -39,7 +39,12 @@ export default function CabinetPayoutReturnPage() {
         }
         const data = await res.json();
         if (data.error && res.status >= 400) {
-          setResult({ status: "error", error: data.error });
+          // Для пользователя показываем понятный итог без технического "Заявка не найдена".
+          if (res.status === 404) {
+            setResult({ status: "unknown" });
+          } else {
+            setResult({ status: "error", error: data.error });
+          }
         } else {
           setResult({
             status: data.status ?? "unknown",
@@ -123,7 +128,7 @@ export default function CabinetPayoutReturnPage() {
             Результат операции
           </h2>
           <p className="text-[var(--color-text-secondary)]">
-            {result.error ?? "Не удалось определить результат. Проверьте историю операций."}
+            {result.error ?? "Операция обрабатывается. Проверьте итог в истории операций."}
           </p>
           <p className="text-sm text-[var(--color-text-secondary)]">
             Через {REDIRECT_DELAY_MS / 1000} сек. вы будете перенаправлены в историю операций.
@@ -131,7 +136,14 @@ export default function CabinetPayoutReturnPage() {
         </>
       )}
 
-      <div className="pt-4">
+      <div className="flex flex-col items-center justify-center gap-3 pt-4 sm:flex-row">
+        <Link
+          href="/cabinet/transactions"
+          className="inline-flex items-center gap-2 rounded-xl border border-[var(--color-brand-gold)]/40 bg-transparent px-5 py-3 font-semibold text-[var(--color-text)] transition-all hover:bg-[var(--color-brand-gold)]/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-gold)]/35"
+        >
+          <Menu className="h-4 w-4" />
+          В меню
+        </Link>
         <Link
           href="/cabinet/transactions"
           className="inline-flex items-center gap-2 rounded-xl bg-[var(--color-navy)] px-5 py-3 font-semibold text-white transition-all hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-navy)]/50"

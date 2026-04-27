@@ -14,7 +14,11 @@
  *   SEED_BULK_CREDENTIALS_FILE=…  — путь к txt с логинами/паролями (по умолчанию ./seed-bulk-recipients-credentials.txt)
  *   SEED_BULK_RANDOM=12345        — seed PRNG для воспроизводимости (опционально)
  *
- * Даты регистрации: с 4 марта по «сегодня» по календарю Europe/Moscow; распределение — мало → рост → спад + лёгкий спад в выходные.
+ * Режим «вечерняя заливка за один календарный день (МСК)» — все userAt от 00:00 МСК сегодня до момента запуска:
+ *   SEED_BULK_SPREAD_CURRENT_MSK_DAY=1
+ *   (остальное как обычно: CONFIRM_SEED_BULK_RECIPIENTS=YES, SEED_BULK_COUNT=…)
+ *
+ * По умолчанию даты регистрации: с 4 марта по «сегодня» (Europe/Moscow); распределение — мало → рост → спад + лёгкий спад в выходные.
  */
 
 import "dotenv/config";
@@ -140,6 +144,73 @@ function randomTimeOnMskDay(dayStartUtc: Date, rng: () => number, capUtc: Date):
   return inst;
 }
 
+/** N моментов в [dayStart, cap] сортированно; равномерный «слой» + случайный джиттер внутри каждого интервала. */
+function spreadTimesMskCurrentDay(count: number, dayStartUtc: Date, capUtc: Date, rng: () => number): Date[] {
+  const t0 = dayStartUtc.getTime();
+  const t1 = capUtc.getTime();
+  const span = t1 - t0;
+  if (span < 60_000) {
+    throw new Error("Окно дня слишком короткое (меньше минуты до полуночи МСК?)");
+  }
+  const out: Date[] = [];
+  for (let i = 0; i < count; i++) {
+    const seg0 = t0 + (span * i) / count;
+    const seg1 = t0 + (span * (i + 1)) / count;
+    const u = seg0 + rng() * Math.max(1, seg1 - seg0);
+    out.push(new Date(u));
+  }
+  out.sort((a, b) => a.getTime() - b.getTime());
+  return out;
+}
+
+/** Заявка → одобрение → регистрация: всё не позже userAt, заявка не раньше earliestUtc. */
+function timelineAroundUserAt(
+  userAt: Date,
+  earliestUtc: Date,
+  rangeStartWide: Date,
+  rng: () => number,
+  clampToSingleDay: boolean,
+): { requestCreatedAt: Date; reviewedAt: Date } {
+  const tUser = userAt.getTime();
+  const tEarliest = earliestUtc.getTime();
+  const reviewLagMs = Math.min((0.5 + rng() * 3.5) * 60 * 60 * 1000, Math.max(0, tUser - tEarliest - 25 * 60 * 1000));
+  let reviewedAt = new Date(tUser - Math.max(12 * 60 * 1000, reviewLagMs));
+  const requestLagMs = (0.5 + rng() * 4) * 60 * 60 * 1000;
+  let requestCreatedAt = new Date(reviewedAt.getTime() - requestLagMs);
+
+  if (clampToSingleDay) {
+    if (requestCreatedAt.getTime() < tEarliest) {
+      const room = reviewedAt.getTime() - tEarliest - 8 * 60 * 1000;
+      if (room > 0) {
+        requestCreatedAt = new Date(tEarliest + rng() * room);
+      } else {
+        requestCreatedAt = new Date(tEarliest);
+      }
+    }
+    if (reviewedAt.getTime() <= requestCreatedAt.getTime()) {
+      reviewedAt = new Date(Math.min(tUser - 6 * 60 * 1000, requestCreatedAt.getTime() + 12 * 60 * 1000));
+    }
+    if (reviewedAt.getTime() >= tUser) {
+      reviewedAt = new Date(tUser - 5 * 60 * 1000);
+    }
+    if (reviewedAt.getTime() <= requestCreatedAt.getTime()) {
+      requestCreatedAt = new Date(Math.max(tEarliest, reviewedAt.getTime() - 25 * 60 * 1000));
+    }
+    return { requestCreatedAt, reviewedAt };
+  }
+
+  if (requestCreatedAt.getTime() < rangeStartWide.getTime() - 20 * MSK_DAY_MS) {
+    requestCreatedAt = new Date(rangeStartWide.getTime() - 3 * MSK_DAY_MS);
+  }
+  if (reviewedAt.getTime() <= requestCreatedAt.getTime()) {
+    reviewedAt = new Date(requestCreatedAt.getTime() + 30 * 60 * 1000);
+  }
+  if (reviewedAt.getTime() >= userAt.getTime()) {
+    reviewedAt = new Date(userAt.getTime() - 15 * 60 * 1000);
+  }
+  return { requestCreatedAt, reviewedAt };
+}
+
 function shuffleInPlace<T>(arr: T[], rng: () => number): void {
   for (let i = arr.length - 1; i > 0; i--) {
     const j = Math.floor(rng() * (i + 1));
@@ -251,13 +322,43 @@ async function main() {
 
   const limits = await loadDefaultLimits();
   const now = new Date();
-  const { rangeStart, rangeEnd } = registrationWindowMsk(now);
-  const dayStarts = enumerateMskDays(rangeStart, rangeEnd);
-  if (dayStarts.length === 0) {
-    console.error("Пустое окно дат (проверьте системное время).");
-    process.exit(1);
+  const spreadMskToday =
+    process.env.SEED_BULK_SPREAD_CURRENT_MSK_DAY === "1" ||
+    process.env.SEED_BULK_SPREAD_CURRENT_MSK_DAY === "true";
+
+  const { y: yNow, m: mNow, day: dNow } = mskCalendarParts(now);
+  const mskMidnightToday = mskLocalToUtc(yNow, mNow, dNow, 0, 0, 0);
+
+  let rangeStart: Date;
+  let rangeEnd: Date;
+  let dayStarts: Date[];
+  let weights: number[];
+  let userAtSchedule: Date[] | null = null;
+
+  if (spreadMskToday) {
+    if (now.getTime() <= mskMidnightToday.getTime()) {
+      console.error("SEED_BULK_SPREAD_CURRENT_MSK_DAY: сейчас до полуночи МСК по календарю — нет интервала «за сегодня».");
+      process.exit(1);
+    }
+    rangeStart = mskMidnightToday;
+    rangeEnd = now;
+    dayStarts = [mskMidnightToday];
+    weights = [1];
+    userAtSchedule = spreadTimesMskCurrentDay(count, mskMidnightToday, now, rng);
+    console.log(
+      `Режим одного дня (МСК): ${mskMidnightToday.toISOString()} … ${now.toISOString()}, слотов: ${userAtSchedule.length}`,
+    );
+  } else {
+    const w = registrationWindowMsk(now);
+    rangeStart = w.rangeStart;
+    rangeEnd = w.rangeEnd;
+    dayStarts = enumerateMskDays(rangeStart, rangeEnd);
+    if (dayStarts.length === 0) {
+      console.error("Пустое окно дат (проверьте системное время).");
+      process.exit(1);
+    }
+    weights = dayWeights(dayStarts, rng);
   }
-  const weights = dayWeights(dayStarts, rng);
 
   const nonWaiterTitles = buildNonWaiterJobTitles();
   shuffleInPlace(nonWaiterTitles, rng);
@@ -285,25 +386,24 @@ async function main() {
   );
 
   console.log(`Запись учётных данных: ${outFile}`);
-  console.log(`Окно регистраций (МСК): ${rangeStart.toISOString()} … ${rangeEnd.toISOString()}, дней: ${dayStarts.length}`);
+  console.log(
+    spreadMskToday
+      ? `Окно: один календарный день МСК до now (${dayStarts.length} дн. в индексе).`
+      : `Окно регистраций (МСК): ${rangeStart.toISOString()} … ${rangeEnd.toISOString()}, дней: ${dayStarts.length}`,
+  );
 
   for (let i = 0; i < count; i++) {
-    const dayIdx = pickWeightedDayIndex(weights, rng);
-    const userAt = randomTimeOnMskDay(dayStarts[dayIdx]!, rng, rangeEnd);
+    const userAt = userAtSchedule
+      ? userAtSchedule[i]!
+      : randomTimeOnMskDay(dayStarts[pickWeightedDayIndex(weights, rng)]!, rng, rangeEnd);
 
-    const reviewLagMs = (0.5 + rng() * 4) * 60 * 60 * 1000;
-    const requestLagMs = (6 + rng() * 96) * 60 * 60 * 1000;
-    let reviewedAt = new Date(userAt.getTime() - reviewLagMs);
-    let requestCreatedAt = new Date(reviewedAt.getTime() - requestLagMs);
-    if (requestCreatedAt.getTime() < rangeStart.getTime() - 20 * MSK_DAY_MS) {
-      requestCreatedAt = new Date(rangeStart.getTime() - 3 * MSK_DAY_MS);
-    }
-    if (reviewedAt.getTime() <= requestCreatedAt.getTime()) {
-      reviewedAt = new Date(requestCreatedAt.getTime() + 30 * 60 * 1000);
-    }
-    if (reviewedAt.getTime() >= userAt.getTime()) {
-      reviewedAt = new Date(userAt.getTime() - 15 * 60 * 1000);
-    }
+    const { requestCreatedAt, reviewedAt } = timelineAroundUserAt(
+      userAt,
+      mskMidnightToday,
+      rangeStart,
+      rng,
+      spreadMskToday,
+    );
 
     const fn = FIRST_NAMES[Math.floor(rng() * FIRST_NAMES.length)]!;
     const ln = LAST_NAMES[Math.floor(rng() * LAST_NAMES.length)]!;

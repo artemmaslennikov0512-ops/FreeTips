@@ -323,32 +323,21 @@ export default function PayPageClient() {
     );
   }
 
-  if (tidFromUrl && urlOutcome === "success" && settlementPhase === "verifying") {
-    return (
-      <div className={`pay-page${m5c} ${PAY_SUCCESS_FLOW_OUTER}`}>
-        <div className={`pay-success-card${m5SuccessCard} ${PAY_SUCCESS_CARD_GEOMETRY}`}>
-          <Loader2 className="mx-auto h-12 w-12 animate-spin text-[var(--color-accent-emerald)]" aria-hidden />
-          <p className="mt-6 text-center text-lg font-medium text-[#0a192f]">Подтверждаем зачисление…</p>
-          <p className="mt-2 text-center text-sm text-[#2d3748]">
-            Платёж прошёл, дождитесь подтверждения — обычно это несколько секунд.
-          </p>
-        </div>
-        <PayTelegramSupportBlock variant="result" className="mt-5 w-full max-w-sm shrink-0" />
-      </div>
-    );
-  }
-
-  if (tidFromUrl && urlOutcome === "success" && settlementPhase === "slow") {
+  if (
+    tidFromUrl &&
+    urlOutcome === "success" &&
+    (settlementPhase === "verifying" || settlementPhase === "slow")
+  ) {
     return (
       <div className={`pay-page${m5c} ${PAY_SUCCESS_FLOW_OUTER}`}>
         <div className={`pay-success-card${m5SuccessCard} ${PAY_SUCCESS_CARD_GEOMETRY}`}>
           <div className={PAY_RESULT_ICON_PENDING}>
-            <Loader2 className="h-9 w-9 text-amber-600 animate-spin" aria-hidden />
+            <CheckCircle2 className="h-9 w-9 text-amber-600" aria-hidden />
           </div>
           <div className="mt-8 flex flex-col items-center text-center">
             <h1 className={PAY_RESULT_TITLE}>Платёж принят</h1>
             <p className={PAY_RESULT_SUBTITLE_MUTED}>
-              Банк подтвердил оплату. Зачисление на баланс получателя может занять несколько минут — это нормально.
+              Спасибо! Оплата прошла успешно. Зачисление на баланс получателя может занять несколько минут — это нормально.
             </p>
           </div>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">

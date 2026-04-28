@@ -97,6 +97,7 @@ function LkPresenceCell({ user }: { user: User }) {
 const PAGE_SIZE = 10;
 type SortField = "createdAt" | "login" | "balance" | "received" | "transactions";
 type SortDirection = "asc" | "desc";
+const SORT_FIELDS: SortField[] = ["createdAt", "login", "balance", "received", "transactions"];
 
 export default function AdminUsersPage() {
   const [users, setUsers] = useState<User[]>([]);
@@ -318,6 +319,10 @@ export default function AdminUsersPage() {
   }, [sortBy, sortOrder]);
 
   const isActiveSortColumn = useCallback((column: SortField) => sortBy === column, [sortBy]);
+  const handleSortByChange = useCallback((value: string) => {
+    if (!SORT_FIELDS.includes(value as SortField)) return;
+    setSortBy(value as SortField);
+  }, []);
 
   if (loading && users.length === 0) {
     return (
@@ -480,7 +485,7 @@ export default function AdminUsersPage() {
               id="admin-users-sort"
               variant="admin"
               value={sortBy}
-              onChange={setSortBy}
+              onChange={handleSortByChange}
               placeholder="По дате"
               options={[
                 { value: "createdAt", label: "По дате" },

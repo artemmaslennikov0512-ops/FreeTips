@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { Search, Copy, Check, Filter, ArrowUpDown, Lock, RefreshCw } from "lucide-react";
+import { Search, Copy, Check, Filter, ArrowUpDown, Lock, RefreshCw, ChevronUp, ChevronDown } from "lucide-react";
 import Link from "next/link";
 import { CustomDropdown } from "@/components/CustomDropdown";
 import { getBaseUrl } from "@/lib/get-base-url";
@@ -95,6 +95,8 @@ function LkPresenceCell({ user }: { user: User }) {
 }
 
 const PAGE_SIZE = 10;
+type SortField = "createdAt" | "login" | "balance" | "received" | "transactions";
+type SortDirection = "asc" | "desc";
 
 export default function AdminUsersPage() {
   const [users, setUsers] = useState<User[]>([]);
@@ -106,8 +108,8 @@ export default function AdminUsersPage() {
   const [roleFilter, setRoleFilter] = useState("");
   const [blockedFilter, setBlockedFilter] = useState("");
   const [lkActiveFilter, setLkActiveFilter] = useState("");
-  const [sortBy, setSortBy] = useState("createdAt");
-  const [sortOrder, setSortOrder] = useState("desc");
+  const [sortBy, setSortBy] = useState<SortField>("createdAt");
+  const [sortOrder, setSortOrder] = useState<SortDirection>("desc");
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [tokenLoading, setTokenLoading] = useState(false);
   const [registrationLink, setRegistrationLink] = useState<string | null>(null);
@@ -299,20 +301,23 @@ export default function AdminUsersPage() {
     }
   };
 
-  const sortedUsers = useMemo(() => {
-    const clientSortKeys = ["balance", "received", "transactions"];
-    if (!clientSortKeys.includes(sortBy)) return users;
-    const sorted = [...users].sort((a, b) => {
-      const valA = sortBy === "balance" ? a.stats.balanceKop
-        : sortBy === "received" ? a.stats.totalReceivedKop
-        : a.stats.transactionsCount;
-      const valB = sortBy === "balance" ? b.stats.balanceKop
-        : sortBy === "received" ? b.stats.totalReceivedKop
-        : b.stats.transactionsCount;
-      return valA - valB;
-    });
-    return sortOrder === "desc" ? sorted.reverse() : sorted;
-  }, [users, sortBy, sortOrder]);
+  const sortedUsers = useMemo(() => users, [users]);
+
+  const cycleSort = useCallback((column: SortField) => {
+    if (sortBy !== column) {
+      setSortBy(column);
+      setSortOrder("desc");
+      return;
+    }
+    if (sortOrder === "desc") {
+      setSortOrder("asc");
+      return;
+    }
+    setSortBy("createdAt");
+    setSortOrder("desc");
+  }, [sortBy, sortOrder]);
+
+  const isActiveSortColumn = useCallback((column: SortField) => sortBy === column, [sortBy]);
 
   if (loading && users.length === 0) {
     return (
@@ -583,7 +588,25 @@ export default function AdminUsersPage() {
           <thead className="bg-[var(--color-brand-gold)]">
             <tr>
               <th className="whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">ID</th>
-              <th className="whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">Логин</th>
+              <th className="whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">
+                <button
+                  type="button"
+                  onClick={() => cycleSort("login")}
+                  className="inline-flex items-center gap-1.5 text-left text-sm font-semibold text-[#0a192f]"
+                >
+                  <span>Логин</span>
+                  <span className="inline-flex flex-col leading-none">
+                    <ChevronUp
+                      className={`h-3 w-3 ${isActiveSortColumn("login") && sortOrder === "asc" ? "opacity-100" : "opacity-40"}`}
+                      aria-hidden
+                    />
+                    <ChevronDown
+                      className={`-mt-1 h-3 w-3 ${isActiveSortColumn("login") && sortOrder === "desc" ? "opacity-100" : "opacity-40"}`}
+                      aria-hidden
+                    />
+                  </span>
+                </button>
+              </th>
               <th className="whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">Код оплаты</th>
               <th
                 className="w-12 whitespace-nowrap px-3 py-3 text-left text-sm font-semibold text-[#0a192f]"
@@ -591,11 +614,83 @@ export default function AdminUsersPage() {
               />
               <th className="whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">Email</th>
               <th className="whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">Роль</th>
-              <th className="whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">Баланс</th>
-              <th className="whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">Получено</th>
-              <th className="whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">Транзакции</th>
+              <th className="whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">
+                <button
+                  type="button"
+                  onClick={() => cycleSort("balance")}
+                  className="inline-flex items-center gap-1.5 text-left text-sm font-semibold text-[#0a192f]"
+                >
+                  <span>Баланс</span>
+                  <span className="inline-flex flex-col leading-none">
+                    <ChevronUp
+                      className={`h-3 w-3 ${isActiveSortColumn("balance") && sortOrder === "asc" ? "opacity-100" : "opacity-40"}`}
+                      aria-hidden
+                    />
+                    <ChevronDown
+                      className={`-mt-1 h-3 w-3 ${isActiveSortColumn("balance") && sortOrder === "desc" ? "opacity-100" : "opacity-40"}`}
+                      aria-hidden
+                    />
+                  </span>
+                </button>
+              </th>
+              <th className="whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">
+                <button
+                  type="button"
+                  onClick={() => cycleSort("received")}
+                  className="inline-flex items-center gap-1.5 text-left text-sm font-semibold text-[#0a192f]"
+                >
+                  <span>Получено</span>
+                  <span className="inline-flex flex-col leading-none">
+                    <ChevronUp
+                      className={`h-3 w-3 ${isActiveSortColumn("received") && sortOrder === "asc" ? "opacity-100" : "opacity-40"}`}
+                      aria-hidden
+                    />
+                    <ChevronDown
+                      className={`-mt-1 h-3 w-3 ${isActiveSortColumn("received") && sortOrder === "desc" ? "opacity-100" : "opacity-40"}`}
+                      aria-hidden
+                    />
+                  </span>
+                </button>
+              </th>
+              <th className="whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">
+                <button
+                  type="button"
+                  onClick={() => cycleSort("transactions")}
+                  className="inline-flex items-center gap-1.5 text-left text-sm font-semibold text-[#0a192f]"
+                >
+                  <span>Транзакции</span>
+                  <span className="inline-flex flex-col leading-none">
+                    <ChevronUp
+                      className={`h-3 w-3 ${isActiveSortColumn("transactions") && sortOrder === "asc" ? "opacity-100" : "opacity-40"}`}
+                      aria-hidden
+                    />
+                    <ChevronDown
+                      className={`-mt-1 h-3 w-3 ${isActiveSortColumn("transactions") && sortOrder === "desc" ? "opacity-100" : "opacity-40"}`}
+                      aria-hidden
+                    />
+                  </span>
+                </button>
+              </th>
               <th className="whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">В ожидании вывода</th>
-              <th className="whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">Дата регистрации</th>
+              <th className="whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">
+                <button
+                  type="button"
+                  onClick={() => cycleSort("createdAt")}
+                  className="inline-flex items-center gap-1.5 text-left text-sm font-semibold text-[#0a192f]"
+                >
+                  <span>Дата регистрации</span>
+                  <span className="inline-flex flex-col leading-none">
+                    <ChevronUp
+                      className={`h-3 w-3 ${isActiveSortColumn("createdAt") && sortOrder === "asc" ? "opacity-100" : "opacity-40"}`}
+                      aria-hidden
+                    />
+                    <ChevronDown
+                      className={`-mt-1 h-3 w-3 ${isActiveSortColumn("createdAt") && sortOrder === "desc" ? "opacity-100" : "opacity-40"}`}
+                      aria-hidden
+                    />
+                  </span>
+                </button>
+              </th>
               <th className="min-w-[7rem] whitespace-nowrap px-4 py-3 text-left text-sm font-semibold text-[#0a192f]">Доступ</th>
             </tr>
           </thead>

@@ -37,6 +37,7 @@ export async function GET(request: NextRequest) {
   const lkActiveFilter = searchParams.get("lkActive");
   const sortBy = searchParams.get("sortBy") ?? "createdAt";
   const sortOrder = searchParams.get("sortOrder") === "asc" ? "asc" : "desc";
+  const statsSort = sortBy === "balance" || sortBy === "received" || sortBy === "transactions";
 
   const now = new Date();
   const lkFreshAfter = new Date(now.getTime() - LK_PRESENCE_WINDOW_MS);
@@ -92,7 +93,7 @@ export async function GET(request: NextRequest) {
     where = baseWhere;
   }
 
-  const [users, total, txAgg, payoutPendingAgg, payoutCompletedAgg] = await Promise.all([
+  const [allCandidates, total] = await Promise.all([
     db.user.findMany({
       where,
       select: {
@@ -109,25 +110,27 @@ export async function GET(request: NextRequest) {
           orderBy: { createdAt: "asc" },
         },
       },
-      orderBy: { [sortBy === "login" ? "login" : "createdAt"]: sortOrder },
-      take: limit,
-      skip: offset,
+      ...(statsSort ? {} : { orderBy: { [sortBy === "login" ? "login" : "createdAt"]: sortOrder }, take: limit, skip: offset }),
     }),
     db.user.count({ where }),
+  ]);
+
+  const userIds = allCandidates.map((u) => u.id);
+  const [txAgg, payoutPendingAgg, payoutCompletedAgg] = await Promise.all([
     db.transaction.groupBy({
       by: ["recipientId"],
-      where: { status: "SUCCESS" },
+      where: { status: "SUCCESS", recipientId: { in: userIds } },
       _sum: { amountKop: true, feeKop: true },
       _count: { _all: true },
     }),
     db.payoutRequest.groupBy({
       by: ["userId"],
-      where: { status: { in: ["CREATED", "PROCESSING"] } },
+      where: { status: { in: ["CREATED", "PROCESSING"] }, userId: { in: userIds } },
       _count: { _all: true },
     }),
     db.payoutRequest.groupBy({
       by: ["userId"],
-      where: { status: "COMPLETED" },
+      where: { status: "COMPLETED", userId: { in: userIds } },
       _sum: { amountKop: true, feeKop: true },
     }),
   ]);
@@ -148,8 +151,7 @@ export async function GET(request: NextRequest) {
     }),
   );
 
-  return NextResponse.json({
-    users: users.map((u) => {
+  const usersWithStats = allCandidates.map((u) => {
       const tx = txMap.get(u.id) ?? { receivedKop: BigInt(0), count: 0 };
       const pendingCount = pendingMap.get(u.id) ?? 0;
       const withdrawn = completedMap.get(u.id) ?? BigInt(0);
@@ -172,7 +174,23 @@ export async function GET(request: NextRequest) {
           payoutsPendingCount: pendingCount,
         },
       };
-    }),
+    });
+
+  const users = statsSort
+    ? [...usersWithStats]
+        .sort((a, b) => {
+          const av =
+            sortBy === "balance" ? a.stats.balanceKop : sortBy === "received" ? a.stats.totalReceivedKop : a.stats.transactionsCount;
+          const bv =
+            sortBy === "balance" ? b.stats.balanceKop : sortBy === "received" ? b.stats.totalReceivedKop : b.stats.transactionsCount;
+          if (av === bv) return b.createdAt.localeCompare(a.createdAt);
+          return sortOrder === "asc" ? av - bv : bv - av;
+        })
+        .slice(offset, offset + limit)
+    : usersWithStats;
+
+  return NextResponse.json({
+    users,
     total,
     limit,
     offset,

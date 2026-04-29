@@ -3,20 +3,71 @@
  * В приложении: пополнение картой (Register → SDPayIn).
  * Порядок параметров и подпись — Таблицы 1, 2, 44 и Приложение №2.
  *
- * Все запросы к API Paygine идут через очередь: по одному в момент. При нескольких вебхуках одновременно
- * запросы не летят параллельно — снижается риск ошибок и лимитов со стороны ПЦ.
+ * Все запросы к API Paygine идут через ограниченный параллелизм по каналам:
+ * - tip (пополнения/переливы/статусы),
+ * - payout (выводы).
+ * Это уменьшает хвосты в пике и не даёт одному типу операций полностью забить другой.
  */
 
 import { buildPaygineSignature } from "./signature";
 import { logWarn } from "@/lib/logger";
 
-let paygineQueue: Promise<unknown> = Promise.resolve();
+type PaygineChannel = "tip" | "payout";
 
-/** Выполняет запрос к Paygine по одному (очередь). */
-function withPaygineSerial<T>(fn: () => Promise<T>): Promise<T> {
-  const work = paygineQueue.then(() => fn());
-  paygineQueue = work.catch(() => undefined);
-  return work;
+type ChannelLimiterState = {
+  active: number;
+  waiters: Array<() => void>;
+};
+
+const channelState: Record<PaygineChannel, ChannelLimiterState> = {
+  tip: { active: 0, waiters: [] },
+  payout: { active: 0, waiters: [] },
+};
+
+/**
+ * Параллелизм внешних вызовов Paygine.
+ * Дефолт: 4 (можно мгновенно откатить в env до 1 без правок кода).
+ */
+function getPaygineApiConcurrency(): number {
+  const raw = process.env.PAYGINE_API_CONCURRENCY?.trim();
+  if (!raw) return 4;
+  const n = parseInt(raw, 10);
+  return Number.isFinite(n) && n >= 1 && n <= 16 ? n : 4;
+}
+
+function getPaygineChannelConcurrency(channel: PaygineChannel): number {
+  if (channel === "payout") {
+    const raw = process.env.PAYGINE_API_CONCURRENCY_PAYOUT?.trim();
+    if (!raw) return 1;
+    const n = parseInt(raw, 10);
+    return Number.isFinite(n) && n >= 1 && n <= 16 ? n : 1;
+  }
+  const raw = process.env.PAYGINE_API_CONCURRENCY_TIP?.trim();
+  if (!raw) return getPaygineApiConcurrency();
+  const n = parseInt(raw, 10);
+  return Number.isFinite(n) && n >= 1 && n <= 16 ? n : getPaygineApiConcurrency();
+}
+
+/** Выполняет запросы к Paygine с ограниченным параллелизмом по каналу. */
+async function withPaygineChannel<T>(channel: PaygineChannel, fn: () => Promise<T>): Promise<T> {
+  const cap = getPaygineChannelConcurrency(channel);
+  const state = channelState[channel];
+  if (state.active >= cap) {
+    await new Promise<void>((resolve) => state.waiters.push(resolve));
+  }
+  state.active += 1;
+  try {
+    return await fn();
+  } finally {
+    state.active = Math.max(0, state.active - 1);
+    const next = state.waiters.shift();
+    if (next) next();
+  }
+}
+
+/** Совместимость: по умолчанию канал tip. */
+async function withPaygineSerial<T>(fn: () => Promise<T>): Promise<T> {
+  return withPaygineChannel("tip", fn);
 }
 
 // Базовый URL для запросов — до /webapi включительно. Тест: https://test.paygine.com/webapi , прод: https://pay.paygine.com/webapi
@@ -417,7 +468,7 @@ export async function sdPayOut(
   config: PaygineConfig,
   params: SDPayOutParams
 ): Promise<SDPayOutResult> {
-  return withPaygineSerial(async () => {
+  return withPaygineChannel("payout", async () => {
   const { sector, password } = config;
   const pan = params.pan.replace(/\s/g, "");
   const amountStr = String(params.amountKop);
@@ -603,7 +654,7 @@ export async function sdPayOutSBPPrecheck(
   config: PaygineConfig,
   params: SDPayOutSBPPrecheckParams
 ): Promise<SDPayOutSBPPrecheckResult> {
-  return withPaygineSerial(async () => {
+  return withPaygineChannel("payout", async () => {
   const { sector, password } = config;
   const signParts = [
     String(sector),
@@ -660,7 +711,7 @@ export async function sdPayOutSBP(
   config: PaygineConfig,
   params: SDPayOutSBPParams
 ): Promise<SDPayOutSBPResult> {
-  return withPaygineSerial(async () => {
+  return withPaygineChannel("payout", async () => {
   const { sector, password } = config;
   const signParts = [String(sector), params.precheck_id];
   const signature = buildPaygineSignature(signParts, password);

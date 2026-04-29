@@ -6,6 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
+import { createHash } from "crypto";
 import { requireAuthOrApiKey } from "@/lib/auth-or-api-key";
 import { db } from "@/lib/db";
 import { getPaygineConfig } from "@/lib/config";
@@ -33,6 +34,17 @@ const paygineBalanceCache = new Map<
   string,
   { balanceKop: number; cachedAt: number }
 >();
+const PROFILE_BALANCE_SOURCE_LOG_EVERY_MS =
+  (Number(process.env.PROFILE_BALANCE_SOURCE_LOG_EVERY_SEC) || 300) * 1000;
+const profileBalanceSourceLogState = new Map<
+  string,
+  {
+    lastLoggedAt: number;
+    lastBalanceFromDb: number;
+    lastBalanceFromPaygine: number | null;
+    lastBalanceReturned: number;
+  }
+>();
 
 function getCachedPaygineBalance(userId: string): number | null {
   const entry = paygineBalanceCache.get(userId);
@@ -46,6 +58,39 @@ function getCachedPaygineBalance(userId: string): number | null {
 
 function setCachedPaygineBalance(userId: string, balanceKop: number): void {
   paygineBalanceCache.set(userId, { balanceKop, cachedAt: Date.now() });
+}
+
+function buildWeakEtagFromJson(payload: unknown): string {
+  const json = JSON.stringify(payload);
+  const digest = createHash("sha1").update(json).digest("base64url").slice(0, 16);
+  return `W/"${json.length.toString(16)}-${digest}"`;
+}
+
+function shouldLogProfileBalanceSource(
+  userId: string,
+  snapshot: {
+    balanceFromDb: number;
+    balanceFromPaygine: number | null;
+    balanceReturned: number;
+  },
+): boolean {
+  const now = Date.now();
+  const prev = profileBalanceSourceLogState.get(userId);
+  if (!prev) {
+    profileBalanceSourceLogState.set(userId, { lastLoggedAt: now, ...snapshot });
+    return true;
+  }
+
+  const changed =
+    prev.lastBalanceFromDb !== snapshot.balanceFromDb ||
+    prev.lastBalanceFromPaygine !== snapshot.balanceFromPaygine ||
+    prev.lastBalanceReturned !== snapshot.balanceReturned;
+  const periodic = now - prev.lastLoggedAt >= PROFILE_BALANCE_SOURCE_LOG_EVERY_MS;
+  if (changed || periodic) {
+    profileBalanceSourceLogState.set(userId, { lastLoggedAt: now, ...snapshot });
+    return true;
+  }
+  return false;
 }
 
 export async function GET(request: NextRequest) {
@@ -169,16 +214,21 @@ export async function GET(request: NextRequest) {
         }
       }
     }
-    logInfo("profile.balance_source", {
-      userId: id,
-      login: profile.login,
-      uniqueId: profile.uniqueId,
+    const balanceSourceSnapshot = {
       balanceFromDb: Number(balanceCalculated),
       balanceFromPaygine: paygineBalanceKop,
       balanceReturned: balanceKopForStats,
-      sdRef: sdRef ?? null,
-      transactionsCount: txCount,
-    });
+    };
+    if (shouldLogProfileBalanceSource(id, balanceSourceSnapshot)) {
+      logInfo("profile.balance_source", {
+        userId: id,
+        login: profile.login,
+        uniqueId: profile.uniqueId,
+        ...balanceSourceSnapshot,
+        sdRef: sdRef ?? null,
+        transactionsCount: txCount,
+      });
+    }
 
     const maxPayoutPerRequestKop = Number(
       computeEffectiveMaxPayoutPerRequestKop({
@@ -266,6 +316,18 @@ export async function GET(request: NextRequest) {
             ? `${getBaseUrlFromRequest(request).replace(/\/$/, "")}/api/profile/photo/${profile.id}`
             : null,
     };
+    const etag = buildWeakEtagFromJson(body);
+    const ifNoneMatch = request.headers.get("if-none-match")?.trim();
+    if (ifNoneMatch && ifNoneMatch === etag) {
+      return new NextResponse(null, {
+        status: 304,
+        headers: {
+          ETag: etag,
+          "Cache-Control": "private, no-cache",
+        },
+      });
+    }
+
     const elapsedMs = Date.now() - startedAt;
     if (elapsedMs >= 1200) {
       logInfo("profile.slow_request", {
@@ -274,7 +336,12 @@ export async function GET(request: NextRequest) {
         source: "profile.get",
       });
     }
-    return NextResponse.json(body);
+    return NextResponse.json(body, {
+      headers: {
+        ETag: etag,
+        "Cache-Control": "private, no-cache",
+      },
+    });
   } catch (err) {
     const requestId = getRequestId(request);
     logError("profile.get.error", err, { requestId });

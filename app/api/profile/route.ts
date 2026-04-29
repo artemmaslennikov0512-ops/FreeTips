@@ -77,7 +77,12 @@ function shouldLogProfileBalanceSource(
   const now = Date.now();
   const prev = profileBalanceSourceLogState.get(userId);
   if (!prev) {
-    profileBalanceSourceLogState.set(userId, { lastLoggedAt: now, ...snapshot });
+    profileBalanceSourceLogState.set(userId, {
+      lastLoggedAt: now,
+      lastBalanceFromDb: snapshot.balanceFromDb,
+      lastBalanceFromPaygine: snapshot.balanceFromPaygine,
+      lastBalanceReturned: snapshot.balanceReturned,
+    });
     return true;
   }
 
@@ -87,7 +92,12 @@ function shouldLogProfileBalanceSource(
     prev.lastBalanceReturned !== snapshot.balanceReturned;
   const periodic = now - prev.lastLoggedAt >= PROFILE_BALANCE_SOURCE_LOG_EVERY_MS;
   if (changed || periodic) {
-    profileBalanceSourceLogState.set(userId, { lastLoggedAt: now, ...snapshot });
+    profileBalanceSourceLogState.set(userId, {
+      lastLoggedAt: now,
+      lastBalanceFromDb: snapshot.balanceFromDb,
+      lastBalanceFromPaygine: snapshot.balanceFromPaygine,
+      lastBalanceReturned: snapshot.balanceReturned,
+    });
     return true;
   }
   return false;

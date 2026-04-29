@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo, Fragment, useCallback } from "react";
+import { useEffect, useState, useMemo, Fragment, useCallback, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { CheckCircle2, Clock, XCircle, ChevronLeft, ChevronRight } from "lucide-react";
 import { formatMoney, formatDate, toMoscowDateKey, formatMoscowCalendarDayLabel } from "@/lib/utils";
@@ -26,6 +26,10 @@ type Operation = {
   linkSlug?: string;
   createdAt: string;
 };
+
+function operationKey(op: Operation): string {
+  return `${op.type}:${op.id}`;
+}
 
 function operationStatusKind(op: Operation): "success" | "pending" | "failed" {
   if (op.type === "tip") {
@@ -104,6 +108,8 @@ export default function CabinetTransactionsPage() {
   const [payoutLimitsFromProfile, setPayoutLimitsFromProfile] = useState(false);
   const [verificationStatus, setVerificationStatus] = useState<string | null>(null);
   const [login, setLogin] = useState<string | null>(null);
+  const fetchInFlightRef = useRef(false);
+  const latestOperationAtRef = useRef<string | null>(null);
 
   const maxPayoutRub = maxPayoutPerRequestKop / 100;
   const enteredPayoutKop = parsePayoutRubInputToKop(sdPageAmount);
@@ -129,9 +135,15 @@ export default function CabinetTransactionsPage() {
     setCurrentPage((p) => Math.min(p, Math.max(1, Math.ceil(list.length / PER_PAGE))));
   }, [list.length]);
 
-  const fetchData = useCallback(async () => {
+  const fetchData = useCallback(async (mode: "full" | "incremental" = "full") => {
+    if (fetchInFlightRef.current) return;
+    fetchInFlightRef.current = true;
     try {
-      const res = await fetchWithAuth("/api/operations?limit=50");
+      const sinceParam =
+        mode === "incremental" && latestOperationAtRef.current
+          ? `&since=${encodeURIComponent(latestOperationAtRef.current)}`
+          : "";
+      const res = await fetchWithAuth(`/api/operations?limit=50${sinceParam}`);
       if (res.status === 401) {
         clearAccessToken();
         router.replace("/login");
@@ -141,9 +153,26 @@ export default function CabinetTransactionsPage() {
         setError("Не удалось загрузить историю");
         return;
       }
-      const data = (await res.json()) as { operations: Operation[]; total: number };
-      setList(data.operations);
-      setTotal(data.total);
+      const data = (await res.json()) as { operations: Operation[]; total: number | null };
+      if (mode === "incremental") {
+        setList((prev) => {
+          const byKey = new Map<string, Operation>();
+          for (const op of prev) byKey.set(operationKey(op), op);
+          for (const op of data.operations) byKey.set(operationKey(op), op);
+          const merged = Array.from(byKey.values()).sort(
+            (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+          );
+          const next = merged.slice(0, 200);
+          latestOperationAtRef.current = next[0]?.createdAt ?? latestOperationAtRef.current;
+          return next;
+        });
+      } else {
+        setList(data.operations);
+        latestOperationAtRef.current = data.operations[0]?.createdAt ?? null;
+      }
+      if (typeof data.total === "number") {
+        setTotal(data.total);
+      }
 
       const profileRes = await fetchWithAuth("/api/profile");
       if (profileRes.ok) {
@@ -170,19 +199,43 @@ export default function CabinetTransactionsPage() {
     } catch {
       setError("Ошибка соединения");
     } finally {
+      fetchInFlightRef.current = false;
       setLoading(false);
     }
   }, [router]);
 
   useEffect(() => {
-    fetchData();
+    fetchData("full");
+  }, [fetchData]);
+
+  // Фоновый refresh при открытой вкладке с jitter (без "волны" запросов у всех клиентов одновременно).
+  useEffect(() => {
+    let disposed = false;
+    let timer: number | null = null;
+
+    const schedule = () => {
+      if (disposed) return;
+      const jitterMs = Math.floor(Math.random() * 5000);
+      timer = window.setTimeout(() => {
+        if (document.visibilityState === "visible") {
+          fetchData("incremental");
+        }
+        schedule();
+      }, 30000 + jitterMs);
+    };
+
+    schedule();
+    return () => {
+      disposed = true;
+      if (timer != null) window.clearTimeout(timer);
+    };
   }, [fetchData]);
 
   // Обновление баланса и списка при возврате на вкладку (после зачислений/списаний)
   useEffect(() => {
     const onVisible = () => {
       if (document.visibilityState === "visible") {
-        fetchData();
+        fetchData("full");
       }
     };
     document.addEventListener("visibilitychange", onVisible);

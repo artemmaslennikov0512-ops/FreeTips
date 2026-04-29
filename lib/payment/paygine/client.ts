@@ -8,6 +8,7 @@
  */
 
 import { buildPaygineSignature } from "./signature";
+import { logWarn } from "@/lib/logger";
 
 let paygineQueue: Promise<unknown> = Promise.resolve();
 
@@ -108,13 +109,11 @@ export async function registerOrder(
 
   const body = new URLSearchParams(pairs);
 
-  const res = await fetch(`${getPaygineBaseUrl()}/Register`, {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: body.toString(),
-  });
-
-  const text = await res.text();
+  const fetched = await fetchPaygineFormText(`${getPaygineBaseUrl()}/Register`, body);
+  if (!fetched.ok) {
+    return { ok: false, description: fetched.description.slice(0, 500) };
+  }
+  const { res, text } = fetched;
   const trimmed = text.trim();
   const responsePreview = text.replace(/\s+/g, " ").trim().slice(0, 1200);
   if (!res.ok) {
@@ -253,13 +252,11 @@ export async function getOrderStatus(
   pairs.push(["mode", "1"], ["signature", signature]);
   const body = new URLSearchParams(pairs);
 
-  const res = await fetch(`${getPaygineBaseUrl()}/Order`, {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: body.toString(),
-  });
-
-  const text = await res.text();
+  const fetched = await fetchPaygineFormText(`${getPaygineBaseUrl()}/Order`, body);
+  if (!fetched.ok) {
+    return { ok: false, description: fetched.description.slice(0, 500) };
+  }
+  const { res, text } = fetched;
   if (!res.ok) {
     return { ok: false, description: text.slice(0, 500) || `HTTP ${res.status}` };
   }
@@ -362,16 +359,14 @@ export async function sdRelocateFunds(
     ["signature", signature],
   ]);
 
-  const res = await fetch(
+  const fetched = await fetchPaygineFormText(
     `${getPaygineBaseUrl()}/${SD_SERVICES_PATH}/SDRelocateFunds`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: body.toString(),
-    }
+    body,
   );
-
-  const text = await res.text();
+  if (!fetched.ok) {
+    return { ok: false, description: fetched.description.slice(0, 500) };
+  }
+  const { res, text } = fetched;
   if (!res.ok) {
     return { ok: false, description: text.slice(0, 500) || `HTTP ${res.status}` };
   }
@@ -441,13 +436,11 @@ export async function sdPayOut(
   body.set("description", (params.description ?? "Payout").trim().slice(0, 1000));
   if (params.feeKop != null && params.feeKop > 0) body.set("fee", String(params.feeKop));
 
-  const res = await fetch(`${getPaygineBaseUrl()}/${SD_SERVICES_PATH}/SDPayOut`, {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: body.toString(),
-  });
-
-  const text = await res.text();
+  const fetched = await fetchPaygineFormText(`${getPaygineBaseUrl()}/${SD_SERVICES_PATH}/SDPayOut`, body);
+  if (!fetched.ok) {
+    return { ok: false, description: fetched.description.slice(0, 500) };
+  }
+  const { res, text } = fetched;
   if (!res.ok) {
     return { ok: false, description: text.slice(0, 500) || `HTTP ${res.status}` };
   }
@@ -493,6 +486,55 @@ export function getSDPayOutPageEndpoint(): string {
 const SD_SERVICES_PATH = "b2puser/sd-services";
 
 const DEFAULT_REQUEST_TIMEOUT_MS = 10_000;
+const DEFAULT_REQUEST_ERROR = "Request failed";
+
+function getPaygineRequestTimeoutMs(): number {
+  return Number(process.env.PAYGINE_REQUEST_TIMEOUT_MS) || DEFAULT_REQUEST_TIMEOUT_MS;
+}
+
+async function fetchPaygineFormText(
+  url: string,
+  body: URLSearchParams,
+): Promise<
+  | { ok: true; res: Response; text: string }
+  | { ok: false; description: string; timeout: boolean }
+> {
+  const timeoutMs = getPaygineRequestTimeoutMs();
+  const endpointPath = (() => {
+    try {
+      return new URL(url).pathname;
+    } catch {
+      return url;
+    }
+  })();
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: body.toString(),
+      signal: controller.signal,
+    });
+    const text = await res.text();
+    return { ok: true, res, text };
+  } catch (err) {
+    const isAbort = err instanceof Error && err.name === "AbortError";
+    if (isAbort) {
+      logWarn("paygine.request.timeout", {
+        endpoint: endpointPath,
+        timeoutMs,
+      });
+    }
+    return {
+      ok: false,
+      timeout: isAbort,
+      description: isAbort ? `Timeout after ${timeoutMs}ms` : err instanceof Error ? err.message : DEFAULT_REQUEST_ERROR,
+    };
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
 
 type SDGetBalanceResult =
   | { ok: true; balanceKop: number }
@@ -517,29 +559,11 @@ export async function sdGetBalance(
     ["signature", signature],
   ]);
 
-  const timeoutMs = Number(process.env.PAYGINE_REQUEST_TIMEOUT_MS) || DEFAULT_REQUEST_TIMEOUT_MS;
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
-
-  let res: Response;
-  let text: string;
-  try {
-    res = await fetch(`${getPaygineBaseUrl()}/${SD_SERVICES_PATH}/SDGetBalance`, {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: body.toString(),
-      signal: controller.signal,
-    });
-    text = await res.text();
-  } catch (err) {
-    clearTimeout(timeoutId);
-    const isAbort = err instanceof Error && err.name === "AbortError";
-    return {
-      ok: false,
-      description: isAbort ? "Timeout" : err instanceof Error ? err.message : "Request failed",
-    };
+  const fetched = await fetchPaygineFormText(`${getPaygineBaseUrl()}/${SD_SERVICES_PATH}/SDGetBalance`, body);
+  if (!fetched.ok) {
+    return { ok: false, description: fetched.description.slice(0, 500) };
   }
-  clearTimeout(timeoutId);
+  const { res, text } = fetched;
 
   if (!res.ok) {
     return { ok: false, description: text.slice(0, 500) || `HTTP ${res.status}` };
@@ -597,16 +621,14 @@ export async function sdPayOutSBPPrecheck(
     ["signature", signature],
   ]);
 
-  const res = await fetch(
+  const fetched = await fetchPaygineFormText(
     `${getPaygineBaseUrl()}/${SD_SERVICES_PATH}/SDPayOutSBPPrecheck`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: body.toString(),
-    }
+    body,
   );
-
-  const text = await res.text();
+  if (!fetched.ok) {
+    return { ok: false, description: fetched.description.slice(0, 500) };
+  }
+  const { res, text } = fetched;
   if (!res.ok) {
     return { ok: false, description: text.slice(0, 500) || `HTTP ${res.status}` };
   }
@@ -649,16 +671,14 @@ export async function sdPayOutSBP(
     ["signature", signature],
   ]);
 
-  const res = await fetch(
+  const fetched = await fetchPaygineFormText(
     `${getPaygineBaseUrl()}/${SD_SERVICES_PATH}/SDPayOutSBP`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: body.toString(),
-    }
+    body,
   );
-
-  const text = await res.text();
+  if (!fetched.ok) {
+    return { ok: false, description: fetched.description.slice(0, 500) };
+  }
+  const { res, text } = fetched;
   if (!res.ok) {
     return { ok: false, description: text.slice(0, 500) || `HTTP ${res.status}` };
   }

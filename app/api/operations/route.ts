@@ -1,7 +1,9 @@
 /**
  * GET /api/operations — единая история операций (пополнения + выводы).
  * Поддержка: Bearer (кабинет) и X-API-Key (приложение).
- * Query: limit (default 50), offset (default 0).
+ * Query:
+ * - limit (default 50), offset (default 0)
+ * - since (ISO datetime, optional) — вернуть только новые операции после указанного времени.
  */
 
 import { NextRequest, NextResponse } from "next/server";
@@ -10,6 +12,7 @@ import { db } from "@/lib/db";
 import { parseLimitOffset } from "@/lib/api/helpers";
 import { feeKopForPayout } from "@/lib/payment/paygine-fee";
 import { getBaseUrlFromRequest } from "@/lib/get-base-url";
+import { logInfo } from "@/lib/logger";
 
 export type OperationItem = {
   id: string;
@@ -27,17 +30,30 @@ export type OperationItem = {
 };
 
 export async function GET(request: NextRequest) {
+  const startedAt = Date.now();
   const auth = await requireAuthOrApiKey(request);
   if ("response" in auth) return auth.response;
 
   const { searchParams } = new URL(request.url);
   const { limit, offset } = parseLimitOffset(searchParams);
+  const sinceRaw = searchParams.get("since")?.trim() ?? "";
+  const sinceDate = sinceRaw ? new Date(sinceRaw) : null;
+  const hasSince = !!sinceDate && !Number.isNaN(sinceDate.getTime());
 
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") || getBaseUrlFromRequest(request) || "";
-  const takeEach = offset + limit;
+  const takeEach = hasSince ? limit : offset + limit;
+  const txWhere = {
+    recipientId: auth.userId,
+    status: "SUCCESS" as const,
+    ...(hasSince && sinceDate ? { createdAt: { gt: sinceDate } } : {}),
+  };
+  const payoutWhere = {
+    userId: auth.userId,
+    ...(hasSince && sinceDate ? { createdAt: { gt: sinceDate } } : {}),
+  };
   const [transactions, payouts, totalTx, totalPayout] = await Promise.all([
     db.transaction.findMany({
-      where: { recipientId: auth.userId, status: "SUCCESS" },
+      where: txWhere,
       select: {
         id: true,
         amountKop: true,
@@ -51,14 +67,18 @@ export async function GET(request: NextRequest) {
       skip: 0,
     }),
     db.payoutRequest.findMany({
-      where: { userId: auth.userId },
+      where: payoutWhere,
       select: { id: true, amountKop: true, feeKop: true, status: true, rejectionReason: true, createdAt: true },
       orderBy: { createdAt: "desc" },
       take: takeEach,
       skip: 0,
     }),
-    db.transaction.count({ where: { recipientId: auth.userId, status: "SUCCESS" } }),
-    db.payoutRequest.count({ where: { userId: auth.userId } }),
+    hasSince
+      ? Promise.resolve<number | null>(null)
+      : db.transaction.count({ where: { recipientId: auth.userId, status: "SUCCESS" } }),
+    hasSince
+      ? Promise.resolve<number | null>(null)
+      : db.payoutRequest.count({ where: { userId: auth.userId } }),
   ]);
 
   const txItems: OperationItem[] = transactions.map((t) => ({
@@ -91,8 +111,25 @@ export async function GET(request: NextRequest) {
   const merged = [...txItems, ...payoutItems].sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
   );
-  const total = totalTx + totalPayout;
-  const list = merged.slice(offset, offset + limit);
+  const total =
+    totalTx != null && totalPayout != null
+      ? totalTx + totalPayout
+      : null;
+  const list = hasSince ? merged.slice(0, limit) : merged.slice(offset, offset + limit);
+
+  const elapsedMs = Date.now() - startedAt;
+  if (elapsedMs >= 1200) {
+    logInfo("operations.slow_request", {
+      userId: auth.userId,
+      mode: hasSince ? "incremental" : "full",
+      limit,
+      offset,
+      elapsedMs,
+      txRows: transactions.length,
+      payoutRows: payouts.length,
+      returned: list.length,
+    });
+  }
 
   return NextResponse.json({ operations: list, total });
 }

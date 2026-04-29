@@ -1,6 +1,6 @@
 /**
  * GET /api/profile
- * Данные текущего пользователя (login, email, role) и статистика (баланс, всего получено, кол-во платежей, заявок на вывод).
+ * Данные текущего пользователя (login, email, role) и статистика: баланс из БД (как при выводе), всего получено, кол-во платежей, заявок на вывод.
  * PATCH /api/profile — обновление полей профиля (login, email, ФИО, дата рождения и др.).
  * Требует: Authorization: Bearer <access_token>
  */
@@ -26,7 +26,7 @@ import { getBaseUrlFromRequest } from "@/lib/get-base-url";
 import { messageFromUnknown } from "@/lib/errors";
 import { getBalance } from "@/lib/balance";
 
-/** Кэш баланса Paygine по userId для снижения числа запросов к ПЦ. TTL из PAYGINE_BALANCE_CACHE_TTL_SEC (по умолчанию 30 сек). */
+/** Кэш ответа Paygine sdGetBalance по userId (только для логов/мониторинга; основной баланс в ответе — из БД). TTL: PAYGINE_BALANCE_CACHE_TTL_SEC (по умолчанию 30 сек). */
 const PAYGINE_BALANCE_CACHE_TTL_MS =
   (Number(process.env.PAYGINE_BALANCE_CACHE_TTL_SEC) || 30) * 1000;
 const paygineBalanceCache = new Map<
@@ -49,6 +49,7 @@ function setCachedPaygineBalance(userId: string, balanceKop: number): void {
 }
 
 export async function GET(request: NextRequest) {
+  const startedAt = Date.now();
   try {
     const auth = await requireAuthOrApiKey(request);
     if ("response" in auth) return auth.response;
@@ -147,7 +148,8 @@ export async function GET(request: NextRequest) {
     const monthCount = monthPayouts._count;
     const monthSumKop = monthPayouts._sum.amountKop ?? BigInt(0);
 
-    let balanceKopForStats = Number(balanceCalculated);
+    /** Основной баланс для ЛК и вывода — учёт в БД (совпадает с getBalance в /api/payouts). */
+    const balanceKopForStats = Number(balanceCalculated);
     const paygineConfig = getPaygineConfig();
     const sdRef = profile.paygineSdRef?.trim();
     let paygineBalanceKop: number | null = null;
@@ -155,17 +157,15 @@ export async function GET(request: NextRequest) {
       const cached = getCachedPaygineBalance(id);
       if (cached !== null) {
         paygineBalanceKop = cached;
-        balanceKopForStats = cached;
       } else {
         try {
           const paygineBalance = await sdGetBalance(paygineConfig, { sdRef });
           if (paygineBalance.ok) {
             paygineBalanceKop = paygineBalance.balanceKop;
-            balanceKopForStats = paygineBalance.balanceKop;
             setCachedPaygineBalance(id, paygineBalance.balanceKop);
           }
         } catch {
-          // При недоступности Paygine отдаём баланс по БД
+          /* Paygine недоступен — в ответе только БД, в логе paygineBalanceKop останется null */
         }
       }
     }
@@ -266,6 +266,14 @@ export async function GET(request: NextRequest) {
             ? `${getBaseUrlFromRequest(request).replace(/\/$/, "")}/api/profile/photo/${profile.id}`
             : null,
     };
+    const elapsedMs = Date.now() - startedAt;
+    if (elapsedMs >= 1200) {
+      logInfo("profile.slow_request", {
+        userId: id,
+        elapsedMs,
+        source: "profile.get",
+      });
+    }
     return NextResponse.json(body);
   } catch (err) {
     const requestId = getRequestId(request);

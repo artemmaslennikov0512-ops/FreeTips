@@ -63,6 +63,7 @@ export default function CabinetDashboardPage() {
   const [savingForSaving, setSavingForSaving] = useState(false);
   const [savingForEditing, setSavingForEditing] = useState(false);
   const goalTextareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const fetchInFlightRef = useRef(false);
 
   useEffect(() => {
     const el = goalTextareaRef.current;
@@ -72,6 +73,8 @@ export default function CabinetDashboardPage() {
   }, [savingForEdit]);
 
   const fetchProfileAndData = useCallback(async () => {
+    if (fetchInFlightRef.current) return;
+    fetchInFlightRef.current = true;
     try {
       const profileRes = await fetchWithAuth("/api/profile");
       if (profileRes.status === 401) {
@@ -139,12 +142,36 @@ export default function CabinetDashboardPage() {
     } catch {
       setError("Ошибка соединения");
     } finally {
+      fetchInFlightRef.current = false;
       setLoading(false);
     }
   }, [router]);
 
   useEffect(() => {
     fetchProfileAndData();
+  }, [fetchProfileAndData]);
+
+  // Фоновый refresh при открытой вкладке с jitter (без "волны" запросов у всех клиентов одновременно).
+  useEffect(() => {
+    let disposed = false;
+    let timer: number | null = null;
+
+    const schedule = () => {
+      if (disposed) return;
+      const jitterMs = Math.floor(Math.random() * 5000);
+      timer = window.setTimeout(() => {
+        if (document.visibilityState === "visible") {
+          fetchProfileAndData();
+        }
+        schedule();
+      }, 30000 + jitterMs);
+    };
+
+    schedule();
+    return () => {
+      disposed = true;
+      if (timer != null) window.clearTimeout(timer);
+    };
   }, [fetchProfileAndData]);
 
   useEffect(() => {

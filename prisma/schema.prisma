@@ -277,6 +277,7 @@ model PayoutRequest {
   @@index([status])
   @@index([externalId])
   @@index([createdAt])
+  @@index([userId, status, createdAt])
   @@map("payout_requests")
 }
 

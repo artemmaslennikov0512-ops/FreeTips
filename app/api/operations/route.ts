@@ -29,6 +29,57 @@ export type OperationItem = {
   createdAt: string;
 };
 
+type OperationRow = OperationItem & { createdAtMs: number };
+
+const compareOperationRows = (a: OperationRow, b: OperationRow) =>
+  b.createdAtMs - a.createdAtMs || b.id.localeCompare(a.id);
+
+const toTipRow = (
+  t: {
+    id: string;
+    amountKop: bigint;
+    feeKop: bigint | null;
+    status: string;
+    createdAt: Date;
+    link: { slug: string } | null;
+  },
+  baseUrl: string,
+): OperationRow => ({
+  id: t.id,
+  type: "tip",
+  amountKop: Number(t.amountKop),
+  feeKop: Number(t.feeKop ?? 0),
+  status: t.status,
+  ...(t.link && {
+    linkSlug: t.link.slug,
+    paymentPageUrl: baseUrl ? `${baseUrl}/pay/${t.link.slug}` : undefined,
+  }),
+  createdAt: t.createdAt.toISOString(),
+  createdAtMs: t.createdAt.getTime(),
+});
+
+const toPayoutRow = (p: {
+  id: string;
+  amountKop: bigint;
+  feeKop: bigint | null;
+  status: string;
+  rejectionReason: string | null;
+  createdAt: Date;
+}): OperationRow => {
+  const amountKop = Number(p.amountKop);
+  const feeStored = p.feeKop != null ? Number(p.feeKop) : feeKopForPayout(amountKop);
+  return {
+    id: p.id,
+    type: "payout",
+    amountKop,
+    feeKop: feeStored,
+    status: p.status,
+    rejectionReason: p.rejectionReason ?? undefined,
+    createdAt: p.createdAt.toISOString(),
+    createdAtMs: p.createdAt.getTime(),
+  };
+};
+
 export async function GET(request: NextRequest) {
   const startedAt = Date.now();
   const auth = await requireAuthOrApiKey(request);
@@ -41,7 +92,6 @@ export async function GET(request: NextRequest) {
   const hasSince = !!sinceDate && !Number.isNaN(sinceDate.getTime());
 
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") || getBaseUrlFromRequest(request) || "";
-  const takeEach = hasSince ? limit : offset + limit;
   const txWhere = {
     recipientId: auth.userId,
     status: "SUCCESS" as const,
@@ -51,71 +101,117 @@ export async function GET(request: NextRequest) {
     userId: auth.userId,
     ...(hasSince && sinceDate ? { createdAt: { gt: sinceDate } } : {}),
   };
-  const [transactions, payouts, totalTx, totalPayout] = await Promise.all([
-    db.transaction.findMany({
-      where: txWhere,
-      select: {
-        id: true,
-        amountKop: true,
-        feeKop: true,
-        status: true,
-        createdAt: true,
-        link: { select: { slug: true } },
-      },
-      orderBy: { createdAt: "desc" },
-      take: takeEach,
-      skip: 0,
-    }),
-    db.payoutRequest.findMany({
-      where: payoutWhere,
-      select: { id: true, amountKop: true, feeKop: true, status: true, rejectionReason: true, createdAt: true },
-      orderBy: { createdAt: "desc" },
-      take: takeEach,
-      skip: 0,
-    }),
-    hasSince
-      ? Promise.resolve<number | null>(null)
-      : db.transaction.count({ where: { recipientId: auth.userId, status: "SUCCESS" } }),
-    hasSince
-      ? Promise.resolve<number | null>(null)
-      : db.payoutRequest.count({ where: { userId: auth.userId } }),
-  ]);
+  let txRows = 0;
+  let payoutRows = 0;
+  let total: number | null = null;
+  let list: OperationItem[] = [];
 
-  const txItems: OperationItem[] = transactions.map((t) => ({
-    id: t.id,
-    type: "tip",
-    amountKop: Number(t.amountKop),
-    feeKop: Number(t.feeKop ?? 0),
-    status: t.status,
-    ...(t.link && {
-      linkSlug: t.link.slug,
-      paymentPageUrl: baseUrl ? `${baseUrl}/pay/${t.link.slug}` : undefined,
-    }),
-    createdAt: t.createdAt.toISOString(),
-  }));
+  if (hasSince) {
+    const [transactions, payouts] = await Promise.all([
+      db.transaction.findMany({
+        where: txWhere,
+        select: {
+          id: true,
+          amountKop: true,
+          feeKop: true,
+          status: true,
+          createdAt: true,
+          link: { select: { slug: true } },
+        },
+        orderBy: { createdAt: "desc" },
+        take: limit,
+        skip: 0,
+      }),
+      db.payoutRequest.findMany({
+        where: payoutWhere,
+        select: { id: true, amountKop: true, feeKop: true, status: true, rejectionReason: true, createdAt: true },
+        orderBy: { createdAt: "desc" },
+        take: limit,
+        skip: 0,
+      }),
+    ]);
+    txRows = transactions.length;
+    payoutRows = payouts.length;
+    list = [...transactions.map((t) => toTipRow(t, baseUrl)), ...payouts.map((p) => toPayoutRow(p))]
+      .sort(compareOperationRows)
+      .slice(0, limit)
+      .map(({ createdAtMs: _createdAtMs, ...item }) => item);
+  } else {
+    const [totalTx, totalPayout] = await Promise.all([
+      db.transaction.count({ where: { recipientId: auth.userId, status: "SUCCESS" } }),
+      db.payoutRequest.count({ where: { userId: auth.userId } }),
+    ]);
+    total = totalTx + totalPayout;
 
-  const payoutItems: OperationItem[] = payouts.map((p) => {
-    const amountKop = Number(p.amountKop);
-    const feeStored = p.feeKop != null ? Number(p.feeKop) : feeKopForPayout(amountKop);
-    return {
-      id: p.id,
-      type: "payout",
-      amountKop,
-      feeKop: feeStored,
-      status: p.status,
-      rejectionReason: p.rejectionReason ?? undefined,
-      createdAt: p.createdAt.toISOString(),
-    };
-  });
+    const target = offset + limit;
+    const batchSize = Math.min(200, Math.max(limit, 50));
+    let txSkip = 0;
+    let payoutSkip = 0;
+    let txBuffer: OperationRow[] = [];
+    let payoutBuffer: OperationRow[] = [];
+    let txIndex = 0;
+    let payoutIndex = 0;
+    let txDone = false;
+    let payoutDone = false;
+    const selected: OperationRow[] = [];
 
-  const merged = [...txItems, ...payoutItems].sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-  );
-  const total =
-    totalTx != null && totalPayout != null
-      ? totalTx + totalPayout
-      : null;
-  const list = hasSince ? merged.slice(0, limit) : merged.slice(offset, offset + limit);
+    while (selected.length < target) {
+      if (txIndex >= txBuffer.length && !txDone) {
+        const txBatch = await db.transaction.findMany({
+          where: txWhere,
+          select: {
+            id: true,
+            amountKop: true,
+            feeKop: true,
+            status: true,
+            createdAt: true,
+            link: { select: { slug: true } },
+          },
+          orderBy: { createdAt: "desc" },
+          take: batchSize,
+          skip: txSkip,
+        });
+        txRows += txBatch.length;
+        txSkip += txBatch.length;
+        txBuffer = txBatch.map((t) => toTipRow(t, baseUrl));
+        txIndex = 0;
+        if (txBatch.length < batchSize) txDone = true;
+      }
+
+      if (payoutIndex >= payoutBuffer.length && !payoutDone) {
+        const payoutBatch = await db.payoutRequest.findMany({
+          where: payoutWhere,
+          select: { id: true, amountKop: true, feeKop: true, status: true, rejectionReason: true, createdAt: true },
+          orderBy: { createdAt: "desc" },
+          take: batchSize,
+          skip: payoutSkip,
+        });
+        payoutRows += payoutBatch.length;
+        payoutSkip += payoutBatch.length;
+        payoutBuffer = payoutBatch.map((p) => toPayoutRow(p));
+        payoutIndex = 0;
+        if (payoutBatch.length < batchSize) payoutDone = true;
+      }
+
+      const txCurrent = txBuffer[txIndex];
+      const payoutCurrent = payoutBuffer[payoutIndex];
+      if (!txCurrent && !payoutCurrent) break;
+
+      if (!payoutCurrent || (txCurrent && compareOperationRows(txCurrent, payoutCurrent) <= 0)) {
+        if (txCurrent) {
+          selected.push(txCurrent);
+          txIndex += 1;
+        }
+      } else {
+        selected.push(payoutCurrent);
+        payoutIndex += 1;
+      }
+    }
+
+    list = selected
+      .slice(offset, offset + limit)
+      .map(({ createdAtMs: _createdAtMs, ...item }) => item);
+  }
 
   const elapsedMs = Date.now() - startedAt;
   if (elapsedMs >= 1200) {
@@ -125,8 +221,8 @@ export async function GET(request: NextRequest) {
       limit,
       offset,
       elapsedMs,
-      txRows: transactions.length,
-      payoutRows: payouts.length,
+      txRows,
+      payoutRows,
       returned: list.length,
     });
   }

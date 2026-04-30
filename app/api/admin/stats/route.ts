@@ -11,9 +11,13 @@ import { LK_PRESENCE_WINDOW_MS } from "@/lib/lk-presence";
 import { PAYOUT_DAILY_LIMIT_COUNT, PAYOUT_DAILY_LIMIT_KOP } from "@/lib/payout-limits";
 import { getRelocateStuckMonitoring } from "@/lib/payment/relocate-stuck-queries";
 import { RELOCATE_CLAIM_STALE_MS, RELOCATE_CLAIM_ALERT_AFTER_MS } from "@/lib/payment/relocate-constants";
+import { getSharedIoredis } from "@/lib/redis-shared";
 import { z } from "zod";
 
 const periodSchema = z.enum(["all", "day", "week"]);
+const ADMIN_STATS_CACHE_TTL_MS = 15_000;
+const ADMIN_STATS_CACHE_TTL_SEC = Math.ceil(ADMIN_STATS_CACHE_TTL_MS / 1000);
+const memoryStatsCache = new Map<string, { expiresAt: number; payload: unknown }>();
 
 export async function GET(request: NextRequest) {
   const auth = await requireRole(["SUPERADMIN"])(request);
@@ -26,6 +30,33 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Некорректный период" }, { status: 400 });
   }
   const period = periodParse.data;
+  const cacheKey = `admin:stats:${period}`;
+  const nowMs = Date.now();
+
+  const memoryCached = memoryStatsCache.get(cacheKey);
+  if (memoryCached && memoryCached.expiresAt > nowMs) {
+    return NextResponse.json(memoryCached.payload);
+  }
+  if (memoryCached && memoryCached.expiresAt <= nowMs) {
+    memoryStatsCache.delete(cacheKey);
+  }
+
+  const redis = await getSharedIoredis();
+  if (redis) {
+    try {
+      const cachedJson = await redis.get(cacheKey);
+      if (cachedJson) {
+        const cachedPayload = JSON.parse(cachedJson);
+        memoryStatsCache.set(cacheKey, {
+          payload: cachedPayload,
+          expiresAt: Date.now() + ADMIN_STATS_CACHE_TTL_MS,
+        });
+        return NextResponse.json(cachedPayload);
+      }
+    } catch {
+      // ignore cache read issues and fall back to DB
+    }
+  }
 
   const now = new Date();
   const MS_PER_DAY = 24 * 60 * 60 * 1000;
@@ -107,7 +138,7 @@ export async function GET(request: NextRequest) {
 
   const defaults = systemDefaultLimits;
 
-  return NextResponse.json({
+  const payload = {
     usersCount,
     /** Сейчас в ЛК: lastSeenAt свежее окна LK_PRESENCE_WINDOW_MS (без SUPERADMIN) */
     usersActiveInLkCount,
@@ -145,5 +176,19 @@ export async function GET(request: NextRequest) {
     paymentRelocateStuckClaimSample: relocateStuck.sampleJson,
     paymentRelocateStaleClaimResetMs: RELOCATE_CLAIM_STALE_MS,
     paymentRelocateAlertAfterClaimMs: RELOCATE_CLAIM_ALERT_AFTER_MS,
+  };
+
+  memoryStatsCache.set(cacheKey, {
+    payload,
+    expiresAt: Date.now() + ADMIN_STATS_CACHE_TTL_MS,
   });
+  if (redis) {
+    try {
+      await redis.set(cacheKey, JSON.stringify(payload), "EX", ADMIN_STATS_CACHE_TTL_SEC);
+    } catch {
+      // ignore cache write issues and return fresh payload
+    }
+  }
+
+  return NextResponse.json(payload);
 }

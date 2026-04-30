@@ -8,11 +8,32 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireRole } from "@/lib/middleware/auth";
 import { db } from "@/lib/db";
-import { UserRole } from "@prisma/client";
+import { Prisma, UserRole } from "@prisma/client";
 import { parseLimitOffset } from "@/lib/api/helpers";
 import { isActiveInLk, LK_PRESENCE_WINDOW_MS } from "@/lib/lk-presence";
 
 const SEARCH_MAX_LENGTH = 100;
+type StatsUserRow = {
+  id: string;
+  unique_id: number;
+  login: string;
+  email: string | null;
+  role: UserRole;
+  is_blocked: boolean;
+  created_at: Date;
+  last_seen_at: Date | null;
+  tip_slugs: string[] | null;
+  balance_kop: bigint | string | number;
+  total_received_kop: bigint | string | number;
+  transactions_count: bigint | string | number;
+  payouts_pending_count: bigint | string | number;
+};
+
+const toNumberSafe = (value: bigint | string | number | null | undefined): number => {
+  if (value == null) return 0;
+  if (typeof value === "number") return value;
+  return Number(value);
+};
 
 export async function GET(request: NextRequest) {
   const auth = await requireRole(["SUPERADMIN"])(request);
@@ -93,47 +114,199 @@ export async function GET(request: NextRequest) {
     where = baseWhere;
   }
 
-  const [allCandidates, total] = await Promise.all([
-    db.user.findMany({
-      where,
-      select: {
-        id: true,
-        uniqueId: true,
-        login: true,
-        email: true,
-        role: true,
-        createdAt: true,
-        isBlocked: true,
-        lastSeenAt: true,
-        tipLinks: {
-          select: { slug: true },
-          orderBy: { createdAt: "asc" },
-        },
-      },
-      ...(statsSort ? {} : { orderBy: { [sortBy === "login" ? "login" : "createdAt"]: sortOrder }, take: limit, skip: offset }),
-    }),
-    db.user.count({ where }),
-  ]);
+  const total = await db.user.count({ where });
 
-  const userIds = allCandidates.map((u) => u.id);
-  const [txAgg, payoutPendingAgg, payoutCompletedAgg] = await Promise.all([
-    db.transaction.groupBy({
-      by: ["recipientId"],
-      where: { status: "SUCCESS", recipientId: { in: userIds } },
-      _sum: { amountKop: true, feeKop: true },
-      _count: { _all: true },
-    }),
-    db.payoutRequest.groupBy({
-      by: ["userId"],
-      where: { status: { in: ["CREATED", "PROCESSING"] }, userId: { in: userIds } },
-      _count: { _all: true },
-    }),
-    db.payoutRequest.groupBy({
-      by: ["userId"],
-      where: { status: "COMPLETED", userId: { in: userIds } },
-      _sum: { amountKop: true, feeKop: true },
-    }),
-  ]);
+  if (statsSort) {
+    const statsSortColumn =
+      sortBy === "balance"
+        ? `"balance_kop"`
+        : sortBy === "received"
+          ? `"total_received_kop"`
+          : `"transactions_count"`;
+    const statsSortDirection = sortOrder === "asc" ? "ASC" : "DESC";
+    const sqlConditions: Prisma.Sql[] = [Prisma.sql`u.role <> ${UserRole.SUPERADMIN}`];
+    if (roleFilter && validRoles.includes(roleFilter as (typeof validRoles)[number])) {
+      sqlConditions.push(Prisma.sql`u.role = ${roleFilter as UserRole}`);
+    }
+    if (blockedFilter === "true") {
+      sqlConditions.push(Prisma.sql`u."isBlocked" = true`);
+    } else if (blockedFilter === "false") {
+      sqlConditions.push(Prisma.sql`u."isBlocked" = false`);
+    }
+    if (lkActiveFilter === "true") {
+      sqlConditions.push(Prisma.sql`u."lastSeenAt" > ${lkFreshAfter}`);
+    } else if (lkActiveFilter === "false") {
+      sqlConditions.push(Prisma.sql`(u."lastSeenAt" IS NULL OR u."lastSeenAt" <= ${lkFreshAfter})`);
+    }
+    if (search) {
+      const searchPattern = `%${search}%`;
+      sqlConditions.push(Prisma.sql`(
+          u.login ILIKE ${searchPattern}
+          OR COALESCE(u.email, '') ILIKE ${searchPattern}
+          OR EXISTS (
+            SELECT 1
+            FROM tip_links tl
+            WHERE tl."userId" = u.id
+              AND tl.slug ILIKE ${searchPattern}
+          )
+          OR EXISTS (
+            SELECT 1
+            FROM employees e
+            WHERE e."userId" = u.id
+              AND e."qrCodeIdentifier" ILIKE ${searchPattern}
+          )
+          OR EXISTS (
+            SELECT 1
+            FROM establishments est
+            WHERE est.id = u."establishmentId"
+              AND est."uniqueSlug" ILIKE ${searchPattern}
+          )
+        )`);
+    }
+
+    const statsRows = await db.$queryRaw<StatsUserRow[]>(Prisma.sql`
+      WITH filtered_users AS (
+        SELECT
+          u.id,
+          u."uniqueId" AS unique_id,
+          u.login,
+          u.email,
+          u.role,
+          u."isBlocked" AS is_blocked,
+          u."createdAt" AS created_at,
+          u."lastSeenAt" AS last_seen_at
+        FROM users u
+        WHERE ${Prisma.join(sqlConditions, " AND ")}
+      ),
+      tx AS (
+        SELECT
+          t."recipientId" AS user_id,
+          COALESCE(SUM(t."amountKop" - COALESCE(t."feeKop", 0)), 0)::bigint AS total_received_kop,
+          COUNT(*)::bigint AS transactions_count
+        FROM transactions t
+        INNER JOIN filtered_users fu ON fu.id = t."recipientId"
+        WHERE t.status = 'SUCCESS'
+        GROUP BY t."recipientId"
+      ),
+      pending AS (
+        SELECT
+          p."userId" AS user_id,
+          COUNT(*)::bigint AS payouts_pending_count
+        FROM payout_requests p
+        INNER JOIN filtered_users fu ON fu.id = p."userId"
+        WHERE p.status IN ('CREATED', 'PROCESSING')
+        GROUP BY p."userId"
+      ),
+      completed AS (
+        SELECT
+          p."userId" AS user_id,
+          COALESCE(SUM(p."amountKop" + COALESCE(p."feeKop", 0)), 0)::bigint AS withdrawn_kop
+        FROM payout_requests p
+        INNER JOIN filtered_users fu ON fu.id = p."userId"
+        WHERE p.status = 'COMPLETED'
+        GROUP BY p."userId"
+      )
+      SELECT
+        fu.id,
+        fu.unique_id,
+        fu.login,
+        fu.email,
+        fu.role,
+        fu.is_blocked,
+        fu.created_at,
+        fu.last_seen_at,
+        COALESCE(tl.tip_slugs, ARRAY[]::text[]) AS tip_slugs,
+        (COALESCE(tx.total_received_kop, 0) - COALESCE(completed.withdrawn_kop, 0)) AS balance_kop,
+        COALESCE(tx.total_received_kop, 0) AS total_received_kop,
+        COALESCE(tx.transactions_count, 0) AS transactions_count,
+        COALESCE(pending.payouts_pending_count, 0) AS payouts_pending_count
+      FROM filtered_users fu
+      LEFT JOIN tx ON tx.user_id = fu.id
+      LEFT JOIN pending ON pending.user_id = fu.id
+      LEFT JOIN completed ON completed.user_id = fu.id
+      LEFT JOIN LATERAL (
+        SELECT ARRAY_AGG(tl.slug ORDER BY tl."createdAt" ASC) AS tip_slugs
+        FROM tip_links tl
+        WHERE tl."userId" = fu.id
+      ) tl ON TRUE
+      ORDER BY ${Prisma.raw(statsSortColumn)} ${Prisma.raw(statsSortDirection)}, fu.created_at DESC
+      LIMIT ${limit}
+      OFFSET ${offset}
+    `);
+
+    const users = statsRows.map((row) => ({
+      id: row.id,
+      uniqueId: row.unique_id,
+      login: row.login,
+      email: row.email,
+      role: row.role,
+      isBlocked: row.is_blocked,
+      createdAt: row.created_at.toISOString(),
+      tipSlugs: row.tip_slugs ?? [],
+      lastSeenAt: row.last_seen_at?.toISOString() ?? null,
+      activeInLk: isActiveInLk(row.last_seen_at, now),
+      stats: {
+        balanceKop: toNumberSafe(row.balance_kop),
+        totalReceivedKop: toNumberSafe(row.total_received_kop),
+        transactionsCount: toNumberSafe(row.transactions_count),
+        payoutsPendingCount: toNumberSafe(row.payouts_pending_count),
+      },
+    }));
+
+    return NextResponse.json({
+      users,
+      total,
+      limit,
+      offset,
+    });
+  }
+
+  const baseUsers = await db.user.findMany({
+    where,
+    select: {
+      id: true,
+      uniqueId: true,
+      login: true,
+      email: true,
+      role: true,
+      createdAt: true,
+      isBlocked: true,
+      lastSeenAt: true,
+      tipLinks: {
+        select: { slug: true },
+        orderBy: { createdAt: "asc" },
+      },
+    },
+    orderBy: { [sortBy === "login" ? "login" : "createdAt"]: sortOrder },
+    take: limit,
+    skip: offset,
+  });
+
+  const pageIds = baseUsers.map((u) => u.id);
+  const [txAgg, payoutPendingAgg, payoutCompletedAgg] =
+    pageIds.length === 0
+      ? [[], [], []]
+      : await Promise.all([
+          db.transaction.groupBy({
+            by: ["recipientId"],
+            where: { status: "SUCCESS", recipientId: { in: pageIds } },
+            _sum: { amountKop: true, feeKop: true },
+            _count: { _all: true },
+          }),
+          db.payoutRequest.groupBy({
+            by: ["userId"],
+            where: {
+              status: { in: ["CREATED", "PROCESSING"] },
+              userId: { in: pageIds },
+            },
+            _count: { _all: true },
+          }),
+          db.payoutRequest.groupBy({
+            by: ["userId"],
+            where: { status: "COMPLETED", userId: { in: pageIds } },
+            _sum: { amountKop: true, feeKop: true },
+          }),
+        ]);
 
   const txMap = new Map(
     txAgg.map((t) => {
@@ -151,43 +324,45 @@ export async function GET(request: NextRequest) {
     }),
   );
 
-  const usersWithStats = allCandidates.map((u) => {
-      const tx = txMap.get(u.id) ?? { receivedKop: BigInt(0), count: 0 };
-      const pendingCount = pendingMap.get(u.id) ?? 0;
-      const withdrawn = completedMap.get(u.id) ?? BigInt(0);
+  const statsByUserId = new Map(
+    pageIds.map((id) => {
+      const tx = txMap.get(id) ?? { receivedKop: BigInt(0), count: 0 };
+      const pendingCount = pendingMap.get(id) ?? 0;
+      const withdrawn = completedMap.get(id) ?? BigInt(0);
       const balance = tx.receivedKop - withdrawn;
-      return {
-        id: u.id,
-        uniqueId: u.uniqueId,
-        login: u.login,
-        email: u.email,
-        role: u.role,
-        isBlocked: u.isBlocked,
-        createdAt: u.createdAt.toISOString(),
-        tipSlugs: u.tipLinks.map((t) => t.slug),
-        lastSeenAt: u.lastSeenAt?.toISOString() ?? null,
-        activeInLk: isActiveInLk(u.lastSeenAt, now),
-        stats: {
+      return [
+        id,
+        {
           balanceKop: Number(balance),
           totalReceivedKop: Number(tx.receivedKop),
           transactionsCount: tx.count,
           payoutsPendingCount: pendingCount,
         },
-      };
-    });
+      ];
+    }),
+  );
 
-  const users = statsSort
-    ? [...usersWithStats]
-        .sort((a, b) => {
-          const av =
-            sortBy === "balance" ? a.stats.balanceKop : sortBy === "received" ? a.stats.totalReceivedKop : a.stats.transactionsCount;
-          const bv =
-            sortBy === "balance" ? b.stats.balanceKop : sortBy === "received" ? b.stats.totalReceivedKop : b.stats.transactionsCount;
-          if (av === bv) return b.createdAt.localeCompare(a.createdAt);
-          return sortOrder === "asc" ? av - bv : bv - av;
-        })
-        .slice(offset, offset + limit)
-    : usersWithStats;
+  const users = baseUsers.map((u) => {
+    const stats = statsByUserId.get(u.id) ?? {
+      balanceKop: 0,
+      totalReceivedKop: 0,
+      transactionsCount: 0,
+      payoutsPendingCount: 0,
+    };
+    return {
+      id: u.id,
+      uniqueId: u.uniqueId,
+      login: u.login,
+      email: u.email,
+      role: u.role,
+      isBlocked: u.isBlocked,
+      createdAt: u.createdAt.toISOString(),
+      tipSlugs: u.tipLinks.map((t) => t.slug),
+      lastSeenAt: u.lastSeenAt?.toISOString() ?? null,
+      activeInLk: isActiveInLk(u.lastSeenAt, now),
+      stats,
+    };
+  });
 
   return NextResponse.json({
     users,

@@ -5,6 +5,8 @@
 export type Stats = {
   balanceKop: number;
   totalReceivedKop: number;
+  /** Списано с гостей по вашим чаевым (заказ + комиссия карты), для моб. пуша */
+  totalGuestPaidTipsKop?: number;
   transactionsCount: number;
   payoutsPendingCount: number;
 };

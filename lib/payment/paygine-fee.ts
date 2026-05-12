@@ -26,3 +26,12 @@ export function feeKopForIncoming(amountKop: number, paymentMethod: "card" | "sb
   const percent = paymentMethod === "sbp" ? FEE_PERCENT_IN_QR_SBP : FEE_PERCENT_IN_CARD;
   return Math.round((amountKop * percent) / 100);
 }
+
+/**
+ * Списание с гостя по Register (карта): сумма заказа amountKop + комиссия сверху.
+ * feeKop из БД, если есть; иначе — как при создании платежа (feeKopForIncoming по карте).
+ */
+export function guestChargedKopForIncomingCardOrder(amountKop: bigint, feeKop: bigint | null): bigint {
+  const fee = feeKop ?? BigInt(feeKopForIncoming(Number(amountKop), "card"));
+  return amountKop + fee;
+}

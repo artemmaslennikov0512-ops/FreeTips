@@ -194,6 +194,7 @@ class TransactionsFragment : Fragment() {
                             com.freetips.app.util.BalanceNotificationHelper.showIfNeeded(
                                 binding.root.context.applicationContext,
                                 s.balanceKop,
+                                s.totalGuestPaidTipsKop,
                                 s.totalReceivedKop
                             )
                         }

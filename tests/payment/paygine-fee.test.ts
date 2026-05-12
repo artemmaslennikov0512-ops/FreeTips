@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { feeKopForPayout, FEE_MIN_PAYOUT_KOP } from "../../lib/payment/paygine-fee";
+import { feeKopForPayout, feeKopForIncoming, guestChargedKopForIncomingCardOrder, FEE_MIN_PAYOUT_KOP } from "../../lib/payment/paygine-fee";
 
 test("feeKopForPayout: 0 или невалидно → 0", () => {
   assert.equal(feeKopForPayout(0), 0);
@@ -14,4 +14,12 @@ test("feeKopForPayout: 1% ниже минимума → минимум 30 ₽", 
 
 test("feeKopForPayout: 1% выше минимума → процент", () => {
   assert.equal(feeKopForPayout(500_000), 5_000);
+});
+
+test("guestChargedKopForIncomingCardOrder: 121 ₽ чаевых + 2.5% комиссии", () => {
+  assert.equal(feeKopForIncoming(12_100, "card"), 303);
+  assert.equal(
+    Number(guestChargedKopForIncomingCardOrder(BigInt(12_100), null)),
+    12_100 + 303,
+  );
 });

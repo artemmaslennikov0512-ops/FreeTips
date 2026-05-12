@@ -3,7 +3,6 @@
  * в том же смысле, что и в lib/balance.ts для SUCCESS.
  */
 
-import { feeKopForIncoming } from "@/lib/payment/paygine-fee";
 import { parseTipSplitFromPayerInfo, poolShareKopFromNet } from "@/lib/tip-routing";
 
 export type PendingTxCreditRow = {
@@ -15,12 +14,7 @@ export type PendingTxCreditRow = {
 };
 
 function feeForTx(row: PendingTxCreditRow): bigint {
-  if (row.feeKop != null) return row.feeKop;
-  // Карта: комиссия у плательщика поверх суммы заказа в Paygine; amountKop — сумма к распределению, не уменьшаем на оценку.
-  if (row.paymentMethod !== "sbp") return BigInt(0);
-  const amountNum = Number(row.amountKop);
-  if (!Number.isFinite(amountNum) || amountNum <= 0) return BigInt(0);
-  return BigInt(feeKopForIncoming(amountNum, "sbp"));
+  return row.feeKop ?? BigInt(0);
 }
 
 /** Сколько копеек получит recipientId этого Transaction при успешной оплате (оценка для PENDING). */

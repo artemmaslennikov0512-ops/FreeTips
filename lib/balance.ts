@@ -3,11 +3,14 @@
  */
 
 import { db } from "@/lib/db";
+import { guestChargedKopForIncomingCardOrder } from "@/lib/payment/paygine-fee";
 
 export async function getBalance(userId: string): Promise<{
   balanceKop: bigint;
   receivedKop: bigint;
   withdrawnKop: bigint;
+  /** Сумма по SUCCESS, где пользователь — recipientId: списание с гостя (amount + acquiring fee), без доли пула с чужих ссылок. */
+  guestPaidTipsKop: bigint;
 }> {
   const [txRows, poolShareSum, payoutSum] = await Promise.all([
     db.transaction.findMany({
@@ -24,14 +27,21 @@ export async function getBalance(userId: string): Promise<{
     }),
   ]);
   let received = BigInt(0);
+  let guestPaidTips = BigInt(0);
   for (const t of txRows) {
     const fee = t.feeKop ?? BigInt(0);
     const share = t.establishmentShareKop ?? BigInt(0);
     received += t.amountKop - fee - share;
+    guestPaidTips += guestChargedKopForIncomingCardOrder(t.amountKop, t.feeKop);
   }
   received += poolShareSum._sum.establishmentShareKop ?? BigInt(0);
   const withdrawnAmount = payoutSum._sum.amountKop ?? BigInt(0);
   const withdrawnFee = payoutSum._sum.feeKop ?? BigInt(0);
   const withdrawn = withdrawnAmount + withdrawnFee;
-  return { balanceKop: received - withdrawn, receivedKop: received, withdrawnKop: withdrawn };
+  return {
+    balanceKop: received - withdrawn,
+    receivedKop: received,
+    withdrawnKop: withdrawn,
+    guestPaidTipsKop: guestPaidTips,
+  };
 }

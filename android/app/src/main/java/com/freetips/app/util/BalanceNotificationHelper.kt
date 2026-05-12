@@ -11,11 +11,14 @@ import com.freetips.app.R
 
 /**
  * Уведомления только о пополнении (с суммой): в шторку и в список по колокольчику.
+ * Сумма в пуше — как списано с гостя (заказ + комиссия по карте), см. stats.totalGuestPaidTipsKop в API.
+ * Для текста пуша сумма округляется до целого рубля (копейки не показываем); в БД и Paygine это не влияет.
  */
 object BalanceNotificationHelper {
 
     private const val PREFS_NAME = "balance_notification"
-    private const val KEY_LAST_TOTAL_RECEIVED_KOP = "last_total_received_kop"
+    /** База для сравнения: накопитель «списано с гостей» по вашим чаевым (не нетто на баланс). */
+    private const val KEY_LAST_GUEST_PAID_TIPS_KOP = "last_guest_paid_tips_kop"
     private const val KEY_LAST_BALANCE_KOP = "last_balance_kop"
     private const val KEY_ITEMS_JSON = "notification_items_json"
     private const val KEY_LAST_VIEWED_MILLIS = "last_viewed_millis"
@@ -23,22 +26,33 @@ object BalanceNotificationHelper {
     private const val NOTIFICATION_ID_TOPUP = 1
 
     /**
-     * Только пополнение: сравнивает с последним «всего получено», при увеличении показывает
-     * уведомление в шторке с суммой и добавляет запись в список по колокольчику.
-     * При первом запуске (lastTotal < 0) уведомление не показываем — только сохраняем базу для сравнения.
+     * @param totalGuestPaidTipsKop с сервера (amount Register + fee по карте по вашим SUCCESS).
+     * @param totalReceivedKop fallback, если в ответе API ещё нет поля (старый бэкенд) или только доля пула без своих чаевых.
      */
-    fun showIfNeeded(context: Context, balanceKop: Int, totalReceivedKop: Int) {
+    fun showIfNeeded(
+        context: Context,
+        balanceKop: Int,
+        totalGuestPaidTipsKop: Int,
+        totalReceivedKop: Int,
+    ) {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        val lastTotal = prefs.getInt(KEY_LAST_TOTAL_RECEIVED_KOP, -1)
+        val lastBasis = prefs.getInt(KEY_LAST_GUEST_PAID_TIPS_KOP, -1)
 
-        val hadTopUp = lastTotal >= 0 && totalReceivedKop > lastTotal
+        val basis = when {
+            totalGuestPaidTipsKop > 0 -> totalGuestPaidTipsKop
+            totalReceivedKop > 0 -> totalReceivedKop
+            else -> 0
+        }
+
+        val hadTopUp = lastBasis >= 0 && basis > lastBasis
         if (hadTopUp) {
-            val addKop = totalReceivedKop - lastTotal
-            showTopUpAndSave(context, addKop)
+            val addKop = basis - lastBasis
+            val displayKop = kotlin.math.round(addKop / 100.0).toInt() * 100
+            showTopUpAndSave(context, displayKop)
         }
 
         prefs.edit()
-            .putInt(KEY_LAST_TOTAL_RECEIVED_KOP, totalReceivedKop)
+            .putInt(KEY_LAST_GUEST_PAID_TIPS_KOP, basis)
             .putInt(KEY_LAST_BALANCE_KOP, balanceKop)
             .apply()
     }

@@ -38,6 +38,7 @@ data class ProfileResponse(
 data class Stats(
     val balanceKop: Int,
     val totalReceivedKop: Int,
+    val totalGuestPaidTipsKop: Int = 0,
     val transactionsCount: Int,
     val payoutsPendingCount: Int
 )
@@ -187,6 +188,7 @@ class HomeFragment : Fragment() {
                                     BalanceNotificationHelper.showIfNeeded(
                                         b.root.context.applicationContext,
                                         s.balanceKop,
+                                        s.totalGuestPaidTipsKop,
                                         s.totalReceivedKop
                                     )
                                 }

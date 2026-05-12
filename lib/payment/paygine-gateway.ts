@@ -462,6 +462,16 @@ export class PayginePaymentGateway implements PaymentGateway {
       data: {
         status: setStatusImmediately,
         ...(mergedPayerInfo && { payerInfo: mergedPayerInfo }),
+        ...(setStatusImmediately === TransactionStatus.SUCCESS && relocatePlan
+          ? {
+              ...(relocatePlan.establishmentShareKop != null
+                ? { establishmentShareKop: relocatePlan.establishmentShareKop }
+                : {}),
+              ...(relocatePlan.poolShareRecipientId
+                ? { poolShareRecipientId: relocatePlan.poolShareRecipientId }
+                : {}),
+            }
+          : {}),
       },
     });
 

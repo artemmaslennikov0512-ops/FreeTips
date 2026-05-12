@@ -53,6 +53,7 @@ class BalanceRefreshWorker(
             BalanceNotificationHelper.showIfNeeded(
                 applicationContext,
                 stats.balanceKop,
+                stats.totalGuestPaidTipsKop,
                 stats.totalReceivedKop
             )
             BalanceCache.save(applicationContext, stats.balanceKop)

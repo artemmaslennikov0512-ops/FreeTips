@@ -289,6 +289,8 @@ export async function GET(request: NextRequest) {
       stats: {
         balanceKop: Number(balanceKopForStats),
         totalReceivedKop: Number(received),
+        /** Списано с гостей по вашим SUCCESS-чаевым (amount Register + комиссия сверху); для пуша «как с карты». */
+        totalGuestPaidTipsKop: Number(balanceRow.guestPaidTipsKop),
         transactionsCount: Number(txCount),
         payoutsPendingCount: Number(payoutsPendingCount),
       },

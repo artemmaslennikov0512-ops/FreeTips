@@ -23,3 +23,11 @@ test("guestChargedKopForIncomingCardOrder: 121 ₽ чаевых + 2.5% коми�
     12_100 + 303,
   );
 });
+
+test("guestChargedKopForIncomingCardOrder: feeKop 0 в БД — всё равно добавляем расчётную комиссию (пуш totalGuestPaidTipsKop)", () => {
+  assert.equal(Number(guestChargedKopForIncomingCardOrder(BigInt(5_000), BigInt(0))), 5_000 + 125);
+});
+
+test("guestChargedKopForIncomingCardOrder: положительный feeKop в БД — не пересчитываем", () => {
+  assert.equal(Number(guestChargedKopForIncomingCardOrder(BigInt(5_000), BigInt(99))), 5_000 + 99);
+});

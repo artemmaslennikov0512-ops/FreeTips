@@ -28,10 +28,17 @@ export function feeKopForIncoming(amountKop: number, paymentMethod: "card" | "sb
 }
 
 /**
- * Списание с гостя по Register (карта): сумма заказа amountKop + комиссия сверху.
- * feeKop из БД, если есть; иначе — как при создании платежа (feeKopForIncoming по карте).
+ * Списание с гостя по Register: amountKop + комиссия сверху (карта/СБП — один процент в `feeKopForIncoming`).
+ * Берём fee из БД, только если оно задано и > 0. Иначе считаем по сумме заказа (как при Register):
+ * `feeKop ?? расчёт` недостаточно — в БД часто бывает 0, а не null, тогда без комиссии занижается totalGuestPaidTipsKop и пуш «+50 ₽» вместо «+51 ₽».
  */
-export function guestChargedKopForIncomingCardOrder(amountKop: bigint, feeKop: bigint | null): bigint {
-  const fee = feeKop ?? BigInt(feeKopForIncoming(Number(amountKop), "card"));
+export function guestChargedKopForIncomingCardOrder(
+  amountKop: bigint,
+  feeKop: bigint | null,
+  paymentMethod: "card" | "sbp" | null = "card",
+): bigint {
+  const method = paymentMethod === "sbp" ? "sbp" : "card";
+  const stored = feeKop != null && feeKop > BigInt(0) ? feeKop : null;
+  const fee = stored ?? BigInt(feeKopForIncoming(Number(amountKop), method));
   return amountKop + fee;
 }

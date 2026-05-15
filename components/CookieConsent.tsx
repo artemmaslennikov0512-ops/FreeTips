@@ -48,10 +48,10 @@ export function CookieConsent() {
       role="dialog"
       aria-live="polite"
       aria-label="Уведомление об использовании cookies"
-      className="fixed bottom-0 left-0 right-0 z-50 border-0 bg-[var(--color-white)] px-4 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] text-[var(--color-text)] shadow-[var(--shadow-medium)] sm:px-6"
+      className="fixed bottom-0 left-0 right-0 z-50 border-0 bg-[var(--color-white)] px-3 pt-2.5 pb-[max(0.5rem,env(safe-area-inset-bottom))] text-[var(--color-text)] shadow-[var(--shadow-medium)] sm:px-4 sm:pt-3 sm:pb-[max(0.625rem,env(safe-area-inset-bottom))]"
     >
-      <div className="mx-auto flex max-w-6xl flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-sm text-[var(--color-text-secondary)]">
+      <div className="mx-auto flex max-w-6xl flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+        <p className="text-xs leading-snug text-[var(--color-text-secondary)]">
           Мы используем файлы cookies, чтобы вам было удобно работать с сайтом. Продолжая
           пользоваться сайтом, вы выражаете своё согласие на обработку ваших данных с
           использованием интернет-сервисов «Google Analytics» и «Яндекс Метрика». Порядок
@@ -68,7 +68,7 @@ export function CookieConsent() {
         <button
           type="button"
           onClick={handleAccept}
-          className="shrink-0 self-start rounded-xl bg-[var(--color-accent-gold)] px-5 py-2.5 text-sm font-semibold text-[var(--color-navy)] transition-all hover:opacity-90 sm:self-center"
+          className="shrink-0 self-start rounded-lg bg-[var(--color-accent-gold)] px-3 py-1.5 text-xs font-semibold text-[var(--color-navy)] transition-all hover:opacity-90 sm:self-center sm:px-3.5 sm:py-1.5"
         >
           Понятно
         </button>

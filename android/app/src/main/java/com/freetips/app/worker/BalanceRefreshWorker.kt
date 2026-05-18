@@ -54,7 +54,6 @@ class BalanceRefreshWorker(
                 applicationContext,
                 stats.balanceKop,
                 stats.totalGuestPaidTipsKop,
-                stats.totalReceivedKop
             )
             BalanceCache.save(applicationContext, stats.balanceKop)
             applicationContext.sendBroadcast(Intent(ACTION_BALANCE_UPDATED).setPackage(applicationContext.packageName))

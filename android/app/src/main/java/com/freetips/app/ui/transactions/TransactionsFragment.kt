@@ -195,7 +195,6 @@ class TransactionsFragment : Fragment() {
                                 binding.root.context.applicationContext,
                                 s.balanceKop,
                                 s.totalGuestPaidTipsKop,
-                                s.totalReceivedKop
                             )
                         }
                     } catch (_: Exception) {}

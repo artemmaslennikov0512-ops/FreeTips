@@ -11,50 +11,71 @@ import com.freetips.app.R
 
 /**
  * Уведомления только о пополнении (с суммой): в шторку и в список по колокольчику.
- * Сумма в пуше — как списано с гостя (заказ + комиссия по карте), см. stats.totalGuestPaidTipsKop в API.
+ * Сумма в пуше — как списано с гостя (amount Register + комиссия по карте/СБП), см. stats.totalGuestPaidTipsKop.
  * Для текста пуша сумма округляется до целого рубля (копейки не показываем); в БД и Paygine это не влияет.
  */
 object BalanceNotificationHelper {
 
     private const val PREFS_NAME = "balance_notification"
-    /** База для сравнения: накопитель «списано с гостей» по вашим чаевым (не нетто на баланс). */
+    /** База для сравнения: накопитель «списано с гостей» (amount + fee), не нетто на баланс. */
     private const val KEY_LAST_GUEST_PAID_TIPS_KOP = "last_guest_paid_tips_kop"
     private const val KEY_LAST_BALANCE_KOP = "last_balance_kop"
     private const val KEY_ITEMS_JSON = "notification_items_json"
     private const val KEY_LAST_VIEWED_MILLIS = "last_viewed_millis"
+    /**
+     * v2: только totalGuestPaidTipsKop (без fallback на totalReceivedKop — иначе два пуша: 50 ₽ + 1 ₽).
+     */
+    private const val KEY_BASIS_SCHEMA = "notify_basis_schema"
+    private const val SCHEMA_GUEST_PAID_ONLY = 2
     private const val MAX_ITEMS = 100
     private const val NOTIFICATION_ID_TOPUP = 1
 
+    private val lock = Any()
+
     /**
-     * @param totalGuestPaidTipsKop с сервера (amount Register + fee по карте по вашим SUCCESS).
-     * @param totalReceivedKop fallback, если в ответе API ещё нет поля (старый бэкенд) или только доля пула без своих чаевых.
+     * @param totalGuestPaidTipsKop с сервера (amount Register + fee по карте/СБП по вашим SUCCESS).
      */
     fun showIfNeeded(
         context: Context,
         balanceKop: Int,
         totalGuestPaidTipsKop: Int,
-        totalReceivedKop: Int,
     ) {
-        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        val lastBasis = prefs.getInt(KEY_LAST_GUEST_PAID_TIPS_KOP, -1)
+        synchronized(lock) {
+            val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
-        val basis = when {
-            totalGuestPaidTipsKop > 0 -> totalGuestPaidTipsKop
-            totalReceivedKop > 0 -> totalReceivedKop
-            else -> 0
+            if (prefs.getInt(KEY_BASIS_SCHEMA, 0) < SCHEMA_GUEST_PAID_ONLY) {
+                prefs.edit()
+                    .putInt(KEY_LAST_GUEST_PAID_TIPS_KOP, totalGuestPaidTipsKop.coerceAtLeast(0))
+                    .putInt(KEY_BASIS_SCHEMA, SCHEMA_GUEST_PAID_ONLY)
+                    .putInt(KEY_LAST_BALANCE_KOP, balanceKop)
+                    .apply()
+                return
+            }
+
+            val lastBasis = prefs.getInt(KEY_LAST_GUEST_PAID_TIPS_KOP, -1)
+            val basis = totalGuestPaidTipsKop.coerceAtLeast(0)
+
+            if (lastBasis < 0) {
+                prefs.edit()
+                    .putInt(KEY_LAST_GUEST_PAID_TIPS_KOP, basis)
+                    .putInt(KEY_LAST_BALANCE_KOP, balanceKop)
+                    .apply()
+                return
+            }
+
+            if (basis > lastBasis) {
+                val addKop = basis - lastBasis
+                val displayKop = kotlin.math.round(addKop / 100.0).toInt() * 100
+                if (displayKop > 0) {
+                    showTopUpAndSave(context, displayKop)
+                }
+            }
+
+            prefs.edit()
+                .putInt(KEY_LAST_GUEST_PAID_TIPS_KOP, basis)
+                .putInt(KEY_LAST_BALANCE_KOP, balanceKop)
+                .apply()
         }
-
-        val hadTopUp = lastBasis >= 0 && basis > lastBasis
-        if (hadTopUp) {
-            val addKop = basis - lastBasis
-            val displayKop = kotlin.math.round(addKop / 100.0).toInt() * 100
-            showTopUpAndSave(context, displayKop)
-        }
-
-        prefs.edit()
-            .putInt(KEY_LAST_GUEST_PAID_TIPS_KOP, basis)
-            .putInt(KEY_LAST_BALANCE_KOP, balanceKop)
-            .apply()
     }
 
     private fun showTopUpAndSave(context: Context, addKop: Int) {

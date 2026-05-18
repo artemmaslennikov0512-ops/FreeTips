@@ -189,7 +189,6 @@ class HomeFragment : Fragment() {
                                         b.root.context.applicationContext,
                                         s.balanceKop,
                                         s.totalGuestPaidTipsKop,
-                                        s.totalReceivedKop
                                     )
                                 }
                                 bindLimits(b, profile.payoutLimits, profile.payoutUsageToday, profile.payoutUsageMonth)

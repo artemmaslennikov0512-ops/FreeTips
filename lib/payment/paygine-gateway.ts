@@ -84,11 +84,24 @@ function computeTipRelocateExecutionPlan(input: {
   if (!orderSdRef) return null;
 
   const isSbp = (input.paymentMethod ?? "") === "sbp";
+  const method: "card" | "sbp" = isSbp ? "sbp" : "card";
   const companySdRef = getPaygineSdRefLegal();
-  const feeKopNum = Number(input.feeKop ?? 0);
-  const feeToCompanyKop = isSbp && companySdRef && feeKopNum > 0 ? feeKopNum : 0;
-
   const amountNum = Number(input.amountKop);
+  const payerPayload = (() => {
+    try {
+      return input.payerInfo ? (JSON.parse(input.payerInfo) as { paygineFeePayer?: unknown }) : {};
+    } catch {
+      return {};
+    }
+  })();
+  const storedFeeKopNum = Number(input.feeKop ?? 0);
+  const feeKopNum =
+    storedFeeKopNum > 0
+      ? storedFeeKopNum
+      : payerPayload.paygineFeePayer === "recipient"
+        ? feeKopForIncoming(amountNum, method)
+        : 0;
+  const feeToCompanyKop = isSbp && companySdRef && feeKopNum > 0 ? feeKopNum : 0;
   const netAfterFeeNum = feeToCompanyKop > 0 ? amountNum - feeToCompanyKop : amountNum;
   const netKop = BigInt(Math.max(0, Math.floor(netAfterFeeNum)));
 

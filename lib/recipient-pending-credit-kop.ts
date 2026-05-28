@@ -4,6 +4,7 @@
  */
 
 import { parseTipSplitFromPayerInfo, poolShareKopFromNet } from "@/lib/tip-routing";
+import { recipientFeeKopForIncomingTx } from "@/lib/payment/paygine-fee";
 
 export type PendingTxCreditRow = {
   amountKop: bigint;
@@ -14,7 +15,12 @@ export type PendingTxCreditRow = {
 };
 
 function feeForTx(row: PendingTxCreditRow): bigint {
-  return row.feeKop ?? BigInt(0);
+  return recipientFeeKopForIncomingTx({
+    amountKop: row.amountKop,
+    feeKop: row.feeKop,
+    paymentMethod: row.paymentMethod === "sbp" ? "sbp" : "card",
+    payerInfo: row.payerInfo,
+  });
 }
 
 /** Сколько копеек получит recipientId этого Transaction при успешной оплате (оценка для PENDING). */

@@ -1,6 +1,12 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { feeKopForPayout, feeKopForIncoming, guestChargedKopForIncomingCardOrder, FEE_MIN_PAYOUT_KOP } from "../../lib/payment/paygine-fee";
+import {
+  feeKopForPayout,
+  feeKopForIncoming,
+  guestChargedKopForIncomingCardOrder,
+  recipientFeeKopForIncomingTx,
+  FEE_MIN_PAYOUT_KOP,
+} from "../../lib/payment/paygine-fee";
 
 test("feeKopForPayout: 0 или невалидно → 0", () => {
   assert.equal(feeKopForPayout(0), 0);
@@ -43,5 +49,19 @@ test("guestChargedKopForIncomingCardOrder: комиссия на получат�
       ),
     ),
     12_100,
+  );
+});
+
+test("recipientFeeKopForIncomingTx: feeKop null + recipient mode — досчитываем 2.5%", () => {
+  assert.equal(
+    Number(
+      recipientFeeKopForIncomingTx({
+        amountKop: BigInt(10_600),
+        feeKop: null,
+        paymentMethod: "card",
+        payerInfo: JSON.stringify({ paygineFeePayer: "recipient" }),
+      }),
+    ),
+    265,
   );
 });

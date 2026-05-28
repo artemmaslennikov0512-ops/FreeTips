@@ -10,7 +10,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireAuthOrApiKey } from "@/lib/auth-or-api-key";
 import { db } from "@/lib/db";
 import { parseLimitOffset } from "@/lib/api/helpers";
-import { feeKopForPayout } from "@/lib/payment/paygine-fee";
+import { feeKopForPayout, recipientFeeKopForIncomingTx } from "@/lib/payment/paygine-fee";
 import { getBaseUrlFromRequest } from "@/lib/get-base-url";
 import { logInfo } from "@/lib/logger";
 
@@ -39,6 +39,8 @@ const toTipRow = (
     id: string;
     amountKop: bigint;
     feeKop: bigint | null;
+    paymentMethod: string | null;
+    payerInfo: string | null;
     status: string;
     createdAt: Date;
     link: { slug: string } | null;
@@ -48,7 +50,14 @@ const toTipRow = (
   id: t.id,
   type: "tip",
   amountKop: Number(t.amountKop),
-  feeKop: Number(t.feeKop ?? 0),
+  feeKop: Number(
+    recipientFeeKopForIncomingTx({
+      amountKop: t.amountKop,
+      feeKop: t.feeKop,
+      paymentMethod: t.paymentMethod === "sbp" ? "sbp" : "card",
+      payerInfo: t.payerInfo,
+    }),
+  ),
   status: t.status,
   ...(t.link && {
     linkSlug: t.link.slug,
@@ -114,6 +123,8 @@ export async function GET(request: NextRequest) {
           id: true,
           amountKop: true,
           feeKop: true,
+          paymentMethod: true,
+          payerInfo: true,
           status: true,
           createdAt: true,
           link: { select: { slug: true } },
@@ -163,6 +174,8 @@ export async function GET(request: NextRequest) {
             id: true,
             amountKop: true,
             feeKop: true,
+            paymentMethod: true,
+            payerInfo: true,
             status: true,
             createdAt: true,
             link: { select: { slug: true } },

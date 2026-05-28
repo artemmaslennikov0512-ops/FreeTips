@@ -226,12 +226,21 @@ async function main(): Promise<void> {
   const companySdRef = process.env.PAYGINE_SD_REF_LEGAL?.trim();
   const amountKopNum = Number(tx.amountKop);
   const feeKopNum = Number(tx.feeKop ?? 0);
-  const toWaiterKop = isSbp && companySdRef && feeKopNum > 0 ? amountKopNum - feeKopNum : amountKopNum;
+  const isCard = !isSbp;
+  const toWaiterKop = Math.max(
+    0,
+    isSbp && companySdRef && feeKopNum > 0
+      ? amountKopNum - feeKopNum
+      : isCard && feeKopNum > 0
+        ? amountKopNum - feeKopNum
+        : amountKopNum,
+  );
 
   const doOneRelocate = async (
     amount: number,
     toSdRef: string,
-    desc: string
+    desc: string,
+    feeForRegisterKop?: number,
   ): Promise<{ ok: boolean; orderId?: string }> => {
     const ref = `relocate-${tx.id}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
     const regSig = sign([sector, String(amount), String(CURRENCY_RUB)], password);
@@ -246,6 +255,9 @@ async function main(): Promise<void> {
       signature: regSig,
       mode: "1",
     });
+    if (feeForRegisterKop != null && feeForRegisterKop > 0) {
+      regBody.set("fee", String(feeForRegisterKop));
+    }
     const regRes = await fetch(`${baseUrl}/Register`, {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -327,7 +339,12 @@ async function main(): Promise<void> {
     process.exit(0);
   }
 
-  const rWaiter = await doOneRelocate(toWaiterKop, waiterSdRef, `Перевод чаевых → ${waiterSdRef}`);
+  const rWaiter = await doOneRelocate(
+    toWaiterKop,
+    waiterSdRef,
+    `Перевод чаевых → ${waiterSdRef}`,
+    isCard && feeKopNum > 0 ? feeKopNum : undefined,
+  );
   if (!rWaiter.ok) {
     console.error("Ошибка перевода на кубышку официанта.");
     await prisma.transaction.updateMany({

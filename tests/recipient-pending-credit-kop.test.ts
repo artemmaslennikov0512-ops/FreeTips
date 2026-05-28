@@ -33,6 +33,17 @@ test("pendingNetCreditToRecipientKop: карта, feeKop null — не вычи�
   assert.equal(net, BigInt(5000));
 });
 
+test("pendingNetCreditToRecipientKop: карта, feeKop null и комиссия на получателе — вычитаем расчётную комиссию", () => {
+  const net = pendingNetCreditToRecipientKop({
+    amountKop: BigInt(10_600),
+    feeKop: null,
+    establishmentShareKop: null,
+    paymentMethod: "card",
+    payerInfo: JSON.stringify({ paygineFeePayer: "recipient" }),
+  });
+  assert.equal(net, BigInt(10_600 - 265));
+});
+
 test("pendingNetCreditToRecipientKop: uses stored fee and share", () => {
   const net = pendingNetCreditToRecipientKop({
     amountKop: BigInt(5000),

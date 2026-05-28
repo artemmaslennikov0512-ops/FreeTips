@@ -27,6 +27,38 @@ export function feeKopForIncoming(amountKop: number, paymentMethod: "card" | "sb
   return Math.round((amountKop * percent) / 100);
 }
 
+type FeePayerMode = "recipient" | "none" | "payer" | null;
+
+function parseFeePayerMode(payerInfo: string | null): FeePayerMode {
+  if (!payerInfo) return null;
+  try {
+    const payload = JSON.parse(payerInfo) as { paygineFeePayer?: unknown };
+    const mode = payload.paygineFeePayer;
+    if (mode === "recipient" || mode === "none" || mode === "payer") return mode;
+  } catch {
+    // ignore invalid json
+  }
+  return null;
+}
+
+/**
+ * Эффективная комиссия входящего платежа, списываемая с получателя.
+ * Если в БД feeKop отсутствует, но режим комиссии у получателя — досчитываем по формуле.
+ */
+export function recipientFeeKopForIncomingTx(input: {
+  amountKop: bigint;
+  feeKop: bigint | null;
+  paymentMethod: "card" | "sbp" | null;
+  payerInfo: string | null;
+}): bigint {
+  const stored = input.feeKop != null && input.feeKop > BigInt(0) ? input.feeKop : null;
+  if (stored) return stored;
+  const mode = parseFeePayerMode(input.payerInfo);
+  if (mode !== "recipient") return BigInt(0);
+  const method = input.paymentMethod === "sbp" ? "sbp" : "card";
+  return BigInt(feeKopForIncoming(Number(input.amountKop), method));
+}
+
 /**
  * Сколько списано с гостя по входящему платежу.
  * Исторически fee взимался с гостя; в новом режиме fee списывается с получателя
@@ -38,15 +70,9 @@ export function guestChargedKopForIncomingCardOrder(
   paymentMethod: "card" | "sbp" | null = "card",
   payerInfo: string | null = null,
 ): bigint {
-  if (payerInfo) {
-    try {
-      const payload = JSON.parse(payerInfo) as { paygineFeePayer?: unknown };
-      if (payload.paygineFeePayer === "recipient" || payload.paygineFeePayer === "none") {
-        return amountKop;
-      }
-    } catch {
-      // Невалидный JSON не должен ломать профиль/баланс.
-    }
+  const mode = parseFeePayerMode(payerInfo);
+  if (mode === "recipient" || mode === "none") {
+    return amountKop;
   }
   const method = paymentMethod === "sbp" ? "sbp" : "card";
   const stored = feeKop != null && feeKop > BigInt(0) ? feeKop : null;

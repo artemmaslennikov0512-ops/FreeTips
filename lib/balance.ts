@@ -3,7 +3,7 @@
  */
 
 import { db } from "@/lib/db";
-import { guestChargedKopForIncomingCardOrder } from "@/lib/payment/paygine-fee";
+import { guestChargedKopForIncomingCardOrder, recipientFeeKopForIncomingTx } from "@/lib/payment/paygine-fee";
 
 export async function getBalance(userId: string): Promise<{
   balanceKop: bigint;
@@ -29,7 +29,12 @@ export async function getBalance(userId: string): Promise<{
   let received = BigInt(0);
   let guestPaidTips = BigInt(0);
   for (const t of txRows) {
-    const fee = t.feeKop ?? BigInt(0);
+    const fee = recipientFeeKopForIncomingTx({
+      amountKop: t.amountKop,
+      feeKop: t.feeKop,
+      paymentMethod: t.paymentMethod === "sbp" ? "sbp" : "card",
+      payerInfo: t.payerInfo,
+    });
     const share = t.establishmentShareKop ?? BigInt(0);
     received += t.amountKop - fee - share;
     guestPaidTips += guestChargedKopForIncomingCardOrder(

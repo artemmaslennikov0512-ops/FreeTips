@@ -31,3 +31,17 @@ test("guestChargedKopForIncomingCardOrder: feeKop 0 в БД — всё равн�
 test("guestChargedKopForIncomingCardOrder: положительный feeKop в БД — не пересчитываем", () => {
   assert.equal(Number(guestChargedKopForIncomingCardOrder(BigInt(5_000), BigInt(99))), 5_000 + 99);
 });
+
+test("guestChargedKopForIncomingCardOrder: комиссия на получателе — гость платит только amount", () => {
+  assert.equal(
+    Number(
+      guestChargedKopForIncomingCardOrder(
+        BigInt(12_100),
+        BigInt(303),
+        "card",
+        JSON.stringify({ paygineFeePayer: "recipient" }),
+      ),
+    ),
+    12_100,
+  );
+});

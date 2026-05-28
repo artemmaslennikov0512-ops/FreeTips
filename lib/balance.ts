@@ -15,7 +15,7 @@ export async function getBalance(userId: string): Promise<{
   const [txRows, poolShareSum, payoutSum] = await Promise.all([
     db.transaction.findMany({
       where: { recipientId: userId, status: "SUCCESS" },
-      select: { amountKop: true, feeKop: true, establishmentShareKop: true, paymentMethod: true },
+      select: { amountKop: true, feeKop: true, establishmentShareKop: true, paymentMethod: true, payerInfo: true },
     }),
     db.transaction.aggregate({
       where: { poolShareRecipientId: userId, status: "SUCCESS" },
@@ -36,6 +36,7 @@ export async function getBalance(userId: string): Promise<{
       t.amountKop,
       t.feeKop,
       t.paymentMethod === "sbp" ? "sbp" : null,
+      t.payerInfo,
     );
   }
   received += poolShareSum._sum.establishmentShareKop ?? BigInt(0);

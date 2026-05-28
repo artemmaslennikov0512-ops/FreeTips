@@ -62,7 +62,7 @@ type TipRelocateExecutionPlan = {
   feeToCompanyKop: number;
   isSbp: boolean;
   companySdRef: string;
-  steps: { toSdRef: string; amountKop: number; desc: string }[];
+  steps: { toSdRef: string; amountKop: number; feeKop?: number; desc: string }[];
   establishmentShareKop: bigint | null;
   poolShareRecipientId: string | null;
   hasPendingWork: boolean;
@@ -98,7 +98,7 @@ function computeTipRelocateExecutionPlan(input: {
   const tipSplit = parseTipSplitFromPayerInfo(input.payerInfo ?? null);
   let establishmentShareKop: bigint | null = null;
   let poolShareRecipientId: string | null = null;
-  const steps: { toSdRef: string; amountKop: number; desc: string }[] = [];
+  const steps: { toSdRef: string; amountKop: number; feeKop?: number; desc: string }[] = [];
 
   if (
     tipSplit &&
@@ -107,7 +107,9 @@ function computeTipRelocateExecutionPlan(input: {
     poolSdRef !== orderSdRef
   ) {
     const poolKop = poolShareKopFromNet(netKop, tipSplit.establishmentSharePercent);
-    const waiterKop = netKop - poolKop;
+    const cardRelocateFeeKop = !isSbp && feeKopNum > 0 ? BigInt(feeKopNum) : BigInt(0);
+    const waiterKopRaw = netKop - poolKop;
+    const waiterKop = waiterKopRaw - cardRelocateFeeKop;
     if (poolKop >= BigInt(1)) {
       steps.push({
         toSdRef: poolSdRef,
@@ -121,15 +123,18 @@ function computeTipRelocateExecutionPlan(input: {
       steps.push({
         toSdRef: waiterSdRef,
         amountKop: Number(waiterKop),
+        ...(cardRelocateFeeKop > BigInt(0) ? { feeKop: Number(cardRelocateFeeKop) } : {}),
         desc: `Перевод чаевых → ${waiterSdRef}`,
       });
     }
   } else if (waiterSdRef && orderSdRef !== waiterSdRef) {
-    const toWaiterKop = Number(netKop);
+    const cardRelocateFeeKop = !isSbp && feeKopNum > 0 ? feeKopNum : 0;
+    const toWaiterKop = Math.max(0, Number(netKop) - cardRelocateFeeKop);
     if (toWaiterKop >= 1) {
       steps.push({
         toSdRef: waiterSdRef,
         amountKop: toWaiterKop,
+        ...(cardRelocateFeeKop > 0 ? { feeKop: cardRelocateFeeKop } : {}),
         desc: `Перевод чаевых → ${waiterSdRef}`,
       });
     }
@@ -238,6 +243,7 @@ export class PayginePaymentGateway implements PaymentGateway {
     const payerPayload: Record<string, unknown> = {
       comment: comment ?? undefined,
       paygineMethod: "card",
+      paygineFeePayer: "recipient",
     };
     if (tipSplit && tipSplit.establishmentSharePercent > 0) {
       payerPayload.tipSplit = {
@@ -250,7 +256,7 @@ export class PayginePaymentGateway implements PaymentGateway {
         linkId,
         recipientId,
         amountKop,
-        feeKop: null,
+        feeKop: feeKop > 0 ? BigInt(feeKop) : null,
         paymentMethod: "card",
         payerInfo: JSON.stringify(payerPayload),
         status: TransactionStatus.PENDING,
@@ -274,7 +280,6 @@ export class PayginePaymentGateway implements PaymentGateway {
         reference: idempotencyKey,
         /** Описание заказа в ЛК Paygine = код официанта из пути /pay/{код} */
         description: linkSlug.slice(0, 1000),
-        fee: feeKop > 0 ? feeKop : undefined,
         url: successUrl,
         failurl: failUrl,
         notify_url: notifyUrl,
@@ -587,12 +592,13 @@ export async function runRelocateForTransaction(txId: string): Promise<{ ok: boo
   try {
     await new Promise((r) => setTimeout(r, delayMs));
 
-    const doRelocate = async (amount: number, toSdRef: string, desc: string) => {
+    const doRelocate = async (amount: number, toSdRef: string, desc: string, feeKop?: number) => {
       const reg = await registerOrder(config, {
         amount,
         currency: CURRENCY_RUB,
         reference: `relocate-${txId}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
         description: desc.slice(0, 1000),
+        ...(feeKop && feeKop > 0 ? { fee: feeKop } : {}),
       });
       if (!reg.ok) return { ok: false, code: reg.code, description: reg.description };
       let rel = await sdRelocateFunds(config, {
@@ -635,7 +641,7 @@ export async function runRelocateForTransaction(txId: string): Promise<{ ok: boo
     let stepsOk = true;
     let lastFail: { code?: string; description?: string; debugBody?: string } = {};
     for (const step of plan.steps) {
-      const rel = await doRelocate(step.amountKop, step.toSdRef, step.desc);
+      const rel = await doRelocate(step.amountKop, step.toSdRef, step.desc, step.feeKop);
       if (!rel.ok) {
         stepsOk = false;
         lastFail = {

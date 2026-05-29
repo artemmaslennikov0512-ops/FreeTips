@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
       continue;
     }
 
-    const result = await getOrderStatus({ sector, password }, orderId);
+    const result = await getOrderStatus({ sector, password }, orderId, { reference: p.id });
     if (!result.ok) {
       errors.push(`Payout ${p.id} (order ${orderId}): ${result.description ?? result.code ?? "ошибка"}`);
       continue;
@@ -53,12 +53,13 @@ export async function POST(request: NextRequest) {
     )
       ? "COMPLETED"
       : "REJECTED";
-    const panMasked = result.ok && result.pan ? `****${result.pan.replace(/\s+/g, "").slice(-4)}` : "";
+    const panDigits = result.ok && result.pan ? result.pan.replace(/\D/g, "") : "";
+    const panMasked = panDigits.length >= 4 ? `****${panDigits.slice(-4)}` : "";
     const current = await db.payoutRequest.findUnique({
       where: { id: p.id },
       select: { details: true },
     });
-    const hasCard = !!current && /Карта:\s*\S+/i.test(current.details);
+    const hasCard = !!current && /Карта:\s*([^\n;]+)/i.test(current.details) && (current.details.match(/Карта:\s*([^\n;]+)/i)?.[1]?.replace(/\D/g, "").length ?? 0) >= 4;
     const nextDetails =
       current && !hasCard && panMasked
         ? `${current.details}; Карта: ${panMasked}`.slice(0, 1000)

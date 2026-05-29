@@ -263,7 +263,11 @@ export function parsePaygineOrderResponseXml(text: string): {
   const orderLevelState = orderLevelRaw ? normalizePaygineOrderStateToken(orderLevelRaw) : "";
   const orderState = orderStateTag || orderLevelState;
   if (!orderState && !operationState) return null;
-  const pan = text.match(/<pan>([^<]*)<\/pan>/i)?.[1]?.trim() ?? null;
+  const pan =
+    text.match(/<pan>([^<]*)<\/pan>/i)?.[1]?.trim() ??
+    text.match(/<card>([^<]*)<\/card>/i)?.[1]?.trim() ??
+    text.match(/<card_number>([^<]*)<\/card_number>/i)?.[1]?.trim() ??
+    null;
 
   return {
     orderState: orderState || orderLevelState || "UNKNOWN",

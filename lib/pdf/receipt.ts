@@ -108,13 +108,13 @@ export async function buildPayoutReceiptPdf(
   const font = await doc.embedFont(options.fontBytes);
   const page = doc.addPage([PAGE_WIDTH_PT, PAGE_HEIGHT_PT]);
   const { width, height } = page.getSize();
-  const margin = 18;
+  const margin = 16;
   let y = height - margin;
 
   const titleSize = 12;
   const labelSize = 9;
   const valueSize = 9;
-  const lineHeight = 16;
+  const lineHeight = 19;
 
   // Логотип (уменьшен для 80 мм)
   if (options.logoPngBytes && options.logoPngBytes.length > 0) {
@@ -130,20 +130,11 @@ export async function buildPayoutReceiptPdf(
     }
   } else {
     page.drawText(SITE_NAME, { x: margin, y, size: 11, font, color: rgb(0.2, 0.3, 0.6) });
-    y -= 16;
+    y -= 14;
   }
 
   page.drawText("Чек по операции", { x: margin, y, size: 10, font, color: rgb(0.4, 0.4, 0.4) });
-  y -= 14;
-  const operationLabel = OPERATION_TYPE_LABEL[data.operationType];
-  page.drawText(operationLabel, {
-    x: margin,
-    y,
-    size: titleSize,
-    font,
-    color: rgb(0.15, 0.15, 0.15),
-  });
-  y -= 18;
+  y -= 7;
 
   page.drawLine({
     start: { x: margin, y },
@@ -151,7 +142,7 @@ export async function buildPayoutReceiptPdf(
     thickness: 0.8,
     color: rgb(0.85, 0.85, 0.85),
   });
-  y -= 14;
+  y -= 12;
 
   const truncate = (val: string, maxLen: number) =>
     val.length > maxLen ? val.slice(0, maxLen) + "…" : val;
@@ -168,6 +159,7 @@ export async function buildPayoutReceiptPdf(
 
   line("Статус", STATUS_LABEL[data.status] ?? data.status);
   line("Дата", formatDate(data.createdAt));
+  const operationLabel = OPERATION_TYPE_LABEL[data.operationType];
   line("Операция", operationLabel);
   line("Отправитель", data.senderName);
   const { cardNumber, bank } = parseDetailsForReceipt(data.details);
@@ -176,8 +168,15 @@ export async function buildPayoutReceiptPdf(
   line("Сумма без комиссии", formatAmount(data.amountKop));
   line("Комиссия", formatAmount(data.feeKop ?? 0));
 
-  y -= 14;
-  const chipH = 18;
+  y -= 10;
+  page.drawLine({
+    start: { x: margin, y },
+    end: { x: width - margin, y },
+    thickness: 0.8,
+    color: rgb(0.85, 0.85, 0.85),
+  });
+  y -= 8;
+  const chipH = 19;
   const chipText =
     data.status === "COMPLETED"
       ? "Успешно"
@@ -186,7 +185,7 @@ export async function buildPayoutReceiptPdf(
         : "В обработке";
   const chipSize = 10;
   const chipTextW = font.widthOfTextAtSize(chipText, chipSize);
-  const chipPadX = 12;
+  const chipPadX = 13;
   const chipW = chipTextW + chipPadX * 2;
   const chipX = margin + (width - margin * 2 - chipW) / 2;
   const chipY = y - chipH;
@@ -202,7 +201,7 @@ export async function buildPayoutReceiptPdf(
   });
   page.drawText(chipText, {
     x: chipX + chipPadX,
-    y: chipY + 4,
+    y: chipY + 4.5,
     size: chipSize,
     font,
     color: success ? rgb(0.1, 0.55, 0.2) : failed ? rgb(0.7, 0.15, 0.15) : rgb(0.35, 0.35, 0.35),

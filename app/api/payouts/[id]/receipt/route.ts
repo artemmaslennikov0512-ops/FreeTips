@@ -57,7 +57,11 @@ function getLogoPngBytes(): Uint8Array | undefined {
 }
 
 function hasCardInDetails(details: string): boolean {
-  return /Карта:\s*\S+/i.test(details);
+  const m = details.match(/Карта:\s*([^\n;]+)/i);
+  if (!m) return false;
+  const value = (m[1] ?? "").trim();
+  const digits = value.replace(/\D/g, "");
+  return digits.length >= 4;
 }
 
 export async function GET(
@@ -112,11 +116,12 @@ export async function GET(
       const sector = process.env.PAYGINE_SECTOR?.trim();
       const password = process.env.PAYGINE_PASSWORD?.trim();
       if (Number.isInteger(orderId) && sector && password) {
-        const order = await getOrderStatus({ sector, password }, orderId);
+        const order = await getOrderStatus({ sector, password }, orderId, { reference: payout.id });
         if (order.ok && order.pan) {
           const pan = order.pan.replace(/\s+/g, "");
-          if (pan) {
-            const maskedPan = `****${pan.slice(-4)}`;
+          const last4 = pan.replace(/\D/g, "").slice(-4);
+          if (last4.length === 4) {
+            const maskedPan = `****${last4}`;
             details = `${details}; Карта: ${maskedPan}`.slice(0, 1000);
             await db.payoutRequest.update({
               where: { id: payout.id },

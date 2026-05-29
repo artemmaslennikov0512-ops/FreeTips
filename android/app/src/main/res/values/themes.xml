@@ -6,7 +6,7 @@
         <item name="android:navigationBarColor">@color/background</item>
     </style>
 
-    <!-- Экран входа: тёмный фон как в приложении, золотые кнопки -->
+    <!-- Экран входа: тёмный фон как в приложении, синий акцент -->
     <style name="Theme.FreeTips.ApiKeyEntry" parent="Theme.FreeTips">
         <item name="android:windowBackground">@color/background</item>
         <item name="android:statusBarColor">@color/background</item>
@@ -33,7 +33,7 @@
         <item name="android:windowBackground">@color/background</item>
         <item name="android:windowLightNavigationBar">true</item>
         <item name="materialButtonStyle">@style/Widget.FreeTips.Button</item>
-        <!-- Поэлементные атрибуты: шапка и низ белые, иконки/подписи — золото и тёмно-синий -->
+        <!-- Поэлементные атрибуты: шапка и низ белые, иконки/подписи — синий и тёмно-синий -->
         <item name="freetips_headerBarBackground">@color/surface_light</item>
         <item name="freetips_headerBarTextColor">@color/logo_ft_dark_blue</item>
         <item name="freetips_headerBarIconColor">@color/primary</item>

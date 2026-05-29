@@ -46,67 +46,65 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/section_title_to_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
+                    android:orientation="vertical">
 
-                    <EditText
-                        android:id="@+id/filterAmountFrom"
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="0"
-                        android:minHeight="48dp"
-                        android:minWidth="120dp"
-                        android:maxWidth="160dp"
-                        android:hint="@string/operations_filter_amount_from"
-                        android:inputType="numberDecimal"
-                        android:importantForAutofill="yes"
-                        android:autofillHints="creditCardNumber"
-                        android:maxLines="1"
-                        android:textSize="@dimen/text_body"
-                        android:textColor="@color/on_surface"
-                        android:textColorHint="@color/on_surface_variant"
-                        android:paddingStart="12dp"
-                        android:paddingEnd="12dp"
-                        android:paddingTop="10dp"
-                        android:paddingBottom="10dp"
-                        android:background="@drawable/bg_filter_edit"
-                        android:layout_marginEnd="@dimen/spacing_sm" />
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
 
-                    <EditText
-                        android:id="@+id/filterAmountTo"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="0"
-                        android:minHeight="48dp"
-                        android:minWidth="120dp"
-                        android:maxWidth="160dp"
-                        android:hint="@string/operations_filter_amount_to"
-                        android:inputType="numberDecimal"
-                        android:importantForAutofill="yes"
-                        android:autofillHints="creditCardNumber"
-                        android:maxLines="1"
-                        android:textSize="@dimen/text_body"
-                        android:textColor="@color/on_surface"
-                        android:textColorHint="@color/on_surface_variant"
-                        android:paddingStart="12dp"
-                        android:paddingEnd="12dp"
-                        android:paddingTop="10dp"
-                        android:paddingBottom="10dp"
-                        android:background="@drawable/bg_filter_edit"
-                        android:layout_marginEnd="@dimen/spacing_sm" />
+                        <EditText
+                            android:id="@+id/filterAmountFrom"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:minHeight="48dp"
+                            android:hint="@string/operations_filter_amount_from"
+                            android:inputType="numberDecimal"
+                            android:importantForAutofill="yes"
+                            android:autofillHints="creditCardNumber"
+                            android:maxLines="1"
+                            android:textSize="@dimen/text_body"
+                            android:textColor="@color/on_surface"
+                            android:textColorHint="@color/on_surface_variant"
+                            android:paddingStart="12dp"
+                            android:paddingEnd="12dp"
+                            android:paddingTop="10dp"
+                            android:paddingBottom="10dp"
+                            android:background="@drawable/bg_filter_edit"
+                            android:layout_marginEnd="@dimen/spacing_sm" />
 
-                    <View
-                        android:layout_width="0dp"
-                        android:layout_height="0dp"
-                        android:layout_weight="1" />
+                        <EditText
+                            android:id="@+id/filterAmountTo"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:minHeight="48dp"
+                            android:hint="@string/operations_filter_amount_to"
+                            android:inputType="numberDecimal"
+                            android:importantForAutofill="yes"
+                            android:autofillHints="creditCardNumber"
+                            android:maxLines="1"
+                            android:textSize="@dimen/text_body"
+                            android:textColor="@color/on_surface"
+                            android:textColorHint="@color/on_surface_variant"
+                            android:paddingStart="12dp"
+                            android:paddingEnd="12dp"
+                            android:paddingTop="10dp"
+                            android:paddingBottom="10dp"
+                            android:background="@drawable/bg_filter_edit" />
+                    </LinearLayout>
 
                     <Button
                         android:id="@+id/filterApply"
+                        style="?attr/materialButtonStyle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="end"
+                        android:layout_marginTop="@dimen/spacing_sm"
                         android:text="@string/operations_filter_apply"
-                        android:textSize="@dimen/text_caption"
-                        style="?attr/materialButtonStyle" />
+                        android:textSize="@dimen/text_caption" />
                 </LinearLayout>
 
                 <androidx.recyclerview.widget.RecyclerView

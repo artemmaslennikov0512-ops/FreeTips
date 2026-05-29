@@ -19,6 +19,15 @@ import { logInfo } from "@/lib/logger";
 import { payoutSelfServiceVerificationError } from "@/lib/payout-verification-guard";
 const CURRENCY_RUB = 643;
 
+function buildReceiptCardMask(raw: string): string | null {
+  const digits = String(raw).replace(/\D/g, "").slice(0, 19);
+  if (digits.length < 10) return null;
+  const prefix = digits.slice(0, 6);
+  const suffix = digits.slice(-4);
+  const hiddenLen = Math.max(1, digits.length - 10);
+  return `${prefix}${"*".repeat(hiddenLen)}${suffix}`;
+}
+
 export async function POST(request: NextRequest) {
   const auth = await requireAuthOrApiKey(request);
   if ("response" in auth) return auth.response;
@@ -31,9 +40,20 @@ export async function POST(request: NextRequest) {
 
   const data = bodyResult.data as unknown;
   const amountKop = typeof data === "object" && data !== null && "amountKop" in data ? Number((data as { amountKop: number }).amountKop) : NaN;
+  const cardMaskRaw =
+    typeof data === "object" && data !== null && "cardMask" in data
+      ? String((data as { cardMask?: unknown }).cardMask ?? "")
+      : "";
+  const cardMask = buildReceiptCardMask(cardMaskRaw);
   if (!Number.isFinite(amountKop) || amountKop < PAYOUT_MIN_AMOUNT_KOP || amountKop > PAYOUT_MAX_AMOUNT_KOP) {
     return NextResponse.json(
       { error: "Укажите сумму от 100 до 100 000 ₽" },
+      { status: 400 },
+    );
+  }
+  if (!cardMask) {
+    return NextResponse.json(
+      { error: "Укажите номер карты для чека" },
       { status: 400 },
     );
   }
@@ -137,7 +157,9 @@ export async function POST(request: NextRequest) {
       userId: auth.userId,
       amountKop: amountBigInt,
       feeKop: feeKop > 0 ? BigInt(feeKop) : null,
-      details: "Вывод через страницу Paygine (SDPayOutPage)",
+      details: cardMask
+        ? `Вывод через страницу Paygine (SDPayOutPage); Карта: ${cardMask}`
+        : "Вывод через страницу Paygine (SDPayOutPage)",
     },
     select: { id: true },
   });

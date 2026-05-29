@@ -83,6 +83,24 @@ function parsePayoutRubInputToKop(raw: string): number | null {
   return Math.round(v * 100);
 }
 
+function normalizePanDigits(raw: string): string {
+  return String(raw).replace(/\D/g, "").slice(0, 19);
+}
+
+function formatPanInput(raw: string): string {
+  const digits = normalizePanDigits(raw);
+  return digits.replace(/(\d{4})(?=\d)/g, "$1 ").trim();
+}
+
+function buildReceiptCardMask(raw: string): string | null {
+  const digits = normalizePanDigits(raw);
+  if (digits.length < 10) return null;
+  const prefix = digits.slice(0, 6);
+  const suffix = digits.slice(-4);
+  const hiddenLen = Math.max(1, digits.length - 10);
+  return `${prefix}${"*".repeat(hiddenLen)}${suffix}`;
+}
+
 export default function CabinetTransactionsPage() {
   const router = useRouter();
   useSearchParams(); // subscribe to URL updates
@@ -93,6 +111,7 @@ export default function CabinetTransactionsPage() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [sdPageAmount, setSdPageAmount] = useState("");
+  const [sdPageCard, setSdPageCard] = useState("");
   const [sdPageLoading, setSdPageLoading] = useState(false);
   const [sdPageError, setSdPageError] = useState<string | null>(null);
   const [sdPageNewTabHint, setSdPageNewTabHint] = useState(false);
@@ -107,6 +126,8 @@ export default function CabinetTransactionsPage() {
 
   const maxPayoutRub = maxPayoutPerRequestKop / 100;
   const enteredPayoutKop = parsePayoutRubInputToKop(sdPageAmount);
+  const receiptCardMask = buildReceiptCardMask(sdPageCard);
+  const hasValidPanForReceipt = receiptCardMask != null;
   const payoutExceedsMax = enteredPayoutKop != null && enteredPayoutKop > maxPayoutPerRequestKop;
   const canWithdrawByLimit = maxPayoutPerRequestKop >= PAYOUT_MIN_AMOUNT_KOP;
 
@@ -254,6 +275,10 @@ export default function CabinetTransactionsPage() {
       setSdPageError(`Сумма превышает лимит (макс. ${(maxPayoutPerRequestKop / 100).toLocaleString("ru-RU")} ₽)`);
       return;
     }
+    if (!hasValidPanForReceipt) {
+      setSdPageError("Введите номер карты для чека (минимум 10 цифр)");
+      return;
+    }
     setSdPageLoading(true);
     setSdPageError(null);
     try {
@@ -262,7 +287,7 @@ export default function CabinetTransactionsPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ amountKop }),
+        body: JSON.stringify({ amountKop, cardMask: receiptCardMask }),
       });
       const data = (await res.json()) as {
         formUrl?: string;
@@ -387,6 +412,25 @@ export default function CabinetTransactionsPage() {
                         : "border-[var(--color-brand-gold)]/30 focus:ring-[var(--color-brand-gold)]/40"
                     }`}
                   />
+                  <input
+                    id="cabinet-transactions-payout-card"
+                    name="payoutCardForReceipt"
+                    type="text"
+                    inputMode="numeric"
+                    autoComplete="cc-number"
+                    value={sdPageCard}
+                    onChange={(e) => {
+                      setSdPageCard(formatPanInput(e.target.value));
+                      setSdPageError(null);
+                    }}
+                    disabled={verificationStatus !== "VERIFIED" || !canWithdrawByLimit}
+                    placeholder="Номер карты (для отображения в чеке)"
+                    className={`min-w-[240px] max-w-full rounded-xl border bg-white px-5 py-3 text-[#0a192f] placeholder:text-[var(--color-text-secondary)]/70 focus:outline-none focus:ring-2 overflow-hidden disabled:cursor-not-allowed disabled:opacity-60 ${
+                      sdPageCard.length > 0 && !hasValidPanForReceipt
+                        ? "border-red-500 focus:ring-red-500/40"
+                        : "border-[var(--color-brand-gold)]/30 focus:ring-[var(--color-brand-gold)]/40"
+                    }`}
+                  />
                   <button
                     type="button"
                     onClick={handleSDPayOutPage}
@@ -398,7 +442,8 @@ export default function CabinetTransactionsPage() {
                       !sdPageAmount ||
                       enteredPayoutKop == null ||
                       enteredPayoutKop < PAYOUT_MIN_AMOUNT_KOP ||
-                      enteredPayoutKop > maxPayoutPerRequestKop
+                      enteredPayoutKop > maxPayoutPerRequestKop ||
+                      !hasValidPanForReceipt
                     }
                     className={`w-auto ${CABINET_WAITER_BTN_INLINE} px-6 py-3 text-[14px] disabled:pointer-events-none`}
                     title={verificationStatus !== "VERIFIED" ? "Вывод доступен после прохождения верификации" : undefined}
@@ -406,6 +451,11 @@ export default function CabinetTransactionsPage() {
                     {sdPageLoading ? "Переход…" : "Вывести средства"}
                   </button>
                 </div>
+                {sdPageCard.length > 0 && !hasValidPanForReceipt && (
+                  <p className="text-center text-sm font-medium text-red-600" role="alert">
+                    Для чека укажите минимум 10 цифр номера карты.
+                  </p>
+                )}
                 {verificationStatus !== "VERIFIED" && (
                   <p className="text-center text-sm text-amber-600" role="status">
                     Вывод доступен после прохождения верификации в разделе профиля.

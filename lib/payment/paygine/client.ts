@@ -265,6 +265,7 @@ export function parsePaygineOrderResponseXml(text: string): {
   if (!orderState && !operationState) return null;
   const pan =
     text.match(/<pan>([^<]*)<\/pan>/i)?.[1]?.trim() ??
+    text.match(/<pan2>([^<]*)<\/pan2>/i)?.[1]?.trim() ??
     text.match(/<card>([^<]*)<\/card>/i)?.[1]?.trim() ??
     text.match(/<card_number>([^<]*)<\/card_number>/i)?.[1]?.trim() ??
     null;

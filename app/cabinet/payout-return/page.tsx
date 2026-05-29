@@ -79,78 +79,82 @@ export default function CabinetPayoutReturnPage() {
   const isRejected = result?.status === "REJECTED";
 
   return (
-    <div className="mx-auto max-w-md space-y-6 px-4 py-8 text-center">
-      {isSuccess && (
-        <>
-          <div className="flex justify-center">
-            <span className="pay-result-icon pay-result-icon-success inline-flex h-16 w-16 items-center justify-center rounded-full bg-[var(--color-accent-emerald)]/15">
-              <CheckCircle2 className="h-10 w-10 text-[var(--color-accent-emerald)]" />
-            </span>
-          </div>
-          <h2 className={PANEL_CARD_TITLE_CABINET_XL}>
-            Вывод выполнен
-          </h2>
-          {result.amountKop != null && (
-            <p className="text-lg text-[var(--color-text)]">
-              {formatMoney(BigInt(result.amountKop))} переведены на карту.
-            </p>
+    <div className="flex min-h-[72vh] items-center justify-center px-4 py-8">
+      <div className="cabinet-card w-full max-w-xl rounded-2xl border border-[var(--color-dark-gray)]/15 bg-[var(--color-bg-sides)] p-6 text-center shadow-[var(--shadow-subtle)] sm:p-8">
+        <div className="space-y-5">
+          {isSuccess && (
+            <>
+              <div className="flex justify-center">
+                <span className="pay-result-icon pay-result-icon-success inline-flex h-16 w-16 items-center justify-center rounded-full bg-[var(--color-accent-emerald)]/15">
+                  <CheckCircle2 className="h-10 w-10 text-[var(--color-accent-emerald)]" />
+                </span>
+              </div>
+              <h2 className={PANEL_CARD_TITLE_CABINET_XL}>
+                Вывод выполнен
+              </h2>
+              {result.amountKop != null && (
+                <p className="text-lg text-[var(--color-text)]">
+                  {formatMoney(BigInt(result.amountKop))} переведены на карту.
+                </p>
+              )}
+              {result.alreadyProcessed && (
+                <p className="text-sm text-[var(--color-text-secondary)]">Эта заявка уже была обработана ранее.</p>
+              )}
+            </>
           )}
-          {result.alreadyProcessed && (
-            <p className="text-sm text-[var(--color-text-secondary)]">Эта заявка уже была обработана ранее.</p>
+
+          {isRejected && (
+            <>
+              <div className="flex justify-center">
+                <span className="pay-result-icon pay-result-icon-error inline-flex h-16 w-16 items-center justify-center rounded-full bg-[var(--color-accent-red)]/15">
+                  <XCircle className="h-10 w-10 text-[var(--color-accent-red)]" />
+                </span>
+              </div>
+              <h2 className={PANEL_CARD_TITLE_CABINET_XL}>
+                Вывод не выполнен
+              </h2>
+              <p className="text-[var(--color-text-secondary)]">
+                Операция была отменена или завершилась с ошибкой. Средства остались на вашем балансе.
+              </p>
+            </>
           )}
-        </>
-      )}
 
-      {isRejected && (
-        <>
-          <div className="flex justify-center">
-            <span className="pay-result-icon pay-result-icon-error inline-flex h-16 w-16 items-center justify-center rounded-full bg-[var(--color-accent-red)]/15">
-              <XCircle className="h-10 w-10 text-[var(--color-accent-red)]" />
-            </span>
-          </div>
-          <h2 className={PANEL_CARD_TITLE_CABINET_XL}>
-            Вывод не выполнен
-          </h2>
-          <p className="text-[var(--color-text-secondary)]">
-            Операция была отменена или завершилась с ошибкой. Средства остались на вашем балансе.
-          </p>
-        </>
-      )}
+          {isUnclear && (
+            <>
+              <div className="flex justify-center">
+                <span className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-[var(--color-muted)]/20">
+                  <HelpCircle className="h-10 w-10 text-[var(--color-muted)]" />
+                </span>
+              </div>
+              <h2 className={PANEL_CARD_TITLE_CABINET_XL}>
+                Заявка обрабатывается
+              </h2>
+              <p className="text-[var(--color-text-secondary)]">
+                {result.error ?? "Проверяем финальный статус вывода. Обычно это занимает несколько секунд."}
+              </p>
+              <p className="text-sm text-[var(--color-text-secondary)]">
+                Через {REDIRECT_DELAY_MS / 1000} сек. вы будете перенаправлены в историю операций.
+              </p>
+            </>
+          )}
+        </div>
 
-      {isUnclear && (
-        <>
-          <div className="flex justify-center">
-            <span className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-[var(--color-muted)]/20">
-              <HelpCircle className="h-10 w-10 text-[var(--color-muted)]" />
-            </span>
-          </div>
-          <h2 className={PANEL_CARD_TITLE_CABINET_XL}>
-            Результат операции
-          </h2>
-          <p className="text-[var(--color-text-secondary)]">
-            {result.error ?? "Операция обрабатывается. Проверьте итог в истории операций."}
-          </p>
-          <p className="text-sm text-[var(--color-text-secondary)]">
-            Через {REDIRECT_DELAY_MS / 1000} сек. вы будете перенаправлены в историю операций.
-          </p>
-        </>
-      )}
-
-      <div className="flex flex-col items-center justify-center gap-3 pt-4 sm:flex-row">
-        <Link
-          href="/cabinet/transactions"
-          className="inline-flex items-center gap-2 rounded-xl border border-[var(--color-brand-gold)]/40 bg-transparent px-5 py-3 font-semibold text-[var(--color-text)] transition-all hover:bg-[var(--color-brand-gold)]/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-gold)]/35"
-        >
-          <Menu className="h-4 w-4" />
-          В меню
-        </Link>
-        <Link
-          href="/cabinet/transactions"
-          className="inline-flex items-center gap-2 rounded-xl bg-[var(--color-navy)] px-5 py-3 font-semibold text-white transition-all hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-navy)]/50"
-        >
-          К истории операций
-          <ArrowRight className="h-4 w-4" />
-        </Link>
+        <div className="mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row">
+          <Link
+            href="/cabinet/transactions"
+            className="inline-flex items-center gap-2 rounded-xl border border-[var(--color-brand-gold)]/40 bg-transparent px-5 py-3 font-semibold text-[var(--color-text)] transition-all hover:bg-[var(--color-brand-gold)]/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-gold)]/35"
+          >
+            <Menu className="h-4 w-4" />
+            В меню
+          </Link>
+          <Link
+            href="/cabinet/transactions"
+            className="inline-flex items-center gap-2 rounded-xl border border-[var(--color-brand-gold)]/30 bg-[var(--color-brand-gold)]/15 px-5 py-3 font-semibold text-[var(--color-text)] transition-all hover:bg-[var(--color-brand-gold)]/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-gold)]/35"
+          >
+            К истории операций
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
       </div>
     </div>
   );

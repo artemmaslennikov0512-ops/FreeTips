@@ -116,9 +116,17 @@ export async function GET(
       const sector = process.env.PAYGINE_SECTOR?.trim();
       const password = process.env.PAYGINE_PASSWORD?.trim();
       if (Number.isInteger(orderId) && sector && password) {
-        const order = await getOrderStatus({ sector, password }, orderId, { reference: payout.id });
-        if (order.ok && order.pan) {
-          const pan = order.pan.replace(/\s+/g, "");
+        const withReference = await getOrderStatus({ sector, password }, orderId, { reference: payout.id });
+        const noReference = !withReference.ok || !withReference.pan
+          ? await getOrderStatus({ sector, password }, orderId)
+          : null;
+        const resolvedPan = withReference.ok && withReference.pan
+          ? withReference.pan
+          : noReference?.ok
+            ? noReference.pan
+            : null;
+        if (resolvedPan) {
+          const pan = resolvedPan.replace(/\s+/g, "");
           const last4 = pan.replace(/\D/g, "").slice(-4);
           if (last4.length === 4) {
             const maskedPan = `****${last4}`;

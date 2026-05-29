@@ -142,7 +142,7 @@ export async function buildPayoutReceiptPdf(
     thickness: 0.8,
     color: rgb(0.85, 0.85, 0.85),
   });
-  y -= 12;
+  y -= 18;
 
   const truncate = (val: string, maxLen: number) =>
     val.length > maxLen ? val.slice(0, maxLen) + "…" : val;

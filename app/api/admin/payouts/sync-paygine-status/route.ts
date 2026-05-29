@@ -41,9 +41,12 @@ export async function POST(request: NextRequest) {
       continue;
     }
 
-    const result = await getOrderStatus({ sector, password }, orderId, { reference: p.id });
-    if (!result.ok) {
-      errors.push(`Payout ${p.id} (order ${orderId}): ${result.description ?? result.code ?? "ошибка"}`);
+    const withReference = await getOrderStatus({ sector, password }, orderId, { reference: p.id });
+    const noReference = !withReference.ok ? await getOrderStatus({ sector, password }, orderId) : null;
+    const result = withReference.ok ? withReference : noReference;
+    if (!result || !result.ok) {
+      const err = withReference.ok ? noReference : withReference;
+      errors.push(`Payout ${p.id} (order ${orderId}): ${err?.description ?? err?.code ?? "ошибка"}`);
       continue;
     }
 

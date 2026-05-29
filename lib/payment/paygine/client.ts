@@ -211,6 +211,8 @@ type OrderStatusResult =
       orderState: string;
       /** Статус последней релевантной операции (не REVERSE) внутри <operations> — как <state> в вебхуке. */
       operationState: string | null;
+      /** PAN из ответа Paygine (обычно в маске). */
+      pan: string | null;
     }
   | { ok: false; code?: string; description?: string };
 
@@ -242,6 +244,7 @@ export function normalizePaygineOrderStateToken(raw: string): string {
 export function parsePaygineOrderResponseXml(text: string): {
   orderState: string;
   operationState: string | null;
+  pan: string | null;
 } | null {
   const orderStateRaw = text.match(/<order_state>([^<]*)<\/order_state>/i)?.[1]?.trim() ?? "";
   const beforeOps = text.split(/<operations\b/i)[0] ?? text;
@@ -260,10 +263,12 @@ export function parsePaygineOrderResponseXml(text: string): {
   const orderLevelState = orderLevelRaw ? normalizePaygineOrderStateToken(orderLevelRaw) : "";
   const orderState = orderStateTag || orderLevelState;
   if (!orderState && !operationState) return null;
+  const pan = text.match(/<pan>([^<]*)<\/pan>/i)?.[1]?.trim() ?? null;
 
   return {
     orderState: orderState || orderLevelState || "UNKNOWN",
     operationState,
+    pan,
   };
 }
 
@@ -314,7 +319,12 @@ export async function getOrderStatus(
 
   const parsed = parsePaygineOrderResponseXml(text);
   if (parsed) {
-    return { ok: true, orderState: parsed.orderState, operationState: parsed.operationState };
+    return {
+      ok: true,
+      orderState: parsed.orderState,
+      operationState: parsed.operationState,
+      pan: parsed.pan,
+    };
   }
 
   const errCode = text.match(/<code>([^<]+)<\/code>/)?.[1];

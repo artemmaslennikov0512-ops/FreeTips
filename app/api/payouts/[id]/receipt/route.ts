@@ -10,6 +10,7 @@ import { join } from "path";
 import { requireAuthOrApiKey } from "@/lib/auth-or-api-key";
 import { db } from "@/lib/db";
 import { buildPayoutReceiptPdf } from "@/lib/pdf/receipt";
+import { getOrderStatus } from "@/lib/payment/paygine/client";
 import { logError, logWarn } from "@/lib/logger";
 
 const FONT_URLS = [
@@ -55,6 +56,10 @@ function getLogoPngBytes(): Uint8Array | undefined {
   return undefined;
 }
 
+function hasCardInDetails(details: string): boolean {
+  return /Карта:\s*\S+/i.test(details);
+}
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -73,6 +78,7 @@ export async function GET(
       userId: true,
       amountKop: true,
       details: true,
+      externalId: true,
       status: true,
       createdAt: true,
       recipientName: true,
@@ -100,7 +106,28 @@ export async function GET(
     const fontBytes = await getFontBytes();
     const logoPngBytes = getLogoPngBytes();
 
-    const isPhoneTransfer = payout.details.startsWith("Телефон");
+    let details = payout.details;
+    if (!hasCardInDetails(details) && payout.externalId) {
+      const orderId = Number.parseInt(payout.externalId, 10);
+      const sector = process.env.PAYGINE_SECTOR?.trim();
+      const password = process.env.PAYGINE_PASSWORD?.trim();
+      if (Number.isInteger(orderId) && sector && password) {
+        const order = await getOrderStatus({ sector, password }, orderId);
+        if (order.ok && order.pan) {
+          const pan = order.pan.replace(/\s+/g, "");
+          if (pan) {
+            const maskedPan = `****${pan.slice(-4)}`;
+            details = `${details}; Карта: ${maskedPan}`.slice(0, 1000);
+            await db.payoutRequest.update({
+              where: { id: payout.id },
+              data: { details },
+            });
+          }
+        }
+      }
+    }
+
+    const isPhoneTransfer = details.startsWith("Телефон");
     const user = await db.user.findUnique({
       where: { id: payout.userId },
       select: { login: true },
@@ -110,7 +137,7 @@ export async function GET(
         id: payout.id,
         amountKop: Number(payout.amountKop),
         feeKop: payout.feeKop != null ? Number(payout.feeKop) : 0,
-        details: payout.details,
+        details,
         status: payout.status,
         createdAt: payout.createdAt.toISOString(),
         senderName: user?.login || "—",

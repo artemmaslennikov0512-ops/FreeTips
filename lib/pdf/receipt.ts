@@ -77,7 +77,7 @@ function formatAmount(kop: number): string {
   const abs = Math.abs(rub).toFixed(2);
   const [intPart, decPart] = abs.split(".");
   const intWithSpaces = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, "\u00A0");
-  return `${sign}${intWithSpaces}.${decPart} ₽`;
+  return `${sign}${intWithSpaces}.${decPart} руб.`;
 }
 
 function formatDate(iso: string): string {
@@ -171,31 +171,41 @@ export async function buildPayoutReceiptPdf(
   line("Операция", operationLabel);
   line("Отправитель", data.senderName);
   const { cardNumber, bank } = parseDetailsForReceipt(data.details);
-  line("Реквизиты", bank);
+  line("Банк", bank);
   line("Номер карты", cardNumber);
   line("Сумма без комиссии", formatAmount(data.amountKop));
   line("Комиссия", formatAmount(data.feeKop ?? 0));
 
   y -= 14;
-  const boxH = 22;
-  const boxY = y - boxH;
+  const chipH = 18;
+  const chipText =
+    data.status === "COMPLETED"
+      ? "Успешно"
+      : data.status === "REJECTED"
+        ? "Неудачно"
+        : "В обработке";
+  const chipSize = 10;
+  const chipTextW = font.widthOfTextAtSize(chipText, chipSize);
+  const chipPadX = 12;
+  const chipW = chipTextW + chipPadX * 2;
+  const chipX = margin + (width - margin * 2 - chipW) / 2;
+  const chipY = y - chipH;
+  const success = data.status === "COMPLETED";
+  const failed = data.status === "REJECTED";
   page.drawRectangle({
-    x: margin,
-    y: boxY,
-    width: width - margin * 2,
-    height: boxH,
-    borderColor: rgb(0.4, 0.55, 0.85),
-    borderWidth: 0.8,
-    color: rgb(0.95, 0.97, 1),
+    x: chipX,
+    y: chipY,
+    width: chipW,
+    height: chipH,
+    borderWidth: 0,
+    color: success ? rgb(0.86, 0.95, 0.88) : failed ? rgb(0.98, 0.88, 0.88) : rgb(0.92, 0.92, 0.92),
   });
-  const doneText = data.status === "COMPLETED" ? "Операция выполнена" : "Операция не выполнена";
-  const doneW = font.widthOfTextAtSize(doneText, 10);
-  page.drawText(doneText, {
-    x: margin + (width - margin * 2 - doneW) / 2,
-    y: boxY + 6,
-    size: 10,
+  page.drawText(chipText, {
+    x: chipX + chipPadX,
+    y: chipY + 4,
+    size: chipSize,
     font,
-    color: rgb(0.2, 0.4, 0.75),
+    color: success ? rgb(0.1, 0.55, 0.2) : failed ? rgb(0.7, 0.15, 0.15) : rgb(0.35, 0.35, 0.35),
   });
   return doc.save();
 }

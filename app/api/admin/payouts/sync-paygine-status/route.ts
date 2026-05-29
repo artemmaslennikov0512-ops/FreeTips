@@ -53,9 +53,19 @@ export async function POST(request: NextRequest) {
     )
       ? "COMPLETED"
       : "REJECTED";
+    const panMasked = result.ok && result.pan ? `****${result.pan.replace(/\s+/g, "").slice(-4)}` : "";
+    const current = await db.payoutRequest.findUnique({
+      where: { id: p.id },
+      select: { details: true },
+    });
+    const hasCard = !!current && /Карта:\s*\S+/i.test(current.details);
+    const nextDetails =
+      current && !hasCard && panMasked
+        ? `${current.details}; Карта: ${panMasked}`.slice(0, 1000)
+        : undefined;
     await db.payoutRequest.update({
       where: { id: p.id },
-      data: { status: newStatus },
+      data: { status: newStatus, ...(nextDetails ? { details: nextDetails } : {}) },
     });
     if (newStatus === "COMPLETED") {
       completed++;

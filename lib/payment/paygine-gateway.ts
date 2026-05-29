@@ -377,22 +377,30 @@ export class PayginePaymentGateway implements PaymentGateway {
     if (!tx) {
       const payout = await db.payoutRequest.findUnique({
         where: { id: reference, status: "PROCESSING" },
-        select: { id: true, userId: true },
+        select: { id: true, userId: true, details: true },
       });
       if (payout) {
         const state = stateMatch?.[1]?.trim().toUpperCase();
         const orderState = orderStateMatch?.[1]?.trim().toUpperCase();
         const success = state === "APPROVED" || orderState === "COMPLETED";
+        const panRaw = rawBody.match(/<pan>([^<]*)<\/pan>/i)?.[1]?.trim() ?? "";
+        const pan = panRaw ? panRaw.replace(/\s+/g, "") : "";
+        const panMasked = pan ? `****${pan.slice(-4)}` : "";
         const codeMatch = rawBody.match(/<code>([^<]*)<\/code>/i);
         const descMatch = rawBody.match(/<description>([^<]*)<\/description>/i);
         const rejectionReason =
           !success && (codeMatch?.[1] || descMatch?.[1])
             ? [codeMatch?.[1]?.trim(), descMatch?.[1]?.trim()].filter(Boolean).join(": ").slice(0, 500)
             : undefined;
+        const alreadyHasCard = /Карта:\s*\S+/i.test(payout.details);
+        const detailsWithPan = !alreadyHasCard && panMasked
+          ? `${payout.details}; Карта: ${panMasked}`.slice(0, 1000)
+          : payout.details;
         await db.payoutRequest.update({
           where: { id: payout.id },
           data: {
             status: success ? "COMPLETED" : "REJECTED",
+            details: detailsWithPan,
             ...(rejectionReason && { rejectionReason }),
           },
         });

@@ -65,6 +65,8 @@ type TipRelocateExecutionPlan = {
   steps: { toSdRef: string; amountKop: number; feeKop?: number; desc: string }[];
   establishmentShareKop: bigint | null;
   poolShareRecipientId: string | null;
+  recipientCreditedKop: bigint;
+  recipientFeeChargedKop: bigint;
   hasPendingWork: boolean;
 };
 
@@ -111,6 +113,7 @@ function computeTipRelocateExecutionPlan(input: {
   const tipSplit = parseTipSplitFromPayerInfo(input.payerInfo ?? null);
   let establishmentShareKop: bigint | null = null;
   let poolShareRecipientId: string | null = null;
+  let recipientCreditedKop = BigInt(0);
   const steps: { toSdRef: string; amountKop: number; feeKop?: number; desc: string }[] = [];
 
   if (
@@ -139,6 +142,7 @@ function computeTipRelocateExecutionPlan(input: {
         ...(cardRelocateFeeKop > BigInt(0) ? { feeKop: Number(cardRelocateFeeKop) } : {}),
         desc: `Перевод чаевых → ${waiterSdRef}`,
       });
+      recipientCreditedKop = waiterKop;
     }
   } else if (waiterSdRef && orderSdRef !== waiterSdRef) {
     const cardRelocateFeeKop = !isSbp && feeKopNum > 0 ? feeKopNum : 0;
@@ -150,8 +154,13 @@ function computeTipRelocateExecutionPlan(input: {
         ...(cardRelocateFeeKop > 0 ? { feeKop: cardRelocateFeeKop } : {}),
         desc: `Перевод чаевых → ${waiterSdRef}`,
       });
+      recipientCreditedKop = BigInt(toWaiterKop);
     }
   }
+
+  const recipientFeeChargedKop = isSbp
+    ? BigInt(Math.max(0, feeToCompanyKop))
+    : BigInt(Math.max(0, feeKopNum));
 
   const feeWork = feeToCompanyKop >= 1 && !!companySdRef;
   const stepWork = steps.some((s) => s.amountKop >= 1);
@@ -165,6 +174,8 @@ function computeTipRelocateExecutionPlan(input: {
     steps,
     establishmentShareKop,
     poolShareRecipientId,
+    recipientCreditedKop,
+    recipientFeeChargedKop,
     hasPendingWork,
   };
 }
@@ -383,7 +394,10 @@ export class PayginePaymentGateway implements PaymentGateway {
         const state = stateMatch?.[1]?.trim().toUpperCase();
         const orderState = orderStateMatch?.[1]?.trim().toUpperCase();
         const success = state === "APPROVED" || orderState === "COMPLETED";
-        const panRaw = rawBody.match(/<pan>([^<]*)<\/pan>/i)?.[1]?.trim() ?? "";
+        const panRaw =
+          rawBody.match(/<pan2>([^<]*)<\/pan2>/i)?.[1]?.trim() ??
+          rawBody.match(/<pan>([^<]*)<\/pan>/i)?.[1]?.trim() ??
+          "";
         const pan = panRaw ? panRaw.replace(/\s+/g, "") : "";
         const panMasked = pan ? `****${pan.slice(-4)}` : "";
         const codeMatch = rawBody.match(/<code>([^<]*)<\/code>/i);
@@ -496,6 +510,8 @@ export class PayginePaymentGateway implements PaymentGateway {
               ...(relocatePlan.poolShareRecipientId
                 ? { poolShareRecipientId: relocatePlan.poolShareRecipientId }
                 : {}),
+              recipientCreditedKop: relocatePlan.recipientCreditedKop,
+              recipientFeeChargedKop: relocatePlan.recipientFeeChargedKop,
             }
           : {}),
       },
@@ -587,6 +603,8 @@ export async function runRelocateForTransaction(txId: string): Promise<{ ok: boo
         status: TransactionStatus.SUCCESS,
         ...(plan?.establishmentShareKop != null ? { establishmentShareKop: plan.establishmentShareKop } : {}),
         ...(plan?.poolShareRecipientId ? { poolShareRecipientId: plan.poolShareRecipientId } : {}),
+        recipientCreditedKop: plan?.recipientCreditedKop ?? BigInt(0),
+        recipientFeeChargedKop: plan?.recipientFeeChargedKop ?? BigInt(0),
       },
     });
     void broadcastBalanceUpdated(tx.recipientId);
@@ -681,6 +699,8 @@ export async function runRelocateForTransaction(txId: string): Promise<{ ok: boo
           status: TransactionStatus.SUCCESS,
           ...(plan.establishmentShareKop != null ? { establishmentShareKop: plan.establishmentShareKop } : {}),
           ...(plan.poolShareRecipientId ? { poolShareRecipientId: plan.poolShareRecipientId } : {}),
+          recipientCreditedKop: plan.recipientCreditedKop,
+          recipientFeeChargedKop: plan.recipientFeeChargedKop,
         },
       });
       void broadcastBalanceUpdated(tx.recipientId);

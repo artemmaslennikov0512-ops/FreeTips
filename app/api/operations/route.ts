@@ -13,6 +13,7 @@ import { parseLimitOffset } from "@/lib/api/helpers";
 import { feeKopForPayout, recipientFeeKopForIncomingTx } from "@/lib/payment/paygine-fee";
 import { getBaseUrlFromRequest } from "@/lib/get-base-url";
 import { logInfo } from "@/lib/logger";
+import { reconcileRecentTipsForUserIfDue } from "@/lib/payment/reconcile-user-tip-transactions";
 
 export type OperationItem = {
   id: string;
@@ -39,6 +40,8 @@ const toTipRow = (
     id: string;
     amountKop: bigint;
     feeKop: bigint | null;
+    recipientCreditedKop: bigint | null;
+    recipientFeeChargedKop: bigint | null;
     paymentMethod: string | null;
     payerInfo: string | null;
     status: string;
@@ -51,13 +54,13 @@ const toTipRow = (
   type: "tip",
   amountKop: Number(t.amountKop),
   feeKop: Number(
-    recipientFeeKopForIncomingTx({
-      amountKop: t.amountKop,
-      feeKop: t.feeKop,
-      paymentMethod: t.paymentMethod === "sbp" ? "sbp" : "card",
-      payerInfo: t.payerInfo,
-      assumeLegacyCardRecipientFee: true,
-    }),
+    t.recipientFeeChargedKop ??
+      recipientFeeKopForIncomingTx({
+        amountKop: t.amountKop,
+        feeKop: t.feeKop,
+        paymentMethod: t.paymentMethod === "sbp" ? "sbp" : "card",
+        payerInfo: t.payerInfo,
+      }),
   ),
   status: t.status,
   ...(t.link && {
@@ -94,6 +97,7 @@ export async function GET(request: NextRequest) {
   const startedAt = Date.now();
   const auth = await requireAuthOrApiKey(request);
   if ("response" in auth) return auth.response;
+  void reconcileRecentTipsForUserIfDue(auth.userId);
 
   const { searchParams } = new URL(request.url);
   const { limit, offset } = parseLimitOffset(searchParams);
@@ -124,6 +128,8 @@ export async function GET(request: NextRequest) {
           id: true,
           amountKop: true,
           feeKop: true,
+          recipientCreditedKop: true,
+          recipientFeeChargedKop: true,
           paymentMethod: true,
           payerInfo: true,
           status: true,
@@ -175,6 +181,8 @@ export async function GET(request: NextRequest) {
             id: true,
             amountKop: true,
             feeKop: true,
+            recipientCreditedKop: true,
+            recipientFeeChargedKop: true,
             paymentMethod: true,
             payerInfo: true,
             status: true,

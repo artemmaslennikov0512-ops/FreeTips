@@ -496,7 +496,7 @@ export default function CabinetTransactionsPage() {
                     </span>
                   </div>
                   {(byDay.map.get(dayKey) ?? []).map((op) => {
-                    const tipNetKop = op.type === "tip" ? Math.max(0, op.amountKop - op.feeKop) : null;
+                    const tipNetKop = op.type === "tip" ? op.amountKop : null;
                     return (
                     <div
                       key={`${op.type}-${op.id}`}
@@ -585,7 +585,7 @@ export default function CabinetTransactionsPage() {
                         </td>
                       </tr>
                       {(byDay.map.get(dayKey) ?? []).map((op) => {
-                        const tipNetKop = op.type === "tip" ? Math.max(0, op.amountKop - op.feeKop) : null;
+                        const tipNetKop = op.type === "tip" ? op.amountKop : null;
                         return (
                         <tr
                           key={`${op.type}-${op.id}`}

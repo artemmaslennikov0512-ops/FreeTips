@@ -263,9 +263,10 @@ export function parsePaygineOrderResponseXml(text: string): {
   const orderLevelState = orderLevelRaw ? normalizePaygineOrderStateToken(orderLevelRaw) : "";
   const orderState = orderStateTag || orderLevelState;
   if (!orderState && !operationState) return null;
+  // Для выводов используем pan2 (карта получателя), а pan — карта отправителя.
   const pan =
-    text.match(/<pan>([^<]*)<\/pan>/i)?.[1]?.trim() ??
     text.match(/<pan2>([^<]*)<\/pan2>/i)?.[1]?.trim() ??
+    text.match(/<pan>([^<]*)<\/pan>/i)?.[1]?.trim() ??
     text.match(/<card>([^<]*)<\/card>/i)?.[1]?.trim() ??
     text.match(/<card_number>([^<]*)<\/card_number>/i)?.[1]?.trim() ??
     null;

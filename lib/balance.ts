@@ -15,7 +15,15 @@ export async function getBalance(userId: string): Promise<{
   const [txRows, poolShareSum, payoutSum] = await Promise.all([
     db.transaction.findMany({
       where: { recipientId: userId, status: "SUCCESS" },
-      select: { amountKop: true, feeKop: true, establishmentShareKop: true, paymentMethod: true, payerInfo: true },
+      select: {
+        amountKop: true,
+        feeKop: true,
+        establishmentShareKop: true,
+        paymentMethod: true,
+        payerInfo: true,
+        recipientCreditedKop: true,
+        recipientFeeChargedKop: true,
+      },
     }),
     db.transaction.aggregate({
       where: { poolShareRecipientId: userId, status: "SUCCESS" },
@@ -29,18 +37,19 @@ export async function getBalance(userId: string): Promise<{
   let received = BigInt(0);
   let guestPaidTips = BigInt(0);
   for (const t of txRows) {
+    const creditedFact = t.recipientCreditedKop;
+    const feeFact = t.recipientFeeChargedKop;
     const fee = recipientFeeKopForIncomingTx({
       amountKop: t.amountKop,
       feeKop: t.feeKop,
       paymentMethod: t.paymentMethod === "sbp" ? "sbp" : "card",
       payerInfo: t.payerInfo,
-      assumeLegacyCardRecipientFee: true,
     });
     const share = t.establishmentShareKop ?? BigInt(0);
-    received += t.amountKop - fee - share;
+    received += creditedFact ?? (t.amountKop - fee - share);
     guestPaidTips += guestChargedKopForIncomingCardOrder(
       t.amountKop,
-      t.feeKop,
+      feeFact ?? t.feeKop,
       t.paymentMethod === "sbp" ? "sbp" : null,
       t.payerInfo,
     );

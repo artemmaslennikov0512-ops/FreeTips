@@ -43,10 +43,15 @@ export async function POST(request: NextRequest) {
 
     const withReference = await getOrderStatus({ sector, password }, orderId, { reference: p.id });
     const noReference = !withReference.ok ? await getOrderStatus({ sector, password }, orderId) : null;
-    const result = withReference.ok ? withReference : noReference;
-    if (!result || !result.ok) {
-      const err = withReference.ok ? noReference : withReference;
-      errors.push(`Payout ${p.id} (order ${orderId}): ${err?.description ?? err?.code ?? "ошибка"}`);
+    const result =
+      withReference.ok ? withReference : noReference?.ok ? noReference : null;
+    if (!result) {
+      const fail = !withReference.ok
+        ? withReference
+        : noReference && !noReference.ok
+          ? noReference
+          : null;
+      errors.push(`Payout ${p.id} (order ${orderId}): ${fail?.description ?? fail?.code ?? "ошибка"}`);
       continue;
     }
 
@@ -56,7 +61,7 @@ export async function POST(request: NextRequest) {
     )
       ? "COMPLETED"
       : "REJECTED";
-    const panDigits = result.ok && result.pan ? result.pan.replace(/\D/g, "") : "";
+    const panDigits = result.pan ? result.pan.replace(/\D/g, "") : "";
     const panMasked = panDigits.length >= 4 ? `****${panDigits.slice(-4)}` : "";
     const current = await db.payoutRequest.findUnique({
       where: { id: p.id },

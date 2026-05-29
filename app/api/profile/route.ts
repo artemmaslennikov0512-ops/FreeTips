@@ -26,6 +26,7 @@ import { getRequestId } from "@/lib/security/request";
 import { getBaseUrlFromRequest } from "@/lib/get-base-url";
 import { messageFromUnknown } from "@/lib/errors";
 import { getBalance } from "@/lib/balance";
+import { reconcileRecentTipsForUserIfDue } from "@/lib/payment/reconcile-user-tip-transactions";
 
 /** Кэш ответа Paygine sdGetBalance по userId (только для логов/мониторинга; основной баланс в ответе — из БД). TTL: PAYGINE_BALANCE_CACHE_TTL_SEC (по умолчанию 30 сек). */
 const PAYGINE_BALANCE_CACHE_TTL_MS =
@@ -109,6 +110,7 @@ export async function GET(request: NextRequest) {
     const auth = await requireAuthOrApiKey(request);
     if ("response" in auth) return auth.response;
     const id = auth.userId;
+    void reconcileRecentTipsForUserIfDue(id);
 
     const dayStart = getUtcDayStart();
     const monthStart = getUtcMonthStart();

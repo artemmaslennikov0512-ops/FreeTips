@@ -8,7 +8,11 @@ import { requireAuthOrApiKey } from "@/lib/auth-or-api-key";
 import { db } from "@/lib/db";
 import { getBalance } from "@/lib/balance";
 import { getUtcDayStart, getEffectivePayoutLimits } from "@/lib/payout-limits";
-import { PAYOUT_MAX_AMOUNT_KOP, PAYOUT_MIN_AMOUNT_KOP } from "@/lib/payout-amount-bounds";
+import {
+  PAYOUT_MAX_AMOUNT_KOP,
+  PAYOUT_MAX_TOTAL_DEBIT_PER_OPERATION_KOP,
+  PAYOUT_MIN_AMOUNT_KOP,
+} from "@/lib/payout-amount-bounds";
 import { feeKopForPayout } from "@/lib/payment/paygine-fee";
 import { registerOrder, buildSDPayOutPageFormParams, getSDPayOutPageEndpoint } from "@/lib/payment/paygine/client";
 import { getBaseUrlFromRequest } from "@/lib/get-base-url";
@@ -61,6 +65,14 @@ export async function POST(request: NextRequest) {
   const amountBigInt = BigInt(Math.round(amountKop));
   const feeKop = feeKopForPayout(amountKop);
   const totalDebitKop = amountBigInt + BigInt(feeKop);
+  if (totalDebitKop > BigInt(PAYOUT_MAX_TOTAL_DEBIT_PER_OPERATION_KOP)) {
+    return NextResponse.json(
+      {
+        error: `Сумма с комиссией не должна превышать ${(PAYOUT_MAX_TOTAL_DEBIT_PER_OPERATION_KOP / 100).toLocaleString("ru-RU")} ₽ за одну операцию`,
+      },
+      { status: 400 },
+    );
+  }
 
   const { balanceKop } = await getBalance(auth.userId);
   if (totalDebitKop > balanceKop) {
@@ -130,13 +142,13 @@ export async function POST(request: NextRequest) {
     );
   }
   const todaySumKop = todaySum._sum.amountKop ?? BigInt(0);
-  if (todaySumKop + amountBigInt > limits.kop) {
+  if (todaySumKop + totalDebitKop > limits.kop) {
     const limitRub = Number(limits.kop) / 100;
     void recordFraudSignal({
       userId: auth.userId,
       ruleCode: FRAUD_RULE.PAYOUT_LIMIT_DAILY_KOP,
       message: `Попытка вывода (SDPayOutPage) при исчерпании суточного лимита суммы (лимит ${limitRub.toLocaleString("ru-RU")} ₽)`,
-      metadata: { limitKop: Number(limits.kop), amountKop: Number(amountBigInt) },
+      metadata: { limitKop: Number(limits.kop), amountKop: Number(amountBigInt), feeKop, totalDebitKop: Number(totalDebitKop) },
       dedupeMinutes: 360,
     });
     return NextResponse.json(

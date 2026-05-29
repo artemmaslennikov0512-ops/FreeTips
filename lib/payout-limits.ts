@@ -6,7 +6,7 @@ import { db } from "@/lib/db";
 import { PAYOUT_MAX_AMOUNT_KOP } from "@/lib/payout-amount-bounds";
 
 export const PAYOUT_DAILY_LIMIT_COUNT = 5;
-export const PAYOUT_DAILY_LIMIT_KOP = BigInt("20000000"); // 200 000 ₽
+export const PAYOUT_DAILY_LIMIT_KOP = BigInt("1000000"); // 10 000 ₽
 
 /** Начало текущих суток по UTC. */
 export function getUtcDayStart(): Date {
@@ -42,13 +42,19 @@ export async function getEffectivePayoutLimits(userId: string): Promise<{
   count: number;
   kop: bigint;
 }> {
-  const user = await db.user.findUnique({
-    where: { id: userId },
-    select: { payoutDailyLimitCount: true, payoutDailyLimitKop: true },
-  });
+  const [user, defaults] = await Promise.all([
+    db.user.findUnique({
+      where: { id: userId },
+      select: { payoutDailyLimitCount: true, payoutDailyLimitKop: true },
+    }),
+    db.systemDefaultLimits.findUnique({
+      where: { id: "default" },
+      select: { payoutDailyLimitCount: true, payoutDailyLimitKop: true },
+    }),
+  ]);
   return {
-    count: user?.payoutDailyLimitCount ?? PAYOUT_DAILY_LIMIT_COUNT,
-    kop: user?.payoutDailyLimitKop ?? PAYOUT_DAILY_LIMIT_KOP,
+    count: user?.payoutDailyLimitCount ?? defaults?.payoutDailyLimitCount ?? PAYOUT_DAILY_LIMIT_COUNT,
+    kop: user?.payoutDailyLimitKop ?? defaults?.payoutDailyLimitKop ?? PAYOUT_DAILY_LIMIT_KOP,
   };
 }
 
@@ -57,13 +63,19 @@ export async function getEffectiveMonthlyPayoutLimits(userId: string): Promise<{
   count: number | null;
   kop: bigint | null;
 }> {
-  const user = await db.user.findUnique({
-    where: { id: userId },
-    select: { payoutMonthlyLimitCount: true, payoutMonthlyLimitKop: true },
-  });
+  const [user, defaults] = await Promise.all([
+    db.user.findUnique({
+      where: { id: userId },
+      select: { payoutMonthlyLimitCount: true, payoutMonthlyLimitKop: true },
+    }),
+    db.systemDefaultLimits.findUnique({
+      where: { id: "default" },
+      select: { payoutMonthlyLimitCount: true, payoutMonthlyLimitKop: true },
+    }),
+  ]);
   return {
-    count: user?.payoutMonthlyLimitCount ?? null,
-    kop: user?.payoutMonthlyLimitKop ?? null,
+    count: user?.payoutMonthlyLimitCount ?? defaults?.payoutMonthlyLimitCount ?? null,
+    kop: user?.payoutMonthlyLimitKop ?? defaults?.payoutMonthlyLimitKop ?? null,
   };
 }
 

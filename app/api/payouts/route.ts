@@ -13,6 +13,7 @@ import { parseJsonWithLimit, MAX_BODY_SIZE_AUTH, jsonError } from "@/lib/api/hel
 import { getUtcDayStart, getUtcMonthStart, getEffectivePayoutLimits, getEffectiveMonthlyPayoutLimits } from "@/lib/payout-limits";
 import { sendPayoutToPaygine, isPayginePayoutAutoSendEnabled } from "@/lib/payment/send-payout-to-paygine";
 import { feeKopForPayout } from "@/lib/payment/paygine-fee";
+import { PAYOUT_MAX_TOTAL_DEBIT_PER_OPERATION_KOP } from "@/lib/payout-amount-bounds";
 import { logSecurity } from "@/lib/logger";
 import { broadcastBalanceUpdated } from "@/lib/ws-broadcast";
 import { getRequestId } from "@/lib/security/request";
@@ -75,6 +76,12 @@ export async function POST(request: NextRequest) {
   const amountNum = Number(amountBigInt);
   const payoutFeeKop = feeKopForPayout(amountNum);
   const totalDebitKop = amountBigInt + BigInt(payoutFeeKop);
+  if (totalDebitKop > BigInt(PAYOUT_MAX_TOTAL_DEBIT_PER_OPERATION_KOP)) {
+    return jsonError(
+      400,
+      `Сумма с комиссией не должна превышать ${(PAYOUT_MAX_TOTAL_DEBIT_PER_OPERATION_KOP / 100).toLocaleString("ru-RU")} ₽ за одну операцию`,
+    );
+  }
 
   const { balanceKop } = await getBalance(auth.userId);
   if (totalDebitKop > balanceKop) {
@@ -167,7 +174,7 @@ export async function POST(request: NextRequest) {
     return jsonError(400, `Превышен лимит: не более ${limits.count} заявок в сутки`);
   }
   const todaySumKop = todaySum._sum.amountKop ?? BigInt(0);
-  if (todaySumKop + amountBigInt > limits.kop) {
+  if (todaySumKop + totalDebitKop > limits.kop) {
     logSecurity("payout.create.limit_daily_kop", {
       rule: "payout_daily_kop",
       action: "reject",
@@ -175,6 +182,8 @@ export async function POST(request: NextRequest) {
       ip,
       userId: auth.userId,
       amountKop: Number(amountBigInt),
+      feeKop: payoutFeeKop,
+      totalDebitKop: Number(totalDebitKop),
       limitKop: Number(limits.kop),
     });
     const limitRub = Number(limits.kop) / 100;
@@ -182,7 +191,7 @@ export async function POST(request: NextRequest) {
       userId: auth.userId,
       ruleCode: FRAUD_RULE.PAYOUT_LIMIT_DAILY_KOP,
       message: `Попытка вывода при исчерпании суточного лимита суммы (лимит ${limitRub.toLocaleString("ru-RU")} ₽)`,
-      metadata: { limitKop: Number(limits.kop), amountKop: Number(amountBigInt) },
+      metadata: { limitKop: Number(limits.kop), amountKop: Number(amountBigInt), feeKop: payoutFeeKop, totalDebitKop: Number(totalDebitKop) },
       dedupeMinutes: 360,
     });
     return jsonError(400, `Превышен лимит: не более ${limitRub.toLocaleString("ru-RU")} ₽ вывода в сутки`);

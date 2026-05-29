@@ -94,7 +94,8 @@ function LkPresenceCell({ user }: { user: User }) {
   );
 }
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE_OPTIONS = [20, 30, 50, 100] as const;
+const DEFAULT_PAGE_SIZE = PAGE_SIZE_OPTIONS[0];
 type SortField = "createdAt" | "login" | "balance" | "received" | "transactions";
 type SortDirection = "asc" | "desc";
 const SORT_FIELDS: SortField[] = ["createdAt", "login", "balance", "received", "transactions"];
@@ -103,6 +104,7 @@ export default function AdminUsersPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [usersTotal, setUsersTotal] = useState(0);
   const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState<number>(DEFAULT_PAGE_SIZE);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
@@ -124,8 +126,8 @@ export default function AdminUsersPage() {
     setError(null);
     try {
       const qp = new URLSearchParams();
-      qp.set("limit", String(PAGE_SIZE));
-      qp.set("offset", String(page * PAGE_SIZE));
+      qp.set("limit", String(pageSize));
+      qp.set("offset", String(page * pageSize));
       if (search) qp.set("search", search);
       if (roleFilter) qp.set("role", roleFilter);
       if (blockedFilter) qp.set("blocked", blockedFilter);
@@ -151,16 +153,16 @@ export default function AdminUsersPage() {
     } finally {
       setLoading(false);
     }
-  }, [search, roleFilter, blockedFilter, lkActiveFilter, sortBy, sortOrder, page]);
+  }, [search, roleFilter, blockedFilter, lkActiveFilter, sortBy, sortOrder, page, pageSize]);
 
   useEffect(() => {
     setPage(0);
   }, [search, roleFilter, blockedFilter, lkActiveFilter, sortBy, sortOrder]);
 
   useEffect(() => {
-    const lastPage = usersTotal <= 0 ? 0 : Math.max(0, Math.ceil(usersTotal / PAGE_SIZE) - 1);
+    const lastPage = usersTotal <= 0 ? 0 : Math.max(0, Math.ceil(usersTotal / pageSize) - 1);
     if (page > lastPage) setPage(lastPage);
-  }, [usersTotal, page]);
+  }, [usersTotal, page, pageSize]);
 
   useLayoutEffect(() => {
     const v = new URLSearchParams(window.location.search).get("lkActive");
@@ -322,6 +324,12 @@ export default function AdminUsersPage() {
   const handleSortByChange = useCallback((value: string) => {
     if (!SORT_FIELDS.includes(value as SortField)) return;
     setSortBy(value as SortField);
+  }, []);
+  const handlePageSizeChange = useCallback((value: string) => {
+    const parsed = Number(value);
+    if (!PAGE_SIZE_OPTIONS.includes(parsed as (typeof PAGE_SIZE_OPTIONS)[number])) return;
+    setPageSize(parsed);
+    setPage(0);
   }, []);
 
   if (loading && users.length === 0) {
@@ -504,7 +512,25 @@ export default function AdminUsersPage() {
             {sortOrder === "desc" ? "↓ Убыв." : "↑ Возр."}
           </button>
         </div>
-        {(roleFilter || blockedFilter || lkActiveFilter || sortBy !== "createdAt" || sortOrder !== "desc") && (
+        <div className="col-span-2 flex min-w-0 flex-wrap items-center gap-2 sm:col-span-1 sm:w-auto">
+          <span className="text-xs text-[var(--color-text-secondary)] sm:text-sm">Показывать:</span>
+          <div className="min-w-0 flex-1 sm:min-w-[8rem] sm:flex-initial">
+            <CustomDropdown
+              id="admin-users-page-size"
+              variant="admin"
+              value={String(pageSize)}
+              onChange={handlePageSizeChange}
+              placeholder="20"
+              options={PAGE_SIZE_OPTIONS.map((size) => ({ value: String(size), label: `${size}` }))}
+            />
+          </div>
+        </div>
+        {(roleFilter ||
+          blockedFilter ||
+          lkActiveFilter ||
+          sortBy !== "createdAt" ||
+          sortOrder !== "desc" ||
+          pageSize !== DEFAULT_PAGE_SIZE) && (
           <button
             type="button"
             onClick={() => {
@@ -513,6 +539,7 @@ export default function AdminUsersPage() {
               setLkActiveFilter("");
               setSortBy("createdAt");
               setSortOrder("desc");
+              setPageSize(DEFAULT_PAGE_SIZE);
               setPage(0);
             }}
             className={`col-span-2 w-full sm:col-auto sm:w-auto ${ADMIN_BTN} ${ADMIN_BTN_SM} admin-btn--neutral`}
@@ -600,13 +627,13 @@ export default function AdminUsersPage() {
                   className="inline-flex items-center gap-1.5 text-left text-sm font-semibold text-[#0a192f]"
                 >
                   <span>Логин</span>
-                  <span className="inline-flex flex-col leading-none">
+                  <span className="inline-flex flex-col leading-none text-[#0a192f]">
                     <ChevronUp
-                      className={`h-3 w-3 ${isActiveSortColumn("login") && sortOrder === "asc" ? "opacity-100" : "opacity-40"}`}
+                      className={`h-3 w-3 ${isActiveSortColumn("login") && sortOrder === "asc" ? "opacity-100" : "opacity-65"}`}
                       aria-hidden
                     />
                     <ChevronDown
-                      className={`-mt-1 h-3 w-3 ${isActiveSortColumn("login") && sortOrder === "desc" ? "opacity-100" : "opacity-40"}`}
+                      className={`-mt-1 h-3 w-3 ${isActiveSortColumn("login") && sortOrder === "desc" ? "opacity-100" : "opacity-65"}`}
                       aria-hidden
                     />
                   </span>
@@ -626,13 +653,13 @@ export default function AdminUsersPage() {
                   className="inline-flex items-center gap-1.5 text-left text-sm font-semibold text-[#0a192f]"
                 >
                   <span>Баланс</span>
-                  <span className="inline-flex flex-col leading-none">
+                  <span className="inline-flex flex-col leading-none text-[#0a192f]">
                     <ChevronUp
-                      className={`h-3 w-3 ${isActiveSortColumn("balance") && sortOrder === "asc" ? "opacity-100" : "opacity-40"}`}
+                      className={`h-3 w-3 ${isActiveSortColumn("balance") && sortOrder === "asc" ? "opacity-100" : "opacity-65"}`}
                       aria-hidden
                     />
                     <ChevronDown
-                      className={`-mt-1 h-3 w-3 ${isActiveSortColumn("balance") && sortOrder === "desc" ? "opacity-100" : "opacity-40"}`}
+                      className={`-mt-1 h-3 w-3 ${isActiveSortColumn("balance") && sortOrder === "desc" ? "opacity-100" : "opacity-65"}`}
                       aria-hidden
                     />
                   </span>
@@ -645,13 +672,13 @@ export default function AdminUsersPage() {
                   className="inline-flex items-center gap-1.5 text-left text-sm font-semibold text-[#0a192f]"
                 >
                   <span>Получено</span>
-                  <span className="inline-flex flex-col leading-none">
+                  <span className="inline-flex flex-col leading-none text-[#0a192f]">
                     <ChevronUp
-                      className={`h-3 w-3 ${isActiveSortColumn("received") && sortOrder === "asc" ? "opacity-100" : "opacity-40"}`}
+                      className={`h-3 w-3 ${isActiveSortColumn("received") && sortOrder === "asc" ? "opacity-100" : "opacity-65"}`}
                       aria-hidden
                     />
                     <ChevronDown
-                      className={`-mt-1 h-3 w-3 ${isActiveSortColumn("received") && sortOrder === "desc" ? "opacity-100" : "opacity-40"}`}
+                      className={`-mt-1 h-3 w-3 ${isActiveSortColumn("received") && sortOrder === "desc" ? "opacity-100" : "opacity-65"}`}
                       aria-hidden
                     />
                   </span>
@@ -664,13 +691,13 @@ export default function AdminUsersPage() {
                   className="inline-flex items-center gap-1.5 text-left text-sm font-semibold text-[#0a192f]"
                 >
                   <span>Транзакции</span>
-                  <span className="inline-flex flex-col leading-none">
+                  <span className="inline-flex flex-col leading-none text-[#0a192f]">
                     <ChevronUp
-                      className={`h-3 w-3 ${isActiveSortColumn("transactions") && sortOrder === "asc" ? "opacity-100" : "opacity-40"}`}
+                      className={`h-3 w-3 ${isActiveSortColumn("transactions") && sortOrder === "asc" ? "opacity-100" : "opacity-65"}`}
                       aria-hidden
                     />
                     <ChevronDown
-                      className={`-mt-1 h-3 w-3 ${isActiveSortColumn("transactions") && sortOrder === "desc" ? "opacity-100" : "opacity-40"}`}
+                      className={`-mt-1 h-3 w-3 ${isActiveSortColumn("transactions") && sortOrder === "desc" ? "opacity-100" : "opacity-65"}`}
                       aria-hidden
                     />
                   </span>
@@ -684,13 +711,13 @@ export default function AdminUsersPage() {
                   className="inline-flex items-center gap-1.5 text-left text-sm font-semibold text-[#0a192f]"
                 >
                   <span>Дата регистрации</span>
-                  <span className="inline-flex flex-col leading-none">
+                  <span className="inline-flex flex-col leading-none text-[#0a192f]">
                     <ChevronUp
-                      className={`h-3 w-3 ${isActiveSortColumn("createdAt") && sortOrder === "asc" ? "opacity-100" : "opacity-40"}`}
+                      className={`h-3 w-3 ${isActiveSortColumn("createdAt") && sortOrder === "asc" ? "opacity-100" : "opacity-65"}`}
                       aria-hidden
                     />
                     <ChevronDown
-                      className={`-mt-1 h-3 w-3 ${isActiveSortColumn("createdAt") && sortOrder === "desc" ? "opacity-100" : "opacity-40"}`}
+                      className={`-mt-1 h-3 w-3 ${isActiveSortColumn("createdAt") && sortOrder === "desc" ? "opacity-100" : "opacity-65"}`}
                       aria-hidden
                     />
                   </span>
@@ -756,7 +783,7 @@ export default function AdminUsersPage() {
           <p className="text-center text-sm text-[var(--color-text-secondary)]">
             Показано{" "}
             <span className="font-medium tabular-nums text-[var(--color-text)]">
-              {page * PAGE_SIZE + 1}–{Math.min((page + 1) * PAGE_SIZE, usersTotal)}
+              {page * pageSize + 1}–{Math.min((page + 1) * pageSize, usersTotal)}
             </span>{" "}
             из{" "}
             <span className="font-medium tabular-nums text-[var(--color-text)]">{usersTotal}</span>
@@ -774,12 +801,12 @@ export default function AdminUsersPage() {
               Страница{" "}
               <span className="font-semibold tabular-nums text-[var(--color-text)]">{page + 1}</span> /{" "}
               <span className="font-semibold tabular-nums text-[var(--color-text)]">
-                {Math.max(1, Math.ceil(usersTotal / PAGE_SIZE))}
+                {Math.max(1, Math.ceil(usersTotal / pageSize))}
               </span>
             </span>
             <button
               type="button"
-              disabled={loading || (page + 1) * PAGE_SIZE >= usersTotal}
+              disabled={loading || (page + 1) * pageSize >= usersTotal}
               onClick={() => setPage((p) => p + 1)}
               className={`${ADMIN_BTN} ${ADMIN_BTN_SM} admin-btn--neutral min-w-[7rem] disabled:opacity-50`}
             >

@@ -19,6 +19,8 @@ import {
   getUtcMonthStart,
   computeEffectiveMaxPayoutPerRequestKop,
 } from "@/lib/payout-limits";
+import { PAYOUT_MAX_TOTAL_DEBIT_PER_OPERATION_KOP } from "@/lib/payout-amount-bounds";
+import { feeKopForPayout } from "@/lib/payment/paygine-fee";
 import { sumIncomingSuccessNetKopUtcMonth } from "@/lib/recipient-pay-limits";
 import { sdGetBalance } from "@/lib/payment/paygine/client";
 import { logError, logInfo } from "@/lib/logger";
@@ -242,7 +244,7 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    const maxPayoutPerRequestKop = Number(
+    const maxByLimitsKop = Number(
       computeEffectiveMaxPayoutPerRequestKop({
         autoConfirmPayoutThresholdKop: profile.autoConfirmPayoutThresholdKop ?? null,
         dailyLimitKop: limits.kop,
@@ -251,6 +253,18 @@ export async function GET(request: NextRequest) {
         monthCompletedSumKop: monthSumKop,
       }),
     );
+    const effectiveMaxPayoutByTotalDebitKop = (() => {
+      // Ограничиваем сумму "на карту" так, чтобы (сумма + комиссия) не превышали 5 000 ₽ за операцию.
+      // Идём вниз от лимита по шагу 1 ₽ — достаточно быстро для текущих диапазонов.
+      let amountKop = Math.max(0, maxByLimitsKop);
+      amountKop -= amountKop % 100;
+      while (amountKop >= 0) {
+        const totalDebit = amountKop + feeKopForPayout(amountKop);
+        if (totalDebit <= PAYOUT_MAX_TOTAL_DEBIT_PER_OPERATION_KOP) return amountKop;
+        amountKop -= 100;
+      }
+      return 0;
+    })();
 
     // Ответ только примитивами — гарантированная сериализация без BigInt
     const body = {
@@ -314,7 +328,7 @@ export async function GET(request: NextRequest) {
         sumKop: Number(monthSumKop),
       },
       /** Максимальная сумма одной заявки на вывод (коп); для подсказки и валидации на клиенте */
-      maxPayoutPerRequestKop,
+      maxPayoutPerRequestKop: effectiveMaxPayoutByTotalDebitKop,
       verificationStatus: String(profile.verificationStatus),
       verificationRejectionReason: profile.verificationRejectionReason != null ? String(profile.verificationRejectionReason) : null,
       savingFor: profile.savingFor != null ? String(profile.savingFor) : null,

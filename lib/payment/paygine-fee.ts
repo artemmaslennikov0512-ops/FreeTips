@@ -50,12 +50,27 @@ export function recipientFeeKopForIncomingTx(input: {
   feeKop: bigint | null;
   paymentMethod: "card" | "sbp" | null;
   payerInfo: string | null;
+  /**
+   * Для legacy card-транзакций без payerInfo:
+   * true  — считаем комиссию получателя по формуле;
+   * false — считаем комиссию 0 (строгий режим).
+   */
+  assumeLegacyCardRecipientFee?: boolean;
 }): bigint {
   const stored = input.feeKop != null && input.feeKop > BigInt(0) ? input.feeKop : null;
   if (stored) return stored;
   const mode = parseFeePayerMode(input.payerInfo);
-  if (mode !== "recipient") return BigInt(0);
   const method = input.paymentMethod === "sbp" ? "sbp" : "card";
+  if (mode === "payer" || mode === "none") return BigInt(0);
+  /**
+   * Исторически часть card-транзакций была сохранена без paygineFeePayer,
+   * хотя фактически комиссия уже вычиталась на переливе.
+   * Для консистентного баланса считаем их как recipient-fee по умолчанию.
+   */
+  if (mode == null) {
+    if (method !== "card") return BigInt(0);
+    if (input.assumeLegacyCardRecipientFee !== true) return BigInt(0);
+  }
   return BigInt(feeKopForIncoming(Number(input.amountKop), method));
 }
 

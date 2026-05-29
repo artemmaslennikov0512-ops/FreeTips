@@ -34,6 +34,7 @@ export async function getBalance(userId: string): Promise<{
       feeKop: t.feeKop,
       paymentMethod: t.paymentMethod === "sbp" ? "sbp" : "card",
       payerInfo: t.payerInfo,
+      assumeLegacyCardRecipientFee: true,
     });
     const share = t.establishmentShareKop ?? BigInt(0);
     received += t.amountKop - fee - share;

@@ -82,14 +82,6 @@ function parsePayoutRubInputToKop(raw: string): number | null {
   return Math.round(v * 100);
 }
 
-/** Пополнение: сумма списания с плательщика, если поступление S уже «за минусом» 2,5% (S / (1 − 0,025)). */
-const TIP_NET_TO_PAYER_GROSS_DIVISOR = 0.975;
-
-function tipPayerGrossKop(amountKop: number): number | null {
-  if (!Number.isFinite(amountKop) || amountKop <= 0) return null;
-  return Math.round(amountKop / TIP_NET_TO_PAYER_GROSS_DIVISOR);
-}
-
 export default function CabinetTransactionsPage() {
   const router = useRouter();
   useSearchParams(); // subscribe to URL updates
@@ -480,7 +472,7 @@ export default function CabinetTransactionsPage() {
                     </span>
                   </div>
                   {(byDay.map.get(dayKey) ?? []).map((op) => {
-                    const tipGrossKop = op.type === "tip" ? tipPayerGrossKop(op.amountKop) : null;
+                    const tipNetKop = op.type === "tip" ? Math.max(0, op.amountKop - op.feeKop) : null;
                     return (
                     <div
                       key={`${op.type}-${op.id}`}
@@ -499,11 +491,11 @@ export default function CabinetTransactionsPage() {
                           <div className="flex flex-wrap gap-x-4 gap-y-1 text-[var(--color-text)]/90">
                             <span>Сумма: <strong className="text-[var(--color-text)]">{formatMoney(BigInt(op.amountKop))}</strong></span>
                             {op.type === "tip" ? (
-                              tipGrossKop != null && <span>Комиссия: {formatMoney(BigInt(tipGrossKop))}</span>
+                              op.feeKop > 0 && <span>Комиссия: {formatMoney(BigInt(op.feeKop))}</span>
                             ) : (
                               op.feeKop > 0 && <span>Комиссия: {formatMoney(BigInt(op.feeKop))}</span>
                             )}
-                            <span>Итого: <strong className="text-[var(--color-text)]">{formatMoney(BigInt(op.amountKop + op.feeKop))}</strong></span>
+                            <span>Итого: <strong className="text-[var(--color-text)]">{formatMoney(BigInt(op.type === "tip" ? (tipNetKop ?? op.amountKop) : op.amountKop + op.feeKop))}</strong></span>
                           </div>
                           {op.type === "payout" && op.status === "REJECTED" && op.rejectionReason && (
                             <p className="text-xs text-[var(--color-text)]/80" title={op.rejectionReason}>
@@ -546,7 +538,7 @@ export default function CabinetTransactionsPage() {
                         </td>
                       </tr>
                       {(byDay.map.get(dayKey) ?? []).map((op) => {
-                        const tipGrossKop = op.type === "tip" ? tipPayerGrossKop(op.amountKop) : null;
+                        const tipNetKop = op.type === "tip" ? Math.max(0, op.amountKop - op.feeKop) : null;
                         return (
                         <tr
                           key={`${op.type}-${op.id}`}
@@ -563,15 +555,15 @@ export default function CabinetTransactionsPage() {
                           </td>
                           <td className="whitespace-nowrap px-5 py-4 text-[var(--color-text)]/90">
                             {op.type === "tip"
-                              ? tipGrossKop != null
-                                ? formatMoney(BigInt(tipGrossKop))
+                              ? op.feeKop
+                                ? formatMoney(BigInt(op.feeKop))
                                 : "—"
                               : op.feeKop
                                 ? formatMoney(BigInt(op.feeKop))
                                 : "—"}
                           </td>
                           <td className="whitespace-nowrap px-5 py-4 font-medium text-[var(--color-text)]">
-                            {formatMoney(BigInt(op.amountKop + op.feeKop))}
+                            {formatMoney(BigInt(op.type === "tip" ? (tipNetKop ?? op.amountKop) : op.amountKop + op.feeKop))}
                           </td>
                           <td className="px-5 py-4">
                             <div className="flex flex-col gap-1">

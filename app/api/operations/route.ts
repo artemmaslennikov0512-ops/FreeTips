@@ -56,6 +56,7 @@ const toTipRow = (
       feeKop: t.feeKop,
       paymentMethod: t.paymentMethod === "sbp" ? "sbp" : "card",
       payerInfo: t.payerInfo,
+      assumeLegacyCardRecipientFee: true,
     }),
   ),
   status: t.status,

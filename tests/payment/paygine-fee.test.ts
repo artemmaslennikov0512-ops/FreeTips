@@ -65,3 +65,18 @@ test("recipientFeeKopForIncomingTx: feeKop null + recipient mode — досчи�
     265,
   );
 });
+
+test("recipientFeeKopForIncomingTx: legacy card без payerInfo — считаем комиссию получателя", () => {
+  assert.equal(
+    Number(
+      recipientFeeKopForIncomingTx({
+        amountKop: BigInt(10_600),
+        feeKop: null,
+        paymentMethod: "card",
+        payerInfo: null,
+        assumeLegacyCardRecipientFee: true,
+      }),
+    ),
+    265,
+  );
+});

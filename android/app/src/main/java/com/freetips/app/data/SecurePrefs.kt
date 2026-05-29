@@ -10,6 +10,9 @@ private const val PREFS_NAME = "freetips_secure"
 private const val KEY_API_KEY = "api_key"
 private const val KEY_HAS_SUCCESSFUL_LOGIN = "has_successful_login"
 private const val KEY_LOGIN_429_BLOCKED_UNTIL = "login_429_blocked_until"
+private const val KEY_THEME_MODE = "theme_mode"
+private const val THEME_MODE_DARK = "dark"
+private const val THEME_MODE_LIGHT = "light"
 
 class SecurePrefs(context: Context) {
 
@@ -57,6 +60,23 @@ class SecurePrefs(context: Context) {
         get() = prefs.getLong(KEY_LOGIN_429_BLOCKED_UNTIL, 0L)
         set(value) {
             prefs.edit().putLong(KEY_LOGIN_429_BLOCKED_UNTIL, value).apply()
+        }
+
+    /** Тема приложения: dark (по умолчанию) или light. */
+    var themeMode: String
+        get() = prefs.getString(KEY_THEME_MODE, THEME_MODE_DARK) ?: THEME_MODE_DARK
+        set(value) {
+            val normalized = when (value.lowercase()) {
+                THEME_MODE_LIGHT -> THEME_MODE_LIGHT
+                else -> THEME_MODE_DARK
+            }
+            prefs.edit().putString(KEY_THEME_MODE, normalized).apply()
+        }
+
+    var isLightTheme: Boolean
+        get() = themeMode == THEME_MODE_LIGHT
+        set(value) {
+            themeMode = if (value) THEME_MODE_LIGHT else THEME_MODE_DARK
         }
 
     fun clear() {

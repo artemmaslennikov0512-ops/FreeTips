@@ -11,6 +11,7 @@ import android.os.SystemClock
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.app.AppCompatActivity
 import com.freetips.app.BuildConfig
 import com.freetips.app.data.ApiClient
@@ -32,9 +33,12 @@ class ApiKeyEntryActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         try {
+            prefs = SecurePrefs(this)
+            AppCompatDelegate.setDefaultNightMode(
+                if (prefs.isLightTheme) AppCompatDelegate.MODE_NIGHT_NO else AppCompatDelegate.MODE_NIGHT_YES
+            )
             binding = ActivityApiKeyEntryBinding.inflate(layoutInflater)
             setContentView(binding.root)
-            prefs = SecurePrefs(this)
 
             applyGradientWhenLaidOut(binding.titleHeading)
 

@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.widget.ImageViewCompat
@@ -24,6 +25,7 @@ class MainActivity : AppCompatActivity(), NotificationsBottomSheet.BadgeUpdater 
 
     private lateinit var binding: ActivityMainBinding
     private var notificationBadge: BadgeDrawable? = null
+    private var currentDestinationId: Int = R.id.nav_home
 
     private val requestNotificationPermission = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -33,6 +35,9 @@ class MainActivity : AppCompatActivity(), NotificationsBottomSheet.BadgeUpdater 
         super.onCreate(savedInstanceState)
         try {
             val prefs = SecurePrefs(this)
+            AppCompatDelegate.setDefaultNightMode(
+                if (prefs.isLightTheme) AppCompatDelegate.MODE_NIGHT_NO else AppCompatDelegate.MODE_NIGHT_YES
+            )
             if (prefs.apiKey.isNullOrBlank()) {
                 startActivity(Intent(this, ApiKeyEntryActivity::class.java))
                 finish()
@@ -57,7 +62,24 @@ class MainActivity : AppCompatActivity(), NotificationsBottomSheet.BadgeUpdater 
             }
             val navController = navHost.navController
             binding.bottomNav.setupWithNavController(navController)
+            updateThemeNavIcon(SecurePrefs(this).isLightTheme)
+            binding.bottomNav.setOnItemSelectedListener { item ->
+                if (item.itemId == R.id.nav_theme_toggle) {
+                    val securePrefs = SecurePrefs(this)
+                    val toLight = !securePrefs.isLightTheme
+                    securePrefs.isLightTheme = toLight
+                    updateThemeNavIcon(toLight)
+                    AppCompatDelegate.setDefaultNightMode(
+                        if (toLight) AppCompatDelegate.MODE_NIGHT_NO else AppCompatDelegate.MODE_NIGHT_YES
+                    )
+                    recreate()
+                    true
+                } else {
+                    androidx.navigation.ui.NavigationUI.onNavDestinationSelected(item, navController)
+                }
+            }
             navController.addOnDestinationChangedListener { _, destination, _ ->
+                currentDestinationId = destination.id
                 val isHome = (destination.id == R.id.nav_home)
                 binding.headerContainer.visibility = if (isHome) View.VISIBLE else View.GONE
                 // На главной — только значок уведомлений на синем фоне, без шапки и логотипа
@@ -72,6 +94,11 @@ class MainActivity : AppCompatActivity(), NotificationsBottomSheet.BadgeUpdater 
                 } else {
                     binding.btnNotifications.clearColorFilter()
                     (binding.headerContentRow.layoutParams as? ViewGroup.MarginLayoutParams)?.topMargin = 0
+                }
+                val selectedItemId =
+                    if (destination.id == R.id.nav_theme_toggle) R.id.nav_profile else destination.id
+                if (binding.bottomNav.selectedItemId != selectedItemId) {
+                    binding.bottomNav.selectedItemId = selectedItemId
                 }
             }
 
@@ -98,7 +125,14 @@ class MainActivity : AppCompatActivity(), NotificationsBottomSheet.BadgeUpdater 
 
     override fun onResume() {
         super.onResume()
-        if (::binding.isInitialized) updateNotificationBadge()
+        if (::binding.isInitialized) {
+            updateThemeNavIcon(SecurePrefs(this).isLightTheme)
+            val selectedItemId = if (currentDestinationId == R.id.nav_theme_toggle) R.id.nav_profile else currentDestinationId
+            if (binding.bottomNav.selectedItemId != selectedItemId) {
+                binding.bottomNav.selectedItemId = selectedItemId
+            }
+            updateNotificationBadge()
+        }
     }
 
     override fun onNotificationsViewed() {
@@ -120,6 +154,12 @@ class MainActivity : AppCompatActivity(), NotificationsBottomSheet.BadgeUpdater 
             binding.btnNotifications,
             ColorStateList.valueOf(ContextCompat.getColor(this, R.color.logo_ft_dark_blue))
         )
+    }
+
+    private fun updateThemeNavIcon(isLightTheme: Boolean) {
+        if (!::binding.isInitialized) return
+        val menuItem = binding.bottomNav.menu.findItem(R.id.nav_theme_toggle) ?: return
+        menuItem.setIcon(if (isLightTheme) R.drawable.ic_nav_theme_light else R.drawable.ic_nav_theme_dark)
     }
 
 }

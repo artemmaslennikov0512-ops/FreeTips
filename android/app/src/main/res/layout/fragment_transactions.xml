@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background">
+    android:background="?attr/freetips_screenBackground">
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefresh"
@@ -34,12 +34,13 @@
                     android:layout_marginTop="@dimen/card_inset_margin" />
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/card_to_section_margin"
                     android:text="@string/operations_history"
                     android:textSize="@dimen/text_title"
                     android:textStyle="bold"
+                    android:gravity="center"
                     android:textColor="@color/on_surface" />
 
                 <LinearLayout
@@ -66,8 +67,8 @@
                             android:autofillHints="creditCardNumber"
                             android:maxLines="1"
                             android:textSize="@dimen/text_body"
-                            android:textColor="@color/on_surface"
-                            android:textColorHint="@color/on_surface_variant"
+                    android:textColor="?attr/freetips_cardTextColor"
+                    android:textColorHint="?attr/freetips_cardTextColorVariant"
                             android:paddingStart="12dp"
                             android:paddingEnd="12dp"
                             android:paddingTop="10dp"
@@ -87,8 +88,8 @@
                             android:autofillHints="creditCardNumber"
                             android:maxLines="1"
                             android:textSize="@dimen/text_body"
-                            android:textColor="@color/on_surface"
-                            android:textColorHint="@color/on_surface_variant"
+                    android:textColor="?attr/freetips_cardTextColor"
+                    android:textColorHint="?attr/freetips_cardTextColorVariant"
                             android:paddingStart="12dp"
                             android:paddingEnd="12dp"
                             android:paddingTop="10dp"
@@ -99,10 +100,10 @@
                     <Button
                         android:id="@+id/filterApply"
                         style="?attr/materialButtonStyle"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="end"
                         android:layout_marginTop="@dimen/spacing_sm"
+                        android:textAllCaps="false"
                         android:text="@string/operations_filter_apply"
                         android:textSize="@dimen/text_caption" />
                 </LinearLayout>

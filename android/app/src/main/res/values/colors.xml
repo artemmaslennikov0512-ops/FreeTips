@@ -1,20 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Primary: основной акцент в текущем сайте (синий) -->
-    <color name="primary">#1C69D4</color>
-    <color name="primary_dark">#1553AB</color>
-    <color name="primary_light">#4A9FFF</color>
-    <color name="on_primary">#FFFFFF</color>
+    <!-- Primary: акцент сайта -->
+    <color name="primary">#C5A572</color>
+    <color name="primary_dark">#9A7B4F</color>
+    <color name="primary_light">#D4B896</color>
+    <color name="on_primary">#0D1117</color>
 
-    <!-- Surface & background (тёмная тема) -->
-    <color name="surface">#1C2128</color>
-    <color name="surface_variant">#252D37</color>
-    <!-- Блоки в Выводы и Операции (тёмный синевато-серый) -->
-    <color name="block_card">#24272E</color>
-    <color name="background">#0D1117</color>
-    <color name="on_surface">#E6EDF3</color>
-    <color name="on_surface_variant">#8B949E</color>
-    <color name="outline">#484F58</color>
+    <!-- Базовые цвета (светлая тема по умолчанию) -->
+    <color name="surface">#FFFFFF</color>
+    <color name="surface_variant">#F3F5F7</color>
+    <color name="block_card">#FFFFFF</color>
+    <color name="background">#E5E9E7</color>
+    <color name="on_surface">#0A192F</color>
+    <color name="on_surface_variant">#566578</color>
+    <color name="outline">#C9D3DC</color>
 
     <!-- Semantic -->
     <color name="error">#F85149</color>
@@ -25,16 +24,24 @@
     <!-- Специфичные (чип на карте — тёмный текст на светлом фоне) -->
     <color name="chip_text">#1C1B1F</color>
     <color name="logo_ft_dark_blue">#0D1B2A</color>
-    <color name="logo_tips_gold">#1C69D4</color>
+    <color name="logo_tips_gold">#B8860B</color>
     <color name="logo_container_border">#E0E0E0</color>
 
-    <!-- Светлые блоки (история операций: белый фон, чёрный текст) -->
+    <!-- Светлые блоки -->
     <color name="surface_light">#FFFFFF</color>
     <color name="on_surface_light">#1C1B1F</color>
     <color name="on_surface_light_variant">#6B7280</color>
     <color name="amount_chip_bg_light">#E5E7EB</color>
-    <!-- Кнопка колокольчика на белой шапке -->
     <color name="header_bell_bg">#E8E8E8</color>
+
+    <!-- Семантические цвета темы (день/ночь через qualifiers) -->
+    <color name="theme_screen_bg">#E5E9E7</color>
+    <color name="theme_header_bg">#FFFFFF</color>
+    <color name="theme_bottom_nav_bg">#FFFFFF</color>
+    <color name="theme_system_bar_bg">#FFFFFF</color>
+    <color name="theme_card_bg">#FFFFFF</color>
+    <color name="theme_text">#0A192F</color>
+    <color name="theme_text_variant">#566578</color>
 
     <!-- Экран ввода API-ключа: подсказка на светлом градиенте карточки -->
     <color name="login_field_hint">#374151</color>

@@ -57,6 +57,7 @@ export default function CabinetDashboardPage() {
   const [tipLink, setTipLink] = useState<string | null>(null);
   const [tipWaiterCode, setTipWaiterCode] = useState<string | null>(null);
   const [linkCopied, setLinkCopied] = useState(false);
+  const [tipCodeCopied, setTipCodeCopied] = useState(false);
   const [verificationStatus, setVerificationStatus] = useState<string | null>(null);
   const [savingFor, setSavingFor] = useState<string | null>(null);
   const [savingForEdit, setSavingForEdit] = useState("");
@@ -199,6 +200,17 @@ export default function CabinetDashboardPage() {
       /* ignore */
     }
   }, [tipLink]);
+
+  const copyTipCode = useCallback(async () => {
+    if (!tipWaiterCode) return;
+    try {
+      await navigator.clipboard.writeText(tipWaiterCode);
+      setTipCodeCopied(true);
+      setTimeout(() => setTipCodeCopied(false), 2000);
+    } catch {
+      /* ignore */
+    }
+  }, [tipWaiterCode]);
 
   const saveSavingFor = useCallback(async () => {
     const value = savingForEdit.trim() || null;
@@ -574,8 +586,19 @@ export default function CabinetDashboardPage() {
               <div className="cabinet-block-inner mb-6 rounded-[10px] border border-[var(--color-brand-gold)]/20 bg-[var(--color-dark-gray)]/10 p-4">
                 <div className="mb-2 text-sm font-semibold text-[var(--color-text)]">Ваш ID для чаевых</div>
                 {tipWaiterCode ? (
-                  <div className="cabinet-input-window mb-3 min-w-0 max-w-full break-all rounded-lg bg-[var(--color-bg-sides)] px-3 py-2 font-mono text-sm font-semibold tracking-wide text-[var(--color-text)]">
-                    {tipWaiterCode}
+                  <div className="cabinet-input-window mb-3 flex min-w-0 max-w-full items-center gap-2 rounded-lg bg-[var(--color-bg-sides)] px-3 py-2">
+                    <span className="min-w-0 flex-1 break-all font-mono text-sm font-semibold tracking-wide text-[var(--color-text)]">
+                      {tipWaiterCode}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={copyTipCode}
+                      className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-[var(--color-text)]/80 transition-colors hover:bg-[var(--color-dark-gray)]/15 hover:text-[var(--color-text)]"
+                      aria-label={tipCodeCopied ? "ID скопирован" : "Скопировать ID"}
+                      title={tipCodeCopied ? "Скопировано" : "Скопировать ID"}
+                    >
+                      <Copy className="h-4 w-4" />
+                    </button>
                   </div>
                 ) : null}
                 <div className="mb-1 text-xs font-medium text-[var(--color-text)]/80">Ссылка для гостей</div>

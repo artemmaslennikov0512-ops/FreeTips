@@ -4,4 +4,5 @@
     <item android:id="@+id/nav_transactions" android:icon="@drawable/ic_nav_transactions" android:title="Операции" />
     <item android:id="@+id/nav_links" android:icon="@drawable/ic_nav_qr" android:title="QR" />
     <item android:id="@+id/nav_profile" android:icon="@drawable/ic_nav_profile" android:title="Профиль" />
+    <item android:id="@+id/nav_theme_toggle" android:checkable="false" android:icon="@drawable/ic_nav_theme" android:title="Тема" />
 </menu>

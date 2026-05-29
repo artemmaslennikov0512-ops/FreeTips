@@ -16,7 +16,7 @@
     <dimen name="content_bottom_padding">16dp</dimen>
     <dimen name="section_title_to_content">12dp</dimen>
     <dimen name="card_to_section_margin">32dp</dimen>
-    <dimen name="card_inset_margin">12dp</dimen>
+    <dimen name="card_inset_margin">20dp</dimen>
 
     <!-- Карточки: больше elevation для читаемости на тёмном фоне -->
     <dimen name="card_radius">12dp</dimen>

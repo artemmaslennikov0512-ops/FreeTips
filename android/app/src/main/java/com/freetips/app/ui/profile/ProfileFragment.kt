@@ -42,9 +42,11 @@ class ProfileFragment : Fragment() {
     }
 
     private fun loadProfile() {
-        val prefs = SecurePrefs(requireContext())
+        val b = _binding ?: return
+        val ctx = context ?: return
+        val prefs = SecurePrefs(ctx)
         val apiKey = prefs.apiKey ?: run {
-            binding.swipeRefresh.isRefreshing = false
+            b.swipeRefresh.isRefreshing = false
             return
         }
         ApiClient(apiKey, prefs.effectiveBaseUrl).getProfile().enqueue(object : Callback {

@@ -37,6 +37,19 @@ interface User {
   };
 }
 
+interface VerifyBulkResponse {
+  ok: boolean;
+  processed: number;
+  verifiedCount: number;
+  alreadyVerifiedCount: number;
+  notEmployeeCount: number;
+  notFoundCount: number;
+  verified: string[];
+  alreadyVerified: string[];
+  notEmployee: string[];
+  notFound: string[];
+}
+
 interface UsersResponse {
   users: User[];
   total: number;
@@ -118,10 +131,16 @@ export default function AdminUsersPage() {
   const [registrationLink, setRegistrationLink] = useState<string | null>(null);
   const [linkJustCopied, setLinkJustCopied] = useState(false);
   const linkCopiedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const fetchRequestSeqRef = useRef(0);
   const [blockAllLoading, setBlockAllLoading] = useState(false);
   const [blockAllError, setBlockAllError] = useState<string | null>(null);
+  const [bulkVerifyInput, setBulkVerifyInput] = useState("");
+  const [bulkVerifyLoading, setBulkVerifyLoading] = useState(false);
+  const [bulkVerifyError, setBulkVerifyError] = useState<string | null>(null);
+  const [bulkVerifyResult, setBulkVerifyResult] = useState<VerifyBulkResponse | null>(null);
 
   const fetchUsers = useCallback(async () => {
+    const requestSeq = ++fetchRequestSeqRef.current;
     setLoading(true);
     setError(null);
     try {
@@ -145,12 +164,15 @@ export default function AdminUsersPage() {
       }
 
       const data: UsersResponse = await res.json();
+      if (requestSeq !== fetchRequestSeqRef.current) return;
       setUsers(data.users);
       setUsersTotal(typeof data.total === "number" ? data.total : 0);
     } catch {
+      if (requestSeq !== fetchRequestSeqRef.current) return;
       setError("Ошибка загрузки пользователей");
       setUsersTotal(0);
     } finally {
+      if (requestSeq !== fetchRequestSeqRef.current) return;
       setLoading(false);
     }
   }, [search, roleFilter, blockedFilter, lkActiveFilter, sortBy, sortOrder, page, pageSize]);
@@ -289,6 +311,59 @@ export default function AdminUsersPage() {
     }
   };
 
+  const handleBulkVerify = async () => {
+    const parsedIds = bulkVerifyInput
+      .split(/[\s,;]+/)
+      .map((v) => v.trim())
+      .filter(Boolean);
+    const uniqIds = Array.from(new Set(parsedIds));
+
+    if (uniqIds.length === 0) {
+      setBulkVerifyError("Вставьте хотя бы один ID");
+      setBulkVerifyResult(null);
+      return;
+    }
+
+    if (uniqIds.length > 1000) {
+      setBulkVerifyError("Максимум 1000 ID за один запуск");
+      setBulkVerifyResult(null);
+      return;
+    }
+
+    if (!window.confirm(`Подтвердить верификацию для ${uniqIds.length} ID?`)) {
+      return;
+    }
+
+    setBulkVerifyLoading(true);
+    setBulkVerifyError(null);
+    setBulkVerifyResult(null);
+    setError(null);
+    try {
+      const res = await fetchWithAuth("/api/admin/users/verify-bulk", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ ids: uniqIds }),
+      });
+      const data = (await res.json().catch(() => ({}))) as
+        | VerifyBulkResponse
+        | { error?: string };
+      if (!res.ok) {
+        setBulkVerifyError(
+          (data as { error?: string }).error ?? "Ошибка массовой верификации",
+        );
+        return;
+      }
+      setBulkVerifyResult(data as VerifyBulkResponse);
+      await fetchUsers();
+    } catch {
+      setBulkVerifyError("Ошибка соединения");
+    } finally {
+      setBulkVerifyLoading(false);
+    }
+  };
+
   const handleCopyToken = async () => {
     if (!registrationLink) return;
     try {
@@ -312,12 +387,7 @@ export default function AdminUsersPage() {
       setSortOrder("desc");
       return;
     }
-    if (sortOrder === "desc") {
-      setSortOrder("asc");
-      return;
-    }
-    setSortBy("createdAt");
-    setSortOrder("desc");
+    setSortOrder((prev) => (prev === "desc" ? "asc" : "desc"));
   }, [sortBy, sortOrder]);
 
   const isActiveSortColumn = useCallback((column: SortField) => sortBy === column, [sortBy]);
@@ -356,6 +426,58 @@ export default function AdminUsersPage() {
           {blockAllError}
         </div>
       )}
+      <div className="mb-6 rounded-xl border border-[var(--color-brand-gold)]/25 bg-[var(--color-dark-gray)]/15 p-4">
+        <div className="mb-2 text-sm font-semibold text-[var(--color-text)]">
+          Массовая верификация официантов по списку ID
+        </div>
+        <p className="mb-3 text-xs text-[var(--color-text-secondary)]">
+          Вставьте ID через перенос строки, запятую или пробел. Поддерживаются `user.id`
+          и числовой `uniqueId`.
+        </p>
+        <textarea
+          value={bulkVerifyInput}
+          onChange={(e) => setBulkVerifyInput(e.target.value)}
+          placeholder={"Например:\n123\n456\ncmabc123..."}
+          rows={5}
+          className="mb-3 w-full rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-bg-sides)] px-3 py-2 font-mono text-xs text-[var(--color-text)] placeholder:text-[var(--color-muted)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-gold)]/40"
+        />
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={handleBulkVerify}
+            disabled={bulkVerifyLoading}
+            className={`${ADMIN_BTN} ${ADMIN_BTN_PRIMARY} gap-2 px-3 py-2 text-[14px] font-semibold disabled:opacity-60`}
+          >
+            {bulkVerifyLoading ? "Подтверждаем..." : "Подтвердить верификацию по списку"}
+          </button>
+          <span className="text-xs text-[var(--color-text-secondary)]">
+            Найдено ID: {
+              Array.from(
+                new Set(
+                  bulkVerifyInput
+                    .split(/[\s,;]+/)
+                    .map((v) => v.trim())
+                    .filter(Boolean),
+                ),
+              ).length
+            }
+          </span>
+        </div>
+        {bulkVerifyError && (
+          <div className="mt-3 rounded-lg bg-[var(--color-light-gray)] px-3 py-2 text-xs text-[var(--color-text)]">
+            {bulkVerifyError}
+          </div>
+        )}
+        {bulkVerifyResult && (
+          <div className="mt-3 rounded-lg bg-[var(--color-light-gray)] px-3 py-2 text-xs text-[var(--color-text)]">
+            <div>Обработано: {bulkVerifyResult.processed}</div>
+            <div>Подтверждено: {bulkVerifyResult.verifiedCount}</div>
+            <div>Уже были верифицированы: {bulkVerifyResult.alreadyVerifiedCount}</div>
+            <div>Не официанты: {bulkVerifyResult.notEmployeeCount}</div>
+            <div>Не найдены: {bulkVerifyResult.notFoundCount}</div>
+          </div>
+        )}
+      </div>
       <div className="admin-users-toolbar mb-6 flex min-w-0 flex-col gap-3 sm:gap-3.5 lg:flex-row lg:items-start">
         <div className="relative w-full shrink-0 lg:max-w-md">
           <Search
@@ -624,7 +746,9 @@ export default function AdminUsersPage() {
                 <button
                   type="button"
                   onClick={() => cycleSort("login")}
-                  className="inline-flex items-center gap-1.5 text-left text-sm font-semibold text-[#0a192f]"
+                  className={`inline-flex items-center gap-1.5 rounded-md px-1.5 py-0.5 text-left text-sm font-semibold text-[#0a192f] ${
+                    isActiveSortColumn("login") ? "bg-[#0a192f]/10" : ""
+                  }`}
                 >
                   <span>Логин</span>
                   <span className="inline-flex flex-col leading-none text-[#0a192f]">
@@ -650,7 +774,9 @@ export default function AdminUsersPage() {
                 <button
                   type="button"
                   onClick={() => cycleSort("balance")}
-                  className="inline-flex items-center gap-1.5 text-left text-sm font-semibold text-[#0a192f]"
+                  className={`inline-flex items-center gap-1.5 rounded-md px-1.5 py-0.5 text-left text-sm font-semibold text-[#0a192f] ${
+                    isActiveSortColumn("balance") ? "bg-[#0a192f]/10" : ""
+                  }`}
                 >
                   <span>Баланс</span>
                   <span className="inline-flex flex-col leading-none text-[#0a192f]">
@@ -669,7 +795,9 @@ export default function AdminUsersPage() {
                 <button
                   type="button"
                   onClick={() => cycleSort("received")}
-                  className="inline-flex items-center gap-1.5 text-left text-sm font-semibold text-[#0a192f]"
+                  className={`inline-flex items-center gap-1.5 rounded-md px-1.5 py-0.5 text-left text-sm font-semibold text-[#0a192f] ${
+                    isActiveSortColumn("received") ? "bg-[#0a192f]/10" : ""
+                  }`}
                 >
                   <span>Получено</span>
                   <span className="inline-flex flex-col leading-none text-[#0a192f]">
@@ -688,7 +816,9 @@ export default function AdminUsersPage() {
                 <button
                   type="button"
                   onClick={() => cycleSort("transactions")}
-                  className="inline-flex items-center gap-1.5 text-left text-sm font-semibold text-[#0a192f]"
+                  className={`inline-flex items-center gap-1.5 rounded-md px-1.5 py-0.5 text-left text-sm font-semibold text-[#0a192f] ${
+                    isActiveSortColumn("transactions") ? "bg-[#0a192f]/10" : ""
+                  }`}
                 >
                   <span>Транзакции</span>
                   <span className="inline-flex flex-col leading-none text-[#0a192f]">
@@ -708,7 +838,9 @@ export default function AdminUsersPage() {
                 <button
                   type="button"
                   onClick={() => cycleSort("createdAt")}
-                  className="inline-flex items-center gap-1.5 text-left text-sm font-semibold text-[#0a192f]"
+                  className={`inline-flex items-center gap-1.5 rounded-md px-1.5 py-0.5 text-left text-sm font-semibold text-[#0a192f] ${
+                    isActiveSortColumn("createdAt") ? "bg-[#0a192f]/10" : ""
+                  }`}
                 >
                   <span>Дата регистрации</span>
                   <span className="inline-flex flex-col leading-none text-[#0a192f]">

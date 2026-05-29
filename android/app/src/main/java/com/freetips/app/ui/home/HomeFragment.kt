@@ -146,13 +146,15 @@ class HomeFragment : Fragment() {
     }
 
     private fun loadProfile(silent: Boolean = false) {
-        val prefs = SecurePrefs(requireContext())
+        val b = _binding ?: return
+        val ctx = context ?: return
+        val prefs = SecurePrefs(ctx)
         val apiKey = prefs.apiKey ?: run {
-            if (!silent) binding.swipeRefresh.isRefreshing = false
+            if (!silent) b.swipeRefresh.isRefreshing = false
             return
         }
-        if (!silent && !binding.swipeRefresh.isRefreshing) binding.progress.visibility = View.VISIBLE
-        if (!silent) binding.errorText.visibility = View.GONE
+        if (!silent && !b.swipeRefresh.isRefreshing) b.progress.visibility = View.VISIBLE
+        if (!silent) b.errorText.visibility = View.GONE
 
         ApiClient(apiKey, prefs.effectiveBaseUrl).getProfile().enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {

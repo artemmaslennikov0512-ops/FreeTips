@@ -57,29 +57,33 @@ class LinksFragment : Fragment() {
     }
 
     private fun loadLinks() {
-        val prefs = SecurePrefs(requireContext())
+        val b = _binding ?: return
+        val ctx = context ?: return
+        val prefs = SecurePrefs(ctx)
         val apiKey = prefs.apiKey ?: run {
-            binding.swipeRefresh.isRefreshing = false
+            b.swipeRefresh.isRefreshing = false
             return
         }
-        if (!binding.swipeRefresh.isRefreshing) binding.progress.visibility = View.VISIBLE
-        binding.errorText.visibility = View.GONE
+        if (!b.swipeRefresh.isRefreshing) b.progress.visibility = View.VISIBLE
+        b.errorText.visibility = View.GONE
         val base = prefs.effectiveBaseUrl
         ApiClient(apiKey, base).getLinks().enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 activity?.runOnUiThread {
-                    binding.progress.visibility = View.GONE
-                    binding.swipeRefresh.isRefreshing = false
-                    binding.qrCard.visibility = View.GONE
-                    binding.qrTitle.visibility = View.GONE
-                    binding.errorText.visibility = View.VISIBLE
-                    binding.errorText.text = "Ошибка загрузки"
+                    val ui = _binding ?: return@runOnUiThread
+                    ui.progress.visibility = View.GONE
+                    ui.swipeRefresh.isRefreshing = false
+                    ui.qrCard.visibility = View.GONE
+                    ui.qrTitle.visibility = View.GONE
+                    ui.errorText.visibility = View.VISIBLE
+                    ui.errorText.text = "Ошибка загрузки"
                 }
             }
             override fun onResponse(call: Call, response: Response) {
                 activity?.runOnUiThread {
-                    binding.progress.visibility = View.GONE
-                    binding.swipeRefresh.isRefreshing = false
+                    val ui = _binding ?: return@runOnUiThread
+                    ui.progress.visibility = View.GONE
+                    ui.swipeRefresh.isRefreshing = false
                     if (response.isSuccessful) {
                         val body = response.body?.string() ?: ""
                         try {
@@ -91,26 +95,26 @@ class LinksFragment : Fragment() {
                                 val url = "${base.removeSuffix("/")}/pay/$slug"
                                 if (firstUrl == null) firstUrl = url
                             }
-                            binding.linksList.text = firstUrl ?: "Нет ссылок"
+                            ui.linksList.text = firstUrl ?: "Нет ссылок"
                             firstUrl?.let { url ->
-                                binding.qrTitle.visibility = View.VISIBLE
-                                binding.qrCard.visibility = View.VISIBLE
-                                binding.qrImage.setImageBitmap(encodeQrToBitmap(requireContext(), url, 512))
-                                applyGradientToFreeTipsLabel(binding.qrFreeTipsLabel)
+                                ui.qrTitle.visibility = View.VISIBLE
+                                ui.qrCard.visibility = View.VISIBLE
+                                ui.qrImage.setImageBitmap(encodeQrToBitmap(ui.root.context, url, 512))
+                                applyGradientToFreeTipsLabel(ui.qrFreeTipsLabel)
                             } ?: run {
-                                binding.qrTitle.visibility = View.GONE
-                                binding.qrCard.visibility = View.GONE
+                                ui.qrTitle.visibility = View.GONE
+                                ui.qrCard.visibility = View.GONE
                             }
                         } catch (_: Exception) {
-                            binding.linksList.text = "Нет ссылок"
-                            binding.qrTitle.visibility = View.GONE
-                            binding.qrCard.visibility = View.GONE
+                            ui.linksList.text = "Нет ссылок"
+                            ui.qrTitle.visibility = View.GONE
+                            ui.qrCard.visibility = View.GONE
                         }
                     } else {
-                        binding.qrTitle.visibility = View.GONE
-                        binding.qrCard.visibility = View.GONE
-                        binding.errorText.visibility = View.VISIBLE
-                        binding.errorText.text = "Ошибка ${response.code}"
+                        ui.qrTitle.visibility = View.GONE
+                        ui.qrCard.visibility = View.GONE
+                        ui.errorText.visibility = View.VISIBLE
+                        ui.errorText.text = "Ошибка ${response.code}"
                     }
                 }
             }

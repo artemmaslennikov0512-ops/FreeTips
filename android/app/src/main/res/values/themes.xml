@@ -2,15 +2,15 @@
 <resources>
     <style name="Theme.FreeTips.Splash" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="android:windowBackground">@drawable/splash_background</item>
-        <item name="android:statusBarColor">@color/background</item>
-        <item name="android:navigationBarColor">@color/background</item>
+        <item name="android:statusBarColor">@color/theme_system_bar_bg</item>
+        <item name="android:navigationBarColor">@color/theme_system_bar_bg</item>
     </style>
 
-    <!-- Экран входа: тёмный фон как в приложении, синий акцент -->
+    <!-- Экран входа: в стиле выбранной темы -->
     <style name="Theme.FreeTips.ApiKeyEntry" parent="Theme.FreeTips">
-        <item name="android:windowBackground">@color/background</item>
-        <item name="android:statusBarColor">@color/background</item>
-        <item name="android:navigationBarColor">@color/surface</item>
+        <item name="android:windowBackground">@color/theme_screen_bg</item>
+        <item name="android:statusBarColor">@color/theme_system_bar_bg</item>
+        <item name="android:navigationBarColor">@color/theme_system_bar_bg</item>
     </style>
 
     <!-- Атрибуты freetips_* в attrs.xml — переопределяйте в своей теме по одному. -->
@@ -18,33 +18,33 @@
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primary_dark</item>
         <item name="colorAccent">@color/primary</item>
-        <item name="android:colorBackground">@color/background</item>
+        <item name="android:colorBackground">@color/theme_screen_bg</item>
         <item name="colorSurface">@color/surface</item>
         <item name="colorOnPrimary">@color/on_primary</item>
-        <item name="colorOnSurface">@color/on_surface</item>
-        <item name="colorOnSurfaceVariant">@color/on_surface_variant</item>
+        <item name="colorOnSurface">@color/theme_text</item>
+        <item name="colorOnSurfaceVariant">@color/theme_text_variant</item>
         <item name="colorError">@color/error</item>
-        <item name="android:textColorPrimary">@color/on_surface</item>
-        <item name="android:textColorSecondary">@color/on_surface_variant</item>
+        <item name="android:textColorPrimary">@color/theme_text</item>
+        <item name="android:textColorSecondary">@color/theme_text_variant</item>
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:statusBarColor">?attr/freetips_statusBarColor</item>
         <item name="android:navigationBarColor">?attr/freetips_navigationBarColor</item>
         <item name="android:windowLightStatusBar">true</item>
-        <item name="android:windowBackground">@color/background</item>
+        <item name="android:windowBackground">@color/theme_screen_bg</item>
         <item name="android:windowLightNavigationBar">true</item>
         <item name="materialButtonStyle">@style/Widget.FreeTips.Button</item>
-        <!-- Поэлементные атрибуты: шапка и низ белые, иконки/подписи — синий и тёмно-синий -->
-        <item name="freetips_headerBarBackground">@color/surface_light</item>
-        <item name="freetips_headerBarTextColor">@color/logo_ft_dark_blue</item>
+        <!-- Поэлементные атрибуты: адаптируются через values/values-night -->
+        <item name="freetips_headerBarBackground">@color/theme_header_bg</item>
+        <item name="freetips_headerBarTextColor">@color/theme_text</item>
         <item name="freetips_headerBarIconColor">@color/primary</item>
-        <item name="freetips_screenBackground">@color/background</item>
-        <item name="freetips_bottomNavBackground">@color/surface_light</item>
+        <item name="freetips_screenBackground">@color/theme_screen_bg</item>
+        <item name="freetips_bottomNavBackground">@color/theme_bottom_nav_bg</item>
         <item name="freetips_bottomNavIconColor">@color/bottom_nav_color</item>
-        <item name="freetips_cardBackground">@color/surface</item>
-        <item name="freetips_cardTextColor">@color/on_surface</item>
-        <item name="freetips_cardTextColorVariant">@color/on_surface_variant</item>
-        <item name="freetips_statusBarColor">@color/surface_light</item>
-        <item name="freetips_navigationBarColor">@color/surface_light</item>
+        <item name="freetips_cardBackground">@color/theme_card_bg</item>
+        <item name="freetips_cardTextColor">@color/theme_text</item>
+        <item name="freetips_cardTextColorVariant">@color/theme_text_variant</item>
+        <item name="freetips_statusBarColor">@color/theme_system_bar_bg</item>
+        <item name="freetips_navigationBarColor">@color/theme_system_bar_bg</item>
         <!-- Положение и отступы (можно менять без смены цветов темы) -->
         <item name="freetips_headerBarPaddingStart">@dimen/header_content_inset</item>
         <item name="freetips_headerBarPaddingEnd">@dimen/header_content_inset</item>

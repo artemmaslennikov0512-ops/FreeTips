@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="surface">#162131</color>
+    <color name="surface_variant">#1E2A3A</color>
+    <color name="block_card">#1A2738</color>
+    <color name="background">#0D1117</color>
+    <color name="on_surface">#E6EDF3</color>
+    <color name="on_surface_variant">#9AA8B8</color>
+    <color name="outline">#2D3B4F</color>
+
+    <color name="theme_screen_bg">#0D1117</color>
+    <color name="theme_header_bg">#0D1117</color>
+    <color name="theme_bottom_nav_bg">#FFFFFF</color>
+    <color name="theme_system_bar_bg">#0D1117</color>
+    <color name="theme_card_bg">#162131</color>
+    <color name="theme_text">#E6EDF3</color>
+    <color name="theme_text_variant">#9AA8B8</color>
+</resources>

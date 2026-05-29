@@ -45,38 +45,42 @@ class PayoutsFragment : Fragment() {
     }
 
     private fun loadPayouts() {
-        val prefs = SecurePrefs(requireContext())
+        val b = _binding ?: return
+        val ctx = context ?: return
+        val prefs = SecurePrefs(ctx)
         val apiKey = prefs.apiKey ?: run {
-            binding.swipeRefresh.isRefreshing = false
+            b.swipeRefresh.isRefreshing = false
             return
         }
-        if (!binding.swipeRefresh.isRefreshing) binding.progress.visibility = View.VISIBLE
-        binding.errorText.visibility = View.GONE
+        if (!b.swipeRefresh.isRefreshing) b.progress.visibility = View.VISIBLE
+        b.errorText.visibility = View.GONE
 
         ApiClient(apiKey, prefs.effectiveBaseUrl).getPayouts().enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 activity?.runOnUiThread {
-                    binding.progress.visibility = View.GONE
-                    binding.swipeRefresh.isRefreshing = false
-                    binding.errorText.visibility = View.VISIBLE
-                    binding.errorText.text = "Ошибка загрузки"
+                    val ui = _binding ?: return@runOnUiThread
+                    ui.progress.visibility = View.GONE
+                    ui.swipeRefresh.isRefreshing = false
+                    ui.errorText.visibility = View.VISIBLE
+                    ui.errorText.text = "Ошибка загрузки"
                 }
             }
 
             override fun onResponse(call: Call, response: Response) {
                 activity?.runOnUiThread {
-                    binding.progress.visibility = View.GONE
-                    binding.swipeRefresh.isRefreshing = false
+                    val ui = _binding ?: return@runOnUiThread
+                    ui.progress.visibility = View.GONE
+                    ui.swipeRefresh.isRefreshing = false
                     if (response.isSuccessful) {
                         val body = response.body?.string() ?: ""
                         try {
                             val data = Gson().fromJson(body, PayoutsResponse::class.java)
-                            binding.virtualCardInclude.cardBalance.text = formatKop(data.balanceKop)
-                            binding.recycler.adapter = PayoutAdapter(data.payouts)
+                            ui.virtualCardInclude.cardBalance.text = formatKop(data.balanceKop)
+                            ui.recycler.adapter = PayoutAdapter(data.payouts)
                         } catch (_: Exception) {}
                     } else {
-                        binding.errorText.visibility = View.VISIBLE
-                        binding.errorText.text = "Ошибка ${response.code}"
+                        ui.errorText.visibility = View.VISIBLE
+                        ui.errorText.text = "Ошибка ${response.code}"
                     }
                 }
             }

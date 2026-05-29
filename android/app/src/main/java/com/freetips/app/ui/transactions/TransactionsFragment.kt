@@ -157,6 +157,7 @@ class TransactionsFragment : Fragment() {
     }
 
     private fun applyFilter() {
+        val b = _binding ?: return
         val fromKop = parseRubToKop(binding.filterAmountFrom.text?.toString() ?: "") ?: 0L
         val toKop = parseRubToKop(binding.filterAmountTo.text?.toString() ?: "") ?: Long.MAX_VALUE
         val filtered = if (fromKop == 0L && toKop == Long.MAX_VALUE) {
@@ -164,19 +165,21 @@ class TransactionsFragment : Fragment() {
         } else {
             allOperations.filter { it.amountKop in fromKop..toKop }
         }
-        binding.recycler.adapter = OpAdapter(filtered)
+        b.recycler.adapter = OpAdapter(filtered)
     }
 
     private fun load(silent: Boolean = false) {
-        val prefs = SecurePrefs(requireContext())
+        val b = _binding ?: return
+        val ctx = context ?: return
+        val prefs = SecurePrefs(ctx)
         val apiKey = prefs.apiKey ?: run {
-            binding.swipeRefresh.isRefreshing = false
+            b.swipeRefresh.isRefreshing = false
             return
         }
         val baseUrl = prefs.effectiveBaseUrl
         if (!silent) {
-            if (!binding.swipeRefresh.isRefreshing) binding.progress.visibility = View.VISIBLE
-            binding.errorText.visibility = View.GONE
+            if (!b.swipeRefresh.isRefreshing) b.progress.visibility = View.VISIBLE
+            b.errorText.visibility = View.GONE
         }
 
         ApiClient(apiKey, baseUrl).getProfile().enqueue(object : Callback {
@@ -186,13 +189,14 @@ class TransactionsFragment : Fragment() {
                 if (!response.isSuccessful) return
                 val body = response.body?.string() ?: return
                 activity?.runOnUiThread {
+                    val ui = _binding ?: return@runOnUiThread
                     try {
                         val profile = Gson().fromJson(body, ProfileResponse::class.java)
                         profile.stats?.let { s ->
-                            binding.virtualCardInclude.cardBalance.text = formatKopToRub(s.balanceKop)
-                            BalanceCache.save(binding.root.context.applicationContext, s.balanceKop)
+                            ui.virtualCardInclude.cardBalance.text = formatKopToRub(s.balanceKop)
+                            BalanceCache.save(ui.root.context.applicationContext, s.balanceKop)
                             com.freetips.app.util.BalanceNotificationHelper.showIfNeeded(
-                                binding.root.context.applicationContext,
+                                ui.root.context.applicationContext,
                                 s.balanceKop,
                                 s.totalGuestPaidTipsKop,
                             )
@@ -205,19 +209,21 @@ class TransactionsFragment : Fragment() {
         ApiClient(apiKey, baseUrl).getOperations(50, 0).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 activity?.runOnUiThread {
+                    val ui = _binding ?: return@runOnUiThread
                     if (!silent) {
-                        binding.progress.visibility = View.GONE
-                        binding.swipeRefresh.isRefreshing = false
-                        binding.errorText.visibility = View.VISIBLE
-                        binding.errorText.text = "Ошибка загрузки"
+                        ui.progress.visibility = View.GONE
+                        ui.swipeRefresh.isRefreshing = false
+                        ui.errorText.visibility = View.VISIBLE
+                        ui.errorText.text = "Ошибка загрузки"
                     }
                 }
             }
             override fun onResponse(call: Call, response: Response) {
                 activity?.runOnUiThread {
+                    val ui = _binding ?: return@runOnUiThread
                     if (!silent) {
-                        binding.progress.visibility = View.GONE
-                        binding.swipeRefresh.isRefreshing = false
+                        ui.progress.visibility = View.GONE
+                        ui.swipeRefresh.isRefreshing = false
                     }
                     if (response.isSuccessful) {
                         val body = response.body?.string() ?: ""
@@ -228,8 +234,8 @@ class TransactionsFragment : Fragment() {
                         } catch (_: Exception) {}
                     } else {
                         if (!silent) {
-                            binding.errorText.visibility = View.VISIBLE
-                            binding.errorText.text = "Ошибка ${response.code}"
+                            ui.errorText.visibility = View.VISIBLE
+                            ui.errorText.text = "Ошибка ${response.code}"
                         }
                         if (silent && response.code == 429) {
                             scheduleSilentRetryAfterRateLimit()

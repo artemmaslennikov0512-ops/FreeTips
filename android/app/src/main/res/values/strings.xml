@@ -30,4 +30,6 @@
     <string name="api_key_hint">Вставьте или введите API-ключ</string>
     <string name="download_app">Скачать приложение с сайта</string>
     <string name="copy_link">Скопировать ссылку</string>
+    <string name="theme_switch_to_light">Светлая тема</string>
+    <string name="theme_switch_to_dark">Тёмная тема</string>
 </resources>

@@ -148,12 +148,6 @@ export const forgotPasswordRequestSchema = z.object({
 // Создание ссылки
 export const createLinkSchema = z.object({
   slug: slugSchema.optional(), // код официанта в URL; если не указан — генерируем автоматически
-  count: z
-    .number()
-    .int("Количество должно быть целым числом")
-    .min(1, "Минимум 1 ссылка")
-    .max(300, "Максимум 300 ссылок")
-    .optional(),
 });
 
 // Минимальная / максимальная сумма платежа (антифрод, лимит продукта)

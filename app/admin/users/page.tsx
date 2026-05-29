@@ -129,7 +129,11 @@ export default function AdminUsersPage() {
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [tokenLoading, setTokenLoading] = useState(false);
   const [registrationLink, setRegistrationLink] = useState<string | null>(null);
+  const [registrationLinks, setRegistrationLinks] = useState<string[]>([]);
   const [linkJustCopied, setLinkJustCopied] = useState(false);
+  const [allLinksJustCopied, setAllLinksJustCopied] = useState(false);
+  const [tokenCount, setTokenCount] = useState("1");
+  const [tokenPageIndex, setTokenPageIndex] = useState(0);
   const linkCopiedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const fetchRequestSeqRef = useRef(0);
   const [blockAllLoading, setBlockAllLoading] = useState(false);
@@ -289,21 +293,42 @@ export default function AdminUsersPage() {
     setTokenLoading(true);
     setError(null);
     try {
+      const parsedCount = Number.parseInt(tokenCount, 10);
+      if (!Number.isFinite(parsedCount) || parsedCount < 1 || parsedCount > 300) {
+        setError("Количество токенов: от 1 до 300");
+        return;
+      }
       const res = await fetchWithAuth("/api/admin/registration-tokens", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: "{}",
+        body: JSON.stringify({ count: parsedCount }),
       });
       if (!res.ok) {
         setError("Ошибка создания токена");
         return;
       }
-      const data = (await res.json()) as { token: string; link?: string; expiresAt: string; validHours?: number };
-      const link = data.link ?? `${getBaseUrl()}/register?token=${encodeURIComponent(data.token)}`;
-      setRegistrationLink(link);
+      const data = (await res.json()) as {
+        token?: string;
+        link?: string;
+        links?: string[];
+        expiresAt: string;
+        validHours?: number;
+      };
+      const links =
+        data.links && data.links.length > 0
+          ? data.links
+          : data.link
+            ? [data.link]
+            : data.token
+              ? [`${getBaseUrl()}/register?token=${encodeURIComponent(data.token)}`]
+              : [];
+      setRegistrationLinks(links);
+      setRegistrationLink(links[0] ?? null);
+      setTokenPageIndex(0);
       setLinkJustCopied(false);
+      setAllLinksJustCopied(false);
     } catch {
       setError("Ошибка создания токена");
     } finally {
@@ -379,7 +404,20 @@ export default function AdminUsersPage() {
     }
   };
 
+  const handleCopyAllTokens = async () => {
+    if (registrationLinks.length === 0) return;
+    try {
+      await navigator.clipboard.writeText(registrationLinks.join("\n"));
+      setAllLinksJustCopied(true);
+      setTimeout(() => setAllLinksJustCopied(false), 2200);
+    } catch {
+      setError("Не удалось скопировать ссылки");
+    }
+  };
+
   const sortedUsers = useMemo(() => users, [users]);
+  const tokenPagesCount = Math.max(1, Math.ceil(registrationLinks.length / 10));
+  const pagedRegistrationLinks = registrationLinks.slice(tokenPageIndex * 10, tokenPageIndex * 10 + 10);
 
   const cycleSort = useCallback((column: SortField) => {
     if (sortBy !== column) {
@@ -494,13 +532,23 @@ export default function AdminUsersPage() {
         </div>
         <div className="min-w-0 flex-1 text-sm text-[var(--color-text-secondary)]">
           <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
+            <input
+              type="number"
+              min={1}
+              max={300}
+              value={tokenCount}
+              onChange={(e) => setTokenCount(e.target.value)}
+              className="h-9 w-28 rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-bg-sides)] px-2 py-0 text-center text-sm text-[var(--color-text)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-gold)]/40"
+              aria-label="Количество токенов"
+              title="Количество токенов (1-300)"
+            />
             <button
               type="button"
               onClick={handleCreateToken}
               disabled={tokenLoading}
               className={`admin-users-token-btn ${ADMIN_BTN} ${ADMIN_BTN_PRIMARY} gap-2 px-3 py-2 text-[14px] font-semibold disabled:opacity-60`}
             >
-              {tokenLoading ? "Создание..." : "Выдать токен регистрации"}
+              {tokenLoading ? "Создание..." : "Выдать токены регистрации"}
             </button>
             <button
               type="button"
@@ -526,6 +574,15 @@ export default function AdminUsersPage() {
                 {linkJustCopied ? "Скопировано" : "Скопировать ссылку"}
               </button>
             )}
+            {registrationLinks.length > 1 && (
+              <button
+                type="button"
+                onClick={() => void handleCopyAllTokens()}
+                className={`${ADMIN_BTN} ${ADMIN_BTN_SM} gap-1 ${allLinksJustCopied ? "admin-btn--success" : "admin-btn--neutral"}`}
+              >
+                {allLinksJustCopied ? "Скопировано" : "Скопировать все ссылки"}
+              </button>
+            )}
           </div>
           {registrationLink && (
             <div className="mt-2.5 flex items-stretch gap-2">
@@ -549,6 +606,39 @@ export default function AdminUsersPage() {
               >
                 <RefreshCw className={`h-4 w-4 ${tokenLoading ? "animate-spin" : ""}`} aria-hidden />
               </button>
+            </div>
+          )}
+          {registrationLinks.length > 1 && (
+            <div className="mt-2.5 rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-bg-sides)]/30 p-2">
+              <div className="mb-2 flex items-center justify-between text-xs text-[var(--color-text-secondary)]">
+                <span>Показано по 10. Всего: {registrationLinks.length}</span>
+                <span>Страница {tokenPageIndex + 1} из {tokenPagesCount}</span>
+              </div>
+              <div className="space-y-1.5">
+                {pagedRegistrationLinks.map((link, idx) => (
+                  <div key={`${link}-${idx}`} className="break-all rounded-md border border-[var(--color-brand-gold)]/20 px-2 py-1 font-mono text-[11px] text-[var(--color-text)]">
+                    {link}
+                  </div>
+                ))}
+              </div>
+              <div className="mt-2 flex items-center justify-between">
+                <button
+                  type="button"
+                  disabled={tokenPageIndex === 0}
+                  onClick={() => setTokenPageIndex((prev) => Math.max(0, prev - 1))}
+                  className={`${ADMIN_BTN} ${ADMIN_BTN_SM} admin-btn--neutral px-2 py-1 text-[11px] disabled:opacity-50`}
+                >
+                  Назад
+                </button>
+                <button
+                  type="button"
+                  disabled={tokenPageIndex >= tokenPagesCount - 1}
+                  onClick={() => setTokenPageIndex((prev) => Math.min(tokenPagesCount - 1, prev + 1))}
+                  className={`${ADMIN_BTN} ${ADMIN_BTN_SM} admin-btn--neutral px-2 py-1 text-[11px] disabled:opacity-50`}
+                >
+                  Далее
+                </button>
+              </div>
             </div>
           )}
           {registrationLink && (

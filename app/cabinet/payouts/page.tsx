@@ -114,7 +114,7 @@ export default function CabinetPayoutsPage() {
                   <p className="mt-2 text-sm text-[var(--color-text-secondary)]">{formatDate(p.createdAt, { includeYear: true })}</p>
                   <p className="mt-1 truncate text-sm text-[var(--color-text-secondary)]" title={p.details}>{truncateDetails(p.details, 50)}</p>
                   <div className="mt-3 border-t border-[var(--color-dark-gray)]/10 pt-3">
-                    {p.status === "COMPLETED" ? (
+                    {p.status === "COMPLETED" || p.status === "REJECTED" ? (
                       <button
                         type="button"
                         onClick={() => handleDownloadReceipt(p.id)}
@@ -159,7 +159,7 @@ export default function CabinetPayoutsPage() {
                         </span>
                       </td>
                       <td className="px-5 py-4">
-                        {p.status === "COMPLETED" ? (
+                        {p.status === "COMPLETED" || p.status === "REJECTED" ? (
                           <button type="button" onClick={() => handleDownloadReceipt(p.id)} disabled={downloadingId === p.id} className="inline-flex items-center gap-1.5 rounded-xl border-0 px-3 py-2 text-xs font-semibold text-[var(--color-text)] transition-all hover:bg-[var(--color-dark-gray)]/10 disabled:opacity-50">
                             <FileDown className="h-4 w-4" />{downloadingId === p.id ? "…" : "PDF"}
                           </button>

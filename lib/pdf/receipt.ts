@@ -15,23 +15,33 @@ const PAGE_WIDTH_PT = Math.round(RECEIPT_WIDTH_MM * PT_PER_MM);
 const PAGE_HEIGHT_PT = 280;
 
 const SITE_NAME = "FreeTips";
-const COMMISSION = "0,00 ₽";
 
 /**
- * Для чека: реквизиты без префикса (только номер карты или только номер телефона),
- * и банк при переводе по телефону (из «Телефон (Банк): номер»).
+ * Для чека: банк и номер карты из строки реквизитов.
+ * Поддерживаем форматы:
+ * - "Карта: 411111******1111"
+ * - "Телефон (Сбер): +7..."
+ * - "Банк: Tinkoff; Карта: 220012******1234"
  */
-function parseDetailsForReceipt(details: string): { requisites: string; bank: string | null } {
+function parseDetailsForReceipt(details: string): { cardNumber: string; bank: string } {
   const s = (details || "").trim();
+  const cardByKey = s.match(/(?:^|[;,]\s*)Карта:\s*([^;,\n]+)/i);
+  const bankByKey = s.match(/(?:^|[;,]\s*)Банк:\s*([^;,\n]+)/i);
+  if (cardByKey || bankByKey) {
+    return {
+      cardNumber: cardByKey?.[1]?.trim() || "—",
+      bank: bankByKey?.[1]?.trim() || "—",
+    };
+  }
   if (s.startsWith("Карта:") || s.startsWith("Карта: ")) {
     const num = s.startsWith("Карта: ") ? s.slice(7).trim() : s.slice(6).trim();
-    return { requisites: num || "—", bank: null };
+    return { cardNumber: num || "—", bank: "—" };
   }
   const phoneMatch = s.match(/^Телефон\s*\(([^)]+)\)\s*:\s*(.+)$/);
   if (phoneMatch) {
-    return { requisites: phoneMatch[2].trim() || "—", bank: phoneMatch[1].trim() || null };
+    return { cardNumber: phoneMatch[2].trim() || "—", bank: phoneMatch[1].trim() || "—" };
   }
-  return { requisites: s || "—", bank: null };
+  return { cardNumber: "—", bank: "—" };
 }
 
 interface PayoutReceiptData {
@@ -41,7 +51,7 @@ interface PayoutReceiptData {
   status: string;
   createdAt: string;
   senderName: string;
-  recipientName?: string | null;
+  feeKop?: number | null;
   /** "phone" — перевод по номеру телефона, "card" — перевод на карту */
   operationType: "phone" | "card";
 }
@@ -54,10 +64,10 @@ interface ReceiptOptions {
 }
 
 const STATUS_LABEL: Record<string, string> = {
-  CREATED: "Создана",
+  COMPLETED: "Успешно",
+  REJECTED: "Неудачно",
+  CREATED: "В обработке",
   PROCESSING: "В обработке",
-  COMPLETED: "Выполнена",
-  REJECTED: "Отклонена",
 };
 
 /** Пробел — тысячи, точка — копейки (10 000.00 ₽). */
@@ -156,20 +166,15 @@ export async function buildPayoutReceiptPdf(
     y -= lineHeight;
   };
 
-  line("Дата и время", formatDate(data.createdAt));
+  line("Статус", STATUS_LABEL[data.status] ?? data.status);
+  line("Дата", formatDate(data.createdAt));
   line("Операция", operationLabel);
   line("Отправитель", data.senderName);
-  if (data.operationType === "phone" && data.recipientName?.trim()) {
-    line("ФИО получателя", data.recipientName.trim());
-  }
-  const { requisites, bank } = parseDetailsForReceipt(data.details);
-  line("Реквизиты", requisites);
-  if (bank) {
-    line("Банк", bank);
-  }
-  line("Сумма перевода", formatAmount(data.amountKop));
-  line("Комиссия", COMMISSION);
-  line("Статус", STATUS_LABEL[data.status] ?? data.status);
+  const { cardNumber, bank } = parseDetailsForReceipt(data.details);
+  line("Реквизиты", bank);
+  line("Номер карты", cardNumber);
+  line("Сумма без комиссии", formatAmount(data.amountKop));
+  line("Комиссия", formatAmount(data.feeKop ?? 0));
 
   y -= 14;
   const boxH = 22;
@@ -183,7 +188,7 @@ export async function buildPayoutReceiptPdf(
     borderWidth: 0.8,
     color: rgb(0.95, 0.97, 1),
   });
-  const doneText = "Операция выполнена";
+  const doneText = data.status === "COMPLETED" ? "Операция выполнена" : "Операция не выполнена";
   const doneW = font.widthOfTextAtSize(doneText, 10);
   page.drawText(doneText, {
     x: margin + (width - margin * 2 - doneW) / 2,

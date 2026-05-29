@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useMemo, Fragment, useCallback, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { CheckCircle2, Clock, XCircle, ChevronLeft, ChevronRight } from "lucide-react";
+import { CheckCircle2, Clock, XCircle, ChevronLeft, ChevronRight, FileDown } from "lucide-react";
 import { formatMoney, formatDate, toMoscowDateKey, formatMoscowCalendarDayLabel } from "@/lib/utils";
 import { fetchWithAuth, clearAccessToken } from "@/lib/auth-client";
 import { PAYOUT_MIN_AMOUNT_KOP } from "@/lib/payout-amount-bounds";
@@ -95,6 +95,7 @@ export default function CabinetTransactionsPage() {
   const [sdPageLoading, setSdPageLoading] = useState(false);
   const [sdPageError, setSdPageError] = useState<string | null>(null);
   const [sdPageNewTabHint, setSdPageNewTabHint] = useState(false);
+  const [downloadingReceiptId, setDownloadingReceiptId] = useState<string | null>(null);
   const [maxPayoutPerRequestKop, setMaxPayoutPerRequestKop] = useState<number>(10_000_000);
   /** После ответа /api/profile — чтобы не отправлять вывод с дефолтным 100k до прихода лимитов. */
   const [payoutLimitsFromProfile, setPayoutLimitsFromProfile] = useState(false);
@@ -304,6 +305,29 @@ export default function CabinetTransactionsPage() {
     }
   };
 
+  const handleDownloadReceipt = async (payoutId: string) => {
+    setDownloadingReceiptId(payoutId);
+    setError(null);
+    try {
+      const res = await fetchWithAuth(`/api/payouts/${payoutId}/receipt`);
+      if (!res.ok) {
+        const data = (await res.json().catch(() => ({}))) as { error?: string };
+        throw new Error(data.error || "Не удалось скачать чек");
+      }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `chek-vyvod-${payoutId.slice(0, 8)}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Не удалось скачать чек");
+    } finally {
+      setDownloadingReceiptId(null);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex min-h-[40vh] flex-col items-center justify-center">
@@ -502,6 +526,29 @@ export default function CabinetTransactionsPage() {
                               {op.rejectionReason}
                             </p>
                           )}
+                          {op.type === "payout" && (
+                            <div className="pt-1">
+                              {op.status === "COMPLETED" || op.status === "REJECTED" ? (
+                                <button
+                                  type="button"
+                                  onClick={() => handleDownloadReceipt(op.id)}
+                                  disabled={downloadingReceiptId === op.id}
+                                  className="inline-flex items-center gap-1.5 rounded-xl border-0 px-3 py-2 text-xs font-semibold text-[var(--color-text)] transition-all hover:bg-[var(--color-dark-gray)]/10 disabled:opacity-50"
+                                >
+                                  <FileDown className="h-4 w-4" />
+                                  {downloadingReceiptId === op.id ? "…" : "Скачать чек PDF"}
+                                </button>
+                              ) : (
+                                <span
+                                  className="inline-flex items-center gap-1.5 rounded-xl bg-[var(--color-dark-gray)]/6 px-3 py-2 text-xs text-[var(--color-muted)]"
+                                  title="Доступно после выполнения вывода"
+                                >
+                                  <FileDown className="h-4 w-4" />
+                                  Чек (после выполнения)
+                                </span>
+                              )}
+                            </div>
+                          )}
                         </div>
                         <div className="shrink-0">
                           <StatusIcon op={op} />
@@ -573,6 +620,26 @@ export default function CabinetTransactionsPage() {
                                   {op.rejectionReason}
                                 </span>
                               )}
+                              {op.type === "payout" &&
+                                (op.status === "COMPLETED" || op.status === "REJECTED" ? (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleDownloadReceipt(op.id)}
+                                    disabled={downloadingReceiptId === op.id}
+                                    className="mt-1 inline-flex items-center gap-1.5 rounded-xl border-0 px-3 py-2 text-xs font-semibold text-[var(--color-text)] transition-all hover:bg-[var(--color-dark-gray)]/10 disabled:opacity-50"
+                                  >
+                                    <FileDown className="h-4 w-4" />
+                                    {downloadingReceiptId === op.id ? "…" : "Скачать PDF"}
+                                  </button>
+                                ) : (
+                                  <span
+                                    className="mt-1 inline-flex items-center gap-1.5 rounded-xl bg-[var(--color-dark-gray)]/6 px-3 py-2 text-xs text-[var(--color-muted)]"
+                                    title="Доступно после выполнения вывода"
+                                  >
+                                    <FileDown className="h-4 w-4" />
+                                    Чек позже
+                                  </span>
+                                ))}
                             </div>
                           </td>
                         </tr>

@@ -76,6 +76,7 @@ export async function GET(
       status: true,
       createdAt: true,
       recipientName: true,
+      feeKop: true,
       completedByUserId: true,
     },
   });
@@ -88,9 +89,9 @@ export async function GET(
     return NextResponse.json({ error: "Нет доступа" }, { status: 403 });
   }
 
-  if (payout.status !== "COMPLETED") {
+  if (payout.status !== "COMPLETED" && payout.status !== "REJECTED") {
     return NextResponse.json(
-      { error: "Чек доступен только после успешного выполнения вывода" },
+      { error: "Чек доступен после завершения выплаты (успешно или неудачно)" },
       { status: 403 },
     );
   }
@@ -100,15 +101,19 @@ export async function GET(
     const logoPngBytes = getLogoPngBytes();
 
     const isPhoneTransfer = payout.details.startsWith("Телефон");
+    const user = await db.user.findUnique({
+      where: { id: payout.userId },
+      select: { login: true },
+    });
     const pdfBytes = await buildPayoutReceiptPdf(
       {
         id: payout.id,
         amountKop: Number(payout.amountKop),
+        feeKop: payout.feeKop != null ? Number(payout.feeKop) : 0,
         details: payout.details,
         status: payout.status,
         createdAt: payout.createdAt.toISOString(),
-        senderName: "FreeTips.World",
-        recipientName: isPhoneTransfer ? (payout.recipientName?.trim() || null) : null,
+        senderName: user?.login || "—",
         operationType: isPhoneTransfer ? "phone" : "card",
       },
       { fontBytes, logoPngBytes },

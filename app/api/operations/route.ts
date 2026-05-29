@@ -10,7 +10,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireAuthOrApiKey } from "@/lib/auth-or-api-key";
 import { db } from "@/lib/db";
 import { parseLimitOffset } from "@/lib/api/helpers";
-import { feeKopForPayout, recipientFeeKopForIncomingTx } from "@/lib/payment/paygine-fee";
+import { feeKopForPayout } from "@/lib/payment/paygine-fee";
 import { getBaseUrlFromRequest } from "@/lib/get-base-url";
 import { logInfo } from "@/lib/logger";
 import { reconcileRecentTipsForUserIfDue } from "@/lib/payment/reconcile-user-tip-transactions";
@@ -52,15 +52,10 @@ const toTipRow = (
 ): OperationRow => ({
   id: t.id,
   type: "tip",
-  amountKop: Number(t.amountKop),
+  amountKop: Number(t.recipientCreditedKop ?? t.amountKop),
   feeKop: Number(
     t.recipientFeeChargedKop ??
-      recipientFeeKopForIncomingTx({
-        amountKop: t.amountKop,
-        feeKop: t.feeKop,
-        paymentMethod: t.paymentMethod === "sbp" ? "sbp" : "card",
-        payerInfo: t.payerInfo,
-      }),
+      (t.feeKop ?? BigInt(0)),
   ),
   status: t.status,
   ...(t.link && {

@@ -18,6 +18,7 @@ type Operation = {
   type: "tip" | "payout";
   amountKop: number;
   feeKop: number;
+  tipNetKop?: number;
   status: string;
   rejectionReason?: string | null;
   /** URL страницы приёма чаевых (офика). Только для type "tip". */
@@ -496,7 +497,10 @@ export default function CabinetTransactionsPage() {
                     </span>
                   </div>
                   {(byDay.map.get(dayKey) ?? []).map((op) => {
-                    const tipNetKop = op.type === "tip" ? op.amountKop : null;
+                    const tipNetKop =
+                      op.type === "tip"
+                        ? (typeof op.tipNetKop === "number" ? op.tipNetKop : Math.max(0, op.amountKop - op.feeKop))
+                        : null;
                     return (
                     <div
                       key={`${op.type}-${op.id}`}
@@ -585,7 +589,10 @@ export default function CabinetTransactionsPage() {
                         </td>
                       </tr>
                       {(byDay.map.get(dayKey) ?? []).map((op) => {
-                        const tipNetKop = op.type === "tip" ? op.amountKop : null;
+                        const tipNetKop =
+                          op.type === "tip"
+                            ? (typeof op.tipNetKop === "number" ? op.tipNetKop : Math.max(0, op.amountKop - op.feeKop))
+                            : null;
                         return (
                         <tr
                           key={`${op.type}-${op.id}`}

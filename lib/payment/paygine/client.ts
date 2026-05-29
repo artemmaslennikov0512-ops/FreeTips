@@ -211,6 +211,8 @@ type OrderStatusResult =
       orderState: string;
       /** Статус последней релевантной операции (не REVERSE) внутри <operations> — как <state> в вебхуке. */
       operationState: string | null;
+      /** Идентификатор последней релевантной операции в заказе. */
+      operationId: string | null;
       /** PAN из ответа Paygine (обычно в маске). */
       pan: string | null;
     }
@@ -238,25 +240,49 @@ export function normalizePaygineOrderStateToken(raw: string): string {
   return u;
 }
 
+function cleanXmlValue(raw: string): string {
+  return raw
+    .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, "$1")
+    .replace(/<[^>]+>/g, "")
+    .trim();
+}
+
+function extractLastXmlTagValue(xml: string, tag: string): string | null {
+  const re = new RegExp(`<${tag}\\b[^>]*>([\\s\\S]*?)<\\/${tag}>`, "gi");
+  let m: RegExpExecArray | null;
+  let last: string | null = null;
+  while ((m = re.exec(xml)) !== null) {
+    const v = cleanXmlValue(m[1] ?? "");
+    if (v) last = v;
+  }
+  return last;
+}
+
 /**
  * Разбор ответа webapi/Order: в доке бывает и <order_state>, и формат <order><state>…</state><operations><operation><state>APPROVED</state>.
  */
 export function parsePaygineOrderResponseXml(text: string): {
   orderState: string;
   operationState: string | null;
+  operationId: string | null;
   pan: string | null;
 } | null {
-  const orderStateRaw = text.match(/<order_state>([^<]*)<\/order_state>/i)?.[1]?.trim() ?? "";
+  const orderStateRaw = extractLastXmlTagValue(text, "order_state") ?? "";
   const beforeOps = text.split(/<operations\b/i)[0] ?? text;
-  const orderLevelRaw = beforeOps.match(/<state>([^<]*)<\/state>/i)?.[1]?.trim() ?? "";
+  const orderLevelRaw = extractLastXmlTagValue(beforeOps, "state") ?? "";
 
   let operationState: string | null = null;
+  let operationId: string | null = null;
   const opBlocks = text.match(/<operation>[\s\S]*?<\/operation>/gi) ?? [];
   for (const block of opBlocks) {
     const type = (block.match(/<type>([^<]*)<\/type>/i)?.[1] ?? "").trim().toUpperCase();
     if (type.includes("REVERSE")) continue;
-    const st = block.match(/<state>([^<]*)<\/state>/i)?.[1]?.trim() ?? "";
-    if (st) operationState = normalizePaygineOrderStateToken(st);
+    const st = extractLastXmlTagValue(block, "state") ?? "";
+    const opId = extractLastXmlTagValue(block, "id");
+    if (st) {
+      operationState = normalizePaygineOrderStateToken(st);
+      operationId = opId;
+    }
   }
 
   const orderStateTag = orderStateRaw ? normalizePaygineOrderStateToken(orderStateRaw) : "";
@@ -265,15 +291,16 @@ export function parsePaygineOrderResponseXml(text: string): {
   if (!orderState && !operationState) return null;
   // Для выводов используем pan2 (карта получателя), а pan — карта отправителя.
   const pan =
-    text.match(/<pan2>([^<]*)<\/pan2>/i)?.[1]?.trim() ??
-    text.match(/<pan>([^<]*)<\/pan>/i)?.[1]?.trim() ??
-    text.match(/<card>([^<]*)<\/card>/i)?.[1]?.trim() ??
-    text.match(/<card_number>([^<]*)<\/card_number>/i)?.[1]?.trim() ??
+    extractLastXmlTagValue(text, "pan2") ??
+    extractLastXmlTagValue(text, "pan") ??
+    extractLastXmlTagValue(text, "card") ??
+    extractLastXmlTagValue(text, "card_number") ??
     null;
 
   return {
     orderState: orderState || orderLevelState || "UNKNOWN",
     operationState,
+    operationId,
     pan,
   };
 }
@@ -329,6 +356,7 @@ export async function getOrderStatus(
       ok: true,
       orderState: parsed.orderState,
       operationState: parsed.operationState,
+      operationId: parsed.operationId,
       pan: parsed.pan,
     };
   }
@@ -336,6 +364,49 @@ export async function getOrderStatus(
   const errCode = text.match(/<code>([^<]+)<\/code>/)?.[1];
   const errDesc = text.match(/<description>([^<]*)<\/description>/)?.[1];
   return { ok: false, code: errCode ?? undefined, description: (errDesc ?? text).slice(0, 500) };
+  });
+}
+
+type OperationStatusResult =
+  | { ok: true; pan: string | null; pan2: string | null }
+  | { ok: false; code?: string; description?: string };
+
+/**
+ * webapi/Operation — получение информации по операции заказа.
+ * Подпись: sector, id, operation, password.
+ */
+export async function getOperationStatus(
+  config: PaygineConfig,
+  orderId: number,
+  operationId: string,
+): Promise<OperationStatusResult> {
+  return withPaygineSerial(async () => {
+    const { sector, password } = config;
+    const signature = buildPaygineSignature([String(sector), String(orderId), String(operationId)], password);
+    const body = new URLSearchParams([
+      ["sector", String(sector)],
+      ["id", String(orderId)],
+      ["operation", String(operationId)],
+      ["mode", "1"],
+      ["signature", signature],
+    ]);
+
+    const fetched = await fetchPaygineFormText(`${getPaygineBaseUrl()}/Operation`, body);
+    if (!fetched.ok) {
+      return { ok: false, description: fetched.description.slice(0, 500) };
+    }
+    const { res, text } = fetched;
+    if (!res.ok) {
+      return { ok: false, description: text.slice(0, 500) || `HTTP ${res.status}` };
+    }
+
+    const pan2 = extractLastXmlTagValue(text, "pan2");
+    const pan =
+      extractLastXmlTagValue(text, "pan") ??
+      extractLastXmlTagValue(text, "card") ??
+      extractLastXmlTagValue(text, "card_number") ??
+      null;
+    return { ok: true, pan, pan2 };
   });
 }
 

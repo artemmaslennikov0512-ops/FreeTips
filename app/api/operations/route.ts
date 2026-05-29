@@ -20,6 +20,8 @@ export type OperationItem = {
   type: "tip" | "payout";
   amountKop: number;
   feeKop: number; // комиссия в копейках (для вывода — из БД или расчёт; для пополнения — из БД или 0)
+  /** Для пополнения: фактически зачисленная сумма после релокейта. */
+  tipNetKop?: number;
   status: string;
   /** Причина отклонения (только для выводов со статусом REJECTED). */
   rejectionReason?: string | null;
@@ -52,11 +54,12 @@ const toTipRow = (
 ): OperationRow => ({
   id: t.id,
   type: "tip",
-  amountKop: Number(t.recipientCreditedKop ?? t.amountKop),
+  amountKop: Number(t.amountKop),
   feeKop: Number(
     t.recipientFeeChargedKop ??
       (t.feeKop ?? BigInt(0)),
   ),
+  ...(t.recipientCreditedKop != null ? { tipNetKop: Number(t.recipientCreditedKop) } : {}),
   status: t.status,
   ...(t.link && {
     linkSlug: t.link.slug,

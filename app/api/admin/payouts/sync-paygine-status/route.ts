@@ -9,7 +9,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireRole } from "@/lib/middleware/auth";
 import { db } from "@/lib/db";
-import { getOrderStatus, isPaygineOrderPaidInOrderResponse } from "@/lib/payment/paygine/client";
+import { getOperationStatus, getOrderStatus, isPaygineOrderPaidInOrderResponse } from "@/lib/payment/paygine/client";
 import { broadcastBalanceUpdated } from "@/lib/ws-broadcast";
 
 export async function POST(request: NextRequest) {
@@ -61,7 +61,14 @@ export async function POST(request: NextRequest) {
     )
       ? "COMPLETED"
       : "REJECTED";
-    const panDigits = result.pan ? result.pan.replace(/\D/g, "") : "";
+    let panSource = result.pan;
+    if (!panSource && result.operationId) {
+      const op = await getOperationStatus({ sector, password }, orderId, result.operationId);
+      if (op.ok) {
+        panSource = op.pan2 ?? op.pan;
+      }
+    }
+    const panDigits = panSource ? panSource.replace(/\D/g, "") : "";
     const panMasked = panDigits.length >= 4 ? `****${panDigits.slice(-4)}` : "";
     const current = await db.payoutRequest.findUnique({
       where: { id: p.id },

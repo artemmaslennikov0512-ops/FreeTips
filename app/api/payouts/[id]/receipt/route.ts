@@ -10,7 +10,7 @@ import { join } from "path";
 import { requireAuthOrApiKey } from "@/lib/auth-or-api-key";
 import { db } from "@/lib/db";
 import { buildPayoutReceiptPdf } from "@/lib/pdf/receipt";
-import { getOrderStatus } from "@/lib/payment/paygine/client";
+import { getOperationStatus, getOrderStatus } from "@/lib/payment/paygine/client";
 import { logError, logWarn } from "@/lib/logger";
 
 const FONT_URLS = [
@@ -120,11 +120,26 @@ export async function GET(
         const noReference = !withReference.ok || !withReference.pan
           ? await getOrderStatus({ sector, password }, orderId)
           : null;
-        const resolvedPan = withReference.ok && withReference.pan
+        const orderPan = withReference.ok && withReference.pan
           ? withReference.pan
           : noReference?.ok
             ? noReference.pan
             : null;
+        let resolvedPan = orderPan;
+        if (!resolvedPan) {
+          const operationId =
+            withReference.ok && withReference.operationId
+              ? withReference.operationId
+              : noReference?.ok
+                ? noReference.operationId
+                : null;
+          if (operationId) {
+            const op = await getOperationStatus({ sector, password }, orderId, operationId);
+            if (op.ok) {
+              resolvedPan = op.pan2 ?? op.pan;
+            }
+          }
+        }
         if (resolvedPan) {
           const pan = resolvedPan.replace(/\s+/g, "");
           const last4 = pan.replace(/\D/g, "").slice(-4);

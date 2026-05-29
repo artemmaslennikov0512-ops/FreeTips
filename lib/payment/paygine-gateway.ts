@@ -209,6 +209,20 @@ function verifyPaygineCallbackSignature(xml: string, password: string): boolean 
   return expected === signature;
 }
 
+function extractLastXmlTagValue(xml: string, tag: string): string | null {
+  const re = new RegExp(`<${tag}\\b[^>]*>([\\s\\S]*?)<\\/${tag}>`, "gi");
+  let m: RegExpExecArray | null;
+  let last: string | null = null;
+  while ((m = re.exec(xml)) !== null) {
+    const v = (m[1] ?? "")
+      .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, "$1")
+      .replace(/<[^>]+>/g, "")
+      .trim();
+    if (v) last = v;
+  }
+  return last;
+}
+
 export class PayginePaymentGateway implements PaymentGateway {
   async createPayment(params: CreatePaymentParams): Promise<CreatePaymentResult> {
     const config = getConfig();
@@ -395,8 +409,8 @@ export class PayginePaymentGateway implements PaymentGateway {
         const orderState = orderStateMatch?.[1]?.trim().toUpperCase();
         const success = state === "APPROVED" || orderState === "COMPLETED";
         const panRaw =
-          rawBody.match(/<pan2>([^<]*)<\/pan2>/i)?.[1]?.trim() ??
-          rawBody.match(/<pan>([^<]*)<\/pan>/i)?.[1]?.trim() ??
+          extractLastXmlTagValue(rawBody, "pan2") ??
+          extractLastXmlTagValue(rawBody, "pan") ??
           "";
         const pan = panRaw ? panRaw.replace(/\s+/g, "") : "";
         const panMasked = pan ? `****${pan.slice(-4)}` : "";

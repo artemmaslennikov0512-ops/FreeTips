@@ -52,21 +52,25 @@ class BalanceRefreshWorker(
                 return@withContext Result.success()
             }
 
-            BalanceNotificationHelper.showIfNeeded(
-                applicationContext,
-                stats.balanceKop,
-                stats.totalGuestPaidTipsKop,
-            )
-            // Подтягиваем пропущенные "пооперационные" уведомления при фоновом обновлении.
+            // Сначала пооперационные пуши, затем обновление базы totalGuestPaidTipsKop.
             runCatching {
                 val opsResponse = ApiClient(apiKey, prefs.effectiveBaseUrl).getOperations(50, 0).execute()
                 if (opsResponse.isSuccessful) {
                     val opsBody = opsResponse.body?.string() ?: ""
                     if (opsBody.isNotBlank()) {
-                        BalanceNotificationHelper.syncIncomingTipsFromOperationsJson(applicationContext, opsBody)
+                        BalanceNotificationHelper.syncIncomingTipsFromOperationsJson(
+                            applicationContext,
+                            opsBody,
+                            stats.totalGuestPaidTipsKop,
+                        )
                     }
                 }
             }
+            BalanceNotificationHelper.showIfNeeded(
+                applicationContext,
+                stats.balanceKop,
+                stats.totalGuestPaidTipsKop,
+            )
             BalanceCache.save(applicationContext, stats.balanceKop)
             applicationContext.sendBroadcast(Intent(ACTION_BALANCE_UPDATED).setPackage(applicationContext.packageName))
             BalanceRefreshScheduler.scheduleNext(applicationContext)

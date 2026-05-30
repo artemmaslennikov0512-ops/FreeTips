@@ -12,36 +12,40 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 
 /**
- * Уведомления только о пополнении (с суммой): в шторку и в список по колокольчику.
- * Сумма в пуше — как списано с гостя (amount Register + комиссия по карте/СБП), см. stats.totalGuestPaidTipsKop.
- * Для текста пуша сумма округляется до целого рубля (копейки не показываем); в БД и Paygine это не влияет.
+ * Уведомления о пополнении: один SUCCESS tip — один пуш и одна запись в колокольчике.
+ * Уже отправленные tip-id хранятся в SharedPreferences, повторов при повторном входе нет.
  */
 object BalanceNotificationHelper {
 
     private const val PREFS_NAME = "balance_notification"
-    /** База для сравнения: накопитель «списано с гостей» (amount + fee), не нетто на баланс. */
     private const val KEY_LAST_GUEST_PAID_TIPS_KOP = "last_guest_paid_tips_kop"
     private const val KEY_LAST_BALANCE_KOP = "last_balance_kop"
     private const val KEY_ITEMS_JSON = "notification_items_json"
     private const val KEY_LAST_VIEWED_MILLIS = "last_viewed_millis"
+    /** tip-id, по которым уже отправляли пуш (или пометили при первичной инициализации). */
+    private const val KEY_NOTIFIED_TIP_IDS_JSON = "notified_tip_ids_json"
+    /** @deprecated читается только при миграции v5 */
     private const val KEY_SEEN_TIP_IDS_JSON = "seen_tip_ids_json"
-    /**
-     * v2: только totalGuestPaidTipsKop (без fallback на totalReceivedKop — иначе два пуша: 50 ₽ + 1 ₽).
-     */
     private const val KEY_BASIS_SCHEMA = "notify_basis_schema"
+    private const val KEY_TIPS_BOOTSTRAP_DONE = "tips_bootstrap_done"
+    private const val KEY_V5_MIGRATED = "notify_v5_migrated"
+    private const val KEY_LEGACY_RECONCILE_DONE = "notify_legacy_reconcile_done"
     private const val SCHEMA_GUEST_PAID_ONLY = 2
-    private const val SCHEMA_PER_TRANSACTION = 3
+    private const val SCHEMA_TIP_ID_DEDUP = 5
     private const val MAX_ITEMS = 100
-    private const val MAX_SEEN_TIP_IDS = 500
-    private const val NOTIFICATION_ID_TOPUP = 1
+    private const val MAX_NOTIFIED_TIP_IDS = 500
+    private const val NOTIFICATION_ID_BASE = 10_000
 
     private val lock = Any()
 
-    data class TipOperation(val id: String, val amountKop: Int, val status: String)
+    data class TipOperation(
+        val id: String,
+        val amountKop: Int,
+        val status: String,
+        val createdAtMillis: Long = System.currentTimeMillis(),
+    )
 
-    /**
-     * @param totalGuestPaidTipsKop с сервера (amount Register + fee по карте/СБП по вашим SUCCESS).
-     */
+    /** Обновляет базу totalGuestPaidTipsKop; пуши не шлёт. */
     fun showIfNeeded(
         context: Context,
         balanceKop: Int,
@@ -49,6 +53,7 @@ object BalanceNotificationHelper {
     ) {
         synchronized(lock) {
             val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            migrateToV5IfNeeded(prefs)
 
             if (prefs.getInt(KEY_BASIS_SCHEMA, 0) < SCHEMA_GUEST_PAID_ONLY) {
                 prefs.edit()
@@ -70,17 +75,6 @@ object BalanceNotificationHelper {
                 return
             }
 
-            if (basis > lastBasis) {
-                val addKop = basis - lastBasis
-                val displayKop = kotlin.math.round(addKop / 100.0).toInt() * 100
-                // При SCHEMA_PER_TRANSACTION пуши идут только из syncIncomingTips (по tip-id),
-                // иначе один чай даёт два уведомления: дельта totalGuestPaidTipsKop + операция.
-                val schema = prefs.getInt(KEY_BASIS_SCHEMA, 0)
-                if (displayKop > 0 && schema < SCHEMA_PER_TRANSACTION) {
-                    showTopUpAndSave(context, displayKop)
-                }
-            }
-
             prefs.edit()
                 .putInt(KEY_LAST_GUEST_PAID_TIPS_KOP, basis)
                 .putInt(KEY_LAST_BALANCE_KOP, balanceKop)
@@ -89,51 +83,70 @@ object BalanceNotificationHelper {
     }
 
     /**
-     * Пооперационная синхронизация пополнений для колокольчика.
-     * На первом запуске только "семплируем" уже существующие tip-id без пушей, чтобы не заспамить.
+     * Синхронизация с /api/operations.
+     * Новые tip-id → пуш + запись в колокольчик; уже известные tip-id пропускаются.
      */
-    fun syncIncomingTips(context: Context, tips: List<TipOperation>) {
+    fun syncIncomingTips(
+        context: Context,
+        tips: List<TipOperation>,
+        @Suppress("UNUSED_PARAMETER") totalGuestPaidTipsKop: Int? = null,
+    ) {
         synchronized(lock) {
             val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            migrateToV5IfNeeded(prefs)
+
             val normalized = tips
                 .asSequence()
                 .filter { it.status == "SUCCESS" }
                 .filter { it.id.isNotBlank() && it.amountKop > 0 }
+                .distinctBy { it.id }
                 .toList()
             if (normalized.isEmpty()) return
 
-            val seenIds = getSeenTipIds(prefs).toMutableList()
-            val seenSet = seenIds.toMutableSet()
-            val schema = prefs.getInt(KEY_BASIS_SCHEMA, 0)
-            if (schema < SCHEMA_PER_TRANSACTION) {
-                // Первая инициализация: запоминаем текущие операции без уведомлений.
+            val notifiedIds = getNotifiedTipIds(prefs).toMutableSet()
+            val inAppTipIds = getInAppTipIds(prefs)
+            notifiedIds.addAll(inAppTipIds)
+
+            if (!prefs.getBoolean(KEY_TIPS_BOOTSTRAP_DONE, false)) {
                 for (tip in normalized) {
-                    if (seenSet.add(tip.id)) seenIds.add(0, tip.id)
+                    notifiedIds.add(tip.id)
                 }
-                trimSeenIds(seenIds)
-                saveSeenTipIds(prefs, seenIds)
-                prefs.edit().putInt(KEY_BASIS_SCHEMA, SCHEMA_PER_TRANSACTION).apply()
+                saveNotifiedTipIds(prefs, notifiedIds)
+                prefs.edit()
+                    .putBoolean(KEY_TIPS_BOOTSTRAP_DONE, true)
+                    .putInt(KEY_BASIS_SCHEMA, SCHEMA_TIP_ID_DEDUP)
+                    .apply()
                 return
             }
 
-            // История обычно приходит в порядке "сначала новые", поэтому уведомляем в обратном порядке.
-            val newTips = normalized.filter { !seenSet.contains(it.id) }.asReversed()
-            for (tip in newTips) {
-                if (seenSet.add(tip.id)) {
-                    val displayKop = kotlin.math.round(tip.amountKop / 100.0).toInt() * 100
-                    if (displayKop > 0) {
-                        showTopUpAndSave(context, displayKop)
-                    }
-                    seenIds.add(0, tip.id)
-                }
+            if (!prefs.getBoolean(KEY_LEGACY_RECONCILE_DONE, false)) {
+                reconcileLegacyInAppItems(prefs, normalized, notifiedIds)
+                prefs.edit().putBoolean(KEY_LEGACY_RECONCILE_DONE, true).apply()
             }
-            trimSeenIds(seenIds)
-            saveSeenTipIds(prefs, seenIds)
+
+            // Сначала старые, потом новые — естественный порядок в шторке.
+            val pending = normalized
+                .filter { !notifiedIds.contains(it.id) }
+                .asReversed()
+
+            for (tip in pending) {
+                val displayKop = kotlin.math.round(tip.amountKop / 100.0).toInt() * 100
+                if (displayKop <= 0) {
+                    notifiedIds.add(tip.id)
+                    continue
+                }
+                deliverTipNotification(context, prefs, tip, displayKop, notifiedIds)
+            }
+
+            saveNotifiedTipIds(prefs, notifiedIds)
         }
     }
 
-    /** Удобный адаптер: забрать SUCCESS tip-операции из JSON /api/operations и синхронизировать уведомления. */
-    fun syncIncomingTipsFromOperationsJson(context: Context, operationsJson: String) {
+    fun syncIncomingTipsFromOperationsJson(
+        context: Context,
+        operationsJson: String,
+        totalGuestPaidTipsKop: Int? = null,
+    ) {
         val root = runCatching { com.google.gson.Gson().fromJson(operationsJson, JsonObject::class.java) }.getOrNull()
             ?: return
         val arr = root.getAsJsonArray("operations") ?: return
@@ -146,27 +159,117 @@ object BalanceNotificationHelper {
             val amount = amountRaw?.toLongOrNull()
                 ?: runCatching { obj.get("amountKop")?.asLong }.getOrNull()
                 ?: 0L
+            val createdAtMillis = parseCreatedAtMillis(obj.get("createdAt"))
             if (type != "tip" || status != "SUCCESS" || id.isEmpty() || amount <= 0L) return@mapNotNull null
             TipOperation(
                 id = id,
                 amountKop = amount.coerceAtMost(Int.MAX_VALUE.toLong()).toInt(),
                 status = status,
+                createdAtMillis = createdAtMillis,
             )
         }
-        if (tips.isNotEmpty()) syncIncomingTips(context, tips)
+        if (tips.isNotEmpty()) syncIncomingTips(context, tips, totalGuestPaidTipsKop)
     }
 
-    private fun showTopUpAndSave(context: Context, addKop: Int) {
-        val rubText = formatKopToRub(addKop)
+    private fun deliverTipNotification(
+        context: Context,
+        prefs: android.content.SharedPreferences,
+        tip: TipOperation,
+        displayKop: Int,
+        notifiedIds: MutableSet<String>,
+    ) {
+        if (!notifiedIds.add(tip.id)) return
+
+        val rubText = formatKopToRub(displayKop)
         val title = context.getString(R.string.notification_topup_title)
         val text = context.getString(R.string.notification_topup_body, rubText)
-        showSystemNotification(context, title, text)
-        addToInAppList(context, addKop, text)
+        showSystemNotification(context, title, text, tip.id)
+        addToInAppList(context, tip.id, displayKop, text, tip.createdAtMillis)
+        saveNotifiedTipIds(prefs, notifiedIds)
     }
 
-    private fun showSystemNotification(context: Context, title: String, text: String) {
-        val openApp = Intent(context, MainActivity::class.java).apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP }
-        val pending = PendingIntent.getActivity(context, 0, openApp, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+    /**
+     * Старые записи в колокольчике без tipId сопоставляем с операциями по сумме,
+     * чтобы не продублировать уже показанные пуши и не потерять пропущенные offline.
+     */
+    private fun reconcileLegacyInAppItems(
+        prefs: android.content.SharedPreferences,
+        normalized: List<TipOperation>,
+        notifiedIds: MutableSet<String>,
+    ) {
+        val gson = com.google.gson.Gson()
+        val list = loadInAppJsonObjects(prefs, gson)
+        if (list.isEmpty()) return
+
+        val unmatchedTips = normalized
+            .filter { !notifiedIds.contains(it.id) }
+            .sortedByDescending { it.createdAtMillis }
+            .toMutableList()
+
+        var changed = false
+        for (obj in list) {
+            val existingTipId = obj.get("tipId")?.takeIf { it.isJsonPrimitive }?.asString?.trim().orEmpty()
+            if (existingTipId.isNotEmpty()) {
+                notifiedIds.add(existingTipId)
+                continue
+            }
+            val amountKop = obj.get("amountKop")?.takeIf { it.isJsonPrimitive }?.asInt ?: continue
+            val matchIdx = unmatchedTips.indexOfFirst { tip ->
+                kotlin.math.round(tip.amountKop / 100.0).toInt() * 100 == amountKop
+            }
+            if (matchIdx < 0) continue
+            val match = unmatchedTips.removeAt(matchIdx)
+            obj.addProperty("tipId", match.id)
+            notifiedIds.add(match.id)
+            changed = true
+        }
+
+        if (changed) {
+            prefs.edit().putString(KEY_ITEMS_JSON, gson.toJson(list)).apply()
+        }
+    }
+
+    private fun migrateToV5IfNeeded(prefs: android.content.SharedPreferences) {
+        if (prefs.getBoolean(KEY_V5_MIGRATED, false)) return
+
+        // Не переносим старый seen_tip_ids — он мог содержать offline-чаевые без реального пуша.
+        val notified = getInAppTipIds(prefs).toMutableSet()
+        saveNotifiedTipIds(prefs, notified)
+        prefs.edit()
+            .remove(KEY_SEEN_TIP_IDS_JSON)
+            .putBoolean(KEY_V5_MIGRATED, true)
+            .putBoolean(KEY_TIPS_BOOTSTRAP_DONE, prefs.getInt(KEY_BASIS_SCHEMA, 0) >= SCHEMA_GUEST_PAID_ONLY)
+            .putInt(KEY_BASIS_SCHEMA, SCHEMA_TIP_ID_DEDUP)
+            .apply()
+    }
+
+    private fun parseCreatedAtMillis(element: com.google.gson.JsonElement?): Long {
+        if (element == null || !element.isJsonPrimitive) return System.currentTimeMillis()
+        val raw = element.asString.trim()
+        if (raw.isEmpty()) return System.currentTimeMillis()
+        return runCatching {
+            java.time.Instant.parse(raw).toEpochMilli()
+        }.getOrElse {
+            runCatching {
+                java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", java.util.Locale.US)
+                    .parse(raw)?.time
+            }.getOrNull() ?: System.currentTimeMillis()
+        }
+    }
+
+    private fun notificationIdForTip(tipId: String): Int =
+        NOTIFICATION_ID_BASE + (tipId.hashCode() and 0x7FFF)
+
+    private fun showSystemNotification(context: Context, title: String, text: String, tipId: String) {
+        val openApp = Intent(context, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
+        val pending = PendingIntent.getActivity(
+            context,
+            tipId.hashCode(),
+            openApp,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
         val builder = NotificationCompat.Builder(context, App.CHANNEL_BALANCE)
             .setSmallIcon(R.drawable.ic_notification_small)
             .setContentTitle(title)
@@ -179,66 +282,89 @@ object BalanceNotificationHelper {
             .setDefaults(NotificationCompat.DEFAULT_ALL)
         try {
             if (NotificationManagerCompat.from(context).areNotificationsEnabled()) {
-                NotificationManagerCompat.from(context).notify(NOTIFICATION_ID_TOPUP, builder.build())
+                NotificationManagerCompat.from(context).notify(notificationIdForTip(tipId), builder.build())
             }
         } catch (_: SecurityException) { }
     }
 
-    private fun addToInAppList(context: Context, amountKop: Int, displayText: String) {
+    private fun addToInAppList(
+        context: Context,
+        tipId: String,
+        amountKop: Int,
+        displayText: String,
+        timeMillis: Long,
+    ) {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        val json = prefs.getString(KEY_ITEMS_JSON, "[]") ?: "[]"
         val gson = com.google.gson.Gson()
-        val list = try {
-            val arr = gson.fromJson(json, com.google.gson.JsonArray::class.java) ?: com.google.gson.JsonArray()
-            (0 until arr.size()).map { arr.get(it).asJsonObject }.toMutableList()
-        } catch (_: Exception) {
-            mutableListOf<com.google.gson.JsonObject>()
-        }
-        val obj = com.google.gson.JsonObject().apply {
+        val list = loadInAppJsonObjects(prefs, gson)
+        if (list.any { it.get("tipId")?.asString == tipId }) return
+
+        val obj = JsonObject().apply {
+            addProperty("tipId", tipId)
             addProperty("amountKop", amountKop)
             addProperty("text", displayText)
-            addProperty("time", System.currentTimeMillis())
+            addProperty("time", timeMillis)
         }
         list.add(0, obj)
         while (list.size > MAX_ITEMS) list.removeAt(list.size - 1)
-        val out = gson.toJson(list)
-        prefs.edit().putString(KEY_ITEMS_JSON, out).apply()
+        prefs.edit().putString(KEY_ITEMS_JSON, gson.toJson(list)).apply()
     }
 
-    private fun getSeenTipIds(prefs: android.content.SharedPreferences): List<String> {
-        val json = prefs.getString(KEY_SEEN_TIP_IDS_JSON, "[]") ?: "[]"
-        return try {
+    private fun loadInAppJsonObjects(
+        prefs: android.content.SharedPreferences,
+        gson: com.google.gson.Gson,
+    ): MutableList<JsonObject> =
+        try {
+            val json = prefs.getString(KEY_ITEMS_JSON, "[]") ?: "[]"
+            val arr = gson.fromJson(json, JsonArray::class.java) ?: JsonArray()
+            (0 until arr.size()).map { arr.get(it).asJsonObject }.toMutableList()
+        } catch (_: Exception) {
+            mutableListOf()
+        }
+
+    private fun getInAppTipIds(prefs: android.content.SharedPreferences): Set<String> =
+        loadInAppJsonObjects(prefs, com.google.gson.Gson())
+            .mapNotNull { obj -> obj.get("tipId")?.takeIf { it.isJsonPrimitive }?.asString?.trim() }
+            .filter { it.isNotEmpty() }
+            .toSet()
+
+    private fun getNotifiedTipIds(prefs: android.content.SharedPreferences): Set<String> {
+        val json = prefs.getString(KEY_NOTIFIED_TIP_IDS_JSON, "[]") ?: "[]"
+        return parseStringSetFromJson(json)
+    }
+
+    private fun parseStringSetFromJson(json: String): Set<String> =
+        try {
             val arr = com.google.gson.Gson().fromJson(json, JsonArray::class.java) ?: JsonArray()
             (0 until arr.size())
                 .mapNotNull { idx -> arr.get(idx)?.takeIf { it.isJsonPrimitive }?.asString?.trim() }
                 .filter { it.isNotEmpty() }
+                .toSet()
         } catch (_: Exception) {
-            emptyList()
+            emptySet()
         }
+
+    private fun saveNotifiedTipIds(prefs: android.content.SharedPreferences, ids: Set<String>) {
+        val trimmed = ids.toList().take(MAX_NOTIFIED_TIP_IDS)
+        prefs.edit().putString(KEY_NOTIFIED_TIP_IDS_JSON, com.google.gson.Gson().toJson(trimmed)).apply()
     }
 
-    private fun saveSeenTipIds(prefs: android.content.SharedPreferences, ids: List<String>) {
-        prefs.edit().putString(KEY_SEEN_TIP_IDS_JSON, com.google.gson.Gson().toJson(ids)).apply()
-    }
-
-    private fun trimSeenIds(ids: MutableList<String>) {
-        if (ids.size <= MAX_SEEN_TIP_IDS) return
-        while (ids.size > MAX_SEEN_TIP_IDS) ids.removeAt(ids.size - 1)
-    }
-
-    data class NotificationItem(val amountKop: Int, val text: String, val timeMillis: Long)
+    data class NotificationItem(
+        val tipId: String?,
+        val amountKop: Int,
+        val text: String,
+        val timeMillis: Long,
+    )
 
     fun getInAppList(context: Context): List<NotificationItem> {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        val json = prefs.getString(KEY_ITEMS_JSON, "[]") ?: "[]"
         return try {
-            val arr = com.google.gson.Gson().fromJson(json, com.google.gson.JsonArray::class.java) ?: return emptyList()
-            (0 until arr.size()).mapNotNull { i ->
-                val obj = arr.get(i).asJsonObject
+            loadInAppJsonObjects(prefs, com.google.gson.Gson()).mapNotNull { obj ->
                 val amount = obj.get("amountKop")?.takeIf { it.isJsonPrimitive }?.asInt ?: return@mapNotNull null
                 val text = obj.get("text")?.asString ?: ""
                 val time = obj.get("time")?.asLong ?: 0L
-                NotificationItem(amount, text, time)
+                val tipId = obj.get("tipId")?.takeIf { it.isJsonPrimitive }?.asString
+                NotificationItem(tipId, amount, text, time)
             }
         } catch (_: Exception) {
             emptyList()
@@ -250,14 +376,12 @@ object BalanceNotificationHelper {
             .edit().putString(KEY_ITEMS_JSON, "[]").apply()
     }
 
-    /** Количество непросмотренных уведомлений (по времени последнего просмотра). */
     fun getUnreadCount(context: Context): Int {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         val viewedAt = prefs.getLong(KEY_LAST_VIEWED_MILLIS, 0L)
         return getInAppList(context).count { it.timeMillis > viewedAt }
     }
 
-    /** Вызывать при открытии экрана уведомлений: все текущие считаются просмотренными. */
     fun markAllAsViewed(context: Context) {
         val list = getInAppList(context)
         val viewedAt = if (list.isEmpty()) System.currentTimeMillis()

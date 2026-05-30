@@ -142,6 +142,9 @@ class HomeFragment : Fragment() {
     private val handler = Handler(Looper.getMainLooper())
     private var refreshRunnable: Runnable? = null
     private var balanceUpdatedReceiver: BroadcastReceiver? = null
+    /** Синхронизация пушей: ждём и профиль, и /api/operations, чтобы не слать одной суммой. */
+    private var pendingNotifyStats: Stats? = null
+    private var pendingNotifyOperationsJson: String? = null
 
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
@@ -233,6 +236,8 @@ class HomeFragment : Fragment() {
             if (!silent) b.swipeRefresh.isRefreshing = false
             return
         }
+        pendingNotifyStats = null
+        pendingNotifyOperationsJson = null
         if (!silent && !b.swipeRefresh.isRefreshing) b.progress.visibility = View.VISIBLE
         if (!silent) b.errorText.visibility = View.GONE
 
@@ -267,11 +272,8 @@ class HomeFragment : Fragment() {
                                 if (s != null) {
                                     b.virtualCardInclude.cardBalance.text = formatKopToRub(s.balanceKop)
                                     BalanceCache.save(b.root.context.applicationContext, s.balanceKop)
-                                    BalanceNotificationHelper.showIfNeeded(
-                                        b.root.context.applicationContext,
-                                        s.balanceKop,
-                                        s.totalGuestPaidTipsKop,
-                                    )
+                                    pendingNotifyStats = s
+                                    trySyncTopUpNotifications(b.root.context.applicationContext)
                                 }
                                 bindLimits(b, profile.payoutLimits, profile.payoutUsageToday, profile.payoutUsageMonth)
                             } catch (_: Throwable) {}
@@ -294,14 +296,30 @@ class HomeFragment : Fragment() {
                 val body = response.body?.string() ?: ""
                 if (!response.isSuccessful || body.isBlank()) return
                 val appCtx = context?.applicationContext ?: return
-                runCatching {
-                    BalanceNotificationHelper.syncIncomingTipsFromOperationsJson(
-                        appCtx,
-                        body
-                    )
+                activity?.runOnUiThread {
+                    pendingNotifyOperationsJson = body
+                    trySyncTopUpNotifications(appCtx)
                 }
             }
         })
+    }
+
+    /** Сначала пооперационные пуши, затем обновление базы — иначе дельта уходит одной суммой. */
+    private fun trySyncTopUpNotifications(appCtx: Context) {
+        val stats = pendingNotifyStats ?: return
+        val operationsJson = pendingNotifyOperationsJson ?: return
+        runCatching {
+            BalanceNotificationHelper.syncIncomingTipsFromOperationsJson(
+                appCtx,
+                operationsJson,
+                stats.totalGuestPaidTipsKop,
+            )
+            BalanceNotificationHelper.showIfNeeded(
+                appCtx,
+                stats.balanceKop,
+                stats.totalGuestPaidTipsKop,
+            )
+        }
     }
 
     private fun bindLimits(

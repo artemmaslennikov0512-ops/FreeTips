@@ -86,7 +86,7 @@ private fun parseOperationsResponseSafe(json: String): OperationsResponse {
         val createdAt = obj.stringOrEmpty("createdAt")
         val amountKop = obj.get("amountKop").asLongSafe() ?: return@mapNotNull null
         val feeKop = obj.get("feeKop").asLongSafe() ?: 0L
-        val tipNetKop = obj.get("tipNetKop").asLongSafe()
+        val tipNetKop = obj.get("tipNetKop").asLongSafe()?.takeIf { it > 0L }
         if (id.isEmpty() || createdAt.isEmpty()) return@mapNotNull null
         val type = if (typeRaw == "tip") "tip" else "payout"
         OperationItem(
@@ -94,7 +94,7 @@ private fun parseOperationsResponseSafe(json: String): OperationsResponse {
             type = type,
             amountKop = amountKop.coerceAtLeast(0L),
             feeKop = feeKop.coerceAtLeast(0L),
-            tipNetKop = tipNetKop?.coerceAtLeast(0L),
+            tipNetKop = tipNetKop,
             status = statusRaw.ifEmpty { "UNKNOWN" },
             createdAt = createdAt,
         )
@@ -317,9 +317,13 @@ class TransactionsFragment : Fragment() {
     }
 }
 
-private fun tipNetKopForDisplay(op: OperationItem): Long =
-    if (op.type != "tip") op.amountKop
-    else op.tipNetKop ?: (op.amountKop - op.feeKop).coerceAtLeast(0L)
+/** Нетто для истории: tipNetKop с API, иначе amount − fee; 0 из API не используем. */
+private fun tipNetKopForDisplay(op: OperationItem): Long {
+    if (op.type != "tip") return op.amountKop
+    val fee = op.feeKop.coerceAtLeast(0L)
+    val net = op.tipNetKop ?: (op.amountKop - fee).coerceAtLeast(0L)
+    return net.takeIf { it > 0L } ?: op.amountKop
+}
 
 class OpAdapter(private val items: List<OperationItem>) : RecyclerView.Adapter<OpAdapter.VH>() {
     class VH(val binding: ItemTransactionBinding) : RecyclerView.ViewHolder(binding.root)

@@ -59,7 +59,9 @@ const toTipRow = (
     t.recipientFeeChargedKop ??
       (t.feeKop ?? BigInt(0)),
   ),
-  ...(t.recipientCreditedKop != null ? { tipNetKop: Number(t.recipientCreditedKop) } : {}),
+  ...(t.recipientCreditedKop != null && t.recipientCreditedKop > BigInt(0)
+    ? { tipNetKop: Number(t.recipientCreditedKop) }
+    : {}),
   status: t.status,
   ...(t.link && {
     linkSlug: t.link.slug,

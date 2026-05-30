@@ -17,6 +17,7 @@ import {
 import { ADMIN_PANEL_STATE_CENTER } from "@/lib/admin-surface-classes";
 import { PANEL_PAGE_TITLE_ADMIN } from "@/lib/panel-shell-visual-classes";
 import { fetchWithAuth } from "@/lib/auth-client";
+import { parseBulkUserIdTokens } from "@/lib/parse-bulk-user-id-tokens";
 
 interface User {
   id: string;
@@ -337,11 +338,7 @@ export default function AdminUsersPage() {
   };
 
   const handleBulkVerify = async () => {
-    const parsedIds = bulkVerifyInput
-      .split(/[\s,;]+/)
-      .map((v) => v.trim())
-      .filter(Boolean);
-    const uniqIds = Array.from(new Set(parsedIds));
+    const uniqIds = parseBulkUserIdTokens(bulkVerifyInput);
 
     if (uniqIds.length === 0) {
       setBulkVerifyError("Вставьте хотя бы один ID");
@@ -469,13 +466,13 @@ export default function AdminUsersPage() {
           Массовая верификация официантов по списку ID
         </div>
         <p className="mb-3 text-xs text-[var(--color-text-secondary)]">
-          Вставьте ID через перенос строки, запятую или пробел. Поддерживаются `user.id`
-          и числовой `uniqueId`.
+          Вставьте ID через перенос строки, запятую или пробел. Поддерживаются код официанта
+          (`000-123`), числовой ID из таблицы (можно с `#`), `user.id`, логин.
         </p>
         <textarea
           value={bulkVerifyInput}
           onChange={(e) => setBulkVerifyInput(e.target.value)}
-          placeholder={"Например:\n123\n456\ncmabc123..."}
+          placeholder={"Например:\n000-123\n000-456\n#789\nlogin_name"}
           rows={5}
           className="mb-3 w-full rounded-lg border border-[var(--color-brand-gold)]/20 bg-[var(--color-bg-sides)] px-3 py-2 font-mono text-xs text-[var(--color-text)] placeholder:text-[var(--color-muted)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-gold)]/40"
         />
@@ -489,16 +486,7 @@ export default function AdminUsersPage() {
             {bulkVerifyLoading ? "Подтверждаем..." : "Подтвердить верификацию по списку"}
           </button>
           <span className="text-xs text-[var(--color-text-secondary)]">
-            Найдено ID: {
-              Array.from(
-                new Set(
-                  bulkVerifyInput
-                    .split(/[\s,;]+/)
-                    .map((v) => v.trim())
-                    .filter(Boolean),
-                ),
-              ).length
-            }
+            Найдено ID: {parseBulkUserIdTokens(bulkVerifyInput).length}
           </span>
         </div>
         {bulkVerifyError && (
@@ -511,8 +499,13 @@ export default function AdminUsersPage() {
             <div>Обработано: {bulkVerifyResult.processed}</div>
             <div>Подтверждено: {bulkVerifyResult.verifiedCount}</div>
             <div>Уже были верифицированы: {bulkVerifyResult.alreadyVerifiedCount}</div>
-            <div>Не официанты: {bulkVerifyResult.notEmployeeCount}</div>
+            <div>Пропущено (суперадмин): {bulkVerifyResult.notEmployeeCount}</div>
             <div>Не найдены: {bulkVerifyResult.notFoundCount}</div>
+            {bulkVerifyResult.notFound.length > 0 && (
+              <div className="mt-1 break-all font-mono text-[var(--color-text-secondary)]">
+                {bulkVerifyResult.notFound.join(", ")}
+              </div>
+            )}
           </div>
         )}
       </div>

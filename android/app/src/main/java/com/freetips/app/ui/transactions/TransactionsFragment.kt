@@ -37,6 +37,8 @@ data class OperationItem(
     val id: String,
     val type: String,
     val amountKop: Long,
+    val feeKop: Long = 0L,
+    val tipNetKop: Long? = null,
     val status: String,
     val createdAt: String
 )
@@ -83,12 +85,16 @@ private fun parseOperationsResponseSafe(json: String): OperationsResponse {
         val statusRaw = obj.stringOrEmpty("status").uppercase()
         val createdAt = obj.stringOrEmpty("createdAt")
         val amountKop = obj.get("amountKop").asLongSafe() ?: return@mapNotNull null
+        val feeKop = obj.get("feeKop").asLongSafe() ?: 0L
+        val tipNetKop = obj.get("tipNetKop").asLongSafe()
         if (id.isEmpty() || createdAt.isEmpty()) return@mapNotNull null
         val type = if (typeRaw == "tip") "tip" else "payout"
         OperationItem(
             id = id,
             type = type,
             amountKop = amountKop.coerceAtLeast(0L),
+            feeKop = feeKop.coerceAtLeast(0L),
+            tipNetKop = tipNetKop?.coerceAtLeast(0L),
             status = statusRaw.ifEmpty { "UNKNOWN" },
             createdAt = createdAt,
         )
@@ -215,7 +221,10 @@ class TransactionsFragment : Fragment() {
         val filtered = if (fromKop == 0L && toKop == Long.MAX_VALUE) {
             allOperations
         } else {
-            allOperations.filter { it.amountKop in fromKop..toKop }
+            allOperations.filter { op ->
+                val kop = if (op.type == "tip") tipNetKopForDisplay(op) else op.amountKop
+                kop in fromKop..toKop
+            }
         }
         b.recycler.adapter = OpAdapter(filtered)
     }
@@ -323,6 +332,10 @@ class TransactionsFragment : Fragment() {
     }
 }
 
+private fun tipNetKopForDisplay(op: OperationItem): Long =
+    if (op.type != "tip") op.amountKop
+    else op.tipNetKop ?: (op.amountKop - op.feeKop).coerceAtLeast(0L)
+
 class OpAdapter(private val items: List<OperationItem>) : RecyclerView.Adapter<OpAdapter.VH>() {
     class VH(val binding: ItemTransactionBinding) : RecyclerView.ViewHolder(binding.root)
 
@@ -332,7 +345,8 @@ class OpAdapter(private val items: List<OperationItem>) : RecyclerView.Adapter<O
     override fun onBindViewHolder(holder: VH, position: Int) {
         runCatching {
             val op = items[position]
-            val rub = op.amountKop.toDouble() / 100.0
+            val kop = if (op.type == "payout") op.amountKop else tipNetKopForDisplay(op)
+            val rub = kop.toDouble() / 100.0
             val displayRub = if (op.type == "payout") -rub else rub
             holder.binding.amount.text = com.freetips.app.util.formatRub(displayRub, signed = true)
             holder.binding.typeLabel.text = typeLabel(op)

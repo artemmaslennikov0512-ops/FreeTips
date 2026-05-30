@@ -13,7 +13,8 @@ import com.google.gson.JsonObject
 
 /**
  * Уведомления о пополнении: один SUCCESS tip — один пуш и одна запись в колокольчике.
- * Уже отправленные tip-id хранятся в SharedPreferences, повторов при повторном входе нет.
+ * Сумма в пуше — amountKop (сколько заплатил гость, напр. 100 ₽).
+ * В истории операций показывается tipNetKop (нетто после комиссии, напр. 97,50 ₽).
  */
 object BalanceNotificationHelper {
 
@@ -41,9 +42,22 @@ object BalanceNotificationHelper {
     data class TipOperation(
         val id: String,
         val amountKop: Int,
+        val feeKop: Int = 0,
+        val tipNetKop: Int? = null,
         val status: String,
         val createdAtMillis: Long = System.currentTimeMillis(),
     )
+
+    /**
+     * Пуш: сколько заплатил гость (100 ₽), не нетто на баланс (97,50 ₽).
+     * Берём max(amountKop, tipNetKop + feeKop) — на случай если в API amount ещё без fee.
+     */
+    private fun displayKopForPush(tip: TipOperation): Int {
+        val fee = tip.feeKop.coerceAtLeast(0)
+        val net = tip.tipNetKop ?: (tip.amountKop - fee).coerceAtLeast(0)
+        val gross = maxOf(tip.amountKop, net + fee)
+        return kotlin.math.round(gross / 100.0).toInt() * 100
+    }
 
     /** Обновляет базу totalGuestPaidTipsKop; пуши не шлёт. */
     fun showIfNeeded(
@@ -130,7 +144,7 @@ object BalanceNotificationHelper {
                 .asReversed()
 
             for (tip in pending) {
-                val displayKop = kotlin.math.round(tip.amountKop / 100.0).toInt() * 100
+                val displayKop = displayKopForPush(tip)
                 if (displayKop <= 0) {
                     notifiedIds.add(tip.id)
                     continue
@@ -159,11 +173,15 @@ object BalanceNotificationHelper {
             val amount = amountRaw?.toLongOrNull()
                 ?: runCatching { obj.get("amountKop")?.asLong }.getOrNull()
                 ?: 0L
+            val feeKop = parseLongField(obj, "feeKop")?.coerceAtMost(Int.MAX_VALUE.toLong())?.toInt() ?: 0
+            val tipNetKop = parseLongField(obj, "tipNetKop")?.coerceAtMost(Int.MAX_VALUE.toLong())?.toInt()
             val createdAtMillis = parseCreatedAtMillis(obj.get("createdAt"))
             if (type != "tip" || status != "SUCCESS" || id.isEmpty() || amount <= 0L) return@mapNotNull null
             TipOperation(
                 id = id,
                 amountKop = amount.coerceAtMost(Int.MAX_VALUE.toLong()).toInt(),
+                feeKop = feeKop,
+                tipNetKop = tipNetKop,
                 status = status,
                 createdAtMillis = createdAtMillis,
             )
@@ -215,7 +233,10 @@ object BalanceNotificationHelper {
             }
             val amountKop = obj.get("amountKop")?.takeIf { it.isJsonPrimitive }?.asInt ?: continue
             val matchIdx = unmatchedTips.indexOfFirst { tip ->
-                kotlin.math.round(tip.amountKop / 100.0).toInt() * 100 == amountKop
+                val pushKop = displayKopForPush(tip)
+                val netKop = tip.tipNetKop
+                    ?: (tip.amountKop - tip.feeKop.coerceAtLeast(0)).coerceAtLeast(0)
+                pushKop == amountKop || netKop == amountKop
             }
             if (matchIdx < 0) continue
             val match = unmatchedTips.removeAt(matchIdx)
@@ -241,6 +262,17 @@ object BalanceNotificationHelper {
             .putBoolean(KEY_TIPS_BOOTSTRAP_DONE, prefs.getInt(KEY_BASIS_SCHEMA, 0) >= SCHEMA_GUEST_PAID_ONLY)
             .putInt(KEY_BASIS_SCHEMA, SCHEMA_TIP_ID_DEDUP)
             .apply()
+    }
+
+    private fun parseLongField(obj: JsonObject, name: String): Long? {
+        val el = obj.get(name) ?: return null
+        if (!el.isJsonPrimitive) return null
+        val p = el.asJsonPrimitive
+        return when {
+            p.isNumber -> p.asLong
+            p.isString -> p.asString.trim().toLongOrNull()
+            else -> null
+        }
     }
 
     private fun parseCreatedAtMillis(element: com.google.gson.JsonElement?): Long {

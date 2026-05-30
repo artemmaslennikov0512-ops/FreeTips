@@ -80,12 +80,14 @@ class LinksFragment : Fragment() {
                 }
             }
             override fun onResponse(call: Call, response: Response) {
+                val body = response.body?.string() ?: ""
+                val code = response.code
+                val ok = response.isSuccessful
                 activity?.runOnUiThread {
                     val ui = _binding ?: return@runOnUiThread
                     ui.progress.visibility = View.GONE
                     ui.swipeRefresh.isRefreshing = false
-                    if (response.isSuccessful) {
-                        val body = response.body?.string() ?: ""
+                    if (ok) {
                         try {
                             @Suppress("UNCHECKED_CAST")
                             val links = (Gson().fromJson(body, Map::class.java)["links"] as? List<*>)?.map { it as Map<*, *> } ?: emptyList()
@@ -114,7 +116,7 @@ class LinksFragment : Fragment() {
                         ui.qrTitle.visibility = View.GONE
                         ui.qrCard.visibility = View.GONE
                         ui.errorText.visibility = View.VISIBLE
-                        ui.errorText.text = "Ошибка ${response.code}"
+                        ui.errorText.text = "Ошибка $code"
                     }
                 }
             }

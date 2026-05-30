@@ -6,10 +6,9 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.freetips.app.data.ApiClient
 import com.freetips.app.data.SecurePrefs
-import com.freetips.app.ui.home.ProfileResponse
+import com.freetips.app.ui.home.parseProfileResponseSafe
 import com.freetips.app.util.BalanceCache
 import com.freetips.app.util.BalanceNotificationHelper
-import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.IOException
@@ -44,7 +43,10 @@ class BalanceRefreshWorker(
                 BalanceRefreshScheduler.scheduleNext(applicationContext)
                 return@withContext Result.success()
             }
-            val profile = Gson().fromJson(body, ProfileResponse::class.java)
+            val profile = parseProfileResponseSafe(body) ?: run {
+                BalanceRefreshScheduler.scheduleNext(applicationContext)
+                return@withContext Result.success()
+            }
             val stats = profile.stats ?: run {
                 BalanceRefreshScheduler.scheduleNext(applicationContext)
                 return@withContext Result.success()
@@ -55,6 +57,16 @@ class BalanceRefreshWorker(
                 stats.balanceKop,
                 stats.totalGuestPaidTipsKop,
             )
+            // Подтягиваем пропущенные "пооперационные" уведомления при фоновом обновлении.
+            runCatching {
+                val opsResponse = ApiClient(apiKey, prefs.effectiveBaseUrl).getOperations(50, 0).execute()
+                if (opsResponse.isSuccessful) {
+                    val opsBody = opsResponse.body?.string() ?: ""
+                    if (opsBody.isNotBlank()) {
+                        BalanceNotificationHelper.syncIncomingTipsFromOperationsJson(applicationContext, opsBody)
+                    }
+                }
+            }
             BalanceCache.save(applicationContext, stats.balanceKop)
             applicationContext.sendBroadcast(Intent(ACTION_BALANCE_UPDATED).setPackage(applicationContext.packageName))
             BalanceRefreshScheduler.scheduleNext(applicationContext)

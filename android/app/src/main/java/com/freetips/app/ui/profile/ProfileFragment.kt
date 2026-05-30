@@ -52,25 +52,29 @@ class ProfileFragment : Fragment() {
         ApiClient(apiKey, prefs.effectiveBaseUrl).getProfile().enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 activity?.runOnUiThread {
-                    binding.swipeRefresh.isRefreshing = false
-                    binding.errorText.visibility = View.VISIBLE
-                    binding.errorText.text = "Ошибка загрузки"
+                    val ui = _binding ?: return@runOnUiThread
+                    ui.swipeRefresh.isRefreshing = false
+                    ui.errorText.visibility = View.VISIBLE
+                    ui.errorText.text = "Ошибка загрузки"
                 }
             }
             override fun onResponse(call: Call, response: Response) {
+                val body = response.body?.string() ?: ""
+                val code = response.code
+                val ok = response.isSuccessful
                 activity?.runOnUiThread {
-                    binding.swipeRefresh.isRefreshing = false
-                    if (response.isSuccessful) {
-                        val body = response.body?.string() ?: ""
+                    val ui = _binding ?: return@runOnUiThread
+                    ui.swipeRefresh.isRefreshing = false
+                    if (ok) {
                         try {
                             val data = Gson().fromJson(body, ProfileData::class.java)
-                            binding.loginText.text = "Логин: ${data.login ?: "—"}"
-                            binding.emailText.text = data.email ?: "—"
-                            binding.fullNameText.text = data.fullName ?: "—"
+                            ui.loginText.text = "Логин: ${data.login ?: "—"}"
+                            ui.emailText.text = data.email ?: "—"
+                            ui.fullNameText.text = data.fullName ?: "—"
                         } catch (_: Exception) {}
                     } else {
-                        binding.errorText.visibility = View.VISIBLE
-                        binding.errorText.text = "Ошибка ${response.code}"
+                        ui.errorText.visibility = View.VISIBLE
+                        ui.errorText.text = "Ошибка $code"
                     }
                 }
             }

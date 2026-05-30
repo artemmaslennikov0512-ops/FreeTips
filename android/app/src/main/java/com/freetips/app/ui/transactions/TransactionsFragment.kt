@@ -25,13 +25,21 @@ import com.freetips.app.util.MoscowDateTime
 import com.freetips.app.util.formatKopToRub
 import com.freetips.app.worker.BalanceRefreshWorker
 import com.google.gson.Gson
+import com.google.gson.JsonElement
+import com.google.gson.JsonObject
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.Response
 import java.io.IOException
 
 data class OperationsResponse(val operations: List<OperationItem>, val total: Int)
-data class OperationItem(val id: String, val type: String, val amountKop: Int, val status: String, val createdAt: String)
+data class OperationItem(
+    val id: String,
+    val type: String,
+    val amountKop: Long,
+    val status: String,
+    val createdAt: String
+)
 
 private fun statusKind(op: OperationItem): String {
     if (op.type == "tip") {
@@ -46,6 +54,48 @@ private fun statusKind(op: OperationItem): String {
 
 private fun typeLabel(op: OperationItem): String =
     if (op.type == "tip") "Пополнение" else "Списание"
+
+private fun JsonObject.stringOrEmpty(name: String): String =
+    this.get(name)?.takeIf { it.isJsonPrimitive }?.asString?.trim().orEmpty()
+
+private fun JsonElement?.asLongSafe(): Long? {
+    if (this == null || !this.isJsonPrimitive) return null
+    val primitive = this.asJsonPrimitive
+    return when {
+        primitive.isNumber -> primitive.asBigDecimal.toLong()
+        primitive.isString -> primitive.asString.trim().toLongOrNull()
+        else -> null
+    }
+}
+
+private fun parseOperationsResponseSafe(json: String): OperationsResponse {
+    val root = runCatching { Gson().fromJson(json, JsonObject::class.java) }.getOrNull()
+        ?: return OperationsResponse(emptyList(), 0)
+    val total = runCatching {
+        root.get("total")?.let { if (it.isJsonPrimitive) it.asInt else 0 } ?: 0
+    }.getOrDefault(0)
+    val operationsArray = root.getAsJsonArray("operations") ?: return OperationsResponse(emptyList(), total)
+
+    val operations = operationsArray.mapNotNull { el ->
+        val obj = el?.takeIf { it.isJsonObject }?.asJsonObject ?: return@mapNotNull null
+        val id = obj.stringOrEmpty("id")
+        val typeRaw = obj.stringOrEmpty("type").lowercase()
+        val statusRaw = obj.stringOrEmpty("status").uppercase()
+        val createdAt = obj.stringOrEmpty("createdAt")
+        val amountKop = obj.get("amountKop").asLongSafe() ?: return@mapNotNull null
+        if (id.isEmpty() || createdAt.isEmpty()) return@mapNotNull null
+        val type = if (typeRaw == "tip") "tip" else "payout"
+        OperationItem(
+            id = id,
+            type = type,
+            amountKop = amountKop.coerceAtLeast(0L),
+            status = statusRaw.ifEmpty { "UNKNOWN" },
+            createdAt = createdAt,
+        )
+    }
+
+    return OperationsResponse(operations, total)
+}
 
 class TransactionsFragment : Fragment() {
 
@@ -219,6 +269,7 @@ class TransactionsFragment : Fragment() {
                 }
             }
             override fun onResponse(call: Call, response: Response) {
+                val body = runCatching { response.body?.string().orEmpty() }.getOrDefault("")
                 activity?.runOnUiThread {
                     val ui = _binding ?: return@runOnUiThread
                     if (!silent) {
@@ -226,10 +277,13 @@ class TransactionsFragment : Fragment() {
                         ui.swipeRefresh.isRefreshing = false
                     }
                     if (response.isSuccessful) {
-                        val body = response.body?.string() ?: ""
                         try {
-                            val data = Gson().fromJson(body, OperationsResponse::class.java)
+                            val data = parseOperationsResponseSafe(body)
                             allOperations = data.operations
+                                com.freetips.app.util.BalanceNotificationHelper.syncIncomingTipsFromOperationsJson(
+                                    ui.root.context.applicationContext,
+                                    body
+                                )
                             applyFilter()
                         } catch (_: Exception) {}
                     } else {
@@ -260,18 +314,25 @@ class OpAdapter(private val items: List<OperationItem>) : RecyclerView.Adapter<O
         VH(ItemTransactionBinding.inflate(LayoutInflater.from(parent.context), parent, false))
 
     override fun onBindViewHolder(holder: VH, position: Int) {
-        val op = items[position]
-        val rub = op.amountKop / 100.0
-        val displayRub = if (op.type == "payout") -rub else rub
-        holder.binding.amount.text = com.freetips.app.util.formatRub(displayRub, signed = true)
-        holder.binding.typeLabel.text = typeLabel(op)
-        holder.binding.date.text = MoscowDateTime.formatOperationCreatedAt(op.createdAt)
-        val iconRes = when (statusKind(op)) {
-            "success" -> R.drawable.ic_status_success
-            "pending" -> R.drawable.ic_status_pending
-            else -> R.drawable.ic_status_failed
+        runCatching {
+            val op = items[position]
+            val rub = op.amountKop.toDouble() / 100.0
+            val displayRub = if (op.type == "payout") -rub else rub
+            holder.binding.amount.text = com.freetips.app.util.formatRub(displayRub, signed = true)
+            holder.binding.typeLabel.text = typeLabel(op)
+            holder.binding.date.text = MoscowDateTime.formatOperationCreatedAt(op.createdAt)
+            val iconRes = when (statusKind(op)) {
+                "success" -> R.drawable.ic_status_success
+                "pending" -> R.drawable.ic_status_pending
+                else -> R.drawable.ic_status_failed
+            }
+            holder.binding.statusIcon.setImageResource(iconRes)
+        }.onFailure {
+            holder.binding.amount.text = "0.00 ₽"
+            holder.binding.typeLabel.text = "Операция"
+            holder.binding.date.text = ""
+            holder.binding.statusIcon.setImageResource(R.drawable.ic_status_failed)
         }
-        holder.binding.statusIcon.setImageResource(iconRes)
     }
 
     override fun getItemCount(): Int = items.size

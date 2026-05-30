@@ -17,13 +17,52 @@ import com.freetips.app.databinding.FragmentPayoutsBinding
 import com.freetips.app.databinding.ItemPayoutBinding
 import com.freetips.app.util.MoscowDateTime
 import com.google.gson.Gson
+import com.google.gson.JsonElement
+import com.google.gson.JsonObject
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.Response
 import java.io.IOException
 
-data class PayoutsResponse(val payouts: List<PayoutItem>, val balanceKop: Int)
-data class PayoutItem(val id: String, val amountKop: Int, val status: String, val createdAt: String, val details: String)
+data class PayoutsResponse(val payouts: List<PayoutItem>, val balanceKop: Long)
+data class PayoutItem(
+    val id: String,
+    val amountKop: Long,
+    val status: String,
+    val createdAt: String,
+    val details: String?
+)
+
+private fun JsonObject.stringOrEmpty(name: String): String =
+    this.get(name)?.takeIf { it.isJsonPrimitive }?.asString?.trim().orEmpty()
+
+private fun JsonElement?.asLongSafe(): Long? {
+    if (this == null || !this.isJsonPrimitive) return null
+    val p = this.asJsonPrimitive
+    return when {
+        p.isNumber -> p.asBigDecimal.toLong()
+        p.isString -> p.asString.trim().toLongOrNull()
+        else -> null
+    }
+}
+
+private fun parsePayoutsResponseSafe(json: String): PayoutsResponse {
+    val root = runCatching { Gson().fromJson(json, JsonObject::class.java) }.getOrNull()
+        ?: return PayoutsResponse(emptyList(), 0L)
+    val balanceKop = root.get("balanceKop").asLongSafe() ?: 0L
+    val payoutsArray = root.getAsJsonArray("payouts") ?: return PayoutsResponse(emptyList(), balanceKop)
+    val payouts = payoutsArray.mapNotNull { el ->
+        val obj = el?.takeIf { it.isJsonObject }?.asJsonObject ?: return@mapNotNull null
+        val id = obj.stringOrEmpty("id")
+        val amountKop = obj.get("amountKop").asLongSafe() ?: return@mapNotNull null
+        val status = obj.stringOrEmpty("status").uppercase().ifEmpty { "UNKNOWN" }
+        val createdAt = obj.stringOrEmpty("createdAt")
+        val details = obj.get("details")?.takeIf { it.isJsonPrimitive }?.asString
+        if (id.isEmpty() || createdAt.isEmpty()) return@mapNotNull null
+        PayoutItem(id = id, amountKop = amountKop.coerceAtLeast(0L), status = status, createdAt = createdAt, details = details)
+    }
+    return PayoutsResponse(payouts, balanceKop)
+}
 
 class PayoutsFragment : Fragment() {
 
@@ -67,20 +106,22 @@ class PayoutsFragment : Fragment() {
             }
 
             override fun onResponse(call: Call, response: Response) {
+                val body = response.body?.string() ?: ""
+                val code = response.code
+                val ok = response.isSuccessful
                 activity?.runOnUiThread {
                     val ui = _binding ?: return@runOnUiThread
                     ui.progress.visibility = View.GONE
                     ui.swipeRefresh.isRefreshing = false
-                    if (response.isSuccessful) {
-                        val body = response.body?.string() ?: ""
+                    if (ok) {
                         try {
-                            val data = Gson().fromJson(body, PayoutsResponse::class.java)
+                            val data = parsePayoutsResponseSafe(body)
                             ui.virtualCardInclude.cardBalance.text = formatKop(data.balanceKop)
                             ui.recycler.adapter = PayoutAdapter(data.payouts)
                         } catch (_: Exception) {}
                     } else {
                         ui.errorText.visibility = View.VISIBLE
-                        ui.errorText.text = "Ошибка ${response.code}"
+                        ui.errorText.text = "Ошибка $code"
                     }
                 }
             }
@@ -116,12 +157,19 @@ class PayoutsFragment : Fragment() {
                         activity?.runOnUiThread { Toast.makeText(requireContext(), "Ошибка сети", Toast.LENGTH_SHORT).show() }
                     }
                     override fun onResponse(call: Call, response: Response) {
+                        val ok = response.isSuccessful
+                        val err = if (!ok) {
+                            response.body?.string()
+                                ?.let { Gson().fromJson(it, Map::class.java)?.get("error")?.toString() }
+                                ?: "Ошибка"
+                        } else {
+                            ""
+                        }
                         activity?.runOnUiThread {
-                            if (response.isSuccessful) {
+                            if (ok) {
                                 Toast.makeText(requireContext(), "Заявка создана", Toast.LENGTH_SHORT).show()
                                 loadPayouts()
                             } else {
-                                val err = response.body?.string()?.let { Gson().fromJson(it, Map::class.java)?.get("error")?.toString() } ?: "Ошибка"
                                 Toast.makeText(requireContext(), err, Toast.LENGTH_LONG).show()
                             }
                         }
@@ -132,7 +180,7 @@ class PayoutsFragment : Fragment() {
             .show()
     }
 
-    private fun formatKop(kop: Int): String = com.freetips.app.util.formatKopToRub(kop)
+    private fun formatKop(kop: Long): String = com.freetips.app.util.formatKopToRub(kop)
 
     override fun onDestroyView() {
         _binding = null

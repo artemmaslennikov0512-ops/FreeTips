@@ -21,6 +21,8 @@ import com.freetips.app.util.BalanceCache
 import com.freetips.app.util.BalanceNotificationHelper
 import com.freetips.app.util.formatKopToRub
 import com.google.gson.Gson
+import com.google.gson.JsonElement
+import com.google.gson.JsonObject
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.Response
@@ -54,6 +56,84 @@ data class PayoutUsage(
     val count: Int,
     val sumKop: Long
 )
+
+private fun Long.saturatedToInt(): Int = when {
+    this > Int.MAX_VALUE.toLong() -> Int.MAX_VALUE
+    this < Int.MIN_VALUE.toLong() -> Int.MIN_VALUE
+    else -> this.toInt()
+}
+
+private fun JsonElement?.asLongSafe(): Long? {
+    if (this == null || !this.isJsonPrimitive) return null
+    val p = this.asJsonPrimitive
+    return when {
+        p.isNumber -> p.asBigDecimal.toLong()
+        p.isString -> p.asString.trim().toLongOrNull()
+        else -> null
+    }
+}
+
+private fun JsonElement?.asStringSafe(): String? {
+    if (this == null || !this.isJsonPrimitive) return null
+    return this.asString
+}
+
+fun parseProfileResponseSafe(json: String): ProfileResponse? {
+    val root = runCatching { Gson().fromJson(json, JsonObject::class.java) }.getOrNull() ?: return null
+    val statsObj = root.getAsJsonObject("stats")
+    val stats = if (statsObj != null) {
+        Stats(
+            balanceKop = (statsObj.get("balanceKop").asLongSafe() ?: 0L).saturatedToInt(),
+            totalReceivedKop = (statsObj.get("totalReceivedKop").asLongSafe() ?: 0L).saturatedToInt(),
+            totalGuestPaidTipsKop = (statsObj.get("totalGuestPaidTipsKop").asLongSafe() ?: 0L).saturatedToInt(),
+            transactionsCount = (statsObj.get("transactionsCount").asLongSafe() ?: 0L).saturatedToInt(),
+            payoutsPendingCount = (statsObj.get("payoutsPendingCount").asLongSafe() ?: 0L).saturatedToInt(),
+        )
+    } else {
+        null
+    }
+
+    val limitsObj = root.getAsJsonObject("payoutLimits")
+    val limits = if (limitsObj != null) {
+        PayoutLimits(
+            dailyLimitCount = (limitsObj.get("dailyLimitCount").asLongSafe() ?: 0L).saturatedToInt(),
+            dailyLimitKop = limitsObj.get("dailyLimitKop").asLongSafe() ?: 0L,
+            monthlyLimitCount = limitsObj.get("monthlyLimitCount").asLongSafe()?.saturatedToInt(),
+            monthlyLimitKop = limitsObj.get("monthlyLimitKop").asLongSafe(),
+        )
+    } else {
+        null
+    }
+
+    val usageTodayObj = root.getAsJsonObject("payoutUsageToday")
+    val usageToday = if (usageTodayObj != null) {
+        PayoutUsage(
+            count = (usageTodayObj.get("count").asLongSafe() ?: 0L).saturatedToInt(),
+            sumKop = usageTodayObj.get("sumKop").asLongSafe() ?: 0L,
+        )
+    } else {
+        null
+    }
+
+    val usageMonthObj = root.getAsJsonObject("payoutUsageMonth")
+    val usageMonth = if (usageMonthObj != null) {
+        PayoutUsage(
+            count = (usageMonthObj.get("count").asLongSafe() ?: 0L).saturatedToInt(),
+            sumKop = usageMonthObj.get("sumKop").asLongSafe() ?: 0L,
+        )
+    } else {
+        null
+    }
+
+    return ProfileResponse(
+        stats = stats,
+        fullName = root.get("fullName").asStringSafe(),
+        login = root.get("login").asStringSafe(),
+        payoutLimits = limits,
+        payoutUsageToday = usageToday,
+        payoutUsageMonth = usageMonth,
+    )
+}
 
 class HomeFragment : Fragment() {
 
@@ -182,7 +262,7 @@ class HomeFragment : Fragment() {
                         }
                         if (ok) {
                             try {
-                                val profile = Gson().fromJson(body, ProfileResponse::class.java)
+                                val profile = parseProfileResponseSafe(body) ?: return@let
                                 val s = profile.stats
                                 if (s != null) {
                                     b.virtualCardInclude.cardBalance.text = formatKopToRub(s.balanceKop)
@@ -200,6 +280,25 @@ class HomeFragment : Fragment() {
                             b.errorText.text = "Ошибка $code"
                         }
                     }
+                }
+            }
+        })
+
+        // Подтягиваем пропущенные входящие транзакции для колокольчика даже без открытия "Истории".
+        ApiClient(apiKey, prefs.effectiveBaseUrl).getOperations(50, 0).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                // Тихий фоновый sync уведомлений: отсутствие сети не блокирует экран.
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                val body = response.body?.string() ?: ""
+                if (!response.isSuccessful || body.isBlank()) return
+                val appCtx = context?.applicationContext ?: return
+                runCatching {
+                    BalanceNotificationHelper.syncIncomingTipsFromOperationsJson(
+                        appCtx,
+                        body
+                    )
                 }
             }
         })

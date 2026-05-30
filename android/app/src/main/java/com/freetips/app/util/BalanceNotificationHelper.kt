@@ -8,6 +8,8 @@ import androidx.core.app.NotificationManagerCompat
 import com.freetips.app.App
 import com.freetips.app.MainActivity
 import com.freetips.app.R
+import com.google.gson.JsonArray
+import com.google.gson.JsonObject
 
 /**
  * Уведомления только о пополнении (с суммой): в шторку и в список по колокольчику.
@@ -22,15 +24,20 @@ object BalanceNotificationHelper {
     private const val KEY_LAST_BALANCE_KOP = "last_balance_kop"
     private const val KEY_ITEMS_JSON = "notification_items_json"
     private const val KEY_LAST_VIEWED_MILLIS = "last_viewed_millis"
+    private const val KEY_SEEN_TIP_IDS_JSON = "seen_tip_ids_json"
     /**
      * v2: только totalGuestPaidTipsKop (без fallback на totalReceivedKop — иначе два пуша: 50 ₽ + 1 ₽).
      */
     private const val KEY_BASIS_SCHEMA = "notify_basis_schema"
     private const val SCHEMA_GUEST_PAID_ONLY = 2
+    private const val SCHEMA_PER_TRANSACTION = 3
     private const val MAX_ITEMS = 100
+    private const val MAX_SEEN_TIP_IDS = 500
     private const val NOTIFICATION_ID_TOPUP = 1
 
     private val lock = Any()
+
+    data class TipOperation(val id: String, val amountKop: Int, val status: String)
 
     /**
      * @param totalGuestPaidTipsKop с сервера (amount Register + fee по карте/СБП по вашим SUCCESS).
@@ -76,6 +83,74 @@ object BalanceNotificationHelper {
                 .putInt(KEY_LAST_BALANCE_KOP, balanceKop)
                 .apply()
         }
+    }
+
+    /**
+     * Пооперационная синхронизация пополнений для колокольчика.
+     * На первом запуске только "семплируем" уже существующие tip-id без пушей, чтобы не заспамить.
+     */
+    fun syncIncomingTips(context: Context, tips: List<TipOperation>) {
+        synchronized(lock) {
+            val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            val normalized = tips
+                .asSequence()
+                .filter { it.status == "SUCCESS" }
+                .filter { it.id.isNotBlank() && it.amountKop > 0 }
+                .toList()
+            if (normalized.isEmpty()) return
+
+            val seenIds = getSeenTipIds(prefs).toMutableList()
+            val seenSet = seenIds.toMutableSet()
+            val schema = prefs.getInt(KEY_BASIS_SCHEMA, 0)
+            if (schema < SCHEMA_PER_TRANSACTION) {
+                // Первая инициализация: запоминаем текущие операции без уведомлений.
+                for (tip in normalized) {
+                    if (seenSet.add(tip.id)) seenIds.add(0, tip.id)
+                }
+                trimSeenIds(seenIds)
+                saveSeenTipIds(prefs, seenIds)
+                prefs.edit().putInt(KEY_BASIS_SCHEMA, SCHEMA_PER_TRANSACTION).apply()
+                return
+            }
+
+            // История обычно приходит в порядке "сначала новые", поэтому уведомляем в обратном порядке.
+            val newTips = normalized.filter { !seenSet.contains(it.id) }.asReversed()
+            for (tip in newTips) {
+                if (seenSet.add(tip.id)) {
+                    val displayKop = kotlin.math.round(tip.amountKop / 100.0).toInt() * 100
+                    if (displayKop > 0) {
+                        showTopUpAndSave(context, displayKop)
+                    }
+                    seenIds.add(0, tip.id)
+                }
+            }
+            trimSeenIds(seenIds)
+            saveSeenTipIds(prefs, seenIds)
+        }
+    }
+
+    /** Удобный адаптер: забрать SUCCESS tip-операции из JSON /api/operations и синхронизировать уведомления. */
+    fun syncIncomingTipsFromOperationsJson(context: Context, operationsJson: String) {
+        val root = runCatching { com.google.gson.Gson().fromJson(operationsJson, JsonObject::class.java) }.getOrNull()
+            ?: return
+        val arr = root.getAsJsonArray("operations") ?: return
+        val tips = (0 until arr.size()).mapNotNull { idx ->
+            val obj = arr.get(idx)?.takeIf { it.isJsonObject }?.asJsonObject ?: return@mapNotNull null
+            val id = obj.get("id")?.takeIf { it.isJsonPrimitive }?.asString?.trim().orEmpty()
+            val type = obj.get("type")?.takeIf { it.isJsonPrimitive }?.asString?.trim().orEmpty()
+            val status = obj.get("status")?.takeIf { it.isJsonPrimitive }?.asString?.trim().orEmpty()
+            val amountRaw = obj.get("amountKop")?.takeIf { it.isJsonPrimitive }?.asString?.trim()
+            val amount = amountRaw?.toLongOrNull()
+                ?: runCatching { obj.get("amountKop")?.asLong }.getOrNull()
+                ?: 0L
+            if (type != "tip" || status != "SUCCESS" || id.isEmpty() || amount <= 0L) return@mapNotNull null
+            TipOperation(
+                id = id,
+                amountKop = amount.coerceAtMost(Int.MAX_VALUE.toLong()).toInt(),
+                status = status,
+            )
+        }
+        if (tips.isNotEmpty()) syncIncomingTips(context, tips)
     }
 
     private fun showTopUpAndSave(context: Context, addKop: Int) {
@@ -125,6 +200,27 @@ object BalanceNotificationHelper {
         while (list.size > MAX_ITEMS) list.removeAt(list.size - 1)
         val out = gson.toJson(list)
         prefs.edit().putString(KEY_ITEMS_JSON, out).apply()
+    }
+
+    private fun getSeenTipIds(prefs: android.content.SharedPreferences): List<String> {
+        val json = prefs.getString(KEY_SEEN_TIP_IDS_JSON, "[]") ?: "[]"
+        return try {
+            val arr = com.google.gson.Gson().fromJson(json, JsonArray::class.java) ?: JsonArray()
+            (0 until arr.size())
+                .mapNotNull { idx -> arr.get(idx)?.takeIf { it.isJsonPrimitive }?.asString?.trim() }
+                .filter { it.isNotEmpty() }
+        } catch (_: Exception) {
+            emptyList()
+        }
+    }
+
+    private fun saveSeenTipIds(prefs: android.content.SharedPreferences, ids: List<String>) {
+        prefs.edit().putString(KEY_SEEN_TIP_IDS_JSON, com.google.gson.Gson().toJson(ids)).apply()
+    }
+
+    private fun trimSeenIds(ids: MutableList<String>) {
+        if (ids.size <= MAX_SEEN_TIP_IDS) return
+        while (ids.size > MAX_SEEN_TIP_IDS) ids.removeAt(ids.size - 1)
     }
 
     data class NotificationItem(val amountKop: Int, val text: String, val timeMillis: Long)

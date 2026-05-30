@@ -13,7 +13,7 @@ import android.os.SystemClock
  */
 object BalanceRefreshScheduler {
 
-    private const val INTERVAL_MS = 60_000L
+    private const val INTERVAL_MS = 30_000L
     private const val ACTION_REFRESH = "com.freetips.app.BALANCE_REFRESH"
 
     fun scheduleNext(context: Context) {

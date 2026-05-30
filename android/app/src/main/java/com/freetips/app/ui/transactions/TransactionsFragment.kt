@@ -116,8 +116,6 @@ class TransactionsFragment : Fragment() {
     private val binding get() = _binding!!
 
     private var allOperations: List<OperationItem> = emptyList()
-    private var pendingNotifyStats: com.freetips.app.ui.home.Stats? = null
-    private var pendingNotifyOperationsJson: String? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentTransactionsBinding.inflate(inflater, container, false)
@@ -238,8 +236,6 @@ class TransactionsFragment : Fragment() {
             return
         }
         val baseUrl = prefs.effectiveBaseUrl
-        pendingNotifyStats = null
-        pendingNotifyOperationsJson = null
         if (!silent) {
             if (!b.swipeRefresh.isRefreshing) b.progress.visibility = View.VISIBLE
             b.errorText.visibility = View.GONE
@@ -258,8 +254,11 @@ class TransactionsFragment : Fragment() {
                         profile.stats?.let { s ->
                             ui.virtualCardInclude.cardBalance.text = formatKopToRub(s.balanceKop)
                             BalanceCache.save(ui.root.context.applicationContext, s.balanceKop)
-                            pendingNotifyStats = s
-                            trySyncTopUpNotifications(ui.root.context.applicationContext)
+                            com.freetips.app.util.BalanceNotificationHelper.showIfNeeded(
+                                ui.root.context.applicationContext,
+                                s.balanceKop,
+                                s.totalGuestPaidTipsKop,
+                            )
                         }
                     } catch (_: Exception) {}
                 }
@@ -290,8 +289,11 @@ class TransactionsFragment : Fragment() {
                         try {
                             val data = parseOperationsResponseSafe(body)
                             allOperations = data.operations
-                            pendingNotifyOperationsJson = body
-                            trySyncTopUpNotifications(ui.root.context.applicationContext)
+                            com.freetips.app.util.BalanceNotificationHelper.syncIncomingTipsFromOperationsJson(
+                                ui.root.context.applicationContext,
+                                body,
+                                null,
+                            )
                             applyFilter()
                         } catch (_: Exception) {}
                     } else {
@@ -306,23 +308,6 @@ class TransactionsFragment : Fragment() {
                 }
             }
         })
-    }
-
-    private fun trySyncTopUpNotifications(appCtx: Context) {
-        val stats = pendingNotifyStats ?: return
-        val operationsJson = pendingNotifyOperationsJson ?: return
-        runCatching {
-            com.freetips.app.util.BalanceNotificationHelper.syncIncomingTipsFromOperationsJson(
-                appCtx,
-                operationsJson,
-                stats.totalGuestPaidTipsKop,
-            )
-            com.freetips.app.util.BalanceNotificationHelper.showIfNeeded(
-                appCtx,
-                stats.balanceKop,
-                stats.totalGuestPaidTipsKop,
-            )
-        }
     }
 
     override fun onDestroyView() {

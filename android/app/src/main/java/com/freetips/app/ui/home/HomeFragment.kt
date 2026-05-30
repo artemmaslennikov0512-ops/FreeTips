@@ -137,14 +137,11 @@ fun parseProfileResponseSafe(json: String): ProfileResponse? {
 
 class HomeFragment : Fragment() {
 
-    /** Автообновление баланса раз в минуту (swipe и возврат на вкладку — сразу). */
-    private val refreshIntervalMs = 60_000L
+    /** Автообновление баланса раз в 30 секунд (swipe и возврат на вкладку — сразу). */
+    private val refreshIntervalMs = 30_000L
     private val handler = Handler(Looper.getMainLooper())
     private var refreshRunnable: Runnable? = null
     private var balanceUpdatedReceiver: BroadcastReceiver? = null
-    /** Синхронизация пушей: ждём и профиль, и /api/operations, чтобы не слать одной суммой. */
-    private var pendingNotifyStats: Stats? = null
-    private var pendingNotifyOperationsJson: String? = null
 
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
@@ -236,8 +233,6 @@ class HomeFragment : Fragment() {
             if (!silent) b.swipeRefresh.isRefreshing = false
             return
         }
-        pendingNotifyStats = null
-        pendingNotifyOperationsJson = null
         if (!silent && !b.swipeRefresh.isRefreshing) b.progress.visibility = View.VISIBLE
         if (!silent) b.errorText.visibility = View.GONE
 
@@ -272,8 +267,11 @@ class HomeFragment : Fragment() {
                                 if (s != null) {
                                     b.virtualCardInclude.cardBalance.text = formatKopToRub(s.balanceKop)
                                     BalanceCache.save(b.root.context.applicationContext, s.balanceKop)
-                                    pendingNotifyStats = s
-                                    trySyncTopUpNotifications(b.root.context.applicationContext)
+                                    BalanceNotificationHelper.showIfNeeded(
+                                        b.root.context.applicationContext,
+                                        s.balanceKop,
+                                        s.totalGuestPaidTipsKop,
+                                    )
                                 }
                                 bindLimits(b, profile.payoutLimits, profile.payoutUsageToday, profile.payoutUsageMonth)
                             } catch (_: Throwable) {}
@@ -297,29 +295,14 @@ class HomeFragment : Fragment() {
                 if (!response.isSuccessful || body.isBlank()) return
                 val appCtx = context?.applicationContext ?: return
                 activity?.runOnUiThread {
-                    pendingNotifyOperationsJson = body
-                    trySyncTopUpNotifications(appCtx)
+                    BalanceNotificationHelper.syncIncomingTipsFromOperationsJson(
+                        appCtx,
+                        body,
+                        null,
+                    )
                 }
             }
         })
-    }
-
-    /** Сначала пооперационные пуши, затем обновление базы — иначе дельта уходит одной суммой. */
-    private fun trySyncTopUpNotifications(appCtx: Context) {
-        val stats = pendingNotifyStats ?: return
-        val operationsJson = pendingNotifyOperationsJson ?: return
-        runCatching {
-            BalanceNotificationHelper.syncIncomingTipsFromOperationsJson(
-                appCtx,
-                operationsJson,
-                stats.totalGuestPaidTipsKop,
-            )
-            BalanceNotificationHelper.showIfNeeded(
-                appCtx,
-                stats.balanceKop,
-                stats.totalGuestPaidTipsKop,
-            )
-        }
     }
 
     private fun bindLimits(

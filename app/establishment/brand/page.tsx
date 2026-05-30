@@ -1030,7 +1030,7 @@ export default function EstablishmentBrandPage() {
                     {/* Суммы */}
                     <div className="rounded-xl p-3" style={{ borderWidth: `${Math.min(2, borderWidth)}px`, borderStyle: "solid", borderColor: borderRgba, backgroundColor: blocksBgRgba ?? "rgba(255,255,255,0.06)" }}>
                       <div className="grid grid-cols-4 gap-1.5 mb-2">
-                        {[50, 100, 200, 500].map((r, i) => (
+                        {[100, 200, 500].map((r, i) => (
                           <div key={r} className="rounded-lg py-2 text-center text-xs font-medium" style={{ backgroundColor: i === 1 ? (hex(primaryColor) ? `${hex(primaryColor)}33` : "rgba(201,162,39,0.2)") : "rgba(255,255,255,0.08)", color: hexOr(fontColor, "#fafafa") }}>{r} ₽</div>
                         ))}
                       </div>

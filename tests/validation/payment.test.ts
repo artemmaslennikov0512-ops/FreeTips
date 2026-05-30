@@ -17,17 +17,17 @@ test("createPaymentSchema accepts valid payment", () => {
   assert.equal(result.success, true);
 });
 
-test("createPaymentSchema rejects amount below 100 kop (1 руб)", () => {
+test("createPaymentSchema rejects amount below 100 ₽ (10 000 kop)", () => {
   const result = createPaymentSchema.safeParse({
-    amountKop: 99,
+    amountKop: 9_999,
     idempotencyKey: "test-key-123",
   });
   assert.equal(result.success, false);
 });
 
-test("createPaymentSchema accepts 100 kop (1 руб) minimum", () => {
+test("createPaymentSchema accepts 100 ₽ (10 000 kop) minimum", () => {
   const result = createPaymentSchema.safeParse({
-    amountKop: 100,
+    amountKop: 10_000,
     idempotencyKey: "test-key-123",
   });
   assert.equal(result.success, true);

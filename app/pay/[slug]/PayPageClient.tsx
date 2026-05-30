@@ -765,7 +765,7 @@ export default function PayPageClient() {
                         onChange={(e) => setCustomAmount(e.target.value)}
                         disabled={!acceptPayments}
                         autoComplete="off"
-                        aria-label="Сумма чаевых в рублях, от 1 до 1000"
+                        aria-label="Сумма чаевых в рублях, от 100 до 1000"
                         className="pay-page-netmonet-amount-input min-w-0 flex-1 bg-transparent text-center text-[var(--color-text)] placeholder:text-[var(--color-muted)]/55 disabled:opacity-50"
                       />
                       <div className="flex shrink-0 items-end gap-1.5 pb-0.5">

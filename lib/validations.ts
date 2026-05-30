@@ -157,7 +157,7 @@ const AMOUNT_KOP_MAX_PAYMENT = BigInt(PAYMENT_MAX_AMOUNT_KOP);
 // Создание платежа
 export const createPaymentSchema = z.object({
   amountKop: amountKopSchema
-    .refine((v) => v >= AMOUNT_KOP_MIN_PAYMENT, "Минимальная сумма 1 ₽")
+    .refine((v) => v >= AMOUNT_KOP_MIN_PAYMENT, "Минимальная сумма пополнения — 100 ₽")
     .refine((v) => v <= AMOUNT_KOP_MAX_PAYMENT, "Максимальная сумма пополнения — 1 000 ₽"),
   comment: z.string().max(500, "Комментарий не должен превышать 500 символов").optional(),
   idempotencyKey: z.string().min(1, "idempotencyKey обязателен").max(255),

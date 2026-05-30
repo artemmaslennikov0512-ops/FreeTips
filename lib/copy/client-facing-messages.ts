@@ -15,7 +15,7 @@ export const PAY_MSG_PAYMENT_GENERIC_ERROR = "Ошибка оплаты";
 
 export const PAY_MSG_PAYMENT_DECLINED = "Платёж не прошёл";
 
-export const PAY_MSG_MIN_AMOUNT_RUB = "Минимальная сумма — 1 ₽";
+export const PAY_MSG_MIN_AMOUNT_RUB = "Минимальная сумма — 100 ₽";
 
 /** /pay/table/[slug] */
 export const PAY_MSG_TABLE_NOT_FOUND = "Стол не найден";

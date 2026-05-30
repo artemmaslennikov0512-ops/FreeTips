@@ -147,8 +147,12 @@ class PayoutsFragment : Fragment() {
             .setPositiveButton("Отправить") { _, _ ->
                 val rub = amountEdit.text.toString().toDoubleOrNull() ?: 0.0
                 val details = detailsEdit.text.toString().trim()
-                if (rub < 1 || details.isEmpty()) {
-                    Toast.makeText(requireContext(), "Укажите сумму и реквизиты", Toast.LENGTH_SHORT).show()
+                if (rub < 100.0 || details.isEmpty()) {
+                    Toast.makeText(
+                        requireContext(),
+                        if (details.isEmpty()) "Укажите сумму и реквизиты" else "Минимальная сумма вывода — 100 ₽",
+                        Toast.LENGTH_SHORT,
+                    ).show()
                     return@setPositiveButton
                 }
                 val amountKop = (rub * 100).toLong()

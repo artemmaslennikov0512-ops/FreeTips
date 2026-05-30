@@ -73,7 +73,10 @@ object BalanceNotificationHelper {
             if (basis > lastBasis) {
                 val addKop = basis - lastBasis
                 val displayKop = kotlin.math.round(addKop / 100.0).toInt() * 100
-                if (displayKop > 0) {
+                // При SCHEMA_PER_TRANSACTION пуши идут только из syncIncomingTips (по tip-id),
+                // иначе один чай даёт два уведомления: дельта totalGuestPaidTipsKop + операция.
+                val schema = prefs.getInt(KEY_BASIS_SCHEMA, 0)
+                if (displayKop > 0 && schema < SCHEMA_PER_TRANSACTION) {
                     showTopUpAndSave(context, displayKop)
                 }
             }

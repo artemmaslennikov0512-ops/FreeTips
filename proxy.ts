@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { createHash } from "crypto";
 import { checkRateLimitByIP, getRateLimitIpKey } from "@/lib/middleware/rate-limit";
 import { REQUEST_ID_HEADER } from "@/lib/security/request";
 import {
@@ -29,11 +30,22 @@ const API_RATE_LIMIT_MAX =
   typeof process !== "undefined" && process.env.API_RATE_LIMIT_MAX
     ? Math.max(200, parseInt(process.env.API_RATE_LIMIT_MAX, 10) || 1200)
     : API_RATE_DEFAULT_MAX;
+const API_RATE_API_KEY_DEFAULT_MAX =
+  typeof process !== "undefined" && process.env.NODE_ENV === "production" ? 12000 : 20000;
+const API_RATE_LIMIT_API_KEY_MAX =
+  typeof process !== "undefined" && process.env.API_RATE_LIMIT_API_KEY_MAX
+    ? Math.max(1000, parseInt(process.env.API_RATE_LIMIT_API_KEY_MAX, 10) || 12000)
+    : API_RATE_API_KEY_DEFAULT_MAX;
 const HSTS_MAX_AGE_SECONDS = 15552000;
 const RATE_LIMIT_OPTIONS = {
   windowMs: API_RATE_WINDOW_MS,
   maxRequests: API_RATE_LIMIT_MAX,
   keyPrefix: "api",
+};
+const RATE_LIMIT_OPTIONS_API_KEY = {
+  windowMs: API_RATE_WINDOW_MS,
+  maxRequests: API_RATE_LIMIT_API_KEY_MAX,
+  keyPrefix: "api-mobile",
 };
 
 function isApiRequest(pathname: string): boolean {
@@ -165,7 +177,15 @@ function withJsonError(
 
 async function handleRateLimit(request: NextRequest, pathname: string, requestId: string): Promise<NextResponse | null> {
   if (!isApiRequest(pathname)) return null;
-  const rateResult = await checkRateLimitByIP(getRateLimitIpKey(request), RATE_LIMIT_OPTIONS);
+  const apiKey = request.headers.get("x-api-key")?.trim();
+  const hasApiKey = !!apiKey && apiKey.length >= 16;
+  const rateLimitKey = hasApiKey
+    ? `apk:${createHash("sha256").update(apiKey, "utf8").digest("hex").slice(0, 24)}`
+    : getRateLimitIpKey(request);
+  const rateResult = await checkRateLimitByIP(
+    rateLimitKey,
+    hasApiKey ? RATE_LIMIT_OPTIONS_API_KEY : RATE_LIMIT_OPTIONS,
+  );
   if (rateResult.allowed) return null;
   return withJsonError(request, 429, "Слишком много запросов. Попробуйте позже.", requestId);
 }

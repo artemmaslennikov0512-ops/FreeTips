@@ -132,6 +132,7 @@ model User {
   fraudSignals             FraudSignal[]
   employeeJoinRequests   EmployeeJoinRequest[]
   employeeLeaveRequests  EmployeeLeaveRequest[]
+  pushTipDeliveries      PushTipDelivery[]
 
   @@index([login])
   @@index([email])
@@ -140,6 +141,19 @@ model User {
   @@index([lastAuthIp])
   @@index([lastSeenAt])
   @@map("users")
+}
+
+/// Глобальная отметка отправки push по tip-id: один раз на весь аккаунт (между всеми устройствами).
+model PushTipDelivery {
+  userId    String
+  tipId     String   @db.VarChar(64)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, tipId])
+  @@index([userId, createdAt])
+  @@map("tip_push_deliveries")
 }
 
 model PaygineCubbie {

@@ -17,6 +17,9 @@ node scripts/verify-apk-sync.mjs
 echo "=== docker compose build & up ==="
 docker compose up -d --build
 
+echo "=== prisma migrate deploy ==="
+docker compose exec -T web npx prisma migrate deploy
+
 echo "=== ожидание web ==="
 for i in 1 2 3 4 5 6 7 8 9 10; do
   if curl -sf "http://127.0.0.1:3000/api/app/version" >/dev/null 2>&1; then

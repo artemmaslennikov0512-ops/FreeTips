@@ -8,7 +8,6 @@ import android.content.Intent
  * Все вызовы из UI/Worker идут через [OperationsSyncCoordinator].
  */
 internal object TipNotificationSync {
-
     internal data class Tip(
         val id: String,
         val amountKop: Int,
@@ -48,12 +47,7 @@ internal object TipNotificationSync {
                 .sortedBy { it.createdAtMillis }
                 .toList()
             PushSyncMetrics.addFetched(appCtx, normalized.size)
-
-            if (!TipPushMarkStore.isBootstrapDone(appCtx)) {
-                markStore.markAllDeliveredSilent(normalized.map { it.id })
-                TipPushMarkStore.setBootstrapDone(appCtx)
-                return
-            }
+            if (!TipPushMarkStore.isBootstrapDone(appCtx)) TipPushMarkStore.setBootstrapDone(appCtx)
 
             for (tip in normalized) {
                 if (markStore.isDelivered(tip.id)) {
@@ -70,6 +64,25 @@ internal object TipNotificationSync {
                 if (!alreadyPending && !markStore.markPending(tip.id)) continue
                 if (alreadyPending) PushSyncMetrics.incRetryFromPending(appCtx)
                 else PushSyncMetrics.incPendingCreated(appCtx)
+
+                // Global server-side dedupe: if already claimed by any device, skip local delivery.
+                when (ServerPushClaimApi.claim(appCtx, tip.id)) {
+                    ServerPushClaimApi.ClaimResult.CLAIMED -> {
+                        // continue to local push delivery
+                    }
+                    ServerPushClaimApi.ClaimResult.ALREADY_CLAIMED -> {
+                        PushSyncMetrics.incServerClaimConflict(appCtx)
+                        markStore.markDelivered(tip.id)
+                        continue
+                    }
+                    ServerPushClaimApi.ClaimResult.UNAVAILABLE -> {
+                        // Backward compatibility while backend endpoint is not deployed yet.
+                    }
+                    ServerPushClaimApi.ClaimResult.ERROR -> {
+                        PushSyncMetrics.incServerClaimError(appCtx)
+                        continue
+                    }
+                }
 
                 val rubText = formatKopToRub(displayKop)
                 val text = appCtx.getString(

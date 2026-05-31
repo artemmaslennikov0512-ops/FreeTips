@@ -1,7 +1,7 @@
 {
-  "versionCode": 9,
-  "versionName": "1.1.7",
+  "versionCode": 10,
+  "versionName": "1.1.8",
   "apkUrl": "/freetips.apk",
   "minVersionCode": 1,
-  "releaseNotes": "Push sync stability: paged history fetch, pending->delivered marks, anti-duplicates, polling jitter."
+  "releaseNotes": "Server-side global push dedupe by tipId across devices; strict flag-based push flow."
 }

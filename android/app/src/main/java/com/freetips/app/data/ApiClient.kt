@@ -61,6 +61,16 @@ class ApiClient(private val apiKey: String, baseUrl: String = BuildConfig.BASE_U
     fun getLinks(): Call =
         sharedClient.newCall(newRequest("$baseUrl/api/links") { get() })
 
+    /** Atomic server-side claim: only first caller gets claimed=true for user+tipId. */
+    fun claimTipPush(tipId: String): Call {
+        val body = mapOf("tipId" to tipId)
+        return sharedClient.newCall(
+            newRequest("$baseUrl/api/push/tips/claim") {
+                post(gson.toJson(body).toRequestBody("application/json".toMediaType()))
+            }
+        )
+    }
+
     fun validateApiKey(): Call = getProfile()
 
     companion object {

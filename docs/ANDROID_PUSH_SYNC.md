@@ -45,11 +45,17 @@
 
 ## Модель отметок push
 
-Ключи в `SharedPreferences("balance_notification")`:
+Глобальный (между устройствами) источник истины:
+
+- таблица БД `tip_push_deliveries` с уникальным ключом `(userId, tipId)`;
+- Android перед отправкой push делает `POST /api/push/tips/claim`;
+- только первый успешный `claim` получает право отправить push.
+
+Локальные ключи в `SharedPreferences("balance_notification")`:
 
 - `pending_tip_ids_json` — push подготовлен/должен быть отправлен;
 - `delivered_tip_ids_json` — push доставлен и финализирован;
-- `tips_bootstrap_done` — завершён первый bootstrap устройства.
+- `tips_bootstrap_done` — legacy-флаг совместимости.
 
 Хранилище: `TipPushMarkStore`.
 
@@ -59,9 +65,9 @@
 
 1. Если `delivered` — пропускаем.
 2. Иначе `markPending`.
-3. Формируем текст push (gross-сумма, округление до рубля).
-4. Пишем запись в локальный inbox.
-5. Отправляем системный push.
+3. Делаем серверный `claim` (`/api/push/tips/claim`).
+4. Если `claimed=false` — на другом устройстве уже отправлено, помечаем `delivered` и выходим.
+5. Если `claimed=true` — формируем текст push, пишем inbox, отправляем системный push.
 6. `markDelivered` (pending -> delivered).
 
 `TipNotificationSync.syncFromParsedOperations()` игнорирует пустые страницы и страницы без `SUCCESS tip`.
@@ -70,7 +76,7 @@
 
 ### Дубли
 
-- Дедуп по `tipId`.
+- Глобальный дедуп по `tipId` на сервере (`tip_push_deliveries`).
 - Повторная обработка не отправляет новый push для `delivered`.
 - `TipNotificationSync` сериализует обработку через `synchronized(lock)`.
 
@@ -82,8 +88,8 @@
 
 ## Новый девайс / первая установка
 
-На первом sync (`tips_bootstrap_done=false`) текущие tip-id помечаются `delivered` без push.
-Это не шлёт «исторические» уведомления за период до установки.
+Даже на новом устройстве исторические дубли между девайсами блокируются серверным `claim`.
+Если push по `tipId` уже отправлялся на любом устройстве аккаунта, новое устройство его не отправит.
 
 ## Метрики стабильности
 
@@ -94,5 +100,7 @@
 - `delivered`
 - `retry_from_pending`
 - `skipped_delivered`
+- `server_claim_conflict`
+- `server_claim_error`
 
 Используются для диагностики стабильности пайплайна на реальных устройствах.

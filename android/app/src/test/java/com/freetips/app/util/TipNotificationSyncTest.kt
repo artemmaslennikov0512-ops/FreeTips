@@ -1,6 +1,7 @@
 package com.freetips.app.util
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
@@ -18,7 +19,7 @@ class TipNotificationSyncTest {
     }
 
     @Test
-    fun first_sync_bootstrap_marks_without_notifications() {
+    fun first_sync_delivers_tip_and_marks_delivered() {
         TipNotificationSync.syncTips(
             context,
             listOf(
@@ -32,10 +33,9 @@ class TipNotificationSyncTest {
             )
         )
 
-        // На первом запуске пуш не должен отправляться, только метка delivered.
         val store = TipPushMarkStore.load(context)
-        assertEquals(true, store.isDelivered("tip-a"))
-        assertEquals(0, BalanceNotificationHelper.getInAppList(context).size)
+        assertTrue(store.isDelivered("tip-a"))
+        assertEquals(1, BalanceNotificationHelper.getInAppList(context).size)
     }
 
     @Test
@@ -49,11 +49,11 @@ class TipNotificationSyncTest {
             createdAtMillis = now,
         )
 
-        // bootstrap (без push)
+        // первый sync отправляет пуш и ставит delivered
         TipNotificationSync.syncTips(context, listOf(tip))
         // повторный sync того же tip-id
         TipNotificationSync.syncTips(context, listOf(tip))
 
-        assertEquals(0, BalanceNotificationHelper.getInAppList(context).size)
+        assertEquals(1, BalanceNotificationHelper.getInAppList(context).size)
     }
 }

@@ -13,6 +13,8 @@ internal object PushSyncMetrics {
     private const val KEY_DELIVERED = "delivered"
     private const val KEY_RETRY_FROM_PENDING = "retry_from_pending"
     private const val KEY_SKIPPED_DELIVERED = "skipped_delivered"
+    private const val KEY_SERVER_CLAIM_CONFLICT = "server_claim_conflict"
+    private const val KEY_SERVER_CLAIM_ERROR = "server_claim_error"
 
     private fun prefs(context: Context) =
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -27,6 +29,8 @@ internal object PushSyncMetrics {
     fun incDelivered(context: Context) = inc(context, KEY_DELIVERED)
     fun incRetryFromPending(context: Context) = inc(context, KEY_RETRY_FROM_PENDING)
     fun incSkippedDelivered(context: Context) = inc(context, KEY_SKIPPED_DELIVERED)
+    fun incServerClaimConflict(context: Context) = inc(context, KEY_SERVER_CLAIM_CONFLICT)
+    fun incServerClaimError(context: Context) = inc(context, KEY_SERVER_CLAIM_ERROR)
 
     private fun inc(context: Context, key: String) {
         val p = prefs(context)

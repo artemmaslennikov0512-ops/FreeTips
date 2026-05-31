@@ -96,7 +96,9 @@ object BalanceNotificationHelper {
         val fee = tip.feeKop.coerceAtLeast(0)
         val net = tip.tipNetKop ?: (tip.amountKop - fee).coerceAtLeast(0)
         val gross = maxOf(tip.amountKop, net + fee)
-        return kotlin.math.round(gross / 100.0).toInt() * 100
+        if (gross <= 0) return 0
+        // Округление до целых рублей для текста пуша; не обнуляем мелкие суммы.
+        return kotlin.math.round(gross / 100.0).toInt().coerceAtLeast(1) * 100
     }
 
     /** Обновляет базу totalGuestPaidTipsKop; пуши не шлёт. */

@@ -11,8 +11,8 @@ android {
         applicationId = "com.freetips.app"
         minSdk = 24
         targetSdk = 35
-        versionCode = 4
-        versionName = "1.1.2"
+        versionCode = 6
+        versionName = "1.1.4"
 
         // URL сервера (тот же, что NEXT_PUBLIC_APP_URL на бэкенде). Менять при смене окружения.
         buildConfigField("String", "BASE_URL", "\"https://free-tips.ru\"")

@@ -24,8 +24,17 @@ object AppUpdateChecker {
     @Volatile
     private var dialogShowing = false
 
+    @Volatile
+    private var lastCheckStartedMs = 0L
+
+    private const val CHECK_COOLDOWN_MS = 60_000L
+
     fun check(activity: AppCompatActivity) {
-        if (activity.isFinishing) return
+        if (activity.isFinishing || activity.isDestroyed) return
+        val now = System.currentTimeMillis()
+        if (now - lastCheckStartedMs < CHECK_COOLDOWN_MS) return
+        lastCheckStartedMs = now
+
         val baseUrl = SecurePrefs(activity).effectiveBaseUrl
         Thread {
             try {
@@ -38,7 +47,7 @@ object AppUpdateChecker {
                     val body = response.body?.string()?.takeIf { it.isNotBlank() } ?: return@Thread
                     val info = gson.fromJson(body, AppVersionInfo::class.java) ?: return@Thread
                     activity.runOnUiThread {
-                        if (!activity.isFinishing) {
+                        if (!activity.isFinishing && !activity.isDestroyed) {
                             showUpdateDialogIfNeeded(activity, info)
                         }
                     }

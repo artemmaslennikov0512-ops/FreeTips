@@ -148,6 +148,8 @@ class MainActivity : AppCompatActivity(), NotificationsBottomSheet.BadgeUpdater 
                 binding.bottomNav.selectedItemId = selectedItemId
             }
             updateNotificationBadge()
+            // Повторная проверка при возврате в приложение (не только onCreate).
+            AppUpdateChecker.check(this)
         }
     }
 

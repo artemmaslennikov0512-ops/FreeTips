@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.SystemClock
+import com.freetips.app.util.PollJitter
 
 /**
  * Планирует фоновое обновление баланса раз в минуту через AlarmManager
@@ -21,7 +22,7 @@ object BalanceRefreshScheduler {
         val intent = Intent(context, BalanceRefreshReceiver::class.java).apply { action = ACTION_REFRESH }
         val flags = PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         val pending = PendingIntent.getBroadcast(context, 0, intent, flags)
-        val triggerAt = SystemClock.elapsedRealtime() + INTERVAL_MS
+        val triggerAt = SystemClock.elapsedRealtime() + PollJitter.withJitter(INTERVAL_MS)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             am.setAndAllowWhileIdle(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerAt, pending)
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {

@@ -20,6 +20,19 @@ object MoscowDateTime {
         SimpleDateFormat(pattern, Locale.US).apply { timeZone = utc }
     }
 
+    fun parseCreatedAtMillis(iso: String): Long {
+        val s = iso.trim()
+        if (s.isEmpty()) return System.currentTimeMillis()
+        for (fmt in parsers) {
+            try {
+                val date = fmt.parse(s) ?: continue
+                return date.time
+            } catch (_: ParseException) {
+            }
+        }
+        return System.currentTimeMillis()
+    }
+
     fun formatOperationCreatedAt(iso: String): String {
         val s = iso.trim()
         if (s.isEmpty()) return ""

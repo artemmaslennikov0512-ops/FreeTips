@@ -1,6 +1,7 @@
 /**
  * GET /api/app/version — публичная информация о последней версии Android APK.
- * Источник: public/app-version.json (обновляется npm run copy-apk), env переопределяет поля.
+ * Единственный источник: public/app-version.json (обновляется npm run copy-apk).
+ * Не переопределяется через .env — иначе рассинхрон с build.gradle.kts и freetips.apk на диске.
  */
 
 import fs from "fs";
@@ -66,25 +67,11 @@ function resolveApkUrl(apkUrl: string, request: NextRequest): string {
 export async function GET(request: NextRequest) {
   const file = loadFromFile();
 
-  const versionCode = process.env.APP_APK_VERSION_CODE?.trim()
-    ? parsePositiveInt(process.env.APP_APK_VERSION_CODE, file.versionCode)
-    : file.versionCode;
-
-  const versionName = process.env.APP_APK_VERSION_NAME?.trim() || file.versionName;
-
-  const apkPath = process.env.APP_APK_URL?.trim() || file.apkUrl;
-
-  const minVersionCode = process.env.APP_APK_MIN_VERSION_CODE?.trim()
-    ? parsePositiveInt(process.env.APP_APK_MIN_VERSION_CODE, file.minVersionCode ?? 1)
-    : file.minVersionCode ?? 1;
-
-  const releaseNotes = process.env.APP_APK_RELEASE_NOTES?.trim() || file.releaseNotes;
-
   return NextResponse.json({
-    versionCode,
-    versionName,
-    apkUrl: resolveApkUrl(apkPath, request),
-    minVersionCode,
-    ...(releaseNotes ? { releaseNotes } : {}),
+    versionCode: file.versionCode,
+    versionName: file.versionName,
+    apkUrl: resolveApkUrl(file.apkUrl, request),
+    minVersionCode: file.minVersionCode ?? 1,
+    ...(file.releaseNotes ? { releaseNotes: file.releaseNotes } : {}),
   });
 }

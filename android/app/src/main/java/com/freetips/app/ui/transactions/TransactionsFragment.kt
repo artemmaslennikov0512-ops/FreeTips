@@ -21,10 +21,12 @@ import com.freetips.app.databinding.FragmentTransactionsBinding
 import com.freetips.app.databinding.ItemTransactionBinding
 import com.freetips.app.ui.home.parseProfileResponseSafe
 import com.freetips.app.util.BalanceCache
-import com.freetips.app.util.BalanceNotificationHelper
 import com.freetips.app.util.MoscowDateTime
 import com.freetips.app.util.OperationsJsonParser
+import com.freetips.app.util.OperationsSync
+import com.freetips.app.util.OperationsSyncCoordinator
 import com.freetips.app.util.ParsedOperation
+import com.freetips.app.util.PollJitter
 import com.freetips.app.util.formatKopToRub
 import com.freetips.app.worker.BalanceRefreshWorker
 import okhttp3.Call
@@ -118,10 +120,10 @@ class TransactionsFragment : Fragment() {
         refreshRunnable = object : Runnable {
             override fun run() {
                 if (_binding != null) load(silent = true)
-                refreshRunnable?.let { handler.postDelayed(it, refreshIntervalMs) }
+                refreshRunnable?.let { handler.postDelayed(it, PollJitter.withJitter(refreshIntervalMs)) }
             }
         }
-        handler.postDelayed(refreshRunnable!!, refreshIntervalMs)
+        handler.postDelayed(refreshRunnable!!, PollJitter.withJitter(refreshIntervalMs))
     }
 
     private fun stopPeriodicRefresh() {
@@ -224,17 +226,12 @@ class TransactionsFragment : Fragment() {
                     profile?.stats?.let { s ->
                         ui.virtualCardInclude.cardBalance.text = formatKopToRub(s.balanceKop)
                         BalanceCache.save(ui.root.context.applicationContext, s.balanceKop)
-                        BalanceNotificationHelper.showIfNeeded(
-                            ui.root.context.applicationContext,
-                            s.balanceKop,
-                            s.totalGuestPaidTipsKop,
-                        )
                     }
                 }
             }
         })
 
-        ApiClient(apiKey, baseUrl).getOperations(100, 0).enqueue(object : Callback {
+        ApiClient(apiKey, baseUrl).getOperations(OperationsSync.FULL_HISTORY_LIMIT, 0).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 activity?.runOnUiThread {
                     val ui = _binding ?: return@runOnUiThread
@@ -269,6 +266,10 @@ class TransactionsFragment : Fragment() {
                     }
                     val parsed = OperationsJsonParser.parse(body)
                     allOperations = parsed.operations
+                    OperationsSyncCoordinator.onParsedOperations(
+                        ui.root.context.applicationContext,
+                        parsed.operations,
+                    )
                     if (allOperations.isEmpty() && parsed.rawCount > 0) {
                         ui.errorText.visibility = View.VISIBLE
                         ui.errorText.text = getString(R.string.operations_parse_warning)

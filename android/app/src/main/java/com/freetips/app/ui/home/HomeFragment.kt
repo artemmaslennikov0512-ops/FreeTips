@@ -18,7 +18,9 @@ import com.freetips.app.worker.BalanceRefreshWorker
 import com.freetips.app.data.SecurePrefs
 import com.freetips.app.databinding.FragmentHomeBinding
 import com.freetips.app.util.BalanceCache
-import com.freetips.app.util.BalanceNotificationHelper
+import com.freetips.app.util.OperationsSyncCoordinator
+import com.freetips.app.util.OperationsPagedSync
+import com.freetips.app.util.PollJitter
 import com.freetips.app.util.formatKopToRub
 import com.google.gson.Gson
 import com.google.gson.JsonElement
@@ -40,7 +42,6 @@ data class ProfileResponse(
 data class Stats(
     val balanceKop: Int,
     val totalReceivedKop: Int,
-    val totalGuestPaidTipsKop: Int = 0,
     val transactionsCount: Int,
     val payoutsPendingCount: Int
 )
@@ -85,7 +86,6 @@ fun parseProfileResponseSafe(json: String): ProfileResponse? {
         Stats(
             balanceKop = (statsObj.get("balanceKop").asLongSafe() ?: 0L).saturatedToInt(),
             totalReceivedKop = (statsObj.get("totalReceivedKop").asLongSafe() ?: 0L).saturatedToInt(),
-            totalGuestPaidTipsKop = (statsObj.get("totalGuestPaidTipsKop").asLongSafe() ?: 0L).saturatedToInt(),
             transactionsCount = (statsObj.get("transactionsCount").asLongSafe() ?: 0L).saturatedToInt(),
             payoutsPendingCount = (statsObj.get("payoutsPendingCount").asLongSafe() ?: 0L).saturatedToInt(),
         )
@@ -209,10 +209,10 @@ class HomeFragment : Fragment() {
         refreshRunnable = object : Runnable {
             override fun run() {
                 if (_binding != null) loadProfile(silent = true)
-                refreshRunnable?.let { handler.postDelayed(it, refreshIntervalMs) }
+                refreshRunnable?.let { handler.postDelayed(it, PollJitter.withJitter(refreshIntervalMs)) }
             }
         }
-        handler.postDelayed(refreshRunnable!!, refreshIntervalMs)
+        handler.postDelayed(refreshRunnable!!, PollJitter.withJitter(refreshIntervalMs))
     }
 
     private fun stopPeriodicRefresh() {
@@ -268,11 +268,6 @@ class HomeFragment : Fragment() {
                                 if (s != null) {
                                     b.virtualCardInclude.cardBalance.text = formatKopToRub(s.balanceKop)
                                     BalanceCache.save(b.root.context.applicationContext, s.balanceKop)
-                                    BalanceNotificationHelper.showIfNeeded(
-                                        b.root.context.applicationContext,
-                                        s.balanceKop,
-                                        s.totalGuestPaidTipsKop,
-                                    )
                                 }
                                 bindLimits(b, profile.payoutLimits, profile.payoutUsageToday, profile.payoutUsageMonth)
                             } catch (_: Throwable) {}
@@ -287,26 +282,25 @@ class HomeFragment : Fragment() {
 
         if (!syncNotifications) return
 
-        // Подтягиваем пропущенные входящие транзакции для колокольчика даже без открытия "Истории".
-        val since = BalanceNotificationHelper.sinceIsoForNextFetch(ctx)
-        ApiClient(apiKey, prefs.effectiveBaseUrl).getOperations(50, 0, since).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
+        syncPushNotificationsPaged(apiKey, prefs.effectiveBaseUrl)
+    }
+
+    private fun syncPushNotificationsPaged(apiKey: String, baseUrl: String) {
+        val appCtx = context?.applicationContext ?: return
+        Thread {
+            try {
+                OperationsPagedSync.fetchAndProcess(
+                    apiKey = apiKey,
+                    baseUrl = baseUrl,
+                ) { operations ->
+                    activity?.runOnUiThread {
+                        OperationsSyncCoordinator.onParsedOperations(appCtx, operations)
+                    }
+                }
+            } catch (_: Exception) {
                 // Тихий фоновый sync уведомлений: отсутствие сети не блокирует экран.
             }
-
-            override fun onResponse(call: Call, response: Response) {
-                val body = response.body?.string() ?: ""
-                if (!response.isSuccessful || body.isBlank()) return
-                val appCtx = context?.applicationContext ?: return
-                activity?.runOnUiThread {
-                    BalanceNotificationHelper.syncIncomingTipsFromOperationsJson(
-                        appCtx,
-                        body,
-                        null,
-                    )
-                }
-            }
-        })
+        }.start()
     }
 
     private fun bindLimits(

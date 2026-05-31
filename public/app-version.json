@@ -1,7 +1,7 @@
 {
-  "versionCode": 6,
-  "versionName": "1.1.4",
+  "versionCode": 9,
+  "versionName": "1.1.7",
   "apkUrl": "/freetips.apk",
   "minVersionCode": 1,
-  "releaseNotes": "Исправлено отображение истории зачислений: полный список операций, фильтр по сумме, сообщения об ошибках."
+  "releaseNotes": "Push sync stability: paged history fetch, pending->delivered marks, anti-duplicates, polling jitter."
 }

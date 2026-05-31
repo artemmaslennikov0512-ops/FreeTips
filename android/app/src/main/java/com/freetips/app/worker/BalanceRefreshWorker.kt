@@ -8,7 +8,8 @@ import com.freetips.app.data.ApiClient
 import com.freetips.app.data.SecurePrefs
 import com.freetips.app.ui.home.parseProfileResponseSafe
 import com.freetips.app.util.BalanceCache
-import com.freetips.app.util.BalanceNotificationHelper
+import com.freetips.app.util.OperationsPagedSync
+import com.freetips.app.util.OperationsSyncCoordinator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.IOException
@@ -52,26 +53,15 @@ class BalanceRefreshWorker(
                 return@withContext Result.success()
             }
 
-            // Сначала пооперационные пуши, затем обновление базы totalGuestPaidTipsKop.
+            // Полная история (постранично) → пуш по каждому tip-id без отметки.
             runCatching {
-                val since = BalanceNotificationHelper.sinceIsoForNextFetch(applicationContext)
-                val opsResponse = ApiClient(apiKey, prefs.effectiveBaseUrl).getOperations(50, 0, since).execute()
-                if (opsResponse.isSuccessful) {
-                    val opsBody = opsResponse.body?.string() ?: ""
-                    if (opsBody.isNotBlank()) {
-                        BalanceNotificationHelper.syncIncomingTipsFromOperationsJson(
-                            applicationContext,
-                            opsBody,
-                            stats.totalGuestPaidTipsKop,
-                        )
-                    }
+                OperationsPagedSync.fetchAndProcess(
+                    apiKey = apiKey,
+                    baseUrl = prefs.effectiveBaseUrl,
+                ) { operations ->
+                    OperationsSyncCoordinator.onParsedOperations(applicationContext, operations)
                 }
             }
-            BalanceNotificationHelper.showIfNeeded(
-                applicationContext,
-                stats.balanceKop,
-                stats.totalGuestPaidTipsKop,
-            )
             BalanceCache.save(applicationContext, stats.balanceKop)
             applicationContext.sendBroadcast(Intent(ACTION_BALANCE_UPDATED).setPackage(applicationContext.packageName))
             BalanceRefreshScheduler.scheduleNext(applicationContext)

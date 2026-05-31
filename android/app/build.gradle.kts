@@ -11,8 +11,8 @@ android {
         applicationId = "com.freetips.app"
         minSdk = 24
         targetSdk = 35
-        versionCode = 6
-        versionName = "1.1.4"
+        versionCode = 9
+        versionName = "1.1.7"
 
         // URL сервера (тот же, что NEXT_PUBLIC_APP_URL на бэкенде). Менять при смене окружения.
         buildConfigField("String", "BASE_URL", "\"https://free-tips.ru\"")
@@ -43,6 +43,9 @@ android {
         viewBinding = true
         buildConfig = true
     }
+    testOptions {
+        unitTests.isIncludeAndroidResources = true
+    }
 }
 
 dependencies {
@@ -59,4 +62,6 @@ dependencies {
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
     implementation("com.google.zxing:core:3.5.2")
     implementation("androidx.work:work-runtime-ktx:2.9.0")
+    testImplementation("junit:junit:4.13.2")
 }
+

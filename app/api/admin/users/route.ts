@@ -229,7 +229,7 @@ export async function GET(request: NextRequest) {
         FROM tip_links tl
         WHERE tl."userId" = fu.id
       ) tl ON TRUE
-      ORDER BY ${Prisma.raw(statsSortColumn)} ${Prisma.raw(statsSortDirection)}, fu.created_at DESC
+      ORDER BY ${Prisma.raw(statsSortColumn)} ${Prisma.raw(statsSortDirection)}, fu.created_at DESC, fu.unique_id ASC
       LIMIT ${limit}
       OFFSET ${offset}
     `);
@@ -261,6 +261,11 @@ export async function GET(request: NextRequest) {
     });
   }
 
+  const baseUsersOrderBy: Prisma.UserOrderByWithRelationInput[] =
+    sortBy === "login"
+      ? [{ login: sortOrder }, { createdAt: "desc" }, { uniqueId: "asc" }]
+      : [{ createdAt: sortOrder }, { uniqueId: "asc" }];
+
   const baseUsers = await db.user.findMany({
     where,
     select: {
@@ -277,7 +282,7 @@ export async function GET(request: NextRequest) {
         orderBy: { createdAt: "asc" },
       },
     },
-    orderBy: { [sortBy === "login" ? "login" : "createdAt"]: sortOrder },
+    orderBy: baseUsersOrderBy,
     take: limit,
     skip: offset,
   });

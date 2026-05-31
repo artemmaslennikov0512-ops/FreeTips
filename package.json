@@ -20,7 +20,9 @@
     "db:generate": "prisma generate",
     "db:studio": "prisma studio",
     "db:push": "prisma db push",
-    "copy-apk": "node -e \"const fs=require('fs'); const p='android/app/build/outputs/apk/debug/app-debug.apk'; const d='public/freetips.apk'; fs.copyFileSync(p,d); console.log('APK скопирован в public/freetips.apk');\" && node scripts/sync-app-version.mjs"
+    "copy-apk": "node -e \"const fs=require('fs'); const p='android/app/build/outputs/apk/debug/app-debug.apk'; const d='public/freetips.apk'; if(!fs.existsSync(p)){console.error('Сначала соберите APK: cd android && gradlew assembleDebug'); process.exit(1);} fs.copyFileSync(p,d); console.log('APK скопирован в public/freetips.apk');\" && node scripts/sync-app-version.mjs",
+    "verify-apk-sync": "node scripts/verify-apk-sync.mjs",
+    "android:publish": "cd android && gradlew.bat assembleDebug && cd .. && npm run copy-apk && npm run verify-apk-sync"
   },
   "dependencies": {
     "@pdf-lib/fontkit": "^1.1.1",

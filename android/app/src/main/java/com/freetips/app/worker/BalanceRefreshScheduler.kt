@@ -9,12 +9,12 @@ import android.os.SystemClock
 import com.freetips.app.util.PollJitter
 
 /**
- * Планирует фоновое обновление баланса раз в минуту через AlarmManager
+ * Планирует фоновое обновление баланса раз в 2 минуты через AlarmManager
  * (WorkManager не позволяет периодичность чаще 15 минут).
  */
 object BalanceRefreshScheduler {
 
-    private const val INTERVAL_MS = 30_000L
+    private const val INTERVAL_MS = 120_000L
     private const val ACTION_REFRESH = "com.freetips.app.BALANCE_REFRESH"
 
     fun scheduleNext(context: Context) {

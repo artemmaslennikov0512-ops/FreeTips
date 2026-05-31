@@ -50,7 +50,7 @@ private fun typeLabel(op: ParsedOperation): String =
 
 class TransactionsFragment : Fragment() {
 
-    private val refreshIntervalMs = 60_000L
+    private val refreshIntervalMs = 120_000L
     private val handler = Handler(Looper.getMainLooper())
     private var refreshRunnable: Runnable? = null
     private var rateLimitRetryRunnable: Runnable? = null

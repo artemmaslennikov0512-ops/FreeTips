@@ -31,10 +31,10 @@ const API_RATE_LIMIT_MAX =
     ? Math.max(200, parseInt(process.env.API_RATE_LIMIT_MAX, 10) || 1200)
     : API_RATE_DEFAULT_MAX;
 const API_RATE_API_KEY_DEFAULT_MAX =
-  typeof process !== "undefined" && process.env.NODE_ENV === "production" ? 12000 : 20000;
+  typeof process !== "undefined" && process.env.NODE_ENV === "production" ? 20000 : 30000;
 const API_RATE_LIMIT_API_KEY_MAX =
   typeof process !== "undefined" && process.env.API_RATE_LIMIT_API_KEY_MAX
-    ? Math.max(1000, parseInt(process.env.API_RATE_LIMIT_API_KEY_MAX, 10) || 12000)
+    ? Math.max(2000, parseInt(process.env.API_RATE_LIMIT_API_KEY_MAX, 10) || 20000)
     : API_RATE_API_KEY_DEFAULT_MAX;
 const HSTS_MAX_AGE_SECONDS = 15552000;
 const RATE_LIMIT_OPTIONS = {

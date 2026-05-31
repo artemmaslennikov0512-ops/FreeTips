@@ -137,8 +137,8 @@ fun parseProfileResponseSafe(json: String): ProfileResponse? {
 
 class HomeFragment : Fragment() {
 
-    /** Автообновление баланса раз в 30 секунд (swipe и возврат на вкладку — сразу). */
-    private val refreshIntervalMs = 30_000L
+    /** Автообновление баланса раз в 60 секунд (swipe и возврат на вкладку — сразу). */
+    private val refreshIntervalMs = 60_000L
     private val handler = Handler(Looper.getMainLooper())
     private var refreshRunnable: Runnable? = null
     private var balanceUpdatedReceiver: BroadcastReceiver? = null

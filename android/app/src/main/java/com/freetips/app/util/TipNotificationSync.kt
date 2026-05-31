@@ -80,7 +80,8 @@ internal object TipNotificationSync {
                     }
                     ServerPushClaimApi.ClaimResult.ERROR -> {
                         PushSyncMetrics.incServerClaimError(appCtx)
-                        continue
+                        // Fail-open: do not lose user-visible push when claim API is temporarily failing.
+                        // Local delivered mark still protects this device from duplicates.
                     }
                 }
 

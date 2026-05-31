@@ -47,6 +47,14 @@ const RATE_LIMIT_OPTIONS_API_KEY = {
   maxRequests: API_RATE_LIMIT_API_KEY_MAX,
   keyPrefix: "api-mobile",
 };
+const API_KEY_RATE_LIMIT_BYPASS_PREFIXES = [
+  "/api/profile",
+  "/api/operations",
+  "/api/payouts",
+  "/api/transactions",
+  "/api/links",
+  "/api/push/tips/claim",
+];
 
 function isApiRequest(pathname: string): boolean {
   return pathname.startsWith(API_PREFIX);
@@ -179,6 +187,9 @@ async function handleRateLimit(request: NextRequest, pathname: string, requestId
   if (!isApiRequest(pathname)) return null;
   const apiKey = request.headers.get("x-api-key")?.trim();
   const hasApiKey = !!apiKey && apiKey.length >= 16;
+  if (hasApiKey && API_KEY_RATE_LIMIT_BYPASS_PREFIXES.some((prefix) => pathname.startsWith(prefix))) {
+    return null;
+  }
   const rateLimitKey = hasApiKey
     ? `apk:${createHash("sha256").update(apiKey, "utf8").digest("hex").slice(0, 24)}`
     : getRateLimitIpKey(request);

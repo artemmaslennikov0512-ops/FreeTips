@@ -1,6 +1,9 @@
 package com.freetips.app
 
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.res.ColorStateList
 import android.os.Build
 import android.os.Bundle
@@ -27,6 +30,7 @@ class MainActivity : AppCompatActivity(), NotificationsBottomSheet.BadgeUpdater 
     private lateinit var binding: ActivityMainBinding
     private var notificationBadge: BadgeDrawable? = null
     private var currentDestinationId: Int = R.id.nav_home
+    private var tipDeliveredReceiver: BroadcastReceiver? = null
 
     private val requestNotificationPermission = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -125,6 +129,16 @@ class MainActivity : AppCompatActivity(), NotificationsBottomSheet.BadgeUpdater 
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+        registerTipDeliveredReceiver()
+    }
+
+    override fun onStop() {
+        unregisterTipDeliveredReceiver()
+        super.onStop()
+    }
+
     override fun onResume() {
         super.onResume()
         if (::binding.isInitialized) {
@@ -139,6 +153,31 @@ class MainActivity : AppCompatActivity(), NotificationsBottomSheet.BadgeUpdater 
 
     override fun onNotificationsViewed() {
         updateNotificationBadge()
+    }
+
+    private fun registerTipDeliveredReceiver() {
+        if (tipDeliveredReceiver != null) return
+        tipDeliveredReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context, intent: Intent) {
+                if (intent.action == BalanceNotificationHelper.ACTION_TIP_NOTIFICATION_DELIVERED) {
+                    updateNotificationBadge()
+                }
+            }
+        }
+        val filter = IntentFilter(BalanceNotificationHelper.ACTION_TIP_NOTIFICATION_DELIVERED)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(tipDeliveredReceiver, filter, RECEIVER_NOT_EXPORTED)
+        } else {
+            @Suppress("DEPRECATION")
+            registerReceiver(tipDeliveredReceiver, filter)
+        }
+    }
+
+    private fun unregisterTipDeliveredReceiver() {
+        tipDeliveredReceiver?.let {
+            try { unregisterReceiver(it) } catch (_: Exception) {}
+            tipDeliveredReceiver = null
+        }
     }
 
     private fun updateNotificationBadge() {

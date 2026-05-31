@@ -265,7 +265,8 @@ class TransactionsFragment : Fragment() {
             }
         })
 
-        ApiClient(apiKey, baseUrl).getOperations(50, 0).enqueue(object : Callback {
+        val since = com.freetips.app.util.BalanceNotificationHelper.sinceIsoForNextFetch(ctx)
+        ApiClient(apiKey, baseUrl).getOperations(50, 0, since).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 activity?.runOnUiThread {
                     val ui = _binding ?: return@runOnUiThread
@@ -289,11 +290,6 @@ class TransactionsFragment : Fragment() {
                         try {
                             val data = parseOperationsResponseSafe(body)
                             allOperations = data.operations
-                            com.freetips.app.util.BalanceNotificationHelper.syncIncomingTipsFromOperationsJson(
-                                ui.root.context.applicationContext,
-                                body,
-                                null,
-                            )
                             applyFilter()
                         } catch (_: Exception) {}
                     } else {

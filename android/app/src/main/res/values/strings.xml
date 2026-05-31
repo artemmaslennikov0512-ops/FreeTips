@@ -37,4 +37,5 @@
     <string name="update_force_hint">Эта версия приложения больше не поддерживается. Обновите, чтобы продолжить работу.</string>
     <string name="update_button">Обновить</string>
     <string name="update_later">Позже</string>
+    <string name="profile_app_version_fmt">Версия приложения: %1$s</string>
 </resources>

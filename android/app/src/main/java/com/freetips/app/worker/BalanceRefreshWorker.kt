@@ -54,7 +54,8 @@ class BalanceRefreshWorker(
 
             // Сначала пооперационные пуши, затем обновление базы totalGuestPaidTipsKop.
             runCatching {
-                val opsResponse = ApiClient(apiKey, prefs.effectiveBaseUrl).getOperations(50, 0).execute()
+                val since = BalanceNotificationHelper.sinceIsoForNextFetch(applicationContext)
+                val opsResponse = ApiClient(apiKey, prefs.effectiveBaseUrl).getOperations(50, 0, since).execute()
                 if (opsResponse.isSuccessful) {
                     val opsBody = opsResponse.body?.string() ?: ""
                     if (opsBody.isNotBlank()) {
@@ -86,5 +87,6 @@ class BalanceRefreshWorker(
 
     companion object {
         const val ACTION_BALANCE_UPDATED = "com.freetips.app.BALANCE_UPDATED"
+        const val UNIQUE_WORK_NAME = "balance_refresh"
     }
 }

@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.freetips.app.ApiKeyEntryActivity
+import com.freetips.app.BuildConfig
 import com.freetips.app.R
 import com.freetips.app.data.ApiClient
 import com.freetips.app.data.SecurePrefs
@@ -33,6 +34,7 @@ class ProfileFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.swipeRefresh.setColorSchemeResources(R.color.primary)
         binding.swipeRefresh.setOnRefreshListener { loadProfile() }
+        binding.versionText.text = getString(R.string.profile_app_version_fmt, BuildConfig.VERSION_NAME)
         loadProfile()
         binding.btnLogout.setOnClickListener {
             SecurePrefs(requireContext()).clear()

@@ -10,6 +10,7 @@ import com.freetips.app.MainActivity
 import com.freetips.app.R
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import java.time.Instant
 
 /**
  * Уведомления о пополнении: один SUCCESS tip — один пуш и одна запись в колокольчике.
@@ -17,6 +18,9 @@ import com.google.gson.JsonObject
  * В истории операций показывается tipNetKop (нетто после комиссии, напр. 97,50 ₽).
  */
 object BalanceNotificationHelper {
+
+    /** После доставки пуша + записи в колокольчик (для обновления badge в UI). */
+    const val ACTION_TIP_NOTIFICATION_DELIVERED = "com.freetips.app.TIP_NOTIFICATION_DELIVERED"
 
     private const val PREFS_NAME = "balance_notification"
     private const val KEY_LAST_GUEST_PAID_TIPS_KOP = "last_guest_paid_tips_kop"
@@ -36,13 +40,22 @@ object BalanceNotificationHelper {
     private const val KEY_V5_MIGRATED = "notify_v5_migrated"
     private const val KEY_V6_MIGRATED = "notify_v6_migrated"
     private const val KEY_LEGACY_RECONCILE_DONE = "notify_legacy_reconcile_done"
+    /** Время последней успешной синхронизации /api/operations (ISO-8601 для query since). */
+    private const val KEY_LAST_OPS_SYNC_MILLIS = "last_ops_sync_millis"
     private const val SCHEMA_GUEST_PAID_ONLY = 2
     private const val SCHEMA_TIP_ID_DEDUP = 5
     private const val MAX_ITEMS = 100
     private const val MAX_NOTIFIED_TIP_IDS = 500
     private const val NOTIFICATION_ID_BASE = 10_000
+    /** Перекрытие при запросе since — подтягиваем операции чуть раньше последней синхронизации. */
+    private const val SINCE_OVERLAP_MS = 120_000L
 
     private val lock = Any()
+
+    /** In-memory кэш tip-id: защита от гонки SharedPreferences.apply() между потоками. */
+    private var pushedIdsCache: LinkedHashSet<String>? = null
+    private var sampledIdsCache: LinkedHashSet<String>? = null
+    private var idsCacheLoaded = false
 
     data class TipOperation(
         val id: String,
@@ -52,6 +65,28 @@ object BalanceNotificationHelper {
         val status: String,
         val createdAtMillis: Long = System.currentTimeMillis(),
     )
+
+    /**
+     * ISO-8601 для GET /api/operations?since=… с перекрытием, чтобы не терять операции на границе.
+     * null — bootstrap ещё не завершён, нужен полный список.
+     */
+    fun sinceIsoForNextFetch(context: Context): String? {
+        synchronized(lock) {
+            val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            if (!prefs.getBoolean(KEY_TIPS_BOOTSTRAP_DONE, false)) return null
+            val lastMs = prefs.getLong(KEY_LAST_OPS_SYNC_MILLIS, 0L)
+            if (lastMs <= 0L) return null
+            val sinceMs = (lastMs - SINCE_OVERLAP_MS).coerceAtLeast(0L)
+            return Instant.ofEpochMilli(sinceMs).toString()
+        }
+    }
+
+    private fun markOpsSyncCompleted(context: Context) {
+        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            .edit()
+            .putLong(KEY_LAST_OPS_SYNC_MILLIS, System.currentTimeMillis())
+            .commit()
+    }
 
     /**
      * Пуш: сколько заплатил гость (100 ₽), не нетто на баланс (97,50 ₽).
@@ -79,8 +114,7 @@ object BalanceNotificationHelper {
                 prefs.edit()
                     .putInt(KEY_LAST_GUEST_PAID_TIPS_KOP, totalGuestPaidTipsKop.coerceAtLeast(0))
                     .putInt(KEY_BASIS_SCHEMA, SCHEMA_GUEST_PAID_ONLY)
-                    .putInt(KEY_LAST_BALANCE_KOP, balanceKop)
-                    .apply()
+                    .commit()
                 return
             }
 
@@ -91,14 +125,14 @@ object BalanceNotificationHelper {
                 prefs.edit()
                     .putInt(KEY_LAST_GUEST_PAID_TIPS_KOP, basis)
                     .putInt(KEY_LAST_BALANCE_KOP, balanceKop)
-                    .apply()
+                    .commit()
                 return
             }
 
             prefs.edit()
                 .putInt(KEY_LAST_GUEST_PAID_TIPS_KOP, basis)
                 .putInt(KEY_LAST_BALANCE_KOP, balanceKop)
-                .apply()
+                .commit()
         }
     }
 
@@ -115,6 +149,7 @@ object BalanceNotificationHelper {
             val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             migrateToV6IfNeeded(prefs)
             migrateToV5IfNeeded(prefs)
+            ensureIdsCacheLoaded(prefs)
 
             val normalized = tips
                 .asSequence()
@@ -124,8 +159,8 @@ object BalanceNotificationHelper {
                 .toList()
             if (normalized.isEmpty()) return
 
-            val pushedIds = getPushedTipIds(prefs).toMutableSet()
-            val sampledIds = getSampledTipIds(prefs).toMutableSet()
+            val pushedIds = pushedIdsCache!!
+            val sampledIds = sampledIdsCache!!
 
             if (!prefs.getBoolean(KEY_TIPS_BOOTSTRAP_DONE, false)) {
                 for (tip in normalized) {
@@ -135,19 +170,24 @@ object BalanceNotificationHelper {
                 prefs.edit()
                     .putBoolean(KEY_TIPS_BOOTSTRAP_DONE, true)
                     .putInt(KEY_BASIS_SCHEMA, SCHEMA_TIP_ID_DEDUP)
-                    .apply()
+                    .commit()
+                markOpsSyncCompleted(context)
                 return
             }
 
             if (!prefs.getBoolean(KEY_LEGACY_RECONCILE_DONE, false)) {
-                attachLegacyInAppTipIds(prefs, normalized)
-                prefs.edit().putBoolean(KEY_LEGACY_RECONCILE_DONE, true).apply()
+                attachLegacyInAppTipIds(prefs, normalized, pushedIds, sampledIds)
+                prefs.edit().putBoolean(KEY_LEGACY_RECONCILE_DONE, true).commit()
             }
+
+            // Колокольчик = уже доставлено: tip-id из inbox блокирует повторный пуш при любом числе опросов.
+            reconcileInboxIntoPushedIds(prefs, pushedIds)
+            backfillInboxForAlreadyPushedTips(context, prefs, pushedIds, normalized)
 
             val skipIds = pushedIds + sampledIds
             val pending = normalized
                 .filter { !skipIds.contains(it.id) }
-                .asReversed()
+                .sortedBy { it.createdAtMillis }
 
             for (tip in pending) {
                 val displayKop = displayKopForPush(tip)
@@ -158,8 +198,9 @@ object BalanceNotificationHelper {
                 deliverTipNotification(context, prefs, tip, displayKop, pushedIds)
             }
 
-            savePushedTipIds(prefs, pushedIds)
+            savePushedTipIds(prefs, pushedIds, getInAppTipIds(prefs))
             saveSampledTipIds(prefs, sampledIds)
+            markOpsSyncCompleted(context)
         }
     }
 
@@ -201,22 +242,103 @@ object BalanceNotificationHelper {
         prefs: android.content.SharedPreferences,
         tip: TipOperation,
         displayKop: Int,
-        pushedIds: MutableSet<String>,
+        pushedIds: LinkedHashSet<String>,
     ) {
+        if (pushedIds.contains(tip.id)) return
+        if (isTipAlreadyInInbox(prefs, tip.id)) {
+            pushedIds.add(tip.id)
+            savePushedTipIds(prefs, pushedIds, getInAppTipIds(prefs))
+            return
+        }
+        if (attachLegacyInboxEntryIfMatches(prefs, tip)) {
+            pushedIds.add(tip.id)
+            savePushedTipIds(prefs, pushedIds, getInAppTipIds(prefs))
+            return
+        }
         if (!pushedIds.add(tip.id)) return
+        // 1) id на диск — блокирует повторный пуш при параллельных опросах.
+        savePushedTipIds(prefs, pushedIds, getInAppTipIds(prefs))
 
         val rubText = formatKopToRub(displayKop)
         val title = context.getString(R.string.notification_topup_title)
         val text = context.getString(R.string.notification_topup_body, rubText)
+        // 2) Колокольчик на диск ДО пуша — после перезапуска reconcile найдёт tip-id.
+        if (!appendInAppInboxSilent(prefs, tip.id, displayKop, text, tip.createdAtMillis)) {
+            return
+        }
+        // 3) Системный пуш — только после успешного сохранения в колокольчик.
         showSystemNotification(context, title, text, tip.id)
-        addToInAppList(context, tip.id, displayKop, text, tip.createdAtMillis)
-        savePushedTipIds(prefs, pushedIds)
+        context.sendBroadcast(
+            Intent(ACTION_TIP_NOTIFICATION_DELIVERED).setPackage(context.packageName),
+        )
     }
 
-    /** Только проставляет tipId в старых записях колокольчика; пуш не блокирует. */
+    /**
+     * Если пуш уже был (id в pushedIds), но запись в колокольчик не сохранилась (краш/kill) —
+     * восстанавливаем inbox без повторного notify().
+     */
+    private fun backfillInboxForAlreadyPushedTips(
+        context: Context,
+        prefs: android.content.SharedPreferences,
+        pushedIds: LinkedHashSet<String>,
+        normalized: List<TipOperation>,
+    ) {
+        val inboxIds = getInAppTipIds(prefs)
+        for (tip in normalized) {
+            if (!pushedIds.contains(tip.id) || inboxIds.contains(tip.id)) continue
+            val displayKop = displayKopForPush(tip)
+            if (displayKop <= 0) continue
+            val text = context.getString(R.string.notification_topup_body, formatKopToRub(displayKop))
+            appendInAppInboxSilent(prefs, tip.id, displayKop, text, tip.createdAtMillis)
+        }
+    }
+
+    /** tip-id из колокольчика → pushedIds, чтобы повторный опрос не слал пуш снова. */
+    private fun reconcileInboxIntoPushedIds(
+        prefs: android.content.SharedPreferences,
+        pushedIds: LinkedHashSet<String>,
+    ) {
+        val inboxIds = getInAppTipIds(prefs)
+        if (inboxIds.isEmpty()) return
+        val before = pushedIds.size
+        pushedIds.addAll(inboxIds)
+        if (pushedIds.size != before) {
+            savePushedTipIds(prefs, pushedIds, inboxIds)
+        }
+    }
+
+    private fun isTipAlreadyInInbox(prefs: android.content.SharedPreferences, tipId: String): Boolean =
+        getInAppTipIds(prefs).contains(tipId)
+
+    /** Запись в колокольчике без tipId — привязываем id и не шлём повторный пуш. */
+    private fun attachLegacyInboxEntryIfMatches(
+        prefs: android.content.SharedPreferences,
+        tip: TipOperation,
+    ): Boolean {
+        val gson = com.google.gson.Gson()
+        val list = loadInAppJsonObjects(prefs, gson)
+        val displayKop = displayKopForPush(tip)
+        val legacyIdx = list.indexOfFirst { obj ->
+            val existingId = obj.get("tipId")?.takeIf { it.isJsonPrimitive }?.asString?.trim().orEmpty()
+            if (existingId.isNotEmpty()) return@indexOfFirst false
+            val existingAmount = obj.get("amountKop")?.takeIf { it.isJsonPrimitive }?.asInt ?: return@indexOfFirst false
+            val existingTime = obj.get("time")?.takeIf { it.isJsonPrimitive }?.asLong ?: return@indexOfFirst false
+            val netKop = tip.tipNetKop ?: (tip.amountKop - tip.feeKop.coerceAtLeast(0)).coerceAtLeast(0)
+            (existingAmount == displayKop || existingAmount == netKop) &&
+                kotlin.math.abs(existingTime - tip.createdAtMillis) < 120_000L
+        }
+        if (legacyIdx < 0) return false
+        list[legacyIdx].addProperty("tipId", tip.id)
+        prefs.edit().putString(KEY_ITEMS_JSON, gson.toJson(list)).commit()
+        return true
+    }
+
+    /** Только проставляет tipId в старых записях колокольчика и помечает их pushed. */
     private fun attachLegacyInAppTipIds(
         prefs: android.content.SharedPreferences,
         normalized: List<TipOperation>,
+        pushedIds: LinkedHashSet<String>,
+        sampledIds: LinkedHashSet<String>,
     ) {
         val gson = com.google.gson.Gson()
         val list = loadInAppJsonObjects(prefs, gson)
@@ -226,7 +348,10 @@ object BalanceNotificationHelper {
         var changed = false
         for (obj in list) {
             val existingTipId = obj.get("tipId")?.takeIf { it.isJsonPrimitive }?.asString?.trim().orEmpty()
-            if (existingTipId.isNotEmpty()) continue
+            if (existingTipId.isNotEmpty()) {
+                pushedIds.add(existingTipId)
+                continue
+            }
             val amountKop = obj.get("amountKop")?.takeIf { it.isJsonPrimitive }?.asInt ?: continue
             val matchIdx = unmatchedTips.indexOfFirst { tip ->
                 val pushKop = displayKopForPush(tip)
@@ -237,37 +362,50 @@ object BalanceNotificationHelper {
             if (matchIdx < 0) continue
             val match = unmatchedTips.removeAt(matchIdx)
             obj.addProperty("tipId", match.id)
+            pushedIds.add(match.id)
             changed = true
         }
         if (changed) {
-            prefs.edit().putString(KEY_ITEMS_JSON, gson.toJson(list)).apply()
+            prefs.edit().putString(KEY_ITEMS_JSON, gson.toJson(list)).commit()
         }
+        savePushedTipIds(prefs, pushedIds, getInAppTipIds(prefs))
+        saveSampledTipIds(prefs, sampledIds)
+    }
+
+    private fun ensureIdsCacheLoaded(prefs: android.content.SharedPreferences) {
+        if (idsCacheLoaded) return
+        pushedIdsCache = readOrderedIdSet(prefs.getString(KEY_PUSHED_TIP_IDS_JSON, "[]") ?: "[]")
+        sampledIdsCache = readOrderedIdSet(prefs.getString(KEY_SAMPLED_TIP_IDS_JSON, "[]") ?: "[]")
+        idsCacheLoaded = true
     }
 
     private fun migrateToV6IfNeeded(prefs: android.content.SharedPreferences) {
         if (prefs.getBoolean(KEY_V6_MIGRATED, false)) return
-        val pushed = getInAppTipIds(prefs).toMutableSet()
-        savePushedTipIds(prefs, pushed)
-        saveSampledTipIds(prefs, emptySet())
+        ensureIdsCacheLoaded(prefs)
+        val pushed = pushedIdsCache!!
+        pushed.addAll(getInAppTipIds(prefs))
+        savePushedTipIds(prefs, pushed, getInAppTipIds(prefs))
+        saveSampledTipIds(prefs, linkedSetOf())
         prefs.edit()
             .remove(KEY_NOTIFIED_TIP_IDS_JSON)
             .putBoolean(KEY_V6_MIGRATED, true)
             .putBoolean(KEY_LEGACY_RECONCILE_DONE, false)
-            .apply()
+            .commit()
     }
 
     private fun migrateToV5IfNeeded(prefs: android.content.SharedPreferences) {
         if (prefs.getBoolean(KEY_V5_MIGRATED, false)) return
 
-        // v6 использует pushed/sampled; здесь только schema/bootstrap для старых установок.
-        val notified = getInAppTipIds(prefs).toMutableSet()
-        savePushedTipIds(prefs, notified)
+        ensureIdsCacheLoaded(prefs)
+        val pushed = pushedIdsCache!!
+        pushed.addAll(getInAppTipIds(prefs))
+        savePushedTipIds(prefs, pushed, getInAppTipIds(prefs))
         prefs.edit()
             .remove(KEY_SEEN_TIP_IDS_JSON)
             .putBoolean(KEY_V5_MIGRATED, true)
             .putBoolean(KEY_TIPS_BOOTSTRAP_DONE, prefs.getInt(KEY_BASIS_SCHEMA, 0) >= SCHEMA_GUEST_PAID_ONLY)
             .putInt(KEY_BASIS_SCHEMA, SCHEMA_TIP_ID_DEDUP)
-            .apply()
+            .commit()
     }
 
     private fun parseLongField(obj: JsonObject, name: String): Long? {
@@ -325,17 +463,31 @@ object BalanceNotificationHelper {
         } catch (_: SecurityException) { }
     }
 
-    private fun addToInAppList(
-        context: Context,
+    /** Локальный inbox колокольчика — без системного пуша. @return true если запись есть на диске. */
+    private fun appendInAppInboxSilent(
+        prefs: android.content.SharedPreferences,
         tipId: String,
         amountKop: Int,
         displayText: String,
         timeMillis: Long,
-    ) {
-        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+    ): Boolean {
         val gson = com.google.gson.Gson()
         val list = loadInAppJsonObjects(prefs, gson)
-        if (list.any { it.get("tipId")?.asString == tipId }) return
+        val existingIdx = list.indexOfFirst { it.get("tipId")?.asString == tipId }
+        if (existingIdx >= 0) return true
+
+        // Старая запись без tipId — привязываем tipId вместо дубля.
+        val legacyIdx = list.indexOfFirst { obj ->
+            val existingId = obj.get("tipId")?.takeIf { it.isJsonPrimitive }?.asString?.trim().orEmpty()
+            if (existingId.isNotEmpty()) return@indexOfFirst false
+            val existingAmount = obj.get("amountKop")?.takeIf { it.isJsonPrimitive }?.asInt ?: return@indexOfFirst false
+            val existingTime = obj.get("time")?.takeIf { it.isJsonPrimitive }?.asLong ?: return@indexOfFirst false
+            existingAmount == amountKop && kotlin.math.abs(existingTime - timeMillis) < 120_000L
+        }
+        if (legacyIdx >= 0) {
+            list[legacyIdx].addProperty("tipId", tipId)
+            return prefs.edit().putString(KEY_ITEMS_JSON, gson.toJson(list)).commit()
+        }
 
         val obj = JsonObject().apply {
             addProperty("tipId", tipId)
@@ -345,7 +497,7 @@ object BalanceNotificationHelper {
         }
         list.add(0, obj)
         while (list.size > MAX_ITEMS) list.removeAt(list.size - 1)
-        prefs.edit().putString(KEY_ITEMS_JSON, gson.toJson(list)).apply()
+        return prefs.edit().putString(KEY_ITEMS_JSON, gson.toJson(list)).commit()
     }
 
     private fun loadInAppJsonObjects(
@@ -366,30 +518,40 @@ object BalanceNotificationHelper {
             .filter { it.isNotEmpty() }
             .toSet()
 
-    private fun getPushedTipIds(prefs: android.content.SharedPreferences): Set<String> =
-        parseStringSetFromJson(prefs.getString(KEY_PUSHED_TIP_IDS_JSON, "[]") ?: "[]")
-
-    private fun getSampledTipIds(prefs: android.content.SharedPreferences): Set<String> =
-        parseStringSetFromJson(prefs.getString(KEY_SAMPLED_TIP_IDS_JSON, "[]") ?: "[]")
-
-    private fun savePushedTipIds(prefs: android.content.SharedPreferences, ids: Set<String>) {
-        prefs.edit().putString(KEY_PUSHED_TIP_IDS_JSON, com.google.gson.Gson().toJson(ids.take(MAX_NOTIFIED_TIP_IDS))).apply()
-    }
-
-    private fun saveSampledTipIds(prefs: android.content.SharedPreferences, ids: Set<String>) {
-        prefs.edit().putString(KEY_SAMPLED_TIP_IDS_JSON, com.google.gson.Gson().toJson(ids.take(MAX_NOTIFIED_TIP_IDS))).apply()
-    }
-
-    private fun parseStringSetFromJson(json: String): Set<String> =
+    private fun readOrderedIdSet(json: String): LinkedHashSet<String> {
+        val result = linkedSetOf<String>()
         try {
             val arr = com.google.gson.Gson().fromJson(json, JsonArray::class.java) ?: JsonArray()
-            (0 until arr.size())
-                .mapNotNull { idx -> arr.get(idx)?.takeIf { it.isJsonPrimitive }?.asString?.trim() }
-                .filter { it.isNotEmpty() }
-                .toSet()
-        } catch (_: Exception) {
-            emptySet()
+            for (idx in 0 until arr.size()) {
+                val id = arr.get(idx)?.takeIf { it.isJsonPrimitive }?.asString?.trim().orEmpty()
+                if (id.isNotEmpty()) result.add(id)
+            }
+        } catch (_: Exception) { }
+        return result
+    }
+
+    private fun savePushedTipIds(
+        prefs: android.content.SharedPreferences,
+        ids: LinkedHashSet<String>,
+        protectFromTrim: Set<String> = emptySet(),
+    ) {
+        trimOldest(ids, protectFromTrim)
+        pushedIdsCache = ids
+        prefs.edit().putString(KEY_PUSHED_TIP_IDS_JSON, com.google.gson.Gson().toJson(ids.toList())).commit()
+    }
+
+    private fun saveSampledTipIds(prefs: android.content.SharedPreferences, ids: LinkedHashSet<String>) {
+        trimOldest(ids)
+        sampledIdsCache = ids
+        prefs.edit().putString(KEY_SAMPLED_TIP_IDS_JSON, com.google.gson.Gson().toJson(ids.toList())).commit()
+    }
+
+    private fun trimOldest(ids: LinkedHashSet<String>, protect: Set<String> = emptySet()) {
+        while (ids.size > MAX_NOTIFIED_TIP_IDS) {
+            val oldest = ids.firstOrNull { it !in protect } ?: break
+            ids.remove(oldest)
         }
+    }
 
     data class NotificationItem(
         val tipId: String?,
@@ -415,7 +577,7 @@ object BalanceNotificationHelper {
 
     fun clearInAppList(context: Context) {
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-            .edit().putString(KEY_ITEMS_JSON, "[]").apply()
+            .edit().putString(KEY_ITEMS_JSON, "[]").commit()
     }
 
     fun getUnreadCount(context: Context): Int {
@@ -429,6 +591,6 @@ object BalanceNotificationHelper {
         val viewedAt = if (list.isEmpty()) System.currentTimeMillis()
         else list.maxOf { it.timeMillis }
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-            .edit().putLong(KEY_LAST_VIEWED_MILLIS, viewedAt).apply()
+            .edit().putLong(KEY_LAST_VIEWED_MILLIS, viewedAt).commit()
     }
 }

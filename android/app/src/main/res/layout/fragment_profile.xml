@@ -129,6 +129,27 @@
                                 android:textColor="@color/primary"
                                 tools:text="Иван Иванов" />
                         </LinearLayout>
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="@color/primary"
+                            android:alpha="0.5" />
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:minHeight="44dp"
+                            android:paddingVertical="@dimen/spacing_md">
+                            <TextView
+                                android:id="@+id/versionText"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_vertical"
+                                android:textSize="@dimen/text_body"
+                                android:textColor="@color/primary"
+                                tools:text="Версия приложения: 1.1.2" />
+                        </LinearLayout>
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 

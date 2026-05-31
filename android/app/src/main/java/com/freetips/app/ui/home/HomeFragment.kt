@@ -183,7 +183,8 @@ class HomeFragment : Fragment() {
         balanceUpdatedReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
                 if (intent.action == BalanceRefreshWorker.ACTION_BALANCE_UPDATED) {
-                    loadProfile(silent = true)
+                    // Worker уже синхронизировал пуши — только обновляем баланс на экране.
+                    loadProfile(silent = true, syncNotifications = false)
                 }
             }
         }
@@ -225,7 +226,7 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun loadProfile(silent: Boolean = false) {
+    private fun loadProfile(silent: Boolean = false, syncNotifications: Boolean = true) {
         val b = _binding ?: return
         val ctx = context ?: return
         val prefs = SecurePrefs(ctx)
@@ -284,8 +285,11 @@ class HomeFragment : Fragment() {
             }
         })
 
+        if (!syncNotifications) return
+
         // Подтягиваем пропущенные входящие транзакции для колокольчика даже без открытия "Истории".
-        ApiClient(apiKey, prefs.effectiveBaseUrl).getOperations(50, 0).enqueue(object : Callback {
+        val since = BalanceNotificationHelper.sinceIsoForNextFetch(ctx)
+        ApiClient(apiKey, prefs.effectiveBaseUrl).getOperations(50, 0, since).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 // Тихий фоновый sync уведомлений: отсутствие сети не блокирует экран.
             }

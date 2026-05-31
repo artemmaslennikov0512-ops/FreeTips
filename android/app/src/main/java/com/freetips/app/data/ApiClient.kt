@@ -50,11 +50,13 @@ class ApiClient(private val apiKey: String, baseUrl: String = BuildConfig.BASE_U
             newRequest("$baseUrl/api/transactions?limit=$limit&offset=$offset") { get() }
         )
 
-    /** Unified operations (tips + payouts) for history. */
-    fun getOperations(limit: Int = 50, offset: Int = 0): Call =
-        sharedClient.newCall(
-            newRequest("$baseUrl/api/operations?limit=$limit&offset=$offset") { get() }
+    /** Unified operations (tips + payouts) for history. [since] — ISO-8601, только операции после указанного времени. */
+    fun getOperations(limit: Int = 50, offset: Int = 0, since: String? = null): Call {
+        val sinceParam = since?.trim()?.takeIf { it.isNotEmpty() }?.let { "&since=${java.net.URLEncoder.encode(it, Charsets.UTF_8.name())}" } ?: ""
+        return sharedClient.newCall(
+            newRequest("$baseUrl/api/operations?limit=$limit&offset=$offset$sinceParam") { get() }
         )
+    }
 
     fun getLinks(): Call =
         sharedClient.newCall(newRequest("$baseUrl/api/links") { get() })

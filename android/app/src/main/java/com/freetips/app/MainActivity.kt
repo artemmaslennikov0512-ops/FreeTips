@@ -17,6 +17,7 @@ import com.freetips.app.data.SecurePrefs
 import com.freetips.app.worker.BalanceRefreshScheduler
 import com.freetips.app.databinding.ActivityMainBinding
 import com.freetips.app.ui.notifications.NotificationsBottomSheet
+import com.freetips.app.util.AppUpdateChecker
 import com.freetips.app.util.BalanceNotificationHelper
 import com.google.android.material.badge.BadgeDrawable
 import com.google.android.material.badge.BadgeUtils
@@ -114,6 +115,7 @@ class MainActivity : AppCompatActivity(), NotificationsBottomSheet.BadgeUpdater 
             }
             updateNotificationBadge()
             BalanceRefreshScheduler.scheduleNext(this)
+            AppUpdateChecker.check(this)
         } catch (t: Throwable) {
             try {
                 SecurePrefs(this).clear()

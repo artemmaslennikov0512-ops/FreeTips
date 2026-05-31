@@ -1,0 +1,7 @@
+{
+  "versionCode": 2,
+  "versionName": "1.1.0",
+  "apkUrl": "/freetips.apk",
+  "minVersionCode": 1,
+  "releaseNotes": "Исправлены push-уведомления по каждой транзакции и отображение сумм в истории."
+}

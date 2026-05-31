@@ -17,6 +17,7 @@ import com.freetips.app.BuildConfig
 import com.freetips.app.data.ApiClient
 import com.freetips.app.data.SecurePrefs
 import com.freetips.app.databinding.ActivityApiKeyEntryBinding
+import com.freetips.app.util.AppUpdateChecker
 import okhttp3.Callback
 import okhttp3.Response
 import java.io.IOException
@@ -80,6 +81,7 @@ class ApiKeyEntryActivity : AppCompatActivity() {
                     }
                 }
             }
+            AppUpdateChecker.check(this)
         } catch (t: Throwable) {
             android.util.Log.e("ApiKeyEntry", "onCreate", t)
             try {

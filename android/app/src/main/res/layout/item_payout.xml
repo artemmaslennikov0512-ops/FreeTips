@@ -58,7 +58,7 @@
                 android:textSize="@dimen/text_body"
                 android:maxLines="1"
                 android:ellipsize="end"
-                android:textColor="@android:color/white"
+                android:textColor="@color/on_surface"
                 tools:text="500 ₽" />
             <ImageView
                 android:id="@+id/statusIcon"

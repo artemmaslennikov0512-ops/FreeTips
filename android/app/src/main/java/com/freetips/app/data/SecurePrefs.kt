@@ -13,6 +13,7 @@ private const val KEY_LOGIN_429_BLOCKED_UNTIL = "login_429_blocked_until"
 private const val KEY_THEME_MODE = "theme_mode"
 private const val THEME_MODE_DARK = "dark"
 private const val THEME_MODE_LIGHT = "light"
+private const val KEY_UPDATE_DISMISSED_VERSION = "update_dismissed_version_code"
 
 class SecurePrefs(context: Context) {
 
@@ -77,6 +78,13 @@ class SecurePrefs(context: Context) {
         get() = themeMode == THEME_MODE_LIGHT
         set(value) {
             themeMode = if (value) THEME_MODE_LIGHT else THEME_MODE_DARK
+        }
+
+    /** Последняя versionCode с сервера, для которой пользователь нажал «Позже». */
+    var updateDismissedVersionCode: Int
+        get() = prefs.getInt(KEY_UPDATE_DISMISSED_VERSION, 0)
+        set(value) {
+            prefs.edit().putInt(KEY_UPDATE_DISMISSED_VERSION, value.coerceAtLeast(0)).apply()
         }
 
     fun clear() {

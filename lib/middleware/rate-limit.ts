@@ -27,21 +27,21 @@ const DEFAULT_MAX_REQUESTS = 100;
 /** Окно и лимит для auth (login, регистрация, верификация кода, сброс пароля и т.д.) — по IP */
 export const AUTH_RATE_LIMIT = {
   windowMs: 15 * 60 * 1000,
-  maxRequests: 40,
+  maxRequests: 90,
   keyPrefix: "auth",
 } as const;
 
 /** Проверка TOTP при входе — жёстче против перебора */
 export const AUTH_TOTP_VERIFY_RATE_LIMIT = {
   windowMs: 15 * 60 * 1000,
-  maxRequests: 25,
+  maxRequests: 45,
   keyPrefix: "auth-totp-verify",
 } as const;
 
 /** Окно и лимит для публичной подачи заявки на регистрацию */
 export const REGISTRATION_REQUEST_RATE_LIMIT = {
   windowMs: 15 * 60 * 1000,
-  maxRequests: 10,
+  maxRequests: 20,
   keyPrefix: "reg-request",
 } as const;
 
@@ -61,26 +61,26 @@ export function getWebhookRateLimitOptions(): RateLimitOptions & { keyPrefix: st
 }
 
 const payIpDefaultMax =
-  typeof process !== "undefined" && process.env.NODE_ENV === "production" ? 60 : 2000;
+  typeof process !== "undefined" && process.env.NODE_ENV === "production" ? 120 : 2000;
 const paySlugDefaultMax =
-  typeof process !== "undefined" && process.env.NODE_ENV === "production" ? 30 : 2000;
+  typeof process !== "undefined" && process.env.NODE_ENV === "production" ? 80 : 2000;
 
-/** Окно и лимит для POST /api/pay/[slug] по IP (антифрод). В dev по умолчанию мягче; в prod — 60 без env. */
+/** Окно и лимит для POST /api/pay/[slug] по IP (антифрод). В dev по умолчанию мягче; в prod — 120 без env. */
 export const PAY_RATE_LIMIT_IP = {
   windowMs: 15 * 60 * 1000,
   maxRequests:
     typeof process !== "undefined" && process.env.PAY_RATE_LIMIT_IP_MAX !== undefined && process.env.PAY_RATE_LIMIT_IP_MAX !== ""
-    ? Math.max(10, parseInt(process.env.PAY_RATE_LIMIT_IP_MAX, 10) || 60)
+    ? Math.max(10, parseInt(process.env.PAY_RATE_LIMIT_IP_MAX, 10) || 120)
     : payIpDefaultMax,
   keyPrefix: "pay-ip",
 } as const;
 
-/** Окно и лимит для POST /api/pay/[slug] по slug. В prod по умолчанию 30 без env. */
+/** Окно и лимит для POST /api/pay/[slug] по slug. В prod по умолчанию 80 без env. */
 export const PAY_RATE_LIMIT_SLUG = {
   windowMs: 15 * 60 * 1000,
   maxRequests:
     typeof process !== "undefined" && process.env.PAY_RATE_LIMIT_SLUG_MAX !== undefined && process.env.PAY_RATE_LIMIT_SLUG_MAX !== ""
-    ? Math.max(10, parseInt(process.env.PAY_RATE_LIMIT_SLUG_MAX, 10) || 30)
+    ? Math.max(10, parseInt(process.env.PAY_RATE_LIMIT_SLUG_MAX, 10) || 80)
     : paySlugDefaultMax,
   keyPrefix: "pay-slug",
 } as const;
@@ -201,13 +201,37 @@ export function getClientIP(request: NextRequest): string {
 
 /**
  * IP для логов и ключ для rate limit за один проход по заголовкам.
- * При неизвестном IP ключ = unknown + хеш User-Agent (не один общий bucket).
+ * При неизвестном IP используем расширенный отпечаток клиента, чтобы не складывать
+ * много разных пользователей в один общий bucket.
  */
 export function getClientIpAndRateLimitKey(request: NextRequest): { ip: string; rateLimitKey: string } {
   const ip = getClientIP(request);
   if (ip !== "unknown") return { ip, rateLimitKey: ip };
   const ua = request.headers.get("user-agent") ?? "";
-  const suffix = createHash("sha256").update(ua, "utf8").digest("hex").slice(0, 16);
+  const acceptLanguage = request.headers.get("accept-language") ?? "";
+  const secChUa = request.headers.get("sec-ch-ua") ?? "";
+  const secChUaPlatform = request.headers.get("sec-ch-ua-platform") ?? "";
+  const cf = request.headers.get("cf-connecting-ip")?.trim() ?? "";
+  const trueClient = request.headers.get("true-client-ip")?.trim() ?? "";
+  const xff = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "";
+  const xRealIp = request.headers.get("x-real-ip")?.trim() ?? "";
+  const csrfToken = request.cookies.get("csrfToken")?.value ?? "";
+  const refreshToken = request.cookies.get("refreshToken")?.value ?? "";
+  const accessToken = request.cookies.get("accessToken")?.value ?? "";
+  const fingerprint = [
+    ua,
+    acceptLanguage,
+    secChUa,
+    secChUaPlatform,
+    cf,
+    trueClient,
+    xff,
+    xRealIp,
+    csrfToken,
+    refreshToken,
+    accessToken,
+  ].join("|");
+  const suffix = createHash("sha256").update(fingerprint, "utf8").digest("hex").slice(0, 24);
   return { ip, rateLimitKey: `unknown:${suffix}` };
 }
 

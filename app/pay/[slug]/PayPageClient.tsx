@@ -65,6 +65,16 @@ function toKopecks(rub: number): number {
   return Math.round(rub * 100);
 }
 
+function buildIdempotencyKey(slug: string): string {
+  const c = globalThis.crypto as { randomUUID?: () => string } | undefined;
+  if (c && typeof c.randomUUID === "function") {
+    return `pay-${slug}-${c.randomUUID()}`;
+  }
+  const ts = Date.now().toString(36);
+  const rnd = Math.random().toString(36).slice(2, 10);
+  return `pay-${slug}-${ts}-${rnd}`;
+}
+
 /** Сумма из `?amount=` в рублях; только если в допустимых границах платежа. */
 function parseLockedAmountKopFromSearch(searchParams: URLSearchParams): number | null {
   const raw = searchParams.get("amount");
@@ -224,7 +234,7 @@ export default function PayPageClient() {
     setResult(null);
     setResultError(null);
 
-    const idempotencyKey = `pay-${slug}-${crypto.randomUUID()}`;
+    const idempotencyKey = buildIdempotencyKey(slug);
     let leaveForPaygine = false;
 
     const commentTrim = comment.trim();

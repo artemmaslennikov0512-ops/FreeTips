@@ -164,6 +164,7 @@ export default function AdminUsersPage() {
 
       if (!res.ok) {
         setError("Ошибка загрузки пользователей");
+        setUsers([]);
         setUsersTotal(0);
         return;
       }
@@ -175,6 +176,7 @@ export default function AdminUsersPage() {
     } catch {
       if (requestSeq !== fetchRequestSeqRef.current) return;
       setError("Ошибка загрузки пользователей");
+      setUsers([]);
       setUsersTotal(0);
     } finally {
       if (requestSeq !== fetchRequestSeqRef.current) return;

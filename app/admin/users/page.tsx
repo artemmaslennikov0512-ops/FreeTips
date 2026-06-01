@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { Search, Copy, Check, Filter, ArrowUpDown, Lock, RefreshCw, ChevronUp, ChevronDown } from "lucide-react";
+import { Search, Copy, Check, Filter, ArrowUpDown, Lock, RefreshCw } from "lucide-react";
 import Link from "next/link";
 import { CustomDropdown } from "@/components/CustomDropdown";
 import { getBaseUrl } from "@/lib/get-base-url";
@@ -426,6 +426,10 @@ export default function AdminUsersPage() {
   }, [sortBy, sortOrder]);
 
   const isActiveSortColumn = useCallback((column: SortField) => sortBy === column, [sortBy]);
+  const renderSortMarker = useCallback((column: SortField) => {
+    if (!isActiveSortColumn(column)) return "↕";
+    return sortOrder === "desc" ? "↓" : "↑";
+  }, [isActiveSortColumn, sortOrder]);
   const handleSortByChange = useCallback((value: string) => {
     if (!SORT_FIELDS.includes(value as SortField)) return;
     setSortBy(value as SortField);
@@ -834,15 +838,8 @@ export default function AdminUsersPage() {
                   }`}
                 >
                   <span>Логин</span>
-                  <span className="inline-flex flex-col leading-none text-[#0a192f]">
-                    <ChevronUp
-                      className={`h-3 w-3 ${isActiveSortColumn("login") && sortOrder === "asc" ? "opacity-100" : "opacity-65"}`}
-                      aria-hidden
-                    />
-                    <ChevronDown
-                      className={`-mt-1 h-3 w-3 ${isActiveSortColumn("login") && sortOrder === "desc" ? "opacity-100" : "opacity-65"}`}
-                      aria-hidden
-                    />
+                  <span className="text-xs leading-none" aria-hidden>
+                    {renderSortMarker("login")}
                   </span>
                 </button>
               </th>
@@ -862,15 +859,8 @@ export default function AdminUsersPage() {
                   }`}
                 >
                   <span>Баланс</span>
-                  <span className="inline-flex flex-col leading-none text-[#0a192f]">
-                    <ChevronUp
-                      className={`h-3 w-3 ${isActiveSortColumn("balance") && sortOrder === "asc" ? "opacity-100" : "opacity-65"}`}
-                      aria-hidden
-                    />
-                    <ChevronDown
-                      className={`-mt-1 h-3 w-3 ${isActiveSortColumn("balance") && sortOrder === "desc" ? "opacity-100" : "opacity-65"}`}
-                      aria-hidden
-                    />
+                  <span className="text-xs leading-none" aria-hidden>
+                    {renderSortMarker("balance")}
                   </span>
                 </button>
               </th>
@@ -883,15 +873,8 @@ export default function AdminUsersPage() {
                   }`}
                 >
                   <span>Получено</span>
-                  <span className="inline-flex flex-col leading-none text-[#0a192f]">
-                    <ChevronUp
-                      className={`h-3 w-3 ${isActiveSortColumn("received") && sortOrder === "asc" ? "opacity-100" : "opacity-65"}`}
-                      aria-hidden
-                    />
-                    <ChevronDown
-                      className={`-mt-1 h-3 w-3 ${isActiveSortColumn("received") && sortOrder === "desc" ? "opacity-100" : "opacity-65"}`}
-                      aria-hidden
-                    />
+                  <span className="text-xs leading-none" aria-hidden>
+                    {renderSortMarker("received")}
                   </span>
                 </button>
               </th>
@@ -904,15 +887,8 @@ export default function AdminUsersPage() {
                   }`}
                 >
                   <span>Транзакции</span>
-                  <span className="inline-flex flex-col leading-none text-[#0a192f]">
-                    <ChevronUp
-                      className={`h-3 w-3 ${isActiveSortColumn("transactions") && sortOrder === "asc" ? "opacity-100" : "opacity-65"}`}
-                      aria-hidden
-                    />
-                    <ChevronDown
-                      className={`-mt-1 h-3 w-3 ${isActiveSortColumn("transactions") && sortOrder === "desc" ? "opacity-100" : "opacity-65"}`}
-                      aria-hidden
-                    />
+                  <span className="text-xs leading-none" aria-hidden>
+                    {renderSortMarker("transactions")}
                   </span>
                 </button>
               </th>
@@ -926,15 +902,8 @@ export default function AdminUsersPage() {
                   }`}
                 >
                   <span>Дата регистрации</span>
-                  <span className="inline-flex flex-col leading-none text-[#0a192f]">
-                    <ChevronUp
-                      className={`h-3 w-3 ${isActiveSortColumn("createdAt") && sortOrder === "asc" ? "opacity-100" : "opacity-65"}`}
-                      aria-hidden
-                    />
-                    <ChevronDown
-                      className={`-mt-1 h-3 w-3 ${isActiveSortColumn("createdAt") && sortOrder === "desc" ? "opacity-100" : "opacity-65"}`}
-                      aria-hidden
-                    />
+                  <span className="text-xs leading-none" aria-hidden>
+                    {renderSortMarker("createdAt")}
                   </span>
                 </button>
               </th>

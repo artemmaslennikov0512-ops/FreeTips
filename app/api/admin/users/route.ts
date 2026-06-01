@@ -117,13 +117,14 @@ export async function GET(request: NextRequest) {
   const total = await db.user.count({ where });
 
   if (statsSort) {
-    const statsSortColumn =
-      sortBy === "balance"
-        ? `"balance_kop"`
-        : sortBy === "received"
-          ? `"total_received_kop"`
-          : `"transactions_count"`;
     const statsSortDirection = sortOrder === "asc" ? "ASC" : "DESC";
+    const tieBreakDirection = statsSortDirection;
+    const statsSortExpression =
+      sortBy === "balance"
+        ? Prisma.sql`(COALESCE(tx.total_received_kop, 0) - COALESCE(completed.withdrawn_kop, 0))`
+        : sortBy === "received"
+          ? Prisma.sql`COALESCE(tx.total_received_kop, 0)`
+          : Prisma.sql`COALESCE(tx.transactions_count, 0)`;
     const sqlConditions: Prisma.Sql[] = [Prisma.sql`u.role <> ${UserRole.SUPERADMIN}`];
     if (roleFilter && validRoles.includes(roleFilter as (typeof validRoles)[number])) {
       sqlConditions.push(Prisma.sql`u.role = ${roleFilter as UserRole}`);
@@ -229,7 +230,7 @@ export async function GET(request: NextRequest) {
         FROM tip_links tl
         WHERE tl."userId" = fu.id
       ) tl ON TRUE
-      ORDER BY ${Prisma.raw(statsSortColumn)} ${Prisma.raw(statsSortDirection)}, fu.created_at DESC, fu.unique_id ASC
+      ORDER BY ${statsSortExpression} ${Prisma.raw(statsSortDirection)}, fu.created_at ${Prisma.raw(tieBreakDirection)}, fu.unique_id ASC
       LIMIT ${limit}
       OFFSET ${offset}
     `);

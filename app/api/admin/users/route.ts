@@ -117,14 +117,8 @@ export async function GET(request: NextRequest) {
   const total = await db.user.count({ where });
 
   if (statsSort) {
-    const statsSortDirection = sortOrder === "asc" ? "ASC" : "DESC";
-    const tieBreakDirection = statsSortDirection;
-    const statsSortColumnIndex =
-      sortBy === "balance"
-        ? "10" // balance_kop
-        : sortBy === "received"
-          ? "11" // total_received_kop
-          : "12"; // transactions_count
+    const sortByParam = sortBy;
+    const sortOrderParam = sortOrder;
     const sqlConditions: Prisma.Sql[] = [Prisma.sql`u.role <> ${UserRole.SUPERADMIN}`];
     if (roleFilter && validRoles.includes(roleFilter as (typeof validRoles)[number])) {
       sqlConditions.push(Prisma.sql`u.role = ${roleFilter as UserRole}`);
@@ -230,7 +224,34 @@ export async function GET(request: NextRequest) {
         FROM tip_links tl
         WHERE tl."userId" = fu.id
       ) tl ON TRUE
-      ORDER BY ${Prisma.raw(statsSortColumnIndex)} ${Prisma.raw(statsSortDirection)}, fu.created_at ${Prisma.raw(tieBreakDirection)}, fu.unique_id ASC
+      ORDER BY
+        CASE
+          WHEN ${sortByParam} = 'balance' AND ${sortOrderParam} = 'asc'
+          THEN (COALESCE(tx.total_received_kop, 0) - COALESCE(completed.withdrawn_kop, 0))
+        END ASC,
+        CASE
+          WHEN ${sortByParam} = 'balance' AND ${sortOrderParam} = 'desc'
+          THEN (COALESCE(tx.total_received_kop, 0) - COALESCE(completed.withdrawn_kop, 0))
+        END DESC,
+        CASE
+          WHEN ${sortByParam} = 'received' AND ${sortOrderParam} = 'asc'
+          THEN COALESCE(tx.total_received_kop, 0)
+        END ASC,
+        CASE
+          WHEN ${sortByParam} = 'received' AND ${sortOrderParam} = 'desc'
+          THEN COALESCE(tx.total_received_kop, 0)
+        END DESC,
+        CASE
+          WHEN ${sortByParam} = 'transactions' AND ${sortOrderParam} = 'asc'
+          THEN COALESCE(tx.transactions_count, 0)
+        END ASC,
+        CASE
+          WHEN ${sortByParam} = 'transactions' AND ${sortOrderParam} = 'desc'
+          THEN COALESCE(tx.transactions_count, 0)
+        END DESC,
+        CASE WHEN ${sortOrderParam} = 'asc' THEN fu.created_at END ASC,
+        CASE WHEN ${sortOrderParam} = 'desc' THEN fu.created_at END DESC,
+        fu.unique_id ASC
       LIMIT ${limit}
       OFFSET ${offset}
     `);

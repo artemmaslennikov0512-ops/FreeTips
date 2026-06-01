@@ -109,6 +109,7 @@ export default function PayPageClient() {
   /** 0 — не выбрано; при оплате добавляется строкой к комментарию для получателя. */
   const [tipRating, setTipRating] = useState(0);
   const [paying, setPaying] = useState(false);
+  const [autoPayStarted, setAutoPayStarted] = useState(false);
   const [result, setResult] = useState<"success" | "fail" | null>(null);
   const [resultError, setResultError] = useState<string | null>(null);
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
@@ -284,6 +285,27 @@ export default function PayPageClient() {
       if (!leaveForPaygine) setPaying(false);
     }
   };
+
+  useEffect(() => {
+    // Для ссылок с фиксированной суммой (`?amount=`) запускаем оплату сразу,
+    // чтобы не показывать промежуточный шаг с кнопкой.
+    if (lockedAmountKop == null) return;
+    if (loading || paying || autoPayStarted) return;
+    if (tidFromUrl || urlOutcome) return;
+    if (!acceptPayments) return;
+
+    setAutoPayStarted(true);
+    void handlePay();
+  }, [
+    acceptPayments,
+    autoPayStarted,
+    handlePay,
+    loading,
+    lockedAmountKop,
+    paying,
+    tidFromUrl,
+    urlOutcome,
+  ]);
 
   const payReturnFail = urlOutcome === "fail" || (urlOutcome === "success" && settlementPhase === "fail");
 

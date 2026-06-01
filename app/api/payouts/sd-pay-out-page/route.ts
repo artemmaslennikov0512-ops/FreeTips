@@ -22,6 +22,14 @@ import { observePayoutVelocityAfterCreate } from "@/lib/fraud-velocity-observe";
 import { logInfo } from "@/lib/logger";
 import { payoutSelfServiceVerificationError } from "@/lib/payout-verification-guard";
 const CURRENCY_RUB = 643;
+const DEFAULT_REJECTED_CARD_COOLDOWN_MIN = 15;
+
+function getRejectedCardCooldownMs(): number {
+  const raw = process.env.PAYOUT_REJECTED_CARD_COOLDOWN_MIN?.trim();
+  const n = raw ? Number(raw) : DEFAULT_REJECTED_CARD_COOLDOWN_MIN;
+  const minutes = Number.isFinite(n) && n >= 0 && n <= 240 ? n : DEFAULT_REJECTED_CARD_COOLDOWN_MIN;
+  return Math.round(minutes * 60_000);
+}
 
 function buildReceiptCardMask(raw: string): string | null {
   const digits = String(raw).replace(/\D/g, "").slice(0, 19);
@@ -60,6 +68,32 @@ export async function POST(request: NextRequest) {
       { error: "Укажите номер карты для чека" },
       { status: 400 },
     );
+  }
+  const rejectedCardCooldownMs = getRejectedCardCooldownMs();
+  if (rejectedCardCooldownMs > 0) {
+    const cooldownFrom = new Date(Date.now() - rejectedCardCooldownMs);
+    const recentRejectedWithSameCard = await db.payoutRequest.findFirst({
+      where: {
+        userId: auth.userId,
+        status: "REJECTED",
+        updatedAt: { gte: cooldownFrom },
+        details: { contains: `Карта: ${cardMask}` },
+      },
+      select: { updatedAt: true },
+      orderBy: { updatedAt: "desc" },
+    });
+    if (recentRejectedWithSameCard) {
+      const untilTs = recentRejectedWithSameCard.updatedAt.getTime() + rejectedCardCooldownMs;
+      const leftMs = Math.max(0, untilTs - Date.now());
+      const leftMin = Math.max(1, Math.ceil(leftMs / 60_000));
+      return NextResponse.json(
+        {
+          error: `После отклонения вывода на эту карту повторная попытка доступна через ${leftMin} мин`,
+          code: "CARD_RETRY_COOLDOWN",
+        },
+        { status: 429 },
+      );
+    }
   }
 
   const amountBigInt = BigInt(Math.round(amountKop));
